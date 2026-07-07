@@ -1,14 +1,15 @@
-# FireVault Build 0.29.0 — Settings Tabs
+# FireVault Build 0.30.0 — Modular Resource Library
 
 Root-level package for GitHub Pages.
 
 ## Changes
-- Settings page cleaned up with section tabs
-- Tabs: Tech, Photo, Alerts, Reports, PDF, Email, App, Backup
-- Keeps the modular architecture from Build 0.28.0
-- Core site and photo features preserved
-- JSON backup retained
+- Restores editable Resource Library in the modular app
+- Add/Edit/Delete manufacturer resources
+- Resource search
+- Manual URL/link field
+- Panel/topic notes
+- Existing resource data preserved
 
 Suggested commit:
 
-`Build 0.29.0 settings tabs`
+`Build 0.30.0 modular resource library`

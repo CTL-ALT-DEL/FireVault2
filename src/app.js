@@ -25,7 +25,7 @@ function route(v){ view = v; mode = null; render(); }
 
 function render(){
   try{
-    const routes = {home, sites, siteDetail, siteForm, docs, docForm, imageViewer, library, settings, diagnostics};
+    const routes = {home, sites, siteDetail, siteForm, docs, docForm, imageViewer, library, resourceForm, settings, diagnostics};
     (routes[view] || home)();
     setActiveNav();
   }catch(err){
@@ -221,7 +221,64 @@ function imageViewer(){
 }
 
 function library(){
-  html(`<div class="screen"><h1>Library</h1><p>Resource Library module will be rebuilt next.</p><div class="card grow"><p>Existing resources are preserved in storage.</p></div></div>`);
+  html(`<div class="screen">
+    <div class="row"><div><h1>Library</h1><p>Manufacturer resources, panel notes, links, and cheat sheets.</p></div><button class="primary" id="addResource">＋ Add</button></div>
+    <input id="resourceSearch" placeholder="Search manufacturer, panel, trouble code, note, link...">
+    <div id="resourceList" class="list grow"></div>
+  </div>`);
+  document.getElementById("addResource").onclick = () => { mode=null; view="resourceForm"; render(); };
+  document.getElementById("resourceSearch").oninput = drawResourceList;
+  drawResourceList();
+}
+
+function drawResourceList(){
+  const q = (document.getElementById("resourceSearch")?.value || "").toLowerCase();
+  const list = (data.resources || []).map((r,idx)=>({...r,idx})).filter(r => JSON.stringify(r).toLowerCase().includes(q));
+  const box = document.getElementById("resourceList");
+  box.innerHTML = list.length ? list.map(r => `<div class="card docLine">
+    <div class="row"><h2>${esc(r.m || r.manufacturer || "Resource")}</h2><button class="ghost editResource" data-idx="${r.idx}">Edit</button></div>
+    <p><strong>${esc(r.panel || r.t || "General")}</strong></p>
+    <p>${esc(r.n || r.notes || "")}</p>
+    ${r.url ? `<a class="btn ghost" href="${esc(r.url)}" target="_blank">Open Link</a>` : ""}
+  </div>`).join("") : `<div class="empty">No resources yet. Add a manufacturer or panel note.</div>`;
+  document.querySelectorAll(".editResource").forEach(btn => btn.onclick = () => {
+    mode = Number(btn.dataset.idx);
+    view = "resourceForm";
+    render();
+  });
+}
+
+function resourceForm(){
+  const editing = Number.isInteger(mode);
+  const r = editing ? (data.resources[mode] || {}) : {};
+  html(`<div class="screen">
+    <div class="row"><button class="back ghost" id="backLibrary">←</button><h1>${editing ? "Edit Resource" : "Add Resource"}</h1></div>
+    <div class="form grow">
+      <label>Manufacturer</label><input id="resMake" value="${esc(r.m || r.manufacturer)}" placeholder="Fire-Lite, Notifier, EST...">
+      <label>Panel / Topic</label><input id="resPanel" value="${esc(r.panel || r.t)}" placeholder="ES-200X, EST4, Ground Faults...">
+      <label>URL / Manual Link</label><input id="resUrl" value="${esc(r.url)}" placeholder="Optional link to manual or reference">
+      <label>Notes / Cheat Sheet</label><textarea id="resNotes" placeholder="Programming notes, reset steps, trouble code tips...">${esc(r.n || r.notes)}</textarea>
+    </div>
+    <div class="grid2"><button class="primary" id="saveResource">Save Resource</button>${editing ? `<button class="danger" id="deleteResource">Delete</button>` : `<button class="ghost" id="cancelResource">Cancel</button>`}</div>
+  </div>`);
+  document.getElementById("backLibrary").onclick = () => route("library");
+  document.getElementById("cancelResource")?.addEventListener("click", () => route("library"));
+  document.getElementById("saveResource").onclick = () => {
+    const obj = {m:val("resMake") || "Unknown Manufacturer", panel:val("resPanel"), url:val("resUrl"), n:val("resNotes"), updatedAt:new Date().toISOString()};
+    data.resources = Array.isArray(data.resources) ? data.resources : [];
+    if(editing){
+      data.resources[mode] = {...data.resources[mode], ...obj};
+    }else{
+      data.resources.unshift({...obj, id:uid(), createdAt:new Date().toISOString()});
+    }
+    save(); mode=null; route("library");
+  };
+  document.getElementById("deleteResource")?.addEventListener("click", () => {
+    if(confirm("Delete this resource?")){
+      data.resources.splice(mode,1);
+      save(); mode=null; route("library");
+    }
+  });
 }
 
 function settings(){
@@ -408,18 +465,19 @@ function exportJson(){
   const blob = new Blob([JSON.stringify(data,null,2)], {type:"application/json"});
   const a = document.createElement("a");
   a.href = URL.createObjectURL(blob);
-  a.download = "firevault-backup-build-0.29.0.json";
+  a.download = "firevault-backup-build-0.30.0.json";
   a.click();
 }
 
 function showChangelog(){
   alert(`FireVault Build ${BUILD}
 
-- Settings page cleaned up with section tabs
-- Tech, Photo, Alerts, Reports, PDF, Email, App, Backup
-- Smaller modular update
-- Core photo/site features preserved
-- JSON backup retained`);
+- Modular Resource Library restored
+- Add/Edit/Delete manufacturer resources
+- Search resources
+- Manual URL/link field
+- Panel/topic notes
+- Existing resource data preserved`);
 }
 
 render();
