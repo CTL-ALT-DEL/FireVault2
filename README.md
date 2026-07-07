@@ -1,15 +1,16 @@
-# FireVault Build 0.43.5
+# FireVault Build 0.43.6
 
-Dashboard cleanup build.
+Build 0.43.6 adds Field Snapshot sharing/copy tools for faster service handoff from a site record.
 
-## Updated
+## Highlights
 
-- Removed the large Library button from the main dashboard.
-- Removed the large Settings button from the main dashboard.
-- Library and Settings remain available in the lower navigation bar.
-- Dashboard now focuses on field actions: Add Site, GPS / Maps, Nearby Sites, Attention Queue, and Diagnostics.
-- Preserved Site Health, Attention Queue, Site Finder, Documents / Links Vault, Contacts & Access Vault, Equipment Vault, GPS/Nearby, Task Center, Visit Log, haptics, map tools, refined 3D controls, and the Loading FireVault boot watchdog.
+- Added **Field Snapshot** on Site Detail.
+- Added a **Snapshot** tile beside Report.
+- Snapshot includes address, panel details, site health, GPS/maps, contacts/access, open tasks, deficiencies, equipment attention, documents, and site notes.
+- Uses native share where available and falls back to clipboard copy.
+- Preserves the dashboard cleanup from 0.43.5.
+- Preserves the Loading FireVault boot watchdog, refined 3D controls, GPS/Nearby Sites, Task Center, Visit Log, Equipment Vault, Contacts & Access Vault, Documents / Links Vault, and Attention Queue.
 
 ## Install
 
-Copy the contents of this ZIP into the GitHub Pages project root. Do not copy the enclosing folder itself.
+Copy the contents of this ZIP into the GitHub Pages project root. Do not commit nested `firevault-build-*` folders.

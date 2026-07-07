@@ -822,7 +822,24 @@ nav button:active{transform:translateY(1px) scale(.992)}
 @media(max-width:430px){.attentionHero{grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}.attentionTop h2{font-size:16px}.attentionLine{font-size:12.5px}.attentionMini{grid-template-columns:1fr}.attentionMini span{text-align:left}.smallScore{min-width:48px}}
 
 
-/* Build 0.43.5 dashboard cleanup */
+/* Build 0.43.6 dashboard cleanup */
 .homeActionGrid{align-items:stretch}
 .homeActionGrid .tile{min-height:76px}
 @media (max-width:520px){.homeActionGrid{gap:10px}.homeActionGrid .tile{min-height:70px}}
+
+
+/* Build 0.43.6 field snapshot */
+.snapshotCard{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  padding:14px;
+}
+.snapshotCard h2{margin:0 0 4px;font-size:1rem;}
+.snapshotCard p{margin:0;color:var(--muted);font-size:.9rem;line-height:1.35;}
+.snapshotTile strong{letter-spacing:.01em;}
+@media (max-width:560px){
+  .snapshotCard{align-items:stretch;flex-direction:column;}
+  .snapshotCard .smallBtn{width:100%;}
+}
