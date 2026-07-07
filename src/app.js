@@ -1308,8 +1308,8 @@ function settings(){
         <button class="ghost iconBtn settingsInfoBtn" id="diagBtn" title="Diagnostics" aria-label="Diagnostics">ⓘ</button>
       </div>
       <div class="settingsChoiceGrid451 grow" aria-label="Settings choices">
-        ${tabs.map((t,i)=>`<button class="settingsChoice451" data-tab="${t[0]}"><span class="settingsChoiceIcon451">${["👤","⌖","▤","✉","▧","◐","⚡","⇅","ⓘ"][i]}</span><strong>${t[1]}</strong><small>${t[2]}</small><b>Open →</b></button>`).join("")}
-        <button class="settingsChoice451 settingsChoiceUtility451" id="diagnosticsChoice"><span class="settingsChoiceIcon451">⌁</span><strong>Diagnostics</strong><small>Build, storage, GPS, module, task, report, and vault health details.</small><b>Open →</b></button>
+        ${tabs.map((t,i)=>`<button class="settingsChoice451 settingsChoice455" data-tab="${t[0]}"><span class="settingsChoiceTitle455"><span class="settingsChoiceIcon451">${["👤","⌖","▤","✉","▧","◐","⚡","⇅","ⓘ"][i]}</span><strong>${t[1]}</strong></span><small>${t[2]}</small><span class="settingsChoiceArrow455">›</span></button>`).join("")}
+        <button class="settingsChoice451 settingsChoice455 settingsChoiceUtility451" id="diagnosticsChoice"><span class="settingsChoiceTitle455"><span class="settingsChoiceIcon451">⌁</span><strong>Diagnostics</strong></span><small>Build, storage, GPS, module, task, report, and vault health details.</small><span class="settingsChoiceArrow455">›</span></button>
       </div>
     </div>`);
     document.querySelectorAll(".settingsChoice451[data-tab]").forEach(b=>b.onclick=()=>{ settingsTab=b.dataset.tab; mode="settingsDetail"; settings(); });
