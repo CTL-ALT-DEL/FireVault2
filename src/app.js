@@ -7,6 +7,7 @@ let mode = null;
 let settingsTab = "tech";
 let activeJob = loadActiveJob();
 let jobTimer = null;
+const QUICK_EVENTS = ["Arrived on site","Opened panel","Panel normal","Trouble active","Ground fault active","Device tested","Customer update","Parts needed"];
 const appEl = document.getElementById("app");
 const themePresets = {
   "firevault-dark": {label:"FireVault Dark", accentColor:"#ef4444"},
@@ -92,6 +93,19 @@ function saveActiveJob(){ activeJob ? localStorage.setItem(ACTIVE_JOB_KEY, JSON.
 function fmtDate(d=new Date()){ return d.toLocaleDateString([], {month:"short", day:"numeric", year:"numeric"}); }
 function todayIso(){ return new Date().toISOString().slice(0,10); }
 function elapsedText(startIso){ const ms=Date.now()-new Date(startIso).getTime(); const h=Math.floor(ms/3600000); const m=Math.floor((ms%3600000)/60000); const s=Math.floor((ms%60000)/1000); return h?`${h}:${String(m).padStart(2,"0")}:${String(s).padStart(2,"0")}`:`${m}:${String(s).padStart(2,"0")}`; }
+function durationText(startIso,endIso){
+  if(!startIso || !endIso) return "Duration not saved";
+  const ms=Math.max(0,new Date(endIso).getTime()-new Date(startIso).getTime());
+  const h=Math.floor(ms/3600000), m=Math.floor((ms%3600000)/60000);
+  return h ? `${h}h ${m}m` : `${m}m`;
+}
+function eventTime(iso){ return new Date(iso).toLocaleTimeString([], {hour:"numeric", minute:"2-digit"}); }
+function addJobEvent(note){
+  if(!activeJob) return;
+  activeJob.events = Array.isArray(activeJob.events) ? activeJob.events : [];
+  activeJob.events.unshift({time:new Date().toISOString(), note});
+  saveActiveJob();
+}
 function startJobTimer(){ stopJobTimer(); jobTimer=setInterval(()=>{ const el=document.getElementById("jobElapsed"); if(el && activeJob) el.textContent=elapsedText(activeJob.startedAt); },1000); }
 function stopJobTimer(){ if(jobTimer){ clearInterval(jobTimer); jobTimer=null; } }
 function setActiveNav(){ document.querySelectorAll("nav button").forEach(b=>b.classList.remove("active")); const section=["siteDetail","siteForm","tasks","taskForm","deficiencies","deficiencyForm","report","jobMode"].includes(view)?"sites":view; document.getElementById("nav-"+section)?.classList.add("active"); }
@@ -129,7 +143,7 @@ function home(){
       <button class="ghost tile" id="diagBtn"><strong>Diagnostics</strong><span>Build status</span></button>
     </div>
     ${activeJob ? `<div class="card activeJobMini"><div class="row"><div><h2>Service Call Active</h2><p>${esc(activeJob.siteName)} • <span id="jobElapsed">${elapsedText(activeJob.startedAt)}</span></p></div><button class="primary" id="resumeJobBtn">Open</button></div></div>` : ""}
-    <div class="card grow"><h2>Build 0.41.4</h2><p>Stable GPS restore build on the confirmed-good rollback baseline.</p><p>GPS tools are restored without reintroducing the bad 0.41.0 service-call changes. Builds 0.41.0, 0.41.1, and 0.41.2 should still be skipped.</p></div>
+    <div class="card grow"><h2>Build 0.41.5</h2><p>Service Visit Lite build on the confirmed-good 0.41.4 GPS baseline.</p><p>Quick service-call event chips and recent visit history are restored carefully without the bad 0.41.0 startup changes.</p></div>
   </div>`);
   document.getElementById("sitesCard").onclick=()=>route("sites");
   document.getElementById("tasksCard").onclick=()=>{selectedSiteId=null; route("tasks");};
@@ -161,6 +175,7 @@ function siteDetail(){
       <button class="ghost tile" id="defBtn"><strong>${def}</strong><span>Deficiencies</span></button>
     </div>
     <div class="card gpsCard"><div class="row"><div><h2>GPS / Maps</h2><p>${esc(gpsLine(s))}</p></div>${data.settings.gps?.enabled===false?"":`<button id="captureGpsBtn" class="primary smallBtn">Capture GPS</button>`}</div><div class="mapActions"><button id="appleBtn" class="ghost">Apple Maps</button><button id="googleBtn" class="ghost">Google Maps</button></div></div>
+    <div class="card recentVisitsCard"><div class="row"><div><h2>Recent Visits</h2><p>${(s.visits||[]).length ? `${(s.visits||[]).length} saved visit${(s.visits||[]).length===1?"":"s"}` : "No completed visits yet."}</p></div></div>${(s.visits||[]).slice(0,3).map(v=>`<div class="visitMini"><strong>${esc(v.date || fmtDate(new Date(v.startedAt||Date.now())))}</strong><span>${esc(durationText(v.startedAt,v.endedAt))}</span><p>${esc((v.notes||"").split("\n").slice(0,2).join(" • ") || "No visit notes saved.")}</p></div>`).join("")}</div>
     <div class="card grow"><h2>Site Notes</h2><p>${esc(s.notes || "No notes entered.")}</p></div>
   </div>`);
   document.getElementById("backBtn").onclick=()=>route("sites");
@@ -239,8 +254,36 @@ function report(){ const s=site(); if(!s){route("sites"); return;} const txt=rep
 function library(){ html(`<div class="screen"><div class="row"><h1>Library</h1><button class="primary" id="addBtn">＋</button></div><div class="list grow">${data.resources.length?data.resources.map(r=>`<div class="card docLine siteItem" data-id="${r.id}"><h2>${esc(r.m||"Resource")}</h2><p>${esc(r.n||"")}</p><p>${esc(r.url||"")}</p></div>`).join(""):`<div class="empty">No resources yet.</div>`}</div></div>`); document.getElementById("addBtn").onclick=()=>{mode=null; route("resourceForm");}; document.querySelectorAll(".siteItem").forEach(el=>el.onclick=()=>{mode=el.dataset.id; route("resourceForm");}); }
 function resourceForm(){ const r=mode?data.resources.find(x=>x.id===mode):{}; html(`<div class="screen"><div class="row"><button class="back ghost" id="backBtn">←</button><h1>${mode?"Edit":"Add"} Resource</h1></div><div class="form grow"><div class="card"><label>Manufacturer</label><input id="m" value="${esc(r.m||"")}"><label>Name / Model</label><input id="n" value="${esc(r.n||"")}"><label>URL / Notes</label><textarea id="url">${esc(r.url||"")}</textarea></div><button class="primary" id="saveBtn">Save Resource</button>${mode?`<button class="danger" id="delBtn">Delete Resource</button>`:""}</div></div>`); document.getElementById("backBtn").onclick=()=>route("library"); document.getElementById("saveBtn").onclick=()=>{const obj={m:val("m"),n:val("n"),url:raw("url")}; if(mode) Object.assign(r,obj); else data.resources.unshift({...obj,id:uid()}); save(); route("library");}; const del=document.getElementById("delBtn"); if(del) del.onclick=()=>{data.resources=data.resources.filter(x=>x.id!==mode); save(); route("library");}; }
 
-function startJob(){ const s=site(); activeJob={siteId:s.id,siteName:s.name,startedAt:new Date().toISOString(),events:[{time:new Date().toISOString(),note:"Job started"}]}; saveActiveJob(); route("jobMode"); }
-function jobMode(){ const s=site(); if(!s||!activeJob){route("siteDetail"); return;} html(`<div class="screen"><div class="row"><button class="back ghost" id="backBtn">←</button><h1>Job Mode</h1></div><div class="card"><h2>${esc(s.name)}</h2><div class="timer" id="jobElapsed">${elapsedText(activeJob.startedAt)}</div></div><div class="grid2"><button class="ghost" id="noteBtn">Add Event</button><button class="primary" id="finishBtn">Finish Visit</button></div><div class="list grow">${(activeJob.events||[]).map(e=>`<div class="card visit"><strong>${new Date(e.time).toLocaleTimeString([], {hour:"numeric",minute:"2-digit"})}</strong><p>${esc(e.note)}</p></div>`).join("")}</div></div>`); document.getElementById("backBtn").onclick=()=>route("siteDetail"); document.getElementById("noteBtn").onclick=()=>{const note=prompt("Event note:","Checked panel"); if(note){activeJob.events.unshift({time:new Date().toISOString(),note}); saveActiveJob(); render();}}; document.getElementById("finishBtn").onclick=()=>{s.visits=s.visits||[]; s.visits.unshift({id:uid(),date:todayIso(),startedAt:activeJob.startedAt,endedAt:new Date().toISOString(),notes:(activeJob.events||[]).map(e=>`${new Date(e.time).toLocaleTimeString([], {hour:"numeric",minute:"2-digit"})} - ${e.note}`).join("\n")}); activeJob=null; saveActiveJob(); save(); toast("Visit saved."); route("siteDetail");}; }
+function startJob(){
+  const s=site();
+  if(!s) return;
+  if(activeJob && activeJob.siteId !== s.id){
+    if(!confirm(`A service call is already active for ${activeJob.siteName}. Replace it with this site?`)) return;
+  }
+  if(activeJob && activeJob.siteId === s.id){ route("jobMode"); return; }
+  activeJob={siteId:s.id,siteName:s.name,startedAt:new Date().toISOString(),events:[{time:new Date().toISOString(),note:"Job started"}]};
+  saveActiveJob(); route("jobMode");
+}
+function jobMode(){
+  const s=site();
+  if(!s||!activeJob){route("siteDetail"); return;}
+  const events = Array.isArray(activeJob.events) ? activeJob.events : [];
+  html(`<div class="screen serviceCallScreen"><div class="row"><button class="back ghost" id="backBtn">←</button><h1>Job Mode</h1></div>
+    <div class="card serviceTimerCard"><h2>${esc(s.name)}</h2><div class="timer" id="jobElapsed">${elapsedText(activeJob.startedAt)}</div><p>Started ${esc(eventTime(activeJob.startedAt))}</p></div>
+    <div class="card quickEventCard"><h2>Quick Events</h2><div class="quickEventGrid">${QUICK_EVENTS.map(q=>`<button class="ghost quickEventBtn" data-note="${esc(q)}">${esc(q)}</button>`).join("")}</div></div>
+    <div class="grid2"><button class="ghost" id="noteBtn">Custom Event</button><button class="primary" id="finishBtn">Finish Visit</button></div>
+    <div class="list grow serviceEventList">${events.length?events.map(e=>`<div class="card visit"><strong>${esc(eventTime(e.time))}</strong><p>${esc(e.note)}</p></div>`).join(""):`<div class="empty">No events yet.</div>`}</div>
+  </div>`);
+  document.getElementById("backBtn").onclick=()=>route("siteDetail");
+  document.querySelectorAll(".quickEventBtn").forEach(b=>b.onclick=()=>{addJobEvent(b.dataset.note); render();});
+  document.getElementById("noteBtn").onclick=()=>{const note=prompt("Event note:","Checked panel"); if(note){addJobEvent(note); render();}};
+  document.getElementById("finishBtn").onclick=()=>{
+    s.visits=s.visits||[];
+    const endedAt=new Date().toISOString();
+    s.visits.unshift({id:uid(),date:todayIso(),startedAt:activeJob.startedAt,endedAt,notes:(activeJob.events||[]).map(e=>`${eventTime(e.time)} - ${e.note}`).join("\n")});
+    activeJob=null; saveActiveJob(); save(); toast("Visit saved."); route("siteDetail");
+  };
+}
 
 function settings(){
   const tabs=[
@@ -297,22 +340,22 @@ function saveSettings(){
   save(); toast("Settings saved."); settings();
 }
 
-function diagnostics(){ const totalTasks=data.sites.reduce((n,s)=>n+(s.tasks||[]).length,0); const totalDef=data.sites.reduce((n,s)=>n+(s.deficiencies||[]).length,0); html(`<div class="screen"><div class="row"><button class="back ghost" id="backHome">←</button><h1>Diagnostics</h1></div><div class="card grow errorBox"><p>Build: ${BUILD}</p><p>Sites: ${data.sites.length}</p><p>Total Tasks: ${totalTasks}</p><p>Total Deficiencies: ${totalDef}</p><p>Active Job: ${activeJob ? esc(activeJob.siteName) : "None"}</p><p>Current Theme: ${esc(data.settings.theme.name)}</p><p>Accent: ${esc(data.settings.theme.accentColor)}</p><p>Advanced AI Enabled: ${data.settings.advanced?.aiTechnician ? "Yes" : "No"}</p><p>GPS Tools: ${data.settings.gps?.enabled !== false ? "Enabled" : "Hidden"}</p><p>Import/Export: Ready</p><p>Storage key: ${KEY}</p><p>Modules loaded successfully.</p></div></div>`); document.getElementById("backHome").onclick=()=>route("home"); }
+function diagnostics(){ const totalTasks=data.sites.reduce((n,s)=>n+(s.tasks||[]).length,0); const totalDef=data.sites.reduce((n,s)=>n+(s.deficiencies||[]).length,0); const totalVisits=data.sites.reduce((n,s)=>n+(s.visits||[]).length,0); html(`<div class="screen"><div class="row"><button class="back ghost" id="backHome">←</button><h1>Diagnostics</h1></div><div class="card grow errorBox"><p>Build: ${BUILD}</p><p>Sites: ${data.sites.length}</p><p>Total Tasks: ${totalTasks}</p><p>Total Deficiencies: ${totalDef}</p><p>Total Visits: ${totalVisits}</p><p>Active Job: ${activeJob ? esc(activeJob.siteName) : "None"}</p><p>Current Theme: ${esc(data.settings.theme.name)}</p><p>Accent: ${esc(data.settings.theme.accentColor)}</p><p>Advanced AI Enabled: ${data.settings.advanced?.aiTechnician ? "Yes" : "No"}</p><p>GPS Tools: ${data.settings.gps?.enabled !== false ? "Enabled" : "Hidden"}</p><p>Import/Export: Ready</p><p>Storage key: ${KEY}</p><p>Modules loaded successfully.</p></div></div>`); document.getElementById("backHome").onclick=()=>route("home"); }
 function showChangelog(){
   const notes = [
-    "Build number advanced to 0.41.4 across the header, dashboard, manifest, and diagnostics.",
-    "Kept the stable 0.41.3 rollback core and did not reintroduce the bad 0.41.0 service-call changes.",
-    "Restored GPS capture on saved site detail pages.",
-    "Added GPS coordinate fields and Capture button to Add/Edit Site.",
-    "Apple Maps and Google Maps now prefer saved coordinates when available.",
-    "Added a GPS Settings tab with map provider and report controls.",
-    "Reports now include GPS coordinates and a map link."
+    "Build number advanced to 0.41.5 across the header, dashboard, manifest, and diagnostics.",
+    "Started from the confirmed-good 0.41.4 GPS baseline.",
+    "Restored service-call quick event chips in a smaller safe Job Mode module.",
+    "Added a Recent Visits card to Site Detail.",
+    "Reports now include the latest saved visit history.",
+    "Diagnostics now count saved visits.",
+    "Kept GPS tools and the minimalist Settings pill-tab layout."
   ];
   const overlay=document.createElement("div");
   overlay.className="releaseOverlay";
   overlay.innerHTML=`<div class="releaseSheet" role="dialog" aria-modal="true" aria-label="FireVault release notes">
     <div class="releaseHead"><div><strong>FireVault</strong><span>Build ${BUILD}</span></div><button class="ghost iconBtn" id="closeRelease" aria-label="Close release notes">×</button></div>
-    <div class="releaseBody"><h2>Release Notes</h2><p class="releaseIntro">Stable GPS restore on the 0.41.3 rollback baseline.</p><ul>${notes.map(n=>`<li>${esc(n)}</li>`).join("")}</ul></div>
+    <div class="releaseBody"><h2>Release Notes</h2><p class="releaseIntro">Service Visit Lite on the confirmed-good 0.41.4 GPS baseline.</p><ul>${notes.map(n=>`<li>${esc(n)}</li>`).join("")}</ul></div>
   </div>`;
   document.body.appendChild(overlay);
   const close=()=>overlay.remove();

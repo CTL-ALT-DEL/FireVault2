@@ -1,21 +1,23 @@
-# FireVault Build 0.41.4
+# FireVault Build 0.41.5
 
-Stable GPS restore build.
+Service Visit Lite build.
 
 ## Baseline
 
-This build starts from the confirmed-working 0.41.3 stable rollback. It does not reintroduce the 0.41.0 service-call quick-event changes that caused startup failures.
+This build starts from the confirmed-working 0.41.4 stable GPS restore. It does not reuse the bad 0.41.0 service-call implementation.
 
 ## Included
 
 - Clean root package.
-- Visible version advanced to 0.41.4.
-- GPS capture restored on Site Detail.
-- GPS coordinate fields added to Add/Edit Site.
-- Apple Maps and Google Maps prefer saved GPS coordinates when available.
-- GPS Settings tab added for map provider, accuracy mode, visibility, and report inclusion.
-- Reports include GPS coordinates and a map link.
-- Minimalist Settings pill tabs retained with readable 0.41.3 spacing.
+- Visible version advanced to 0.41.5.
+- Job Mode now has safe quick-event chips.
+- Added quick events: Arrived on site, Opened panel, Panel normal, Trouble active, Ground fault active, Device tested, Customer update, Parts needed.
+- Added a Recent Visits card on Site Detail.
+- Finished visits save start time, end time, duration, and event notes.
+- Reports include latest saved visit history.
+- Diagnostics now count saved visits.
+- GPS capture and GPS settings retained from 0.41.4.
+- Minimalist Settings pill tabs retained.
 - Selected #8 Flame Icon retained.
 - Existing storage key retained: firevault_vault_build_030.
 

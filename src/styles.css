@@ -193,3 +193,22 @@ nav{min-height:var(--navH);position:fixed;bottom:0;left:0;right:0;display:grid;g
 .gpsEditCard .fieldNote{margin-top:8px;color:var(--muted)}
 .settingsContent409 .gpsSettingsPane .fieldNote{display:block;margin-top:8px;font-size:12px;line-height:1.35;color:var(--muted)}
 @media(max-width:430px){.gpsCard .row,.gpsEditCard .row{gap:8px}.gpsCard .row{align-items:flex-start}.gpsCard .smallBtn{padding:7px 10px}.gpsCard p{font-size:12px}.gpsEditCard h2{font-size:15px}}
+
+/* Build 0.41.5 Service Visit Lite */
+.serviceCallScreen{gap:10px}
+.serviceTimerCard{border-left-color:var(--accent)}
+.serviceTimerCard h2{margin-bottom:4px}
+.serviceTimerCard p{color:var(--muted);font-size:12px;margin-top:4px}
+.quickEventCard{padding:12px;border-left-color:var(--cyan)}
+.quickEventCard h2{font-size:16px;margin:0 0 9px}
+.quickEventGrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}
+.quickEventBtn{min-height:38px;padding:8px 9px;border-radius:12px;font-size:12px;font-weight:800;text-align:left;justify-content:flex-start}
+.serviceEventList .visit{padding:10px 12px}
+.recentVisitsCard{border-left-color:var(--cyan)}
+.recentVisitsCard h2{margin:0}
+.recentVisitsCard .row p{color:var(--muted);font-size:12px;margin-top:2px}
+.visitMini{border-top:1px solid rgba(255,255,255,.075);padding:9px 0 0;margin-top:9px;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:3px 8px;align-items:center}
+.visitMini strong{font-size:13px;line-height:1.2}
+.visitMini span{font-size:12px;color:var(--muted);white-space:nowrap}
+.visitMini p{grid-column:1/-1;font-size:12px;line-height:1.35;color:var(--muted);margin:0;word-break:break-word}
+@media(max-width:430px){.quickEventGrid{grid-template-columns:1fr}.quickEventBtn{min-height:36px;font-size:12px}.visitMini{grid-template-columns:1fr}.visitMini span{white-space:normal}.quickEventCard{padding:10px}}
