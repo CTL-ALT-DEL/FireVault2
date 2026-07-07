@@ -35,7 +35,7 @@ nav button{background:transparent;border:0;color:var(--muted);display:flex;flex-
 </style>
 </head>
 <body>
-<header><div class="brand"><div class="logo">🔥</div><div>FIREVAULT</div></div><button class="build" onclick="showChangelog()">Build 0.25.3</button></header>
+<header><div class="brand"><div class="logo">🔥</div><div>FIREVAULT</div></div><button class="build" onclick="showChangelog()">Build 0.26.0</button></header>
 <main id="app"></main>
 <nav>
 <button id="nav-home" onclick="go('home')"><span>🏠</span><span>Today</span></button>
@@ -44,73 +44,99 @@ nav button{background:transparent;border:0;color:var(--muted);display:flex;flex-
 <button id="nav-settings" onclick="go('settings')"><span>⚙️</span><span>Settings</span></button>
 </nav>
 <script>
-const BUILD="0.25.3"; const KEY="firevault_vault_build_030"; const ACTIVE="firevault_active_job_080";
+const BUILD="0.26.0"; const KEY="firevault_vault_build_030"; const ACTIVE="firevault_active_job_080";
 let data=load(), activeJob=loadActive(), view="home", selected=null, mode=null, timer=null, currentDocImageData="";
 function load(){const raw=localStorage.getItem(KEY);if(raw){try{return JSON.parse(raw)}catch(e){}}return{sites:[],resources:[{m:"Fire-Lite",n:"Manual links, trouble notes, walk-test reminders."},{m:"Notifier",n:"Panel notes, programming reminders, common issues."},{m:"Silent Knight",n:"Model notes, NAC quirks, communicator references."},{m:"Edwards / EST",n:"EST3 / EST4 notes, mapping, node information."},{m:"Potter",n:"Programming notes, compatibility, field observations."}]}}
-function save(){localStorage.setItem(KEY,JSON.stringify(data))}function loadActive(){const raw=localStorage.getItem(ACTIVE);if(raw){try{return JSON.parse(raw)}catch(e){}}return null}function saveActive(){activeJob?localStorage.setItem(ACTIVE,JSON.stringify(activeJob)):localStorage.removeItem(ACTIVE)}
+function ensureSettings(){
+ data.settings=data.settings||{};
+ data.settings.overlay=data.settings.overlay||{fields:["site","date","time"],alignment:"bottom",fontSize:"medium",textColor:"#ffffff",accentColor:"#ef4444",showLogo:true,showTagline:true};
+ return data.settings.overlay;
+}
+ensureSettings();
+function save(){ensureSettings();localStorage.setItem(KEY,JSON.stringify(data))}function loadActive(){const raw=localStorage.getItem(ACTIVE);if(raw){try{return JSON.parse(raw)}catch(e){}}return null}function saveActive(){activeJob?localStorage.setItem(ACTIVE,JSON.stringify(activeJob)):localStorage.removeItem(ACTIVE)}
 function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,7)}function esc(s){return String(s||"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#039;"}[m]))}
 function stampFireVaultPhoto(dataUrl, siteName, cb){
- if(!CanvasRenderingContext2D.prototype.roundRect){
- CanvasRenderingContext2D.prototype.roundRect=function(x,y,w,h,r){this.beginPath();this.moveTo(x+r,y);this.lineTo(x+w-r,y);this.quadraticCurveTo(x+w,y,x+w,y+r);this.lineTo(x+w,y+h-r);this.quadraticCurveTo(x+w,y+h,x+w-r,y+h);this.lineTo(x+r,y+h);this.quadraticCurveTo(x,y+h,x,y+h-r);this.lineTo(x,y+r);this.quadraticCurveTo(x,y,x+r,y);return this;}
-}
-const img=new Image();
- img.onload=()=>{
-   const canvas=document.createElement("canvas");
-   const maxW=1600;
-   const scale=Math.min(1,maxW/img.width);
-   canvas.width=Math.round(img.width*scale);
-   canvas.height=Math.round(img.height*scale);
-   const ctx=canvas.getContext("2d");
-   ctx.drawImage(img,0,0,canvas.width,canvas.height);
+ const cfg=ensureSettings();
+ const img=new Image();
+ img.onload=function(){
+   try{
+     const canvas=document.createElement("canvas");
+     const maxW=1400;
+     const scale=Math.min(1,maxW/img.width);
+     canvas.width=Math.round(img.width*scale);
+     canvas.height=Math.round(img.height*scale);
+     const ctx=canvas.getContext("2d");
+     ctx.drawImage(img,0,0,canvas.width,canvas.height);
 
-   const h=Math.max(105,Math.round(canvas.height*0.16));
-   const y=canvas.height-h;
-   const grad=ctx.createLinearGradient(0,y,canvas.width,y);
-   grad.addColorStop(0,"rgba(0,0,0,.82)");
-   grad.addColorStop(.55,"rgba(0,0,0,.64)");
-   grad.addColorStop(1,"rgba(127,29,29,.58)");
-   ctx.fillStyle=grad;
-   ctx.fillRect(0,y,canvas.width,h);
+     const sizeMap={small:.12,medium:.15,large:.19};
+     const barH=Math.max(78,Math.round(canvas.height*(sizeMap[cfg.fontSize]||.15)));
+     const y=cfg.alignment==="top"?0:canvas.height-barH;
+     const grad=ctx.createLinearGradient(0,y,canvas.width,y);
+     grad.addColorStop(0,"rgba(0,0,0,.86)");
+     grad.addColorStop(.65,"rgba(0,0,0,.66)");
+     grad.addColorStop(1,"rgba(120,0,0,.62)");
+     ctx.fillStyle=grad;
+     ctx.fillRect(0,y,canvas.width,barH);
 
-   const pad=Math.round(canvas.width*0.035);
-   const logoSize=Math.round(h*.62);
-   const logoX=pad;
-   const logoY=y+Math.round((h-logoSize)/2);
+     const pad=Math.round(canvas.width*0.035);
+     const accent=cfg.accentColor||"#ef4444";
+     const textColor=cfg.textColor||"#ffffff";
 
-   ctx.fillStyle="rgba(239,68,68,.95)";
-   ctx.beginPath();
-   ctx.roundRect(logoX,logoY,logoSize,logoSize,Math.round(logoSize*.18));
-   ctx.fill();
+     if(cfg.showLogo!==false){
+       const logo=Math.round(barH*.52);
+       const lx=pad, ly=y+Math.round((barH-logo)/2);
+       ctx.fillStyle=accent;
+       ctx.fillRect(lx,ly,logo,logo);
+       ctx.fillStyle="#fff";
+       ctx.textAlign="center";
+       ctx.textBaseline="middle";
+       ctx.font="900 "+Math.round(logo*.46)+"px Arial";
+       ctx.fillText("F",lx+logo/2,ly+logo/2);
+       ctx.textAlign="left";
+       ctx.textBaseline="alphabetic";
+       ctx.font="900 "+Math.round(barH*.26)+"px Arial";
+       ctx.fillStyle=textColor;
+       ctx.fillText("FIRE",lx+logo+16,y+Math.round(barH*.46));
+       const fireW=ctx.measureText("FIRE").width;
+       ctx.fillStyle=accent;
+       ctx.fillText("VAULT",lx+logo+16+fireW+5,y+Math.round(barH*.46));
+       if(cfg.showTagline!==false){
+         ctx.font="600 "+Math.round(barH*.12)+"px Arial";
+         ctx.fillStyle="rgba(255,255,255,.84)";
+         ctx.fillText("DOCUMENT. TRACK. PROTECT.",lx+logo+16,y+Math.round(barH*.68));
+       }
+     }
 
-   ctx.fillStyle="white";
-   ctx.font=`900 ${Math.round(logoSize*.46)}px Arial`;
-   ctx.textAlign="center";
-   ctx.textBaseline="middle";
-   ctx.fillText("F",logoX+logoSize/2,logoY+logoSize/2);
+     const now=new Date();
+     const dateText=now.toLocaleDateString([], {year:"numeric",month:"short",day:"numeric"});
+     const timeText=now.toLocaleTimeString([], {hour:"numeric",minute:"2-digit"});
+     const currentSite=site()?ensureArrays(site()):{};
+     const fieldMap={
+       site:"Site: "+(siteName||"Unknown Site"),
+       date:"Date: "+dateText,
+       time:"Time: "+timeText,
+       panel:"Panel: "+[((currentSite&&currentSite.panelManufacturer)||""),((currentSite&&currentSite.panelModel)||"")].filter(Boolean).join(" "),
+       address:"Address: "+(currentSite?fullAddress(currentSite):""),
+       gps:"GPS: "+(currentSite&&currentSite.lat&&currentSite.lng?(currentSite.lat+", "+currentSite.lng):"Not set")
+     };
+     const lines=(cfg.fields||["site","date","time"]).map(function(k){return fieldMap[k]}).filter(Boolean);
+     ctx.textAlign="right";
+     ctx.fillStyle=textColor;
+     const mainFont=Math.round(barH*(cfg.fontSize==="large"?.20:cfg.fontSize==="small"?.14:.17));
+     ctx.font="800 "+mainFont+"px Arial";
+     const startY=y+Math.round(barH*.34);
+     const gap=Math.round(mainFont*1.25);
+     lines.slice(0,3).forEach(function(line,i){
+       ctx.fillText(line,canvas.width-pad,startY+(i*gap));
+     });
 
-   ctx.textAlign="left";
-   ctx.textBaseline="alphabetic";
-   ctx.font=`900 ${Math.round(h*.30)}px Arial`;
-   ctx.fillStyle="#ffffff";
-   ctx.fillText("FIRE",logoX+logoSize+18,y+Math.round(h*.48));
-   const fw=ctx.measureText("FIRE").width;
-   ctx.fillStyle="#ef4444";
-   ctx.fillText("VAULT",logoX+logoSize+18+fw+6,y+Math.round(h*.48));
-
-   ctx.font=`600 ${Math.round(h*.13)}px Arial`;
-   ctx.fillStyle="rgba(255,255,255,.86)";
-   ctx.fillText("DOCUMENT. TRACK. PROTECT.",logoX+logoSize+18,y+Math.round(h*.70));
-
-   const dateText=new Date().toLocaleString([], {year:"numeric",month:"short",day:"numeric",hour:"numeric",minute:"2-digit"});
-   ctx.textAlign="right";
-   ctx.fillStyle="#ffffff";
-   ctx.font=`800 ${Math.round(h*.20)}px Arial`;
-   ctx.fillText(`Site: ${siteName||"Unknown Site"}`,canvas.width-pad,y+Math.round(h*.43));
-   ctx.font=`700 ${Math.round(h*.18)}px Arial`;
-   ctx.fillText(`Date: ${dateText}`,canvas.width-pad,y+Math.round(h*.69));
-
-   cb(canvas.toDataURL("image/jpeg",0.88));
+     cb(canvas.toDataURL("image/jpeg",0.88));
+   }catch(err){
+     console.warn("Photo stamp failed",err);
+     cb(dataUrl);
+   }
  };
+ img.onerror=function(){cb(dataUrl)};
  img.src=dataUrl;
 }
 
@@ -561,7 +587,60 @@ function saveResource(){
  save();mode=null;if(selected){view="siteResources";render()}else{go("library")}
 }
 
-function settings(){app(`<div class="screen"><h1>Settings</h1><div class="card"><h2>Backup</h2><p>Export before major changes.</p><button class="primary" onclick="exportData()">Export JSON Backup</button><br><br><div class="grid2"><button class="ghost" onclick="exportSitesCSV()">Export Sites CSV</button><button class="ghost" onclick="exportVisitsCSV()">Export Visits CSV</button></div><br><input type="file" accept="application/json" onchange="importData(event)"></div><div class="card"><h2>Reset</h2><button class="danger" onclick="resetData()">Clear Local Data</button></div></div>`)}
+
+function overlaySettings(){
+ const cfg=ensureSettings();
+ const checked=function(name){return (cfg.fields||[]).includes(name)?"checked":""};
+ app(`<div class="screen">
+  <div class="row"><button class="back ghost" onclick="go('settings')">←</button><h1>Photo Overlay</h1></div>
+  <div class="form grow">
+    <div class="card">
+      <h2>Data Fields</h2>
+      <label><input type="checkbox" id="f_site" ${checked("site")}> Site Name</label>
+      <label><input type="checkbox" id="f_date" ${checked("date")}> Date</label>
+      <label><input type="checkbox" id="f_time" ${checked("time")}> Time</label>
+      <label><input type="checkbox" id="f_panel" ${checked("panel")}> Panel Manufacturer / Model</label>
+      <label><input type="checkbox" id="f_address" ${checked("address")}> Address</label>
+      <label><input type="checkbox" id="f_gps" ${checked("gps")}> GPS Coordinates</label>
+    </div>
+    <div class="card">
+      <label>Overlay Alignment</label>
+      <select id="ovAlign"><option value="bottom" ${cfg.alignment==="bottom"?"selected":""}>Bottom</option><option value="top" ${cfg.alignment==="top"?"selected":""}>Top</option></select>
+      <label>Font Size</label>
+      <select id="ovFont"><option value="small" ${cfg.fontSize==="small"?"selected":""}>Small</option><option value="medium" ${cfg.fontSize==="medium"?"selected":""}>Medium</option><option value="large" ${cfg.fontSize==="large"?"selected":""}>Large</option></select>
+      <label>Text Color</label>
+      <input id="ovText" type="color" value="${esc(cfg.textColor||"#ffffff")}">
+      <label>Accent Color</label>
+      <input id="ovAccent" type="color" value="${esc(cfg.accentColor||"#ef4444")}">
+      <label><input type="checkbox" id="ovLogo" ${cfg.showLogo!==false?"checked":""}> Show FireVault Logo</label>
+      <label><input type="checkbox" id="ovTagline" ${cfg.showTagline!==false?"checked":""}> Show Tagline</label>
+    </div>
+  </div>
+  <button class="primary" onclick="saveOverlaySettings()">Save Overlay Settings</button>
+ </div>`)
+}
+function saveOverlaySettings(){
+ const fields=[];
+ ["site","date","time","panel","address","gps"].forEach(function(k){
+   const el=document.getElementById("f_"+k);
+   if(el&&el.checked)fields.push(k);
+ });
+ data.settings=data.settings||{};
+ data.settings.overlay={
+   fields:fields.length?fields:["site","date","time"],
+   alignment:val("ovAlign"),
+   fontSize:val("ovFont"),
+   textColor:val("ovText"),
+   accentColor:val("ovAccent"),
+   showLogo:document.getElementById("ovLogo").checked,
+   showTagline:document.getElementById("ovTagline").checked
+ };
+ save();
+ alert("Photo overlay settings saved.");
+ go("settings");
+}
+
+function settings(){app(`<div class="screen"><h1>Settings</h1><div class="card"><h2>Photo Overlay</h2><p>Customize the FireVault stamp added to new photos.</p><button class="primary" onclick="view='overlaySettings';render()">Customize Overlay</button></div><div class="card"><h2>Backup</h2><p>Export before major changes.</p><button class="primary" onclick="exportData()">Export JSON Backup</button><br><br><div class="grid2"><button class="ghost" onclick="exportSitesCSV()">Export Sites CSV</button><button class="ghost" onclick="exportVisitsCSV()">Export Visits CSV</button></div><br><input type="file" accept="application/json" onchange="importData(event)"></div><div class="card"><h2>Reset</h2><button class="danger" onclick="resetData()">Clear Local Data</button></div></div>`)}
 
 function csvEscape(v){
  const s=String(v??"");
@@ -598,16 +677,18 @@ function exportVisitsCSV(){
  a.click();
 }
 
-function exportData(){let blob=new Blob([JSON.stringify(data,null,2)],{type:"application/json"});let a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="firevault-backup-build-0.25.3.json";a.click()}
+function exportData(){let blob=new Blob([JSON.stringify(data,null,2)],{type:"application/json"});let a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="firevault-backup-build-0.26.0.json";a.click()}
 function importData(e){let f=e.target.files[0];if(!f)return;let r=new FileReader();r.onload=()=>{try{data=JSON.parse(r.result);save();alert("Imported.");go("home")}catch(err){alert("Import failed.")}};r.readAsText(f)}
 function resetData(){if(confirm("Clear all local FireVault data?")){localStorage.removeItem(KEY);localStorage.removeItem(ACTIVE);data=load();activeJob=null;go("home")}}
 function showChangelog(){alert(`FireVault Build ${BUILD}
 
-- Image viewer hotfix
-- Adds View Image button directly on saved photo cards
-- Opens saved image full-size without Edit
-- Keeps Edit thumbnail preview
-- Keeps Delete and photo overlay fixes from 0.25.2`)}
+- Photo Overlay Settings
+- Choose overlay fields: site, date, time, panel, address, GPS
+- Alignment: top or bottom
+- Font size: small, medium, large
+- Text color and accent color pickers
+- Logo and tagline toggles
+- Overlay settings saved in backup data`)}
 render()
 </script>
 </body>
