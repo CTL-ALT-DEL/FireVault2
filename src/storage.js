@@ -27,6 +27,7 @@ export function saveData(data){
 export function normalize(data){
   data.sites = Array.isArray(data.sites) ? data.sites : [];
   data.resources = Array.isArray(data.resources) ? data.resources : [];
+  data.breadcrumbs = Array.isArray(data.breadcrumbs) ? data.breadcrumbs : [];
   data.settings = data.settings || {};
   data.settings.overlay = data.settings.overlay || {
     fields:["site","date","time"],

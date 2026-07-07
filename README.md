@@ -1,15 +1,16 @@
-# FireVault Build 0.37.0 — AI Technician Placeholder
+# FireVault Build 0.38.0 — Daily Summary / Breadcrumbs Module
 
 Root-level package for GitHub Pages.
 
 ## Changes
-- AI Technician placeholder module
-- Site-aware context summary
-- Local rule-based assistant responses
-- AI Technician button on site vault
-- Advanced Features settings tab added
-- External-service features marked with *
+- Daily Summary screen
+- List of sites visited by date
+- Manual Drop Crumb GPS capture
+- Route point timeline
+- Apple Maps and Google Maps route helpers
+- Copy daily summary
+- Breadcrumb count in Diagnostics
 
 Suggested commit:
 
-`Build 0.37.0 ai technician placeholder`
+`Build 0.38.0 daily summary breadcrumbs`

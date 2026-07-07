@@ -79,3 +79,11 @@ nav button span:last-child{font-size:12px}
 .aiAnswer{border-left:4px solid var(--green)}
 .featureStar{color:var(--amber);font-weight:950}
 .contextBlock{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;white-space:pre-wrap;font-size:12px;line-height:1.35}
+
+.routeCard{border-left:4px solid var(--blue)}
+.breadcrumbCard{border-left:4px solid var(--green)}
+.routeLine{display:flex;align-items:center;gap:8px}
+.routeDot{width:12px;height:12px;border-radius:50%;background:var(--blue);flex:0 0 auto}
+.routePath{border-left:2px dashed rgba(56,189,248,.45);margin-left:6px;padding-left:13px}
+.summaryStat{display:flex;flex-direction:column;gap:2px}
+.summaryStat strong{font-size:20px}

@@ -68,7 +68,7 @@ function route(v){ view = v; mode = null; render(); }
 
 function render(){
   try{
-    const routes = {home, sites, siteDetail, siteForm, docs, docForm, imageViewer, library, resourceForm, jobMode, visits, visitDetail, tasks, taskForm, deficiencies, deficiencyForm, report, importer, aiTechnician, settings, diagnostics};
+    const routes = {home, sites, siteDetail, siteForm, docs, docForm, imageViewer, library, resourceForm, jobMode, visits, visitDetail, tasks, taskForm, deficiencies, deficiencyForm, report, importer, aiTechnician, dailySummary, settings, diagnostics};
     (routes[view] || home)();
     if(view === "jobMode") startJobTimer(); else stopJobTimer();
     setActiveNav();
@@ -175,7 +175,9 @@ function home(){
     </div>
     <div class="grid2">
       <button class="primary tile" id="nearbyBtn"><strong>📍 Nearby Site</strong><span>Use GPS to match location</span></button>
+      <button class="ghost tile" id="dailyBtn"><strong>🧭 Daily Summary</strong><span>Route and breadcrumbs</span></button>
       <button class="ghost tile" id="addSiteBtn"><strong>＋ Add Site</strong><span>Create customer vault</span></button>
+      <button class="ghost tile" id="dropCrumbBtn"><strong>📌 Drop Crumb</strong><span>Save current GPS</span></button>
     </div>
     <div id="nearbyBox"></div>
     ${activeJob ? `<div class="card activeJobMini"><div class="row"><div><h2>Service Call Active</h2><p>${esc(activeJob.siteName)} • <span id="jobElapsed">${elapsedText(activeJob.startedAt)}</span></p></div><button class="primary" id="resumeJobBtn">Open</button></div></div>` : ""}
@@ -187,6 +189,8 @@ function home(){
   document.getElementById("addSiteBtn").onclick = () => { selectedSiteId=null; view="siteForm"; render(); };
   document.getElementById("diagBtn").onclick = () => { view="diagnostics"; render(); };
   document.getElementById("nearbyBtn").onclick = scanNearbySites;
+  document.getElementById("dailyBtn").onclick = () => { view="dailySummary"; render(); };
+  document.getElementById("dropCrumbBtn").onclick = dropBreadcrumb;
   const resumeBtn = document.getElementById("resumeJobBtn");
   if(resumeBtn) resumeBtn.onclick = () => {
     selectedSiteId = activeJob.siteId;
@@ -213,6 +217,172 @@ function scanNearbySites(){
     });
   });
 }
+
+
+function todayIso(){
+  return new Date().toISOString().slice(0,10);
+}
+
+function minutesBetween(a,b){
+  if(!a || !b) return null;
+  const m = Math.round((new Date(b).getTime() - new Date(a).getTime()) / 60000);
+  return isFinite(m) && m >= 0 ? m : null;
+}
+
+function dropBreadcrumb(){
+  getCurrentGps((lat,lng)=>{
+    const note = prompt("Breadcrumb note:", "Manual breadcrumb") || "Manual breadcrumb";
+    data.breadcrumbs = Array.isArray(data.breadcrumbs) ? data.breadcrumbs : [];
+    data.breadcrumbs.unshift({
+      id: uid(),
+      date: todayIso(),
+      time: new Date().toISOString(),
+      lat: lat.toFixed(6),
+      lng: lng.toFixed(6),
+      note
+    });
+    save();
+    alert("Breadcrumb saved.");
+    view = "dailySummary";
+    render();
+  });
+}
+
+function visitsForDate(date){
+  const rows = [];
+  data.sites.forEach(s => {
+    ensureSite(s);
+    s.visits.forEach(v => {
+      if((v.date || "") === date) rows.push({site:s, visit:v, type:"visit"});
+    });
+  });
+  rows.sort((a,b)=>(a.visit.startedAt || a.visit.date || "").localeCompare(b.visit.startedAt || b.visit.date || ""));
+  return rows;
+}
+
+function breadcrumbsForDate(date){
+  data.breadcrumbs = Array.isArray(data.breadcrumbs) ? data.breadcrumbs : [];
+  return data.breadcrumbs.filter(b => b.date === date).sort((a,b)=>(a.time||"").localeCompare(b.time||""));
+}
+
+function dailyRoutePoints(date){
+  const visitPoints = visitsForDate(date)
+    .filter(r => r.site.lat && r.site.lng)
+    .map(r => ({label:r.site.name, lat:r.site.lat, lng:r.site.lng, time:r.visit.startedAt || r.visit.date, kind:"site"}));
+  const crumbs = breadcrumbsForDate(date)
+    .map(b => ({label:b.note || "Breadcrumb", lat:b.lat, lng:b.lng, time:b.time, kind:"crumb"}));
+  return [...visitPoints, ...crumbs].sort((a,b)=>(a.time||"").localeCompare(b.time||""));
+}
+
+function appleRouteUrl(points){
+  if(!points.length) return "";
+  if(points.length === 1) return "https://maps.apple.com/?q=" + encodeURIComponent(points[0].lat + "," + points[0].lng);
+  const first = points[0];
+  const last = points[points.length-1];
+  return "https://maps.apple.com/?saddr=" + encodeURIComponent(first.lat + "," + first.lng) + "&daddr=" + encodeURIComponent(last.lat + "," + last.lng);
+}
+
+function googleRouteUrl(points){
+  if(!points.length) return "";
+  if(points.length === 1) return "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(points[0].lat + "," + points[0].lng);
+  const first = points[0];
+  const last = points[points.length-1];
+  const mids = points.slice(1,-1).slice(0,8).map(p => p.lat + "," + p.lng).join("|");
+  return "https://www.google.com/maps/dir/?api=1&origin=" + encodeURIComponent(first.lat + "," + first.lng) + "&destination=" + encodeURIComponent(last.lat + "," + last.lng) + (mids ? "&waypoints=" + encodeURIComponent(mids) : "");
+}
+
+function dailySummaryText(date){
+  const visits = visitsForDate(date);
+  const crumbs = breadcrumbsForDate(date);
+  const points = dailyRoutePoints(date);
+  const lines = [];
+  lines.push("FIREVAULT DAILY SUMMARY");
+  lines.push("Date: " + date);
+  lines.push("");
+  lines.push("VISITED SITES (" + visits.length + ")");
+  if(visits.length){
+    visits.forEach((r,i)=>{
+      const v = r.visit;
+      const mins = minutesBetween(v.startedAt, v.endedAt);
+      lines.push(`${i+1}. ${r.site.name} - ${v.startedAt ? fmtTime(v.startedAt) : ""}${mins!==null ? " - " + Math.floor(mins/60)+"h "+(mins%60)+"m" : ""}`);
+      lines.push("   " + fullAddress(r.site));
+    });
+  }else lines.push("None recorded.");
+  lines.push("");
+  lines.push("BREADCRUMBS (" + crumbs.length + ")");
+  if(crumbs.length) crumbs.forEach((b,i)=>lines.push(`${i+1}. ${fmtTime(b.time)} - ${b.note} - ${b.lat}, ${b.lng}`));
+  else lines.push("None recorded.");
+  lines.push("");
+  lines.push("ROUTE POINTS (" + points.length + ")");
+  if(points.length) points.forEach((p,i)=>lines.push(`${i+1}. ${fmtTime(p.time)} - ${p.label} - ${p.lat}, ${p.lng}`));
+  else lines.push("No GPS route points.");
+  return lines.join("\\n");
+}
+
+function dailySummary(){
+  const date = mode || todayIso();
+  const visits = visitsForDate(date);
+  const crumbs = breadcrumbsForDate(date);
+  const points = dailyRoutePoints(date);
+  let totalMins = 0;
+  visits.forEach(r => {
+    const m = minutesBetween(r.visit.startedAt, r.visit.endedAt);
+    if(m !== null) totalMins += m;
+  });
+  html(`<div class="screen">
+    <div class="row"><button class="back ghost" id="dailyBack">←</button><h1>Daily Summary</h1></div>
+    <div class="card">
+      <label>Date</label>
+      <input id="summaryDate" type="date" value="${esc(date)}">
+      <div class="grid3">
+        <div class="summaryStat"><strong>${visits.length}</strong><span>Sites</span></div>
+        <div class="summaryStat"><strong>${crumbs.length}</strong><span>Crumbs</span></div>
+        <div class="summaryStat"><strong>${Math.floor(totalMins/60)}h ${totalMins%60}m</strong><span>Site Time</span></div>
+      </div>
+      <div class="grid2">
+        <button class="primary" id="dropCrumbDaily">Drop Crumb</button>
+        <button class="ghost" id="copyDaily">Copy Summary</button>
+      </div>
+      <div class="grid2">
+        <button class="ghost" id="appleRoute">Apple Route</button>
+        <button class="ghost" id="googleRoute">Google Route</button>
+      </div>
+    </div>
+
+    <div class="card routeCard">
+      <h2>Route Points</h2>
+      <div class="routePath">${points.length ? points.map((p,i)=>`<div class="routeLine"><span class="routeDot"></span><div><strong>${esc(fmtTime(p.time))}</strong> ${esc(p.label)}<p>${esc(p.lat+", "+p.lng)}</p></div></div>`).join("") : `<div class="empty">No GPS points for this date. Start/finish jobs or drop manual breadcrumbs.</div>`}</div>
+    </div>
+
+    <div class="card grow" style="overflow:auto">
+      <h2>Visited Sites</h2>
+      ${visits.length ? visits.map(r=>`<div class="card tight compactVisit siteItem dailyVisit" data-site="${r.site.id}" data-visit="${r.visit.id}"><div><strong>${esc(r.site.name)}</strong><p>${esc(r.visit.startedAt ? fmtTime(r.visit.startedAt) : r.visit.date)}</p></div><span class="pill">View</span></div>`).join("") : `<div class="empty">No visits recorded for this date.</div>`}
+    </div>
+  </div>`);
+  document.getElementById("dailyBack").onclick = () => { mode=null; route("home"); };
+  document.getElementById("summaryDate").onchange = () => { mode = val("summaryDate"); view="dailySummary"; render(); };
+  document.getElementById("dropCrumbDaily").onclick = dropBreadcrumb;
+  document.getElementById("copyDaily").onclick = () => {
+    navigator.clipboard?.writeText(dailySummaryText(date)).then(()=>alert("Daily summary copied.")).catch(()=>{
+      alert(dailySummaryText(date));
+    });
+  };
+  document.getElementById("appleRoute").onclick = () => {
+    const url = appleRouteUrl(points);
+    if(url) window.open(url,"_blank"); else alert("No route points available.");
+  };
+  document.getElementById("googleRoute").onclick = () => {
+    const url = googleRouteUrl(points);
+    if(url) window.open(url,"_blank"); else alert("No route points available.");
+  };
+  document.querySelectorAll(".dailyVisit").forEach(el => el.onclick = () => {
+    selectedSiteId = el.dataset.site;
+    mode = el.dataset.visit;
+    view = "visitDetail";
+    render();
+  });
+}
+
 
 function sites(){
   html(`<div class="screen">
@@ -1321,23 +1491,24 @@ function saveSettingsFromVisibleTab(){
 }
 
 function diagnostics(){
-  html(`<div class="screen"><div class="row"><button class="back ghost" id="backHome">←</button><h1>Diagnostics</h1></div><div class="card grow errorBox"><p>Build: ${BUILD}</p><p>Sites: ${data.sites.length}</p><p>Sites with GPS: ${data.sites.filter(s=>s.lat&&s.lng).length}</p><p>Active Job: ${activeJob ? activeJob.siteName : "None"}</p><p>Total Tasks: ${data.sites.reduce((n,s)=>n+(s.tasks||[]).length,0)}</p><p>Total Deficiencies: ${data.sites.reduce((n,s)=>n+(s.deficiencies||[]).length,0)}</p><p>Report Title: ${esc(data.settings.reports.title)}</p><p>Import/Export: Ready</p><p>Advanced AI Enabled: ${data.settings.advanced?.aiTechnician ? "Yes" : "No"}</p><p>Storage key: ${KEY}</p><p>Modules loaded successfully.</p></div></div>`);
+  html(`<div class="screen"><div class="row"><button class="back ghost" id="backHome">←</button><h1>Diagnostics</h1></div><div class="card grow errorBox"><p>Build: ${BUILD}</p><p>Sites: ${data.sites.length}</p><p>Sites with GPS: ${data.sites.filter(s=>s.lat&&s.lng).length}</p><p>Active Job: ${activeJob ? activeJob.siteName : "None"}</p><p>Total Tasks: ${data.sites.reduce((n,s)=>n+(s.tasks||[]).length,0)}</p><p>Total Deficiencies: ${data.sites.reduce((n,s)=>n+(s.deficiencies||[]).length,0)}</p><p>Report Title: ${esc(data.settings.reports.title)}</p><p>Import/Export: Ready</p><p>Advanced AI Enabled: ${data.settings.advanced?.aiTechnician ? "Yes" : "No"}</p><p>Breadcrumbs: ${(data.breadcrumbs||[]).length}</p><p>Storage key: ${KEY}</p><p>Modules loaded successfully.</p></div></div>`);
   document.getElementById("backHome").onclick = () => route("home");
 }
 
 function exportJson(){
-  downloadBlob("firevault-backup-build-0.37.0.json", JSON.stringify(data,null,2), "application/json");
+  downloadBlob("firevault-backup-build-0.38.0.json", JSON.stringify(data,null,2), "application/json");
 }
 
 function showChangelog(){
   alert(`FireVault Build ${BUILD}
 
-- AI Technician placeholder module
-- Site-aware context summary
-- Local rule-based assistant responses
-- AI Technician button on site vault
-- Advanced Features settings tab added
-- External-service features marked with *`);
+- Daily Summary / Breadcrumbs module
+- Daily visited-sites list
+- Manual Drop Crumb GPS capture
+- Route points timeline
+- Apple Maps and Google Maps route helpers
+- Copy daily summary
+- Breadcrumb count in Diagnostics`);
 }
 
 render();
