@@ -89,7 +89,7 @@ function home(){
       <button class="ghost tile" id="diagBtn"><strong>Diagnostics</strong><span>Build status</span></button>
     </div>
     ${activeJob ? `<div class="card activeJobMini"><div class="row"><div><h2>Service Call Active</h2><p>${esc(activeJob.siteName)} • <span id="jobElapsed">${elapsedText(activeJob.startedAt)}</span></p></div><button class="primary" id="resumeJobBtn">Open</button></div></div>` : ""}
-    <div class="card grow"><h2>Build 0.40.5</h2><p>Settings received a full small-screen redesign with a micro header, compact submenu chips, denser forms, and corrected alignment.</p><p>The #8 Flame Icon is now cache-busted across the header, favicon, Apple icon, and PWA icons.</p></div>
+    <div class="card grow"><h2>Build 0.40.6</h2><p>Release notes now open in a compact, better-justified panel instead of the oversized browser alert.</p><p>Settings cleanup remains the active roadmap lane: tighter small-screen panels, better alignment, and less wasted space.</p></div>
   </div>`);
   document.getElementById("sitesCard").onclick=()=>route("sites");
   document.getElementById("tasksCard").onclick=()=>{selectedSiteId=null; route("tasks");};
@@ -251,5 +251,24 @@ function saveSettings(){
 }
 
 function diagnostics(){ const totalTasks=data.sites.reduce((n,s)=>n+(s.tasks||[]).length,0); const totalDef=data.sites.reduce((n,s)=>n+(s.deficiencies||[]).length,0); html(`<div class="screen"><div class="row"><button class="back ghost" id="backHome">←</button><h1>Diagnostics</h1></div><div class="card grow errorBox"><p>Build: ${BUILD}</p><p>Sites: ${data.sites.length}</p><p>Total Tasks: ${totalTasks}</p><p>Total Deficiencies: ${totalDef}</p><p>Active Job: ${activeJob ? esc(activeJob.siteName) : "None"}</p><p>Current Theme: ${esc(data.settings.theme.name)}</p><p>Accent: ${esc(data.settings.theme.accentColor)}</p><p>Advanced AI Enabled: ${data.settings.advanced?.aiTechnician ? "Yes" : "No"}</p><p>Import/Export: Ready</p><p>Storage key: ${KEY}</p><p>Modules loaded successfully.</p></div></div>`); document.getElementById("backHome").onclick=()=>route("home"); }
-function showChangelog(){ alert(`FireVault Build ${BUILD}\n\n- Compact Settings header replaces the oversized Settings hero box\n- Smaller submenu typography and tighter alignment across Settings panels\n- Live Theme Engine: saved themes now apply to the app\n- Preset theme buttons added\n- Large text, compact layout, button shape, and card style modes\n- Replaced the app header, favicon, Apple touch icon, and PWA icons with selected #8 Flame Icon logo\n- Manifest polish for Add to Home Screen\n- Advanced features remain clearly marked with *\n- Preserves modular storage key`); }
+function showChangelog(){
+  const notes = [
+    "Build number advanced to 0.40.6 across the header, dashboard, manifest, and diagnostics.",
+    "Release notes were redesigned from a large browser alert into a compact FireVault panel.",
+    "Release note text now uses smaller font sizing, left justification, tighter spacing, and cleaner line breaks.",
+    "Added a visible roadmap note for the next Settings polish lane.",
+    "Kept the selected #8 Flame Icon logo and cache-busted app assets.",
+    "Preserved the modular storage key so existing local data stays compatible."
+  ];
+  const overlay=document.createElement("div");
+  overlay.className="releaseOverlay";
+  overlay.innerHTML=`<div class="releaseSheet" role="dialog" aria-modal="true" aria-label="FireVault release notes">
+    <div class="releaseHead"><div><strong>FireVault</strong><span>Build ${BUILD}</span></div><button class="ghost iconBtn" id="closeRelease" aria-label="Close release notes">×</button></div>
+    <div class="releaseBody"><h2>Release Notes</h2><p class="releaseIntro">Compact formatting pass for small screens and field use.</p><ul>${notes.map(n=>`<li>${esc(n)}</li>`).join("")}</ul></div>
+  </div>`;
+  document.body.appendChild(overlay);
+  const close=()=>overlay.remove();
+  document.getElementById("closeRelease").onclick=close;
+  overlay.addEventListener("click",e=>{ if(e.target===overlay) close(); });
+}
 render();
