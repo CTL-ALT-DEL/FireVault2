@@ -28,6 +28,8 @@ const EMAIL_TAGS = [
   ["{site_name}","Site"], ["{date}","Date"], ["{technician}","Tech"],
   ["{company}","Company"], ["{phone}","Phone"], ["{email}","Email"]
 ];
+const REPORT_SECTION_KEY = "firevault_report_section_prefs";
+let reportSectionPrefs = loadReportSectionPrefs();
 const appEl = document.getElementById("app");
 const themePresets = {
   "firevault-dark": {label:"FireVault Dark", accentColor:"#ef4444"},
@@ -569,7 +571,7 @@ function home(){
       <button class="ghost tile" id="diagBtn"><strong>Diagnostics</strong><span>Build status</span></button>
     </div>
     ${activeJob ? `<div class="card activeJobMini"><div class="row"><div><h2>Service Call Active</h2><p>${esc(activeJob.siteName)} • <span id="jobElapsed">${elapsedText(activeJob.startedAt)}</span></p></div><button class="primary" id="resumeJobBtn">Open</button></div></div>` : ""}
-    <div class="card grow"><h2>Build ${BUILD}</h2><p>Professional Report Center is active.</p><p>Open a site report to preview health, tasks, deficiencies, equipment, checklist status, and share/download from one cleaner screen.</p></div>
+    <div class="card grow"><h2>Build ${BUILD}</h2><p>Report Package Builder is active.</p><p>Open a site report to toggle sections on/off before sharing, copying, or downloading.</p></div>
   </div>`);
   document.getElementById("sitesCard").onclick=()=>route("sites");
   document.getElementById("tasksCard").onclick=()=>{selectedSiteId=null; route("tasks");};
@@ -1073,59 +1075,69 @@ function deficiencyForm(){
   const del=document.getElementById("delBtn"); if(del) del.onclick=()=>{s.deficiencies=s.deficiencies.filter(x=>x.id!==mode); save(); route("deficiencies");};
 }
 
-function reportText(s){
+
+function loadReportSectionPrefs(){
+  try{ return JSON.parse(localStorage.getItem(REPORT_SECTION_KEY) || "null"); }
+  catch{ return null; }
+}
+function saveReportSectionPrefs(prefs){
+  reportSectionPrefs = prefs;
+  try{ localStorage.setItem(REPORT_SECTION_KEY, JSON.stringify(prefs)); }catch{}
+}
+function defaultReportSections(){
+  const r=data.settings.reports || {};
+  return {
+    site:true,
+    tech:r.includeTechnician !== false,
+    visits:true,
+    contacts:true,
+    equipment:true,
+    docs:true,
+    checklist:true,
+    tasks:r.includeTasks !== false,
+    deficiencies:r.includeDeficiencies !== false,
+    notes:true,
+    email:true
+  };
+}
+function reportSectionState(){
+  return {...defaultReportSections(), ...(reportSectionPrefs || {})};
+}
+function reportSectionLabels(){
+  return [
+    ["site","Site"], ["tech","Tech"], ["visits","Visits"], ["contacts","Contacts"],
+    ["equipment","Equipment"], ["docs","Docs"], ["checklist","Checklist"], ["tasks","Tasks"],
+    ["deficiencies","Deficiencies"], ["notes","Notes"], ["email","Email"]
+  ];
+}
+function reportSectionControls(opts){
+  return reportSectionLabels().map(([key,label])=>`<label class="reportSectionToggle ${opts[key]?"on":""}"><input type="checkbox" data-section="${key}" ${opts[key]?"checked":""}><span>${esc(label)}</span></label>`).join("");
+}
+function reportJoin(sections){
+  return sections.map(([title, body])=>`${title}\n${body}`).join("\n\n");
+}
+
+function reportText(s, opts=reportSectionState()){
   const set=data.settings, tech=set.technician||{};
   const visits=(s.visits||[]).slice(0,5).map(v=>visitReportBlock(v)).join("\n\n") || "No completed visits";
   const contacts=(s.contacts||[]).map(contactReportLine).join("\n") || "No contacts or access notes saved";
   const equipment=(s.equipment||[]).map(e=>`- ${e.status||"Active"}: ${equipmentTitle(e)}${e.location?` @ ${e.location}`:""}${e.serial?` | Serial ${e.serial}`:""}${e.date?` | Checked ${e.date}`:""}${e.interval&&e.interval!=="None"?` | Interval ${e.interval}`:""}${e.notes?`\n  Notes: ${String(e.notes).replaceAll("\n","\n  ")}`:""}`).join("\n") || "No equipment saved";
   const docs=(s.docs||[]).map(docReportLine).join("\n") || "No documents or links saved";
   const checklist=checklistReportBlock(s);
-  return `${set.reports.title}
-Generated: ${new Date().toLocaleString()}
-
-SITE
-${s.name}
-${fullAddress(s)}
-Panel: ${[s.panelManufacturer,s.panelModel].filter(Boolean).join(" ")||"Not entered"}
-GPS: ${data.settings.gps?.includeInReports===false?"Hidden in Settings":gpsLine(s)}
-Map: ${mapUrl(s,(set.gps&&set.gps.mapProvider)||"apple")}
-Health: ${siteHealthLine(s)}
-
-TECHNICIAN
-${tech.name||""}
-${tech.company||""}
-${tech.phone||""}
-${tech.email||""}
-
-VISITS
-${visits}
-
-CONTACTS / ACCESS
-${contacts}
-
-EQUIPMENT
-${equipment}
-
-DOCUMENTS / LINKS
-${docs}
-
-INSPECTION CHECKLIST
-${checklist}
-
-TASKS
-${(s.tasks||[]).map(t=>`- ${t.status||"Open"}: ${t.title}${t.source?` [${t.source}]`:""}${t.due?` due ${t.due}`:""}`).join("\n")||"No tasks"}
-
-DEFICIENCIES
-${(s.deficiencies||[]).map(d=>`- ${d.status||"Open"}: ${d.priority||"Normal"} - ${d.title}`).join("\n")||"No deficiencies"}
-
-NOTES
-${s.notes||"No notes"}
-
-EMAIL SUBJECT
-${renderTemplate(set.email.defaultSubject,s)}
-
-SIGNATURE
-${renderTemplate(set.email.signature,s)}`;
+  const sections=[];
+  sections.push([set.reports.title || "FireVault Service Report", `Generated: ${new Date().toLocaleString()}\nBuild: ${BUILD}`]);
+  if(opts.site) sections.push(["SITE", `${s.name||"Unnamed Site"}\n${fullAddress(s)}\nPanel: ${[s.panelManufacturer,s.panelModel].filter(Boolean).join(" ")||"Not entered"}\nGPS: ${data.settings.gps?.includeInReports===false?"Hidden in Settings":gpsLine(s)}\nMap: ${mapUrl(s,(set.gps&&set.gps.mapProvider)||"apple")}\nHealth: ${siteHealthLine(s)}`]);
+  if(opts.tech) sections.push(["TECHNICIAN", `${tech.name||""}\n${tech.company||""}\n${tech.phone||""}\n${tech.email||""}`.trim() || "No technician profile entered"]);
+  if(opts.visits) sections.push(["VISITS", visits]);
+  if(opts.contacts) sections.push(["CONTACTS / ACCESS", contacts]);
+  if(opts.equipment) sections.push(["EQUIPMENT", equipment]);
+  if(opts.docs) sections.push(["DOCUMENTS / LINKS", docs]);
+  if(opts.checklist) sections.push(["INSPECTION CHECKLIST", checklist]);
+  if(opts.tasks) sections.push(["TASKS", (s.tasks||[]).map(t=>`- ${t.status||"Open"}: ${t.title}${t.source?` [${t.source}]`:""}${t.due?` due ${t.due}`:""}`).join("\n")||"No tasks"]);
+  if(opts.deficiencies) sections.push(["DEFICIENCIES", (s.deficiencies||[]).map(d=>`- ${d.status||"Open"}: ${d.priority||"Normal"} - ${d.title}`).join("\n")||"No deficiencies"]);
+  if(opts.notes) sections.push(["NOTES", s.notes||"No notes"]);
+  if(opts.email) sections.push(["EMAIL SUBJECT", renderTemplate(set.email.defaultSubject,s) || "FireVault Report"]), sections.push(["SIGNATURE", renderTemplate(set.email.signature,s) || "No signature template entered"]);
+  return reportJoin(sections);
 }
 function renderTemplate(t,s){ const tech=data.settings.technician||{}; return String(t||"").replaceAll("{site_name}",s.name||"").replaceAll("{date}",fmtDate()).replaceAll("{technician}",tech.name||"").replaceAll("{company}",tech.company||"").replaceAll("{phone}",tech.phone||"").replaceAll("{email}",tech.email||""); }
 function reportStats(s){
@@ -1158,13 +1170,15 @@ async function shareReportText(s,txt){
 }
 function report(){
   const s=site(); if(!s){route("sites"); return;}
-  const txt=reportText(s);
+  const opts=reportSectionState();
+  const txt=reportText(s, opts);
   const stats=reportStats(s);
   const subject=renderTemplate(data.settings.email.defaultSubject,s);
   html(`<div class="screen reportScreen440"><div class="row reportTopRow"><button class="back ghost" id="backBtn">←</button><div><h1>Report Center</h1><p>${esc(s.name||"Site")}</p></div></div>
     <div class="card reportHero440 ${stats.h.cls}"><div><strong>${stats.h.score}%</strong><span>Health</span></div><div><strong>${stats.openTasks.length}</strong><span>Open Tasks</span></div><div><strong>${stats.openDef.length}</strong><span>Deficiencies</span></div><div><strong>${stats.equipmentIssues.length}</strong><span>Equip Issues</span></div></div>
     <div class="reportActionGrid440"><button class="primary" id="shareBtn">Share / Copy</button><button class="ghost" id="copyBtn">Copy TXT</button><button class="ghost" id="downloadBtn">Download</button><button class="ghost" id="subjectBtn">Copy Subject</button></div>
     <div class="card reportReadyCard"><div><h2>Ready to Send</h2><p>${esc(subject || "FireVault Report")}</p></div><span class="pill ${stats.h.cls}">${esc(stats.h.label)}</span></div>
+    <div class="card reportOptions441"><div class="reportOptionsHead"><div><h2>Report Package</h2><p>Tap sections on/off before sharing, copying, or downloading.</p></div><button class="ghost smallBtn" id="resetReportSections">Reset</button></div><div class="reportSectionGrid441">${reportSectionControls(opts)}</div></div>
     <div class="reportPreviewGrid440">${reportPreviewCards(s).map(card=>`<div class="card reportPreviewCard440"><span>${esc(card[0])}</span><h2>${esc(card[1])}</h2>${card[2].map(x=>`<p>${esc(x)}</p>`).join("")}</div>`).join("")}</div>
     <div class="card reportBox reportBox440 grow">${esc(txt)}</div></div>`);
   document.getElementById("backBtn").onclick=()=>route("siteDetail");
@@ -1172,6 +1186,8 @@ function report(){
   document.getElementById("copyBtn").onclick=async()=>{await navigator.clipboard.writeText(txt); toast("Report copied.");};
   document.getElementById("subjectBtn").onclick=async()=>{await navigator.clipboard.writeText(subject); toast("Email subject copied.");};
   document.getElementById("downloadBtn").onclick=()=>downloadBlob(`firevault-report-${(s.name||"site").replace(/\W+/g,"-")}.txt`,txt);
+  document.querySelectorAll(".reportSectionToggle input").forEach(cb=>cb.onchange=()=>{ const next={...reportSectionState(), [cb.dataset.section]: cb.checked}; saveReportSectionPrefs(next); report(); });
+  const resetSections=document.getElementById("resetReportSections"); if(resetSections) resetSections.onclick=()=>{ reportSectionPrefs=null; try{localStorage.removeItem(REPORT_SECTION_KEY);}catch{}; toast("Report package reset."); report(); };
 }
 
 function library(){ html(`<div class="screen"><div class="row"><h1>Library</h1><button class="primary" id="addBtn">＋</button></div><div class="list grow">${data.resources.length?data.resources.map(r=>`<div class="card docLine siteItem" data-id="${r.id}"><h2>${esc(r.m||"Resource")}</h2><p>${esc(r.n||"")}</p><p>${esc(r.url||"")}</p></div>`).join(""):`<div class="empty">No resources yet.</div>`}</div></div>`); document.getElementById("addBtn").onclick=()=>{mode=null; route("resourceForm");}; document.querySelectorAll(".siteItem").forEach(el=>el.onclick=()=>{mode=el.dataset.id; route("resourceForm");}); }
@@ -1338,17 +1354,17 @@ function saveSettings(){
 function diagnostics(){ const taskRows=allTaskRows(); const taskCounts=taskFilterCounts(taskRows); const totalTasks=taskRows.length; const serviceTasks=taskRows.filter(r=>r.t.source==="Service Call").length; const totalDef=data.sites.reduce((n,s)=>n+(s.deficiencies||[]).length,0); const openDefTotal=data.sites.reduce((n,s)=>n+(s.deficiencies||[]).filter(d=>(d.status||"Open")!=="Closed").length,0); const closedDefTotal=data.sites.reduce((n,s)=>n+(s.deficiencies||[]).filter(d=>(d.status||"Open")==="Closed").length,0); const totalVisits=data.sites.reduce((n,s)=>n+(s.visits||[]).length,0); const totalContacts=data.sites.reduce((n,s)=>n+(s.contacts||[]).length,0); const totalDocs=data.sites.reduce((n,s)=>n+(s.docs||[]).length,0); const totalChecklist=data.sites.reduce((n,s)=>n+(s.checklist||[]).length,0); const checklistIssues=data.sites.reduce((n,s)=>n+(s.checklist||[]).filter(i=>i.status==="Issue").length,0); const completedInspections=data.sites.reduce((n,s)=>n+(s.visits||[]).filter(v=>v.type==="Inspection Checklist").length,0); const healthWarn=data.sites.filter(s=>siteHealth(s).cls==="healthWarn").length; const healthWatch=data.sites.filter(s=>siteHealth(s).cls==="healthWatch").length; const attentionTotal=attentionRows().length; html(`<div class="screen"><div class="row"><button class="back ghost" id="backHome">←</button><h1>Diagnostics</h1></div><div class="card grow errorBox"><p>Build: ${BUILD}</p><p>Sites: ${data.sites.length}</p><p>Total Tasks: ${totalTasks}</p><p>Open Tasks: ${taskCounts.open}</p><p>Due Today: ${taskCounts.today}</p><p>Overdue Tasks: ${taskCounts.overdue}</p><p>Service Follow-Ups: ${serviceTasks}</p><p>Total Deficiencies: ${totalDef}</p><p>Open Deficiencies: ${openDefTotal}</p><p>Closed Deficiencies: ${closedDefTotal}</p><p>Total Visits: ${totalVisits}</p><p>Total Contacts: ${totalContacts}</p><p>Total Documents: ${totalDocs}</p><p>Checklist Items: ${totalChecklist}</p><p>Checklist Issues: ${checklistIssues}</p><p>Completed Inspections: ${completedInspections}</p><p>Attention Sites: ${healthWarn}</p><p>Watch Sites: ${healthWatch}</p><p>Attention Queue: ${attentionTotal}</p><p>Active Job: ${activeJob ? esc(activeJob.siteName) : "None"}</p><p>Current Theme: ${esc(data.settings.theme.name)}</p><p>Accent: ${esc(data.settings.theme.accentColor)}</p><p>Advanced AI Enabled: ${data.settings.advanced?.aiTechnician ? "Yes" : "No"}</p><p>GPS Tools: ${data.settings.gps?.enabled !== false ? "Enabled" : "Hidden"}</p><p>Nearby Radius: ${nearbyRadiusMiles()} mi</p><p>Haptics: ${data.settings.app?.haptics !== false ? "Enabled" : "Off"}</p><p>Import/Export: Ready</p><p>Storage key: ${KEY}</p><p>Modules loaded successfully.</p></div></div>`); document.getElementById("backHome").onclick=()=>route("home"); }
 function showChangelog(){
   const notes = [
-    "Added a professional Report Center screen for each site.",
-    "Added report health summary counters for site health, open tasks, deficiencies, and equipment issues.",
-    "Added clean preview cards for Site, Service, Equipment, and Checklist sections before the raw report text.",
-    "Added Share / Copy, Copy TXT, Download, and Copy Subject actions from one report toolbar.",
-    "Preserved Deficiency Center filters, Inspection Checklist completion, Visit History, Site Health, Attention Queue, Equipment, Contacts, Documents, GPS/Nearby, and refined 3D controls."
+    "Added Report Package section toggles inside Report Center.",
+    "Reports can now include or hide Site, Tech, Visits, Contacts, Equipment, Docs, Checklist, Tasks, Deficiencies, Notes, and Email sections.",
+    "Report package choices persist locally and can be reset from the report screen.",
+    "Share, copy, subject copy, and download now use the active package selections.",
+    "Preserved the Professional Report Center, Deficiency Center, Inspection Checklist completion, Site Health, Attention Queue, GPS/Nearby, and refined 3D controls."
   ];
   const overlay=document.createElement("div");
   overlay.className="releaseOverlay";
   overlay.innerHTML=`<div class="releaseSheet" role="dialog" aria-modal="true" aria-label="FireVault release notes">
     <div class="releaseHead"><div><strong>FireVault</strong><span>Build ${BUILD}</span></div><button class="ghost iconBtn" id="closeRelease" aria-label="Close release notes">×</button></div>
-    <div class="releaseBody"><h2>Release Notes</h2><p class="releaseIntro">professional report center preview and sharing workflow.</p><ul>${notes.map(n=>`<li>${esc(n)}</li>`).join("")}</ul></div>
+    <div class="releaseBody"><h2>Release Notes</h2><p class="releaseIntro">report package builder with selectable sections.</p><ul>${notes.map(n=>`<li>${esc(n)}</li>`).join("")}</ul></div>
   </div>`;
   document.body.appendChild(overlay);
   const close=()=>overlay.remove();
