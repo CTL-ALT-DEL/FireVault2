@@ -32,6 +32,46 @@ function route(v){ view = v; mode = null; render(); }
 function html(content){ appEl.innerHTML = content; }
 function toast(msg){ const t=document.createElement("div"); t.className="toast"; t.textContent=msg; document.body.appendChild(t); setTimeout(()=>t.remove(),1800); }
 
+function hasGps(s){
+  return !!(s && s.gps && Number.isFinite(Number(s.gps.lat)) && Number.isFinite(Number(s.gps.lng)));
+}
+function gpsLine(s){
+  if(!hasGps(s)) return "No GPS coordinates saved.";
+  const g=s.gps;
+  const acc=Number.isFinite(Number(g.accuracy)) && Number(g.accuracy)>0 ? ` • Accuracy ±${Math.round(Number(g.accuracy))} m` : "";
+  const when=g.capturedAt ? ` • Saved ${new Date(g.capturedAt).toLocaleString([], {month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}` : "";
+  return `${Number(g.lat).toFixed(6)}, ${Number(g.lng).toFixed(6)}${acc}${when}`;
+}
+function mapQuery(s){ return hasGps(s) ? `${Number(s.gps.lat).toFixed(6)},${Number(s.gps.lng).toFixed(6)}` : fullAddress(s); }
+function mapUrl(s, provider){
+  const q=encodeURIComponent(mapQuery(s));
+  return provider === "google" ? `https://www.google.com/maps/search/?api=1&query=${q}` : `https://maps.apple.com/?q=${q}`;
+}
+function gpsOptions(){ const g=data.settings.gps||{}; return {enableHighAccuracy:g.highAccuracy!==false,timeout:15000,maximumAge:60000}; }
+function captureGpsForSite(){
+  const s=site();
+  if(!s){ toast("Open a saved site first."); return; }
+  if(data.settings.gps?.enabled===false){ toast("GPS tools are hidden in Settings."); return; }
+  if(!navigator.geolocation){ toast("GPS is not available in this browser."); return; }
+  toast("Requesting GPS location...");
+  navigator.geolocation.getCurrentPosition(pos=>{
+    s.gps={lat:Number(pos.coords.latitude.toFixed(6)),lng:Number(pos.coords.longitude.toFixed(6)),accuracy:Math.round(pos.coords.accuracy || 0),capturedAt:new Date().toISOString()};
+    save(); toast("GPS saved to site."); render();
+  },err=>toast("GPS failed: " + (err.message || "permission denied")),gpsOptions());
+}
+function captureGpsIntoForm(){
+  if(!navigator.geolocation){ toast("GPS is not available in this browser."); return; }
+  toast("Requesting GPS location...");
+  navigator.geolocation.getCurrentPosition(pos=>{
+    const lat=document.getElementById("gpsLat"), lng=document.getElementById("gpsLng"), acc=document.getElementById("gpsAccuracy"), at=document.getElementById("gpsCapturedAt");
+    if(lat) lat.value=Number(pos.coords.latitude.toFixed(6));
+    if(lng) lng.value=Number(pos.coords.longitude.toFixed(6));
+    if(acc) acc.value=Math.round(pos.coords.accuracy || 0);
+    if(at) at.value=new Date().toISOString();
+    toast("GPS captured. Save the site to keep it.");
+  },err=>toast("GPS failed: " + (err.message || "permission denied")),gpsOptions());
+}
+
 function applyTheme(){
   const t = data.settings.theme || {};
   const body = document.body;
@@ -89,7 +129,7 @@ function home(){
       <button class="ghost tile" id="diagBtn"><strong>Diagnostics</strong><span>Build status</span></button>
     </div>
     ${activeJob ? `<div class="card activeJobMini"><div class="row"><div><h2>Service Call Active</h2><p>${esc(activeJob.siteName)} • <span id="jobElapsed">${elapsedText(activeJob.startedAt)}</span></p></div><button class="primary" id="resumeJobBtn">Open</button></div></div>` : ""}
-    <div class="card grow"><h2>Build 0.41.3</h2><p>Stability rollback build: restored the last known-good 0.40.9 core while keeping the minimalist Settings pill-tab picker.</p><p>0.41.0, 0.41.1, and 0.41.2 are treated as bad startup builds and should be skipped.</p></div>
+    <div class="card grow"><h2>Build 0.41.4</h2><p>Stable GPS restore build on the confirmed-good rollback baseline.</p><p>GPS tools are restored without reintroducing the bad 0.41.0 service-call changes. Builds 0.41.0, 0.41.1, and 0.41.2 should still be skipped.</p></div>
   </div>`);
   document.getElementById("sitesCard").onclick=()=>route("sites");
   document.getElementById("tasksCard").onclick=()=>{selectedSiteId=null; route("tasks");};
@@ -120,7 +160,8 @@ function siteDetail(){
       <button class="ghost tile" id="taskBtn"><strong>${open}</strong><span>Open Tasks</span></button>
       <button class="ghost tile" id="defBtn"><strong>${def}</strong><span>Deficiencies</span></button>
     </div>
-    <div class="card grow"><h2>Site Notes</h2><p>${esc(s.notes || "No notes entered.")}</p><div class="mapActions"><button id="appleBtn" class="ghost">Apple Maps</button><button id="googleBtn" class="ghost">Google Maps</button></div></div>
+    <div class="card gpsCard"><div class="row"><div><h2>GPS / Maps</h2><p>${esc(gpsLine(s))}</p></div>${data.settings.gps?.enabled===false?"":`<button id="captureGpsBtn" class="primary smallBtn">Capture GPS</button>`}</div><div class="mapActions"><button id="appleBtn" class="ghost">Apple Maps</button><button id="googleBtn" class="ghost">Google Maps</button></div></div>
+    <div class="card grow"><h2>Site Notes</h2><p>${esc(s.notes || "No notes entered.")}</p></div>
   </div>`);
   document.getElementById("backBtn").onclick=()=>route("sites");
   document.getElementById("editBtn").onclick=()=>{mode="edit"; route("siteForm");};
@@ -128,20 +169,26 @@ function siteDetail(){
   document.getElementById("defBtn").onclick=()=>route("deficiencies");
   document.getElementById("reportBtn").onclick=()=>route("report");
   document.getElementById("jobBtn").onclick=startJob;
-  document.getElementById("appleBtn").onclick=()=>window.open("https://maps.apple.com/?q="+encodeURIComponent(fullAddress(s)),"_blank");
-  document.getElementById("googleBtn").onclick=()=>window.open("https://www.google.com/maps/search/?api=1&query="+encodeURIComponent(fullAddress(s)),"_blank");
+  const gpsBtn=document.getElementById("captureGpsBtn"); if(gpsBtn) gpsBtn.onclick=captureGpsForSite;
+  document.getElementById("appleBtn").onclick=()=>window.open(mapUrl(s,"apple"),"_blank");
+  document.getElementById("googleBtn").onclick=()=>window.open(mapUrl(s,"google"),"_blank");
 }
 
 function siteForm(){
   const s = mode==="edit" ? site() : {};
   html(`<div class="screen"><div class="row"><button class="back ghost" id="backBtn">←</button><h1>${mode==="edit"?"Edit":"Add"} Site</h1></div><div class="form grow">
     <div class="card"><label>Name</label><input id="name" value="${esc(s.name||"")}"><label>Street</label><input id="street" value="${esc(s.street||"")}"><div class="compactField"><div><label>City</label><input id="city" value="${esc(s.city||"")}"></div><div><label>State</label><input id="state" value="${esc(s.state||"")}"></div></div><label>ZIP</label><input id="zip" value="${esc(s.zip||"")}"></div>
+    <div class="card gpsEditCard"><div class="row"><h2>GPS Coordinates</h2><button type="button" class="ghost smallBtn" id="formGpsBtn">Capture</button></div><div class="compactField"><div><label>Latitude</label><input id="gpsLat" inputmode="decimal" value="${hasGps(s)?esc(s.gps.lat):""}"></div><div><label>Longitude</label><input id="gpsLng" inputmode="decimal" value="${hasGps(s)?esc(s.gps.lng):""}"></div></div><div class="compactField"><div><label>Accuracy m</label><input id="gpsAccuracy" inputmode="numeric" value="${hasGps(s)?esc(s.gps.accuracy||""):""}"></div><div><label>Captured</label><input id="gpsCapturedAt" value="${hasGps(s)?esc(s.gps.capturedAt||""):""}"></div></div><p class="fieldNote">GPS is optional. Capture requires browser location permission and works best from HTTPS.</p></div>
     <div class="card"><div class="compactField"><div><label>Panel Make</label><input id="pm" value="${esc(s.panelManufacturer||"")}"></div><div><label>Panel Model</label><input id="model" value="${esc(s.panelModel||"")}"></div></div><label>Notes</label><textarea id="notes">${esc(s.notes||"")}</textarea></div>
     <button class="primary" id="saveBtn">Save Site</button>${mode==="edit"?`<button class="danger" id="delBtn">Delete Site</button>`:""}
   </div></div>`);
   document.getElementById("backBtn").onclick=()=>{route(mode==="edit"?"siteDetail":"sites")};
+  const fg=document.getElementById("formGpsBtn"); if(fg) fg.onclick=captureGpsIntoForm;
   document.getElementById("saveBtn").onclick=()=>{
     const obj={name:val("name")||"Unnamed Site",street:val("street"),city:val("city"),state:val("state"),zip:val("zip"),panelManufacturer:val("pm"),panelModel:val("model"),notes:raw("notes")};
+    const gpsLat=Number(val("gpsLat")), gpsLng=Number(val("gpsLng"));
+    if(Number.isFinite(gpsLat) && Number.isFinite(gpsLng)) obj.gps={lat:gpsLat,lng:gpsLng,accuracy:Number(val("gpsAccuracy"))||0,capturedAt:val("gpsCapturedAt")||new Date().toISOString()};
+    else obj.gps=null;
     if(mode==="edit" && s){ Object.assign(s,obj); } else { const n=ensureSite({...obj,id:uid(),createdAt:new Date().toISOString()}); data.sites.unshift(n); selectedSiteId=n.id; }
     save(); route("siteDetail");
   };
@@ -184,7 +231,7 @@ function deficiencyForm(){
 
 function reportText(s){
   const set=data.settings, tech=set.technician||{};
-  return `${set.reports.title}\nGenerated: ${new Date().toLocaleString()}\n\nSITE\n${s.name}\n${fullAddress(s)}\nPanel: ${[s.panelManufacturer,s.panelModel].filter(Boolean).join(" ")||"Not entered"}\n\nTECHNICIAN\n${tech.name||""}\n${tech.company||""}\n${tech.phone||""}\n${tech.email||""}\n\nTASKS\n${(s.tasks||[]).map(t=>`- ${t.status||"Open"}: ${t.title}${t.due?` due ${t.due}`:""}`).join("\n")||"No tasks"}\n\nDEFICIENCIES\n${(s.deficiencies||[]).map(d=>`- ${d.status||"Open"}: ${d.priority||"Normal"} - ${d.title}`).join("\n")||"No deficiencies"}\n\nNOTES\n${s.notes||"No notes"}\n\nEMAIL SUBJECT\n${renderTemplate(set.email.defaultSubject,s)}\n\nSIGNATURE\n${renderTemplate(set.email.signature,s)}`;
+  return `${set.reports.title}\nGenerated: ${new Date().toLocaleString()}\n\nSITE\n${s.name}\n${fullAddress(s)}\nPanel: ${[s.panelManufacturer,s.panelModel].filter(Boolean).join(" ")||"Not entered"}\nGPS: ${data.settings.gps?.includeInReports===false?"Hidden in Settings":gpsLine(s)}\nMap: ${mapUrl(s,(set.gps&&set.gps.mapProvider)||"apple")}\n\nTECHNICIAN\n${tech.name||""}\n${tech.company||""}\n${tech.phone||""}\n${tech.email||""}\n\nTASKS\n${(s.tasks||[]).map(t=>`- ${t.status||"Open"}: ${t.title}${t.due?` due ${t.due}`:""}`).join("\n")||"No tasks"}\n\nDEFICIENCIES\n${(s.deficiencies||[]).map(d=>`- ${d.status||"Open"}: ${d.priority||"Normal"} - ${d.title}`).join("\n")||"No deficiencies"}\n\nNOTES\n${s.notes||"No notes"}\n\nEMAIL SUBJECT\n${renderTemplate(set.email.defaultSubject,s)}\n\nSIGNATURE\n${renderTemplate(set.email.signature,s)}`;
 }
 function renderTemplate(t,s){ const tech=data.settings.technician||{}; return String(t||"").replaceAll("{site_name}",s.name||"").replaceAll("{date}",fmtDate()).replaceAll("{technician}",tech.name||"").replaceAll("{company}",tech.company||"").replaceAll("{phone}",tech.phone||"").replaceAll("{email}",tech.email||""); }
 function report(){ const s=site(); if(!s){route("sites"); return;} const txt=reportText(s); html(`<div class="screen"><div class="row"><button class="back ghost" id="backBtn">←</button><h1>Report</h1></div><div class="reportActions"><button class="primary" id="copyBtn">Copy Report</button><button class="ghost" id="downloadBtn">Download TXT</button></div><div class="card reportBox grow">${esc(txt)}</div></div>`); document.getElementById("backBtn").onclick=()=>route("siteDetail"); document.getElementById("copyBtn").onclick=async()=>{await navigator.clipboard.writeText(txt); toast("Report copied.");}; document.getElementById("downloadBtn").onclick=()=>downloadBlob(`firevault-report-${(s.name||"site").replace(/\W+/g,"-")}.txt`,txt); }
@@ -198,7 +245,7 @@ function jobMode(){ const s=site(); if(!s||!activeJob){route("siteDetail"); retu
 function settings(){
   const tabs=[
     ["tech","Tech"],["reports","Report"],["email","Email"],["overlay","Photos"],
-    ["themes","Theme"],["advanced","Advanced"],["backup","Backup"],["about","About"]
+    ["gps","GPS"],["themes","Theme"],["advanced","Advanced"],["backup","Backup"],["about","About"]
   ];
   const active=tabs.find(t=>t[0]===settingsTab)||tabs[0];
   html(`<div class="screen settingsScreen settingsScreen409">
@@ -220,11 +267,12 @@ function checkBlock(id, text, on){
   return `<label class="checkRow"><input type="checkbox" id="${id}" ${on?"checked":""}><span>${text}</span></label>`;
 }
 function settingsPanel(){
-  const s=data.settings, t=s.theme, tech=s.technician, email=s.email, r=s.reports, o=s.overlay, a=s.advanced;
+  const s=data.settings, t=s.theme, tech=s.technician, email=s.email, r=s.reports, o=s.overlay, a=s.advanced, gps=s.gps||{};
   if(settingsTab==="tech") return `<div class="settingsStack"><div class="card settingGroup compactPane"><div class="paneHead"><h2>Technician Profile</h2><button class="primary saveMini" id="saveSettings">Save</button></div><p class="paneNote">Used on reports, email tags, and future photo stamps.</p><div class="settingsGrid">${fieldBlock("Name",`<input id="techName" value="${esc(tech.name)}">`)}${fieldBlock("Company",`<input id="techCompany" value="${esc(tech.company)}">`)}${fieldBlock("Phone",`<input id="techPhone" value="${esc(tech.phone)}">`)}${fieldBlock("Email",`<input id="techEmail" value="${esc(tech.email)}">`)}${fieldBlock("License / ID",`<input id="techLicense" value="${esc(tech.license)}">`)}</div></div></div>`;
   if(settingsTab==="reports") return `<div class="settingsStack"><div class="card settingGroup compactPane"><div class="paneHead"><h2>Report Defaults</h2><button class="primary saveMini" id="saveSettings">Save</button></div><p class="paneNote">Controls generated site reports.</p><div class="settingsGrid">${fieldBlock("Report Title",`<input id="reportTitle" value="${esc(r.title)}">`)}${fieldBlock("Format",`<select id="reportFormat"><option ${r.format==="detailed"?"selected":""}>detailed</option><option ${r.format==="compact"?"selected":""}>compact</option></select>`)}</div><div class="settingsList">${checkBlock("repTech","Include technician profile",r.includeTechnician)}${checkBlock("repTasks","Include open and completed tasks",r.includeTasks)}${checkBlock("repDef","Include deficiencies",r.includeDeficiencies)}</div></div></div>`;
   if(settingsTab==="email") return `<div class="settingsStack"><div class="card settingGroup compactPane"><div class="paneHead"><h2>Email Defaults</h2><button class="primary saveMini" id="saveSettings">Save</button></div><p class="paneNote">Default recipient, subject, and signature tags.</p><div class="settingsGrid">${fieldBlock("Default To",`<input id="emailTo" value="${esc(email.defaultTo)}">`)}${fieldBlock("CC",`<input id="emailCc" value="${esc(email.cc)}">`)}</div>${fieldBlock("Default Subject",`<input id="emailSubject" value="${esc(email.defaultSubject)}">`)}${fieldBlock("Signature Tag",`<textarea id="emailSig">${esc(email.signature)}</textarea>`,`Tags: {site_name}, {date}, {technician}, {company}, {phone}, {email}`)}</div></div>`;
   if(settingsTab==="overlay") return `<div class="settingsStack"><div class="card settingGroup compactPane"><div class="paneHead"><h2>Photo Overlay</h2><button class="primary saveMini" id="saveSettings">Save</button></div><p class="paneNote">Preview and format the field photo stamp.</p><div class="previewPanel compactPreview"><div class="previewOverlay ${o.alignment==="top"?"top":""}">FIREVAULT • Site • Date • Time</div></div><div class="settingsGrid">${fieldBlock("Alignment",`<select id="ovAlign"><option ${o.alignment==="bottom"?"selected":""}>bottom</option><option ${o.alignment==="top"?"selected":""}>top</option></select>`)}${fieldBlock("Font Size",`<select id="ovSize"><option ${o.fontSize==="small"?"selected":""}>small</option><option ${o.fontSize==="medium"?"selected":""}>medium</option><option ${o.fontSize==="large"?"selected":""}>large</option></select>`)}${fieldBlock("Accent Color",`<input id="ovAccent" type="color" value="${esc(o.accentColor)}">`)}</div><div class="settingsList">${checkBlock("ovLogo","Show FireVault logo on overlay",o.showLogo)}</div></div></div>`;
+  if(settingsTab==="gps") return `<div class="settingsStack"><div class="card settingGroup compactPane gpsSettingsPane"><div class="paneHead"><h2>GPS / Maps</h2><button class="primary saveMini" id="saveSettings">Save</button></div><p class="paneNote">Restored GPS tools. Coordinates are saved locally inside each site record.</p><div class="settingsGrid">${fieldBlock("Default Map",`<select id="gpsMapProvider"><option value="apple" ${gps.mapProvider!=="google"?"selected":""}>Apple Maps</option><option value="google" ${gps.mapProvider==="google"?"selected":""}>Google Maps</option></select>`)}${fieldBlock("GPS Accuracy",`<select id="gpsHighAccuracy"><option value="true" ${gps.highAccuracy!==false?"selected":""}>High accuracy</option><option value="false" ${gps.highAccuracy===false?"selected":""}>Standard</option></select>`)}</div><div class="settingsList">${checkBlock("gpsEnabled","Show GPS capture buttons on site pages",gps.enabled!==false)}${checkBlock("gpsReports","Include GPS coordinates in reports",gps.includeInReports!==false)}</div><p class="fieldNote">Browser GPS works only when allowed by the phone/browser and served from HTTPS.</p></div></div>`;
   if(settingsTab==="themes") return `<div class="settingsStack"><div class="card settingGroup compactPane"><div class="paneHead"><h2>Theme Engine</h2><button class="primary saveMini" id="saveSettings">Apply</button></div><p class="paneNote">Quick presets and live UI controls.</p><div class="presetGrid">${Object.entries(themePresets).map(([key,p])=>`<button class="ghost presetBtn" data-preset="${key}"><span class="themeSwatch" style="background:${p.accentColor}"></span><span>${p.label}</span></button>`).join("")}</div><div class="settingsGrid">${fieldBlock("Theme",`<select id="themeName">${Object.entries(themePresets).map(([key,p])=>`<option value="${key}" ${t.name===key?"selected":""}>${p.label}</option>`).join("")}</select>`)}${fieldBlock("Accent Color",`<input id="themeAccent" type="color" value="${esc(t.accentColor||"#ef4444")}">`)}${fieldBlock("Buttons",`<select id="buttonStyle"><option value="rounded" ${t.buttonStyle!=="squared"?"selected":""}>rounded</option><option value="squared" ${t.buttonStyle==="squared"?"selected":""}>squared</option></select>`)}${fieldBlock("Cards",`<select id="cardStyle"><option value="glass" ${t.cardStyle!=="solid"?"selected":""}>glass</option><option value="solid" ${t.cardStyle==="solid"?"selected":""}>solid</option></select>`)}</div><div class="settingsList">${checkBlock("themeHighContrast","High contrast support",t.highContrast)}${checkBlock("themeLargeText","Larger text",t.largeText)}${checkBlock("themeCompact","Compact layout",t.compactLayout)}</div></div></div>`;
   if(settingsTab==="advanced") return `<div class="settingsStack"><div class="card settingGroup compactPane"><div class="paneHead"><h2>Advanced Features</h2><button class="primary saveMini" id="saveSettings">Save</button></div><p class="paneNote"><span class="featureStar">*</span> Requires outside services, permissions, APIs, or future backend modules.</p><div class="settingsList twoCol">${[["advAi","aiTechnician","AI Technician"],["advReverse","reverseAddressLookup","Reverse Address Lookup *"],["advCloud","cloudBackup","Cloud Backup *"],["advVoice","voiceTranscription","Voice Transcription *"],["advOcr","ocrReader","OCR Reader *"],["advEmail","emailGateway","Email Gateway *"],["advWeather","weather","Weather Context *"],["advTraffic","traffic","Traffic / Routing *"]].map(x=>checkBlock(x[0],x[2],a[x[1]])).join("")}</div></div></div>`;
   if(settingsTab==="backup") return `<div class="settingsStack"><div class="card settingGroup compactPane"><div class="paneHead"><h2>Import / Export</h2></div><p class="paneNote">Export before replacing files in GitHub Pages.</p><div class="settingsList"><button class="primary" id="exportBtn">Export Backup</button>${fieldBlock("Import Backup",`<input type="file" id="importFile" accept="application/json">`)}<button class="danger" id="resetBtn">Clear Local Data</button></div></div></div>`;
@@ -243,26 +291,28 @@ function saveSettings(){
   if(settingsTab==="reports") s.reports={...s.reports,title:val("reportTitle")||"FireVault Service Report",format:val("reportFormat"),includeTechnician:checked("repTech"),includeTasks:checked("repTasks"),includeDeficiencies:checked("repDef")};
   if(settingsTab==="email") s.email={...s.email,defaultTo:val("emailTo"),cc:val("emailCc"),defaultSubject:val("emailSubject"),signature:raw("emailSig")};
   if(settingsTab==="overlay") s.overlay={...s.overlay,alignment:val("ovAlign"),fontSize:val("ovSize"),accentColor:val("ovAccent"),showLogo:checked("ovLogo")};
+  if(settingsTab==="gps") s.gps={enabled:checked("gpsEnabled"),mapProvider:val("gpsMapProvider")||"apple",highAccuracy:val("gpsHighAccuracy")!=="false",includeInReports:checked("gpsReports")};
   if(settingsTab==="themes") s.theme={name:val("themeName"),accentColor:val("themeAccent"),highContrast:checked("themeHighContrast"),largeText:checked("themeLargeText"),compactLayout:checked("themeCompact"),buttonStyle:val("buttonStyle"),cardStyle:val("cardStyle")};
   if(settingsTab==="advanced") s.advanced={aiTechnician:checked("advAi"),reverseAddressLookup:checked("advReverse"),cloudBackup:checked("advCloud"),voiceTranscription:checked("advVoice"),ocrReader:checked("advOcr"),emailGateway:checked("advEmail"),weather:checked("advWeather"),traffic:checked("advTraffic")};
   save(); toast("Settings saved."); settings();
 }
 
-function diagnostics(){ const totalTasks=data.sites.reduce((n,s)=>n+(s.tasks||[]).length,0); const totalDef=data.sites.reduce((n,s)=>n+(s.deficiencies||[]).length,0); html(`<div class="screen"><div class="row"><button class="back ghost" id="backHome">←</button><h1>Diagnostics</h1></div><div class="card grow errorBox"><p>Build: ${BUILD}</p><p>Sites: ${data.sites.length}</p><p>Total Tasks: ${totalTasks}</p><p>Total Deficiencies: ${totalDef}</p><p>Active Job: ${activeJob ? esc(activeJob.siteName) : "None"}</p><p>Current Theme: ${esc(data.settings.theme.name)}</p><p>Accent: ${esc(data.settings.theme.accentColor)}</p><p>Advanced AI Enabled: ${data.settings.advanced?.aiTechnician ? "Yes" : "No"}</p><p>Import/Export: Ready</p><p>Storage key: ${KEY}</p><p>Modules loaded successfully.</p></div></div>`); document.getElementById("backHome").onclick=()=>route("home"); }
+function diagnostics(){ const totalTasks=data.sites.reduce((n,s)=>n+(s.tasks||[]).length,0); const totalDef=data.sites.reduce((n,s)=>n+(s.deficiencies||[]).length,0); html(`<div class="screen"><div class="row"><button class="back ghost" id="backHome">←</button><h1>Diagnostics</h1></div><div class="card grow errorBox"><p>Build: ${BUILD}</p><p>Sites: ${data.sites.length}</p><p>Total Tasks: ${totalTasks}</p><p>Total Deficiencies: ${totalDef}</p><p>Active Job: ${activeJob ? esc(activeJob.siteName) : "None"}</p><p>Current Theme: ${esc(data.settings.theme.name)}</p><p>Accent: ${esc(data.settings.theme.accentColor)}</p><p>Advanced AI Enabled: ${data.settings.advanced?.aiTechnician ? "Yes" : "No"}</p><p>GPS Tools: ${data.settings.gps?.enabled !== false ? "Enabled" : "Hidden"}</p><p>Import/Export: Ready</p><p>Storage key: ${KEY}</p><p>Modules loaded successfully.</p></div></div>`); document.getElementById("backHome").onclick=()=>route("home"); }
 function showChangelog(){
   const notes = [
-    "Build number advanced to 0.41.3 across the header, dashboard, manifest, and diagnostics.",
-    "Rolled the app core back to the last known-good 0.40.9 baseline.",
-    "Marked 0.41.0, 0.41.1, and 0.41.2 as bad startup builds to skip.",
-    "Kept the minimalist Settings pill-tab picker without the blank top boxes.",
-    "Kept Settings readable and slightly less compressed than the overly tight pass.",
-    "Kept compact release notes formatting, the selected #8 Flame Icon logo, and the existing modular storage key."
+    "Build number advanced to 0.41.4 across the header, dashboard, manifest, and diagnostics.",
+    "Kept the stable 0.41.3 rollback core and did not reintroduce the bad 0.41.0 service-call changes.",
+    "Restored GPS capture on saved site detail pages.",
+    "Added GPS coordinate fields and Capture button to Add/Edit Site.",
+    "Apple Maps and Google Maps now prefer saved coordinates when available.",
+    "Added a GPS Settings tab with map provider and report controls.",
+    "Reports now include GPS coordinates and a map link."
   ];
   const overlay=document.createElement("div");
   overlay.className="releaseOverlay";
   overlay.innerHTML=`<div class="releaseSheet" role="dialog" aria-modal="true" aria-label="FireVault release notes">
     <div class="releaseHead"><div><strong>FireVault</strong><span>Build ${BUILD}</span></div><button class="ghost iconBtn" id="closeRelease" aria-label="Close release notes">×</button></div>
-    <div class="releaseBody"><h2>Release Notes</h2><p class="releaseIntro">Minimalist Settings pill-tab picker and compact subpage cleanup.</p><ul>${notes.map(n=>`<li>${esc(n)}</li>`).join("")}</ul></div>
+    <div class="releaseBody"><h2>Release Notes</h2><p class="releaseIntro">Stable GPS restore on the 0.41.3 rollback baseline.</p><ul>${notes.map(n=>`<li>${esc(n)}</li>`).join("")}</ul></div>
   </div>`;
   document.body.appendChild(overlay);
   const close=()=>overlay.remove();
