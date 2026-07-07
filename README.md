@@ -1,17 +1,16 @@
-# FireVault Build 0.33.0 — Job Mode Module
+# FireVault Build 0.34.0 — Tasks / Deficiencies Module
 
 Root-level package for GitHub Pages.
 
 ## Changes
-- Restores Job Mode in the modular app
-- Start Service Call button on site vault
-- Live elapsed timer
-- Quick event buttons and custom notes
-- Job Mode photo capture
-- Finish Call saves to visit history
-- Compact visit list with detail view
-- Active job banner on Today screen
+- Restores follow-up Tasks
+- Add/Edit/Delete tasks per site
+- Open Tasks dashboard shortcut works
+- Restores Deficiency Tracker
+- Add/Edit/Delete deficiencies per site
+- Optional task creation from new deficiencies
+- Diagnostics includes task/deficiency counts
 
 Suggested commit:
 
-`Build 0.33.0 job mode module`
+`Build 0.34.0 tasks deficiencies module`

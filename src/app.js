@@ -68,7 +68,7 @@ function route(v){ view = v; mode = null; render(); }
 
 function render(){
   try{
-    const routes = {home, sites, siteDetail, siteForm, docs, docForm, imageViewer, library, resourceForm, jobMode, visits, visitDetail, settings, diagnostics};
+    const routes = {home, sites, siteDetail, siteForm, docs, docForm, imageViewer, library, resourceForm, jobMode, visits, visitDetail, tasks, taskForm, deficiencies, deficiencyForm, settings, diagnostics};
     (routes[view] || home)();
     if(view === "jobMode") startJobTimer(); else stopJobTimer();
     setActiveNav();
@@ -93,7 +93,7 @@ function showError(err){
 
 function setActiveNav(){
   document.querySelectorAll("nav button").forEach(b => b.classList.remove("active"));
-  const section = ["siteDetail","siteForm","docs","docForm","imageViewer","jobMode","visits","visitDetail"].includes(view) ? "sites" : view;
+  const section = ["siteDetail","siteForm","docs","docForm","imageViewer","jobMode","visits","visitDetail","tasks","taskForm","deficiencies","deficiencyForm"].includes(view) ? "sites" : view;
   document.getElementById("nav-"+section)?.classList.add("active");
 }
 
@@ -183,7 +183,7 @@ function home(){
   </div>`);
   document.getElementById("sitesCard").onclick = () => route("sites");
   document.getElementById("visitsCard").onclick = () => route("visits");
-  document.getElementById("tasksCard").onclick = openTasksPlaceholder;
+  document.getElementById("tasksCard").onclick = () => { selectedSiteId=null; view="tasks"; render(); };
   document.getElementById("addSiteBtn").onclick = () => { selectedSiteId=null; view="siteForm"; render(); };
   document.getElementById("diagBtn").onclick = () => { view="diagnostics"; render(); };
   document.getElementById("nearbyBtn").onclick = scanNearbySites;
@@ -250,7 +250,11 @@ function siteDetail(){
       <button class="tile" id="docsBtn"><strong>Docs / Photos</strong><span>${s.docs.length} records</span></button>
       <button class="tile" id="gpsBtn"><strong>GPS</strong><span>${s.lat&&s.lng?"Saved":"Not set"}</span></button>
       <button class="tile" id="visitsBtn"><strong>Visits</strong><span>${s.visits.length} records</span></button>
-      <button class="tile"><strong>Tasks</strong><span>${s.tasks.length} items</span></button>
+      <button class="tile" id="tasksBtn"><strong>Tasks</strong><span>${s.tasks.filter(t => (t.status||"Open") !== "Done").length} open</span></button>
+    </div>
+    <div class="grid2">
+      <button class="tile" id="defBtn"><strong>Deficiencies</strong><span>${s.deficiencies.length} items</span></button>
+      <button class="tile" id="addTaskBtn"><strong>＋ Task</strong><span>Follow-up item</span></button>
     </div>
     <div class="card ${s.lat&&s.lng?"gpsGood":"gpsWarn"}">
       <h2>Location</h2>
@@ -265,6 +269,9 @@ function siteDetail(){
   document.getElementById("startJobBtn").onclick = () => startServiceCall(s);
   document.getElementById("docsBtn").onclick = () => { view="docs"; render(); };
   document.getElementById("visitsBtn").onclick = () => { view="visits"; render(); };
+  document.getElementById("tasksBtn").onclick = () => { view="tasks"; render(); };
+  document.getElementById("defBtn").onclick = () => { view="deficiencies"; render(); };
+  document.getElementById("addTaskBtn").onclick = () => { mode=null; view="taskForm"; render(); };
   document.getElementById("gpsBtn").onclick = () => { view="siteForm"; render(); };
   document.getElementById("appleMapBtn").onclick = () => openAppleMaps(s);
   document.getElementById("googleMapBtn").onclick = () => openGoogleMaps(s);
@@ -557,6 +564,172 @@ function visitDetail(){
 }
 
 
+
+function allTaskRows(){
+  const rows = [];
+  data.sites.forEach(s => {
+    ensureSite(s);
+    s.tasks.forEach(t => rows.push({site:s, task:t}));
+  });
+  return rows;
+}
+
+function tasks(){
+  const currentSite = getSite();
+  const rows = currentSite
+    ? ensureSite(currentSite).tasks.map(t => ({site:currentSite, task:t}))
+    : allTaskRows();
+
+  rows.sort((a,b)=>{
+    const ad = a.task.due || "9999-99-99";
+    const bd = b.task.due || "9999-99-99";
+    return ad.localeCompare(bd);
+  });
+
+  html(`<div class="screen">
+    <div class="row">
+      <button class="back ghost" id="tasksBack">←</button>
+      <h1>${currentSite ? "Site Tasks" : "Open Tasks"}</h1>
+      ${currentSite ? `<button class="primary" id="addTask">＋ Add</button>` : ""}
+    </div>
+    <div class="list grow">${rows.length ? rows.map(r => {
+      const t = r.task;
+      const done = (t.status||"Open") === "Done";
+      return `<div class="card ${done ? "taskDone statusDone" : "taskOpen"} siteItem taskPick" data-site="${r.site.id}" data-task="${t.id}">
+        <div class="row"><h2><span class="statusDot"></span>${esc(t.title || "Untitled Task")}</h2><span class="pill">${esc(t.status || "Open")}</span></div>
+        <p>${currentSite ? "" : esc(r.site.name)}</p>
+        <span class="pill ${t.priority==="Critical"?"priorityCritical":t.priority==="High"?"priorityHigh":""}">${esc(t.priority || "Normal")}</span>
+        <span class="pill">${esc(t.due || "No due date")}</span>
+        <p>${esc(t.notes || "")}</p>
+      </div>`;
+    }).join("") : `<div class="empty">No tasks recorded.</div>`}</div>
+  </div>`);
+  document.getElementById("tasksBack").onclick = () => currentSite ? route("siteDetail") : route("home");
+  document.getElementById("addTask")?.addEventListener("click", () => { mode=null; view="taskForm"; render(); });
+  document.querySelectorAll(".taskPick").forEach(el => el.onclick = () => {
+    selectedSiteId = el.dataset.site;
+    mode = el.dataset.task;
+    view = "taskForm";
+    render();
+  });
+}
+
+function taskForm(){
+  let s = getSite();
+  if(!s && selectedSiteId) s = getSite();
+  if(!s) return route("sites");
+  ensureSite(s);
+  const t = mode ? s.tasks.find(x => x.id === mode) || {} : {};
+  html(`<div class="screen">
+    <div class="row"><button class="back ghost" id="taskBack">←</button><h1>${mode ? "Edit Task" : "Add Task"}</h1></div>
+    <div class="form grow">
+      <label>Task</label><input id="taskTitle" value="${esc(t.title)}" placeholder="Replace batteries, quote NAC repair...">
+      <div class="grid2">
+        <div><label>Status</label><select id="taskStatus">${["Open","Waiting","Scheduled","Done"].map(x=>`<option ${t.status===x?"selected":""}>${x}</option>`).join("")}</select></div>
+        <div><label>Priority</label><select id="taskPriority">${["Critical","High","Normal","Low"].map(x=>`<option ${t.priority===x?"selected":""}>${x}</option>`).join("")}</select></div>
+      </div>
+      <label>Due Date</label><input id="taskDue" type="date" value="${esc(t.due)}">
+      <label>Notes</label><textarea id="taskNotes">${esc(t.notes)}</textarea>
+    </div>
+    <div class="grid2"><button class="primary" id="saveTask">Save Task</button>${mode ? `<button class="danger" id="deleteTask">Delete</button>` : `<button class="ghost" id="cancelTask">Cancel</button>`}</div>
+  </div>`);
+  document.getElementById("taskBack").onclick = () => route("tasks");
+  document.getElementById("cancelTask")?.addEventListener("click", () => route("tasks"));
+  document.getElementById("saveTask").onclick = () => {
+    const obj = {title:val("taskTitle"),status:val("taskStatus"),priority:val("taskPriority"),due:val("taskDue"),notes:val("taskNotes"),updatedAt:new Date().toISOString()};
+    if(!obj.title){ alert("Enter a task title."); return; }
+    if(mode){
+      const i = s.tasks.findIndex(x => x.id === mode);
+      if(i >= 0) s.tasks[i] = {...s.tasks[i], ...obj};
+    }else{
+      s.tasks.unshift({...obj, id:uid(), createdAt:new Date().toISOString()});
+    }
+    save(); mode=null; route("tasks");
+  };
+  document.getElementById("deleteTask")?.addEventListener("click", () => {
+    if(confirm("Delete this task?")){
+      s.tasks = s.tasks.filter(x => x.id !== mode);
+      save(); mode=null; route("tasks");
+    }
+  });
+}
+
+function deficiencies(){
+  const s = getSite();
+  if(!s) return route("sites");
+  ensureSite(s);
+  html(`<div class="screen">
+    <div class="row"><button class="back ghost" id="defBack">←</button><h1>Deficiencies</h1><button class="primary" id="addDef">＋ Add</button></div>
+    <div class="list grow">${s.deficiencies.length ? s.deficiencies.map(d => `<div class="card deficiencyCard siteItem defPick" data-id="${d.id}">
+      <div class="row"><h2>${esc(d.status || "Open")}</h2><span class="pill ${d.severity==="Critical"?"priorityCritical":d.severity==="High"?"priorityHigh":""}">${esc(d.severity || "Needs Review")}</span></div>
+      <p><strong>${esc(d.description || "No description")}</strong></p>
+      <span class="pill">${esc(d.system || "System TBD")}</span>
+      <span class="pill">${esc(d.location || "Location TBD")}</span>
+      <p>${esc(d.recommendation || "")}</p>
+    </div>`).join("") : `<div class="empty">No deficiencies recorded.</div>`}</div>
+  </div>`);
+  document.getElementById("defBack").onclick = () => route("siteDetail");
+  document.getElementById("addDef").onclick = () => { mode=null; view="deficiencyForm"; render(); };
+  document.querySelectorAll(".defPick").forEach(el => el.onclick = () => {
+    mode = el.dataset.id;
+    view = "deficiencyForm";
+    render();
+  });
+}
+
+function deficiencyForm(){
+  const s = getSite();
+  if(!s) return route("sites");
+  ensureSite(s);
+  const d = mode ? s.deficiencies.find(x => x.id === mode) || {} : {};
+  html(`<div class="screen">
+    <div class="row"><button class="back ghost" id="defFormBack">←</button><h1>${mode ? "Edit Deficiency" : "Add Deficiency"}</h1></div>
+    <div class="form grow">
+      <div class="grid2">
+        <div><label>Status</label><select id="defStatus">${["Open","Quoted","Scheduled","Corrected","Needs Review"].map(x=>`<option ${d.status===x?"selected":""}>${x}</option>`).join("")}</select></div>
+        <div><label>Severity</label><select id="defSeverity">${["Critical","High","Medium","Low","Needs Review"].map(x=>`<option ${d.severity===x?"selected":""}>${x}</option>`).join("")}</select></div>
+      </div>
+      <label>System</label><select id="defSystem">${["Fire Alarm","Sprinkler Monitor","NAC","SLC","Communicator","Power Supply","Battery","Elevator Recall","Smoke Control","Other"].map(x=>`<option ${d.system===x?"selected":""}>${x}</option>`).join("")}</select>
+      <label>Location</label><input id="defLocation" value="${esc(d.location)}" placeholder="Loading dock, lobby, room 118...">
+      <label>Description</label><textarea id="defDescription">${esc(d.description)}</textarea>
+      <label>Recommendation</label><textarea id="defRecommendation">${esc(d.recommendation)}</textarea>
+      ${!mode ? `<label><input type="checkbox" id="makeTask" checked> Create follow-up task</label>` : ""}
+    </div>
+    <div class="grid2"><button class="primary" id="saveDef">Save Deficiency</button>${mode ? `<button class="danger" id="deleteDef">Delete</button>` : `<button class="ghost" id="cancelDef">Cancel</button>`}</div>
+  </div>`);
+  document.getElementById("defFormBack").onclick = () => route("deficiencies");
+  document.getElementById("cancelDef")?.addEventListener("click", () => route("deficiencies"));
+  document.getElementById("saveDef").onclick = () => {
+    const obj = {status:val("defStatus"),severity:val("defSeverity"),system:val("defSystem"),location:val("defLocation"),description:val("defDescription"),recommendation:val("defRecommendation"),updatedAt:new Date().toISOString()};
+    if(!obj.description){ alert("Enter a deficiency description."); return; }
+    if(mode){
+      const i = s.deficiencies.findIndex(x => x.id === mode);
+      if(i >= 0) s.deficiencies[i] = {...s.deficiencies[i], ...obj};
+    }else{
+      s.deficiencies.unshift({...obj, id:uid(), date:new Date().toISOString().slice(0,10), createdAt:new Date().toISOString()});
+      if(checked("makeTask")){
+        s.tasks.unshift({
+          id:uid(),
+          title:"Correct deficiency: " + obj.description.slice(0,60),
+          status:"Open",
+          priority:obj.severity==="Critical" ? "Critical" : obj.severity==="High" ? "High" : "Normal",
+          due:"",
+          notes:obj.recommendation || "",
+          createdAt:new Date().toISOString()
+        });
+      }
+    }
+    save(); mode=null; route("deficiencies");
+  };
+  document.getElementById("deleteDef")?.addEventListener("click", () => {
+    if(confirm("Delete this deficiency?")){
+      s.deficiencies = s.deficiencies.filter(x => x.id !== mode);
+      save(); mode=null; route("deficiencies");
+    }
+  });
+}
+
+
 function library(){
   html(`<div class="screen">
     <div class="row"><div><h1>Library</h1><p>Manufacturer resources, panel notes, links, and cheat sheets.</p></div><button class="primary" id="addResource">＋ Add</button></div>
@@ -799,7 +972,7 @@ function saveSettingsFromVisibleTab(){
 }
 
 function diagnostics(){
-  html(`<div class="screen"><div class="row"><button class="back ghost" id="backHome">←</button><h1>Diagnostics</h1></div><div class="card grow errorBox"><p>Build: ${BUILD}</p><p>Sites: ${data.sites.length}</p><p>Sites with GPS: ${data.sites.filter(s=>s.lat&&s.lng).length}</p><p>Active Job: ${activeJob ? activeJob.siteName : "None"}</p><p>Storage key: ${KEY}</p><p>Modules loaded successfully.</p></div></div>`);
+  html(`<div class="screen"><div class="row"><button class="back ghost" id="backHome">←</button><h1>Diagnostics</h1></div><div class="card grow errorBox"><p>Build: ${BUILD}</p><p>Sites: ${data.sites.length}</p><p>Sites with GPS: ${data.sites.filter(s=>s.lat&&s.lng).length}</p><p>Active Job: ${activeJob ? activeJob.siteName : "None"}</p><p>Total Tasks: ${data.sites.reduce((n,s)=>n+(s.tasks||[]).length,0)}</p><p>Total Deficiencies: ${data.sites.reduce((n,s)=>n+(s.deficiencies||[]).length,0)}</p><p>Storage key: ${KEY}</p><p>Modules loaded successfully.</p></div></div>`);
   document.getElementById("backHome").onclick = () => route("home");
 }
 
@@ -807,20 +980,19 @@ function exportJson(){
   const blob = new Blob([JSON.stringify(data,null,2)], {type:"application/json"});
   const a = document.createElement("a");
   a.href = URL.createObjectURL(blob);
-  a.download = "firevault-backup-build-0.33.0.json";
+  a.download = "firevault-backup-build-0.34.0.json";
   a.click();
 }
 
 function showChangelog(){
   alert(`FireVault Build ${BUILD}
 
-- Job Mode module restored
-- Start Service Call button on site vault
-- Live elapsed timer
-- Quick event buttons and custom notes
-- Job Mode photo capture
-- Finish Call saves visit history
-- Compact visit list with detail view`);
+- Tasks / Deficiencies module restored
+- Add/Edit/Delete tasks per site
+- Open Tasks dashboard shortcut works
+- Deficiency tracker restored
+- Optional task creation from new deficiencies
+- Diagnostics includes task/deficiency counts`);
 }
 
 render();

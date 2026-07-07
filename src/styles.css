@@ -59,3 +59,11 @@ nav button span:last-child{font-size:12px}
 .quickBtn{min-height:58px;text-align:center;padding:9px 6px}
 .eventTime{font-weight:900;color:#fff;margin-right:8px}
 .activeJobMini{border-left:4px solid var(--green)}
+
+.taskOpen{border-left:4px solid var(--amber)}
+.taskDone{border-left:4px solid var(--green);opacity:.82}
+.deficiencyCard{border-left:4px solid var(--red)}
+.statusDot{width:10px;height:10px;border-radius:50%;display:inline-block;margin-right:6px;background:var(--amber)}
+.statusDone .statusDot{background:var(--green)}
+.priorityCritical{color:#fecaca;font-weight:950}
+.priorityHigh{color:#fed7aa;font-weight:950}
