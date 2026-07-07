@@ -1,15 +1,15 @@
-# FireVault Build 0.20.0 — Job Mode Photo Capture
+# FireVault Build 0.21.0 — Voice Note Capture
 
 Root-level package for GitHub Pages.
 
 ## Changes
-- Job Mode Photo Capture
-- Photo button opens camera/file picker
-- Captured photos save into the site Docs / Photos section
-- Photo event is timestamped into the live service timeline
-- Photos carry into visit history when the call is finished
+- Voice Note Capture in Job Mode
+- Uses browser speech recognition when available
+- Typed fallback when speech recognition is unavailable
+- Voice notes timestamp into the live timeline
+- Voice Note tags carry into visit history
 - Preserves previous local storage data
 
 Suggested commit:
 
-`Build 0.20.0 job mode photo capture`
+`Build 0.21.0 voice note capture`

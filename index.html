@@ -32,7 +32,7 @@ nav button{background:transparent;border:0;color:var(--muted);display:flex;flex-
 </style>
 </head>
 <body>
-<header><div class="brand"><div class="logo">🔥</div><div>FIREVAULT</div></div><button class="build" onclick="showChangelog()">Build 0.20.0</button></header>
+<header><div class="brand"><div class="logo">🔥</div><div>FIREVAULT</div></div><button class="build" onclick="showChangelog()">Build 0.21.0</button></header>
 <main id="app"></main>
 <nav>
 <button id="nav-home" onclick="go('home')"><span>🏠</span><span>Today</span></button>
@@ -41,7 +41,7 @@ nav button{background:transparent;border:0;color:var(--muted);display:flex;flex-
 <button id="nav-settings" onclick="go('settings')"><span>⚙️</span><span>Settings</span></button>
 </nav>
 <script>
-const BUILD="0.20.0"; const KEY="firevault_vault_build_030"; const ACTIVE="firevault_active_job_080";
+const BUILD="0.21.0"; const KEY="firevault_vault_build_030"; const ACTIVE="firevault_active_job_080";
 let data=load(), activeJob=loadActive(), view="home", selected=null, mode=null, timer=null;
 function load(){const raw=localStorage.getItem(KEY);if(raw){try{return JSON.parse(raw)}catch(e){}}return{sites:[],resources:[{m:"Fire-Lite",n:"Manual links, trouble notes, walk-test reminders."},{m:"Notifier",n:"Panel notes, programming reminders, common issues."},{m:"Silent Knight",n:"Model notes, NAC quirks, communicator references."},{m:"Edwards / EST",n:"EST3 / EST4 notes, mapping, node information."},{m:"Potter",n:"Programming notes, compatibility, field observations."}]}}
 function save(){localStorage.setItem(KEY,JSON.stringify(data))}function loadActive(){const raw=localStorage.getItem(ACTIVE);if(raw){try{return JSON.parse(raw)}catch(e){}}return null}function saveActive(){activeJob?localStorage.setItem(ACTIVE,JSON.stringify(activeJob)):localStorage.removeItem(ACTIVE)}
@@ -104,9 +104,28 @@ function startJob(){const s=ensureArrays(site());if(activeJob&&!confirm("Another
  const begin=(lat,lng)=>{activeJob={id:uid(),siteId:s.id,siteName:s.name,startedAt:new Date().toISOString(),lat:lat||"",lng:lng||"",events:[{id:uid(),time:new Date().toISOString(),type:"Arrived",text:lat?`Service call started at GPS ${lat.toFixed(5)}, ${lng.toFixed(5)}`:"Service call started"}]};saveActive();view="job";render()}
  if(navigator.geolocation){navigator.geolocation.getCurrentPosition(pos=>begin(pos.coords.latitude,pos.coords.longitude),()=>begin(null,null),{enableHighAccuracy:true,timeout:8000,maximumAge:30000})}else begin(null,null)
 }
-function job(){const s=ensureArrays(siteById(activeJob?activeJob.siteId:selected));if(!activeJob||!s){activeJob=null;saveActive();return go("sites")}selected=s.id;app(`<div class="screen"><div class="row"><button class="back ghost" onclick="view='site';render()">←</button><h1>Job Mode</h1></div><div class="card jobBanner"><h1>${esc(s.name)}</h1><p>SERVICE CALL ACTIVE</p><div class="grid3"><div><span class="muted">Started</span><div><strong>${fmtTime(activeJob.startedAt)}</strong></div></div><div><span class="muted">Elapsed</span><div class="timer" id="elapsed">${elapsed(activeJob.startedAt)}</div></div><div><span class="muted">GPS</span><div><strong>${activeJob.lat?'Saved':'Manual'}</strong></div></div></div></div><div class="grid3"><button class="quick" onclick="quick('⚠ Ground Fault')">⚠<br>Ground</button><button class="quick" onclick="quick('🚨 NAC Trouble')">🚨<br>NAC</button><button class="quick" onclick="quick('🔋 Battery')">🔋<br>Battery</button><button class="quick" onclick="quick('💨 Smoke Detector')">💨<br>Smoke</button><button class="quick" onclick="quick('🚪 Pull Station')">🚪<br>Pull</button><button class="quick" onclick="quick('📡 Communicator')">📡<br>Comm</button><button class="quick" onclick="customNote()">📝<br>Note</button><button class="quick" onclick="view='templates';render()">📋<br>Templates</button><button class="quick" onclick="quick('✅ Test Passed')">✅<br>Passed</button></div><input id="jobPhotoInput" type="file" accept="image/*" capture="environment" style="display:none" onchange="handleJobPhoto(event)"><div class="card grow"><div class="row"><h2>Live Timeline</h2><button class="danger" onclick="finishJob()">Finish</button></div><div class="list">${activeJob.events.map(e=>`<div class="card tight visit"><span class="eventTime">${fmtTime(e.time)}</span><strong>${esc(e.type)}</strong><p>${esc(e.text)}</p></div>`).join("")}</div></div></div>`)}
+function job(){const s=ensureArrays(siteById(activeJob?activeJob.siteId:selected));if(!activeJob||!s){activeJob=null;saveActive();return go("sites")}selected=s.id;app(`<div class="screen"><div class="row"><button class="back ghost" onclick="view='site';render()">←</button><h1>Job Mode</h1></div><div class="card jobBanner"><h1>${esc(s.name)}</h1><p>SERVICE CALL ACTIVE</p><div class="grid3"><div><span class="muted">Started</span><div><strong>${fmtTime(activeJob.startedAt)}</strong></div></div><div><span class="muted">Elapsed</span><div class="timer" id="elapsed">${elapsed(activeJob.startedAt)}</div></div><div><span class="muted">GPS</span><div><strong>${activeJob.lat?'Saved':'Manual'}</strong></div></div></div></div><div class="grid3"><button class="quick" onclick="quick('⚠ Ground Fault')">⚠<br>Ground</button><button class="quick" onclick="quick('🚨 NAC Trouble')">🚨<br>NAC</button><button class="quick" onclick="quick('🔋 Battery')">🔋<br>Battery</button><button class="quick" onclick="quick('💨 Smoke Detector')">💨<br>Smoke</button><button class="quick" onclick="quick('🚪 Pull Station')">🚪<br>Pull</button><button class="quick" onclick="quick('📡 Communicator')">📡<br>Comm</button><button class="quick" onclick="voiceNote()">🎤<br>Voice</button><button class="quick" onclick="view='templates';render()">📋<br>Templates</button><button class="quick" onclick="quick('✅ Test Passed')">✅<br>Passed</button></div><input id="jobPhotoInput" type="file" accept="image/*" capture="environment" style="display:none" onchange="handleJobPhoto(event)"><div class="card grow"><div class="row"><h2>Live Timeline</h2><button class="danger" onclick="finishJob()">Finish</button></div><div class="list">${activeJob.events.map(e=>`<div class="card tight visit"><span class="eventTime">${fmtTime(e.time)}</span><strong>${esc(e.type)}</strong><p>${esc(e.text)}</p></div>`).join("")}</div></div></div>`)}
 function quick(label){activeJob.events.unshift({id:uid(),time:new Date().toISOString(),type:label,text:label});saveActive();job()}
 function customNote(){let t=prompt("Enter service note:");if(!t)return;activeJob.events.unshift({id:uid(),time:new Date().toISOString(),type:"Note",text:t});saveActive();job()}
+function voiceNote(){
+ const SpeechRecognition=window.SpeechRecognition||window.webkitSpeechRecognition;
+ if(!SpeechRecognition){
+   let t=prompt("Voice recognition is not available here. Type the note:");
+   if(!t)return;
+   activeJob.events.unshift({id:uid(),time:new Date().toISOString(),type:"🎤 Voice Note",text:t,tags:["Voice Note"]});
+   saveActive();job();return;
+ }
+ const rec=new SpeechRecognition();
+ rec.lang="en-US"; rec.interimResults=false; rec.maxAlternatives=1;
+ alert("Voice note: speak after tapping OK.");
+ rec.onresult=(event)=>{
+   const text=event.results[0][0].transcript;
+   activeJob.events.unshift({id:uid(),time:new Date().toISOString(),type:"🎤 Voice Note",text:text,tags:["Voice Note"]});
+   saveActive();job();
+ };
+ rec.onerror=()=>{let t=prompt("Voice capture failed. Type the note:");if(t){activeJob.events.unshift({id:uid(),time:new Date().toISOString(),type:"🎤 Voice Note",text:t,tags:["Voice Note"]});saveActive();job();}};
+ rec.start();
+}
 function handleJobPhoto(e){
  const file=e.target.files[0]; if(!file||!activeJob)return;
  const reader=new FileReader();
@@ -504,16 +523,16 @@ function saveResource(){
 }
 
 function settings(){app(`<div class="screen"><h1>Settings</h1><div class="card"><h2>Backup</h2><p>Export before major changes.</p><button class="primary" onclick="exportData()">Export Backup</button><br><br><input type="file" accept="application/json" onchange="importData(event)"></div><div class="card"><h2>Reset</h2><button class="danger" onclick="resetData()">Clear Local Data</button></div></div>`)}
-function exportData(){let blob=new Blob([JSON.stringify(data,null,2)],{type:"application/json"});let a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="firevault-backup-build-0.20.0.json";a.click()}
+function exportData(){let blob=new Blob([JSON.stringify(data,null,2)],{type:"application/json"});let a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="firevault-backup-build-0.21.0.json";a.click()}
 function importData(e){let f=e.target.files[0];if(!f)return;let r=new FileReader();r.onload=()=>{try{data=JSON.parse(r.result);save();alert("Imported.");go("home")}catch(err){alert("Import failed.")}};r.readAsText(f)}
 function resetData(){if(confirm("Clear all local FireVault data?")){localStorage.removeItem(KEY);localStorage.removeItem(ACTIVE);data=load();activeJob=null;go("home")}}
 function showChangelog(){alert(`FireVault Build ${BUILD}
 
-- Job Mode Photo Capture
-- Photo button now opens camera/file picker
-- Captured photos save into the site Docs / Photos section
-- Photo event is timestamped into the live service timeline
-- Photos carry into visit history when the call is finished
+- Voice Note Capture in Job Mode
+- Uses browser speech recognition when available
+- Typed fallback when speech recognition is unavailable
+- Voice notes timestamp into live timeline
+- Voice Note tags carry into visit history
 - Preserves previous local data`)}
 render()
 </script>
