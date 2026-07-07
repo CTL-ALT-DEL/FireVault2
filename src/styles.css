@@ -937,3 +937,11 @@ nav button:active{transform:translateY(1px) scale(.992)}
 .reportDeliveryRow time{font-size:10.8px;color:var(--muted);font-weight:850;white-space:nowrap;}
 .reportDeliveryEmpty{font-size:12px;color:var(--muted);padding:9px 10px;border:1px dashed rgba(255,255,255,.13);border-radius:13px;background:rgba(255,255,255,.025);}
 @media(max-width:560px){.reportActionGrid442{grid-template-columns:repeat(2,minmax(0,1fr));}.reportActionGrid442 #shareBtn{grid-column:1 / -1}.reportDeliveryHead{align-items:center}.reportDeliveryRow{grid-template-columns:1fr}.reportDeliveryRow time{justify-self:start}.reportReadyCard442 small{white-space:normal}}
+
+/* Build 0.44.4 Report delivery receipts and follow-up tasks */
+.reportDeliveryCard444 .reportDeliveryHead{align-items:flex-start;}
+.reportDeliveryHeadActions{display:flex;gap:7px;align-items:center;flex:0 0 auto;}
+.reportDeliveryReceiptBtn{width:100%;text-align:left;color:var(--text);font:inherit;cursor:pointer;}
+.reportDeliveryReceiptBtn:hover{border-color:rgba(255,255,255,.16);transform:translateY(-1px);}
+.reportDeliveryReceiptBtn:active{transform:translateY(1px);}
+@media(max-width:560px){.reportDeliveryCard444 .reportDeliveryHead{display:grid;grid-template-columns:1fr;gap:9px}.reportDeliveryHeadActions{display:grid;grid-template-columns:1fr 1fr;width:100%}.reportDeliveryHeadActions .smallBtn{width:100%}}

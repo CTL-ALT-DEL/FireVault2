@@ -1,13 +1,14 @@
-# FireVault Build 0.44.3
+# FireVault Build 0.44.4
 
-Build 0.44.3 cleans up the main dashboard by removing duplicate Diagnostics access.
+Build 0.44.4 improves Report Center delivery tracking with copyable receipts and follow-up task creation.
 
 ## Updates
-- Visible app version advanced to 0.44.3.
-- Removed the large Diagnostics button from the main dashboard.
-- Kept Diagnostics available from Settings.
-- Dashboard now stays focused on primary field actions: Add Site, GPS / Maps, Nearby Sites, and Attention Queue.
-- Preserved Report Delivery Tools, Report Package Builder, Deficiency Center, Inspection Checklist completion, Site Health, Attention Queue, GPS/Nearby, refined 3D controls, and the Loading FireVault boot watchdog.
+- Visible app version advanced to 0.44.4.
+- Added copyable Report Delivery receipts from the Report Center delivery log.
+- Added a Report Follow-Up action that creates an open site task due in two days.
+- Delivery Log now shows more recent report actions with better tap targets.
+- Diagnostics now counts open Report Delivery follow-up tasks.
+- Preserved Report Delivery Tools, Report Package Builder, dashboard cleanup, Deficiency Center, Inspection Checklist completion, Site Health, Attention Queue, GPS/Nearby, refined 3D controls, and the Loading FireVault boot watchdog.
 
 ## Clean root contents
 - index.html

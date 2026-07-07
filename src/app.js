@@ -570,7 +570,7 @@ function home(){
       <button class="ghost tile attentionHomeTile" id="attentionHomeBtn"><strong>⚠ Attention Queue</strong><span>${attentionList.length ? `${attentionList.length} site${attentionList.length===1?"":"s"} to review` : "No priority issues"}</span></button>
     </div>
     ${activeJob ? `<div class="card activeJobMini"><div class="row"><div><h2>Service Call Active</h2><p>${esc(activeJob.siteName)} • <span id="jobElapsed">${elapsedText(activeJob.startedAt)}</span></p></div><button class="primary" id="resumeJobBtn">Open</button></div></div>` : ""}
-    <div class="card grow"><h2>Build ${BUILD}</h2><p>Dashboard Cleanup is active.</p><p>Diagnostics was removed from the main dashboard and remains available from Settings.</p></div>
+    <div class="card grow"><h2>Build ${BUILD}</h2><p>Report Follow-Up is active.</p><p>Report Delivery Log now supports copyable receipts and quick follow-up tasks.</p></div>
   </div>`);
   document.getElementById("sitesCard").onclick=()=>route("sites");
   document.getElementById("tasksCard").onclick=()=>{selectedSiteId=null; route("tasks");};
@@ -1177,9 +1177,31 @@ function logReportDelivery(s, method, subject){
   save();
 }
 function reportDeliveryHtml(s){
-  const rows=reportDeliveryRows(s).slice(0,4);
+  const rows=reportDeliveryRows(s).slice(0,6);
   if(!rows.length) return `<div class="reportDeliveryEmpty">No report delivery actions logged yet.</div>`;
-  return rows.map(r=>`<div class="reportDeliveryRow"><div><strong>${esc(r.method||"Report")}</strong><span>${esc(r.subject||"FireVault Report")}</span></div><time>${esc(new Date(r.at||Date.now()).toLocaleString([], {month:"short",day:"numeric",hour:"numeric",minute:"2-digit"}))}</time></div>`).join("");
+  return rows.map(r=>`<button class="reportDeliveryRow reportDeliveryReceiptBtn" data-delivery="${esc(r.id)}" title="Copy delivery receipt"><div><strong>${esc(r.method||"Report")}</strong><span>${esc(r.subject||"FireVault Report")}</span></div><time>${esc(new Date(r.at||Date.now()).toLocaleString([], {month:"short",day:"numeric",hour:"numeric",minute:"2-digit"}))}</time></button>`).join("");
+}
+function reportDeliveryText(s,r){
+  const when=new Date(r?.at||Date.now()).toLocaleString();
+  return [`FIREVAULT REPORT DELIVERY`, `Site: ${s?.name||"Unnamed Site"}`, `Address: ${s?fullAddress(s):""}`, `Method: ${r?.method||"Report"}`, `Subject: ${r?.subject||"FireVault Report"}`, `Logged: ${when}`, `Build: ${BUILD}`].join("\n");
+}
+async function copyReportDeliveryReceipt(s,id){
+  const r=reportDeliveryRows(s).find(x=>x.id===id);
+  if(!r){ toast("Delivery log item not found."); return; }
+  try{ await navigator.clipboard.writeText(reportDeliveryText(s,r)); toast("Delivery receipt copied."); }
+  catch{ toast("Clipboard unavailable."); }
+}
+function createReportFollowUpTask(s){
+  if(!s) return;
+  s.tasks=Array.isArray(s.tasks) ? s.tasks : [];
+  const latest=reportDeliveryRows(s)[0];
+  const baseTitle="Follow up on report delivery";
+  const exists=s.tasks.some(t=>!taskIsDone(t) && t.source==="Report Delivery" && t.title===baseTitle);
+  if(exists){ toast("Open report follow-up already exists."); return; }
+  const due=new Date(); due.setDate(due.getDate()+2);
+  s.tasks.unshift({id:uid(),title:baseTitle,status:"Open",due:due.toISOString().slice(0,10),notes:`Created from Report Center on ${fmtDate()}.\n${latest ? reportDeliveryText(s,latest) : "No delivery event logged yet."}`,source:"Report Delivery",createdAt:new Date().toISOString()});
+  save();
+  toast("Report follow-up task added.");
 }
 function reportMailtoUrl(s, txt, subject){
   const email=data.settings.email || {};
@@ -1206,7 +1228,7 @@ function report(){
     <div class="card reportHero440 ${stats.h.cls}"><div><strong>${stats.h.score}%</strong><span>Health</span></div><div><strong>${stats.openTasks.length}</strong><span>Open Tasks</span></div><div><strong>${stats.openDef.length}</strong><span>Deficiencies</span></div><div><strong>${stats.equipmentIssues.length}</strong><span>Equip Issues</span></div></div>
     <div class="reportActionGrid440 reportActionGrid442"><button class="primary" id="shareBtn">Share / Copy</button><button class="ghost" id="emailDraftBtn">Email Draft</button><button class="ghost" id="copyBtn">Copy TXT</button><button class="ghost" id="downloadBtn">Download</button><button class="ghost" id="subjectBtn">Copy Subject</button></div>
     <div class="card reportReadyCard reportReadyCard442"><div><h2>Ready to Send</h2><p>${esc(subject || "FireVault Report")}</p><small>${esc((data.settings.email.defaultTo || "No default recipient") + (data.settings.email.cc ? ` • CC ${data.settings.email.cc}` : ""))}</small></div><span class="pill ${stats.h.cls}">${esc(stats.h.label)}</span></div>
-    <div class="card reportDeliveryCard442"><div class="reportDeliveryHead"><div><h2>Delivery Log</h2><p>Recent report share, email, copy, and download actions for this site.</p></div><button class="ghost smallBtn" id="logSentBtn">Log Sent</button></div><div class="reportDeliveryList">${reportDeliveryHtml(s)}</div></div>
+    <div class="card reportDeliveryCard442 reportDeliveryCard444"><div class="reportDeliveryHead"><div><h2>Delivery Log</h2><p>Tap a delivery item to copy a receipt. Add a follow-up task when a report needs customer confirmation.</p></div><div class="reportDeliveryHeadActions"><button class="ghost smallBtn" id="followReportBtn">Follow-Up</button><button class="ghost smallBtn" id="logSentBtn">Log Sent</button></div></div><div class="reportDeliveryList">${reportDeliveryHtml(s)}</div></div>
     <div class="card reportOptions441"><div class="reportOptionsHead"><div><h2>Report Package</h2><p>Tap sections on/off before sharing, copying, or downloading.</p></div><button class="ghost smallBtn" id="resetReportSections">Reset</button></div><div class="reportSectionGrid441">${reportSectionControls(opts)}</div></div>
     <div class="reportPreviewGrid440">${reportPreviewCards(s).map(card=>`<div class="card reportPreviewCard440"><span>${esc(card[0])}</span><h2>${esc(card[1])}</h2>${card[2].map(x=>`<p>${esc(x)}</p>`).join("")}</div>`).join("")}</div>
     <div class="card reportBox reportBox440 grow">${esc(txt)}</div></div>`);
@@ -1217,6 +1239,8 @@ function report(){
   document.getElementById("subjectBtn").onclick=async()=>{await navigator.clipboard.writeText(subject); logReportDelivery(s,"Subject Copied",subject); toast("Email subject copied."); report();};
   document.getElementById("downloadBtn").onclick=()=>{ downloadBlob(`firevault-report-${(s.name||"site").replace(/\W+/g,"-")}.txt`,txt); logReportDelivery(s,"Downloaded TXT",subject); report(); };
   document.getElementById("logSentBtn").onclick=()=>{ const method=prompt("Delivery note:","Sent to customer"); if(method){ logReportDelivery(s,method,subject); toast("Delivery logged."); report(); } };
+  document.getElementById("followReportBtn").onclick=()=>{ createReportFollowUpTask(s); report(); };
+  document.querySelectorAll(".reportDeliveryReceiptBtn").forEach(b=>b.onclick=()=>copyReportDeliveryReceipt(s,b.dataset.delivery));
   document.querySelectorAll(".reportSectionToggle input").forEach(cb=>cb.onchange=()=>{ const next={...reportSectionState(), [cb.dataset.section]: cb.checked}; saveReportSectionPrefs(next); report(); });
   const resetSections=document.getElementById("resetReportSections"); if(resetSections) resetSections.onclick=()=>{ reportSectionPrefs=null; try{localStorage.removeItem(REPORT_SECTION_KEY);}catch{}; toast("Report package reset."); report(); };
 }
@@ -1382,20 +1406,20 @@ function saveSettings(){
   save(); toast("Settings saved."); settings();
 }
 
-function diagnostics(){ const taskRows=allTaskRows(); const taskCounts=taskFilterCounts(taskRows); const totalTasks=taskRows.length; const serviceTasks=taskRows.filter(r=>r.t.source==="Service Call").length; const totalDef=data.sites.reduce((n,s)=>n+(s.deficiencies||[]).length,0); const openDefTotal=data.sites.reduce((n,s)=>n+(s.deficiencies||[]).filter(d=>(d.status||"Open")!=="Closed").length,0); const closedDefTotal=data.sites.reduce((n,s)=>n+(s.deficiencies||[]).filter(d=>(d.status||"Open")==="Closed").length,0); const totalVisits=data.sites.reduce((n,s)=>n+(s.visits||[]).length,0); const totalContacts=data.sites.reduce((n,s)=>n+(s.contacts||[]).length,0); const totalDocs=data.sites.reduce((n,s)=>n+(s.docs||[]).length,0); const totalReportDeliveries=data.sites.reduce((n,s)=>n+(s.reportDeliveries||[]).length,0); const totalChecklist=data.sites.reduce((n,s)=>n+(s.checklist||[]).length,0); const checklistIssues=data.sites.reduce((n,s)=>n+(s.checklist||[]).filter(i=>i.status==="Issue").length,0); const completedInspections=data.sites.reduce((n,s)=>n+(s.visits||[]).filter(v=>v.type==="Inspection Checklist").length,0); const healthWarn=data.sites.filter(s=>siteHealth(s).cls==="healthWarn").length; const healthWatch=data.sites.filter(s=>siteHealth(s).cls==="healthWatch").length; const attentionTotal=attentionRows().length; html(`<div class="screen"><div class="row"><button class="back ghost" id="backHome">←</button><h1>Diagnostics</h1></div><div class="card grow errorBox"><p>Build: ${BUILD}</p><p>Sites: ${data.sites.length}</p><p>Total Tasks: ${totalTasks}</p><p>Open Tasks: ${taskCounts.open}</p><p>Due Today: ${taskCounts.today}</p><p>Overdue Tasks: ${taskCounts.overdue}</p><p>Service Follow-Ups: ${serviceTasks}</p><p>Total Deficiencies: ${totalDef}</p><p>Open Deficiencies: ${openDefTotal}</p><p>Closed Deficiencies: ${closedDefTotal}</p><p>Total Visits: ${totalVisits}</p><p>Total Contacts: ${totalContacts}</p><p>Total Documents: ${totalDocs}</p><p>Report Deliveries: ${totalReportDeliveries}</p><p>Checklist Items: ${totalChecklist}</p><p>Checklist Issues: ${checklistIssues}</p><p>Completed Inspections: ${completedInspections}</p><p>Attention Sites: ${healthWarn}</p><p>Watch Sites: ${healthWatch}</p><p>Attention Queue: ${attentionTotal}</p><p>Active Job: ${activeJob ? esc(activeJob.siteName) : "None"}</p><p>Current Theme: ${esc(data.settings.theme.name)}</p><p>Accent: ${esc(data.settings.theme.accentColor)}</p><p>Advanced AI Enabled: ${data.settings.advanced?.aiTechnician ? "Yes" : "No"}</p><p>GPS Tools: ${data.settings.gps?.enabled !== false ? "Enabled" : "Hidden"}</p><p>Nearby Radius: ${nearbyRadiusMiles()} mi</p><p>Haptics: ${data.settings.app?.haptics !== false ? "Enabled" : "Off"}</p><p>Import/Export: Ready</p><p>Storage key: ${KEY}</p><p>Modules loaded successfully.</p></div></div>`); document.getElementById("backHome").onclick=()=>route("home"); }
+function diagnostics(){ const taskRows=allTaskRows(); const taskCounts=taskFilterCounts(taskRows); const totalTasks=taskRows.length; const serviceTasks=taskRows.filter(r=>r.t.source==="Service Call").length; const totalDef=data.sites.reduce((n,s)=>n+(s.deficiencies||[]).length,0); const openDefTotal=data.sites.reduce((n,s)=>n+(s.deficiencies||[]).filter(d=>(d.status||"Open")!=="Closed").length,0); const closedDefTotal=data.sites.reduce((n,s)=>n+(s.deficiencies||[]).filter(d=>(d.status||"Open")==="Closed").length,0); const totalVisits=data.sites.reduce((n,s)=>n+(s.visits||[]).length,0); const totalContacts=data.sites.reduce((n,s)=>n+(s.contacts||[]).length,0); const totalDocs=data.sites.reduce((n,s)=>n+(s.docs||[]).length,0); const totalReportDeliveries=data.sites.reduce((n,s)=>n+(s.reportDeliveries||[]).length,0); const reportFollowUps=allTaskRows().filter(r=>r.t.source==="Report Delivery" && !taskIsDone(r.t)).length; const totalChecklist=data.sites.reduce((n,s)=>n+(s.checklist||[]).length,0); const checklistIssues=data.sites.reduce((n,s)=>n+(s.checklist||[]).filter(i=>i.status==="Issue").length,0); const completedInspections=data.sites.reduce((n,s)=>n+(s.visits||[]).filter(v=>v.type==="Inspection Checklist").length,0); const healthWarn=data.sites.filter(s=>siteHealth(s).cls==="healthWarn").length; const healthWatch=data.sites.filter(s=>siteHealth(s).cls==="healthWatch").length; const attentionTotal=attentionRows().length; html(`<div class="screen"><div class="row"><button class="back ghost" id="backHome">←</button><h1>Diagnostics</h1></div><div class="card grow errorBox"><p>Build: ${BUILD}</p><p>Sites: ${data.sites.length}</p><p>Total Tasks: ${totalTasks}</p><p>Open Tasks: ${taskCounts.open}</p><p>Due Today: ${taskCounts.today}</p><p>Overdue Tasks: ${taskCounts.overdue}</p><p>Service Follow-Ups: ${serviceTasks}</p><p>Total Deficiencies: ${totalDef}</p><p>Open Deficiencies: ${openDefTotal}</p><p>Closed Deficiencies: ${closedDefTotal}</p><p>Total Visits: ${totalVisits}</p><p>Total Contacts: ${totalContacts}</p><p>Total Documents: ${totalDocs}</p><p>Report Deliveries: ${totalReportDeliveries}</p><p>Report Follow-Ups: ${reportFollowUps}</p><p>Checklist Items: ${totalChecklist}</p><p>Checklist Issues: ${checklistIssues}</p><p>Completed Inspections: ${completedInspections}</p><p>Attention Sites: ${healthWarn}</p><p>Watch Sites: ${healthWatch}</p><p>Attention Queue: ${attentionTotal}</p><p>Active Job: ${activeJob ? esc(activeJob.siteName) : "None"}</p><p>Current Theme: ${esc(data.settings.theme.name)}</p><p>Accent: ${esc(data.settings.theme.accentColor)}</p><p>Advanced AI Enabled: ${data.settings.advanced?.aiTechnician ? "Yes" : "No"}</p><p>GPS Tools: ${data.settings.gps?.enabled !== false ? "Enabled" : "Hidden"}</p><p>Nearby Radius: ${nearbyRadiusMiles()} mi</p><p>Haptics: ${data.settings.app?.haptics !== false ? "Enabled" : "Off"}</p><p>Import/Export: Ready</p><p>Storage key: ${KEY}</p><p>Modules loaded successfully.</p></div></div>`); document.getElementById("backHome").onclick=()=>route("home"); }
 function showChangelog(){
   const notes = [
-    "Removed the large Diagnostics button from the main dashboard.",
-    "Diagnostics remains available from Settings using the small information button.",
-    "Dashboard is now focused on primary field actions: Add Site, GPS / Maps, Nearby Sites, and Attention Queue.",
-    "Preserved Report Delivery Tools, Report Package Builder, Deficiency Center, Inspection Checklist completion, Site Health, GPS/Nearby, and refined 3D controls.",
-    "Kept the Loading FireVault boot watchdog intact."
+    "Added copyable Report Delivery receipts from the Report Center log.",
+    "Added a Report Follow-Up button that creates an open site task due in two days.",
+    "Delivery Log now shows more recent delivery actions with a cleaner tap target.",
+    "Diagnostics now counts open Report Delivery follow-up tasks.",
+    "Preserved Report Package Builder, dashboard cleanup, GPS/Nearby, Site Health, refined 3D controls, and the Loading FireVault boot watchdog."
   ];
   const overlay=document.createElement("div");
   overlay.className="releaseOverlay";
   overlay.innerHTML=`<div class="releaseSheet" role="dialog" aria-modal="true" aria-label="FireVault release notes">
     <div class="releaseHead"><div><strong>FireVault</strong><span>Build ${BUILD}</span></div><button class="ghost iconBtn" id="closeRelease" aria-label="Close release notes">×</button></div>
-    <div class="releaseBody"><h2>Release Notes</h2><p class="releaseIntro">dashboard cleanup removing duplicate Diagnostics access.</p><ul>${notes.map(n=>`<li>${esc(n)}</li>`).join("")}</ul></div>
+    <div class="releaseBody"><h2>Release Notes</h2><p class="releaseIntro">report delivery receipts and follow-up tasks.</p><ul>${notes.map(n=>`<li>${esc(n)}</li>`).join("")}</ul></div>
   </div>`;
   document.body.appendChild(overlay);
   const close=()=>overlay.remove();
