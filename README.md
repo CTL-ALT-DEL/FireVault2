@@ -1,19 +1,15 @@
-# FireVault Build 0.3.0
+# FireVault Build 0.4.0
 
-Root-level GitHub Pages package.
+Root-level package for GitHub Pages.
 
-## What's new
-- Working local customer site database
-- Add/Edit Site
-- Site Detail tabs
-- Known Issues
-- Visit history with tags
-- Export/import backup
-- Resource Library placeholder
+## Changes
+- No-scroll field layout
+- One screen = one job
+- Site dashboard replaces long site detail page
+- Separate screens for Visits, Known Issues, Equipment, and Access
+- Larger touch targets for field use
+- Preserves Build 0.3 local storage data
 
-## Install
-Copy these files directly into the root of the FireVault2 repository, commit, and push.
+Suggested commit:
 
-Suggested commit message:
-
-`Build 0.3.0 local site database`
+`Build 0.4.0 no-scroll field layout`

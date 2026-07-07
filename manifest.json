@@ -3,7 +3,7 @@
   "short_name": "FireVault",
   "start_url": "./",
   "display": "standalone",
-  "background_color": "#0f1115",
-  "theme_color": "#15171c",
+  "background_color": "#0b0d10",
+  "theme_color": "#101216",
   "description": "Field knowledge system for fire alarm technicians."
 }

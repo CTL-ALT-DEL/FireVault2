@@ -3,438 +3,254 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <meta name="theme-color" content="#15171c" />
+  <meta name="theme-color" content="#101216" />
   <title>FireVault</title>
   <link rel="manifest" href="manifest.json" />
   <style>
     :root{
-      --bg:#0f1115;
-      --panel:#171a21;
-      --panel2:#20242d;
-      --line:#303642;
-      --text:#f3f5f7;
-      --muted:#aab2bf;
-      --red:#f04438;
-      --amber:#f59e0b;
-      --green:#22c55e;
-      --blue:#38bdf8;
-      --radius:18px;
-      --shadow:0 18px 45px rgba(0,0,0,.35);
+      --bg:#0b0d10; --panel:#151922; --panel2:#1d2330; --line:#303747;
+      --text:#f4f7fb; --muted:#a7b0c0; --red:#ef4444; --amber:#f59e0b;
+      --green:#22c55e; --blue:#38bdf8; --radius:18px;
     }
     *{box-sizing:border-box}
+    html,body{height:100%}
     body{
-      margin:0;
-      background:
-        radial-gradient(circle at top left, rgba(240,68,56,.16), transparent 34%),
-        linear-gradient(180deg,#12151c 0%,#0f1115 55%,#090a0d 100%);
-      color:var(--text);
-      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
-      min-height:100vh;
-      padding-bottom:84px;
+      margin:0;background:radial-gradient(circle at top left,rgba(239,68,68,.17),transparent 35%),linear-gradient(180deg,#11151d,#090b0f);
+      color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
+      overflow:hidden;
     }
     header{
-      padding:18px 16px 10px;
-      position:sticky;
-      top:0;
-      z-index:10;
-      backdrop-filter:blur(18px);
-      background:rgba(15,17,21,.86);
-      border-bottom:1px solid rgba(255,255,255,.06);
+      height:62px;padding:10px 14px;display:flex;align-items:center;justify-content:space-between;
+      background:rgba(11,13,16,.92);border-bottom:1px solid rgba(255,255,255,.07);backdrop-filter:blur(16px)
     }
-    .topbar{display:flex;align-items:center;justify-content:space-between;gap:12px}
-    .brand{display:flex;align-items:center;gap:10px;font-weight:900;letter-spacing:.08em}
-    .logo{
-      width:38px;height:38px;border-radius:13px;
-      display:grid;place-items:center;
-      background:linear-gradient(135deg,#ef4444,#7f1d1d);
-      box-shadow:0 10px 24px rgba(239,68,68,.25);
-    }
-    .build{font-size:12px;color:var(--muted);padding:6px 10px;border:1px solid var(--line);border-radius:999px}
-    main{padding:16px;max-width:980px;margin:0 auto}
-    h1{font-size:26px;margin:14px 0 4px}
-    h2{font-size:18px;margin:0 0 10px}
-    h3{font-size:15px;margin:0 0 8px}
-    p{color:var(--muted);line-height:1.45;margin:6px 0}
-    .grid{display:grid;gap:14px}
-    .cards{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
-    .card{
-      background:linear-gradient(180deg,rgba(255,255,255,.055),rgba(255,255,255,.025));
-      border:1px solid rgba(255,255,255,.08);
-      border-radius:var(--radius);
-      padding:15px;
-      box-shadow:var(--shadow);
-    }
-    .stat{font-size:28px;font-weight:900;margin:6px 0 0}
-    .label{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.09em}
-    button,.btn{
-      border:0;border-radius:14px;padding:12px 14px;
-      background:var(--panel2);color:var(--text);
-      font-weight:800;cursor:pointer;
-      border:1px solid rgba(255,255,255,.08);
-      text-decoration:none;
-      display:inline-flex;align-items:center;justify-content:center;gap:8px;
-    }
-    .primary{background:linear-gradient(135deg,#ef4444,#991b1b);border-color:rgba(255,255,255,.12)}
-    .ghost{background:rgba(255,255,255,.04)}
-    .danger{background:rgba(239,68,68,.14);color:#fecaca}
-    .row{display:flex;gap:10px;align-items:center;justify-content:space-between}
+    .brand{display:flex;align-items:center;gap:10px;font-weight:950;letter-spacing:.08em}
+    .logo{width:38px;height:38px;border-radius:13px;display:grid;place-items:center;background:linear-gradient(135deg,#ef4444,#7f1d1d)}
+    .build{font-size:12px;color:var(--muted);background:transparent;border:1px solid var(--line);border-radius:999px;padding:7px 10px}
+    main{height:calc(100vh - 134px);padding:12px;overflow:hidden;max-width:900px;margin:0 auto}
+    h1{font-size:23px;margin:0 0 4px;line-height:1.1}
+    h2{font-size:17px;margin:0 0 8px}
+    h3{font-size:14px;margin:0 0 5px}
+    p{color:var(--muted);margin:4px 0;line-height:1.25;font-size:14px}
+    .screen{height:100%;display:flex;flex-direction:column;gap:10px}
+    .card{background:linear-gradient(180deg,rgba(255,255,255,.06),rgba(255,255,255,.025));border:1px solid rgba(255,255,255,.08);border-radius:var(--radius);padding:12px}
+    .tight{padding:10px}
+    .row{display:flex;align-items:center;justify-content:space-between;gap:8px}
     .wrap{flex-wrap:wrap}
-    input,textarea,select{
-      width:100%;
-      background:#10131a;
-      border:1px solid var(--line);
-      border-radius:14px;
-      padding:12px;
-      color:var(--text);
-      font:inherit;
-      outline:none;
+    .grid2{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+    .grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+    .grow{flex:1;min-height:0}
+    .list{overflow:auto;min-height:0;padding-right:2px}
+    button,.btn{
+      border:1px solid rgba(255,255,255,.09);border-radius:15px;background:var(--panel2);color:var(--text);
+      padding:11px 12px;font-weight:850;cursor:pointer;font-size:14px;text-decoration:none;
     }
-    textarea{min-height:92px;resize:vertical}
-    label{font-size:12px;color:var(--muted);font-weight:800;text-transform:uppercase;letter-spacing:.08em}
-    .formgrid{display:grid;grid-template-columns:1fr;gap:12px}
-    @media(min-width:760px){.formgrid{grid-template-columns:1fr 1fr}.span2{grid-column:span 2}.cards{grid-template-columns:repeat(4,1fr)}}
-    .site-card{cursor:pointer;transition:.15s transform,.15s border}
-    .site-card:hover{transform:translateY(-1px);border-color:rgba(239,68,68,.45)}
-    .pill{font-size:12px;color:#d6dae2;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.08);border-radius:999px;padding:5px 9px;display:inline-flex;margin:3px 4px 3px 0}
+    .primary{background:linear-gradient(135deg,#ef4444,#991b1b)}
+    .ghost{background:rgba(255,255,255,.045)}
+    .danger{background:rgba(239,68,68,.14);color:#fecaca}
+    .tile{min-height:72px;text-align:left;display:flex;flex-direction:column;justify-content:center}
+    .tile strong{font-size:17px}
+    .tile span{color:var(--muted);font-size:12px;margin-top:3px}
+    input,textarea,select{width:100%;background:#0d1118;border:1px solid var(--line);border-radius:13px;padding:10px;color:var(--text);font:inherit}
+    textarea{min-height:72px;resize:none}
+    label{font-size:11px;color:var(--muted);font-weight:900;text-transform:uppercase;letter-spacing:.08em}
+    .form{display:grid;gap:8px;overflow:auto;min-height:0}
+    .pill{font-size:12px;border:1px solid rgba(255,255,255,.09);background:rgba(255,255,255,.065);border-radius:999px;padding:5px 8px;display:inline-flex;margin:2px}
     .muted{color:var(--muted)}
-    .hidden{display:none!important}
-    .tabs{display:flex;gap:8px;overflow:auto;margin:12px 0}
-    .tab{white-space:nowrap;padding:10px 12px;border-radius:999px;background:rgba(255,255,255,.05);color:var(--muted);font-weight:800}
-    .tab.active{background:#ef4444;color:white}
+    .empty{border:1px dashed var(--line);border-radius:16px;padding:16px;text-align:center;color:var(--muted)}
+    .siteItem{cursor:pointer}
+    .search{margin-bottom:8px}
+    .back{padding:8px 10px;border-radius:12px}
     nav{
-      position:fixed;bottom:0;left:0;right:0;
-      display:grid;grid-template-columns:repeat(4,1fr);
-      background:rgba(15,17,21,.95);
-      border-top:1px solid rgba(255,255,255,.08);
-      backdrop-filter:blur(18px);
-      z-index:20;
-      padding:8px 8px calc(8px + env(safe-area-inset-bottom));
+      height:72px;position:fixed;bottom:0;left:0;right:0;display:grid;grid-template-columns:repeat(4,1fr);
+      background:rgba(11,13,16,.96);border-top:1px solid rgba(255,255,255,.08);padding:7px 8px calc(7px + env(safe-area-inset-bottom));
     }
-    nav button{
-      background:transparent;border:0;border-radius:14px;
-      padding:9px 4px;color:var(--muted);font-size:12px;display:flex;flex-direction:column;gap:4px
-    }
+    nav button{background:transparent;border:0;color:var(--muted);display:flex;flex-direction:column;gap:4px;align-items:center;justify-content:center;padding:6px 3px;font-size:12px}
     nav button.active{background:rgba(239,68,68,.14);color:#fff}
-    .empty{border:1px dashed var(--line);border-radius:var(--radius);padding:22px;text-align:center;color:var(--muted)}
     .issue{border-left:4px solid var(--amber)}
     .visit{border-left:4px solid var(--blue)}
-    .resource{border-left:4px solid var(--green)}
-    .search{margin:12px 0}
-    .small{font-size:12px}
+    .redline{border-left:4px solid var(--red)}
   </style>
 </head>
 <body>
-  <header>
-    <div class="topbar">
-      <div class="brand"><div class="logo">🔥</div><div>FIREVAULT</div></div>
-      <button class="build" onclick="showChangelog()">Build 0.3.0</button>
-    </div>
-  </header>
-
-  <main id="app"></main>
-
-  <nav>
-    <button id="nav-dashboard" onclick="route('dashboard')"><span>🏠</span><span>Today</span></button>
-    <button id="nav-sites" onclick="route('sites')"><span>🏢</span><span>Sites</span></button>
-    <button id="nav-resources" onclick="route('resources')"><span>📚</span><span>Library</span></button>
-    <button id="nav-settings" onclick="route('settings')"><span>⚙️</span><span>Settings</span></button>
-  </nav>
+<header>
+  <div class="brand"><div class="logo">🔥</div><div>FIREVAULT</div></div>
+  <button class="build" onclick="showChangelog()">Build 0.4.0</button>
+</header>
+<main id="app"></main>
+<nav>
+  <button id="nav-home" onclick="go('home')"><span>🏠</span><span>Today</span></button>
+  <button id="nav-sites" onclick="go('sites')"><span>🏢</span><span>Sites</span></button>
+  <button id="nav-library" onclick="go('library')"><span>📚</span><span>Library</span></button>
+  <button id="nav-settings" onclick="go('settings')"><span>⚙️</span><span>Settings</span></button>
+</nav>
 
 <script>
-const BUILD = "0.3.0";
-const KEY = "firevault_vault_build_030";
-
-const seedResources = [
-  {m:"Fire-Lite", t:"Panel resources", n:"Add links to manuals, programming notes, and trouble code references."},
-  {m:"Notifier", t:"Panel resources", n:"Store panel-specific cheat sheets and service notes."},
-  {m:"Silent Knight", t:"Panel resources", n:"Add install manuals, walk test steps, and common trouble notes."},
-  {m:"Edwards / EST", t:"Panel resources", n:"Track EST panel notes, mapping quirks, and technician findings."},
-  {m:"Potter", t:"Panel resources", n:"Add programming guides, compatibility notes, and field observations."}
-];
-
-let state = load();
-let view = "dashboard";
-let selectedSiteId = null;
-let detailTab = "overview";
+const BUILD="0.4.0";
+const KEY="firevault_vault_build_030";
+let data=load();
+let view="home", selected=null, mode=null;
 
 function load(){
-  const raw = localStorage.getItem(KEY);
-  if(raw){
-    try { return JSON.parse(raw); } catch(e){}
-  }
-  return { sites: [], resources: seedResources, createdAt: new Date().toISOString() };
+  const raw=localStorage.getItem(KEY);
+  if(raw){try{return JSON.parse(raw)}catch(e){}}
+  return {sites:[], resources:[
+    {m:"Fire-Lite",n:"Manual links, trouble notes, walk-test reminders."},
+    {m:"Notifier",n:"Panel notes, programming reminders, common issues."},
+    {m:"Silent Knight",n:"Model notes, NAC quirks, communicator references."},
+    {m:"Edwards / EST",n:"EST3 / EST4 notes, mapping, node information."},
+    {m:"Potter",n:"Programming notes, compatibility, field observations."}
+  ]};
 }
-function save(){ localStorage.setItem(KEY, JSON.stringify(state)); }
-function id(){ return Date.now().toString(36) + Math.random().toString(36).slice(2,7); }
-function esc(s){ return String(s||"").replace(/[&<>"']/g, m=>({ "&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#039;" }[m])); }
-function setActive(){
-  document.querySelectorAll("nav button").forEach(b=>b.classList.remove("active"));
-  const n = document.getElementById("nav-"+view);
-  if(n) n.classList.add("active");
-}
-function route(v){ view=v; selectedSiteId=null; render(); }
-function app(html){ document.getElementById("app").innerHTML = html; setActive(); window.scrollTo(0,0); }
+function save(){localStorage.setItem(KEY,JSON.stringify(data))}
+function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,7)}
+function esc(s){return String(s||"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#039;"}[m]))}
+function app(html){document.getElementById("app").innerHTML=html; active()}
+function active(){document.querySelectorAll("nav button").forEach(b=>b.classList.remove("active")); let n=document.getElementById("nav-"+(view==="site"||view==="form"||view==="visits"||view==="issues"||view==="equipment"||view==="access"?"sites":view)); if(n)n.classList.add("active")}
+function go(v){view=v; mode=null; render()}
+function site(){return data.sites.find(s=>s.id===selected)}
+function render(){({home,sites,library,settings,site:siteDash,form,visits,issues,equipment,access}[view]||home)()}
 
-function render(){
-  if(view==="dashboard") return dashboard();
-  if(view==="sites") return sites();
-  if(view==="siteDetail") return siteDetail();
-  if(view==="siteForm") return siteForm();
-  if(view==="resources") return resources();
-  if(view==="settings") return settings();
-}
-
-function dashboard(){
-  const visits = state.sites.flatMap(s => (s.visits||[]).map(v=>({...v, site:s.name}))).sort((a,b)=>b.date.localeCompare(a.date));
-  const issues = state.sites.reduce((n,s)=>n+(s.knownIssues||[]).length,0);
-  app(`
-    <h1>Good Day, David</h1>
-    <p>FireVault is your field memory system for customer sites, panel history, known issues, and service visits.</p>
-    <div class="cards">
-      <div class="card"><div class="label">Sites</div><div class="stat">${state.sites.length}</div></div>
-      <div class="card"><div class="label">Visits</div><div class="stat">${visits.length}</div></div>
-      <div class="card"><div class="label">Known Issues</div><div class="stat">${issues}</div></div>
-      <div class="card"><div class="label">Resources</div><div class="stat">${state.resources.length}</div></div>
+function home(){
+ const visits=data.sites.flatMap(s=>(s.visits||[]).map(v=>({...v,site:s.name}))).sort((a,b)=>b.date.localeCompare(a.date));
+ const issueCount=data.sites.reduce((a,s)=>a+(s.knownIssues||[]).length,0);
+ app(`<div class="screen">
+  <div><h1>Today</h1><p>Fast access for field calls. No-scroll dashboard.</p></div>
+  <div class="grid3">
+    <div class="card tile"><strong>${data.sites.length}</strong><span>Sites</span></div>
+    <div class="card tile"><strong>${visits.length}</strong><span>Visits</span></div>
+    <div class="card tile"><strong>${issueCount}</strong><span>Known Issues</span></div>
+  </div>
+  <div class="grid2">
+    <button class="primary tile" onclick="newSite()"><strong>＋ Add Site</strong><span>Create customer vault</span></button>
+    <button class="ghost tile" onclick="go('sites')"><strong>Search Sites</strong><span>Find customer info</span></button>
+  </div>
+  <div class="card grow">
+    <div class="row"><h2>Recent Visits</h2><button class="ghost" onclick="go('sites')">Open Sites</button></div>
+    <div class="list">
+      ${visits.length?visits.slice(0,4).map(v=>`<div class="card tight visit"><strong>${esc(v.site)}</strong><p>${esc(v.summary)}</p><span class="pill">${esc(v.date)}</span></div>`).join(""):`<div class="empty">No visits yet.</div>`}
     </div>
-    <div class="card">
-      <div class="row wrap">
-        <div><h2>Quick Actions</h2><p>Create site records first. GPS, photos, and cloud sync come after this foundation is stable.</p></div>
-        <button class="primary" onclick="newSite()">＋ Add Site</button>
-      </div>
-    </div>
-    <div class="card">
-      <h2>Recent Visits</h2>
-      ${visits.length ? visits.slice(0,5).map(v=>`
-        <div class="card visit">
-          <strong>${esc(v.site)}</strong>
-          <p>${esc(v.summary)}</p>
-          <span class="pill">${esc(v.date)}</span>
-          ${(v.tags||[]).map(t=>`<span class="pill">#${esc(t)}</span>`).join("")}
-        </div>`).join("") : `<div class="empty">No visits yet. Add a site, then add visit history.</div>`}
-    </div>
-  `);
+  </div>
+ </div>`)
 }
 
 function sites(){
-  app(`
-    <div class="row wrap">
-      <div><h1>Customer Sites</h1><p>Every building gets a permanent vault.</p></div>
-      <button class="primary" onclick="newSite()">＋ Add Site</button>
-    </div>
-    <input class="search" id="siteSearch" placeholder="Search customer, address, panel, issue, notes..." oninput="filterSites()" />
-    <div id="siteList">${siteListHTML(state.sites)}</div>
-  `);
+ app(`<div class="screen">
+  <div class="row"><div><h1>Sites</h1><p>Customer vaults sorted for quick access.</p></div><button class="primary" onclick="newSite()">＋ Add</button></div>
+  <input class="search" id="q" placeholder="Search site, panel, issue, notes..." oninput="filter()">
+  <div id="siteList" class="list grow">${siteList(data.sites)}</div>
+ </div>`)
 }
-function siteListHTML(list){
-  if(!list.length) return `<div class="empty">No customer sites yet. Tap Add Site to create the first vault.</div>`;
-  return `<div class="grid">` + list.map(s=>`
-    <div class="card site-card" onclick="openSite('${s.id}')">
-      <div class="row">
-        <h2>${esc(s.name)}</h2>
-        <span class="pill">${esc(s.panelManufacturer||"Panel TBD")}</span>
-      </div>
-      <p>${esc(s.address||"No address entered")}</p>
-      <div>
-        <span class="pill">Visits: ${(s.visits||[]).length}</span>
-        <span class="pill">Issues: ${(s.knownIssues||[]).length}</span>
-        <span class="pill">${esc(s.panelModel||"Model TBD")}</span>
-      </div>
-      <p class="small">${esc((s.notes||"").slice(0,140))}</p>
-    </div>`).join("") + `</div>`;
+function siteList(list){
+ if(!list.length)return `<div class="empty">No sites yet. Tap Add.</div>`;
+ return list.map(s=>`<div class="card siteItem" onclick="openSite('${s.id}')">
+  <div class="row"><h2>${esc(s.name)}</h2><span class="pill">${esc(s.panelManufacturer||"Panel TBD")}</span></div>
+  <p>${esc(s.address||"No address")}</p>
+  <span class="pill">${esc(s.panelModel||"Model TBD")}</span><span class="pill">Visits ${(s.visits||[]).length}</span><span class="pill">Issues ${(s.knownIssues||[]).length}</span>
+ </div>`).join("")
 }
-function filterSites(){
-  const q = document.getElementById("siteSearch").value.toLowerCase();
-  const filtered = state.sites.filter(s => JSON.stringify(s).toLowerCase().includes(q));
-  document.getElementById("siteList").innerHTML = siteListHTML(filtered);
-}
-function newSite(){ selectedSiteId=null; view="siteForm"; render(); }
-function openSite(siteId){ selectedSiteId=siteId; detailTab="overview"; view="siteDetail"; render(); }
-function getSite(){ return state.sites.find(s=>s.id===selectedSiteId); }
+function filter(){let q=document.getElementById("q").value.toLowerCase();document.getElementById("siteList").innerHTML=siteList(data.sites.filter(s=>JSON.stringify(s).toLowerCase().includes(q)))}
+function newSite(){selected=null;view="form";render()}
+function openSite(id){selected=id;view="site";render()}
 
-function siteForm(){
-  const s = selectedSiteId ? getSite() : {};
-  app(`
-    <div class="row wrap">
-      <div><h1>${selectedSiteId ? "Edit Site" : "Add Customer Site"}</h1><p>Start with the details you know. You can improve the vault over time.</p></div>
-      <button class="ghost" onclick="route('sites')">Cancel</button>
-    </div>
-    <div class="card">
-      <div class="formgrid">
-        <div><label>Customer / Site Name</label><input id="name" value="${esc(s.name)}" placeholder="ABC Apartments"></div>
-        <div><label>Address</label><input id="address" value="${esc(s.address)}" placeholder="123 Main St, Casper, WY"></div>
-        <div><label>Panel Manufacturer</label><input id="panelManufacturer" value="${esc(s.panelManufacturer)}" placeholder="Fire-Lite, Notifier, EST..."></div>
-        <div><label>Panel Model</label><input id="panelModel" value="${esc(s.panelModel)}" placeholder="MS-9200UDLS, NFS2-640, EST3..."></div>
-        <div><label>FACP Location</label><input id="facpLocation" value="${esc(s.facpLocation)}" placeholder="Electrical room, front lobby..."></div>
-        <div><label>Communicator / Monitoring</label><input id="monitoring" value="${esc(s.monitoring)}" placeholder="Cell dialer, central station..."></div>
-        <div class="span2"><label>Access Instructions</label><textarea id="access" placeholder="Keys, lockbox, gate code, who to call...">${esc(s.access)}</textarea></div>
-        <div class="span2"><label>General Site Notes</label><textarea id="notes" placeholder="Important building details technicians should know...">${esc(s.notes)}</textarea></div>
-      </div>
-      <br>
-      <button class="primary" onclick="saveSite()">Save Site</button>
-    </div>
-  `);
+function siteDash(){
+ const s=site(); if(!s)return go("sites");
+ app(`<div class="screen">
+  <div class="row"><button class="back ghost" onclick="go('sites')">←</button><button class="ghost" onclick="editSite()">Edit</button></div>
+  <div class="card redline">
+    <h1>${esc(s.name)}</h1>
+    <p>${esc(s.address||"No address entered")}</p>
+    <span class="pill">🔥 ${esc(s.panelManufacturer||"Manufacturer TBD")}</span>
+    <span class="pill">${esc(s.panelModel||"Model TBD")}</span>
+  </div>
+  <div class="grid2">
+    <button class="tile" onclick="view='visits';render()"><strong>Visits</strong><span>${(s.visits||[]).length} records</span></button>
+    <button class="tile" onclick="view='issues';render()"><strong>Known Issues</strong><span>${(s.knownIssues||[]).length} items</span></button>
+    <button class="tile" onclick="view='equipment';render()"><strong>Equipment</strong><span>Panel info</span></button>
+    <button class="tile" onclick="view='access';render()"><strong>Access</strong><span>Keys / contacts</span></button>
+  </div>
+  <div class="card grow">
+    <h2>Site Snapshot</h2>
+    <p><strong>FACP:</strong> ${esc(s.facpLocation||"Not entered")}</p>
+    <p><strong>Monitoring:</strong> ${esc(s.monitoring||"Not entered")}</p>
+    <p><strong>Notes:</strong> ${esc((s.notes||"No notes yet.").slice(0,180))}</p>
+  </div>
+ </div>`)
 }
+function editSite(){view="form";render()}
+
+function form(){
+ const s=selected?site():{};
+ app(`<div class="screen">
+  <div class="row"><button class="back ghost" onclick="${selected?"view='site';render()":"go('sites')"}">←</button><h1>${selected?"Edit Site":"Add Site"}</h1></div>
+  <div class="form grow">
+    <div><label>Site Name</label><input id="name" value="${esc(s.name)}" placeholder="ABC Apartments"></div>
+    <div><label>Address</label><input id="address" value="${esc(s.address)}" placeholder="123 Main St"></div>
+    <div class="grid2"><div><label>Manufacturer</label><input id="panelManufacturer" value="${esc(s.panelManufacturer)}" placeholder="EST"></div><div><label>Model</label><input id="panelModel" value="${esc(s.panelModel)}" placeholder="EST4"></div></div>
+    <div><label>FACP Location</label><input id="facpLocation" value="${esc(s.facpLocation)}" placeholder="Electrical room"></div>
+    <div><label>Monitoring</label><input id="monitoring" value="${esc(s.monitoring)}" placeholder="Central station / communicator"></div>
+    <div><label>Access</label><textarea id="access" placeholder="Keys, codes, contacts">${esc(s.access)}</textarea></div>
+    <div><label>Notes</label><textarea id="notes" placeholder="Important site notes">${esc(s.notes)}</textarea></div>
+  </div>
+  <button class="primary" onclick="saveSite()">Save Site</button>
+ </div>`)
+}
+function val(id){return document.getElementById(id).value.trim()}
 function saveSite(){
-  const data = {
-    name: val("name") || "Unnamed Site",
-    address: val("address"),
-    panelManufacturer: val("panelManufacturer"),
-    panelModel: val("panelModel"),
-    facpLocation: val("facpLocation"),
-    monitoring: val("monitoring"),
-    access: val("access"),
-    notes: val("notes"),
-    updatedAt: new Date().toISOString()
-  };
-  if(selectedSiteId){
-    const i = state.sites.findIndex(x=>x.id===selectedSiteId);
-    state.sites[i] = {...state.sites[i], ...data};
-  } else {
-    selectedSiteId = id();
-    state.sites.unshift({...data, id:selectedSiteId, createdAt:new Date().toISOString(), visits:[], knownIssues:[], contacts:[], equipment:[]});
-  }
-  save();
-  view="siteDetail"; render();
-}
-function val(x){ return document.getElementById(x).value.trim(); }
-
-function siteDetail(){
-  const s = getSite();
-  if(!s) return route("sites");
-  const tabs = ["overview","visits","issues","equipment","access"];
-  app(`
-    <button class="ghost" onclick="route('sites')">← Sites</button>
-    <div class="card">
-      <div class="row wrap">
-        <div>
-          <h1>${esc(s.name)}</h1>
-          <p>${esc(s.address||"No address entered")}</p>
-        </div>
-        <button onclick="view='siteForm';render()">Edit Site</button>
-      </div>
-      <span class="pill">${esc(s.panelManufacturer||"Manufacturer TBD")}</span>
-      <span class="pill">${esc(s.panelModel||"Model TBD")}</span>
-      <span class="pill">Visits ${(s.visits||[]).length}</span>
-      <span class="pill">Issues ${(s.knownIssues||[]).length}</span>
-    </div>
-    <div class="tabs">${tabs.map(t=>`<button class="tab ${detailTab===t?'active':''}" onclick="detailTab='${t}';siteDetail()">${t[0].toUpperCase()+t.slice(1)}</button>`).join("")}</div>
-    <div id="detailBody">${detailBody(s)}</div>
-  `);
-}
-function detailBody(s){
-  if(detailTab==="overview") return `
-    <div class="grid">
-      <div class="card"><h2>Fire Alarm System</h2>
-        <p><strong>Manufacturer:</strong> ${esc(s.panelManufacturer||"Not entered")}</p>
-        <p><strong>Model:</strong> ${esc(s.panelModel||"Not entered")}</p>
-        <p><strong>FACP Location:</strong> ${esc(s.facpLocation||"Not entered")}</p>
-        <p><strong>Monitoring:</strong> ${esc(s.monitoring||"Not entered")}</p>
-      </div>
-      <div class="card"><h2>Site Notes</h2><p>${esc(s.notes||"No notes yet.")}</p></div>
-      <div class="card"><h2>Access</h2><p>${esc(s.access||"No access instructions yet.")}</p></div>
-    </div>`;
-  if(detailTab==="visits") return `
-    <div class="card">
-      <h2>Add Visit</h2>
-      <div class="formgrid">
-        <div><label>Date</label><input id="visitDate" type="date" value="${new Date().toISOString().slice(0,10)}"></div>
-        <div><label>Tags</label><input id="visitTags" placeholder="Ground Fault, NAC, Battery"></div>
-        <div class="span2"><label>Visit Summary</label><textarea id="visitSummary" placeholder="What happened on this service call?"></textarea></div>
-      </div><br>
-      <button class="primary" onclick="addVisit()">Add Visit</button>
-    </div>
-    ${(s.visits||[]).length ? s.visits.map(v=>`
-      <div class="card visit"><strong>${esc(v.date)}</strong><p>${esc(v.summary)}</p>${(v.tags||[]).map(t=>`<span class="pill">#${esc(t)}</span>`).join("")}</div>
-    `).join("") : `<div class="empty">No visits recorded for this site.</div>`}`;
-  if(detailTab==="issues") return `
-    <div class="card">
-      <h2>Add Known Issue</h2>
-      <textarea id="issueText" placeholder="Example: NAC 2 ground fault appears after heavy rain. Check pull station near loading dock first."></textarea><br><br>
-      <button class="primary" onclick="addIssue()">Add Known Issue</button>
-    </div>
-    ${(s.knownIssues||[]).length ? s.knownIssues.map(i=>`
-      <div class="card issue"><p>${esc(i.text)}</p><span class="pill">${esc(i.created)}</span></div>
-    `).join("") : `<div class="empty">No known issues yet.</div>`}`;
-  if(detailTab==="equipment") return `
-    <div class="card">
-      <h2>Equipment Notes</h2>
-      <p>This build starts the equipment area. Next build will add structured equipment records for panels, boosters, annunciators, communicators, and power supplies.</p>
-      <p><strong>Current panel:</strong> ${esc(s.panelManufacturer||"TBD")} ${esc(s.panelModel||"")}</p>
-    </div>`;
-  if(detailTab==="access") return `
-    <div class="card"><h2>Access Instructions</h2><p>${esc(s.access||"No access instructions yet.")}</p></div>
-    <div class="card"><h2>Contacts</h2><p>Contact records will be added in the next build.</p></div>`;
-}
-function addVisit(){
-  const s = getSite();
-  const v = { id:id(), date:val("visitDate"), summary:val("visitSummary"), tags:val("visitTags").split(",").map(x=>x.trim()).filter(Boolean), createdAt:new Date().toISOString() };
-  if(!v.summary) return alert("Enter a visit summary first.");
-  s.visits = s.visits || [];
-  s.visits.unshift(v);
-  save(); siteDetail();
-}
-function addIssue(){
-  const s = getSite();
-  const text = val("issueText");
-  if(!text) return alert("Enter a known issue first.");
-  s.knownIssues = s.knownIssues || [];
-  s.knownIssues.unshift({id:id(), text, created:new Date().toLocaleDateString()});
-  save(); siteDetail();
+ const obj={name:val("name")||"Unnamed Site",address:val("address"),panelManufacturer:val("panelManufacturer"),panelModel:val("panelModel"),facpLocation:val("facpLocation"),monitoring:val("monitoring"),access:val("access"),notes:val("notes"),updatedAt:new Date().toISOString()};
+ if(selected){let i=data.sites.findIndex(x=>x.id===selected);data.sites[i]={...data.sites[i],...obj}}
+ else{selected=uid();data.sites.unshift({...obj,id:selected,createdAt:new Date().toISOString(),visits:[],knownIssues:[]})}
+ save(); view="site"; render()
 }
 
-function resources(){
-  app(`
-    <h1>Resource Library</h1>
-    <p>Manufacturer links and technician cheat sheets will live here.</p>
-    ${state.resources.map(r=>`<div class="card resource"><h2>${esc(r.m)}</h2><p><strong>${esc(r.t)}</strong></p><p>${esc(r.n)}</p></div>`).join("")}
-  `);
+function visits(){
+ const s=site(); if(!s)return go("sites");
+ app(`<div class="screen">
+  <div class="row"><button class="back ghost" onclick="view='site';render()">←</button><h1>Visits</h1></div>
+  <div class="card">
+    <div class="grid2"><input id="vdate" type="date" value="${new Date().toISOString().slice(0,10)}"><input id="vtags" placeholder="Tags: NAC, Battery"></div>
+    <textarea id="vsum" placeholder="Visit summary"></textarea>
+    <button class="primary" onclick="addVisit()">Add Visit</button>
+  </div>
+  <div class="list grow">${(s.visits||[]).length?s.visits.map(v=>`<div class="card visit"><strong>${esc(v.date)}</strong><p>${esc(v.summary)}</p>${(v.tags||[]).map(t=>`<span class="pill">#${esc(t)}</span>`).join("")}</div>`).join(""):`<div class="empty">No visits.</div>`}</div>
+ </div>`)
 }
-function settings(){
-  app(`
-    <h1>Settings</h1>
-    <div class="card">
-      <h2>Backup</h2>
-      <p>Export your FireVault data before replacing builds or changing devices.</p>
-      <button class="primary" onclick="exportData()">Export Backup</button>
-      <br><br>
-      <label>Import Backup</label>
-      <input type="file" accept="application/json" onchange="importData(event)" />
-    </div>
-    <div class="card">
-      <h2>Reset Demo Data</h2>
-      <p>This only clears local data stored in this browser.</p>
-      <button class="danger" onclick="resetData()">Reset FireVault Data</button>
-    </div>
-  `);
+function addVisit(){const s=site();let sum=val("vsum");if(!sum)return alert("Enter a summary.");s.visits=s.visits||[];s.visits.unshift({id:uid(),date:val("vdate"),summary:sum,tags:val("vtags").split(",").map(x=>x.trim()).filter(Boolean)});save();visits()}
+
+function issues(){
+ const s=site(); if(!s)return go("sites");
+ app(`<div class="screen">
+  <div class="row"><button class="back ghost" onclick="view='site';render()">←</button><h1>Known Issues</h1></div>
+  <div class="card"><textarea id="itxt" placeholder="Example: NAC 2 ground fault after rain. Check loading dock pull station first."></textarea><button class="primary" onclick="addIssue()">Add Issue</button></div>
+  <div class="list grow">${(s.knownIssues||[]).length?s.knownIssues.map(i=>`<div class="card issue"><p>${esc(i.text)}</p><span class="pill">${esc(i.created)}</span></div>`).join(""):`<div class="empty">No known issues.</div>`}</div>
+ </div>`)
 }
-function exportData(){
-  const blob = new Blob([JSON.stringify(state,null,2)], {type:"application/json"});
-  const a = document.createElement("a");
-  a.href = URL.createObjectURL(blob);
-  a.download = "firevault-backup-build-0.3.0.json";
-  a.click();
+function addIssue(){const s=site();let text=val("itxt");if(!text)return alert("Enter issue.");s.knownIssues=s.knownIssues||[];s.knownIssues.unshift({id:uid(),text,created:new Date().toLocaleDateString()});save();issues()}
+
+function equipment(){
+ const s=site(); if(!s)return go("sites");
+ app(`<div class="screen"><div class="row"><button class="back ghost" onclick="view='site';render()">←</button><h1>Equipment</h1></div>
+ <div class="card grow">
+  <h2>Fire Alarm System</h2>
+  <p><strong>Manufacturer:</strong> ${esc(s.panelManufacturer||"Not entered")}</p>
+  <p><strong>Model:</strong> ${esc(s.panelModel||"Not entered")}</p>
+  <p><strong>FACP Location:</strong> ${esc(s.facpLocation||"Not entered")}</p>
+  <p><strong>Monitoring:</strong> ${esc(s.monitoring||"Not entered")}</p>
+  <p class="muted">Structured equipment records come next: boosters, annunciators, communicators, batteries, and network nodes.</p>
+ </div></div>`)
 }
-function importData(evt){
-  const file = evt.target.files[0];
-  if(!file) return;
-  const reader = new FileReader();
-  reader.onload = () => {
-    try { state = JSON.parse(reader.result); save(); alert("Backup imported."); route("dashboard"); }
-    catch(e){ alert("Could not import backup."); }
-  };
-  reader.readAsText(file);
+function access(){
+ const s=site(); if(!s)return go("sites");
+ app(`<div class="screen"><div class="row"><button class="back ghost" onclick="view='site';render()">←</button><h1>Access</h1></div>
+ <div class="card grow"><h2>Access Instructions</h2><p>${esc(s.access||"No access instructions entered.")}</p></div></div>`)
 }
-function resetData(){
-  if(confirm("Clear all FireVault data in this browser?")){
-    localStorage.removeItem(KEY);
-    state = load();
-    route("dashboard");
-  }
-}
-function showChangelog(){
-  alert(`FireVault Build ${BUILD}\n\n- Working local site database\n- Add/Edit customer sites\n- Site detail vault tabs\n- Visit history with tags\n- Known Issues records\n- Export/import backup\n- GitHub Pages root package`);
-}
-render();
+
+function library(){app(`<div class="screen"><h1>Library</h1><p>Manufacturer resources and cheat sheets.</p><div class="list grow">${data.resources.map(r=>`<div class="card"><h2>${esc(r.m)}</h2><p>${esc(r.n)}</p></div>`).join("")}</div></div>`)}
+function settings(){app(`<div class="screen"><h1>Settings</h1><div class="card"><h2>Backup</h2><p>Export before major changes.</p><button class="primary" onclick="exportData()">Export Backup</button><br><br><input type="file" accept="application/json" onchange="importData(event)"></div><div class="card"><h2>Reset</h2><button class="danger" onclick="resetData()">Clear Local Data</button></div></div>`)}
+function exportData(){let blob=new Blob([JSON.stringify(data,null,2)],{type:"application/json"});let a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="firevault-backup.json";a.click()}
+function importData(e){let f=e.target.files[0];if(!f)return;let r=new FileReader();r.onload=()=>{try{data=JSON.parse(r.result);save();alert("Imported.");go("home")}catch(err){alert("Import failed.")}};r.readAsText(f)}
+function resetData(){if(confirm("Clear all local FireVault data?")){localStorage.removeItem(KEY);data=load();go("home")}}
+function showChangelog(){alert(`FireVault Build ${BUILD}\n\n- No-scroll field layout\n- Site dashboard replaces long detail page\n- Separate Visits / Issues / Equipment / Access screens\n- Larger touch targets\n- Preserves Build 0.3 local data`)}
+render()
 </script>
 </body>
 </html>
