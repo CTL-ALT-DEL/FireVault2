@@ -1,0 +1,19 @@
+{
+  "name": "FireVault",
+  "short_name": "FireVault",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0b0d10",
+  "theme_color": "#101216",
+  "description": "Field knowledge system for fire alarm technicians.",
+  "icons": [
+    {"src": "assets/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable"},
+    {"src": "assets/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable"}
+  ],
+  "shortcuts": [
+    {"name":"Add Site","short_name":"Add Site","url":"./?route=siteForm","description":"Create a FireVault site"},
+    {"name":"Settings","short_name":"Settings","url":"./?route=settings","description":"Open FireVault settings"}
+  ]
+}
