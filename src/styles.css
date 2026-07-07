@@ -560,3 +560,33 @@ nav button:active{transform:translateY(1px) scale(.992)}
   nav button{width:84%;max-width:66px}
   nav button span:last-child{font-size:10.8px}
 }
+
+
+/* Build 0.42.8 Equipment Vault starter */
+.equipmentMiniCard,.equipmentHero,.equipmentFormCard{
+  border-left-color:var(--fv427Rim)!important;
+}
+.equipmentMiniCard .row,.equipmentHero .row{align-items:center}
+.equipmentMiniCard h2,.equipmentHero h2{margin:0 0 4px;font-size:17px;line-height:1.15}
+.equipmentMiniCard p,.equipmentHero p,.equipmentItem p{margin:0;color:var(--muted);font-size:12.5px;line-height:1.35;overflow-wrap:anywhere}
+.equipmentLine{
+  width:100%;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;align-items:center;
+  margin-top:8px;min-height:38px;padding:8px 10px;border-radius:14px;text-align:left;
+}
+.equipmentLine strong{font-size:13px;line-height:1.15;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.equipmentLine span{font-size:11.5px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:42vw}
+.equipmentScreen .row>div{min-width:0;flex:1}
+.equipmentScreen .row h1{margin:0;font-size:22px;line-height:1.05;letter-spacing:-.02em}
+.equipmentScreen .row p{margin:2px 0 0;color:var(--muted);font-size:12.5px;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.equipmentList{gap:9px}
+.equipmentItem{width:100%;text-align:left;display:grid;gap:7px;padding:12px}
+.equipmentItem h2{margin:0 0 4px;font-size:16px;line-height:1.18;overflow-wrap:anywhere}
+.equipmentItem .pill{white-space:nowrap}
+.equipmentFormCard label{font-size:12px;letter-spacing:.04em;color:var(--muted);text-transform:uppercase}
+.equipmentFormCard input,.equipmentFormCard select,.equipmentFormCard textarea{margin-bottom:10px}
+@media(max-width:430px){
+  .equipmentLine{grid-template-columns:1fr;gap:2px;min-height:42px}
+  .equipmentLine span{max-width:100%;white-space:normal}
+  .equipmentItem .row{display:grid;grid-template-columns:1fr;gap:7px}
+  .equipmentItem .pill{justify-self:start}
+}
