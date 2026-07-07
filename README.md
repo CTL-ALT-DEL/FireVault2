@@ -1,16 +1,15 @@
-# FireVault Build 0.36.0 — Import / Export Module
+# FireVault Build 0.37.0 — AI Technician Placeholder
 
 Root-level package for GitHub Pages.
 
 ## Changes
-- Bulk account import from pasted lines
-- JSON backup import
-- JSON backup export
-- Sites CSV export
-- Visits CSV export
-- Import button added to Sites screen
-- Backup tab updated
+- AI Technician placeholder module
+- Site-aware context summary
+- Local rule-based assistant responses
+- AI Technician button on site vault
+- Advanced Features settings tab added
+- External-service features marked with *
 
 Suggested commit:
 
-`Build 0.36.0 import export module`
+`Build 0.37.0 ai technician placeholder`

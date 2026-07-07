@@ -52,6 +52,16 @@ export function normalize(data){
   };
   data.settings.email = data.settings.email || {defaultTo:"", cc:"", subjectPrefix:"FireVault Report", signature:""};
   data.settings.app = data.settings.app || {defaultScreen:"home", distanceUnit:"feet", theme:"dark", confirmDeletes:true, autoBackupReminder:true};
+  data.settings.advanced = data.settings.advanced || {
+    aiTechnician:false,
+    reverseAddressLookup:false,
+    cloudBackup:false,
+    voiceTranscription:false,
+    ocrReader:false,
+    emailGateway:false,
+    weather:false,
+    traffic:false
+  };
   data.sites.forEach(ensureSite);
   return data;
 }

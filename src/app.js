@@ -68,7 +68,7 @@ function route(v){ view = v; mode = null; render(); }
 
 function render(){
   try{
-    const routes = {home, sites, siteDetail, siteForm, docs, docForm, imageViewer, library, resourceForm, jobMode, visits, visitDetail, tasks, taskForm, deficiencies, deficiencyForm, report, importer, settings, diagnostics};
+    const routes = {home, sites, siteDetail, siteForm, docs, docForm, imageViewer, library, resourceForm, jobMode, visits, visitDetail, tasks, taskForm, deficiencies, deficiencyForm, report, importer, aiTechnician, settings, diagnostics};
     (routes[view] || home)();
     if(view === "jobMode") startJobTimer(); else stopJobTimer();
     setActiveNav();
@@ -93,7 +93,7 @@ function showError(err){
 
 function setActiveNav(){
   document.querySelectorAll("nav button").forEach(b => b.classList.remove("active"));
-  const section = ["siteDetail","siteForm","docs","docForm","imageViewer","jobMode","visits","visitDetail","tasks","taskForm","deficiencies","deficiencyForm","report"].includes(view) ? "sites" : view;
+  const section = ["siteDetail","siteForm","docs","docForm","imageViewer","jobMode","visits","visitDetail","tasks","taskForm","deficiencies","deficiencyForm","report","aiTechnician"].includes(view) ? "sites" : view;
   document.getElementById("nav-"+section)?.classList.add("active");
 }
 
@@ -255,7 +255,11 @@ function siteDetail(){
     </div>
     <div class="grid2">
       <button class="tile" id="defBtn"><strong>Deficiencies</strong><span>${s.deficiencies.length} items</span></button>
+      <button class="tile" id="aiBtn"><strong>AI Tech <span class="featureStar">*</span></strong><span>Site context</span></button>
+    </div>
+    <div class="grid2">
       <button class="tile" id="reportBtn"><strong>Report</strong><span>Copy / download</span></button>
+      <button class="tile" id="quickContextBtn"><strong>Context</strong><span>Site snapshot</span></button>
     </div>
     <div class="card ${s.lat&&s.lng?"gpsGood":"gpsWarn"}">
       <h2>Location</h2>
@@ -272,7 +276,9 @@ function siteDetail(){
   document.getElementById("visitsBtn").onclick = () => { view="visits"; render(); };
   document.getElementById("tasksBtn").onclick = () => { view="tasks"; render(); };
   document.getElementById("defBtn").onclick = () => { view="deficiencies"; render(); };
+  document.getElementById("aiBtn").onclick = () => { view="aiTechnician"; render(); };
   document.getElementById("reportBtn").onclick = () => { view="report"; render(); };
+  document.getElementById("quickContextBtn").onclick = () => { view="aiTechnician"; render(); };
   document.getElementById("gpsBtn").onclick = () => { view="siteForm"; render(); };
   document.getElementById("appleMapBtn").onclick = () => openAppleMaps(s);
   document.getElementById("googleMapBtn").onclick = () => openGoogleMaps(s);
@@ -733,6 +739,100 @@ function deficiencyForm(){
 
 
 
+
+function buildSiteContext(s){
+  ensureSite(s);
+  const openTasks = s.tasks.filter(t => (t.status||"Open") !== "Done");
+  const openDefs = s.deficiencies.filter(d => (d.status||"Open") !== "Corrected");
+  const lastVisit = s.visits[0];
+
+  const lines = [];
+  lines.push("SITE CONTEXT");
+  lines.push("Name: " + (s.name || ""));
+  lines.push("Address: " + fullAddress(s));
+  lines.push("Panel: " + [s.panelManufacturer, s.panelModel].filter(Boolean).join(" "));
+  lines.push("GPS: " + (s.lat && s.lng ? s.lat + ", " + s.lng : "Not set"));
+  lines.push("");
+  lines.push("COUNTS");
+  lines.push("Visits: " + s.visits.length);
+  lines.push("Open Tasks: " + openTasks.length);
+  lines.push("Deficiencies: " + s.deficiencies.length);
+  lines.push("Docs/Photos: " + s.docs.length);
+  lines.push("Resources: " + (data.resources||[]).length);
+  lines.push("");
+  lines.push("OPEN TASKS");
+  if(openTasks.length) openTasks.slice(0,5).forEach((t,i)=>lines.push(`${i+1}. [${t.priority||"Normal"}] ${t.title||""}`));
+  else lines.push("None.");
+  lines.push("");
+  lines.push("OPEN DEFICIENCIES");
+  if(openDefs.length) openDefs.slice(0,5).forEach((d,i)=>lines.push(`${i+1}. [${d.severity||"Needs Review"}] ${d.description||""}`));
+  else lines.push("None.");
+  lines.push("");
+  lines.push("LAST VISIT");
+  if(lastVisit) lines.push((lastVisit.summary || "").split("\\n").slice(0,8).join("\\n"));
+  else lines.push("No visits recorded.");
+  return lines.join("\\n");
+}
+
+function localAiAnswer(question, s){
+  const q = question.toLowerCase();
+  ensureSite(s);
+  if(!question.trim()) return "Ask a question about this site, panel, tasks, deficiencies, visits, or photos.";
+  if(q.includes("ground") || q.includes("fault")){
+    const matches = JSON.stringify(s).toLowerCase().includes("ground");
+    return matches
+      ? "This site has previous notes or records mentioning ground/fault. Review the visit history, known issues, photos, and deficiencies before troubleshooting."
+      : "No stored ground fault history found for this site. Start with panel trouble details, isolate circuits, check NAC/SLC field wiring, and document findings in Job Mode.";
+  }
+  if(q.includes("battery")){
+    return s.docs.some(d => JSON.stringify(d).toLowerCase().includes("battery"))
+      ? "There are battery-related docs/photos on this site. Check Docs / Photos and verify date codes, voltage, and load-test status."
+      : "No battery records found. Add battery label photos and record voltage/load-test results during the service call.";
+  }
+  if(q.includes("task") || q.includes("follow")){
+    const open = s.tasks.filter(t => (t.status||"Open") !== "Done");
+    return open.length ? `There are ${open.length} open follow-up task(s). Open the Tasks section for priority and due dates.` : "No open follow-up tasks recorded.";
+  }
+  if(q.includes("deficien")){
+    return s.deficiencies.length ? `There are ${s.deficiencies.length} deficiency record(s). Review severity, status, and recommendations in the Deficiencies section.` : "No deficiencies recorded for this site.";
+  }
+  if(q.includes("panel") || q.includes("model")){
+    return `Stored panel information: ${[s.panelManufacturer, s.panelModel].filter(Boolean).join(" ") || "No panel information entered yet."}`;
+  }
+  return "Local AI placeholder response: I can summarize stored site context now. Future AI Technician* will use external AI services when enabled in Settings → Advanced Features.";
+}
+
+function aiTechnician(){
+  const s = getSite();
+  if(!s) return route("sites");
+  const adv = data.settings.advanced || {};
+  const context = buildSiteContext(s);
+  html(`<div class="screen">
+    <div class="row"><button class="back ghost" id="aiBack">←</button><h1>AI Technician <span class="featureStar">*</span></h1></div>
+    <div class="card aiCard">
+      <h2>${esc(s.name || "Site")}</h2>
+      <p>This is a local placeholder. External AI service can be enabled later in Settings → Advanced Features.</p>
+      <span class="pill">${adv.aiTechnician ? "AI Enabled" : "AI Disabled"}</span>
+    </div>
+    <div class="card aiQuestion">
+      <label>Ask about this site</label>
+      <textarea id="aiQuestion" placeholder="Example: What should I check for this ground fault?"></textarea>
+      <button class="primary" id="askAi">Ask Local Assistant</button>
+    </div>
+    <div id="aiAnswerBox"></div>
+    <div class="card grow" style="overflow:auto">
+      <h2>Site Context</h2>
+      <div class="contextBlock">${esc(context)}</div>
+    </div>
+  </div>`);
+  document.getElementById("aiBack").onclick = () => route("siteDetail");
+  document.getElementById("askAi").onclick = () => {
+    const answer = localAiAnswer(val("aiQuestion"), s);
+    document.getElementById("aiAnswerBox").innerHTML = `<div class="card aiAnswer"><h2>Answer</h2><p>${esc(answer)}</p></div>`;
+  };
+}
+
+
 function csvEscape(v){
   const s = String(v ?? "");
   return `"${s.replace(/"/g,'""')}"`;
@@ -1016,6 +1116,7 @@ function settings(){
     ["pdf","🧾","PDF"],
     ["email","✉️","Email"],
     ["app","⚙️","App"],
+    ["advanced","⭐","Advanced"],
     ["backup","💾","Backup"]
   ];
 
@@ -1133,6 +1234,22 @@ function drawSettingsTab(){
     </div>`;
   }
 
+  if(settingsTab === "advanced"){
+    const adv = data.settings.advanced || {};
+    panel.innerHTML = `<div class="card">
+      <div class="sectionTitle"><h2>Advanced Features</h2><span class="pill">External Services *</span></div>
+      <p class="settingHint">Features marked with * may require external services, subscriptions, APIs, or cloud connections later.</p>
+      <label><input type="checkbox" id="advAi" ${adv.aiTechnician?"checked":""}> AI Technician *</label>
+      <label><input type="checkbox" id="advReverseAddress" ${adv.reverseAddressLookup?"checked":""}> Reverse Address Lookup *</label>
+      <label><input type="checkbox" id="advCloud" ${adv.cloudBackup?"checked":""}> Cloud Backup / Sync *</label>
+      <label><input type="checkbox" id="advVoice" ${adv.voiceTranscription?"checked":""}> Voice Transcription *</label>
+      <label><input type="checkbox" id="advOcr" ${adv.ocrReader?"checked":""}> OCR Document Reader *</label>
+      <label><input type="checkbox" id="advEmail" ${adv.emailGateway?"checked":""}> Email Gateway *</label>
+      <label><input type="checkbox" id="advWeather" ${adv.weather?"checked":""}> Weather with Visits *</label>
+      <label><input type="checkbox" id="advTraffic" ${adv.traffic?"checked":""}> Traffic / Route Services *</label>
+    </div>`;
+  }
+
   if(settingsTab === "backup"){
     panel.innerHTML = `<div class="card">
       <div class="sectionTitle"><h2>App Icon / Branding</h2><span class="pill">New</span></div>
@@ -1187,29 +1304,40 @@ function saveSettingsFromVisibleTab(){
   if(settingsTab === "app"){
     s.app = {...s.app,defaultScreen:val("defaultScreen"),distanceUnit:val("distanceUnit"),confirmDeletes:checked("confirmDeletes"),autoBackupReminder:checked("backupReminder")};
   }
+  if(settingsTab === "advanced"){
+    s.advanced = {
+      aiTechnician:checked("advAi"),
+      reverseAddressLookup:checked("advReverseAddress"),
+      cloudBackup:checked("advCloud"),
+      voiceTranscription:checked("advVoice"),
+      ocrReader:checked("advOcr"),
+      emailGateway:checked("advEmail"),
+      weather:checked("advWeather"),
+      traffic:checked("advTraffic")
+    };
+  }
   save();
   alert("Settings saved.");
 }
 
 function diagnostics(){
-  html(`<div class="screen"><div class="row"><button class="back ghost" id="backHome">←</button><h1>Diagnostics</h1></div><div class="card grow errorBox"><p>Build: ${BUILD}</p><p>Sites: ${data.sites.length}</p><p>Sites with GPS: ${data.sites.filter(s=>s.lat&&s.lng).length}</p><p>Active Job: ${activeJob ? activeJob.siteName : "None"}</p><p>Total Tasks: ${data.sites.reduce((n,s)=>n+(s.tasks||[]).length,0)}</p><p>Total Deficiencies: ${data.sites.reduce((n,s)=>n+(s.deficiencies||[]).length,0)}</p><p>Report Title: ${esc(data.settings.reports.title)}</p><p>Import/Export: Ready</p><p>Storage key: ${KEY}</p><p>Modules loaded successfully.</p></div></div>`);
+  html(`<div class="screen"><div class="row"><button class="back ghost" id="backHome">←</button><h1>Diagnostics</h1></div><div class="card grow errorBox"><p>Build: ${BUILD}</p><p>Sites: ${data.sites.length}</p><p>Sites with GPS: ${data.sites.filter(s=>s.lat&&s.lng).length}</p><p>Active Job: ${activeJob ? activeJob.siteName : "None"}</p><p>Total Tasks: ${data.sites.reduce((n,s)=>n+(s.tasks||[]).length,0)}</p><p>Total Deficiencies: ${data.sites.reduce((n,s)=>n+(s.deficiencies||[]).length,0)}</p><p>Report Title: ${esc(data.settings.reports.title)}</p><p>Import/Export: Ready</p><p>Advanced AI Enabled: ${data.settings.advanced?.aiTechnician ? "Yes" : "No"}</p><p>Storage key: ${KEY}</p><p>Modules loaded successfully.</p></div></div>`);
   document.getElementById("backHome").onclick = () => route("home");
 }
 
 function exportJson(){
-  downloadBlob("firevault-backup-build-0.36.0.json", JSON.stringify(data,null,2), "application/json");
+  downloadBlob("firevault-backup-build-0.37.0.json", JSON.stringify(data,null,2), "application/json");
 }
 
 function showChangelog(){
   alert(`FireVault Build ${BUILD}
 
-- Import / Export module restored
-- Bulk account import from pasted lines
-- JSON backup import
-- JSON backup export
-- Sites CSV export
-- Visits CSV export
-- Import button added to Sites screen`);
+- AI Technician placeholder module
+- Site-aware context summary
+- Local rule-based assistant responses
+- AI Technician button on site vault
+- Advanced Features settings tab added
+- External-service features marked with *`);
 }
 
 render();
