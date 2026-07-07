@@ -128,6 +128,7 @@ function home(){
   const visits = data.sites.flatMap(s => (s.visits||[]).map(v => ({...v, site:s.name})));
   const openTasks = data.sites.reduce((n,s)=>n+(s.tasks||[]).filter(t => (t.status||"Open") !== "Done").length,0);
   const def = data.sites.reduce((n,s)=>n+(s.deficiencies||[]).filter(d => (d.status||"Open") !== "Closed").length,0);
+  const gpsSites = data.sites.filter(hasGps).length;
   const now = new Date();
   html(`<div class="screen">
     <div><div class="todayDay"><h1>${now.toLocaleDateString([], {weekday:"long"})}</h1></div><p>${fmtDate(now)} • Modular field dashboard</p></div>
@@ -136,19 +137,24 @@ function home(){
       <div class="card tile metricCard" id="tasksCard"><strong>${openTasks}</strong><span>Open Tasks</span></div>
       <div class="card tile metricCard" id="defCard"><strong>${def}</strong><span>Deficiencies</span></div>
     </div>
-    <div class="grid2">
+    <div class="grid2 homeActionGrid">
       <button class="primary tile" id="addSiteBtn"><strong>＋ Add Site</strong><span>Create customer vault</span></button>
-      <button class="ghost tile" id="settingsBtn"><strong>⚙ Settings</strong><span>Theme engine live</span></button>
+      <button class="ghost tile gpsHomeTile" id="gpsHomeBtn"><strong>⌖ GPS / Maps</strong><span>${gpsSites} site${gpsSites===1?"":"s"} with GPS</span></button>
+      <button class="ghost tile" id="settingsBtn"><strong>⚙ Settings</strong><span>Preferences</span></button>
       <button class="ghost tile" id="libraryBtn"><strong>▣ Library</strong><span>Panel resources</span></button>
-      <button class="ghost tile" id="diagBtn"><strong>Diagnostics</strong><span>Build status</span></button>
+      <button class="ghost tile wideTile" id="diagBtn"><strong>Diagnostics</strong><span>Build status</span></button>
     </div>
     ${activeJob ? `<div class="card activeJobMini"><div class="row"><div><h2>Service Call Active</h2><p>${esc(activeJob.siteName)} • <span id="jobElapsed">${elapsedText(activeJob.startedAt)}</span></p></div><button class="primary" id="resumeJobBtn">Open</button></div></div>` : ""}
-    <div class="card grow"><h2>Build 0.41.5</h2><p>Service Visit Lite build on the confirmed-good 0.41.4 GPS baseline.</p><p>Quick service-call event chips and recent visit history are restored carefully without the bad 0.41.0 startup changes.</p></div>
+    <div class="card grow"><h2>Build 0.41.6</h2><p>PWA safe-area fix for iPhone home-screen launch.</p><p>GPS / Maps is back on the dashboard and Settings readability has been relaxed.</p></div>
   </div>`);
   document.getElementById("sitesCard").onclick=()=>route("sites");
   document.getElementById("tasksCard").onclick=()=>{selectedSiteId=null; route("tasks");};
   document.getElementById("defCard").onclick=()=>{selectedSiteId=null; route("deficiencies");};
   document.getElementById("addSiteBtn").onclick=()=>{selectedSiteId=null; mode=null; route("siteForm");};
+  document.getElementById("gpsHomeBtn").onclick=()=>{
+    if(data.sites.length){ route("sites"); setTimeout(()=>toast("Open a site to capture GPS or launch maps."),50); }
+    else { selectedSiteId=null; mode=null; route("siteForm"); setTimeout(()=>toast("Use Capture in GPS Coordinates."),50); }
+  };
   document.getElementById("settingsBtn").onclick=()=>route("settings");
   document.getElementById("libraryBtn").onclick=()=>route("library");
   document.getElementById("diagBtn").onclick=()=>route("diagnostics");
@@ -157,7 +163,7 @@ function home(){
 
 function sites(){
   html(`<div class="screen"><div class="row"><h1>Sites</h1><button class="primary" id="addBtn">＋</button></div>
-    <div class="list grow">${data.sites.length?data.sites.map(s=>`<div class="card siteItem redline" data-id="${s.id}"><div class="row"><div><h2>${esc(s.name||"Unnamed Site")}</h2><p>${esc(fullAddress(s))}</p><p>${esc([s.panelManufacturer,s.panelModel].filter(Boolean).join(" ")||"Panel not entered")}</p></div><span class="pill">${(s.tasks||[]).length} tasks</span></div></div>`).join(""):`<div class="empty">No sites yet. Add your first customer vault.</div>`}</div></div>`);
+    <div class="list grow">${data.sites.length?data.sites.map(s=>`<div class="card siteItem redline" data-id="${s.id}"><div class="row"><div><h2>${esc(s.name||"Unnamed Site")}</h2><p>${esc(fullAddress(s))}</p><p>${esc([s.panelManufacturer,s.panelModel].filter(Boolean).join(" ")||"Panel not entered")}</p></div><div class="sitePills"><span class="pill">${(s.tasks||[]).length} tasks</span><span class="pill ${hasGps(s)?"gpsPill":"noGpsPill"}">${hasGps(s)?"GPS saved":"No GPS"}</span></div></div></div>`).join(""):`<div class="empty">No sites yet. Add your first customer vault.</div>`}</div></div>`);
   document.getElementById("addBtn").onclick=()=>{selectedSiteId=null; mode=null; route("siteForm");};
   document.querySelectorAll(".siteItem").forEach(el=>el.onclick=()=>{selectedSiteId=el.dataset.id; route("siteDetail");});
 }
@@ -343,19 +349,19 @@ function saveSettings(){
 function diagnostics(){ const totalTasks=data.sites.reduce((n,s)=>n+(s.tasks||[]).length,0); const totalDef=data.sites.reduce((n,s)=>n+(s.deficiencies||[]).length,0); const totalVisits=data.sites.reduce((n,s)=>n+(s.visits||[]).length,0); html(`<div class="screen"><div class="row"><button class="back ghost" id="backHome">←</button><h1>Diagnostics</h1></div><div class="card grow errorBox"><p>Build: ${BUILD}</p><p>Sites: ${data.sites.length}</p><p>Total Tasks: ${totalTasks}</p><p>Total Deficiencies: ${totalDef}</p><p>Total Visits: ${totalVisits}</p><p>Active Job: ${activeJob ? esc(activeJob.siteName) : "None"}</p><p>Current Theme: ${esc(data.settings.theme.name)}</p><p>Accent: ${esc(data.settings.theme.accentColor)}</p><p>Advanced AI Enabled: ${data.settings.advanced?.aiTechnician ? "Yes" : "No"}</p><p>GPS Tools: ${data.settings.gps?.enabled !== false ? "Enabled" : "Hidden"}</p><p>Import/Export: Ready</p><p>Storage key: ${KEY}</p><p>Modules loaded successfully.</p></div></div>`); document.getElementById("backHome").onclick=()=>route("home"); }
 function showChangelog(){
   const notes = [
-    "Build number advanced to 0.41.5 across the header, dashboard, manifest, and diagnostics.",
-    "Started from the confirmed-good 0.41.4 GPS baseline.",
-    "Restored service-call quick event chips in a smaller safe Job Mode module.",
-    "Added a Recent Visits card to Site Detail.",
-    "Reports now include the latest saved visit history.",
-    "Diagnostics now count saved visits.",
-    "Kept GPS tools and the minimalist Settings pill-tab layout."
+    "Build number advanced to 0.41.6 across the header, dashboard, manifest, and diagnostics.",
+    "Fixed iPhone home-screen PWA safe-area spacing so the status bar no longer overlaps the FireVault header.",
+    "Changed the iOS status bar mode from translucent overlay to a normal black status area.",
+    "Relaxed Settings typography and spacing so the pill-tab Settings page is readable without feeling cramped.",
+    "Added a visible GPS / Maps tile to the dashboard.",
+    "Added GPS saved / No GPS badges to the Sites list.",
+    "Kept the confirmed-good 0.41.4 GPS capture and map baseline."
   ];
   const overlay=document.createElement("div");
   overlay.className="releaseOverlay";
   overlay.innerHTML=`<div class="releaseSheet" role="dialog" aria-modal="true" aria-label="FireVault release notes">
     <div class="releaseHead"><div><strong>FireVault</strong><span>Build ${BUILD}</span></div><button class="ghost iconBtn" id="closeRelease" aria-label="Close release notes">×</button></div>
-    <div class="releaseBody"><h2>Release Notes</h2><p class="releaseIntro">Service Visit Lite on the confirmed-good 0.41.4 GPS baseline.</p><ul>${notes.map(n=>`<li>${esc(n)}</li>`).join("")}</ul></div>
+    <div class="releaseBody"><h2>Release Notes</h2><p class="releaseIntro">PWA safe-area and GPS visibility fix.</p><ul>${notes.map(n=>`<li>${esc(n)}</li>`).join("")}</ul></div>
   </div>`;
   document.body.appendChild(overlay);
   const close=()=>overlay.remove();
