@@ -1,4 +1,4 @@
-# Clean Install Notes — FireVault 0.43.0
+# Clean Install Notes — FireVault 0.43.1
 
 Copy the contents of this ZIP directly into the GitHub Pages project root.
 

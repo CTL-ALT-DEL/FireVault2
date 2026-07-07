@@ -257,11 +257,11 @@ function addServiceFollowUp(kind="Follow-up"){
 }
 function startJobTimer(){ stopJobTimer(); jobTimer=setInterval(()=>{ const el=document.getElementById("jobElapsed"); if(el && activeJob) el.textContent=elapsedText(activeJob.startedAt); },1000); }
 function stopJobTimer(){ if(jobTimer){ clearInterval(jobTimer); jobTimer=null; } }
-function setActiveNav(){ document.querySelectorAll("nav button").forEach(b=>b.classList.remove("active")); const section=["siteDetail","visits","visitDetail","siteForm","contactsList","contactForm","equipmentList","equipmentForm","tasks","taskForm","deficiencies","deficiencyForm","report","jobMode","nearbySites"].includes(view)?"sites":view; document.getElementById("nav-"+section)?.classList.add("active"); }
+function setActiveNav(){ document.querySelectorAll("nav button").forEach(b=>b.classList.remove("active")); const section=["siteDetail","visits","visitDetail","siteForm","contactsList","contactForm","siteDocs","siteDocForm","equipmentList","equipmentForm","tasks","taskForm","deficiencies","deficiencyForm","report","jobMode","nearbySites"].includes(view)?"sites":view; document.getElementById("nav-"+section)?.classList.add("active"); }
 
 function render(){
   try{
-    const routes = {home, sites, nearbySites, siteDetail, visits, visitDetail, siteForm, contactsList, contactForm, equipmentList, equipmentForm, tasks, taskForm, deficiencies, deficiencyForm, report, library, resourceForm, jobMode, settings, diagnostics};
+    const routes = {home, sites, nearbySites, siteDetail, visits, visitDetail, siteForm, contactsList, contactForm, siteDocs, siteDocForm, equipmentList, equipmentForm, tasks, taskForm, deficiencies, deficiencyForm, report, library, resourceForm, jobMode, settings, diagnostics};
     (routes[view] || home)();
     view === "jobMode" ? startJobTimer() : stopJobTimer();
     setActiveNav();
@@ -297,7 +297,7 @@ function home(){
       <button class="ghost tile" id="diagBtn"><strong>Diagnostics</strong><span>Build status</span></button>
     </div>
     ${activeJob ? `<div class="card activeJobMini"><div class="row"><div><h2>Service Call Active</h2><p>${esc(activeJob.siteName)} • <span id="jobElapsed">${elapsedText(activeJob.startedAt)}</span></p></div><button class="primary" id="resumeJobBtn">Open</button></div></div>` : ""}
-    <div class="card grow"><h2>Build ${BUILD}</h2><p>Contacts & Access Vault is now available for each site.</p><p>Store customer contacts, access notes, gate/key details, and after-hours instructions directly in the site record.</p></div>
+    <div class="card grow"><h2>Build ${BUILD}</h2><p>Site Documents Vault is now available.</p><p>Store panel manuals, permit links, inspection forms, account notes, and other site-specific references inside each customer vault.</p></div>
   </div>`);
   document.getElementById("sitesCard").onclick=()=>route("sites");
   document.getElementById("tasksCard").onclick=()=>{selectedSiteId=null; route("tasks");};
@@ -349,6 +349,7 @@ function siteDetail(){
   const siteVisits=Array.isArray(s.visits) ? s.visits : [];
   const equipment=Array.isArray(s.equipment) ? s.equipment : [];
   const contacts=Array.isArray(s.contacts) ? s.contacts : [];
+  const docs=Array.isArray(s.docs) ? s.docs : [];
   html(`<div class="screen"><div class="row"><button class="back ghost" id="backBtn">←</button><button class="ghost" id="editBtn">Edit</button></div>
     <div class="card redline"><h1>${esc(s.name)}</h1><p>${esc(fullAddress(s))}</p><p>${esc([s.panelManufacturer,s.panelModel].filter(Boolean).join(" ")||"Panel not entered")}</p></div>
     <div class="grid2">
@@ -358,10 +359,12 @@ function siteDetail(){
       <button class="ghost tile" id="defBtn"><strong>${def}</strong><span>Deficiencies</span></button>
       <button class="ghost tile" id="equipmentBtn"><strong>${equipment.length}</strong><span>Equipment</span></button>
       <button class="ghost tile" id="contactsBtn"><strong>${contacts.length}</strong><span>Contacts / Access</span></button>
+      <button class="ghost tile" id="docsBtn"><strong>${docs.length}</strong><span>Documents / Links</span></button>
     </div>
     <div class="card gpsCard"><div class="row"><div><h2>GPS / Maps</h2><p>${esc(gpsLine(s))}</p></div>${data.settings.gps?.enabled===false?"":`<button id="captureGpsBtn" class="primary smallBtn">Capture GPS</button>`}</div><div class="mapActions"><button id="appleBtn" class="ghost">Apple Maps</button><button id="googleBtn" class="ghost">Google Maps</button></div></div>
     <div class="card contactsMiniCard"><div class="row"><div><h2>Contacts & Access</h2><p>${contacts.length ? `${contacts.length} saved contact${contacts.length===1?"":"s"}` : "Customer, access, gate, and after-hours details."}</p></div><button class="ghost smallBtn" id="manageContactsBtn">Manage</button></div>${contacts.length?contacts.slice(0,3).map(c=>`<button class="contactLine" data-contact="${esc(c.id)}"><strong>${esc(contactTitle(c))}</strong><span>${esc(contactMeta(c))}</span></button>`).join(""):`<p class="fieldNote">Add customer contacts, access codes, lockbox notes, or monitoring center details here.</p>`}</div>
     <div class="card equipmentMiniCard"><div class="row"><div><h2>Equipment Vault</h2><p>${equipment.length ? `${equipment.length} saved equipment item${equipment.length===1?"":"s"}` : "Panel, communicator, power supply, and device notes."}</p></div><button class="ghost smallBtn" id="manageEquipmentBtn">Manage</button></div>${equipment.length?equipment.slice(0,3).map(e=>`<button class="equipmentLine" data-eq="${esc(e.id)}"><strong>${esc(equipmentTitle(e))}</strong><span>${esc(e.location||e.type||"No location entered")}</span></button>`).join(""):`<p class="fieldNote">Add the panel, communicator, power supplies, and important site equipment here.</p>`}</div>
+    <div class="card docsMiniCard"><div class="row"><div><h2>Documents / Links</h2><p>${docs.length ? `${docs.length} saved document${docs.length===1?"":"s"}` : "Manuals, permits, forms, and site reference links."}</p></div><button class="ghost smallBtn" id="manageDocsBtn">Manage</button></div>${docs.length?docs.slice(0,3).map(d=>`<button class="docLineMini" data-doc="${esc(d.id)}"><strong>${esc(docTitle(d))}</strong><span>${esc(docMeta(d))}</span></button>`).join(""):`<p class="fieldNote">Add PDF links, panel manuals, account references, permit numbers, or inspection form notes here.</p>`}</div>
     <div class="card recentVisitsCard visitLogCard"><div class="row"><div><h2>Visit History</h2><p>${siteVisits.length ? `${siteVisits.length} completed visit${siteVisits.length===1?"":"s"}` : "No completed visits yet."}</p></div>${siteVisits.length?`<button class="ghost smallBtn" id="allVisitsBtn">View All</button>`:""}</div>${siteVisits.length?siteVisits.slice(0,3).map(v=>`<button class="visitMini visitMiniButton" data-visit="${esc(v.id)}"><strong>${esc(visitDateLabel(v))}</strong><span>${esc(durationText(v.startedAt,v.endedAt))}</span><p>${esc(visitNotesPreview(v,2))}</p></button>`).join(""):`<p class="fieldNote">Finish a Job Mode service call and it will appear here.</p>`}</div>
     <div class="card grow"><h2>Site Notes</h2><p>${esc(s.notes || "No notes entered.")}</p></div>
   </div>`);
@@ -371,6 +374,7 @@ function siteDetail(){
   document.getElementById("defBtn").onclick=()=>route("deficiencies");
   document.getElementById("equipmentBtn").onclick=()=>route("equipmentList");
   document.getElementById("contactsBtn").onclick=()=>route("contactsList");
+  document.getElementById("docsBtn").onclick=()=>route("siteDocs");
   document.getElementById("reportBtn").onclick=()=>route("report");
   document.getElementById("jobBtn").onclick=startJob;
   const gpsBtn=document.getElementById("captureGpsBtn"); if(gpsBtn) gpsBtn.onclick=captureGpsForSite;
@@ -380,10 +384,64 @@ function siteDetail(){
   document.querySelectorAll(".contactLine").forEach(b=>b.onclick=()=>{mode=b.dataset.contact; route("contactForm");});
   const manageEq=document.getElementById("manageEquipmentBtn"); if(manageEq) manageEq.onclick=()=>route("equipmentList");
   document.querySelectorAll(".equipmentLine").forEach(b=>b.onclick=()=>{mode=b.dataset.eq; route("equipmentForm");});
+  const manageDocs=document.getElementById("manageDocsBtn"); if(manageDocs) manageDocs.onclick=()=>route("siteDocs");
+  document.querySelectorAll(".docLineMini").forEach(b=>b.onclick=()=>{mode=b.dataset.doc; route("siteDocForm");});
   const allVisits=document.getElementById("allVisitsBtn"); if(allVisits) allVisits.onclick=()=>route("visits");
   document.querySelectorAll(".visitMiniButton").forEach(b=>b.onclick=()=>{mode=b.dataset.visit; route("visitDetail");});
 }
 
+
+
+function docTitle(d){ return [d.type,d.title].filter(Boolean).join(" • ") || "Document / Link"; }
+function docMeta(d){
+  const parts=[];
+  if(d.ref) parts.push(d.ref);
+  if(d.url) parts.push("Link saved");
+  if(d.date) parts.push(d.date);
+  return parts.join(" • ") || "No reference details entered";
+}
+function docReportLine(d){
+  const main=`- ${docTitle(d)}${d.ref?` | Ref ${d.ref}`:""}${d.date?` | ${d.date}`:""}${d.url?` | ${d.url}`:""}`;
+  const notes=d.notes ? `\n  Notes: ${String(d.notes).replaceAll("\n","\n  ")}` : "";
+  return main + notes;
+}
+function siteDocs(){
+  const s=site(); if(!s){ route("sites"); return; }
+  s.docs=Array.isArray(s.docs) ? s.docs : [];
+  const docs=s.docs;
+  const linked=docs.filter(d=>d.url).length;
+  html(`<div class="screen docsScreen"><div class="row"><button class="back ghost" id="backBtn">←</button><div><h1>Documents / Links</h1><p>${esc(s.name||"Site")}</p></div><button class="primary" id="addDocBtn">＋</button></div>
+    <div class="card docsHero"><h2>Site Documents Vault</h2><p>Keep the field references that are specific to this customer: manuals, permits, inspection forms, account numbers, and useful links.</p><div class="docStats"><span><strong>${docs.length}</strong>Total</span><span><strong>${linked}</strong>Links</span><span><strong>${docs.length-linked}</strong>Notes</span></div></div>
+    <div class="list grow docsList">${docs.length?docs.map(d=>`<div class="card docVaultItem" data-doc="${esc(d.id)}"><div class="row"><div><h2>${esc(docTitle(d))}</h2><p>${esc(docMeta(d))}</p></div><span class="pill">${esc(d.type||"Doc")}</span></div>${d.notes?`<p class="docNotes">${esc(String(d.notes).split("\n").slice(0,2).join(" • "))}</p>`:""}<div class="docQuickActions">${d.url?`<button class="ghost smallBtn openDocLink" data-url="${esc(d.url)}">Open Link</button>`:""}<button class="ghost smallBtn copyDocRef" data-doc="${esc(d.id)}">Copy</button></div></div>`).join(""):`<div class="empty">No documents or links saved yet. Add a panel manual, permit number, inspection form, or account reference.</div>`}</div>
+  </div>`);
+  document.getElementById("backBtn").onclick=()=>route("siteDetail");
+  document.getElementById("addDocBtn").onclick=()=>{mode=null; route("siteDocForm");};
+  document.querySelectorAll(".docVaultItem").forEach(b=>b.onclick=()=>{mode=b.dataset.doc; route("siteDocForm");});
+  document.querySelectorAll(".openDocLink").forEach(b=>b.onclick=e=>{e.stopPropagation(); window.open(b.dataset.url,"_blank");});
+  document.querySelectorAll(".copyDocRef").forEach(b=>b.onclick=async e=>{e.stopPropagation(); const d=docs.find(x=>x.id===b.dataset.doc); if(d){ await navigator.clipboard.writeText(`${docTitle(d)}\n${d.url||""}\n${d.notes||""}`.trim()); toast("Document reference copied."); }});
+}
+function siteDocForm(){
+  const s=site(); if(!s){ route("sites"); return; }
+  s.docs=Array.isArray(s.docs) ? s.docs : [];
+  const d=mode ? s.docs.find(x=>x.id===mode) : {};
+  const types=["Panel Manual","Permit","Inspection Form","Monitoring Account","Contract","Photo Set","Map / Drawing","Code Reference","Other"];
+  html(`<div class="screen"><div class="row"><button class="back ghost" id="backBtn">←</button><h1>${mode?"Edit":"Add"} Document</h1></div><div class="form grow">
+    <div class="card docFormCard"><div class="compactField"><div><label>Type</label><select id="docType">${types.map(x=>`<option value="${esc(x)}" ${((d.type||"Panel Manual")===x)?"selected":""}>${esc(x)}</option>`).join("")}</select></div><div><label>Date / Revision</label><input id="docDate" value="${esc(d.date||"")}" placeholder="Rev, date, or version"></div></div>
+    <label>Title</label><input id="docTitle" value="${esc(d.title||"")}" placeholder="Notifier NFS2-640 manual, annual inspection form...">
+    <label>Reference / Account / Permit #</label><input id="docRef" value="${esc(d.ref||"")}" placeholder="Account number, permit number, drawing ID...">
+    <label>URL / Link</label><input id="docUrl" value="${esc(d.url||"")}" placeholder="https://...">
+    <label>Notes</label><textarea id="docNotes" placeholder="Where to find it, customer-specific instructions, page numbers, revision notes...">${esc(d.notes||"")}</textarea></div>
+    <button class="primary" id="saveDocBtn">Save Document</button>${mode?`<button class="danger" id="deleteDocBtn">Delete Document</button>`:""}
+  </div></div>`);
+  document.getElementById("backBtn").onclick=()=>route("siteDocs");
+  document.getElementById("saveDocBtn").onclick=()=>{
+    const obj={type:val("docType"),title:val("docTitle")||"Untitled Reference",ref:val("docRef"),url:val("docUrl"),date:val("docDate"),notes:raw("docNotes")};
+    if(mode && d){ Object.assign(d,obj); }
+    else s.docs.unshift({...obj,id:uid(),createdAt:new Date().toISOString()});
+    save(); toast("Document saved."); route("siteDocs");
+  };
+  const del=document.getElementById("deleteDocBtn"); if(del) del.onclick=()=>{ if(confirm("Delete this document reference?")){ s.docs=s.docs.filter(x=>x.id!==mode); save(); toast("Document deleted."); route("siteDocs"); } };
+}
 
 function contactTitle(c){ return [c.name,c.role].filter(Boolean).join(" • ") || c.type || "Contact"; }
 function contactMeta(c){
@@ -630,6 +688,7 @@ function reportText(s){
   const visits=(s.visits||[]).slice(0,5).map(v=>visitReportBlock(v)).join("\n\n") || "No completed visits";
   const contacts=(s.contacts||[]).map(contactReportLine).join("\n") || "No contacts or access notes saved";
   const equipment=(s.equipment||[]).map(e=>`- ${e.status||"Active"}: ${equipmentTitle(e)}${e.location?` @ ${e.location}`:""}${e.serial?` | Serial ${e.serial}`:""}${e.date?` | Checked ${e.date}`:""}${e.interval&&e.interval!=="None"?` | Interval ${e.interval}`:""}${e.notes?`\n  Notes: ${String(e.notes).replaceAll("\n","\n  ")}`:""}`).join("\n") || "No equipment saved";
+  const docs=(s.docs||[]).map(docReportLine).join("\n") || "No documents or links saved";
   return `${set.reports.title}
 Generated: ${new Date().toLocaleString()}
 
@@ -654,6 +713,9 @@ ${contacts}
 
 EQUIPMENT
 ${equipment}
+
+DOCUMENTS / LINKS
+${docs}
 
 TASKS
 ${(s.tasks||[]).map(t=>`- ${t.status||"Open"}: ${t.title}${t.source?` [${t.source}]`:""}${t.due?` due ${t.due}`:""}`).join("\n")||"No tasks"}
@@ -834,20 +896,20 @@ function saveSettings(){
   save(); toast("Settings saved."); settings();
 }
 
-function diagnostics(){ const taskRows=allTaskRows(); const taskCounts=taskFilterCounts(taskRows); const totalTasks=taskRows.length; const serviceTasks=taskRows.filter(r=>r.t.source==="Service Call").length; const totalDef=data.sites.reduce((n,s)=>n+(s.deficiencies||[]).length,0); const totalVisits=data.sites.reduce((n,s)=>n+(s.visits||[]).length,0); const totalContacts=data.sites.reduce((n,s)=>n+(s.contacts||[]).length,0); html(`<div class="screen"><div class="row"><button class="back ghost" id="backHome">←</button><h1>Diagnostics</h1></div><div class="card grow errorBox"><p>Build: ${BUILD}</p><p>Sites: ${data.sites.length}</p><p>Total Tasks: ${totalTasks}</p><p>Open Tasks: ${taskCounts.open}</p><p>Due Today: ${taskCounts.today}</p><p>Overdue Tasks: ${taskCounts.overdue}</p><p>Service Follow-Ups: ${serviceTasks}</p><p>Total Deficiencies: ${totalDef}</p><p>Total Visits: ${totalVisits}</p><p>Total Contacts: ${totalContacts}</p><p>Active Job: ${activeJob ? esc(activeJob.siteName) : "None"}</p><p>Current Theme: ${esc(data.settings.theme.name)}</p><p>Accent: ${esc(data.settings.theme.accentColor)}</p><p>Advanced AI Enabled: ${data.settings.advanced?.aiTechnician ? "Yes" : "No"}</p><p>GPS Tools: ${data.settings.gps?.enabled !== false ? "Enabled" : "Hidden"}</p><p>Nearby Radius: ${nearbyRadiusMiles()} mi</p><p>Haptics: ${data.settings.app?.haptics !== false ? "Enabled" : "Off"}</p><p>Import/Export: Ready</p><p>Storage key: ${KEY}</p><p>Modules loaded successfully.</p></div></div>`); document.getElementById("backHome").onclick=()=>route("home"); }
+function diagnostics(){ const taskRows=allTaskRows(); const taskCounts=taskFilterCounts(taskRows); const totalTasks=taskRows.length; const serviceTasks=taskRows.filter(r=>r.t.source==="Service Call").length; const totalDef=data.sites.reduce((n,s)=>n+(s.deficiencies||[]).length,0); const totalVisits=data.sites.reduce((n,s)=>n+(s.visits||[]).length,0); const totalContacts=data.sites.reduce((n,s)=>n+(s.contacts||[]).length,0); const totalDocs=data.sites.reduce((n,s)=>n+(s.docs||[]).length,0); html(`<div class="screen"><div class="row"><button class="back ghost" id="backHome">←</button><h1>Diagnostics</h1></div><div class="card grow errorBox"><p>Build: ${BUILD}</p><p>Sites: ${data.sites.length}</p><p>Total Tasks: ${totalTasks}</p><p>Open Tasks: ${taskCounts.open}</p><p>Due Today: ${taskCounts.today}</p><p>Overdue Tasks: ${taskCounts.overdue}</p><p>Service Follow-Ups: ${serviceTasks}</p><p>Total Deficiencies: ${totalDef}</p><p>Total Visits: ${totalVisits}</p><p>Total Contacts: ${totalContacts}</p><p>Total Documents: ${totalDocs}</p><p>Active Job: ${activeJob ? esc(activeJob.siteName) : "None"}</p><p>Current Theme: ${esc(data.settings.theme.name)}</p><p>Accent: ${esc(data.settings.theme.accentColor)}</p><p>Advanced AI Enabled: ${data.settings.advanced?.aiTechnician ? "Yes" : "No"}</p><p>GPS Tools: ${data.settings.gps?.enabled !== false ? "Enabled" : "Hidden"}</p><p>Nearby Radius: ${nearbyRadiusMiles()} mi</p><p>Haptics: ${data.settings.app?.haptics !== false ? "Enabled" : "Off"}</p><p>Import/Export: Ready</p><p>Storage key: ${KEY}</p><p>Modules loaded successfully.</p></div></div>`); document.getElementById("backHome").onclick=()=>route("home"); }
 function showChangelog(){
   const notes = [
-    "Added Contacts & Access Vault for each saved site.",
-    "Store customer, property manager, monitoring, emergency, and access contacts.",
-    "Added gate, lockbox, panel-room, call-before-entry, and after-hours notes.",
-    "Contact cards support quick Call and Email actions where the device allows it.",
-    "Reports now include a Contacts / Access section."
+    "Added Site Documents Vault for each saved site.",
+    "Added document/link types for panel manuals, permits, inspection forms, monitoring accounts, drawings, and code references.",
+    "Added quick Open Link and Copy actions for saved document references.",
+    "Added document summary cards on the Site Detail screen.",
+    "Reports now include a Documents / Links section."
   ];
   const overlay=document.createElement("div");
   overlay.className="releaseOverlay";
   overlay.innerHTML=`<div class="releaseSheet" role="dialog" aria-modal="true" aria-label="FireVault release notes">
     <div class="releaseHead"><div><strong>FireVault</strong><span>Build ${BUILD}</span></div><button class="ghost iconBtn" id="closeRelease" aria-label="Close release notes">×</button></div>
-    <div class="releaseBody"><h2>Release Notes</h2><p class="releaseIntro">contacts and access vault starter.</p><ul>${notes.map(n=>`<li>${esc(n)}</li>`).join("")}</ul></div>
+    <div class="releaseBody"><h2>Release Notes</h2><p class="releaseIntro">site documents and links vault starter.</p><ul>${notes.map(n=>`<li>${esc(n)}</li>`).join("")}</ul></div>
   </div>`;
   document.body.appendChild(overlay);
   const close=()=>overlay.remove();

@@ -668,3 +668,46 @@ nav button:active{transform:translateY(1px) scale(.992)}
   .contactQuickActions{grid-template-columns:1fr;gap:7px}
   .contactQuickActions .smallBtn{width:100%;min-height:38px}
 }
+
+/* Build 0.43.1 Site Documents Vault */
+.docsMiniCard,.docsHero,.docFormCard,.docVaultItem,.docLineMini{
+  background:linear-gradient(180deg,var(--fv427FaceTop),var(--fv427FaceBottom))!important;
+  border:1px solid var(--fv427Rim)!important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.085),inset 0 -1px 0 rgba(0,0,0,.42),0 2px 0 var(--fv427Lip),0 11px 18px var(--fv427Shadow)!important;
+}
+.docsMiniCard h2,.docsHero h2{margin:0 0 4px;font-size:17px;line-height:1.15}
+.docsMiniCard p,.docsHero p,.docVaultItem p{margin:0;color:var(--muted);font-size:12.5px;line-height:1.35;overflow-wrap:anywhere}
+.docLineMini{
+  width:100%;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;align-items:center;
+  margin-top:8px;min-height:38px;padding:8px 10px;border-radius:14px;text-align:left;
+}
+.docLineMini strong{font-size:13px;line-height:1.15;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.docLineMini span{font-size:11.5px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:42vw}
+.docsScreen .row>div{min-width:0;flex:1}
+.docsScreen .row h1{margin:0;font-size:22px;line-height:1.05;letter-spacing:-.02em}
+.docsScreen .row p{margin:2px 0 0;color:var(--muted);font-size:12.5px;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.docsHero{display:grid;gap:10px}
+.docStats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:2px}
+.docStats span{display:grid;gap:2px;min-height:44px;padding:8px 10px;border-radius:14px;background:linear-gradient(180deg,#1a2230,#101620);border:1px solid rgba(255,255,255,.08);box-shadow:inset 0 1px 0 rgba(255,255,255,.06),0 2px 0 #05070b,0 7px 12px rgba(0,0,0,.24);font-size:11px;line-height:1.1;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;font-weight:850}
+.docStats strong{font-size:18px;line-height:1;color:#fff}
+.docsList{gap:9px}
+.docVaultItem{width:100%;text-align:left;display:grid;gap:7px;padding:12px;cursor:pointer}
+.docVaultItem h2{margin:0 0 4px;font-size:16px;line-height:1.18;overflow-wrap:anywhere}
+.docVaultItem .row{align-items:flex-start!important;gap:10px}
+.docVaultItem .pill{white-space:nowrap}
+.docNotes{padding:8px 9px;border-radius:12px;background:rgba(0,0,0,.18);border:1px solid rgba(255,255,255,.055)}
+.docQuickActions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px;margin-top:2px}
+.docQuickActions .smallBtn{min-height:36px;padding:7px 8px;font-size:12px;white-space:nowrap}
+.docFormCard label{font-size:12px;letter-spacing:.04em;color:var(--muted);text-transform:uppercase}
+.docFormCard input,.docFormCard select,.docFormCard textarea{margin-bottom:10px}
+@media(max-width:430px){
+  .docLineMini{grid-template-columns:1fr;gap:2px;min-height:42px}
+  .docLineMini span{max-width:100%;white-space:normal}
+  .docVaultItem .row{display:grid;grid-template-columns:1fr;gap:7px}
+  .docVaultItem .pill{justify-self:start}
+  .docStats{grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}
+  .docStats span{padding:7px 6px;min-height:41px;font-size:10.2px;text-align:center}
+  .docStats strong{font-size:16px}
+  .docQuickActions{grid-template-columns:1fr;gap:7px}
+  .docQuickActions .smallBtn{width:100%;min-height:38px}
+}
