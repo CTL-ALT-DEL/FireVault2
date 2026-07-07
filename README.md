@@ -1,17 +1,14 @@
-# FireVault Build 0.8.0 — Job Mode
+# FireVault Build 0.9.0 — Arrival Intelligence
 
 Root-level package for GitHub Pages.
 
 ## Changes
-- Start Service Call button on each site
-- Live Job Mode screen
-- Elapsed service timer
-- Quick event buttons
-- Live timeline
-- Finish Call saves the whole timeline into visit history
-- Active call banner on Today screen
+- Save GPS coordinates to customer sites
+- Use Current GPS button on site form
+- Nearby Site scan on Today screen
+- Service Call records arrival GPS when available
 - Preserves previous local storage data
 
 Suggested commit:
 
-`Build 0.8.0 job mode`
+`Build 0.9.0 arrival intelligence`
