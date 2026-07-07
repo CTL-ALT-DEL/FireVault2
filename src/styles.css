@@ -938,10 +938,174 @@ nav button:active{transform:translateY(1px) scale(.992)}
 .reportDeliveryEmpty{font-size:12px;color:var(--muted);padding:9px 10px;border:1px dashed rgba(255,255,255,.13);border-radius:13px;background:rgba(255,255,255,.025);}
 @media(max-width:560px){.reportActionGrid442{grid-template-columns:repeat(2,minmax(0,1fr));}.reportActionGrid442 #shareBtn{grid-column:1 / -1}.reportDeliveryHead{align-items:center}.reportDeliveryRow{grid-template-columns:1fr}.reportDeliveryRow time{justify-self:start}.reportReadyCard442 small{white-space:normal}}
 
-/* Build 0.44.4 Report delivery receipts and follow-up tasks */
+/* Build 0.44.5 Report delivery receipts and follow-up tasks */
 .reportDeliveryCard444 .reportDeliveryHead{align-items:flex-start;}
 .reportDeliveryHeadActions{display:flex;gap:7px;align-items:center;flex:0 0 auto;}
 .reportDeliveryReceiptBtn{width:100%;text-align:left;color:var(--text);font:inherit;cursor:pointer;}
 .reportDeliveryReceiptBtn:hover{border-color:rgba(255,255,255,.16);transform:translateY(-1px);}
 .reportDeliveryReceiptBtn:active{transform:translateY(1px);}
 @media(max-width:560px){.reportDeliveryCard444 .reportDeliveryHead{display:grid;grid-template-columns:1fr;gap:9px}.reportDeliveryHeadActions{display:grid;grid-template-columns:1fr 1fr;width:100%}.reportDeliveryHeadActions .smallBtn{width:100%}}
+
+/* Build 0.44.5 Visual Consistency Pass - professional field-tool surface system */
+:root{
+  --fv445Top:#242d3d;
+  --fv445Bottom:#121923;
+  --fv445Inset:rgba(255,255,255,.10);
+  --fv445InsetLow:rgba(0,0,0,.46);
+  --fv445Rim:rgba(255,255,255,.115);
+  --fv445Lip:#05070b;
+  --fv445Shadow:rgba(0,0,0,.36);
+  --fv445Soft:rgba(255,255,255,.045);
+  --fv445Pressed:#0e141d;
+}
+body{
+  background:
+    radial-gradient(circle at 8% 0%,color-mix(in srgb,var(--accent) 16%,transparent),transparent 30%),
+    linear-gradient(180deg,#10151e 0%,#080b10 100%);
+}
+main{padding-bottom:16px;}
+/* One neutral raised surface for cards and dense modules. Status should be shown in pills/text, not colored side rails. */
+.card,.tile,.siteItem,.taskCard,.deficiencyCard,.visitLogItem,.visitMini,.visitMiniButton,.nearbyItem,
+.gpsStatusBar,.healthSnapshotCard,.snapshotCard,.checklistMiniCard,.contactsMiniCard,.equipmentMiniCard,.docsMiniCard,
+.contactsHero,.equipmentHero,.docsHero,.contactItem,.equipmentItem,.docVaultItem,.reportPreviewCard440,
+.reportReadyCard,.reportDeliveryCard442,.reportDeliveryRow,.reportOptions441,.siteFinderCard,.attentionItem,
+.checklistItem,.deficiencyCard439,.emailModule,.emailPreviewCard,.compactPane,.aboutGrid div{
+  background:linear-gradient(180deg,var(--fv445Top),var(--fv445Bottom))!important;
+  border:1px solid var(--fv445Rim)!important;
+  border-left-width:1px!important;
+  border-left-color:var(--fv445Rim)!important;
+  box-shadow:
+    inset 0 1px 0 var(--fv445Inset),
+    inset 0 -1px 0 var(--fv445InsetLow),
+    0 2px 0 var(--fv445Lip),
+    0 10px 17px var(--fv445Shadow)!important;
+}
+.redline,.docLine,.issue,.visit,.taskOpen,.taskDone,.taskOverdue,.taskToday,.def-critical,.def-high,
+.errorBox,.settingGroup,.visitLogHero,.visitDetailHero,.jobFollowCard,.taskMetricCard,.nearMatch,.nearFallback{
+  border-left-width:1px!important;
+  border-left-style:solid!important;
+  border-left-color:var(--fv445Rim)!important;
+}
+/* Hardware-button look: subtle top highlight, lower lip, and clear pressed state. */
+button,.btn,.smallBtn,.miniBtn,.iconBtn,.tabBtn,.settingsPill,.taskFilterPill,.defFilterPill,
+.reportSectionToggle,.emailTagChip,.presetBtn,.quickEventBtn,.contactLine,.equipmentLine,.docLineMini{
+  background:linear-gradient(180deg,#2a3448,#141b27)!important;
+  border:1px solid rgba(255,255,255,.12)!important;
+  color:var(--text)!important;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.13),
+    inset 0 -1px 0 rgba(0,0,0,.50),
+    0 2px 0 #05070b,
+    0 7px 12px rgba(0,0,0,.33)!important;
+  text-shadow:0 1px 0 rgba(0,0,0,.42);
+}
+button:hover,.btn:hover,.smallBtn:hover,.settingsPill:hover,.taskFilterPill:hover,.defFilterPill:hover,
+.reportSectionToggle:hover,.emailTagChip:hover,.presetBtn:hover,.quickEventBtn:hover{
+  filter:brightness(1.04);
+}
+button:active,.btn:active,.smallBtn:active,.miniBtn:active,.iconBtn:active,.tabBtn:active,
+.settingsPill:active,.taskFilterPill:active,.defFilterPill:active,.reportSectionToggle:active,
+.emailTagChip:active,.presetBtn:active,.quickEventBtn:active,.contactLine:active,.equipmentLine:active,.docLineMini:active{
+  transform:translateY(2px) scale(.995);
+  background:linear-gradient(180deg,#151c28,var(--fv445Pressed))!important;
+  box-shadow:
+    inset 0 2px 4px rgba(0,0,0,.55),
+    inset 0 -1px 0 rgba(255,255,255,.035),
+    0 1px 0 #05070b,
+    0 3px 7px rgba(0,0,0,.34)!important;
+}
+.primary,.settingsPill.active,.tabBtn.active,.taskFilterPill.active,.defFilterPill.active,nav button.active,
+.reportSectionToggle.on{
+  background:linear-gradient(180deg,color-mix(in srgb,var(--accent) 58%,#30394d),color-mix(in srgb,var(--accent2) 66%,#121923))!important;
+  border-color:rgba(255,255,255,.16)!important;
+  color:#fff!important;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.18),
+    inset 0 -1px 0 rgba(0,0,0,.52),
+    0 2px 0 #05070b,
+    0 8px 13px rgba(0,0,0,.36)!important;
+}
+.ghost{background:linear-gradient(180deg,#263146,#121923)!important;}
+.danger,.deleteBtn{
+  background:linear-gradient(180deg,#462229,#1b0f13)!important;
+  border-color:rgba(255,255,255,.13)!important;
+  color:#ffd7d7!important;
+}
+/* Softer semantic styling: no colored side rails, only readable badges and subtle face tint. */
+.pill,.gpsPill,.equipmentStatusPill,.defDonePill,.healthScore{
+  border:1px solid rgba(255,255,255,.12)!important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.08),0 1px 0 rgba(0,0,0,.38)!important;
+}
+.taskOverdue,.def-critical{background:linear-gradient(180deg,color-mix(in srgb,#ef4444 10%,var(--fv445Top)),var(--fv445Bottom))!important;}
+.taskToday,.def-high{background:linear-gradient(180deg,color-mix(in srgb,#f59e0b 9%,var(--fv445Top)),var(--fv445Bottom))!important;}
+.taskDone,.checkOk,.healthOk{background:linear-gradient(180deg,color-mix(in srgb,#22c55e 7%,var(--fv445Top)),var(--fv445Bottom))!important;}
+.checkIssue,.healthWarn{background:linear-gradient(180deg,color-mix(in srgb,#ef4444 8%,var(--fv445Top)),var(--fv445Bottom))!important;}
+/* Dashboard and bottom dock should read as one system. */
+.homeActionGrid{gap:10px!important;}
+.homeActionGrid .tile{min-height:82px;align-content:center;}
+.metricCard{min-height:72px;text-align:center;display:grid;align-content:center;gap:3px;}
+.metricCard strong{font-size:24px;line-height:1;}
+.metricCard span{font-size:11.5px;text-transform:uppercase;letter-spacing:.055em;color:var(--muted);font-weight:900;}
+nav{background:linear-gradient(180deg,rgba(15,20,30,.92),rgba(5,7,10,.98))!important;border-top:1px solid rgba(255,255,255,.09)!important;}
+nav button{width:84%!important;max-width:76px!important;border-radius:16px!important;}
+nav button span:first-child{font-size:23px!important;line-height:1;}
+nav button span:last-child{font-size:11.2px!important;font-weight:850;}
+/* Settings: roomy full-width submenu choices without the blank-box feel. */
+.settingsPickerRail{
+  display:grid!important;
+  grid-template-columns:repeat(auto-fit,minmax(96px,1fr))!important;
+  gap:10px!important;
+  overflow:visible!important;
+  padding:5px 0 12px!important;
+  margin:0!important;
+}
+.settingsPill{
+  min-height:42px!important;
+  border-radius:15px!important;
+  padding:10px 11px!important;
+  font-size:13.4px!important;
+  justify-content:center!important;
+  text-align:center!important;
+}
+.settingsContent409,.settingsContent423{font-size:12.4px!important;}
+.settingsContent409 .compactPane,.settingsContent423 .compactPane{padding:14px 15px!important;border-radius:16px!important;}
+.settingsContent409 .paneHead h2,.settingsContent423 .paneHead h2{font-size:16px!important;}
+.settingsContent409 .paneNote,.settingsContent423 .paneNote{font-size:12px!important;line-height:1.32!important;display:block;}
+.settingsContent409 .settingsGrid,.settingsContent423 .settingsGrid{grid-template-columns:repeat(auto-fit,minmax(220px,1fr))!important;gap:12px!important;}
+.settingsContent409 .settingsList.twoCol,.settingsContent423 .settingsList.twoCol{grid-template-columns:repeat(auto-fit,minmax(210px,1fr))!important;gap:10px!important;}
+.settingsContent409 .settingField label,.settingsContent423 .settingField label,.settingsContent409 label:not(.checkRow),.settingsContent423 label:not(.checkRow){font-size:10px!important;letter-spacing:.06em!important;}
+.settingsContent409 input,.settingsContent409 textarea,.settingsContent409 select,
+.settingsContent423 input,.settingsContent423 textarea,.settingsContent423 select{
+  min-height:40px!important;
+  border-radius:12px!important;
+  font-size:13px!important;
+}
+.settingsContent409 .checkRow,.settingsContent423 .checkRow{min-height:40px!important;border-radius:13px!important;font-size:12.5px!important;}
+/* Dense summary/stat blocks use the same inset tile language. */
+.equipmentStats span,.contactStats span,.docStats span,.attentionHero div,.checklistHero div,.defHero439 div,.reportHero440 div,
+.healthBars span,.reportPreviewCard440,.reportSectionToggle,.defMeta span{
+  background:linear-gradient(180deg,#202838,#111720)!important;
+  border:1px solid rgba(255,255,255,.10)!important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.09),inset 0 -1px 0 rgba(0,0,0,.42),0 2px 0 #05070b,0 7px 12px rgba(0,0,0,.25)!important;
+}
+/* Report Center controls align with the rest of the app. */
+.reportActionGrid440,.reportActionGrid442{gap:9px!important;}
+.reportActionGrid440 button,.reportActionGrid442 button{border-radius:15px!important;min-height:42px!important;}
+.reportDeliveryRow{min-height:46px!important;}
+.releaseSheet{background:linear-gradient(180deg,#222b3b,#0f141d)!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.10),0 20px 50px rgba(0,0,0,.55)!important;}
+.releaseBody{font-size:12.5px!important;line-height:1.38!important;}
+@media(max-width:520px){
+  .grid3{gap:7px!important;}
+  .homeActionGrid{grid-template-columns:1fr 1fr!important;gap:9px!important;}
+  .homeActionGrid .tile{min-height:76px;}
+  .settingsPickerRail{grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:8px!important;}
+  .settingsPill{font-size:12.6px!important;min-height:40px!important;padding:8px 6px!important;}
+  .settingsContent409 .settingsGrid,.settingsContent423 .settingsGrid,
+  .settingsContent409 .settingsList.twoCol,.settingsContent423 .settingsList.twoCol{grid-template-columns:1fr!important;}
+  nav button{width:82%!important;max-width:70px!important;}
+}
+@media(max-width:360px){
+  .settingsPickerRail{grid-template-columns:repeat(2,minmax(0,1fr))!important;}
+  nav button{width:80%!important;max-width:64px!important;}
+  nav button span:last-child{font-size:10.5px!important;}
+}

@@ -570,7 +570,7 @@ function home(){
       <button class="ghost tile attentionHomeTile" id="attentionHomeBtn"><strong>⚠ Attention Queue</strong><span>${attentionList.length ? `${attentionList.length} site${attentionList.length===1?"":"s"} to review` : "No priority issues"}</span></button>
     </div>
     ${activeJob ? `<div class="card activeJobMini"><div class="row"><div><h2>Service Call Active</h2><p>${esc(activeJob.siteName)} • <span id="jobElapsed">${elapsedText(activeJob.startedAt)}</span></p></div><button class="primary" id="resumeJobBtn">Open</button></div></div>` : ""}
-    <div class="card grow"><h2>Build ${BUILD}</h2><p>Report Follow-Up is active.</p><p>Report Delivery Log now supports copyable receipts and quick follow-up tasks.</p></div>
+    <div class="card grow"><h2>Build ${BUILD}</h2><p>Visual consistency pass is active.</p><p>Cards, buttons, stats, reports, and settings now use one cleaner FireVault control style.</p></div>
   </div>`);
   document.getElementById("sitesCard").onclick=()=>route("sites");
   document.getElementById("tasksCard").onclick=()=>{selectedSiteId=null; route("tasks");};
@@ -1409,17 +1409,17 @@ function saveSettings(){
 function diagnostics(){ const taskRows=allTaskRows(); const taskCounts=taskFilterCounts(taskRows); const totalTasks=taskRows.length; const serviceTasks=taskRows.filter(r=>r.t.source==="Service Call").length; const totalDef=data.sites.reduce((n,s)=>n+(s.deficiencies||[]).length,0); const openDefTotal=data.sites.reduce((n,s)=>n+(s.deficiencies||[]).filter(d=>(d.status||"Open")!=="Closed").length,0); const closedDefTotal=data.sites.reduce((n,s)=>n+(s.deficiencies||[]).filter(d=>(d.status||"Open")==="Closed").length,0); const totalVisits=data.sites.reduce((n,s)=>n+(s.visits||[]).length,0); const totalContacts=data.sites.reduce((n,s)=>n+(s.contacts||[]).length,0); const totalDocs=data.sites.reduce((n,s)=>n+(s.docs||[]).length,0); const totalReportDeliveries=data.sites.reduce((n,s)=>n+(s.reportDeliveries||[]).length,0); const reportFollowUps=allTaskRows().filter(r=>r.t.source==="Report Delivery" && !taskIsDone(r.t)).length; const totalChecklist=data.sites.reduce((n,s)=>n+(s.checklist||[]).length,0); const checklistIssues=data.sites.reduce((n,s)=>n+(s.checklist||[]).filter(i=>i.status==="Issue").length,0); const completedInspections=data.sites.reduce((n,s)=>n+(s.visits||[]).filter(v=>v.type==="Inspection Checklist").length,0); const healthWarn=data.sites.filter(s=>siteHealth(s).cls==="healthWarn").length; const healthWatch=data.sites.filter(s=>siteHealth(s).cls==="healthWatch").length; const attentionTotal=attentionRows().length; html(`<div class="screen"><div class="row"><button class="back ghost" id="backHome">←</button><h1>Diagnostics</h1></div><div class="card grow errorBox"><p>Build: ${BUILD}</p><p>Sites: ${data.sites.length}</p><p>Total Tasks: ${totalTasks}</p><p>Open Tasks: ${taskCounts.open}</p><p>Due Today: ${taskCounts.today}</p><p>Overdue Tasks: ${taskCounts.overdue}</p><p>Service Follow-Ups: ${serviceTasks}</p><p>Total Deficiencies: ${totalDef}</p><p>Open Deficiencies: ${openDefTotal}</p><p>Closed Deficiencies: ${closedDefTotal}</p><p>Total Visits: ${totalVisits}</p><p>Total Contacts: ${totalContacts}</p><p>Total Documents: ${totalDocs}</p><p>Report Deliveries: ${totalReportDeliveries}</p><p>Report Follow-Ups: ${reportFollowUps}</p><p>Checklist Items: ${totalChecklist}</p><p>Checklist Issues: ${checklistIssues}</p><p>Completed Inspections: ${completedInspections}</p><p>Attention Sites: ${healthWarn}</p><p>Watch Sites: ${healthWatch}</p><p>Attention Queue: ${attentionTotal}</p><p>Active Job: ${activeJob ? esc(activeJob.siteName) : "None"}</p><p>Current Theme: ${esc(data.settings.theme.name)}</p><p>Accent: ${esc(data.settings.theme.accentColor)}</p><p>Advanced AI Enabled: ${data.settings.advanced?.aiTechnician ? "Yes" : "No"}</p><p>GPS Tools: ${data.settings.gps?.enabled !== false ? "Enabled" : "Hidden"}</p><p>Nearby Radius: ${nearbyRadiusMiles()} mi</p><p>Haptics: ${data.settings.app?.haptics !== false ? "Enabled" : "Off"}</p><p>Import/Export: Ready</p><p>Storage key: ${KEY}</p><p>Modules loaded successfully.</p></div></div>`); document.getElementById("backHome").onclick=()=>route("home"); }
 function showChangelog(){
   const notes = [
-    "Added copyable Report Delivery receipts from the Report Center log.",
-    "Added a Report Follow-Up button that creates an open site task due in two days.",
-    "Delivery Log now shows more recent delivery actions with a cleaner tap target.",
-    "Diagnostics now counts open Report Delivery follow-up tasks.",
-    "Preserved Report Package Builder, dashboard cleanup, GPS/Nearby, Site Health, refined 3D controls, and the Loading FireVault boot watchdog."
+    "Performed a visual consistency pass across cards, buttons, lists, stats, and report panels.",
+    "Unified the raised 3D control style so the app looks more like one professional field tool.",
+    "Neutralized remaining colored side rails and moved status meaning into badges, pills, and labels.",
+    "Improved Settings spacing and full-width submenu tabs so the section picker feels less cramped.",
+    "Preserved Report Delivery Tools, dashboard cleanup, GPS/Nearby, Site Health, refined controls, and the Loading FireVault boot watchdog."
   ];
   const overlay=document.createElement("div");
   overlay.className="releaseOverlay";
   overlay.innerHTML=`<div class="releaseSheet" role="dialog" aria-modal="true" aria-label="FireVault release notes">
     <div class="releaseHead"><div><strong>FireVault</strong><span>Build ${BUILD}</span></div><button class="ghost iconBtn" id="closeRelease" aria-label="Close release notes">×</button></div>
-    <div class="releaseBody"><h2>Release Notes</h2><p class="releaseIntro">report delivery receipts and follow-up tasks.</p><ul>${notes.map(n=>`<li>${esc(n)}</li>`).join("")}</ul></div>
+    <div class="releaseBody"><h2>Release Notes</h2><p class="releaseIntro">visual consistency and professional field-tool polish.</p><ul>${notes.map(n=>`<li>${esc(n)}</li>`).join("")}</ul></div>
   </div>`;
   document.body.appendChild(overlay);
   const close=()=>overlay.remove();
