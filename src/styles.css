@@ -52,3 +52,10 @@ nav button span:last-child{font-size:12px}
 .todayDay{font-size:26px;font-weight:950;margin:0}
 .compactVisit{display:flex;align-items:center;justify-content:space-between;gap:10px}
 .brandIconPreview{width:72px;height:72px;border-radius:18px;border:1px solid rgba(255,255,255,.12)}
+
+.jobBanner{background:linear-gradient(135deg,rgba(239,68,68,.25),rgba(56,189,248,.12));border-color:rgba(239,68,68,.35)}
+.timer{font-size:30px;font-weight:950;letter-spacing:.03em}
+.quickGrid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.quickBtn{min-height:58px;text-align:center;padding:9px 6px}
+.eventTime{font-weight:900;color:#fff;margin-right:8px}
+.activeJobMini{border-left:4px solid var(--green)}

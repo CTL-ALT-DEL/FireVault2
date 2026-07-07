@@ -7,6 +7,9 @@ let selectedSiteId = null;
 let mode = null;
 let currentDocImageData = "";
 let settingsTab = "tech";
+const ACTIVE_JOB_KEY = "firevault_active_job_modular";
+let activeJob = loadActiveJob();
+let jobTimer = null;
 
 const appEl = document.getElementById("app");
 document.getElementById("buildButton").addEventListener("click", showChangelog);
@@ -21,12 +24,53 @@ function getSite(){ return data.sites.find(s => s.id === selectedSiteId); }
 function val(id){ return document.getElementById(id)?.value?.trim() || ""; }
 function checked(id){ return !!document.getElementById(id)?.checked; }
 
+function loadActiveJob(){
+  try{
+    const raw = localStorage.getItem(ACTIVE_JOB_KEY);
+    return raw ? JSON.parse(raw) : null;
+  }catch(err){
+    console.error("Active job load failed", err);
+    return null;
+  }
+}
+
+function saveActiveJob(){
+  if(activeJob) localStorage.setItem(ACTIVE_JOB_KEY, JSON.stringify(activeJob));
+  else localStorage.removeItem(ACTIVE_JOB_KEY);
+}
+
+function fmtTime(iso){
+  if(!iso) return "";
+  return new Date(iso).toLocaleTimeString([], {hour:"numeric", minute:"2-digit"});
+}
+
+function elapsedText(startIso){
+  const ms = Date.now() - new Date(startIso).getTime();
+  const h = Math.floor(ms/3600000);
+  const m = Math.floor((ms%3600000)/60000);
+  const s = Math.floor((ms%60000)/1000);
+  return h ? `${h}:${String(m).padStart(2,"0")}:${String(s).padStart(2,"0")}` : `${m}:${String(s).padStart(2,"0")}`;
+}
+
+function startJobTimer(){
+  stopJobTimer();
+  jobTimer = setInterval(() => {
+    const el = document.getElementById("jobElapsed");
+    if(el && activeJob) el.textContent = elapsedText(activeJob.startedAt);
+  }, 1000);
+}
+
+function stopJobTimer(){
+  if(jobTimer){ clearInterval(jobTimer); jobTimer = null; }
+}
+
 function route(v){ view = v; mode = null; render(); }
 
 function render(){
   try{
-    const routes = {home, sites, siteDetail, siteForm, docs, docForm, imageViewer, library, resourceForm, settings, diagnostics};
+    const routes = {home, sites, siteDetail, siteForm, docs, docForm, imageViewer, library, resourceForm, jobMode, visits, visitDetail, settings, diagnostics};
     (routes[view] || home)();
+    if(view === "jobMode") startJobTimer(); else stopJobTimer();
     setActiveNav();
   }catch(err){
     showError(err);
@@ -49,7 +93,7 @@ function showError(err){
 
 function setActiveNav(){
   document.querySelectorAll("nav button").forEach(b => b.classList.remove("active"));
-  const section = ["siteDetail","siteForm","docs","docForm","imageViewer"].includes(view) ? "sites" : view;
+  const section = ["siteDetail","siteForm","docs","docForm","imageViewer","jobMode","visits","visitDetail"].includes(view) ? "sites" : view;
   document.getElementById("nav-"+section)?.classList.add("active");
 }
 
@@ -134,14 +178,21 @@ function home(){
       <button class="ghost tile" id="addSiteBtn"><strong>＋ Add Site</strong><span>Create customer vault</span></button>
     </div>
     <div id="nearbyBox"></div>
-    <div class="card grow"><h2>GPS / Maps Module</h2><p>Use GPS on site records, scan nearby sites, and open map navigation from the site vault.</p><button class="ghost" id="diagBtn">Diagnostics</button></div>
+    ${activeJob ? `<div class="card activeJobMini"><div class="row"><div><h2>Service Call Active</h2><p>${esc(activeJob.siteName)} • <span id="jobElapsed">${elapsedText(activeJob.startedAt)}</span></p></div><button class="primary" id="resumeJobBtn">Open</button></div></div>` : ""}
+    <div class="card grow"><h2>Job Mode Module</h2><p>Start live service calls, timestamp events, and finish calls into visit history.</p><button class="ghost" id="diagBtn">Diagnostics</button></div>
   </div>`);
   document.getElementById("sitesCard").onclick = () => route("sites");
-  document.getElementById("visitsCard").onclick = openVisitsPlaceholder;
+  document.getElementById("visitsCard").onclick = () => route("visits");
   document.getElementById("tasksCard").onclick = openTasksPlaceholder;
   document.getElementById("addSiteBtn").onclick = () => { selectedSiteId=null; view="siteForm"; render(); };
   document.getElementById("diagBtn").onclick = () => { view="diagnostics"; render(); };
   document.getElementById("nearbyBtn").onclick = scanNearbySites;
+  const resumeBtn = document.getElementById("resumeJobBtn");
+  if(resumeBtn) resumeBtn.onclick = () => {
+    selectedSiteId = activeJob.siteId;
+    view = "jobMode";
+    render();
+  };
 }
 
 function scanNearbySites(){
@@ -194,10 +245,11 @@ function siteDetail(){
   html(`<div class="screen">
     <div class="row"><button class="back ghost" id="backSites">←</button><button class="ghost" id="editSite">Edit</button></div>
     <div class="card redline"><h1>${esc(s.name)}</h1><p>${esc(fullAddress(s))}</p><span class="pill">${esc(s.panelManufacturer||"Panel TBD")}</span><span class="pill">${esc(s.panelModel||"Model TBD")}</span></div>
+    <button class="${activeJob && activeJob.siteId===s.id ? "ghost" : "primary"} tile" id="startJobBtn"><strong>${activeJob && activeJob.siteId===s.id ? "OPEN ACTIVE CALL" : "▶ START SERVICE CALL"}</strong><span>${activeJob && activeJob.siteId===s.id ? "Timer running" : "Create live timeline"}</span></button>
     <div class="grid2">
       <button class="tile" id="docsBtn"><strong>Docs / Photos</strong><span>${s.docs.length} records</span></button>
       <button class="tile" id="gpsBtn"><strong>GPS</strong><span>${s.lat&&s.lng?"Saved":"Not set"}</span></button>
-      <button class="tile"><strong>Visits</strong><span>${s.visits.length} records</span></button>
+      <button class="tile" id="visitsBtn"><strong>Visits</strong><span>${s.visits.length} records</span></button>
       <button class="tile"><strong>Tasks</strong><span>${s.tasks.length} items</span></button>
     </div>
     <div class="card ${s.lat&&s.lng?"gpsGood":"gpsWarn"}">
@@ -210,7 +262,9 @@ function siteDetail(){
   </div>`);
   document.getElementById("backSites").onclick = () => route("sites");
   document.getElementById("editSite").onclick = () => { view="siteForm"; render(); };
+  document.getElementById("startJobBtn").onclick = () => startServiceCall(s);
   document.getElementById("docsBtn").onclick = () => { view="docs"; render(); };
+  document.getElementById("visitsBtn").onclick = () => { view="visits"; render(); };
   document.getElementById("gpsBtn").onclick = () => { view="siteForm"; render(); };
   document.getElementById("appleMapBtn").onclick = () => openAppleMaps(s);
   document.getElementById("googleMapBtn").onclick = () => openGoogleMaps(s);
@@ -325,6 +379,183 @@ function imageViewer(){
   </div>`);
   document.getElementById("backDocs").onclick = () => route("docs");
 }
+
+
+function startServiceCall(s){
+  if(activeJob && activeJob.siteId !== s.id && !confirm("Another service call is active. Replace it?")) return;
+  if(activeJob && activeJob.siteId === s.id){
+    view = "jobMode";
+    render();
+    return;
+  }
+  const begin = (lat,lng) => {
+    activeJob = {
+      id: uid(),
+      siteId: s.id,
+      siteName: s.name || "Unnamed Site",
+      startedAt: new Date().toISOString(),
+      lat: lat || "",
+      lng: lng || "",
+      events: [{id:uid(), time:new Date().toISOString(), type:"Arrived", text: lat ? `Service call started at GPS ${lat.toFixed(5)}, ${lng.toFixed(5)}` : "Service call started"}]
+    };
+    saveActiveJob();
+    view = "jobMode";
+    render();
+  };
+  if(navigator.geolocation){
+    navigator.geolocation.getCurrentPosition(
+      pos => begin(pos.coords.latitude, pos.coords.longitude),
+      () => begin(null,null),
+      {enableHighAccuracy:true,timeout:8000,maximumAge:30000}
+    );
+  }else{
+    begin(null,null);
+  }
+}
+
+function jobMode(){
+  if(!activeJob){ route("sites"); return; }
+  const s = data.sites.find(x => x.id === activeJob.siteId);
+  if(!s){ activeJob=null; saveActiveJob(); route("sites"); return; }
+  selectedSiteId = s.id;
+  html(`<div class="screen">
+    <div class="row"><button class="back ghost" id="backSite">←</button><h1>Job Mode</h1></div>
+    <div class="card jobBanner">
+      <h1>${esc(s.name)}</h1>
+      <p>SERVICE CALL ACTIVE</p>
+      <div class="grid3">
+        <div><span class="pill">Started</span><p><strong>${fmtTime(activeJob.startedAt)}</strong></p></div>
+        <div><span class="pill">Elapsed</span><div class="timer" id="jobElapsed">${elapsedText(activeJob.startedAt)}</div></div>
+        <div><span class="pill">GPS</span><p><strong>${activeJob.lat ? "Saved" : "Manual"}</strong></p></div>
+      </div>
+    </div>
+
+    <div class="quickGrid">
+      <button class="quickBtn" data-event="⚠ Ground Fault">⚠<br>Ground</button>
+      <button class="quickBtn" data-event="🚨 NAC Trouble">🚨<br>NAC</button>
+      <button class="quickBtn" data-event="🔋 Battery">🔋<br>Battery</button>
+      <button class="quickBtn" data-event="💨 Smoke Detector">💨<br>Smoke</button>
+      <button class="quickBtn" data-event="🚪 Pull Station">🚪<br>Pull</button>
+      <button class="quickBtn" data-event="📡 Communicator">📡<br>Comm</button>
+      <button class="quickBtn" id="customNoteBtn">📝<br>Note</button>
+      <button class="quickBtn" id="jobPhotoBtn">📷<br>Photo</button>
+      <button class="quickBtn" data-event="✅ Test Passed">✅<br>Passed</button>
+    </div>
+    <input id="jobPhotoInput" type="file" accept="image/*" capture="environment" style="display:none">
+
+    <div class="card grow">
+      <div class="row"><h2>Live Timeline</h2><button class="danger" id="finishJobBtn">Finish</button></div>
+      <div class="list">${activeJob.events.map(e => `<div class="card tight visit"><span class="eventTime">${fmtTime(e.time)}</span><strong>${esc(e.type)}</strong><p>${esc(e.text)}</p></div>`).join("")}</div>
+    </div>
+  </div>`);
+
+  document.getElementById("backSite").onclick = () => route("siteDetail");
+  document.querySelectorAll("[data-event]").forEach(btn => btn.onclick = () => addJobEvent(btn.dataset.event, btn.dataset.event));
+  document.getElementById("customNoteBtn").onclick = () => {
+    const t = prompt("Enter service note:");
+    if(t) addJobEvent("Note", t);
+  };
+  document.getElementById("jobPhotoBtn").onclick = () => document.getElementById("jobPhotoInput").click();
+  document.getElementById("jobPhotoInput").onchange = handleJobPhoto;
+  document.getElementById("finishJobBtn").onclick = finishServiceCall;
+}
+
+function addJobEvent(type,text,tags=[]){
+  if(!activeJob) return;
+  activeJob.events.unshift({id:uid(), time:new Date().toISOString(), type, text, tags});
+  saveActiveJob();
+  view = "jobMode";
+  render();
+}
+
+function handleJobPhoto(e){
+  const file = e.target.files[0];
+  if(!file || !activeJob) return;
+  const s = data.sites.find(x => x.id === activeJob.siteId);
+  if(!s) return;
+  const reader = new FileReader();
+  reader.onload = () => {
+    stampFireVaultPhoto(reader.result, s, data.settings, stamped => {
+      const title = prompt("Photo title:", "Service call photo") || "Service call photo";
+      const doc = {id:uid(), type:"Panel Photo", title, location:"Service Call", url:"", imageData:stamped, notes:"Captured during service call on " + new Date().toLocaleString(), createdAt:new Date().toISOString()};
+      ensureSite(s).docs.unshift(doc);
+      save();
+      activeJob.events.unshift({id:uid(), time:new Date().toISOString(), type:"📷 Photo Added", text:title, docId:doc.id, tags:["Photo"]});
+      saveActiveJob();
+      view = "jobMode";
+      render();
+    });
+  };
+  reader.readAsDataURL(file);
+}
+
+function finishServiceCall(){
+  if(!activeJob) return;
+  const s = data.sites.find(x => x.id === activeJob.siteId);
+  if(!s) return;
+  ensureSite(s);
+  const endedAt = new Date().toISOString();
+  activeJob.events.unshift({id:uid(), time:endedAt, type:"Departed", text:"Service call finished"});
+  const timeline = activeJob.events.slice().reverse().map(e => `${fmtTime(e.time)} - ${e.text}`).join("\\n");
+  const mins = Math.max(0, Math.round((new Date(endedAt)-new Date(activeJob.startedAt))/60000));
+  s.visits.unshift({
+    id: activeJob.id,
+    date: new Date(activeJob.startedAt).toISOString().slice(0,10),
+    startedAt: activeJob.startedAt,
+    endedAt,
+    summary: `Service call: ${Math.floor(mins/60)}h ${mins%60}m on site\\n${timeline}`,
+    tags:["Service Call"],
+    events: activeJob.events
+  });
+  save();
+  activeJob = null;
+  saveActiveJob();
+  alert("Service call saved to visit history.");
+  view = "visits";
+  render();
+}
+
+function visits(){
+  const s = getSite();
+  const rows = s ? ensureSite(s).visits.map(v => ({site:s, visit:v})) : data.sites.flatMap(site => ensureSite(site).visits.map(v => ({site, visit:v})));
+  rows.sort((a,b)=>(b.visit.startedAt || b.visit.date || "").localeCompare(a.visit.startedAt || a.visit.date || ""));
+  html(`<div class="screen">
+    <div class="row"><button class="back ghost" id="visitsBack">←</button><h1>Visits</h1></div>
+    <div class="list grow">${rows.length ? rows.map(r => {
+      const v = r.visit;
+      const time = v.startedAt ? fmtTime(v.startedAt) : (v.date || "");
+      return `<div class="card compactVisit siteItem visitPick" data-site="${r.site.id}" data-visit="${v.id}">
+        <div><strong>${esc(r.site.name)}</strong><p>${esc(time)}</p></div>
+        <span class="pill">View</span>
+      </div>`;
+    }).join("") : `<div class="empty">No visits yet.</div>`}</div>
+  </div>`);
+  document.getElementById("visitsBack").onclick = () => s ? route("siteDetail") : route("home");
+  document.querySelectorAll(".visitPick").forEach(el => el.onclick = () => {
+    selectedSiteId = el.dataset.site;
+    mode = el.dataset.visit;
+    view = "visitDetail";
+    render();
+  });
+}
+
+function visitDetail(){
+  const s = getSite();
+  const v = s?.visits?.find(x => x.id === mode);
+  if(!s || !v) return route("visits");
+  html(`<div class="screen">
+    <div class="row"><button class="back ghost" id="backVisits">←</button><h1>Visit Detail</h1></div>
+    <div class="card visit">
+      <h2>${esc(s.name)}</h2>
+      <p><strong>Date:</strong> ${esc(v.date || "")}</p>
+      <p><strong>Started:</strong> ${esc(v.startedAt ? fmtTime(v.startedAt) : "")}</p>
+      <p><strong>Ended:</strong> ${esc(v.endedAt ? fmtTime(v.endedAt) : "")}</p>
+    </div>
+    <div class="card grow" style="overflow:auto"><h2>Summary</h2><p style="white-space:pre-line">${esc(v.summary || "")}</p></div>
+  </div>`);
+  document.getElementById("backVisits").onclick = () => route("visits");
+}
+
 
 function library(){
   html(`<div class="screen">
@@ -568,7 +799,7 @@ function saveSettingsFromVisibleTab(){
 }
 
 function diagnostics(){
-  html(`<div class="screen"><div class="row"><button class="back ghost" id="backHome">←</button><h1>Diagnostics</h1></div><div class="card grow errorBox"><p>Build: ${BUILD}</p><p>Sites: ${data.sites.length}</p><p>Sites with GPS: ${data.sites.filter(s=>s.lat&&s.lng).length}</p><p>Storage key: ${KEY}</p><p>Modules loaded successfully.</p></div></div>`);
+  html(`<div class="screen"><div class="row"><button class="back ghost" id="backHome">←</button><h1>Diagnostics</h1></div><div class="card grow errorBox"><p>Build: ${BUILD}</p><p>Sites: ${data.sites.length}</p><p>Sites with GPS: ${data.sites.filter(s=>s.lat&&s.lng).length}</p><p>Active Job: ${activeJob ? activeJob.siteName : "None"}</p><p>Storage key: ${KEY}</p><p>Modules loaded successfully.</p></div></div>`);
   document.getElementById("backHome").onclick = () => route("home");
 }
 
@@ -576,17 +807,20 @@ function exportJson(){
   const blob = new Blob([JSON.stringify(data,null,2)], {type:"application/json"});
   const a = document.createElement("a");
   a.href = URL.createObjectURL(blob);
-  a.download = "firevault-backup-build-0.32.1.json";
+  a.download = "firevault-backup-build-0.33.0.json";
   a.click();
 }
 
 function showChangelog(){
   alert(`FireVault Build ${BUILD}
 
-- Diagnostics hotfix
-- Fixes missing storage key import
-- Diagnostics screen now opens correctly
-- Keeps all Build 0.32.0 branding and UI updates`);
+- Job Mode module restored
+- Start Service Call button on site vault
+- Live elapsed timer
+- Quick event buttons and custom notes
+- Job Mode photo capture
+- Finish Call saves visit history
+- Compact visit list with detail view`);
 }
 
 render();
