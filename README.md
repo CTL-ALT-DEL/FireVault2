@@ -1,14 +1,15 @@
-# FireVault Build 0.10.0 — Structured Site Address
+# FireVault Build 0.11.0 — Bulk Import Accounts
 
 Root-level package for GitHub Pages.
 
 ## Changes
-- Site address now has Street / City / State / ZIP
-- Keeps old single-line address data compatible
-- Site cards and dashboard use formatted address
-- Search includes city/state/zip
+- Bulk Import Accounts screen
+- Paste account lists line by line
+- Format: Name, Street, City, State, ZIP
+- Preview before import
+- Creates site vaults automatically
 - Preserves previous local storage data
 
 Suggested commit:
 
-`Build 0.10.0 structured site address`
+`Build 0.11.0 bulk import accounts`

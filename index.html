@@ -32,7 +32,7 @@ nav button{background:transparent;border:0;color:var(--muted);display:flex;flex-
 </style>
 </head>
 <body>
-<header><div class="brand"><div class="logo">🔥</div><div>FIREVAULT</div></div><button class="build" onclick="showChangelog()">Build 0.10.0</button></header>
+<header><div class="brand"><div class="logo">🔥</div><div>FIREVAULT</div></div><button class="build" onclick="showChangelog()">Build 0.11.0</button></header>
 <main id="app"></main>
 <nav>
 <button id="nav-home" onclick="go('home')"><span>🏠</span><span>Today</span></button>
@@ -41,7 +41,7 @@ nav button{background:transparent;border:0;color:var(--muted);display:flex;flex-
 <button id="nav-settings" onclick="go('settings')"><span>⚙️</span><span>Settings</span></button>
 </nav>
 <script>
-const BUILD="0.10.0"; const KEY="firevault_vault_build_030"; const ACTIVE="firevault_active_job_080";
+const BUILD="0.11.0"; const KEY="firevault_vault_build_030"; const ACTIVE="firevault_active_job_080";
 let data=load(), activeJob=loadActive(), view="home", selected=null, mode=null, timer=null;
 function load(){const raw=localStorage.getItem(KEY);if(raw){try{return JSON.parse(raw)}catch(e){}}return{sites:[],resources:[{m:"Fire-Lite",n:"Manual links, trouble notes, walk-test reminders."},{m:"Notifier",n:"Panel notes, programming reminders, common issues."},{m:"Silent Knight",n:"Model notes, NAC quirks, communicator references."},{m:"Edwards / EST",n:"EST3 / EST4 notes, mapping, node information."},{m:"Potter",n:"Programming notes, compatibility, field observations."}]}}
 function save(){localStorage.setItem(KEY,JSON.stringify(data))}function loadActive(){const raw=localStorage.getItem(ACTIVE);if(raw){try{return JSON.parse(raw)}catch(e){}}return null}function saveActive(){activeJob?localStorage.setItem(ACTIVE,JSON.stringify(activeJob)):localStorage.removeItem(ACTIVE)}
@@ -49,7 +49,7 @@ function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2
 function app(html){document.getElementById("app").innerHTML=html;active();if(view==="job")startTick();else stopTick()}function active(){document.querySelectorAll("nav button").forEach(b=>b.classList.remove("active"));let n=document.getElementById("nav-"+(["site","form","visits","issues","equipment","equipmentForm","access","accessForm","docs","docForm","job"].includes(view)?"sites":view));if(n)n.classList.add("active")}
 function go(v){view=v;mode=null;render()}function site(){return data.sites.find(s=>s.id===selected)}function siteById(id){return data.sites.find(s=>s.id===id)}
 function ensureArrays(s){if(!s)return s;s.visits=s.visits||[];s.knownIssues=s.knownIssues||[];s.equipment=s.equipment||[];s.contacts=s.contacts||[];s.docs=s.docs||[];return s}
-function render(){({home,sites,library,settings,site:siteDash,form,visits,issues,equipment,equipmentForm,access,accessForm,docs,docForm,job}[view]||home)()}function val(id){return document.getElementById(id).value.trim()}
+function render(){({home,sites,library,settings,site:siteDash,form,visits,issues,equipment,equipmentForm,access,accessForm,docs,docForm,job,importer}[view]||home)()}function val(id){return document.getElementById(id).value.trim()}
 function fullAddress(s){
   const structured=[s.street,s.city,s.state,s.zip].filter(Boolean).join(", ");
   return structured || s.address || "No address entered";
@@ -86,7 +86,7 @@ function checkNearby(){
    box.innerHTML=`<div class="card jobBanner"><h2>Nearby Sites</h2>${near.map(x=>`<div class="card tight siteItem" onclick="openSite('${x.s.id}')"><strong>${esc(x.s.name)}</strong><p>${x.ft} ft away</p></div>`).join("")}</div>`;
  })
 }
-function sites(){app(`<div class="screen"><div class="row"><div><h1>Sites</h1><p>Open a customer vault or start a service call.</p></div><button class="primary" onclick="newSite()">＋ Add</button></div><input class="search" id="q" placeholder="Search site, city, panel, doc, contact, issue..." oninput="filter()"><div id="siteList" class="list grow">${siteList(data.sites)}</div></div>`)}
+function sites(){app(`<div class="screen"><div class="row"><div><h1>Sites</h1><p>Open a customer vault or start a service call.</p></div><div class="row"><button class="ghost" onclick="view='importer';render()">Import</button><button class="primary" onclick="newSite()">＋ Add</button></div></div><input class="search" id="q" placeholder="Search site, city, panel, doc, contact, issue..." oninput="filter()"><div id="siteList" class="list grow">${siteList(data.sites)}</div></div>`)}
 function siteList(list){if(!list.length)return `<div class="empty">No sites yet. Tap Add.</div>`;return list.map(s=>{ensureArrays(s);return `<div class="card siteItem" onclick="openSite('${s.id}')"><div class="row"><h2>${esc(s.name)}</h2><span class="pill">${esc(s.panelManufacturer||"Panel TBD")}</span></div><p>${esc(fullAddress(s))}</p><span class="pill">${esc(s.panelModel||"Model TBD")}</span><span class="pill">Visits ${s.visits.length}</span><span class="pill">Issues ${s.knownIssues.length}</span><span class="pill">Docs ${s.docs.length}</span></div>`}).join("")}
 function filter(){let q=val("q").toLowerCase();document.getElementById("siteList").innerHTML=siteList(data.sites.filter(s=>JSON.stringify(s).toLowerCase().includes(q)))}function newSite(){selected=null;view="form";render()}function openSite(id){selected=id;ensureArrays(site());view="site";render()}
 
@@ -118,18 +118,63 @@ function docs(){genericList("Docs / Photos","docs","docForm","docLine",d=>`${esc
 function docForm(){const s=ensureArrays(site());const d=mode?s.docs.find(x=>x.id===mode):{};app(`<div class="screen"><div class="row"><button class="back ghost" onclick="view='docs';render()">←</button><h1>${mode?"Edit File":"Add File"}</h1></div><div class="form grow"><select id="dtype">${["Panel Photo","Trouble Screenshot","Riser Diagram","Map / Floor Plan","Battery Label","Inspection Report","Manual Link","Cloud File Link","Other"].map(t=>`<option ${d.type===t?"selected":""}>${t}</option>`).join("")}</select><input id="dtitle" value="${esc(d.title)}" placeholder="Title"><input id="dlocation" value="${esc(d.location)}" placeholder="Location"><input id="durl" value="${esc(d.url)}" placeholder="URL / Link"><textarea id="dnotes">${esc(d.notes)}</textarea></div><button class="primary" onclick="saveDoc()">Save File</button></div>`)}
 function saveDoc(){const s=ensureArrays(site());const obj={type:val("dtype"),title:val("dtitle"),location:val("dlocation"),url:val("durl"),notes:val("dnotes")};if(mode){let i=s.docs.findIndex(x=>x.id===mode);s.docs[i]={...s.docs[i],...obj}}else{s.docs.unshift({...obj,id:uid()})}save();mode=null;view="docs";render()}
 function genericList(title,arr,formView,line,body){const s=ensureArrays(site());if(!s)return go("sites");app(`<div class="screen"><div class="row"><button class="back ghost" onclick="view='site';render()">←</button><h1>${title}</h1><button class="primary" onclick="mode=null;view='${formView}';render()">＋ Add</button></div><div class="list grow">${s[arr].length?s[arr].map(x=>`<div class="card ${line}"><div class="row"><h2>${body(x)}</h2><button class="ghost" onclick="mode='${x.id}';view='${formView}';render()">Edit</button></div><p>${esc(x.notes||"")}</p></div>`).join(""):`<div class="empty">No records yet.</div>`}</div></div>`)}
+
+function importer(){
+ app(`<div class="screen">
+  <div class="row"><button class="back ghost" onclick="go('sites')">←</button><h1>Import Accounts</h1></div>
+  <div class="card">
+    <p>Paste one customer per line. Best format:</p>
+    <p><strong>Name, Street, City, State, ZIP</strong></p>
+    <textarea id="importText" placeholder="ABC Apartments, 123 Main St, Casper, WY, 82601&#10;XYZ School, 500 Center St, Douglas, WY, 82633"></textarea>
+    <div class="grid2">
+      <button class="ghost" onclick="previewImport()">Preview</button>
+      <button class="primary" onclick="runImport()">Import Sites</button>
+    </div>
+  </div>
+  <div id="importPreview" class="list grow"></div>
+ </div>`)
+}
+function parseImportLines(){
+ const raw=val("importText");
+ return raw.split(/\n+/).map(line=>line.trim()).filter(Boolean).map(line=>{
+   let parts=line.split(",").map(x=>x.trim());
+   let name=parts[0]||"Unnamed Site";
+   let street=parts[1]||"";
+   let city=parts[2]||"";
+   let state=parts[3]||"";
+   let zip=parts[4]||"";
+   if(parts.length===4){state=parts[2]||"";zip=parts[3]||"";city=""}
+   if(parts.length===3){street=parts[1]||"";city=parts[2]||""}
+   return {name,street,city,state,zip,address:street,createdAt:new Date().toISOString(),visits:[],knownIssues:[],equipment:[],contacts:[],docs:[],notes:"Imported account"};
+ })
+}
+function previewImport(){
+ const rows=parseImportLines();
+ const box=document.getElementById("importPreview");
+ box.innerHTML=rows.length?rows.map(r=>`<div class="card tight"><strong>${esc(r.name)}</strong><p>${esc([r.street,r.city,r.state,r.zip].filter(Boolean).join(", "))}</p></div>`).join(""):`<div class="empty">Paste account lines first.</div>`;
+}
+function runImport(){
+ const rows=parseImportLines();
+ if(!rows.length)return alert("Paste account lines first.");
+ if(!confirm(`Import ${rows.length} sites?`))return;
+ rows.reverse().forEach(r=>data.sites.unshift({...r,id:uid()}));
+ save();
+ alert(`${rows.length} sites imported.`);
+ go("sites");
+}
+
 function library(){app(`<div class="screen"><h1>Library</h1><p>Manufacturer resources and cheat sheets.</p><div class="list grow">${data.resources.map(r=>`<div class="card"><h2>${esc(r.m)}</h2><p>${esc(r.n)}</p></div>`).join("")}</div></div>`)}
 function settings(){app(`<div class="screen"><h1>Settings</h1><div class="card"><h2>Backup</h2><p>Export before major changes.</p><button class="primary" onclick="exportData()">Export Backup</button><br><br><input type="file" accept="application/json" onchange="importData(event)"></div><div class="card"><h2>Reset</h2><button class="danger" onclick="resetData()">Clear Local Data</button></div></div>`)}
-function exportData(){let blob=new Blob([JSON.stringify(data,null,2)],{type:"application/json"});let a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="firevault-backup-build-0.10.0.json";a.click()}
+function exportData(){let blob=new Blob([JSON.stringify(data,null,2)],{type:"application/json"});let a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="firevault-backup-build-0.11.0.json";a.click()}
 function importData(e){let f=e.target.files[0];if(!f)return;let r=new FileReader();r.onload=()=>{try{data=JSON.parse(r.result);save();alert("Imported.");go("home")}catch(err){alert("Import failed.")}};r.readAsText(f)}
 function resetData(){if(confirm("Clear all local FireVault data?")){localStorage.removeItem(KEY);localStorage.removeItem(ACTIVE);data=load();activeJob=null;go("home")}}
 function showChangelog(){alert(`FireVault Build ${BUILD}
 
-- Structured site address fields
-- Street / City / State / ZIP
-- Keeps legacy address data compatible
-- Site cards and dashboard use formatted address
-- Search includes city/state/zip
+- Bulk Import Accounts screen
+- Paste customer/account lists
+- Supports Name, Street, City, State, ZIP lines
+- Preview before importing
+- Creates site vaults automatically
 - Preserves previous local data`)}
 render()
 </script>
