@@ -1,19 +1,13 @@
-# Clean Install Notes — FireVault Build 0.45.1
+# Clean Install Notes — FireVault Build 0.45.2
 
-Use this ZIP as a clean root package. Do not copy the outer `firevault-build-*` folder into your repository.
+This package is a clean root build. Copy the contents of this ZIP into the project root, replacing existing FireVault app files.
 
-## Expected root files
+Do not place the extracted `firevault-build-*` folder inside the repository. Copy the files inside it into the repo root.
+
+The app keeps the same localStorage key:
 
 ```text
-index.html
-manifest.json
-src/
-assets/
-README.md
-CLEAN_INSTALL.md
-.gitignore
+firevault_vault_build_030
 ```
 
-## Install reminder
-
-Copy the contents of this ZIP into the GitHub Pages project root, replacing the old files. The app still uses the existing FireVault local storage key, so existing browser data should remain compatible.
+Export a backup from Settings → Backup before replacing a live deployment.

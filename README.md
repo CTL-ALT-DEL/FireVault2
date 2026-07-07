@@ -1,19 +1,20 @@
-# FireVault Build 0.45.1
+# FireVault Build 0.45.2
 
-Build 0.45.1 is a Settings redesign build. It replaces the cramped Settings tab layout with a main choices page and full-screen detail pages.
+Build 0.45.2 is a Settings polish build. It keeps the new full-screen Settings workflow from 0.45.1 and cleans up the main Settings choices so the red OPEN label no longer overlaps other text.
 
 ## Updated
 
-- Visible app version advanced to 0.45.1.
-- Replaced the cramped Settings tab rail with a full Settings choices page.
-- Each Settings option now opens into its own full-screen settings page.
-- Added a top back arrow to return to the main Settings choices.
-- Added a top Save button on editable Settings pages.
-- Kept Backup and About as full-screen utility pages with return navigation.
-- Preserved all current FireVault modules, data storage, GPS/Nearby, Report Center, Backup Center, haptics, refined 3D controls, and the Loading FireVault boot watchdog.
+- Visible app version advanced to 0.45.2.
+- Removed the red OPEN text from Settings choice cards.
+- Replaced OPEN with a clean right-arrow control.
+- Reworked Settings choice cards into a cleaner icon / text / arrow layout.
+- Reduced text overlap risk by clamping helper text and giving cards better internal spacing.
+- Polished the full-screen Settings header, Save button, and back navigation.
+- Preserved the full-screen Settings detail pages from 0.45.1.
+- Preserved Backup Center, Report Center, Site Detail polish, Attention Queue, Deficiency Center, GPS/Nearby, haptics, refined 3D controls, and the Loading FireVault boot watchdog.
 
 ## Suggested commit message
 
 ```text
-Build 0.45.1 settings full-screen redesign
+Build 0.45.2 settings choice card polish
 ```
