@@ -475,3 +475,88 @@ nav button:active{transform:translateY(1px) scale(.995)}
   .settingsPickerRail{grid-template-columns:repeat(2,minmax(0,1fr))}
   .settingsPill,.settingsScreen423 .settingsPill{font-size:12.8px!important}
 }
+
+/* Build 0.42.7 Refined hardware-button look and no left color rails */
+:root{
+  --fv427FaceTop:#222a38;
+  --fv427FaceBottom:#111722;
+  --fv427Rim:rgba(255,255,255,.105);
+  --fv427Lip:#05070b;
+  --fv427Shadow:rgba(0,0,0,.38);
+}
+/* Remove the remaining colored left-edge status rails. Status color should come from badges/text, not box edges. */
+.redline,.docLine,.issue,.visit,.taskOpen,.taskDone,.deficiencyCard,.errorBox,
+.settingGroup,.gpsStatusBar,.nearMatch,.nearFallback,.visitLogHero,.visitLogItem,
+.visitDetailHero,.jobFollowCard,.taskMetricCard,.taskCard,.emailPreviewCard,.nearbyItem{
+  border-left-width:1px!important;
+  border-left-style:solid!important;
+  border-left-color:var(--fv427Rim)!important;
+}
+/* Professional raised-panel surface: one neutral bevel instead of colored rails or glow shadows. */
+.card,.compactPane,.tile,.siteItem,.taskCard,.visitLogItem,.nearbyItem,.gpsStatusBar,
+.jobFollowCard,.taskMetricCard,.visitLogHero,.visitDetailHero,.emailModule,.aboutGrid div{
+  background:linear-gradient(180deg,var(--fv427FaceTop),var(--fv427FaceBottom))!important;
+  border:1px solid var(--fv427Rim)!important;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.085),
+    inset 0 -1px 0 rgba(0,0,0,.42),
+    0 2px 0 var(--fv427Lip),
+    0 11px 18px var(--fv427Shadow)!important;
+}
+button,.btn,.smallBtn,.tabBtn,.settingsPill,.taskFilterPill,.emailTagChip,.presetBtn,.quickEventBtn,.visitMiniButton{
+  background:linear-gradient(180deg,#273044,#141b27)!important;
+  border:1px solid rgba(255,255,255,.11)!important;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.11),
+    inset 0 -1px 0 rgba(0,0,0,.48),
+    0 2px 0 #06080d,
+    0 8px 14px rgba(0,0,0,.34)!important;
+}
+button:active,.btn:active,.smallBtn:active,.tabBtn:active,.settingsPill:active,.taskFilterPill:active,.emailTagChip:active,.presetBtn:active,.quickEventBtn:active,.visitMiniButton:active{
+  transform:translateY(2px) scale(.995);
+  box-shadow:
+    inset 0 2px 3px rgba(0,0,0,.46),
+    inset 0 -1px 0 rgba(255,255,255,.035),
+    0 1px 0 #05070b,
+    0 4px 8px rgba(0,0,0,.34)!important;
+}
+.primary,.settingsPill.active,.tabBtn.active,.taskFilterPill.active,nav button.active{
+  background:linear-gradient(180deg,color-mix(in srgb,var(--accent) 72%, #273044),color-mix(in srgb,var(--accent2) 80%, #111722))!important;
+  border-color:rgba(255,255,255,.14)!important;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.16),
+    inset 0 -1px 0 rgba(0,0,0,.48),
+    0 2px 0 #05070b,
+    0 8px 14px rgba(0,0,0,.36)!important;
+}
+.danger{
+  background:linear-gradient(180deg,#51242a,#211015)!important;
+  border-color:rgba(255,255,255,.12)!important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.12),inset 0 -1px 0 rgba(0,0,0,.5),0 2px 0 #05070b,0 8px 14px rgba(0,0,0,.35)!important;
+}
+/* Bottom dock: slightly narrower buttons with visible space between each control. */
+nav{
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:8px;
+  padding-left:12px!important;
+  padding-right:12px!important;
+}
+nav button{
+  width:88%;
+  max-width:82px;
+  justify-self:center;
+  border-radius:17px!important;
+  background:linear-gradient(180deg,#20283a,#101722)!important;
+  border:1px solid rgba(255,255,255,.10)!important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.105),inset 0 -1px 0 rgba(0,0,0,.46),0 2px 0 #05070b,0 7px 12px rgba(0,0,0,.34)!important;
+}
+nav button:active{transform:translateY(1px) scale(.992)}
+@media(max-width:430px){
+  nav{gap:7px;padding-left:10px!important;padding-right:10px!important}
+  nav button{width:86%;max-width:74px}
+}
+@media(max-width:360px){
+  nav{gap:6px;padding-left:8px!important;padding-right:8px!important}
+  nav button{width:84%;max-width:66px}
+  nav button span:last-child{font-size:10.8px}
+}
