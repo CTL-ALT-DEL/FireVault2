@@ -1,23 +1,35 @@
-# FireVault Build 0.27.2 — Settings Recovery Build
+# FireVault Build 0.28.0 — Modular Recovery
 
 Root-level package for GitHub Pages.
 
-## Fixes
-- Rebuilt from last known-good Build 0.25.3
-- Avoids the broken 0.26.0 / 0.27.1 startup problem
-- Adds a runtime error screen so the app should not fail to a black screen
+## Why this build exists
+The previous single-file app became too fragile. Build 0.28.0 restarts FireVault using a modular structure so future changes are safer.
 
-## Adds
-- Advanced Settings on one safe Settings page
-- Technician information
-- Photo overlay customization fields
-- Notifications
-- Report formatting
-- PDF settings
-- Email defaults
-- App behavior
-- Backup and CSV export remain available
+## Files
+- `index.html`
+- `manifest.json`
+- `src/styles.css`
+- `src/storage.js`
+- `src/photos.js`
+- `src/app.js`
+
+## What works in this recovery build
+- Home screen
+- Sites list
+- Add/Edit Site
+- Site detail
+- Docs / Photos
+- Photo upload
+- FireVault photo overlay
+- View saved images full-size
+- Delete photo/document records
+- Advanced Settings screen
+- JSON backup export
+- Diagnostics screen
+
+## Data
+Uses the same localStorage key as previous builds, so existing data should remain available.
 
 Suggested commit:
 
-`Build 0.27.2 settings recovery`
+`Build 0.28.0 modular recovery`
