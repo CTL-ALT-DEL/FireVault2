@@ -1,19 +1,7 @@
 # Clean Install Notes
 
-Use this ZIP as a clean project root package.
-
-Do not place this folder inside another FireVault build folder.
-
-For GitHub Pages, copy these root files and folders into the repository root:
-
-- index.html
-- manifest.json
-- src/
-- assets/
-- README.md
-- CLEAN_INSTALL.md
-- .gitignore
-
-After installing to the iPhone home screen, delete the old home-screen shortcut and add it again if iOS keeps showing cached icon/status-bar behavior.
-
-Builds 0.41.0, 0.41.1, and 0.41.2 are known-bad startup builds and should be skipped.
+1. Export a FireVault backup before replacing files.
+2. Delete old extracted firevault-build-* folders from your project root.
+3. Copy the contents of this ZIP into the app root, not into a nested build folder.
+4. Commit and deploy.
+5. On iPhone, delete the old home-screen shortcut and add it again if the status bar or bottom safe-area is cached.

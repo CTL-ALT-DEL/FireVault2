@@ -7,14 +7,45 @@
   "orientation": "portrait",
   "background_color": "#0b0d10",
   "theme_color": "#101216",
-  "description": "Field knowledge system for fire alarm technicians. Build 0.41.6.",
+  "description": "Field knowledge system for fire alarm technicians. Build 0.41.7.",
   "icons": [
-    {"src": "assets/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable"},
-    {"src": "assets/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable"}
+    {
+      "src": "assets/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "assets/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
   ],
   "shortcuts": [
-    {"name":"Add Site","short_name":"Add Site","url":"./?route=siteForm","description":"Create a FireVault site"},
-    {"name":"GPS / Maps","short_name":"GPS","url":"./?route=sites","description":"Open site GPS and map tools"},
-    {"name":"Settings","short_name":"Settings","url":"./?route=settings","description":"Open FireVault settings"}
+    {
+      "name": "Add Site",
+      "short_name": "Add Site",
+      "url": "./?route=siteForm",
+      "description": "Create a FireVault site"
+    },
+    {
+      "name": "Nearby Sites",
+      "short_name": "Nearby",
+      "url": "./?route=nearbySites",
+      "description": "Detect saved sites near your current location"
+    },
+    {
+      "name": "GPS / Maps",
+      "short_name": "GPS",
+      "url": "./?route=sites",
+      "description": "Open site GPS and map tools"
+    },
+    {
+      "name": "Settings",
+      "short_name": "Settings",
+      "url": "./?route=settings",
+      "description": "Open FireVault settings"
+    }
   ]
 }

@@ -224,3 +224,22 @@ header{height:var(--headerH);padding:calc(10px + var(--safeTop)) 14px 10px;posit
 @media(max-width:430px){.brand{gap:7px}.brandMark{width:38px;height:38px}.brand{font-size:18px}.build{font-size:11px;padding:7px 9px;max-width:128px}h1{font-size:23px}.tile{min-height:70px}.settingsPill{font-size:12.5px;min-height:34px;padding:8px 12px}.settingsContent409 .compactPane{padding:11px}.settingsContent409 .paneHead h2{font-size:16px}.settingsContent409 .paneNote{display:block;font-size:11.5px}.settingsContent409 .settingsGrid{grid-template-columns:1fr}.settingsContent409 .settingField{grid-template-columns:96px minmax(0,1fr);gap:5px 8px}.settingsContent409 .settingField label,.settingsContent409 label:not(.checkRow){font-size:10.3px}.settingsContent409 input,.settingsContent409 textarea,.settingsContent409 select{min-height:38px;font-size:13.5px}.settingsContent409 .checkRow{min-height:38px;font-size:12.5px}.settingsContent409 .settingsList.twoCol{grid-template-columns:1fr}.settingsContent409 .presetGrid{grid-template-columns:repeat(2,minmax(0,1fr))}.sitePills .pill{font-size:11px;padding:4px 7px}}
 @media(max-width:360px){.build{max-width:105px}.brand small{display:none}.settingsContent409 .settingField{grid-template-columns:1fr}.settingsContent409 .settingField label{margin-top:3px}.homeActionGrid .wideTile{grid-column:auto}}
 
+
+
+/* Build 0.41.7 Nearby Sites + iPhone bottom safe-area hardening */
+:root{--safeTop:env(safe-area-inset-top);--safeBottom:max(env(safe-area-inset-bottom),16px);--headerH:calc(64px + var(--safeTop));--navH:calc(76px + var(--safeBottom))}
+html{background:#0b0d10;min-height:100%;height:100%;overflow:hidden}
+body{min-height:100dvh;background-color:#0b0d10;position:fixed;inset:0;width:100%;height:100dvh;overflow:hidden;overscroll-behavior:none}
+body::after{content:"";position:fixed;left:0;right:0;bottom:0;height:calc(var(--safeBottom) + 22px);background:#0b0d10;z-index:45;pointer-events:none}
+main{height:calc(100dvh - var(--headerH) - var(--navH));padding-bottom:18px;background:transparent}
+nav{height:var(--navH);min-height:var(--navH);padding:7px 8px calc(8px + var(--safeBottom));background:#0b0d10;border-top:1px solid rgba(255,255,255,.09);z-index:80;transform:translateZ(0)}
+nav button{min-height:0;border-radius:18px}
+.miniActions{display:flex;align-items:center;gap:8px}
+.nearbyHomeTile,.nearbyHero{border-color:color-mix(in srgb,var(--cyan) 35%, rgba(255,255,255,.09));border-left:3px solid var(--cyan)}
+.nearbyScreen .nearbyHero h1{font-size:23px;margin-bottom:3px}
+.nearbyScreen .nearbyHero p{font-size:13px;line-height:1.3}
+.nearbyItem{cursor:pointer}.nearMatch{border-left:4px solid var(--green)}.nearFallback{border-left:4px solid var(--amber)}
+.nearbyItem .row{align-items:flex-start}.nearbyItem h2{font-size:16px;margin-bottom:5px}.nearbyItem p{font-size:12px;line-height:1.3;word-break:break-word}
+@supports(height:100svh){body{height:100svh;min-height:100svh}main{height:calc(100svh - var(--headerH) - var(--navH))}}
+@supports(height:100dvh){body{height:100dvh;min-height:100dvh}main{height:calc(100dvh - var(--headerH) - var(--navH))}}
+@media(max-width:430px){:root{--navH:calc(78px + var(--safeBottom))}nav{padding-bottom:calc(9px + var(--safeBottom))}nav button span:first-child{font-size:24px}.nearbyScreen .nearbyHero h1{font-size:22px}.miniActions .smallBtn{padding:7px 10px}.nearbyItem .row{gap:8px}.nearbyItem .pill{white-space:nowrap}}
