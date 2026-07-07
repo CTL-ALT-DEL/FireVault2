@@ -1,15 +1,15 @@
-# FireVault Build 0.43.4
+# FireVault Build 0.43.5
 
-Attention Queue build for faster triage across sites that need review.
+Dashboard cleanup build.
 
-## Updates
-- Advanced visible version to 0.43.4.
-- Added a new Attention Queue screen.
-- Added an Attention Queue tile on the dashboard.
-- Queue automatically groups sites with overdue tasks, due-today tasks, open deficiencies, equipment issues, or missing GPS.
-- Queue sorts higher-risk sites first using the existing Site Health Snapshot scoring.
-- Diagnostics now shows total Attention Queue count.
-- Preserved Site Finder, Site Health Snapshot, Documents / Links Vault, Contacts & Access Vault, Equipment Vault, GPS/Nearby, Task Center, Visit Log, haptics, and map tools.
+## Updated
+
+- Removed the large Library button from the main dashboard.
+- Removed the large Settings button from the main dashboard.
+- Library and Settings remain available in the lower navigation bar.
+- Dashboard now focuses on field actions: Add Site, GPS / Maps, Nearby Sites, Attention Queue, and Diagnostics.
+- Preserved Site Health, Attention Queue, Site Finder, Documents / Links Vault, Contacts & Access Vault, Equipment Vault, GPS/Nearby, Task Center, Visit Log, haptics, map tools, refined 3D controls, and the Loading FireVault boot watchdog.
 
 ## Install
-Copy the contents of this ZIP into the GitHub Pages project root. Do not copy the folder itself into the repo.
+
+Copy the contents of this ZIP into the GitHub Pages project root. Do not copy the enclosing folder itself.

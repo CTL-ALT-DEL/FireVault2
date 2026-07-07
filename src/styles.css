@@ -820,3 +820,9 @@ nav button:active{transform:translateY(1px) scale(.992)}
 .attentionMini{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}
 .attentionMini span{font-size:11px;color:var(--muted);text-align:center;padding:6px;border-radius:12px;background:rgba(0,0,0,.18);border:1px solid rgba(255,255,255,.06)}
 @media(max-width:430px){.attentionHero{grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}.attentionTop h2{font-size:16px}.attentionLine{font-size:12.5px}.attentionMini{grid-template-columns:1fr}.attentionMini span{text-align:left}.smallScore{min-width:48px}}
+
+
+/* Build 0.43.5 dashboard cleanup */
+.homeActionGrid{align-items:stretch}
+.homeActionGrid .tile{min-height:76px}
+@media (max-width:520px){.homeActionGrid{gap:10px}.homeActionGrid .tile{min-height:70px}}

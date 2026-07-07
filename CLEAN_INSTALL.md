@@ -1,7 +1,8 @@
-# Clean Install Notes
+# Clean Install
 
-Copy the contents of this package directly into the repository root.
+1. Back up FireVault data from the app if needed.
+2. Delete old extracted `firevault-build-*` folders from the repo root.
+3. Copy the contents of this ZIP into the project root.
+4. Commit and deploy.
 
-Do not commit extracted folders such as `firevault-build-*` into the app project.
-
-This build preserves the existing localStorage key so current FireVault data should remain compatible.
+Build 0.43.5 keeps Library and Settings on the bottom menu only, removing the duplicate large dashboard buttons.

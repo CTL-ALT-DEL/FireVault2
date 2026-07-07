@@ -364,12 +364,10 @@ function home(){
       <button class="ghost tile gpsHomeTile" id="gpsHomeBtn"><strong>⌖ GPS / Maps</strong><span>${gpsSites} site${gpsSites===1?"":"s"} with GPS</span></button>
       <button class="ghost tile nearbyHomeTile" id="nearbyHomeBtn"><strong>◎ Nearby Sites</strong><span>Detect saved sites near me</span></button>
       <button class="ghost tile attentionHomeTile" id="attentionHomeBtn"><strong>⚠ Attention Queue</strong><span>${attentionList.length ? `${attentionList.length} site${attentionList.length===1?"":"s"} to review` : "No priority issues"}</span></button>
-      <button class="ghost tile" id="settingsBtn"><strong>⚙ Settings</strong><span>Preferences</span></button>
-      <button class="ghost tile" id="libraryBtn"><strong>▣ Library</strong><span>Panel resources</span></button>
       <button class="ghost tile" id="diagBtn"><strong>Diagnostics</strong><span>Build status</span></button>
     </div>
     ${activeJob ? `<div class="card activeJobMini"><div class="row"><div><h2>Service Call Active</h2><p>${esc(activeJob.siteName)} • <span id="jobElapsed">${elapsedText(activeJob.startedAt)}</span></p></div><button class="primary" id="resumeJobBtn">Open</button></div></div>` : ""}
-    <div class="card grow"><h2>Build ${BUILD}</h2><p>Attention Queue is now active.</p><p>FireVault now groups sites that need review based on overdue tasks, deficiencies, equipment issues, and missing GPS.</p></div>
+    <div class="card grow"><h2>Build ${BUILD}</h2><p>Dashboard cleanup is active.</p><p>Library and Settings are now kept in the bottom menu only, leaving the main dashboard focused on field actions and priority work.</p></div>
   </div>`);
   document.getElementById("sitesCard").onclick=()=>route("sites");
   document.getElementById("tasksCard").onclick=()=>{selectedSiteId=null; route("tasks");};
@@ -381,8 +379,6 @@ function home(){
   };
   document.getElementById("nearbyHomeBtn").onclick=detectNearbySites;
   document.getElementById("attentionHomeBtn").onclick=()=>route("attention");
-  document.getElementById("settingsBtn").onclick=()=>route("settings");
-  document.getElementById("libraryBtn").onclick=()=>route("library");
   document.getElementById("diagBtn").onclick=()=>route("diagnostics");
   const rb=document.getElementById("resumeJobBtn"); if(rb) rb.onclick=()=>{selectedSiteId=activeJob.siteId; route("jobMode");};
 }
