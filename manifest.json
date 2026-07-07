@@ -1,1 +1,9 @@
-{"name":"FireVault","short_name":"FireVault","start_url":"./","display":"standalone","background_color":"#0d1117","theme_color":"#101820","icons":[]}
+{
+  "name": "FireVault",
+  "short_name": "FireVault",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#0f1115",
+  "theme_color": "#15171c",
+  "description": "Field knowledge system for fire alarm technicians."
+}
