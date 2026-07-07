@@ -1,13 +1,14 @@
-# FireVault Build 0.22.1 — Photo Upload Hotfix
+# FireVault Build 0.23.0 — FireVault Photo Overlay
 
 Root-level package for GitHub Pages.
 
-## Fixes
-- Fixes photo selection corrupting the top/title field
-- Save File now returns to Docs / Photos
-- Adds Delete button for Docs / Photos records
-- Keeps existing photos and data intact
+## Changes
+- New photos are stamped before saving
+- Overlay includes FireVault branding, site name, and date/time
+- Works for Docs / Photos uploads
+- Works for Job Mode photo capture
+- Existing photos remain unchanged
 
 Suggested commit:
 
-`Build 0.22.1 photo upload hotfix`
+`Build 0.23.0 firevault photo overlay`

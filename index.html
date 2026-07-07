@@ -32,7 +32,7 @@ nav button{background:transparent;border:0;color:var(--muted);display:flex;flex-
 </style>
 </head>
 <body>
-<header><div class="brand"><div class="logo">🔥</div><div>FIREVAULT</div></div><button class="build" onclick="showChangelog()">Build 0.22.1</button></header>
+<header><div class="brand"><div class="logo">🔥</div><div>FIREVAULT</div></div><button class="build" onclick="showChangelog()">Build 0.23.0</button></header>
 <main id="app"></main>
 <nav>
 <button id="nav-home" onclick="go('home')"><span>🏠</span><span>Today</span></button>
@@ -41,11 +41,75 @@ nav button{background:transparent;border:0;color:var(--muted);display:flex;flex-
 <button id="nav-settings" onclick="go('settings')"><span>⚙️</span><span>Settings</span></button>
 </nav>
 <script>
-const BUILD="0.22.1"; const KEY="firevault_vault_build_030"; const ACTIVE="firevault_active_job_080";
+const BUILD="0.23.0"; const KEY="firevault_vault_build_030"; const ACTIVE="firevault_active_job_080";
 let data=load(), activeJob=loadActive(), view="home", selected=null, mode=null, timer=null, currentDocImageData="";
 function load(){const raw=localStorage.getItem(KEY);if(raw){try{return JSON.parse(raw)}catch(e){}}return{sites:[],resources:[{m:"Fire-Lite",n:"Manual links, trouble notes, walk-test reminders."},{m:"Notifier",n:"Panel notes, programming reminders, common issues."},{m:"Silent Knight",n:"Model notes, NAC quirks, communicator references."},{m:"Edwards / EST",n:"EST3 / EST4 notes, mapping, node information."},{m:"Potter",n:"Programming notes, compatibility, field observations."}]}}
 function save(){localStorage.setItem(KEY,JSON.stringify(data))}function loadActive(){const raw=localStorage.getItem(ACTIVE);if(raw){try{return JSON.parse(raw)}catch(e){}}return null}function saveActive(){activeJob?localStorage.setItem(ACTIVE,JSON.stringify(activeJob)):localStorage.removeItem(ACTIVE)}
 function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,7)}function esc(s){return String(s||"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#039;"}[m]))}
+function stampFireVaultPhoto(dataUrl, siteName, cb){
+ if(!CanvasRenderingContext2D.prototype.roundRect){
+ CanvasRenderingContext2D.prototype.roundRect=function(x,y,w,h,r){this.beginPath();this.moveTo(x+r,y);this.lineTo(x+w-r,y);this.quadraticCurveTo(x+w,y,x+w,y+r);this.lineTo(x+w,y+h-r);this.quadraticCurveTo(x+w,y+h,x+w-r,y+h);this.lineTo(x+r,y+h);this.quadraticCurveTo(x,y+h,x,y+h-r);this.lineTo(x,y+r);this.quadraticCurveTo(x,y,x+r,y);return this;}
+}
+const img=new Image();
+ img.onload=()=>{
+   const canvas=document.createElement("canvas");
+   const maxW=1600;
+   const scale=Math.min(1,maxW/img.width);
+   canvas.width=Math.round(img.width*scale);
+   canvas.height=Math.round(img.height*scale);
+   const ctx=canvas.getContext("2d");
+   ctx.drawImage(img,0,0,canvas.width,canvas.height);
+
+   const h=Math.max(105,Math.round(canvas.height*0.16));
+   const y=canvas.height-h;
+   const grad=ctx.createLinearGradient(0,y,canvas.width,y);
+   grad.addColorStop(0,"rgba(0,0,0,.82)");
+   grad.addColorStop(.55,"rgba(0,0,0,.64)");
+   grad.addColorStop(1,"rgba(127,29,29,.58)");
+   ctx.fillStyle=grad;
+   ctx.fillRect(0,y,canvas.width,h);
+
+   const pad=Math.round(canvas.width*0.035);
+   const logoSize=Math.round(h*.62);
+   const logoX=pad;
+   const logoY=y+Math.round((h-logoSize)/2);
+
+   ctx.fillStyle="rgba(239,68,68,.95)";
+   ctx.beginPath();
+   ctx.roundRect(logoX,logoY,logoSize,logoSize,Math.round(logoSize*.18));
+   ctx.fill();
+
+   ctx.fillStyle="white";
+   ctx.font=`900 ${Math.round(logoSize*.46)}px Arial`;
+   ctx.textAlign="center";
+   ctx.textBaseline="middle";
+   ctx.fillText("F",logoX+logoSize/2,logoY+logoSize/2);
+
+   ctx.textAlign="left";
+   ctx.textBaseline="alphabetic";
+   ctx.font=`900 ${Math.round(h*.30)}px Arial`;
+   ctx.fillStyle="#ffffff";
+   ctx.fillText("FIRE",logoX+logoSize+18,y+Math.round(h*.48));
+   const fw=ctx.measureText("FIRE").width;
+   ctx.fillStyle="#ef4444";
+   ctx.fillText("VAULT",logoX+logoSize+18+fw+6,y+Math.round(h*.48));
+
+   ctx.font=`600 ${Math.round(h*.13)}px Arial`;
+   ctx.fillStyle="rgba(255,255,255,.86)";
+   ctx.fillText("DOCUMENT. TRACK. PROTECT.",logoX+logoSize+18,y+Math.round(h*.70));
+
+   const dateText=new Date().toLocaleString([], {year:"numeric",month:"short",day:"numeric",hour:"numeric",minute:"2-digit"});
+   ctx.textAlign="right";
+   ctx.fillStyle="#ffffff";
+   ctx.font=`800 ${Math.round(h*.20)}px Arial`;
+   ctx.fillText(`Site: ${siteName||"Unknown Site"}`,canvas.width-pad,y+Math.round(h*.43));
+   ctx.font=`700 ${Math.round(h*.18)}px Arial`;
+   ctx.fillText(`Date: ${dateText}`,canvas.width-pad,y+Math.round(h*.69));
+
+   cb(canvas.toDataURL("image/jpeg",0.88));
+ };
+ img.src=dataUrl;
+}
 function app(html){document.getElementById("app").innerHTML=html;active();if(view==="job")startTick();else stopTick()}function active(){document.querySelectorAll("nav button").forEach(b=>b.classList.remove("active"));let n=document.getElementById("nav-"+(["site","form","visits","issues","equipment","equipmentForm","access","accessForm","docs","docForm","job"].includes(view)?"sites":view));if(n)n.classList.add("active")}
 function go(v){view=v;mode=null;render()}function site(){return data.sites.find(s=>s.id===selected)}function siteById(id){return data.sites.find(s=>s.id===id)}
 function ensureArrays(s){if(!s)return s;s.visits=s.visits||[];s.knownIssues=s.knownIssues||[];s.equipment=s.equipment||[];s.contacts=s.contacts||[];s.docs=s.docs||[];s.deficiencies=s.deficiencies||[];s.tasks=s.tasks||[];return s}
@@ -131,13 +195,15 @@ function handleJobPhoto(e){
  const reader=new FileReader();
  reader.onload=()=>{
    const s=ensureArrays(siteById(activeJob.siteId));
-   const title=prompt("Photo title:", "Service call photo") || "Service call photo";
-   const doc={id:uid(),type:"Panel Photo",title,location:"Service Call",url:"",imageData:reader.result,notes:`Captured during service call on ${new Date().toLocaleString()}`,createdAt:new Date().toISOString()};
-   s.docs.unshift(doc);
-   save();
-   activeJob.events.unshift({id:uid(),time:new Date().toISOString(),type:"📷 Photo Added",text:title,docId:doc.id,tags:["Photo"]});
-   saveActive();
-   job();
+   stampFireVaultPhoto(reader.result, s.name, stamped=>{
+     const title=prompt("Photo title:", "Service call photo") || "Service call photo";
+     const doc={id:uid(),type:"Panel Photo",title,location:"Service Call",url:"",imageData:stamped,notes:`Captured during service call on ${new Date().toLocaleString()}`,createdAt:new Date().toISOString()};
+     s.docs.unshift(doc);
+     save();
+     activeJob.events.unshift({id:uid(),time:new Date().toISOString(),type:"📷 Photo Added",text:title,docId:doc.id,tags:["Photo"]});
+     saveActive();
+     job();
+   });
  };
  reader.readAsDataURL(file);
 }
@@ -309,9 +375,12 @@ function previewPhoto(e){
  const file=e.target.files[0]; if(!file)return;
  const reader=new FileReader();
  reader.onload=()=>{
-   currentDocImageData=reader.result;
-   const img=document.getElementById("photoPreview");
-   if(img){img.src=currentDocImageData;img.style.display="block";}
+   const s=site()?ensureArrays(site()):{name:"FireVault"};
+   stampFireVaultPhoto(reader.result, s.name, stamped=>{
+     currentDocImageData=stamped;
+     const img=document.getElementById("photoPreview");
+     if(img){img.src=currentDocImageData;img.style.display="block";}
+   });
  };
  reader.readAsDataURL(file);
 }
@@ -628,16 +697,17 @@ function saveResource(){
 }
 
 function settings(){app(`<div class="screen"><h1>Settings</h1><div class="card"><h2>Backup</h2><p>Export before major changes.</p><button class="primary" onclick="exportData()">Export Backup</button><br><br><input type="file" accept="application/json" onchange="importData(event)"></div><div class="card"><h2>Reset</h2><button class="danger" onclick="resetData()">Clear Local Data</button></div></div>`)}
-function exportData(){let blob=new Blob([JSON.stringify(data,null,2)],{type:"application/json"});let a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="firevault-backup-build-0.22.1.json";a.click()}
+function exportData(){let blob=new Blob([JSON.stringify(data,null,2)],{type:"application/json"});let a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="firevault-backup-build-0.23.0.json";a.click()}
 function importData(e){let f=e.target.files[0];if(!f)return;let r=new FileReader();r.onload=()=>{try{data=JSON.parse(r.result);save();alert("Imported.");go("home")}catch(err){alert("Import failed.")}};r.readAsText(f)}
 function resetData(){if(confirm("Clear all local FireVault data?")){localStorage.removeItem(KEY);localStorage.removeItem(ACTIVE);data=load();activeJob=null;go("home")}}
 function showChangelog(){alert(`FireVault Build ${BUILD}
 
-- Photo upload hotfix
-- Fixes photo selection corrupting the title/top entry field
-- Save File now closes back to Docs / Photos
-- Adds Delete button for Docs / Photos records
-- Keeps existing photos and data intact`)}
+- FireVault Photo Overlay
+- New photos are stamped before saving
+- Overlay includes FireVault branding, site name, and date/time
+- Works for Docs / Photos uploads
+- Works for Job Mode photo capture
+- Keeps existing photos unchanged`)}
 render()
 </script>
 </body>
