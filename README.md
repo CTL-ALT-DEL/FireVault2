@@ -1,15 +1,17 @@
-# FireVault Build 0.25.1 — Photo System Repair
+# FireVault Build 0.25.2 — Emergency Photo Repair
 
 Root-level package for GitHub Pages.
 
 ## Fixes
-- Fixes top file type field corruption on iPhone
+- Repairs broken 0.25.1 app load failure
+- Rebuilt from last known-good 0.25.0
+- Fixes photo type field corruption
 - Save File returns to Docs / Photos
-- Saved photos are viewable from the Docs / Photos list
-- Delete button remains available
-- FireVault overlay rewritten for better reliability
-- Job Mode photo capture also uses repaired overlay
+- Delete button available
+- Photo overlay rebuilt safely
+- Saved images can be opened for viewing
+- CSV export retained
 
 Suggested commit:
 
-`Build 0.25.1 photo system repair`
+`Build 0.25.2 emergency photo repair`
