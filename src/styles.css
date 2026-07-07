@@ -938,7 +938,7 @@ nav button:active{transform:translateY(1px) scale(.992)}
 .reportDeliveryEmpty{font-size:12px;color:var(--muted);padding:9px 10px;border:1px dashed rgba(255,255,255,.13);border-radius:13px;background:rgba(255,255,255,.025);}
 @media(max-width:560px){.reportActionGrid442{grid-template-columns:repeat(2,minmax(0,1fr));}.reportActionGrid442 #shareBtn{grid-column:1 / -1}.reportDeliveryHead{align-items:center}.reportDeliveryRow{grid-template-columns:1fr}.reportDeliveryRow time{justify-self:start}.reportReadyCard442 small{white-space:normal}}
 
-/* Build 0.44.5 Report delivery receipts and follow-up tasks */
+/* Build 0.44.6 Report delivery receipts and follow-up tasks */
 .reportDeliveryCard444 .reportDeliveryHead{align-items:flex-start;}
 .reportDeliveryHeadActions{display:flex;gap:7px;align-items:center;flex:0 0 auto;}
 .reportDeliveryReceiptBtn{width:100%;text-align:left;color:var(--text);font:inherit;cursor:pointer;}
@@ -946,7 +946,7 @@ nav button:active{transform:translateY(1px) scale(.992)}
 .reportDeliveryReceiptBtn:active{transform:translateY(1px);}
 @media(max-width:560px){.reportDeliveryCard444 .reportDeliveryHead{display:grid;grid-template-columns:1fr;gap:9px}.reportDeliveryHeadActions{display:grid;grid-template-columns:1fr 1fr;width:100%}.reportDeliveryHeadActions .smallBtn{width:100%}}
 
-/* Build 0.44.5 Visual Consistency Pass - professional field-tool surface system */
+/* Build 0.44.6 Visual Consistency Pass - professional field-tool surface system */
 :root{
   --fv445Top:#242d3d;
   --fv445Bottom:#121923;
@@ -1108,4 +1108,59 @@ nav button span:last-child{font-size:11.2px!important;font-weight:850;}
   .settingsPickerRail{grid-template-columns:repeat(2,minmax(0,1fr))!important;}
   nav button{width:80%!important;max-width:64px!important;}
   nav button span:last-child{font-size:10.5px!important;}
+}
+
+
+/* Build 0.44.6 Site Detail polish - professional customer vault command page */
+.siteDetailScreen446{gap:10px;}
+.siteTopBar{align-items:center;justify-content:space-between;margin-bottom:-2px;}
+.siteTopBar .back,.siteTopBar #editBtn{min-height:38px;border-radius:14px;padding:8px 13px;font-size:13px;font-weight:900;}
+.siteHero446{padding:15px 16px!important;display:grid;gap:5px;}
+.siteHero446 h1{font-size:24px;line-height:1.05;margin:0;letter-spacing:-.035em;overflow-wrap:anywhere;}
+.siteHero446 p{font-size:12.8px;line-height:1.25;margin:0;color:var(--muted);}
+.siteHero446 p:last-child{color:#dbe7f4;font-weight:800;}
+.siteActionGrid446{grid-template-columns:repeat(3,minmax(0,1fr));gap:9px!important;}
+.siteActionGrid446 .tile{min-height:76px!important;padding:11px 9px!important;border-radius:16px!important;display:grid;align-content:center;justify-items:start;gap:4px;text-align:left;}
+.siteActionGrid446 .tile strong{font-size:17px;line-height:1.05;letter-spacing:-.015em;}
+.siteActionGrid446 .tile span{font-size:11.2px;line-height:1.12;color:var(--muted);font-weight:850;}
+.siteDetailScreen446 .healthSnapshotCard,.siteDetailScreen446 .snapshotCard,.siteDetailScreen446 .gpsCard,
+.siteDetailScreen446 .checklistMiniCard,.siteDetailScreen446 .contactsMiniCard,.siteDetailScreen446 .equipmentMiniCard,
+.siteDetailScreen446 .docsMiniCard,.siteDetailScreen446 .recentVisitsCard,.siteDetailScreen446 .grow.card{
+  padding:13px 14px!important;border-radius:17px!important;display:grid;gap:9px;
+}
+.siteDetailScreen446 .row h2,.siteDetailScreen446 .card h2{font-size:15.5px;line-height:1.1;margin:0 0 3px;letter-spacing:-.012em;}
+.siteDetailScreen446 .row p,.siteDetailScreen446 .card p{font-size:12.2px;line-height:1.32;margin:0;color:var(--muted);}
+.siteDetailScreen446 .smallBtn{min-height:36px;border-radius:13px;padding:8px 11px;font-size:12px;white-space:nowrap;}
+.siteDetailScreen446 .mapActions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:2px;}
+.siteDetailScreen446 .mapActions button{min-height:38px;border-radius:14px;font-size:12.5px;}
+.siteDetailScreen446 .contactLine,.siteDetailScreen446 .equipmentLine,.siteDetailScreen446 .docLineMini,.siteDetailScreen446 .visitMiniButton{
+  width:100%;min-height:44px;padding:9px 10px;border-radius:14px;text-align:left;display:grid;gap:3px;align-items:center;
+}
+.siteDetailScreen446 .contactLine strong,.siteDetailScreen446 .equipmentLine strong,.siteDetailScreen446 .docLineMini strong,.siteDetailScreen446 .visitMiniButton strong{font-size:12.8px;line-height:1.1;}
+.siteDetailScreen446 .contactLine span,.siteDetailScreen446 .equipmentLine span,.siteDetailScreen446 .docLineMini span,.siteDetailScreen446 .visitMiniButton span{font-size:11.4px;line-height:1.15;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.siteDetailScreen446 .visitMiniButton p{font-size:11.4px;line-height:1.22;margin:1px 0 0;color:var(--muted);}
+.siteDetailScreen446 .fieldNote{font-size:12px;line-height:1.35;color:var(--muted);margin:0;}
+.siteDetailScreen446 .checkMiniBar{height:8px;border-radius:999px;background:rgba(0,0,0,.28);overflow:hidden;border:1px solid rgba(255,255,255,.08);}
+.siteDetailScreen446 .checkMiniBar span{display:block;height:100%;border-radius:999px;background:linear-gradient(90deg,var(--accent),var(--accent2));}
+.siteDetailScreen446 .healthBars{gap:8px;}
+.siteDetailScreen446 .healthBars span{min-height:36px;border-radius:13px;display:grid;place-items:center;gap:1px;font-size:10.5px;text-transform:uppercase;letter-spacing:.045em;color:var(--muted);font-weight:900;}
+.siteDetailScreen446 .healthBars strong{font-size:16px;color:#fff;line-height:1;}
+.siteDetailScreen446 .snapshotCard{grid-template-columns:minmax(0,1fr) auto;align-items:center;}
+.siteDetailScreen446 .grow.card:last-child p{white-space:pre-wrap;overflow-wrap:anywhere;color:#d6e2ef;}
+@media(max-width:560px){
+  .siteDetailScreen446{gap:8px;}
+  .siteHero446{padding:13px 14px!important;}
+  .siteHero446 h1{font-size:22px;}
+  .siteActionGrid446{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px!important;}
+  .siteActionGrid446 .tile{min-height:72px!important;padding:10px 9px!important;}
+  .siteActionGrid446 .tile strong{font-size:16px;}
+  .siteDetailScreen446 .snapshotCard{grid-template-columns:1fr;}
+  .siteDetailScreen446 .snapshotCard .smallBtn{width:100%;}
+  .siteDetailScreen446 .healthSnapshotTop{gap:8px;}
+  .siteDetailScreen446 .healthScore{font-size:17px;min-width:50px;text-align:center;}
+}
+@media(max-width:370px){
+  .siteActionGrid446 .tile strong{font-size:15px;}
+  .siteActionGrid446 .tile span{font-size:10.5px;}
+  .siteDetailScreen446 .mapActions{grid-template-columns:1fr;}
 }

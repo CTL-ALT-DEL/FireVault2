@@ -570,7 +570,7 @@ function home(){
       <button class="ghost tile attentionHomeTile" id="attentionHomeBtn"><strong>⚠ Attention Queue</strong><span>${attentionList.length ? `${attentionList.length} site${attentionList.length===1?"":"s"} to review` : "No priority issues"}</span></button>
     </div>
     ${activeJob ? `<div class="card activeJobMini"><div class="row"><div><h2>Service Call Active</h2><p>${esc(activeJob.siteName)} • <span id="jobElapsed">${elapsedText(activeJob.startedAt)}</span></p></div><button class="primary" id="resumeJobBtn">Open</button></div></div>` : ""}
-    <div class="card grow"><h2>Build ${BUILD}</h2><p>Visual consistency pass is active.</p><p>Cards, buttons, stats, reports, and settings now use one cleaner FireVault control style.</p></div>
+    <div class="card grow"><h2>Build ${BUILD}</h2><p>Site detail polish pass is active.</p><p>Field cards, vault summaries, and action buttons now use a cleaner, more consistent layout rhythm.</p></div>
   </div>`);
   document.getElementById("sitesCard").onclick=()=>route("sites");
   document.getElementById("tasksCard").onclick=()=>{selectedSiteId=null; route("tasks");};
@@ -655,11 +655,11 @@ function siteDetail(){
   const checklistItems=Array.isArray(s.checklist) ? s.checklist : [];
   const checkStats=checklistStats(s);
   const health=siteHealth(s);
-  html(`<div class="screen"><div class="row"><button class="back ghost" id="backBtn">←</button><button class="ghost" id="editBtn">Edit</button></div>
-    <div class="card redline"><h1>${esc(s.name)}</h1><p>${esc(fullAddress(s))}</p><p>${esc([s.panelManufacturer,s.panelModel].filter(Boolean).join(" ")||"Panel not entered")}</p></div>
+  html(`<div class="screen siteDetailScreen446"><div class="row siteTopBar"><button class="back ghost" id="backBtn">←</button><button class="ghost" id="editBtn">Edit</button></div>
+    <div class="card redline siteHero446"><h1>${esc(s.name)}</h1><p>${esc(fullAddress(s))}</p><p>${esc([s.panelManufacturer,s.panelModel].filter(Boolean).join(" ")||"Panel not entered")}</p></div>
     <div class="card healthSnapshotCard ${health.cls}"><div class="healthSnapshotTop"><div><h2>Site Health</h2><p>${esc(health.details.join(" • "))}</p></div><span class="healthScore">${health.score}%</span></div><div class="healthBars"><span><strong>${health.openTasks}</strong> Open</span><span><strong>${health.openDef}</strong> Def</span><span><strong>${health.equipmentIssues}</strong> Equip</span></div></div>
     <div class="card snapshotCard"><div><h2>Field Snapshot</h2><p>One-tap summary with address, GPS, contacts/access, open tasks, deficiencies, equipment attention, documents, and notes.</p></div><button class="primary smallBtn" id="copySnapshotCardBtn">Share / Copy</button></div>
-    <div class="grid2">
+    <div class="grid2 siteActionGrid446">
       <button class="primary tile" id="jobBtn"><strong>Start Job</strong><span>Live service call</span></button>
       <button class="ghost tile" id="reportBtn"><strong>Report</strong><span>Copy/download</span></button>
       <button class="ghost tile snapshotTile" id="snapshotBtn"><strong>Snapshot</strong><span>Share field summary</span></button>
@@ -1409,17 +1409,17 @@ function saveSettings(){
 function diagnostics(){ const taskRows=allTaskRows(); const taskCounts=taskFilterCounts(taskRows); const totalTasks=taskRows.length; const serviceTasks=taskRows.filter(r=>r.t.source==="Service Call").length; const totalDef=data.sites.reduce((n,s)=>n+(s.deficiencies||[]).length,0); const openDefTotal=data.sites.reduce((n,s)=>n+(s.deficiencies||[]).filter(d=>(d.status||"Open")!=="Closed").length,0); const closedDefTotal=data.sites.reduce((n,s)=>n+(s.deficiencies||[]).filter(d=>(d.status||"Open")==="Closed").length,0); const totalVisits=data.sites.reduce((n,s)=>n+(s.visits||[]).length,0); const totalContacts=data.sites.reduce((n,s)=>n+(s.contacts||[]).length,0); const totalDocs=data.sites.reduce((n,s)=>n+(s.docs||[]).length,0); const totalReportDeliveries=data.sites.reduce((n,s)=>n+(s.reportDeliveries||[]).length,0); const reportFollowUps=allTaskRows().filter(r=>r.t.source==="Report Delivery" && !taskIsDone(r.t)).length; const totalChecklist=data.sites.reduce((n,s)=>n+(s.checklist||[]).length,0); const checklistIssues=data.sites.reduce((n,s)=>n+(s.checklist||[]).filter(i=>i.status==="Issue").length,0); const completedInspections=data.sites.reduce((n,s)=>n+(s.visits||[]).filter(v=>v.type==="Inspection Checklist").length,0); const healthWarn=data.sites.filter(s=>siteHealth(s).cls==="healthWarn").length; const healthWatch=data.sites.filter(s=>siteHealth(s).cls==="healthWatch").length; const attentionTotal=attentionRows().length; html(`<div class="screen"><div class="row"><button class="back ghost" id="backHome">←</button><h1>Diagnostics</h1></div><div class="card grow errorBox"><p>Build: ${BUILD}</p><p>Sites: ${data.sites.length}</p><p>Total Tasks: ${totalTasks}</p><p>Open Tasks: ${taskCounts.open}</p><p>Due Today: ${taskCounts.today}</p><p>Overdue Tasks: ${taskCounts.overdue}</p><p>Service Follow-Ups: ${serviceTasks}</p><p>Total Deficiencies: ${totalDef}</p><p>Open Deficiencies: ${openDefTotal}</p><p>Closed Deficiencies: ${closedDefTotal}</p><p>Total Visits: ${totalVisits}</p><p>Total Contacts: ${totalContacts}</p><p>Total Documents: ${totalDocs}</p><p>Report Deliveries: ${totalReportDeliveries}</p><p>Report Follow-Ups: ${reportFollowUps}</p><p>Checklist Items: ${totalChecklist}</p><p>Checklist Issues: ${checklistIssues}</p><p>Completed Inspections: ${completedInspections}</p><p>Attention Sites: ${healthWarn}</p><p>Watch Sites: ${healthWatch}</p><p>Attention Queue: ${attentionTotal}</p><p>Active Job: ${activeJob ? esc(activeJob.siteName) : "None"}</p><p>Current Theme: ${esc(data.settings.theme.name)}</p><p>Accent: ${esc(data.settings.theme.accentColor)}</p><p>Advanced AI Enabled: ${data.settings.advanced?.aiTechnician ? "Yes" : "No"}</p><p>GPS Tools: ${data.settings.gps?.enabled !== false ? "Enabled" : "Hidden"}</p><p>Nearby Radius: ${nearbyRadiusMiles()} mi</p><p>Haptics: ${data.settings.app?.haptics !== false ? "Enabled" : "Off"}</p><p>Import/Export: Ready</p><p>Storage key: ${KEY}</p><p>Modules loaded successfully.</p></div></div>`); document.getElementById("backHome").onclick=()=>route("home"); }
 function showChangelog(){
   const notes = [
-    "Performed a visual consistency pass across cards, buttons, lists, stats, and report panels.",
-    "Unified the raised 3D control style so the app looks more like one professional field tool.",
-    "Neutralized remaining colored side rails and moved status meaning into badges, pills, and labels.",
-    "Improved Settings spacing and full-width submenu tabs so the section picker feels less cramped.",
-    "Preserved Report Delivery Tools, dashboard cleanup, GPS/Nearby, Site Health, refined controls, and the Loading FireVault boot watchdog."
+    "Polished the Site Detail screen so the customer vault reads more like a clean field command page.",
+    "Grouped primary site actions into a more consistent quick-action grid.",
+    "Improved mini vault cards for GPS, checklist, contacts, equipment, documents, visits, and notes.",
+    "Kept the unified raised 3D control style from the previous polish pass.",
+    "Preserved Report Delivery Tools, dashboard cleanup, GPS/Nearby, Site Health, haptics, and the Loading FireVault boot watchdog."
   ];
   const overlay=document.createElement("div");
   overlay.className="releaseOverlay";
   overlay.innerHTML=`<div class="releaseSheet" role="dialog" aria-modal="true" aria-label="FireVault release notes">
     <div class="releaseHead"><div><strong>FireVault</strong><span>Build ${BUILD}</span></div><button class="ghost iconBtn" id="closeRelease" aria-label="Close release notes">×</button></div>
-    <div class="releaseBody"><h2>Release Notes</h2><p class="releaseIntro">visual consistency and professional field-tool polish.</p><ul>${notes.map(n=>`<li>${esc(n)}</li>`).join("")}</ul></div>
+    <div class="releaseBody"><h2>Release Notes</h2><p class="releaseIntro">site detail layout and field workflow polish.</p><ul>${notes.map(n=>`<li>${esc(n)}</li>`).join("")}</ul></div>
   </div>`;
   document.body.appendChild(overlay);
   const close=()=>overlay.remove();

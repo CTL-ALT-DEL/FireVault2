@@ -1,9 +1,7 @@
-# Clean Install - FireVault Build 0.44.5
+# Clean Install - FireVault 0.44.6
 
-This ZIP is a clean project-root package.
-
-Before copying into GitHub Desktop or your repo folder, remove old extracted FireVault build folders such as `firevault-build-*` from inside the project.
-
-Then copy the contents of this ZIP into the project root.
-
-This build preserves the existing localStorage key so saved FireVault data should remain compatible.
+1. Export a FireVault backup from the app before replacing files.
+2. Delete old extracted `firevault-build-*` folders from your local project root.
+3. Copy the contents of this ZIP into the project root.
+4. Commit and deploy.
+5. If testing from an iPhone home-screen shortcut, delete and re-add the shortcut if old cached spacing/icons remain.
