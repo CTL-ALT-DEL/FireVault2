@@ -1,14 +1,15 @@
-# FireVault Build 0.25.0 — CSV Export
+# FireVault Build 0.25.1 — Photo System Repair
 
 Root-level package for GitHub Pages.
 
-## Changes
-- Export Sites CSV
-- Export Visits CSV
-- Spreadsheet-friendly backup files
-- JSON backup still available
-- Preserves previous local storage data
+## Fixes
+- Fixes top file type field corruption on iPhone
+- Save File returns to Docs / Photos
+- Saved photos are viewable from the Docs / Photos list
+- Delete button remains available
+- FireVault overlay rewritten for better reliability
+- Job Mode photo capture also uses repaired overlay
 
 Suggested commit:
 
-`Build 0.25.0 csv export`
+`Build 0.25.1 photo system repair`
