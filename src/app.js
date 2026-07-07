@@ -52,6 +52,24 @@ function saveActiveJob(){ activeJob ? localStorage.setItem(ACTIVE_JOB_KEY, JSON.
 function fmtDate(d=new Date()){ return d.toLocaleDateString([], {month:"short", day:"numeric", year:"numeric"}); }
 function todayIso(){ return new Date().toISOString().slice(0,10); }
 function elapsedText(startIso){ const ms=Date.now()-new Date(startIso).getTime(); const h=Math.floor(ms/3600000); const m=Math.floor((ms%3600000)/60000); const s=Math.floor((ms%60000)/1000); return h?`${h}:${String(m).padStart(2,"0")}:${String(s).padStart(2,"0")}`:`${m}:${String(s).padStart(2,"0")}`; }
+function timeShort(iso){ return new Date(iso).toLocaleTimeString([], {hour:"numeric",minute:"2-digit"}); }
+function dateShort(iso){ return new Date(iso).toLocaleDateString([], {month:"short",day:"numeric",year:"numeric"}); }
+function durationText(startIso,endIso){
+  if(!startIso || !endIso) return "";
+  const ms=Math.max(0,new Date(endIso).getTime()-new Date(startIso).getTime());
+  const h=Math.floor(ms/3600000); const m=Math.round((ms%3600000)/60000);
+  return h?`${h}h ${m}m`:`${m}m`;
+}
+function visitNotes(v){
+  if(Array.isArray(v.events) && v.events.length) return v.events.map(e=>`${timeShort(e.time)} - ${e.note}`).join("\n");
+  return v.notes || "No visit notes saved.";
+}
+function recentVisits(s){
+  const visits=(s.visits||[]).slice(0,3);
+  if(!visits.length) return `<div class="card grow visitSummaryCard"><h2>Recent Visits</h2><p>No visits saved yet. Start Job will build a service-call timeline here.</p></div>`;
+  return `<div class="card grow visitSummaryCard"><div class="row"><h2>Recent Visits</h2><span class="pill">${visits.length} shown</span></div><div class="siteVisitList">${visits.map(v=>`<div class="visitMini"><strong>${dateShort(v.startedAt||v.date||new Date())}</strong><span>${durationText(v.startedAt,v.endedAt)||"Visit saved"}</span><p>${esc(v.summary || (v.notes||"").split("\n")[0] || "Service visit")}</p></div>`).join("")}</div></div>`;
+}
+
 function startJobTimer(){ stopJobTimer(); jobTimer=setInterval(()=>{ const el=document.getElementById("jobElapsed"); if(el && activeJob) el.textContent=elapsedText(activeJob.startedAt); },1000); }
 function stopJobTimer(){ if(jobTimer){ clearInterval(jobTimer); jobTimer=null; } }
 function setActiveNav(){ document.querySelectorAll("nav button").forEach(b=>b.classList.remove("active")); const section=["siteDetail","siteForm","tasks","taskForm","deficiencies","deficiencyForm","report","jobMode"].includes(view)?"sites":view; document.getElementById("nav-"+section)?.classList.add("active"); }
@@ -89,7 +107,7 @@ function home(){
       <button class="ghost tile" id="diagBtn"><strong>Diagnostics</strong><span>Build status</span></button>
     </div>
     ${activeJob ? `<div class="card activeJobMini"><div class="row"><div><h2>Service Call Active</h2><p>${esc(activeJob.siteName)} • <span id="jobElapsed">${elapsedText(activeJob.startedAt)}</span></p></div><button class="primary" id="resumeJobBtn">Open</button></div></div>` : ""}
-    <div class="card grow"><h2>Build 0.40.9</h2><p>Settings now uses a minimalist pill-tab picker with no blank icon boxes and tighter subpage formatting.</p><p>Release notes and About information remain compact and left justified for field use.</p></div>
+    <div class="card grow"><h2>Build 0.41.0</h2><p>Service Call Mode now has quick event chips, cleaner timeline notes, and saved visit summaries.</p><p>Settings keeps the minimalist pill-tab picker from the last build.</p></div>
   </div>`);
   document.getElementById("sitesCard").onclick=()=>route("sites");
   document.getElementById("tasksCard").onclick=()=>{selectedSiteId=null; route("tasks");};
@@ -120,7 +138,7 @@ function siteDetail(){
       <button class="ghost tile" id="taskBtn"><strong>${open}</strong><span>Open Tasks</span></button>
       <button class="ghost tile" id="defBtn"><strong>${def}</strong><span>Deficiencies</span></button>
     </div>
-    <div class="card grow"><h2>Site Notes</h2><p>${esc(s.notes || "No notes entered.")}</p><div class="mapActions"><button id="appleBtn" class="ghost">Apple Maps</button><button id="googleBtn" class="ghost">Google Maps</button></div></div>
+    <div class="card siteNotesCard"><h2>Site Notes</h2><p>${esc(s.notes || "No notes entered.")}</p><div class="mapActions"><button id="appleBtn" class="ghost">Apple Maps</button><button id="googleBtn" class="ghost">Google Maps</button></div></div>${recentVisits(s)}
   </div>`);
   document.getElementById("backBtn").onclick=()=>route("sites");
   document.getElementById("editBtn").onclick=()=>{mode="edit"; route("siteForm");};
@@ -184,7 +202,43 @@ function deficiencyForm(){
 
 function reportText(s){
   const set=data.settings, tech=set.technician||{};
-  return `${set.reports.title}\nGenerated: ${new Date().toLocaleString()}\n\nSITE\n${s.name}\n${fullAddress(s)}\nPanel: ${[s.panelManufacturer,s.panelModel].filter(Boolean).join(" ")||"Not entered"}\n\nTECHNICIAN\n${tech.name||""}\n${tech.company||""}\n${tech.phone||""}\n${tech.email||""}\n\nTASKS\n${(s.tasks||[]).map(t=>`- ${t.status||"Open"}: ${t.title}${t.due?` due ${t.due}`:""}`).join("\n")||"No tasks"}\n\nDEFICIENCIES\n${(s.deficiencies||[]).map(d=>`- ${d.status||"Open"}: ${d.priority||"Normal"} - ${d.title}`).join("\n")||"No deficiencies"}\n\nNOTES\n${s.notes||"No notes"}\n\nEMAIL SUBJECT\n${renderTemplate(set.email.defaultSubject,s)}\n\nSIGNATURE\n${renderTemplate(set.email.signature,s)}`;
+  const visitBlock=(s.visits||[]).slice(0,5).map(v=>`- ${dateShort(v.startedAt||v.date||new Date())}${durationText(v.startedAt,v.endedAt)?` • ${durationText(v.startedAt,v.endedAt)}`:""}
+${visitNotes(v)}`).join("
+
+")||"No saved visits";
+  return `${set.reports.title}
+Generated: ${new Date().toLocaleString()}
+
+SITE
+${s.name}
+${fullAddress(s)}
+Panel: ${[s.panelManufacturer,s.panelModel].filter(Boolean).join(" ")||"Not entered"}
+
+TECHNICIAN
+${tech.name||""}
+${tech.company||""}
+${tech.phone||""}
+${tech.email||""}
+
+TASKS
+${(s.tasks||[]).map(t=>`- ${t.status||"Open"}: ${t.title}${t.due?` due ${t.due}`:""}`).join("
+")||"No tasks"}
+
+DEFICIENCIES
+${(s.deficiencies||[]).map(d=>`- ${d.status||"Open"}: ${d.priority||"Normal"} - ${d.title}`).join("
+")||"No deficiencies"}
+
+VISITS
+${visitBlock}
+
+NOTES
+${s.notes||"No notes"}
+
+EMAIL SUBJECT
+${renderTemplate(set.email.defaultSubject,s)}
+
+SIGNATURE
+${renderTemplate(set.email.signature,s)}`;
 }
 function renderTemplate(t,s){ const tech=data.settings.technician||{}; return String(t||"").replaceAll("{site_name}",s.name||"").replaceAll("{date}",fmtDate()).replaceAll("{technician}",tech.name||"").replaceAll("{company}",tech.company||"").replaceAll("{phone}",tech.phone||"").replaceAll("{email}",tech.email||""); }
 function report(){ const s=site(); if(!s){route("sites"); return;} const txt=reportText(s); html(`<div class="screen"><div class="row"><button class="back ghost" id="backBtn">←</button><h1>Report</h1></div><div class="reportActions"><button class="primary" id="copyBtn">Copy Report</button><button class="ghost" id="downloadBtn">Download TXT</button></div><div class="card reportBox grow">${esc(txt)}</div></div>`); document.getElementById("backBtn").onclick=()=>route("siteDetail"); document.getElementById("copyBtn").onclick=async()=>{await navigator.clipboard.writeText(txt); toast("Report copied.");}; document.getElementById("downloadBtn").onclick=()=>downloadBlob(`firevault-report-${(s.name||"site").replace(/\W+/g,"-")}.txt`,txt); }
@@ -192,8 +246,43 @@ function report(){ const s=site(); if(!s){route("sites"); return;} const txt=rep
 function library(){ html(`<div class="screen"><div class="row"><h1>Library</h1><button class="primary" id="addBtn">＋</button></div><div class="list grow">${data.resources.length?data.resources.map(r=>`<div class="card docLine siteItem" data-id="${r.id}"><h2>${esc(r.m||"Resource")}</h2><p>${esc(r.n||"")}</p><p>${esc(r.url||"")}</p></div>`).join(""):`<div class="empty">No resources yet.</div>`}</div></div>`); document.getElementById("addBtn").onclick=()=>{mode=null; route("resourceForm");}; document.querySelectorAll(".siteItem").forEach(el=>el.onclick=()=>{mode=el.dataset.id; route("resourceForm");}); }
 function resourceForm(){ const r=mode?data.resources.find(x=>x.id===mode):{}; html(`<div class="screen"><div class="row"><button class="back ghost" id="backBtn">←</button><h1>${mode?"Edit":"Add"} Resource</h1></div><div class="form grow"><div class="card"><label>Manufacturer</label><input id="m" value="${esc(r.m||"")}"><label>Name / Model</label><input id="n" value="${esc(r.n||"")}"><label>URL / Notes</label><textarea id="url">${esc(r.url||"")}</textarea></div><button class="primary" id="saveBtn">Save Resource</button>${mode?`<button class="danger" id="delBtn">Delete Resource</button>`:""}</div></div>`); document.getElementById("backBtn").onclick=()=>route("library"); document.getElementById("saveBtn").onclick=()=>{const obj={m:val("m"),n:val("n"),url:raw("url")}; if(mode) Object.assign(r,obj); else data.resources.unshift({...obj,id:uid()}); save(); route("library");}; const del=document.getElementById("delBtn"); if(del) del.onclick=()=>{data.resources=data.resources.filter(x=>x.id!==mode); save(); route("library");}; }
 
-function startJob(){ const s=site(); activeJob={siteId:s.id,siteName:s.name,startedAt:new Date().toISOString(),events:[{time:new Date().toISOString(),note:"Job started"}]}; saveActiveJob(); route("jobMode"); }
-function jobMode(){ const s=site(); if(!s||!activeJob){route("siteDetail"); return;} html(`<div class="screen"><div class="row"><button class="back ghost" id="backBtn">←</button><h1>Job Mode</h1></div><div class="card"><h2>${esc(s.name)}</h2><div class="timer" id="jobElapsed">${elapsedText(activeJob.startedAt)}</div></div><div class="grid2"><button class="ghost" id="noteBtn">Add Event</button><button class="primary" id="finishBtn">Finish Visit</button></div><div class="list grow">${(activeJob.events||[]).map(e=>`<div class="card visit"><strong>${new Date(e.time).toLocaleTimeString([], {hour:"numeric",minute:"2-digit"})}</strong><p>${esc(e.note)}</p></div>`).join("")}</div></div>`); document.getElementById("backBtn").onclick=()=>route("siteDetail"); document.getElementById("noteBtn").onclick=()=>{const note=prompt("Event note:","Checked panel"); if(note){activeJob.events.unshift({time:new Date().toISOString(),note}); saveActiveJob(); render();}}; document.getElementById("finishBtn").onclick=()=>{s.visits=s.visits||[]; s.visits.unshift({id:uid(),date:todayIso(),startedAt:activeJob.startedAt,endedAt:new Date().toISOString(),notes:(activeJob.events||[]).map(e=>`${new Date(e.time).toLocaleTimeString([], {hour:"numeric",minute:"2-digit"})} - ${e.note}`).join("\n")}); activeJob=null; saveActiveJob(); save(); toast("Visit saved."); route("siteDetail");}; }
+function startJob(){
+  const s=site();
+  activeJob={siteId:s.id,siteName:s.name,startedAt:new Date().toISOString(),events:[{time:new Date().toISOString(),note:"Job started"}]};
+  saveActiveJob();
+  route("jobMode");
+}
+function addJobEvent(note){
+  activeJob.events=Array.isArray(activeJob.events)?activeJob.events:[];
+  activeJob.events.unshift({time:new Date().toISOString(),note});
+  saveActiveJob();
+  render();
+}
+function finishActiveVisit(){
+  const s=site(); if(!s||!activeJob) return;
+  const summary=prompt("Final visit summary:","Service visit completed.");
+  if(summary===null) return;
+  const endedAt=new Date().toISOString();
+  const events=[...(activeJob.events||[])].reverse();
+  const notes=[summary||"Service visit completed",...events.map(e=>`${timeShort(e.time)} - ${e.note}`)].filter(Boolean).join("
+");
+  s.visits=s.visits||[];
+  s.visits.unshift({id:uid(),date:todayIso(),startedAt:activeJob.startedAt,endedAt,summary:summary||"Service visit completed",events,notes});
+  activeJob=null;
+  saveActiveJob();
+  save();
+  toast("Visit saved.");
+  route("siteDetail");
+}
+function jobMode(){
+  const s=site(); if(!s||!activeJob){route("siteDetail"); return;}
+  const quick=["Arrived on site","Opened panel","Panel normal","Trouble active","Ground fault active","Device tested","Customer update","Parts needed"];
+  html(`<div class="screen jobScreen"><div class="row"><button class="back ghost" id="backBtn">←</button><h1>Service Call</h1></div><div class="card jobTimerCard"><div><h2>${esc(s.name)}</h2><p>Live visit timer</p></div><div class="timer" id="jobElapsed">${elapsedText(activeJob.startedAt)}</div></div><div class="quickEventGrid">${quick.map(q=>`<button class="ghost quickEventBtn" data-note="${esc(q)}">${esc(q)}</button>`).join("")}</div><div class="grid2"><button class="ghost" id="noteBtn">Custom Event</button><button class="primary" id="finishBtn">Finish Visit</button></div><div class="list grow eventTimeline">${(activeJob.events||[]).map(e=>`<div class="card visit eventCard"><strong>${timeShort(e.time)}</strong><p>${esc(e.note)}</p></div>`).join("")}</div></div>`);
+  document.getElementById("backBtn").onclick=()=>route("siteDetail");
+  document.querySelectorAll(".quickEventBtn").forEach(btn=>btn.onclick=()=>addJobEvent(btn.dataset.note));
+  document.getElementById("noteBtn").onclick=()=>{const note=prompt("Event note:","Checked panel"); if(note) addJobEvent(note);};
+  document.getElementById("finishBtn").onclick=finishActiveVisit;
+}
 
 function settings(){
   const tabs=[
@@ -251,18 +340,18 @@ function saveSettings(){
 function diagnostics(){ const totalTasks=data.sites.reduce((n,s)=>n+(s.tasks||[]).length,0); const totalDef=data.sites.reduce((n,s)=>n+(s.deficiencies||[]).length,0); html(`<div class="screen"><div class="row"><button class="back ghost" id="backHome">←</button><h1>Diagnostics</h1></div><div class="card grow errorBox"><p>Build: ${BUILD}</p><p>Sites: ${data.sites.length}</p><p>Total Tasks: ${totalTasks}</p><p>Total Deficiencies: ${totalDef}</p><p>Active Job: ${activeJob ? esc(activeJob.siteName) : "None"}</p><p>Current Theme: ${esc(data.settings.theme.name)}</p><p>Accent: ${esc(data.settings.theme.accentColor)}</p><p>Advanced AI Enabled: ${data.settings.advanced?.aiTechnician ? "Yes" : "No"}</p><p>Import/Export: Ready</p><p>Storage key: ${KEY}</p><p>Modules loaded successfully.</p></div></div>`); document.getElementById("backHome").onclick=()=>route("home"); }
 function showChangelog(){
   const notes = [
-    "Build number advanced to 0.40.9 across the header, dashboard, manifest, and diagnostics.",
-    "Removed the blank icon-box submenu design from the Settings page.",
-    "Replaced Settings submenu navigation with a minimalist horizontal pill-tab picker.",
-    "Made Settings tabs text-first, sticky, horizontally scrollable, and easier to use on iPhone.",
-    "Tightened Settings subpage rows, labels, checkboxes, theme presets, Backup, and About formatting.",
-    "Kept compact release notes formatting, the selected #8 Flame Icon logo, and the existing modular storage key."
+    "Build number advanced to 0.41.0 across the header, dashboard, manifest, and diagnostics.",
+    "Added Service Call quick-event chips for common field notes like arrived, panel normal, trouble active, ground fault, device tested, customer update, and parts needed.",
+    "Changed Job Mode into a cleaner live service-call screen with a timer card, quick actions, custom event capture, and a tighter event timeline.",
+    "Saved finished visits now keep a summary, start/end times, duration, and event list.",
+    "Site detail now shows a compact Recent Visits card from the saved service-call timeline.",
+    "Reports now include the latest saved visit notes so service-call history carries forward."
   ];
   const overlay=document.createElement("div");
   overlay.className="releaseOverlay";
   overlay.innerHTML=`<div class="releaseSheet" role="dialog" aria-modal="true" aria-label="FireVault release notes">
     <div class="releaseHead"><div><strong>FireVault</strong><span>Build ${BUILD}</span></div><button class="ghost iconBtn" id="closeRelease" aria-label="Close release notes">×</button></div>
-    <div class="releaseBody"><h2>Release Notes</h2><p class="releaseIntro">Minimalist Settings pill-tab picker and compact subpage cleanup.</p><ul>${notes.map(n=>`<li>${esc(n)}</li>`).join("")}</ul></div>
+    <div class="releaseBody"><h2>Release Notes</h2><p class="releaseIntro">Service Call quick events, saved visit summaries, and recent visit history.</p><ul>${notes.map(n=>`<li>${esc(n)}</li>`).join("")}</ul></div>
   </div>`;
   document.body.appendChild(overlay);
   const close=()=>overlay.remove();
