@@ -13,6 +13,16 @@ let nearbyState = null;
 let siteSearch = "";
 let jobTimer = null;
 const QUICK_EVENTS = ["Arrived on site","Opened panel","Panel normal","Trouble active","Ground fault active","Device tested","Customer update","Parts needed"];
+const DEFAULT_CHECKLIST = [
+  ["Panel", "Panel normal / no active troubles"],
+  ["Panel", "AC power normal and cabinet secure"],
+  ["Panel", "Batteries present, dated, and visually OK"],
+  ["Signals", "Monitoring / communicator signal path verified"],
+  ["Devices", "Sample initiating devices tested"],
+  ["Notification", "Audible / visual notification verified"],
+  ["Documentation", "Customer notified of status"],
+  ["Wrap-Up", "Panel restored and left normal"]
+];
 const EMAIL_TAGS = [
   ["{site_name}","Site"], ["{date}","Date"], ["{technician}","Tech"],
   ["{company}","Company"], ["{phone}","Phone"], ["{email}","Email"]
@@ -217,6 +227,100 @@ function attentionActionLine(r){
   return parts.join(" • ") || "Review site details";
 }
 
+function checklistStats(s){
+  const items=Array.isArray(s?.checklist) ? s.checklist : [];
+  const total=items.length;
+  const ok=items.filter(i=>i.status==="OK").length;
+  const issue=items.filter(i=>i.status==="Issue").length;
+  const na=items.filter(i=>i.status==="N/A").length;
+  const pending=Math.max(0,total-ok-issue-na);
+  const done=ok+issue+na;
+  const progress=total ? Math.round((done/total)*100) : 0;
+  return {total,ok,issue,na,pending,progress};
+}
+function checklistItemClass(item){
+  if(item.status==="OK") return "checkOk";
+  if(item.status==="Issue") return "checkIssue";
+  if(item.status==="N/A") return "checkNa";
+  return "checkPending";
+}
+function seedChecklist(s){
+  ensureSite(s);
+  if(!Array.isArray(s.checklist)) s.checklist=[];
+  if(s.checklist.length) return false;
+  s.checklist = DEFAULT_CHECKLIST.map(([category,label])=>({id:uid(),category,label,status:"Pending",notes:"",createdAt:new Date().toISOString()}));
+  return true;
+}
+function checklistReportBlock(s){
+  const items=Array.isArray(s.checklist) ? s.checklist : [];
+  if(!items.length) return "No checklist saved";
+  return items.map(i=>`- ${i.status||"Pending"}: ${i.category?`${i.category} - `:""}${i.label||"Checklist item"}${i.notes?` | ${String(i.notes).replaceAll("\n"," / ")}`:""}`).join("\n");
+}
+function createDeficiencyFromChecklist(s,item){
+  ensureSite(s);
+  const exists=(s.deficiencies||[]).some(d=>d.checklistId===item.id && (d.status||"Open")!=="Closed");
+  if(exists) return;
+  s.deficiencies.unshift({
+    id:uid(),
+    title:`Checklist issue: ${item.label||"Inspection item"}`,
+    priority:"High",
+    status:"Open",
+    notes:[`Created from Inspection Checklist on ${fmtDate()}.`, item.category?`Category: ${item.category}`:"", item.notes?`Notes: ${item.notes}`:""].filter(Boolean).join("\n"),
+    checklistId:item.id,
+    createdAt:new Date().toISOString()
+  });
+}
+function setChecklistStatus(itemId,status){
+  const s=site(); if(!s) return;
+  const item=(s.checklist||[]).find(i=>i.id===itemId);
+  if(!item) return;
+  item.status=status;
+  item.checkedAt=new Date().toISOString();
+  if(status==="Issue"){
+    const note=prompt("Issue note for this checklist item:", item.notes || "Needs follow-up.");
+    if(note !== null) item.notes=note;
+    createDeficiencyFromChecklist(s,item);
+    toast("Issue flagged and deficiency created.");
+  }else{
+    toast(`Checklist marked ${status}.`);
+  }
+  save(); render();
+}
+function checklist(){
+  const s=site(); if(!s){ route("sites"); return; }
+  const seeded=seedChecklist(s);
+  if(seeded) save();
+  const stats=checklistStats(s);
+  html(`<div class="screen checklistScreen"><div class="row"><button class="back ghost" id="backBtn">←</button><div><h1>Inspection Checklist</h1><p>${esc(s.name||"Site")}</p></div><button class="primary smallBtn" id="addCheckItemBtn">＋</button></div>
+    <div class="card checklistHero"><div><strong>${stats.progress}%</strong><span>Complete</span></div><div><strong>${stats.ok}</strong><span>OK</span></div><div><strong>${stats.issue}</strong><span>Issues</span></div><div><strong>${stats.pending}</strong><span>Pending</span></div></div>
+    <div class="card checklistTools"><p>Tap OK, Issue, or N/A as you work. Issue automatically creates an open deficiency so it shows in Site Health, Attention Queue, and reports.</p><div class="checkToolButtons"><button class="ghost smallBtn" id="resetChecklistBtn">Reset Defaults</button><button class="ghost smallBtn" id="copyChecklistBtn">Copy Summary</button></div></div>
+    <div class="list grow checklistList">${s.checklist.length?s.checklist.map(item=>`<div class="card checkItem ${checklistItemClass(item)}"><div class="checkItemTop"><div><span class="checkCategory">${esc(item.category||"General")}</span><h2>${esc(item.label||"Checklist item")}</h2>${item.notes?`<p>${esc(item.notes)}</p>`:""}</div><span class="pill checkStatus">${esc(item.status||"Pending")}</span></div><div class="checkButtons"><button class="ghost smallBtn checkStatusBtn" data-id="${esc(item.id)}" data-status="OK">OK</button><button class="ghost smallBtn checkStatusBtn" data-id="${esc(item.id)}" data-status="Issue">Issue</button><button class="ghost smallBtn checkStatusBtn" data-id="${esc(item.id)}" data-status="N/A">N/A</button><button class="ghost smallBtn checkNoteBtn" data-id="${esc(item.id)}">Note</button></div></div>`).join(""):`<div class="empty">No checklist items saved.</div>`}</div>
+  </div>`);
+  document.getElementById("backBtn").onclick=()=>route("siteDetail");
+  document.getElementById("addCheckItemBtn").onclick=()=>{
+    const label=prompt("Checklist item:", "");
+    if(!label) return;
+    const category=prompt("Category:", "General") || "General";
+    s.checklist.unshift({id:uid(),category,label,status:"Pending",notes:"",createdAt:new Date().toISOString()});
+    save(); toast("Checklist item added."); render();
+  };
+  document.getElementById("resetChecklistBtn").onclick=()=>{
+    if(!confirm("Reset this site checklist to the default template? Existing checklist notes/status will be replaced.")) return;
+    s.checklist=[]; seedChecklist(s); save(); toast("Checklist reset."); render();
+  };
+  document.getElementById("copyChecklistBtn").onclick=async()=>{
+    await navigator.clipboard.writeText(`Inspection Checklist - ${s.name||"Site"}\n${checklistReportBlock(s)}`);
+    toast("Checklist copied.");
+  };
+  document.querySelectorAll(".checkStatusBtn").forEach(b=>b.onclick=()=>setChecklistStatus(b.dataset.id,b.dataset.status));
+  document.querySelectorAll(".checkNoteBtn").forEach(b=>b.onclick=()=>{
+    const item=s.checklist.find(i=>i.id===b.dataset.id); if(!item) return;
+    const note=prompt("Checklist note:", item.notes || "");
+    if(note===null) return;
+    item.notes=note; item.checkedAt=new Date().toISOString(); save(); toast("Checklist note saved."); render();
+  });
+}
+
 function siteSearchBlob(s){
   ensureSite(s);
   const parts=[s.name, fullAddress(s), s.panelManufacturer, s.panelModel, s.notes];
@@ -225,6 +329,7 @@ function siteSearchBlob(s){
   (s.docs||[]).forEach(d=>parts.push(d.type,d.title,d.ref,d.url,d.notes));
   (s.tasks||[]).forEach(t=>parts.push(t.title,t.status,t.notes,t.source));
   (s.deficiencies||[]).forEach(d=>parts.push(d.title,d.priority,d.status,d.notes));
+  (s.checklist||[]).forEach(i=>parts.push(i.category,i.label,i.status,i.notes));
   return parts.filter(Boolean).join(" ").toLowerCase();
 }
 function detectNearbySites(){
@@ -375,11 +480,11 @@ function addServiceFollowUp(kind="Follow-up"){
 }
 function startJobTimer(){ stopJobTimer(); jobTimer=setInterval(()=>{ const el=document.getElementById("jobElapsed"); if(el && activeJob) el.textContent=elapsedText(activeJob.startedAt); },1000); }
 function stopJobTimer(){ if(jobTimer){ clearInterval(jobTimer); jobTimer=null; } }
-function setActiveNav(){ document.querySelectorAll("nav button").forEach(b=>b.classList.remove("active")); const section=["siteDetail","visits","visitDetail","siteForm","contactsList","contactForm","siteDocs","siteDocForm","equipmentList","equipmentForm","tasks","taskForm","deficiencies","deficiencyForm","report","jobMode","nearbySites","attention"].includes(view)?"sites":view; document.getElementById("nav-"+section)?.classList.add("active"); }
+function setActiveNav(){ document.querySelectorAll("nav button").forEach(b=>b.classList.remove("active")); const section=["siteDetail","visits","visitDetail","checklist","siteForm","contactsList","contactForm","siteDocs","siteDocForm","equipmentList","equipmentForm","tasks","taskForm","deficiencies","deficiencyForm","report","jobMode","nearbySites","attention"].includes(view)?"sites":view; document.getElementById("nav-"+section)?.classList.add("active"); }
 
 function render(){
   try{
-    const routes = {home, sites, nearbySites, attention:attentionQueue, siteDetail, visits, visitDetail, siteForm, contactsList, contactForm, siteDocs, siteDocForm, equipmentList, equipmentForm, tasks, taskForm, deficiencies, deficiencyForm, report, library, resourceForm, jobMode, settings, diagnostics};
+    const routes = {home, sites, nearbySites, attention:attentionQueue, siteDetail, visits, visitDetail, checklist, siteForm, contactsList, contactForm, siteDocs, siteDocForm, equipmentList, equipmentForm, tasks, taskForm, deficiencies, deficiencyForm, report, library, resourceForm, jobMode, settings, diagnostics};
     (routes[view] || home)();
     view === "jobMode" ? startJobTimer() : stopJobTimer();
     setActiveNav();
@@ -415,7 +520,7 @@ function home(){
       <button class="ghost tile" id="diagBtn"><strong>Diagnostics</strong><span>Build status</span></button>
     </div>
     ${activeJob ? `<div class="card activeJobMini"><div class="row"><div><h2>Service Call Active</h2><p>${esc(activeJob.siteName)} • <span id="jobElapsed">${elapsedText(activeJob.startedAt)}</span></p></div><button class="primary" id="resumeJobBtn">Open</button></div></div>` : ""}
-    <div class="card grow"><h2>Build ${BUILD}</h2><p>Site Snapshot tools are active.</p><p>Open any site and use Snapshot to share or copy a field-ready summary of the site vault, access info, GPS, open work, and notes.</p></div>
+    <div class="card grow"><h2>Build ${BUILD}</h2><p>Inspection Checklist is active.</p><p>Open any site and use Checklist to mark OK, Issue, or N/A items during field work. Issues create deficiencies automatically.</p></div>
   </div>`);
   document.getElementById("sitesCard").onclick=()=>route("sites");
   document.getElementById("tasksCard").onclick=()=>{selectedSiteId=null; route("tasks");};
@@ -498,6 +603,8 @@ function siteDetail(){
   const equipment=Array.isArray(s.equipment) ? s.equipment : [];
   const contacts=Array.isArray(s.contacts) ? s.contacts : [];
   const docs=Array.isArray(s.docs) ? s.docs : [];
+  const checklistItems=Array.isArray(s.checklist) ? s.checklist : [];
+  const checkStats=checklistStats(s);
   const health=siteHealth(s);
   html(`<div class="screen"><div class="row"><button class="back ghost" id="backBtn">←</button><button class="ghost" id="editBtn">Edit</button></div>
     <div class="card redline"><h1>${esc(s.name)}</h1><p>${esc(fullAddress(s))}</p><p>${esc([s.panelManufacturer,s.panelModel].filter(Boolean).join(" ")||"Panel not entered")}</p></div>
@@ -507,6 +614,7 @@ function siteDetail(){
       <button class="primary tile" id="jobBtn"><strong>Start Job</strong><span>Live service call</span></button>
       <button class="ghost tile" id="reportBtn"><strong>Report</strong><span>Copy/download</span></button>
       <button class="ghost tile snapshotTile" id="snapshotBtn"><strong>Snapshot</strong><span>Share field summary</span></button>
+      <button class="ghost tile checklistTile" id="checklistBtn"><strong>${checklistItems.length ? checkStats.progress + "%" : "New"}</strong><span>Checklist</span></button>
       <button class="ghost tile" id="taskBtn"><strong>${open}</strong><span>Open Tasks</span></button>
       <button class="ghost tile" id="defBtn"><strong>${def}</strong><span>Deficiencies</span></button>
       <button class="ghost tile" id="equipmentBtn"><strong>${equipment.length}</strong><span>Equipment</span></button>
@@ -514,6 +622,7 @@ function siteDetail(){
       <button class="ghost tile" id="docsBtn"><strong>${docs.length}</strong><span>Documents / Links</span></button>
     </div>
     <div class="card gpsCard"><div class="row"><div><h2>GPS / Maps</h2><p>${esc(gpsLine(s))}</p></div>${data.settings.gps?.enabled===false?"":`<button id="captureGpsBtn" class="primary smallBtn">Capture GPS</button>`}</div><div class="mapActions"><button id="appleBtn" class="ghost">Apple Maps</button><button id="googleBtn" class="ghost">Google Maps</button></div></div>
+    <div class="card checklistMiniCard"><div class="row"><div><h2>Inspection Checklist</h2><p>${checklistItems.length ? `${checkStats.progress}% complete • ${checkStats.issue} issue${checkStats.issue===1?"":"s"} • ${checkStats.pending} pending` : "Default fire alarm field checklist ready to start."}</p></div><button class="ghost smallBtn" id="manageChecklistBtn">Open</button></div><div class="checkMiniBar"><span style="width:${checkStats.progress}%"></span></div></div>
     <div class="card contactsMiniCard"><div class="row"><div><h2>Contacts & Access</h2><p>${contacts.length ? `${contacts.length} saved contact${contacts.length===1?"":"s"}` : "Customer, access, gate, and after-hours details."}</p></div><button class="ghost smallBtn" id="manageContactsBtn">Manage</button></div>${contacts.length?contacts.slice(0,3).map(c=>`<button class="contactLine" data-contact="${esc(c.id)}"><strong>${esc(contactTitle(c))}</strong><span>${esc(contactMeta(c))}</span></button>`).join(""):`<p class="fieldNote">Add customer contacts, access codes, lockbox notes, or monitoring center details here.</p>`}</div>
     <div class="card equipmentMiniCard"><div class="row"><div><h2>Equipment Vault</h2><p>${equipment.length ? `${equipment.length} saved equipment item${equipment.length===1?"":"s"}` : "Panel, communicator, power supply, and device notes."}</p></div><button class="ghost smallBtn" id="manageEquipmentBtn">Manage</button></div>${equipment.length?equipment.slice(0,3).map(e=>`<button class="equipmentLine" data-eq="${esc(e.id)}"><strong>${esc(equipmentTitle(e))}</strong><span>${esc(e.location||e.type||"No location entered")}</span></button>`).join(""):`<p class="fieldNote">Add the panel, communicator, power supplies, and important site equipment here.</p>`}</div>
     <div class="card docsMiniCard"><div class="row"><div><h2>Documents / Links</h2><p>${docs.length ? `${docs.length} saved document${docs.length===1?"":"s"}` : "Manuals, permits, forms, and site reference links."}</p></div><button class="ghost smallBtn" id="manageDocsBtn">Manage</button></div>${docs.length?docs.slice(0,3).map(d=>`<button class="docLineMini" data-doc="${esc(d.id)}"><strong>${esc(docTitle(d))}</strong><span>${esc(docMeta(d))}</span></button>`).join(""):`<p class="fieldNote">Add PDF links, panel manuals, account references, permit numbers, or inspection form notes here.</p>`}</div>
@@ -529,6 +638,8 @@ function siteDetail(){
   document.getElementById("docsBtn").onclick=()=>route("siteDocs");
   document.getElementById("reportBtn").onclick=()=>route("report");
   document.getElementById("snapshotBtn").onclick=shareSiteSnapshot;
+  document.getElementById("checklistBtn").onclick=()=>route("checklist");
+  const manageChecklist=document.getElementById("manageChecklistBtn"); if(manageChecklist) manageChecklist.onclick=()=>route("checklist");
   document.getElementById("copySnapshotCardBtn").onclick=shareSiteSnapshot;
   document.getElementById("jobBtn").onclick=startJob;
   const gpsBtn=document.getElementById("captureGpsBtn"); if(gpsBtn) gpsBtn.onclick=captureGpsForSite;
@@ -843,6 +954,7 @@ function reportText(s){
   const contacts=(s.contacts||[]).map(contactReportLine).join("\n") || "No contacts or access notes saved";
   const equipment=(s.equipment||[]).map(e=>`- ${e.status||"Active"}: ${equipmentTitle(e)}${e.location?` @ ${e.location}`:""}${e.serial?` | Serial ${e.serial}`:""}${e.date?` | Checked ${e.date}`:""}${e.interval&&e.interval!=="None"?` | Interval ${e.interval}`:""}${e.notes?`\n  Notes: ${String(e.notes).replaceAll("\n","\n  ")}`:""}`).join("\n") || "No equipment saved";
   const docs=(s.docs||[]).map(docReportLine).join("\n") || "No documents or links saved";
+  const checklist=checklistReportBlock(s);
   return `${set.reports.title}
 Generated: ${new Date().toLocaleString()}
 
@@ -871,6 +983,9 @@ ${equipment}
 
 DOCUMENTS / LINKS
 ${docs}
+
+INSPECTION CHECKLIST
+${checklist}
 
 TASKS
 ${(s.tasks||[]).map(t=>`- ${t.status||"Open"}: ${t.title}${t.source?` [${t.source}]`:""}${t.due?` due ${t.due}`:""}`).join("\n")||"No tasks"}
@@ -1051,20 +1166,20 @@ function saveSettings(){
   save(); toast("Settings saved."); settings();
 }
 
-function diagnostics(){ const taskRows=allTaskRows(); const taskCounts=taskFilterCounts(taskRows); const totalTasks=taskRows.length; const serviceTasks=taskRows.filter(r=>r.t.source==="Service Call").length; const totalDef=data.sites.reduce((n,s)=>n+(s.deficiencies||[]).length,0); const totalVisits=data.sites.reduce((n,s)=>n+(s.visits||[]).length,0); const totalContacts=data.sites.reduce((n,s)=>n+(s.contacts||[]).length,0); const totalDocs=data.sites.reduce((n,s)=>n+(s.docs||[]).length,0); const healthWarn=data.sites.filter(s=>siteHealth(s).cls==="healthWarn").length; const healthWatch=data.sites.filter(s=>siteHealth(s).cls==="healthWatch").length; const attentionTotal=attentionRows().length; html(`<div class="screen"><div class="row"><button class="back ghost" id="backHome">←</button><h1>Diagnostics</h1></div><div class="card grow errorBox"><p>Build: ${BUILD}</p><p>Sites: ${data.sites.length}</p><p>Total Tasks: ${totalTasks}</p><p>Open Tasks: ${taskCounts.open}</p><p>Due Today: ${taskCounts.today}</p><p>Overdue Tasks: ${taskCounts.overdue}</p><p>Service Follow-Ups: ${serviceTasks}</p><p>Total Deficiencies: ${totalDef}</p><p>Total Visits: ${totalVisits}</p><p>Total Contacts: ${totalContacts}</p><p>Total Documents: ${totalDocs}</p><p>Attention Sites: ${healthWarn}</p><p>Watch Sites: ${healthWatch}</p><p>Attention Queue: ${attentionTotal}</p><p>Active Job: ${activeJob ? esc(activeJob.siteName) : "None"}</p><p>Current Theme: ${esc(data.settings.theme.name)}</p><p>Accent: ${esc(data.settings.theme.accentColor)}</p><p>Advanced AI Enabled: ${data.settings.advanced?.aiTechnician ? "Yes" : "No"}</p><p>GPS Tools: ${data.settings.gps?.enabled !== false ? "Enabled" : "Hidden"}</p><p>Nearby Radius: ${nearbyRadiusMiles()} mi</p><p>Haptics: ${data.settings.app?.haptics !== false ? "Enabled" : "Off"}</p><p>Import/Export: Ready</p><p>Storage key: ${KEY}</p><p>Modules loaded successfully.</p></div></div>`); document.getElementById("backHome").onclick=()=>route("home"); }
+function diagnostics(){ const taskRows=allTaskRows(); const taskCounts=taskFilterCounts(taskRows); const totalTasks=taskRows.length; const serviceTasks=taskRows.filter(r=>r.t.source==="Service Call").length; const totalDef=data.sites.reduce((n,s)=>n+(s.deficiencies||[]).length,0); const totalVisits=data.sites.reduce((n,s)=>n+(s.visits||[]).length,0); const totalContacts=data.sites.reduce((n,s)=>n+(s.contacts||[]).length,0); const totalDocs=data.sites.reduce((n,s)=>n+(s.docs||[]).length,0); const totalChecklist=data.sites.reduce((n,s)=>n+(s.checklist||[]).length,0); const checklistIssues=data.sites.reduce((n,s)=>n+(s.checklist||[]).filter(i=>i.status==="Issue").length,0); const healthWarn=data.sites.filter(s=>siteHealth(s).cls==="healthWarn").length; const healthWatch=data.sites.filter(s=>siteHealth(s).cls==="healthWatch").length; const attentionTotal=attentionRows().length; html(`<div class="screen"><div class="row"><button class="back ghost" id="backHome">←</button><h1>Diagnostics</h1></div><div class="card grow errorBox"><p>Build: ${BUILD}</p><p>Sites: ${data.sites.length}</p><p>Total Tasks: ${totalTasks}</p><p>Open Tasks: ${taskCounts.open}</p><p>Due Today: ${taskCounts.today}</p><p>Overdue Tasks: ${taskCounts.overdue}</p><p>Service Follow-Ups: ${serviceTasks}</p><p>Total Deficiencies: ${totalDef}</p><p>Total Visits: ${totalVisits}</p><p>Total Contacts: ${totalContacts}</p><p>Total Documents: ${totalDocs}</p><p>Checklist Items: ${totalChecklist}</p><p>Checklist Issues: ${checklistIssues}</p><p>Attention Sites: ${healthWarn}</p><p>Watch Sites: ${healthWatch}</p><p>Attention Queue: ${attentionTotal}</p><p>Active Job: ${activeJob ? esc(activeJob.siteName) : "None"}</p><p>Current Theme: ${esc(data.settings.theme.name)}</p><p>Accent: ${esc(data.settings.theme.accentColor)}</p><p>Advanced AI Enabled: ${data.settings.advanced?.aiTechnician ? "Yes" : "No"}</p><p>GPS Tools: ${data.settings.gps?.enabled !== false ? "Enabled" : "Hidden"}</p><p>Nearby Radius: ${nearbyRadiusMiles()} mi</p><p>Haptics: ${data.settings.app?.haptics !== false ? "Enabled" : "Off"}</p><p>Import/Export: Ready</p><p>Storage key: ${KEY}</p><p>Modules loaded successfully.</p></div></div>`); document.getElementById("backHome").onclick=()=>route("home"); }
 function showChangelog(){
   const notes = [
-    "Added Field Snapshot share/copy tools on Site Detail.",
-    "Snapshot includes site address, panel info, health status, GPS/maps, contacts/access, open tasks, deficiencies, equipment attention, documents, and notes.",
-    "Added a Snapshot tile beside Report for faster field handoff.",
-    "Kept the dashboard cleanup from 0.43.5 with Library and Settings only on the bottom menu.",
-    "Preserved Site Health, Attention Queue, Site Finder, Documents / Links Vault, Contacts & Access Vault, Equipment Vault, GPS/Nearby, and Visit Log features."
+    "Added a per-site Inspection Checklist with default fire alarm field items.",
+    "Checklist items can be marked OK, Issue, or N/A with fast 3D field buttons.",
+    "Issue marks automatically create an open deficiency so the site appears in Health, Attention Queue, and reports.",
+    "Added Checklist access from Site Detail and checklist summaries in generated reports.",
+    "Preserved Field Snapshot, Site Health, Attention Queue, Site Finder, Documents / Links, Contacts & Access, Equipment Vault, GPS/Nearby, and Visit Log features."
   ];
   const overlay=document.createElement("div");
   overlay.className="releaseOverlay";
   overlay.innerHTML=`<div class="releaseSheet" role="dialog" aria-modal="true" aria-label="FireVault release notes">
     <div class="releaseHead"><div><strong>FireVault</strong><span>Build ${BUILD}</span></div><button class="ghost iconBtn" id="closeRelease" aria-label="Close release notes">×</button></div>
-    <div class="releaseBody"><h2>Release Notes</h2><p class="releaseIntro">field snapshot sharing and quick site handoff.</p><ul>${notes.map(n=>`<li>${esc(n)}</li>`).join("")}</ul></div>
+    <div class="releaseBody"><h2>Release Notes</h2><p class="releaseIntro">per-site inspection checklist and issue-to-deficiency workflow.</p><ul>${notes.map(n=>`<li>${esc(n)}</li>`).join("")}</ul></div>
   </div>`;
   document.body.appendChild(overlay);
   const close=()=>overlay.remove();

@@ -1,4 +1,4 @@
-export const BUILD = "0.43.6";
+export const BUILD = "0.43.7";
 export const KEY = "firevault_vault_build_030";
 export const ACTIVE_JOB_KEY = "firevault_active_job_modular";
 
@@ -36,6 +36,7 @@ export function ensureSite(s){
   s.equipment = Array.isArray(s.equipment) ? s.equipment : [];
   s.contacts = Array.isArray(s.contacts) ? s.contacts : [];
   s.docs = Array.isArray(s.docs) ? s.docs : [];
+  s.checklist = Array.isArray(s.checklist) ? s.checklist : [];
   s.deficiencies = Array.isArray(s.deficiencies) ? s.deficiencies : [];
   s.tasks = Array.isArray(s.tasks) ? s.tasks : [];
   if(s.gps && (!Number.isFinite(Number(s.gps.lat)) || !Number.isFinite(Number(s.gps.lng)))) s.gps = null;

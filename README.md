@@ -1,16 +1,30 @@
-# FireVault Build 0.43.6
+# FireVault Build 0.43.7
 
-Build 0.43.6 adds Field Snapshot sharing/copy tools for faster service handoff from a site record.
+Build 0.43.7 adds a per-site Inspection Checklist workflow for fast field checks during service and inspection work.
 
-## Highlights
+## Added
 
-- Added **Field Snapshot** on Site Detail.
-- Added a **Snapshot** tile beside Report.
-- Snapshot includes address, panel details, site health, GPS/maps, contacts/access, open tasks, deficiencies, equipment attention, documents, and site notes.
-- Uses native share where available and falls back to clipboard copy.
-- Preserves the dashboard cleanup from 0.43.5.
-- Preserves the Loading FireVault boot watchdog, refined 3D controls, GPS/Nearby Sites, Task Center, Visit Log, Equipment Vault, Contacts & Access Vault, Documents / Links Vault, and Attention Queue.
+- Per-site Inspection Checklist screen.
+- Default fire alarm checklist starter items.
+- Quick status buttons: OK, Issue, and N/A.
+- Issue status automatically creates an open deficiency.
+- Checklist summary card on Site Detail.
+- Checklist results added to generated reports.
+- Checklist item notes and custom checklist item creation.
+
+## Preserved
+
+- Loading FireVault boot watchdog and parser fix.
+- Refined 3D control styling.
+- Field Snapshot share/copy tools.
+- Site Health Snapshot and Attention Queue.
+- Site Finder vault search.
+- Documents / Links Vault.
+- Contacts & Access Vault.
+- Equipment Vault.
+- GPS capture, Nearby Sites, map actions, and GPS reporting.
+- Task Center, Visit Log, Service Follow-Up tasks, and haptics.
 
 ## Install
 
-Copy the contents of this ZIP into the GitHub Pages project root. Do not commit nested `firevault-build-*` folders.
+Copy the contents of this ZIP into the GitHub Pages project root. Do not place the extracted build folder inside the repo.

@@ -822,13 +822,13 @@ nav button:active{transform:translateY(1px) scale(.992)}
 @media(max-width:430px){.attentionHero{grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}.attentionTop h2{font-size:16px}.attentionLine{font-size:12.5px}.attentionMini{grid-template-columns:1fr}.attentionMini span{text-align:left}.smallScore{min-width:48px}}
 
 
-/* Build 0.43.6 dashboard cleanup */
+/* Build 0.43.7 dashboard cleanup */
 .homeActionGrid{align-items:stretch}
 .homeActionGrid .tile{min-height:76px}
 @media (max-width:520px){.homeActionGrid{gap:10px}.homeActionGrid .tile{min-height:70px}}
 
 
-/* Build 0.43.6 field snapshot */
+/* Build 0.43.7 field snapshot */
 .snapshotCard{
   display:flex;
   align-items:center;
@@ -842,4 +842,39 @@ nav button:active{transform:translateY(1px) scale(.992)}
 @media (max-width:560px){
   .snapshotCard{align-items:stretch;flex-direction:column;}
   .snapshotCard .smallBtn{width:100%;}
+}
+
+/* Build 0.43.7 inspection checklist */
+.checklistTile{border-color:rgba(255,255,255,.12)!important}
+.checklistMiniCard{display:grid;gap:10px;padding:13px!important}
+.checkMiniBar{height:10px;border-radius:999px;background:rgba(0,0,0,.28);border:1px solid rgba(255,255,255,.07);overflow:hidden;box-shadow:inset 0 1px 2px rgba(0,0,0,.45)}
+.checkMiniBar span{display:block;height:100%;min-width:0;background:linear-gradient(90deg,var(--accent),rgba(255,255,255,.28));box-shadow:inset 0 1px 0 rgba(255,255,255,.25)}
+.checklistHero{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;padding:10px!important}
+.checklistHero div{display:grid;gap:3px;text-align:center;background:linear-gradient(180deg,rgba(255,255,255,.055),rgba(0,0,0,.18));border:1px solid rgba(255,255,255,.075);border-radius:15px;padding:9px 6px;box-shadow:inset 0 1px 0 rgba(255,255,255,.08),0 2px 0 rgba(0,0,0,.42),0 9px 15px rgba(0,0,0,.18)}
+.checklistHero strong{font-size:20px;line-height:1;color:#fff;font-weight:950}
+.checklistHero span{font-size:10.5px;line-height:1.15;color:var(--muted);font-weight:850;text-transform:uppercase;letter-spacing:.055em}
+.checklistTools{display:grid;gap:10px;padding:12px!important}
+.checklistTools p{margin:0;color:var(--muted);font-size:13px;line-height:1.35}
+.checkToolButtons{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.checklistList{display:grid;gap:9px;align-content:start}
+.checkItem{display:grid;gap:9px;padding:12px!important}
+.checkItemTop{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;align-items:start}
+.checkItem h2{margin:2px 0 0;font-size:16px;line-height:1.18}
+.checkItem p{margin:5px 0 0;color:var(--muted);font-size:12.5px;line-height:1.35;white-space:pre-wrap}
+.checkCategory{font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:950}
+.checkStatus{font-weight:950!important}
+.checkButtons{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:7px}
+.checkButtons .smallBtn{min-height:36px;font-size:12px;padding:8px 6px}
+.checkOk{box-shadow:inset 0 1px 0 rgba(255,255,255,.085),0 2px 0 #05070b,0 0 0 1px rgba(34,197,94,.14),0 10px 16px rgba(0,0,0,.2)!important}
+.checkIssue{box-shadow:inset 0 1px 0 rgba(255,255,255,.085),0 2px 0 #05070b,0 0 0 1px rgba(239,68,68,.18),0 10px 16px rgba(0,0,0,.2)!important}
+.checkNa{opacity:.9}
+.checkPending{border-style:solid!important}
+@media(max-width:430px){
+  .checklistHero{grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}
+  .checkToolButtons{grid-template-columns:1fr}
+  .checkItem{padding:10px!important;gap:8px}
+  .checkItem h2{font-size:15px}
+  .checkItem p{font-size:12px}
+  .checkButtons{grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}
+  .checkButtons .smallBtn{min-height:38px}
 }
