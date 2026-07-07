@@ -128,3 +128,47 @@ nav{min-height:var(--navH);position:fixed;bottom:0;left:0;right:0;display:grid;g
 @media(max-width:720px){.settingsScreen408 .settingsNanoTitle span{display:none}.settingsRail408 .tabBtn{min-width:60px}.settingsRail408 .tabBtn strong{font-size:9.2px}.settingsRail408 .tabBtn em{display:none}.settingsContent408 .settingsGrid{grid-template-columns:1fr}.settingsContent408 .settingsList.twoCol{grid-template-columns:repeat(2,minmax(0,1fr))}.settingsContent408 .settingField{grid-template-columns:78px minmax(0,1fr)}.settingsContent408 .paneNote{display:block}}
 @media(max-width:430px){.settingsScreen408{gap:3px}.settingsContent408 .compactPane{padding:5px 6px}.settingsContent408 .paneHead h2{font-size:12px}.settingsContent408 .paneNote{display:none}.settingsContent408 .settingsList.twoCol{grid-template-columns:1fr}.settingsContent408 .presetGrid{grid-template-columns:repeat(2,minmax(0,1fr))}.settingsContent408 .settingField{grid-template-columns:70px minmax(0,1fr);gap:2px 4px}.settingsContent408 input,.settingsContent408 textarea,.settingsContent408 select{min-height:27px;font-size:10px}.settingsContent408 textarea{min-height:38px}.settingsRail408 .tabBtn{min-width:54px}.settingsRail408 .tabIcon{width:11px;min-width:11px}.settingsRail408 .tabBtn strong{font-size:8.8px;max-width:45px}.settingsContent408 .checkRow{min-height:26px;font-size:9.5px}}
 @media(max-width:360px){.settingsContent408 .settingField{grid-template-columns:1fr}.settingsContent408 .presetGrid{grid-template-columns:1fr}.settingsRail408 .tabBtn{min-width:46px;padding-left:4px;padding-right:4px}.settingsRail408 .tabIcon{display:none}.settingsRail408 .tabBtn strong{max-width:42px}.settingsContent408 .settingsList.twoCol{grid-template-columns:1fr}}
+
+/* Build 0.40.9 Minimal Settings pill-tab picker */
+.settingsScreen409{gap:5px;min-height:0;text-align:left}
+.settingsScreen409 .settingsMiniHead{display:flex;align-items:center;justify-content:space-between;gap:8px;min-height:31px;padding:0 1px 2px;border:0;background:transparent}
+.settingsScreen409 .settingsMiniTitle{display:flex;align-items:baseline;gap:7px;min-width:0}
+.settingsScreen409 .settingsMiniTitle h1{font-size:17px;line-height:1;margin:0;letter-spacing:-.02em}
+.settingsScreen409 .settingsMiniTitle p{font-size:10px;line-height:1;margin:0;color:var(--muted);font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:48vw}
+.settingsScreen409 .settingsInfoBtn{width:25px;height:25px;min-height:25px;padding:0;border-radius:999px;font-size:11px;line-height:1;display:inline-flex;align-items:center;justify-content:center}
+.settingsPickerRail{position:sticky;top:0;z-index:4;display:flex;flex-direction:row;flex-wrap:nowrap;align-items:center;gap:5px;overflow-x:auto;overflow-y:hidden;padding:0 0 5px;margin:0;border-bottom:1px solid rgba(255,255,255,.055);scrollbar-width:none;background:linear-gradient(180deg,rgba(11,13,16,.98),rgba(11,13,16,.82))}
+.settingsPickerRail::-webkit-scrollbar{display:none}
+.settingsPill{flex:0 0 auto;min-height:27px;padding:5px 9px;border-radius:999px;border:1px solid transparent;background:transparent;color:var(--muted);font-size:10.8px;line-height:1;font-weight:850;letter-spacing:0;text-align:center;white-space:nowrap;box-shadow:none}
+.settingsPill.active{background:color-mix(in srgb,var(--accent) 22%, transparent);border-color:color-mix(in srgb,var(--accent) 42%, transparent);color:#fff}
+.settingsPill:focus-visible{outline:2px solid color-mix(in srgb,var(--accent) 60%, transparent);outline-offset:2px}
+.settingsContent409{overflow:auto;padding-bottom:9px;text-align:left;font-size:11px;min-height:0}
+.settingsContent409 .settingsStack{gap:0}
+.settingsContent409 .compactPane{padding:7px 8px;border-radius:11px;border-left-width:2px;text-align:left;background:rgba(255,255,255,.035)}
+.settingsContent409 .paneHead{margin:0 0 3px;gap:6px;min-height:24px;text-align:left;align-items:center}
+.settingsContent409 .paneHead h2{font-size:13px;line-height:1.05;margin:0;text-align:left;letter-spacing:-.015em}
+.settingsContent409 .saveMini{min-height:25px;padding:4px 8px;border-radius:999px;font-size:9.8px;line-height:1}
+.settingsContent409 .paneNote{font-size:9px;line-height:1.15;margin:0 0 5px;text-align:left;color:var(--muted)}
+.settingsContent409 .settingsGrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:5px}
+.settingsContent409 .settingField{display:grid;grid-template-columns:82px minmax(0,1fr);align-items:center;gap:3px 6px;min-width:0;text-align:left}
+.settingsContent409 .settingField label,.settingsContent409 label:not(.checkRow){font-size:7.8px;line-height:1.05;letter-spacing:.04em;text-align:left;margin:0;color:var(--muted)}
+.settingsContent409 input,.settingsContent409 textarea,.settingsContent409 select{min-height:28px;padding:5px 7px;border-radius:8px;font-size:10.5px;line-height:1.12;text-align:left;min-width:0}
+.settingsContent409 textarea{min-height:43px;resize:vertical}
+.settingsContent409 .fieldNote{grid-column:1/-1;font-size:8.5px;line-height:1.12;margin:0;text-align:left;color:var(--muted)}
+.settingsContent409 .settingsList{display:grid;gap:5px;margin-top:5px}
+.settingsContent409 .settingsList.twoCol{grid-template-columns:repeat(2,minmax(0,1fr));gap:5px}
+.settingsContent409 .checkRow{min-height:28px;padding:4px 7px;border-radius:999px;font-size:9.8px;line-height:1.08;gap:6px;text-align:left;justify-content:flex-start;align-items:center;background:rgba(255,255,255,.032)}
+.settingsContent409 .checkRow input{width:14px;height:14px;min-height:14px;flex:0 0 auto}
+.settingsContent409 .presetGrid{grid-template-columns:repeat(3,minmax(0,1fr));gap:5px;margin-bottom:5px}
+.settingsContent409 .presetBtn{min-height:29px;padding:4px 6px;border-radius:999px;font-size:9.5px;line-height:1.02;gap:5px;justify-content:flex-start;text-align:left}
+.settingsContent409 .themeSwatch{width:15px;height:15px;border-radius:999px;flex:0 0 auto;margin:0}
+.settingsContent409 .previewPanel.compactPreview{min-height:58px;margin:3px 0;border-radius:10px}
+.settingsContent409 .previewOverlay{font-size:8.8px;line-height:1.08;padding:4px 6px;text-align:left}
+.settingsContent409 .aboutGrid{gap:5px}
+.settingsContent409 .aboutGrid div{padding:5px 7px;border-radius:9px;gap:1px;text-align:left}
+.settingsContent409 .aboutGrid strong{font-size:7.8px;line-height:1.05;text-align:left}
+.settingsContent409 .aboutGrid span{font-size:9.8px;line-height:1.12;text-align:left}
+.settingsContent409 #exportBtn,.settingsContent409 #resetBtn{min-height:29px;padding:5px 8px;border-radius:999px;font-size:10.5px;text-align:left;justify-content:flex-start}
+@media(max-width:720px){.settingsScreen409{gap:4px}.settingsScreen409 .settingsMiniTitle h1{font-size:16px}.settingsScreen409 .settingsMiniTitle p{font-size:9.5px}.settingsPill{min-height:26px;padding:5px 8px;font-size:10.3px}.settingsContent409 .settingsGrid{grid-template-columns:1fr}.settingsContent409 .settingsList.twoCol{grid-template-columns:repeat(2,minmax(0,1fr))}.settingsContent409 .settingField{grid-template-columns:78px minmax(0,1fr)}.settingsContent409 .paneNote{display:block}}
+@media(max-width:430px){.settingsScreen409 .settingsMiniTitle p{display:none}.settingsPickerRail{gap:4px;padding-bottom:4px}.settingsPill{font-size:10px;padding:5px 8px}.settingsContent409 .compactPane{padding:6px 7px}.settingsContent409 .paneHead h2{font-size:12.5px}.settingsContent409 .paneNote{display:none}.settingsContent409 .settingsList.twoCol{grid-template-columns:1fr}.settingsContent409 .presetGrid{grid-template-columns:repeat(2,minmax(0,1fr))}.settingsContent409 .settingField{grid-template-columns:70px minmax(0,1fr);gap:2px 5px}.settingsContent409 input,.settingsContent409 textarea,.settingsContent409 select{min-height:27px;font-size:10px}.settingsContent409 textarea{min-height:39px}.settingsContent409 .checkRow{min-height:26px;font-size:9.5px}}
+@media(max-width:360px){.settingsContent409 .settingField{grid-template-columns:1fr}.settingsContent409 .presetGrid{grid-template-columns:1fr}.settingsContent409 .settingsList.twoCol{grid-template-columns:1fr}.settingsPill{font-size:9.6px;padding-left:7px;padding-right:7px}}
+

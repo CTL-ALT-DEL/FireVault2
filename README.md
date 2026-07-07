@@ -1,14 +1,14 @@
-# FireVault Build 0.40.8 — Settings Dock Layout Pass
+# FireVault Build 0.40.9 — Minimal Settings Pill Tabs
 
-This build continues the modular FireVault roadmap from 0.40.7.
+This build continues the modular FireVault roadmap from 0.40.8.
 
 ## Updated
 
-- Advanced visible build number to **0.40.8**.
-- Rebuilt Settings around a full-width dock layout instead of wasting space with a side-rail layout.
-- Compressed Settings submenu navigation into a horizontal section tray with smaller labels and cleaner alignment.
-- Reworked Settings fields into compact row-based label/input alignment where screen width allows.
-- Tightened Report, Email, Photo Overlay, Theme, Advanced, Backup, and About subpage spacing.
+- Advanced visible build number to **0.40.9**.
+- Removed the blank icon-box submenu design from the Settings page.
+- Replaced Settings submenu navigation with a modern minimalist horizontal pill-tab picker.
+- Made Settings section tabs text-first, sticky, horizontally scrollable, and easier to use on iPhone.
+- Tightened Settings subpage rows, labels, checkboxes, theme presets, Backup, and About formatting.
 - Kept release notes small, left justified, and easier to read on iPhone.
 - Kept the selected #8 Flame Icon logo and cache-busted app assets.
 - Preserved the modular storage key: `firevault_vault_build_030`.
@@ -20,4 +20,4 @@ Delete any old extracted folders named `firevault-build-*` from your local proje
 
 Suggested commit message:
 
-`Build 0.40.8 settings dock layout row compression`
+`Build 0.40.9 minimalist settings pill tabs`

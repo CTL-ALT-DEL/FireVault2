@@ -89,7 +89,7 @@ function home(){
       <button class="ghost tile" id="diagBtn"><strong>Diagnostics</strong><span>Build status</span></button>
     </div>
     ${activeJob ? `<div class="card activeJobMini"><div class="row"><div><h2>Service Call Active</h2><p>${esc(activeJob.siteName)} • <span id="jobElapsed">${elapsedText(activeJob.startedAt)}</span></p></div><button class="primary" id="resumeJobBtn">Open</button></div></div>` : ""}
-    <div class="card grow"><h2>Build 0.40.8</h2><p>Settings now uses a full-width dock layout with compact horizontal submenus and row-based fields to use small screens better.</p><p>Release notes and About information remain compact and left justified for field use.</p></div>
+    <div class="card grow"><h2>Build 0.40.9</h2><p>Settings now uses a minimalist pill-tab picker with no blank icon boxes and tighter subpage formatting.</p><p>Release notes and About information remain compact and left justified for field use.</p></div>
   </div>`);
   document.getElementById("sitesCard").onclick=()=>route("sites");
   document.getElementById("tasksCard").onclick=()=>{selectedSiteId=null; route("tasks");};
@@ -197,21 +197,19 @@ function jobMode(){ const s=site(); if(!s||!activeJob){route("siteDetail"); retu
 
 function settings(){
   const tabs=[
-    ["tech","Tech","ID","👤"],["reports","Report","Defaults","▤"],["email","Email","Tags","✉"],["overlay","Photo","Overlay","▧"],
-    ["themes","Theme","UI","◐"],["advanced","Advanced","Services","⚡"],["backup","Backup","Data","↥"],["about","About","Build","ⓘ"]
+    ["tech","Tech"],["reports","Report"],["email","Email"],["overlay","Photos"],
+    ["themes","Theme"],["advanced","Advanced"],["backup","Backup"],["about","About"]
   ];
   const active=tabs.find(t=>t[0]===settingsTab)||tabs[0];
-  html(`<div class="screen settingsScreen settingsScreen408">
-    <div class="settingsNanoBar settingsDockBar">
-      <div class="settingsNanoTitle"><img class="settingsMicroLogo" src="assets/icon-192.png?v=${BUILD}" alt="FireVault"><span>Settings</span><b>${active[1]}</b></div>
-      <button class="ghost iconBtn settingsInfoBtn" id="diagBtn" title="Diagnostics">ⓘ</button>
+  html(`<div class="screen settingsScreen settingsScreen409">
+    <div class="settingsMiniHead">
+      <div class="settingsMiniTitle"><h1>Settings</h1><p>${active[1]}</p></div>
+      <button class="ghost iconBtn settingsInfoBtn" id="diagBtn" title="Diagnostics" aria-label="Diagnostics">ⓘ</button>
     </div>
-    <div class="settingsLayout settingsLayout408 grow">
-      <div class="settingsRail settingsRail408" aria-label="Settings sections">${tabs.map(t=>`<button class="tabBtn ${settingsTab===t[0]?"active":""}" data-tab="${t[0]}" title="${t[1]} ${t[2]}"><span class="tabIcon">${t[3]}</span><span class="tabText"><strong>${t[1]}</strong><em>${t[2]}</em></span></button>`).join("")}</div>
-      <div class="settingsContent settingsContent408">${settingsPanel()}</div>
-    </div>
+    <div class="settingsPickerRail" aria-label="Settings sections">${tabs.map(t=>`<button class="settingsPill ${settingsTab===t[0]?"active":""}" data-tab="${t[0]}">${t[1]}</button>`).join("")}</div>
+    <div class="settingsContent settingsContent409 grow">${settingsPanel()}</div>
   </div>`);
-  document.querySelectorAll(".tabBtn").forEach(b=>b.onclick=()=>{settingsTab=b.dataset.tab; settings();});
+  document.querySelectorAll(".settingsPill").forEach(b=>b.onclick=()=>{settingsTab=b.dataset.tab; settings();});
   document.getElementById("diagBtn").onclick=()=>route("diagnostics");
   wireSettingsPanel();
 }
@@ -253,18 +251,18 @@ function saveSettings(){
 function diagnostics(){ const totalTasks=data.sites.reduce((n,s)=>n+(s.tasks||[]).length,0); const totalDef=data.sites.reduce((n,s)=>n+(s.deficiencies||[]).length,0); html(`<div class="screen"><div class="row"><button class="back ghost" id="backHome">←</button><h1>Diagnostics</h1></div><div class="card grow errorBox"><p>Build: ${BUILD}</p><p>Sites: ${data.sites.length}</p><p>Total Tasks: ${totalTasks}</p><p>Total Deficiencies: ${totalDef}</p><p>Active Job: ${activeJob ? esc(activeJob.siteName) : "None"}</p><p>Current Theme: ${esc(data.settings.theme.name)}</p><p>Accent: ${esc(data.settings.theme.accentColor)}</p><p>Advanced AI Enabled: ${data.settings.advanced?.aiTechnician ? "Yes" : "No"}</p><p>Import/Export: Ready</p><p>Storage key: ${KEY}</p><p>Modules loaded successfully.</p></div></div>`); document.getElementById("backHome").onclick=()=>route("home"); }
 function showChangelog(){
   const notes = [
-    "Build number advanced to 0.40.8 across the header, dashboard, manifest, and diagnostics.",
-    "Settings now uses a full-width dock layout instead of the older side-rail layout, which frees up more screen width.",
-    "Settings submenu buttons were compressed into a single horizontal section tray with smaller labels and better alignment.",
-    "Settings fields now use row-based label/input alignment where space allows, reducing vertical scrolling on small screens.",
-    "Report, Email, Photo, Theme, Advanced, Backup, and About panels received tighter card padding and more consistent left justification.",
+    "Build number advanced to 0.40.9 across the header, dashboard, manifest, and diagnostics.",
+    "Removed the blank icon-box submenu design from the Settings page.",
+    "Replaced Settings submenu navigation with a minimalist horizontal pill-tab picker.",
+    "Made Settings tabs text-first, sticky, horizontally scrollable, and easier to use on iPhone.",
+    "Tightened Settings subpage rows, labels, checkboxes, theme presets, Backup, and About formatting.",
     "Kept compact release notes formatting, the selected #8 Flame Icon logo, and the existing modular storage key."
   ];
   const overlay=document.createElement("div");
   overlay.className="releaseOverlay";
   overlay.innerHTML=`<div class="releaseSheet" role="dialog" aria-modal="true" aria-label="FireVault release notes">
     <div class="releaseHead"><div><strong>FireVault</strong><span>Build ${BUILD}</span></div><button class="ghost iconBtn" id="closeRelease" aria-label="Close release notes">×</button></div>
-    <div class="releaseBody"><h2>Release Notes</h2><p class="releaseIntro">Settings dock layout and tighter subpage formatting pass.</p><ul>${notes.map(n=>`<li>${esc(n)}</li>`).join("")}</ul></div>
+    <div class="releaseBody"><h2>Release Notes</h2><p class="releaseIntro">Minimalist Settings pill-tab picker and compact subpage cleanup.</p><ul>${notes.map(n=>`<li>${esc(n)}</li>`).join("")}</ul></div>
   </div>`;
   document.body.appendChild(overlay);
   const close=()=>overlay.remove();
