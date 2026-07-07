@@ -938,7 +938,7 @@ nav button:active{transform:translateY(1px) scale(.992)}
 .reportDeliveryEmpty{font-size:12px;color:var(--muted);padding:9px 10px;border:1px dashed rgba(255,255,255,.13);border-radius:13px;background:rgba(255,255,255,.025);}
 @media(max-width:560px){.reportActionGrid442{grid-template-columns:repeat(2,minmax(0,1fr));}.reportActionGrid442 #shareBtn{grid-column:1 / -1}.reportDeliveryHead{align-items:center}.reportDeliveryRow{grid-template-columns:1fr}.reportDeliveryRow time{justify-self:start}.reportReadyCard442 small{white-space:normal}}
 
-/* Build 0.44.6 Report delivery receipts and follow-up tasks */
+/* Build 0.44.7 Report delivery receipts and follow-up tasks */
 .reportDeliveryCard444 .reportDeliveryHead{align-items:flex-start;}
 .reportDeliveryHeadActions{display:flex;gap:7px;align-items:center;flex:0 0 auto;}
 .reportDeliveryReceiptBtn{width:100%;text-align:left;color:var(--text);font:inherit;cursor:pointer;}
@@ -946,7 +946,7 @@ nav button:active{transform:translateY(1px) scale(.992)}
 .reportDeliveryReceiptBtn:active{transform:translateY(1px);}
 @media(max-width:560px){.reportDeliveryCard444 .reportDeliveryHead{display:grid;grid-template-columns:1fr;gap:9px}.reportDeliveryHeadActions{display:grid;grid-template-columns:1fr 1fr;width:100%}.reportDeliveryHeadActions .smallBtn{width:100%}}
 
-/* Build 0.44.6 Visual Consistency Pass - professional field-tool surface system */
+/* Build 0.44.7 Visual Consistency Pass - professional field-tool surface system */
 :root{
   --fv445Top:#242d3d;
   --fv445Bottom:#121923;
@@ -1111,7 +1111,7 @@ nav button span:last-child{font-size:11.2px!important;font-weight:850;}
 }
 
 
-/* Build 0.44.6 Site Detail polish - professional customer vault command page */
+/* Build 0.44.7 Site Detail polish - professional customer vault command page */
 .siteDetailScreen446{gap:10px;}
 .siteTopBar{align-items:center;justify-content:space-between;margin-bottom:-2px;}
 .siteTopBar .back,.siteTopBar #editBtn{min-height:38px;border-radius:14px;padding:8px 13px;font-size:13px;font-weight:900;}
@@ -1163,4 +1163,51 @@ nav button span:last-child{font-size:11.2px!important;font-weight:850;}
   .siteActionGrid446 .tile strong{font-size:15px;}
   .siteActionGrid446 .tile span{font-size:10.5px;}
   .siteDetailScreen446 .mapActions{grid-template-columns:1fr;}
+}
+
+/* Build 0.44.7 Report Center polish and readability pass */
+.reportScreen447{gap:10px;}
+.reportScreen447 .reportTopRow{min-height:40px;gap:10px;}
+.reportScreen447 .reportTopRow .back{min-width:40px;min-height:40px;border-radius:14px;}
+.reportScreen447 .reportTopRow h1{font-size:22px;letter-spacing:-.025em;}
+.reportScreen447 .reportTopRow p{max-width:100%;font-size:12.8px;}
+.reportScreen447 .reportHero440{padding:11px!important;gap:8px!important;border-radius:18px!important;}
+.reportScreen447 .reportHero440 div{min-height:54px;border-radius:14px!important;align-content:center;}
+.reportScreen447 .reportHero440 strong{font-size:20px;}
+.reportScreen447 .reportHero440 span{font-size:10.3px;}
+.reportActionGrid447{display:grid!important;grid-template-columns:1.25fr 1.05fr 1fr!important;gap:9px!important;}
+.reportActionGrid447 button{min-height:44px!important;border-radius:15px!important;font-size:12.7px!important;padding:9px 10px!important;}
+.reportActionGrid447 #downloadBtn,.reportActionGrid447 #subjectBtn{grid-column:auto;}
+.reportReadyCard447{border-radius:17px!important;padding:12px 13px!important;}
+.reportReadyCard447 h2{font-size:15.7px!important;}
+.reportReadyCard447 p{font-size:12.8px!important;line-height:1.25;}
+.reportDeliveryCard447{border-radius:17px!important;padding:14px!important;}
+.reportDeliveryCard447 .reportDeliveryHead h2,.reportOptions447 .reportOptionsHead h2{font-size:15.8px!important;}
+.reportDeliveryCard447 .reportDeliveryHead p,.reportOptions447 .reportOptionsHead p{font-size:12.2px!important;line-height:1.34!important;}
+.reportDeliveryCard447 .reportDeliveryHeadActions .smallBtn{min-height:36px;border-radius:13px;font-size:12px;}
+.reportDeliveryCard447 .reportDeliveryRow{min-height:50px!important;border-radius:14px!important;padding:10px 11px!important;}
+.reportDeliveryCard447 .reportDeliveryRow strong{font-size:12.8px!important;}
+.reportDeliveryCard447 .reportDeliveryRow span,.reportDeliveryCard447 .reportDeliveryRow time{font-size:11.4px!important;}
+.reportOptions447{border-radius:17px!important;padding:14px!important;}
+.reportOptions447 .reportSectionGrid441{grid-template-columns:repeat(auto-fit,minmax(112px,1fr));gap:9px;}
+.reportOptions447 .reportSectionToggle{min-height:39px;border-radius:14px;font-size:12.2px;}
+.reportOptions447 .reportSectionToggle.on{outline:1px solid color-mix(in srgb,var(--accent) 22%, transparent);}
+.reportPreviewGrid447{gap:9px!important;}
+.reportPreviewGrid447 .reportPreviewCard440{border-radius:16px!important;min-height:98px;padding:12px!important;}
+.reportPreviewGrid447 .reportPreviewCard440>span{font-size:10.2px;}
+.reportPreviewGrid447 .reportPreviewCard440 h2{font-size:15.3px;}
+.reportPreviewGrid447 .reportPreviewCard440 p{font-size:11.7px;line-height:1.24;}
+.reportBox447{border-radius:17px!important;font-size:12px!important;line-height:1.42!important;padding:13px!important;}
+@media(max-width:620px){
+  .reportActionGrid447{grid-template-columns:repeat(2,minmax(0,1fr))!important;}
+  .reportActionGrid447 #shareBtn{grid-column:1 / -1;}
+  .reportActionGrid447 button{min-height:43px!important;}
+  .reportOptions447 .reportSectionGrid441{grid-template-columns:repeat(3,minmax(0,1fr));}
+}
+@media(max-width:380px){
+  .reportScreen447 .reportHero440{grid-template-columns:repeat(2,minmax(0,1fr));}
+  .reportOptions447 .reportSectionGrid441{grid-template-columns:repeat(2,minmax(0,1fr));}
+  .reportActionGrid447{grid-template-columns:1fr!important;}
+  .reportActionGrid447 #shareBtn{grid-column:auto;}
+  .reportBox447{font-size:11.5px!important;}
 }

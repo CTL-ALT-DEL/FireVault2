@@ -1,7 +1,7 @@
-# Clean Install - FireVault 0.44.6
+# Clean Install - FireVault 0.44.7
 
-1. Export a FireVault backup from the app before replacing files.
-2. Delete old extracted `firevault-build-*` folders from your local project root.
-3. Copy the contents of this ZIP into the project root.
+1. Export a FireVault backup from Settings before replacing files.
+2. Delete old extracted `firevault-build-*` folders from the project root.
+3. Copy the contents of this ZIP directly into the project root.
 4. Commit and deploy.
-5. If testing from an iPhone home-screen shortcut, delete and re-add the shortcut if old cached spacing/icons remain.
+5. Hard refresh the browser. On iPhone, delete and re-add the home-screen shortcut if the old PWA shell is cached.
