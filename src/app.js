@@ -297,7 +297,7 @@ function home(){
       <button class="ghost tile" id="diagBtn"><strong>Diagnostics</strong><span>Build status</span></button>
     </div>
     ${activeJob ? `<div class="card activeJobMini"><div class="row"><div><h2>Service Call Active</h2><p>${esc(activeJob.siteName)} • <span id="jobElapsed">${elapsedText(activeJob.startedAt)}</span></p></div><button class="primary" id="resumeJobBtn">Open</button></div></div>` : ""}
-    <div class="card grow"><h2>Build ${BUILD}</h2><p>Equipment Vault starter adds panel, communicator, power supply, and device tracking for each site.</p><p>Site reports now include saved equipment details for return visits.</p></div>
+    <div class="card grow"><h2>Build ${BUILD}</h2><p>Equipment Vault now has quick status actions for field checks.</p><p>Checked OK and Flag Issue update hardware records, create follow-up tasks when needed, and show in reports.</p></div>
   </div>`);
   document.getElementById("sitesCard").onclick=()=>route("sites");
   document.getElementById("tasksCard").onclick=()=>{selectedSiteId=null; route("tasks");};
@@ -379,16 +379,58 @@ function siteDetail(){
 }
 
 function equipmentTitle(e){ return [e.type,e.make,e.model].filter(Boolean).join(" • ") || "Equipment"; }
+function equipmentStatusClass(e){
+  const status=String(e?.status||"Active").toLowerCase();
+  if(status.includes("attention")) return "equipmentNeedsAttention";
+  if(status.includes("replaced")) return "equipmentReplaced";
+  if(status.includes("removed")) return "equipmentRemoved";
+  return "equipmentActive";
+}
+function equipmentMeta(e){
+  const parts=[];
+  if(e.location) parts.push(e.location);
+  if(e.serial) parts.push(`Serial ${e.serial}`);
+  if(e.date) parts.push(`Checked ${e.date}`);
+  return parts.join(" • ") || "No location or checked date entered";
+}
+function updateEquipmentStatus(eqId,status){
+  const s=site(); if(!s) return;
+  s.equipment=Array.isArray(s.equipment) ? s.equipment : [];
+  const e=s.equipment.find(x=>x.id===eqId);
+  if(!e) return;
+  e.status=status;
+  e.date=localDateString();
+  e.lastCheckedAt=new Date().toISOString();
+  if(status==="Needs Attention"){
+    s.tasks=Array.isArray(s.tasks) ? s.tasks : [];
+    const title=`Equipment attention: ${equipmentTitle(e)}`;
+    const exists=s.tasks.some(t=>(t.status||"Open")!=="Done" && t.title===title);
+    if(!exists){
+      s.tasks.unshift({id:uid(),title,status:"Open",due:"",notes:`Created from Equipment Vault on ${fmtDate()}.\n${equipmentMeta(e)}${e.notes?`\n\nEquipment notes: ${e.notes}`:""}`,source:"Equipment Vault",equipmentId:e.id,createdAt:new Date().toISOString()});
+    }
+    toast(exists ? "Equipment flagged. Open task already exists." : "Equipment flagged and task created.");
+  } else {
+    toast(status==="Active" ? "Equipment checked OK." : `Equipment marked ${status}.`);
+  }
+  save();
+  render();
+}
 function equipmentList(){
   const s=site(); if(!s){ route("sites"); return; }
   const equipment=Array.isArray(s.equipment) ? s.equipment : [];
+  const counts={
+    active:equipment.filter(e=>(e.status||"Active")==="Active").length,
+    attention:equipment.filter(e=>(e.status||"").includes("Attention")).length,
+    replaced:equipment.filter(e=>(e.status||"")==="Replaced").length
+  };
   html(`<div class="screen equipmentScreen"><div class="row"><button class="back ghost" id="backBtn">←</button><div><h1>Equipment Vault</h1><p>${esc(s.name||"Site")}</p></div><button class="primary" id="addEquipmentBtn">＋</button></div>
-    <div class="card equipmentHero"><h2>Site Equipment</h2><p>Track panel make/model, communicator, power supplies, and important hardware details for faster return visits.</p></div>
-    <div class="list grow equipmentList">${equipment.length?equipment.map(e=>`<button class="card equipmentItem" data-eq="${esc(e.id)}"><div class="row"><div><h2>${esc(equipmentTitle(e))}</h2><p>${esc(e.location||"No location entered")}</p></div><span class="pill">${esc(e.status||"Active")}</span></div>${e.serial?`<p>Serial: ${esc(e.serial)}</p>`:""}${e.notes?`<p>${esc(e.notes)}</p>`:""}</button>`).join(""):`<div class="empty">No equipment saved yet. Add the panel or communicator first.</div>`}</div>
+    <div class="card equipmentHero equipmentHero429"><h2>Site Equipment</h2><p>Quickly mark hardware checked, flag attention items, and create equipment follow-up tasks from the field.</p><div class="equipmentStats"><span><strong>${equipment.length}</strong>Total</span><span><strong>${counts.active}</strong>Active</span><span><strong>${counts.attention}</strong>Attention</span></div></div>
+    <div class="list grow equipmentList">${equipment.length?equipment.map(e=>`<div class="card equipmentItem equipmentItem429" data-eq="${esc(e.id)}"><div class="row equipmentItemTop"><div><h2>${esc(equipmentTitle(e))}</h2><p>${esc(equipmentMeta(e))}</p></div><span class="pill equipmentStatusPill ${equipmentStatusClass(e)}">${esc(e.status||"Active")}</span></div>${e.notes?`<p class="equipmentNotes">${esc(e.notes)}</p>`:""}<div class="equipmentQuickActions"><button class="ghost smallBtn eqQuickBtn eqOkBtn" data-eq="${esc(e.id)}" data-status="Active">Checked OK</button><button class="ghost smallBtn eqQuickBtn eqIssueBtn" data-eq="${esc(e.id)}" data-status="Needs Attention">Flag Issue</button><button class="ghost smallBtn eqQuickBtn eqReplacedBtn" data-eq="${esc(e.id)}" data-status="Replaced">Replaced</button></div></div>`).join(""):`<div class="empty">No equipment saved yet. Add the panel or communicator first.</div>`}</div>
   </div>`);
   document.getElementById("backBtn").onclick=()=>route("siteDetail");
   document.getElementById("addEquipmentBtn").onclick=()=>{mode=null; route("equipmentForm");};
   document.querySelectorAll(".equipmentItem").forEach(b=>b.onclick=()=>{mode=b.dataset.eq; route("equipmentForm");});
+  document.querySelectorAll(".eqQuickBtn").forEach(b=>b.onclick=e=>{e.stopPropagation(); updateEquipmentStatus(b.dataset.eq,b.dataset.status);});
 }
 function equipmentForm(){
   const s=site(); if(!s){ route("sites"); return; }
@@ -396,21 +438,25 @@ function equipmentForm(){
   const e=mode ? s.equipment.find(x=>x.id===mode) : {};
   const types=["Fire Alarm Panel","Communicator","Power Supply","NAC Extender","Annunciator","Smoke Detector","Pull Station","Notification Appliance","Other"];
   const statuses=["Active","Needs Attention","Replaced","Removed"];
+  const intervals=["None","Monthly","Quarterly","Semiannual","Annual","Two Year"];
   html(`<div class="screen"><div class="row"><button class="back ghost" id="backBtn">←</button><h1>${mode?"Edit":"Add"} Equipment</h1></div><div class="form grow">
     <div class="card equipmentFormCard"><div class="compactField"><div><label>Type</label><select id="eqType">${types.map(x=>`<option value="${esc(x)}" ${e.type===x?"selected":""}>${esc(x)}</option>`).join("")}</select></div><div><label>Status</label><select id="eqStatus">${statuses.map(x=>`<option value="${esc(x)}" ${((e.status||"Active")===x)?"selected":""}>${esc(x)}</option>`).join("")}</select></div></div>
     <label>Location</label><input id="eqLocation" value="${esc(e.location||"")}" placeholder="Panel room, riser room, lobby, etc.">
     <div class="compactField"><div><label>Make</label><input id="eqMake" value="${esc(e.make||"")}"></div><div><label>Model</label><input id="eqModel" value="${esc(e.model||"")}"></div></div>
     <div class="compactField"><div><label>Serial / ID</label><input id="eqSerial" value="${esc(e.serial||"")}"></div><div><label>Installed / Checked</label><input id="eqDate" type="date" value="${esc(e.date||"")}"></div></div>
+    <div class="compactField"><div><label>Service Interval</label><select id="eqInterval">${intervals.map(x=>`<option value="${esc(x)}" ${((e.interval||"None")===x)?"selected":""}>${esc(x)}</option>`).join("")}</select></div><div><label>Last Quick Check</label><input value="${esc(e.lastCheckedAt ? new Date(e.lastCheckedAt).toLocaleString([], {month:'short',day:'numeric',hour:'numeric',minute:'2-digit'}) : 'Not checked yet')}" disabled></div></div>
     <label>Notes</label><textarea id="eqNotes" placeholder="Battery date, account number, loop notes, quirks, access notes...">${esc(e.notes||"")}</textarea></div>
+    ${mode?`<div class="card equipmentActionPanel"><h2>Field Actions</h2><p>Quick actions update status, checked date, and create a follow-up task if attention is needed.</p><div class="equipmentQuickActions"><button class="ghost smallBtn eqFormStatus" data-status="Active">Checked OK</button><button class="ghost smallBtn eqFormStatus" data-status="Needs Attention">Flag Issue</button><button class="ghost smallBtn eqFormStatus" data-status="Replaced">Replaced</button></div></div>`:""}
     <button class="primary" id="saveEquipmentBtn">Save Equipment</button>${mode?`<button class="danger" id="deleteEquipmentBtn">Delete Equipment</button>`:""}
   </div></div>`);
   document.getElementById("backBtn").onclick=()=>route("equipmentList");
   document.getElementById("saveEquipmentBtn").onclick=()=>{
-    const obj={type:val("eqType"),status:val("eqStatus"),location:val("eqLocation"),make:val("eqMake"),model:val("eqModel"),serial:val("eqSerial"),date:val("eqDate"),notes:raw("eqNotes")};
+    const obj={type:val("eqType"),status:val("eqStatus"),location:val("eqLocation"),make:val("eqMake"),model:val("eqModel"),serial:val("eqSerial"),date:val("eqDate"),interval:val("eqInterval"),notes:raw("eqNotes")};
     if(mode && e){ Object.assign(e,obj); }
     else s.equipment.unshift({...obj,id:uid(),createdAt:new Date().toISOString()});
     save(); toast("Equipment saved."); route("equipmentList");
   };
+  document.querySelectorAll(".eqFormStatus").forEach(b=>b.onclick=e=>{e.preventDefault(); updateEquipmentStatus(mode,b.dataset.status);});
   const del=document.getElementById("deleteEquipmentBtn"); if(del) del.onclick=()=>{ if(confirm("Delete this equipment item?")){ s.equipment=s.equipment.filter(x=>x.id!==mode); save(); toast("Equipment deleted."); route("equipmentList"); } };
 }
 
@@ -516,6 +562,7 @@ function deficiencyForm(){
 function reportText(s){
   const set=data.settings, tech=set.technician||{};
   const visits=(s.visits||[]).slice(0,5).map(v=>visitReportBlock(v)).join("\n\n") || "No completed visits";
+  const equipment=(s.equipment||[]).map(e=>`- ${e.status||"Active"}: ${equipmentTitle(e)}${e.location?` @ ${e.location}`:""}${e.serial?` | Serial ${e.serial}`:""}${e.date?` | Checked ${e.date}`:""}${e.interval&&e.interval!=="None"?` | Interval ${e.interval}`:""}${e.notes?`\n  Notes: ${String(e.notes).replaceAll("\n","\n  ")}`:""}`).join("\n") || "No equipment saved";
   return `${set.reports.title}
 Generated: ${new Date().toLocaleString()}
 
@@ -534,6 +581,9 @@ ${tech.email||""}
 
 VISITS
 ${visits}
+
+EQUIPMENT
+${equipment}
 
 TASKS
 ${(s.tasks||[]).map(t=>`- ${t.status||"Open"}: ${t.title}${t.source?` [${t.source}]`:""}${t.due?` due ${t.due}`:""}`).join("\n")||"No tasks"}
@@ -717,16 +767,17 @@ function saveSettings(){
 function diagnostics(){ const taskRows=allTaskRows(); const taskCounts=taskFilterCounts(taskRows); const totalTasks=taskRows.length; const serviceTasks=taskRows.filter(r=>r.t.source==="Service Call").length; const totalDef=data.sites.reduce((n,s)=>n+(s.deficiencies||[]).length,0); const totalVisits=data.sites.reduce((n,s)=>n+(s.visits||[]).length,0); html(`<div class="screen"><div class="row"><button class="back ghost" id="backHome">←</button><h1>Diagnostics</h1></div><div class="card grow errorBox"><p>Build: ${BUILD}</p><p>Sites: ${data.sites.length}</p><p>Total Tasks: ${totalTasks}</p><p>Open Tasks: ${taskCounts.open}</p><p>Due Today: ${taskCounts.today}</p><p>Overdue Tasks: ${taskCounts.overdue}</p><p>Service Follow-Ups: ${serviceTasks}</p><p>Total Deficiencies: ${totalDef}</p><p>Total Visits: ${totalVisits}</p><p>Active Job: ${activeJob ? esc(activeJob.siteName) : "None"}</p><p>Current Theme: ${esc(data.settings.theme.name)}</p><p>Accent: ${esc(data.settings.theme.accentColor)}</p><p>Advanced AI Enabled: ${data.settings.advanced?.aiTechnician ? "Yes" : "No"}</p><p>GPS Tools: ${data.settings.gps?.enabled !== false ? "Enabled" : "Hidden"}</p><p>Nearby Radius: ${nearbyRadiusMiles()} mi</p><p>Haptics: ${data.settings.app?.haptics !== false ? "Enabled" : "Off"}</p><p>Import/Export: Ready</p><p>Storage key: ${KEY}</p><p>Modules loaded successfully.</p></div></div>`); document.getElementById("backHome").onclick=()=>route("home"); }
 function showChangelog(){
   const notes = [
-    "Added an Equipment Vault for each saved site.",
-    "Equipment records can track type, status, location, make, model, serial number, date, and notes.",
-    "Added an Equipment card on Site Detail plus a full Equipment list and editor.",
-    "Reports now include saved site equipment details while preserving the 0.42.4 Loading FireVault fix and 0.42.7 refined 3D controls."
+    "Added quick status actions inside Equipment Vault.",
+    "Checked OK updates status and saves today's checked date.",
+    "Flag Issue marks equipment Needs Attention and creates a follow-up task if one is not already open.",
+    "Equipment records now include service interval and last quick-check visibility.",
+    "Reports now include a complete equipment section with status, checked date, interval, serial, and notes."
   ];
   const overlay=document.createElement("div");
   overlay.className="releaseOverlay";
   overlay.innerHTML=`<div class="releaseSheet" role="dialog" aria-modal="true" aria-label="FireVault release notes">
     <div class="releaseHead"><div><strong>FireVault</strong><span>Build ${BUILD}</span></div><button class="ghost iconBtn" id="closeRelease" aria-label="Close release notes">×</button></div>
-    <div class="releaseBody"><h2>Release Notes</h2><p class="releaseIntro">equipment vault starter for site hardware tracking.</p><ul>${notes.map(n=>`<li>${esc(n)}</li>`).join("")}</ul></div>
+    <div class="releaseBody"><h2>Release Notes</h2><p class="releaseIntro">equipment quick actions and report equipment detail.</p><ul>${notes.map(n=>`<li>${esc(n)}</li>`).join("")}</ul></div>
   </div>`;
   document.body.appendChild(overlay);
   const close=()=>overlay.remove();

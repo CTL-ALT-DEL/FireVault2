@@ -1,8 +1,8 @@
-# FireVault Clean Install
+# Clean Install
 
-Build 0.42.8 is a clean-root package.
+Build 0.42.9 is a clean-root package.
 
-Copy these files into the repository root:
+The ZIP should contain only the FireVault app files:
 
 - index.html
 - manifest.json
@@ -12,6 +12,4 @@ Copy these files into the repository root:
 - CLEAN_INSTALL.md
 - .gitignore
 
-Do not copy the outer `firevault-build-*` folder into the repo. Replace the existing root files instead.
-
-Export a FireVault backup before deploying if the app already contains important local data.
+Delete older extracted `firevault-build-*` folders before copying this build into your repo.

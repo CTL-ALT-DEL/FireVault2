@@ -1,16 +1,15 @@
-# FireVault Build 0.42.8
+# FireVault Build 0.42.9
 
-Equipment Vault starter build for per-site hardware records.
+Equipment quick-actions build for the per-site Equipment Vault.
 
-## Updated
-- Advanced visible version to 0.42.8.
-- Added an Equipment Vault to each site.
-- Added equipment records for panel, communicator, power supply, NAC extender, annunciator, devices, and other hardware.
-- Equipment records track type, status, location, make, model, serial/ID, date, and notes.
-- Added Equipment access from Site Detail.
-- Added Equipment details to generated reports.
-- Preserved the 0.42.4 Loading FireVault emergency fix.
-- Preserved 0.42.7 refined 3D controls, GPS/Nearby Sites, Task Center, Visit Log, service follow-ups, haptics, and map tools.
+## Updates
+- Advanced visible version to 0.42.9.
+- Added quick Equipment Vault actions: Checked OK, Flag Issue, and Replaced.
+- Flag Issue marks the equipment Needs Attention and creates an Equipment Vault follow-up task when needed.
+- Added service interval and last quick-check visibility to equipment records.
+- Added equipment summary counters to the Equipment Vault screen.
+- Reports now include detailed equipment status, checked date, interval, serial, and notes.
+- Preserved the 0.42.4 Loading FireVault fix, refined 3D controls, GPS/Nearby Sites, Task Center, Visit Log, haptics, and map tools.
 
 ## Install
-Use the files in this package as the project root. Do not place this folder inside a previous FireVault build folder.
+Copy the contents of this ZIP into the GitHub Pages project root. Do not copy the folder itself into the repo.

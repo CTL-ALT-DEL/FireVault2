@@ -590,3 +590,33 @@ nav button:active{transform:translateY(1px) scale(.992)}
   .equipmentItem .row{display:grid;grid-template-columns:1fr;gap:7px}
   .equipmentItem .pill{justify-self:start}
 }
+
+/* Build 0.42.9 Equipment quick actions and report detail */
+.equipmentHero429{display:grid;gap:10px}
+.equipmentStats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:2px}
+.equipmentStats span{display:grid;gap:2px;min-height:44px;padding:8px 10px;border-radius:14px;background:linear-gradient(180deg,#1a2230,#101620);border:1px solid rgba(255,255,255,.08);box-shadow:inset 0 1px 0 rgba(255,255,255,.06),0 2px 0 #05070b,0 7px 12px rgba(0,0,0,.24)}
+.equipmentStats strong{font-size:18px;line-height:1;color:#fff}
+.equipmentStats span{font-size:11px;line-height:1.1;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;font-weight:850}
+.equipmentItem429{cursor:pointer}
+.equipmentItemTop{align-items:flex-start!important;gap:10px}
+.equipmentStatusPill{font-weight:950;text-transform:none;letter-spacing:.01em;border-color:rgba(255,255,255,.12)!important}
+.equipmentActive{background:rgba(34,197,94,.13)!important;color:#bbf7d0!important}
+.equipmentNeedsAttention{background:rgba(245,158,11,.16)!important;color:#fde68a!important}
+.equipmentReplaced{background:rgba(56,189,248,.14)!important;color:#bae6fd!important}
+.equipmentRemoved{background:rgba(148,163,184,.14)!important;color:#e2e8f0!important}
+.equipmentNotes{padding:8px 9px;border-radius:12px;background:rgba(0,0,0,.18);border:1px solid rgba(255,255,255,.055)}
+.equipmentQuickActions{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px;margin-top:2px}
+.equipmentQuickActions .smallBtn{min-height:36px;padding:7px 8px;font-size:12px;white-space:nowrap}
+.equipmentActionPanel{display:grid;gap:7px;padding:12px!important}
+.equipmentActionPanel h2{font-size:16px;margin:0}
+.equipmentActionPanel p{font-size:12.5px;color:var(--muted);margin:0;line-height:1.35}
+.eqIssueBtn,.equipmentActionPanel .eqFormStatus[data-status="Needs Attention"]{background:linear-gradient(180deg,#3b2d18,#181107)!important}
+.eqReplacedBtn,.equipmentActionPanel .eqFormStatus[data-status="Replaced"]{background:linear-gradient(180deg,#173140,#0d1820)!important}
+@media(max-width:430px){
+  .equipmentStats{grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}
+  .equipmentStats span{padding:7px 6px;min-height:41px;font-size:10.2px;text-align:center}
+  .equipmentStats strong{font-size:16px}
+  .equipmentQuickActions{grid-template-columns:1fr;gap:7px}
+  .equipmentQuickActions .smallBtn{width:100%;min-height:38px}
+  .equipmentStatusPill{justify-self:start}
+}
