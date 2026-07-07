@@ -1,17 +1,13 @@
-# FireVault Build 0.25.2 — Emergency Photo Repair
+# FireVault Build 0.25.3 — Image Viewer Hotfix
 
 Root-level package for GitHub Pages.
 
 ## Fixes
-- Repairs broken 0.25.1 app load failure
-- Rebuilt from last known-good 0.25.0
-- Fixes photo type field corruption
-- Save File returns to Docs / Photos
-- Delete button available
-- Photo overlay rebuilt safely
-- Saved images can be opened for viewing
-- CSV export retained
+- Saved photos now show a View Image button directly in Docs / Photos
+- Opens saved image full-size without entering Edit
+- Keeps Edit thumbnail preview
+- Keeps Delete and photo overlay fixes from 0.25.2
 
 Suggested commit:
 
-`Build 0.25.2 emergency photo repair`
+`Build 0.25.3 image viewer hotfix`
