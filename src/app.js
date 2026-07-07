@@ -1,4 +1,4 @@
-import { BUILD, loadData, saveData, ensureSite, fullAddress, esc, uid } from "./storage.js";
+import { BUILD, KEY, loadData, saveData, ensureSite, fullAddress, esc, uid } from "./storage.js";
 import { stampFireVaultPhoto } from "./photos.js";
 
 let data = loadData();
@@ -576,19 +576,17 @@ function exportJson(){
   const blob = new Blob([JSON.stringify(data,null,2)], {type:"application/json"});
   const a = document.createElement("a");
   a.href = URL.createObjectURL(blob);
-  a.download = "firevault-backup-build-0.32.0.json";
+  a.download = "firevault-backup-build-0.32.1.json";
   a.click();
 }
 
 function showChangelog(){
   alert(`FireVault Build ${BUILD}
 
-- Professional FireVault iPhone Home Screen icon
-- Apple touch icon and PWA manifest icons
-- Larger bottom navigation icons
-- Today header now shows day and full date
-- Sites / Visits / Open Tasks cards are tappable
-- Branding preview added in Settings → Backup`);
+- Diagnostics hotfix
+- Fixes missing storage key import
+- Diagnostics screen now opens correctly
+- Keeps all Build 0.32.0 branding and UI updates`);
 }
 
 render();

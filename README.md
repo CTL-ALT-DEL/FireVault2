@@ -1,15 +1,12 @@
-# FireVault Build 0.32.0 — UI Branding Pass
+# FireVault Build 0.32.1 — Diagnostics Hotfix
 
 Root-level package for GitHub Pages.
 
-## Changes
-- Professional FireVault iPhone Home Screen icon
-- Adds apple-touch-icon and manifest icons
-- Larger bottom navigation icons
-- Today header now shows day of week and full date
-- Sites / Visits / Open Tasks dashboard cards are tappable
-- Branding preview added in Settings → Backup
+## Fixes
+- Fixes Diagnostics screen error caused by missing storage key import
+- Diagnostics now opens correctly
+- Keeps all Build 0.32.0 branding and UI updates
 
 Suggested commit:
 
-`Build 0.32.0 ui branding pass`
+`Build 0.32.1 diagnostics hotfix`
