@@ -28,11 +28,11 @@ nav{min-height:var(--navH);position:fixed;bottom:0;left:0;right:0;display:grid;g
 nav button{background:transparent;border:0;color:var(--muted);display:flex;flex-direction:column;gap:4px;align-items:center;justify-content:center;padding:6px 3px;font-size:12px}nav button.active{background:rgba(239,68,68,.14);color:#fff}
 .issue{border-left:4px solid var(--amber)}.visit{border-left:4px solid var(--blue)}.equip{border-left:4px solid var(--green)}.accessLine{border-left:4px solid var(--purple)}.docLine{border-left:4px solid var(--cyan)}.redline{border-left:4px solid var(--red)}
 .jobBanner{background:linear-gradient(135deg,rgba(239,68,68,.25),rgba(56,189,248,.12));border-color:rgba(239,68,68,.35)}
-.quick{min-height:58px;text-align:center}.timer{font-size:31px;font-weight:950;letter-spacing:.03em}.eventTime{font-weight:900;color:#fff;margin-right:8px}
+.quick{min-height:58px;text-align:center}.timer{font-size:31px;font-weight:950;letter-spacing:.03em}.eventTime{font-weight:900;color:#fff;margin-right:8px}.thumb{width:100%;max-height:180px;object-fit:cover;border-radius:14px;border:1px solid rgba(255,255,255,.08);margin-top:8px}.photoBox{border:1px dashed var(--line);border-radius:14px;padding:10px;text-align:center}
 </style>
 </head>
 <body>
-<header><div class="brand"><div class="logo">🔥</div><div>FIREVAULT</div></div><button class="build" onclick="showChangelog()">Build 0.18.0</button></header>
+<header><div class="brand"><div class="logo">🔥</div><div>FIREVAULT</div></div><button class="build" onclick="showChangelog()">Build 0.19.0</button></header>
 <main id="app"></main>
 <nav>
 <button id="nav-home" onclick="go('home')"><span>🏠</span><span>Today</span></button>
@@ -41,7 +41,7 @@ nav button{background:transparent;border:0;color:var(--muted);display:flex;flex-
 <button id="nav-settings" onclick="go('settings')"><span>⚙️</span><span>Settings</span></button>
 </nav>
 <script>
-const BUILD="0.18.0"; const KEY="firevault_vault_build_030"; const ACTIVE="firevault_active_job_080";
+const BUILD="0.19.0"; const KEY="firevault_vault_build_030"; const ACTIVE="firevault_active_job_080";
 let data=load(), activeJob=loadActive(), view="home", selected=null, mode=null, timer=null;
 function load(){const raw=localStorage.getItem(KEY);if(raw){try{return JSON.parse(raw)}catch(e){}}return{sites:[],resources:[{m:"Fire-Lite",n:"Manual links, trouble notes, walk-test reminders."},{m:"Notifier",n:"Panel notes, programming reminders, common issues."},{m:"Silent Knight",n:"Model notes, NAC quirks, communicator references."},{m:"Edwards / EST",n:"EST3 / EST4 notes, mapping, node information."},{m:"Potter",n:"Programming notes, compatibility, field observations."}]}}
 function save(){localStorage.setItem(KEY,JSON.stringify(data))}function loadActive(){const raw=localStorage.getItem(ACTIVE);if(raw){try{return JSON.parse(raw)}catch(e){}}return null}function saveActive(){activeJob?localStorage.setItem(ACTIVE,JSON.stringify(activeJob)):localStorage.removeItem(ACTIVE)}
@@ -200,8 +200,14 @@ function access(){genericList("Access","contacts","accessForm","accessLine",c=>`
 function accessForm(){const s=ensureArrays(site());const c=mode?s.contacts.find(x=>x.id===mode):{};app(`<div class="screen"><div class="row"><button class="back ghost" onclick="view='access';render()">←</button><h1>${mode?"Edit Access":"Add Access"}</h1></div><div class="form grow"><select id="ctype">${["Site Contact","Maintenance","Monitoring Company","Knox Box","Lockbox","Gate Code","Key Location","Other"].map(t=>`<option ${c.type===t?"selected":""}>${t}</option>`).join("")}</select><input id="cname" value="${esc(c.name)}" placeholder="Name / Label"><input id="cphone" value="${esc(c.phone)}" placeholder="Phone / Code"><input id="cdetail" value="${esc(c.detail)}" placeholder="Detail"><textarea id="cnotes">${esc(c.notes)}</textarea></div><button class="primary" onclick="saveContact()">Save Access</button></div>`)}
 function saveContact(){const s=ensureArrays(site());const obj={type:val("ctype"),name:val("cname"),phone:val("cphone"),detail:val("cdetail"),notes:val("cnotes")};if(mode){let i=s.contacts.findIndex(x=>x.id===mode);s.contacts[i]={...s.contacts[i],...obj}}else{s.contacts.unshift({...obj,id:uid()})}save();mode=null;view="access";render()}
 function docs(){genericList("Docs / Photos","docs","docForm","docLine",d=>`${esc(d.title||"Untitled")}<p>${esc(d.type)}</p><span class='pill'>${esc(d.location||"No location")}</span>`)}
-function docForm(){const s=ensureArrays(site());const d=mode?s.docs.find(x=>x.id===mode):{};app(`<div class="screen"><div class="row"><button class="back ghost" onclick="view='docs';render()">←</button><h1>${mode?"Edit File":"Add File"}</h1></div><div class="form grow"><select id="dtype">${["Panel Photo","Trouble Screenshot","Riser Diagram","Map / Floor Plan","Battery Label","Inspection Report","Manual Link","Cloud File Link","Other"].map(t=>`<option ${d.type===t?"selected":""}>${t}</option>`).join("")}</select><input id="dtitle" value="${esc(d.title)}" placeholder="Title"><input id="dlocation" value="${esc(d.location)}" placeholder="Location"><input id="durl" value="${esc(d.url)}" placeholder="URL / Link"><textarea id="dnotes">${esc(d.notes)}</textarea></div><button class="primary" onclick="saveDoc()">Save File</button></div>`)}
-function saveDoc(){const s=ensureArrays(site());const obj={type:val("dtype"),title:val("dtitle"),location:val("dlocation"),url:val("durl"),notes:val("dnotes")};if(mode){let i=s.docs.findIndex(x=>x.id===mode);s.docs[i]={...s.docs[i],...obj}}else{s.docs.unshift({...obj,id:uid()})}save();mode=null;view="docs";render()}
+function docForm(){const s=ensureArrays(site());const d=mode?s.docs.find(x=>x.id===mode):{};app(`<div class="screen"><div class="row"><button class="back ghost" onclick="view='docs';render()">←</button><h1>${mode?"Edit File":"Add File"}</h1></div><div class="form grow"><select id="dtype">${["Panel Photo","Trouble Screenshot","Riser Diagram","Map / Floor Plan","Battery Label","Inspection Report","Manual Link","Cloud File Link","Other"].map(t=>`<option ${d.type===t?"selected":""}>${t}</option>`).join("")}</select><input id="dtitle" value="${esc(d.title)}" placeholder="Title"><input id="dlocation" value="${esc(d.location)}" placeholder="Location"><input id="durl" value="${esc(d.url)}" placeholder="URL / Link"><div class="photoBox"><label>Photo Upload</label><input id="dfile" type="file" accept="image/*" onchange="previewPhoto(event)"><p class="muted">Photos are stored locally in this browser backup.</p><img id="photoPreview" class="thumb" style="${d.imageData?'':'display:none'}" src="${esc(d.imageData||'')}"></div><textarea id="dnotes">${esc(d.notes)}</textarea></div><button class="primary" onclick="saveDoc()">Save File</button></div>`)}
+function previewPhoto(e){
+ const file=e.target.files[0]; if(!file)return;
+ const reader=new FileReader();
+ reader.onload=()=>{const img=document.getElementById("photoPreview");img.src=reader.result;img.style.display="block";img.dataset.imageData=reader.result};
+ reader.readAsDataURL(file);
+}
+function saveDoc(){const s=ensureArrays(site());const img=document.getElementById("photoPreview");const obj={type:val("dtype"),title:val("dtitle"),location:val("dlocation"),url:val("durl"),imageData:(img&&img.dataset.imageData)||((mode&&s.docs.find(x=>x.id===mode)||{}).imageData)||"",notes:val("dnotes")};if(mode){let i=s.docs.findIndex(x=>x.id===mode);s.docs[i]={...s.docs[i],...obj}}else{s.docs.unshift({...obj,id:uid()})}save();mode=null;view="docs";render()}
 function genericList(title,arr,formView,line,body){const s=ensureArrays(site());if(!s)return go("sites");app(`<div class="screen"><div class="row"><button class="back ghost" onclick="view='site';render()">←</button><h1>${title}</h1><button class="primary" onclick="mode=null;view='${formView}';render()">＋ Add</button></div><div class="list grow">${s[arr].length?s[arr].map(x=>`<div class="card ${line}"><div class="row"><h2>${body(x)}</h2><button class="ghost" onclick="mode='${x.id}';view='${formView}';render()">Edit</button></div><p>${esc(x.notes||"")}</p></div>`).join(""):`<div class="empty">No records yet.</div>`}</div></div>`)}
 
 
@@ -310,7 +316,7 @@ function buildReportText(s){
  if(s.contacts.length) s.contacts.forEach((c,n)=>lines.push(`${n+1}. ${c.type||""} - ${c.name||""} - ${c.phone||""} - ${c.detail||""} ${c.notes? "- "+c.notes:""}`)); else lines.push("None recorded.");
  lines.push(``);
  lines.push(`DOCS / PHOTOS (${s.docs.length}):`);
- if(s.docs.length) s.docs.forEach((d,n)=>lines.push(`${n+1}. ${d.type||""} - ${d.title||""} - ${d.location||""} ${d.url? "- "+d.url:""}`)); else lines.push("None recorded.");
+ if(s.docs.length) s.docs.forEach((d,n)=>lines.push(`${n+1}. ${d.type||""} - ${d.title||""} - ${d.location||""} ${d.imageData?"- Photo attached ":""}${d.url? "- "+d.url:""}`)); else lines.push("None recorded.");
  lines.push(``);
  lines.push(`LATEST VISIT:`);
  if(latestVisit) lines.push(`${latestVisit.date||""}\n${latestVisit.summary||""}`); else lines.push("No visit history recorded.");
@@ -483,16 +489,16 @@ function saveResource(){
 }
 
 function settings(){app(`<div class="screen"><h1>Settings</h1><div class="card"><h2>Backup</h2><p>Export before major changes.</p><button class="primary" onclick="exportData()">Export Backup</button><br><br><input type="file" accept="application/json" onchange="importData(event)"></div><div class="card"><h2>Reset</h2><button class="danger" onclick="resetData()">Clear Local Data</button></div></div>`)}
-function exportData(){let blob=new Blob([JSON.stringify(data,null,2)],{type:"application/json"});let a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="firevault-backup-build-0.18.0.json";a.click()}
+function exportData(){let blob=new Blob([JSON.stringify(data,null,2)],{type:"application/json"});let a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="firevault-backup-build-0.19.0.json";a.click()}
 function importData(e){let f=e.target.files[0];if(!f)return;let r=new FileReader();r.onload=()=>{try{data=JSON.parse(r.result);save();alert("Imported.");go("home")}catch(err){alert("Import failed.")}};r.readAsText(f)}
 function resetData(){if(confirm("Clear all local FireVault data?")){localStorage.removeItem(KEY);localStorage.removeItem(ACTIVE);data=load();activeJob=null;go("home")}}
 function showChangelog(){alert(`FireVault Build ${BUILD}
 
-- Panel Match Resources
-- Site vault now has Resources button
-- Automatically matches library resources by panel manufacturer/model
-- Shows matched resources first
-- Add/Edit resources from inside a site
+- Photo Uploads for Docs / Photos
+- Attach actual images to site records
+- Image preview before saving
+- Thumbnails in Docs / Photos list
+- Photos included in export backup as local image data
 - Preserves previous local data`)}
 render()
 </script>
