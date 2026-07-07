@@ -1,15 +1,16 @@
-# FireVault Build 0.35.0 — Reports Module
+# FireVault Build 0.36.0 — Import / Export Module
 
 Root-level package for GitHub Pages.
 
 ## Changes
-- Restores Site Reports in the modular app
-- Report button on site vault
-- Copy Report
-- Download TXT report
-- Uses Report Settings options
-- Includes technician, map link, tasks, deficiencies, docs, and visits
+- Bulk account import from pasted lines
+- JSON backup import
+- JSON backup export
+- Sites CSV export
+- Visits CSV export
+- Import button added to Sites screen
+- Backup tab updated
 
 Suggested commit:
 
-`Build 0.35.0 reports module`
+`Build 0.36.0 import export module`

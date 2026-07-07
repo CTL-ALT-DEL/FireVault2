@@ -68,7 +68,7 @@ function route(v){ view = v; mode = null; render(); }
 
 function render(){
   try{
-    const routes = {home, sites, siteDetail, siteForm, docs, docForm, imageViewer, library, resourceForm, jobMode, visits, visitDetail, tasks, taskForm, deficiencies, deficiencyForm, report, settings, diagnostics};
+    const routes = {home, sites, siteDetail, siteForm, docs, docForm, imageViewer, library, resourceForm, jobMode, visits, visitDetail, tasks, taskForm, deficiencies, deficiencyForm, report, importer, settings, diagnostics};
     (routes[view] || home)();
     if(view === "jobMode") startJobTimer(); else stopJobTimer();
     setActiveNav();
@@ -216,11 +216,12 @@ function scanNearbySites(){
 
 function sites(){
   html(`<div class="screen">
-    <div class="row"><div><h1>Sites</h1><p>Customer vaults.</p></div><button class="primary" id="addSite">＋ Add</button></div>
+    <div class="row"><div><h1>Sites</h1><p>Customer vaults.</p></div><div class="row"><button class="ghost" id="importSites">Import</button><button class="primary" id="addSite">＋ Add</button></div></div>
     <input id="siteSearch" placeholder="Search sites, city, panel, notes...">
     <div id="siteList" class="list grow"></div>
   </div>`);
   document.getElementById("addSite").onclick = () => { selectedSiteId=null; view="siteForm"; render(); };
+  document.getElementById("importSites").onclick = () => { view="importer"; render(); };
   document.getElementById("siteSearch").oninput = drawSiteList;
   drawSiteList();
 }
@@ -731,6 +732,110 @@ function deficiencyForm(){
 
 
 
+
+function csvEscape(v){
+  const s = String(v ?? "");
+  return `"${s.replace(/"/g,'""')}"`;
+}
+
+function downloadBlob(filename, content, type){
+  const blob = new Blob([content], {type});
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = filename;
+  a.click();
+}
+
+function exportSitesCSV(){
+  const headers = ["Name","Street","City","State","ZIP","Address","Panel Manufacturer","Panel Model","Latitude","Longitude","Visits","Tasks","Deficiencies","Docs"];
+  const rows = data.sites.map(s => {
+    ensureSite(s);
+    return [
+      s.name, s.street, s.city, s.state, s.zip, fullAddress(s), s.panelManufacturer, s.panelModel, s.lat, s.lng,
+      s.visits.length, s.tasks.length, s.deficiencies.length, s.docs.length
+    ].map(csvEscape).join(",");
+  });
+  downloadBlob("firevault-sites-export.csv", [headers.map(csvEscape).join(","), ...rows].join("\n"), "text/csv");
+}
+
+function exportVisitsCSV(){
+  const headers = ["Date","Site","Address","Started","Ended","Summary","Tags"];
+  const rows = [];
+  data.sites.forEach(s => {
+    ensureSite(s);
+    s.visits.forEach(v => rows.push([v.date, s.name, fullAddress(s), v.startedAt||"", v.endedAt||"", v.summary||"", (v.tags||[]).join("; ")]));
+  });
+  downloadBlob("firevault-visits-export.csv", [headers.map(csvEscape).join(","), ...rows.map(r=>r.map(csvEscape).join(","))].join("\n"), "text/csv");
+}
+
+function parseImportText(){
+  const raw = val("importText");
+  return raw.split(/\n+/).map(line => line.trim()).filter(Boolean).map(line => {
+    const parts = line.split(",").map(x => x.trim());
+    return {
+      id: uid(),
+      name: parts[0] || "Unnamed Site",
+      street: parts[1] || "",
+      city: parts[2] || "",
+      state: parts[3] || "",
+      zip: parts[4] || "",
+      address: parts[1] || "",
+      panelManufacturer: parts[5] || "",
+      panelModel: parts[6] || "",
+      notes: "Imported account",
+      createdAt: new Date().toISOString(),
+      visits:[], knownIssues:[], equipment:[], contacts:[], docs:[], deficiencies:[], tasks:[]
+    };
+  });
+}
+
+function importer(){
+  html(`<div class="screen">
+    <div class="row"><button class="back ghost" id="importBack">←</button><h1>Import Accounts</h1></div>
+    <div class="card">
+      <p>Paste one customer per line.</p>
+      <p class="smallNote">Format: Name, Street, City, State, ZIP, Manufacturer, Model</p>
+      <textarea id="importText" placeholder="ABC Apartments, 123 Main St, Casper, WY, 82601, Fire-Lite, ES-200X"></textarea>
+      <div class="grid2"><button class="ghost" id="previewImport">Preview</button><button class="primary" id="runImport">Import Sites</button></div>
+    </div>
+    <div id="importPreview" class="importPreview grow"></div>
+  </div>`);
+  document.getElementById("importBack").onclick = () => route("sites");
+  document.getElementById("previewImport").onclick = () => {
+    const rows = parseImportText();
+    document.getElementById("importPreview").innerHTML = rows.length ? rows.map(r => `<div class="card tight"><strong>${esc(r.name)}</strong><p>${esc([r.street,r.city,r.state,r.zip].filter(Boolean).join(", "))}</p><span class="pill">${esc(r.panelManufacturer||"Panel TBD")}</span></div>`).join("") : `<div class="empty">Paste accounts first.</div>`;
+  };
+  document.getElementById("runImport").onclick = () => {
+    const rows = parseImportText();
+    if(!rows.length){ alert("Paste account lines first."); return; }
+    if(!confirm("Import " + rows.length + " sites?")) return;
+    rows.reverse().forEach(r => data.sites.unshift(r));
+    save();
+    alert(rows.length + " sites imported.");
+    route("sites");
+  };
+}
+
+function importJsonFile(e){
+  const file = e.target.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = () => {
+    try{
+      const imported = JSON.parse(reader.result);
+      if(!confirm("Replace current FireVault data with imported backup? Export a backup first if unsure.")) return;
+      data = imported;
+      save();
+      alert("JSON backup imported.");
+      route("home");
+    }catch(err){
+      alert("Import failed: " + err.message);
+    }
+  };
+  reader.readAsText(file);
+}
+
+
 function buildSiteReport(s){
   ensureSite(s);
   const cfg = data.settings.reports || {};
@@ -1036,14 +1141,19 @@ function drawSettingsTab(){
     </div>
     <div class="card">
       <div class="sectionTitle"><h2>Backup / Export</h2><span class="pill">Important</span></div>
-      <p class="settingHint">Export JSON often. CSV export will be restored in an upcoming modular build.</p>
+      <p class="settingHint">Export JSON often. CSV files are useful for spreadsheets.</p>
       <button class="primary" id="exportJson">Export JSON Backup</button>
+      <div class="grid2"><button class="ghost" id="exportSitesCsv">Sites CSV</button><button class="ghost" id="exportVisitsCsv">Visits CSV</button></div>
+      <label>Import JSON Backup</label><input id="jsonImportFile" type="file" accept="application/json">
     </div>
     <div class="card">
       <h2>Reset</h2>
       <button class="danger" id="clearData">Clear Local Data</button>
     </div>`;
     document.getElementById("exportJson").onclick = exportJson;
+    document.getElementById("exportSitesCsv").onclick = exportSitesCSV;
+    document.getElementById("exportVisitsCsv").onclick = exportVisitsCSV;
+    document.getElementById("jsonImportFile").onchange = importJsonFile;
     document.getElementById("clearData").onclick = () => {
       if(confirm("Clear all FireVault local data?")){
         localStorage.removeItem("firevault_vault_build_030");
@@ -1082,27 +1192,24 @@ function saveSettingsFromVisibleTab(){
 }
 
 function diagnostics(){
-  html(`<div class="screen"><div class="row"><button class="back ghost" id="backHome">←</button><h1>Diagnostics</h1></div><div class="card grow errorBox"><p>Build: ${BUILD}</p><p>Sites: ${data.sites.length}</p><p>Sites with GPS: ${data.sites.filter(s=>s.lat&&s.lng).length}</p><p>Active Job: ${activeJob ? activeJob.siteName : "None"}</p><p>Total Tasks: ${data.sites.reduce((n,s)=>n+(s.tasks||[]).length,0)}</p><p>Total Deficiencies: ${data.sites.reduce((n,s)=>n+(s.deficiencies||[]).length,0)}</p><p>Report Title: ${esc(data.settings.reports.title)}</p><p>Storage key: ${KEY}</p><p>Modules loaded successfully.</p></div></div>`);
+  html(`<div class="screen"><div class="row"><button class="back ghost" id="backHome">←</button><h1>Diagnostics</h1></div><div class="card grow errorBox"><p>Build: ${BUILD}</p><p>Sites: ${data.sites.length}</p><p>Sites with GPS: ${data.sites.filter(s=>s.lat&&s.lng).length}</p><p>Active Job: ${activeJob ? activeJob.siteName : "None"}</p><p>Total Tasks: ${data.sites.reduce((n,s)=>n+(s.tasks||[]).length,0)}</p><p>Total Deficiencies: ${data.sites.reduce((n,s)=>n+(s.deficiencies||[]).length,0)}</p><p>Report Title: ${esc(data.settings.reports.title)}</p><p>Import/Export: Ready</p><p>Storage key: ${KEY}</p><p>Modules loaded successfully.</p></div></div>`);
   document.getElementById("backHome").onclick = () => route("home");
 }
 
 function exportJson(){
-  const blob = new Blob([JSON.stringify(data,null,2)], {type:"application/json"});
-  const a = document.createElement("a");
-  a.href = URL.createObjectURL(blob);
-  a.download = "firevault-backup-build-0.35.0.json";
-  a.click();
+  downloadBlob("firevault-backup-build-0.36.0.json", JSON.stringify(data,null,2), "application/json");
 }
 
 function showChangelog(){
   alert(`FireVault Build ${BUILD}
 
-- Reports module restored
-- Site Report button on site vault
-- Copy Report
-- Download TXT report
-- Uses Report Settings options
-- Includes technician, map link, tasks, deficiencies, docs, and visits`);
+- Import / Export module restored
+- Bulk account import from pasted lines
+- JSON backup import
+- JSON backup export
+- Sites CSV export
+- Visits CSV export
+- Import button added to Sites screen`);
 }
 
 render();

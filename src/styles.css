@@ -70,3 +70,6 @@ nav button span:last-child{font-size:12px}
 
 .reportBox{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;white-space:pre-wrap;min-height:100%;line-height:1.35}
 .reportActions{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+
+.importPreview{max-height:220px;overflow:auto}
+.smallNote{font-size:12px;color:var(--muted)}
