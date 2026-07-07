@@ -32,7 +32,7 @@ nav button{background:transparent;border:0;color:var(--muted);display:flex;flex-
 </style>
 </head>
 <body>
-<header><div class="brand"><div class="logo">🔥</div><div>FIREVAULT</div></div><button class="build" onclick="showChangelog()">Build 0.13.0</button></header>
+<header><div class="brand"><div class="logo">🔥</div><div>FIREVAULT</div></div><button class="build" onclick="showChangelog()">Build 0.14.0</button></header>
 <main id="app"></main>
 <nav>
 <button id="nav-home" onclick="go('home')"><span>🏠</span><span>Today</span></button>
@@ -41,7 +41,7 @@ nav button{background:transparent;border:0;color:var(--muted);display:flex;flex-
 <button id="nav-settings" onclick="go('settings')"><span>⚙️</span><span>Settings</span></button>
 </nav>
 <script>
-const BUILD="0.13.0"; const KEY="firevault_vault_build_030"; const ACTIVE="firevault_active_job_080";
+const BUILD="0.14.0"; const KEY="firevault_vault_build_030"; const ACTIVE="firevault_active_job_080";
 let data=load(), activeJob=loadActive(), view="home", selected=null, mode=null, timer=null;
 function load(){const raw=localStorage.getItem(KEY);if(raw){try{return JSON.parse(raw)}catch(e){}}return{sites:[],resources:[{m:"Fire-Lite",n:"Manual links, trouble notes, walk-test reminders."},{m:"Notifier",n:"Panel notes, programming reminders, common issues."},{m:"Silent Knight",n:"Model notes, NAC quirks, communicator references."},{m:"Edwards / EST",n:"EST3 / EST4 notes, mapping, node information."},{m:"Potter",n:"Programming notes, compatibility, field observations."}]}}
 function save(){localStorage.setItem(KEY,JSON.stringify(data))}function loadActive(){const raw=localStorage.getItem(ACTIVE);if(raw){try{return JSON.parse(raw)}catch(e){}}return null}function saveActive(){activeJob?localStorage.setItem(ACTIVE,JSON.stringify(activeJob)):localStorage.removeItem(ACTIVE)}
@@ -49,7 +49,7 @@ function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2
 function app(html){document.getElementById("app").innerHTML=html;active();if(view==="job")startTick();else stopTick()}function active(){document.querySelectorAll("nav button").forEach(b=>b.classList.remove("active"));let n=document.getElementById("nav-"+(["site","form","visits","issues","equipment","equipmentForm","access","accessForm","docs","docForm","job"].includes(view)?"sites":view));if(n)n.classList.add("active")}
 function go(v){view=v;mode=null;render()}function site(){return data.sites.find(s=>s.id===selected)}function siteById(id){return data.sites.find(s=>s.id===id)}
 function ensureArrays(s){if(!s)return s;s.visits=s.visits||[];s.knownIssues=s.knownIssues||[];s.equipment=s.equipment||[];s.contacts=s.contacts||[];s.docs=s.docs||[];return s}
-function render(){({home,sites,library,settings,site:siteDash,form,visits,issues,equipment,equipmentForm,access,accessForm,docs,docForm,job,importer,knowledge,report}[view]||home)()}function val(id){return document.getElementById(id).value.trim()}
+function render(){({home,sites,library,settings,site:siteDash,form,visits,issues,equipment,equipmentForm,access,accessForm,docs,docForm,job,importer,knowledge,report,timecard}[view]||home)()}function val(id){return document.getElementById(id).value.trim()}
 function fullAddress(s){
   const structured=[s.street,s.city,s.state,s.zip].filter(Boolean).join(", ");
   return structured || s.address || "No address entered";
@@ -75,7 +75,7 @@ function fmtTime(iso){return new Date(iso).toLocaleTimeString([], {hour:"2-digit
 function startTick(){stopTick();timer=setInterval(()=>{let e=document.getElementById("elapsed");if(e&&activeJob)e.textContent=elapsed(activeJob.startedAt)},1000)}function stopTick(){if(timer){clearInterval(timer);timer=null}}
 
 function home(){const visits=data.sites.flatMap(s=>(s.visits||[]).map(v=>({...v,site:s.name}))).sort((a,b)=>(b.date||"").localeCompare(a.date||""));const issueCount=data.sites.reduce((a,s)=>a+(s.knownIssues||[]).length,0);let jobHtml=activeJob?`<div class="card jobBanner"><div class="row"><div><h2>Service Call Active</h2><p>${esc(activeJob.siteName)} • <span id="elapsed">${elapsed(activeJob.startedAt)}</span></p></div><button class="primary" onclick="selected='${activeJob.siteId}';view='job';render()">Open</button></div></div>`:"";
-app(`<div class="screen"><div><h1>Today</h1><p>Fast service-call workflow for fire alarm technicians.</p></div>${jobHtml}<div class="grid3"><div class="card tile"><strong>${data.sites.length}</strong><span>Sites</span></div><div class="card tile"><strong>${issueCount}</strong><span>Issues</span></div><div class="card tile"><strong>${visits.length}</strong><span>Visits</span></div></div><div class="grid2"><button class="primary tile" onclick="checkNearby()"><strong>📍 Nearby Site</strong><span>Use GPS to match location</span></button><button class="ghost tile" onclick="newSite()"><strong>＋ Add Site</strong><span>Create customer vault</span></button></div><div class="grid2"><button class="ghost tile" onclick="view='knowledge';render()"><strong>🔎 Knowledge Search</strong><span>Search every site note</span></button><button class="ghost tile" onclick="go('library')"><strong>📚 Library</strong><span>Panel resources</span></button></div><div id="nearbyBox"></div><div class="card grow"><div class="row"><h2>Recent Visits</h2><button class="ghost" onclick="go('sites')">Open Sites</button></div><div class="list">${visits.length?visits.slice(0,4).map(v=>`<div class="card tight visit"><strong>${esc(v.site)}</strong><p>${esc(v.summary)}</p><span class="pill">${esc(v.date)}</span></div>`).join(""):`<div class="empty">No visits yet.</div>`}</div></div></div>`)}
+app(`<div class="screen"><div><h1>Today</h1><p>Fast service-call workflow for fire alarm technicians.</p></div>${jobHtml}<div class="grid3"><div class="card tile"><strong>${data.sites.length}</strong><span>Sites</span></div><div class="card tile"><strong>${issueCount}</strong><span>Issues</span></div><div class="card tile"><strong>${visits.length}</strong><span>Visits</span></div></div><div class="grid2"><button class="primary tile" onclick="checkNearby()"><strong>📍 Nearby Site</strong><span>Use GPS to match location</span></button><button class="ghost tile" onclick="newSite()"><strong>＋ Add Site</strong><span>Create customer vault</span></button></div><div class="grid2"><button class="ghost tile" onclick="view='knowledge';render()"><strong>🔎 Knowledge Search</strong><span>Search every site note</span></button><button class="ghost tile" onclick="view='timecard';render()"><strong>⏱ Timecard</strong><span>Daily work summary</span></button></div><div id="nearbyBox"></div><div class="card grow"><div class="row"><h2>Recent Visits</h2><button class="ghost" onclick="go('sites')">Open Sites</button></div><div class="list">${visits.length?visits.slice(0,4).map(v=>`<div class="card tight visit"><strong>${esc(v.site)}</strong><p>${esc(v.summary)}</p><span class="pill">${esc(v.date)}</span></div>`).join(""):`<div class="empty">No visits yet.</div>`}</div></div></div>`)}
 function checkNearby(){
  const box=document.getElementById("nearbyBox");
  if(box)box.innerHTML='<div class="card">Checking GPS...</div>';
@@ -120,6 +120,81 @@ function saveDoc(){const s=ensureArrays(site());const obj={type:val("dtype"),tit
 function genericList(title,arr,formView,line,body){const s=ensureArrays(site());if(!s)return go("sites");app(`<div class="screen"><div class="row"><button class="back ghost" onclick="view='site';render()">←</button><h1>${title}</h1><button class="primary" onclick="mode=null;view='${formView}';render()">＋ Add</button></div><div class="list grow">${s[arr].length?s[arr].map(x=>`<div class="card ${line}"><div class="row"><h2>${body(x)}</h2><button class="ghost" onclick="mode='${x.id}';view='${formView}';render()">Edit</button></div><p>${esc(x.notes||"")}</p></div>`).join(""):`<div class="empty">No records yet.</div>`}</div></div>`)}
 
 
+
+
+function allVisitsForDate(date){
+ let rows=[];
+ data.sites.forEach(s=>{
+   ensureArrays(s);
+   s.visits.forEach(v=>{
+     if((v.date||"")===date) rows.push({site:s, visit:v});
+   });
+ });
+ rows.sort((a,b)=>(a.visit.startedAt||a.visit.date||"").localeCompare(b.visit.startedAt||b.visit.date||""));
+ return rows;
+}
+function minutesBetween(a,b){
+ if(!a||!b)return null;
+ const m=Math.round((new Date(b).getTime()-new Date(a).getTime())/60000);
+ return isFinite(m)&&m>=0?m:null;
+}
+function timecardText(date){
+ const rows=allVisitsForDate(date);
+ const lines=[];
+ lines.push(`FIREVAULT DAILY TIMECARD SUMMARY`);
+ lines.push(`DATE: ${date}`);
+ lines.push(``);
+ if(!rows.length){lines.push("No visits recorded for this date.");return lines.join("\n")}
+ let total=0;
+ rows.forEach((r,n)=>{
+   const v=r.visit, s=r.site;
+   const mins=minutesBetween(v.startedAt,v.endedAt);
+   if(mins!==null) total+=mins;
+   lines.push(`${n+1}. ${s.name}`);
+   lines.push(`   Address: ${fullAddress(s)}`);
+   if(v.startedAt) lines.push(`   Arrived: ${fmtTime(v.startedAt)}`);
+   if(v.endedAt) lines.push(`   Departed: ${fmtTime(v.endedAt)}`);
+   if(mins!==null) lines.push(`   Time On Site: ${Math.floor(mins/60)}h ${mins%60}m`);
+   lines.push(`   Work: ${(v.summary||"").split("\\n")[0]}`);
+   lines.push(``);
+ });
+ if(total) lines.push(`TOTAL RECORDED SITE TIME: ${Math.floor(total/60)}h ${total%60}m`);
+ return lines.join("\n");
+}
+function timecard(){
+ const today=new Date().toISOString().slice(0,10);
+ app(`<div class="screen">
+  <div class="row"><button class="back ghost" onclick="go('home')">←</button><h1>Timecard</h1></div>
+  <div class="card">
+    <label>Date</label>
+    <input id="tcdate" type="date" value="${today}" onchange="refreshTimecard()">
+    <div class="grid2">
+      <button class="primary" onclick="copyTimecard()">Copy Summary</button>
+      <button class="ghost" onclick="downloadTimecard()">Download TXT</button>
+    </div>
+  </div>
+  <textarea id="timecardText" class="grow" style="min-height:0;white-space:pre-wrap"></textarea>
+ </div>`);
+ refreshTimecard();
+}
+function refreshTimecard(){
+ const d=val("tcdate");
+ const el=document.getElementById("timecardText");
+ if(el)el.value=timecardText(d);
+}
+function copyTimecard(){
+ const el=document.getElementById("timecardText");
+ el.select(); el.setSelectionRange(0,999999); document.execCommand("copy");
+ alert("Timecard summary copied.");
+}
+function downloadTimecard(){
+ const date=val("tcdate");
+ const blob=new Blob([document.getElementById("timecardText").value],{type:"text/plain"});
+ const a=document.createElement("a");
+ a.href=URL.createObjectURL(blob);
+ a.download=`firevault-timecard-${date}.txt`;
+ a.click();
+}
 
 function buildReportText(s){
  ensureArrays(s);
@@ -256,15 +331,16 @@ function runImport(){
 
 function library(){app(`<div class="screen"><h1>Library</h1><p>Manufacturer resources and cheat sheets.</p><div class="list grow">${data.resources.map(r=>`<div class="card"><h2>${esc(r.m)}</h2><p>${esc(r.n)}</p></div>`).join("")}</div></div>`)}
 function settings(){app(`<div class="screen"><h1>Settings</h1><div class="card"><h2>Backup</h2><p>Export before major changes.</p><button class="primary" onclick="exportData()">Export Backup</button><br><br><input type="file" accept="application/json" onchange="importData(event)"></div><div class="card"><h2>Reset</h2><button class="danger" onclick="resetData()">Clear Local Data</button></div></div>`)}
-function exportData(){let blob=new Blob([JSON.stringify(data,null,2)],{type:"application/json"});let a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="firevault-backup-build-0.13.0.json";a.click()}
+function exportData(){let blob=new Blob([JSON.stringify(data,null,2)],{type:"application/json"});let a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="firevault-backup-build-0.14.0.json";a.click()}
 function importData(e){let f=e.target.files[0];if(!f)return;let r=new FileReader();r.onload=()=>{try{data=JSON.parse(r.result);save();alert("Imported.");go("home")}catch(err){alert("Import failed.")}};r.readAsText(f)}
 function resetData(){if(confirm("Clear all local FireVault data?")){localStorage.removeItem(KEY);localStorage.removeItem(ACTIVE);data=load();activeJob=null;go("home")}}
 function showChangelog(){alert(`FireVault Build ${BUILD}
 
-- Site Report Generator
-- Creates copyable customer/site summary
-- Includes address, panel, GPS, notes, known issues, equipment, access, docs, and latest visit
-- Copy Report button
+- Daily Timecard Summary
+- Select a date and collect all visits for that day
+- Shows arrival/departure when Job Mode created the visit
+- Calculates recorded time on site
+- Copy summary button
 - Download TXT button
 - Preserves previous local data`)}
 render()

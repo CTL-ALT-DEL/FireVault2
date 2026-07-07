@@ -1,15 +1,16 @@
-# FireVault Build 0.13.0 — Service Report Generator
+# FireVault Build 0.14.0 — Daily Timecard Summary
 
 Root-level package for GitHub Pages.
 
 ## Changes
-- Site Report Generator
-- Copyable customer/site summary
-- Includes address, panel, GPS, notes, known issues, equipment, access, docs/photos, and latest visit
-- Copy Report button
+- Daily Timecard Summary screen
+- Select a date and collect all visits for that day
+- Shows arrival/departure when Job Mode created the visit
+- Calculates recorded time on site
+- Copy summary button
 - Download TXT button
 - Preserves previous local storage data
 
 Suggested commit:
 
-`Build 0.13.0 service report generator`
+`Build 0.14.0 daily timecard summary`
