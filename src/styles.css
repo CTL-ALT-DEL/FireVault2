@@ -356,3 +356,7 @@ nav button span:last-child{font-size:11.5px;line-height:1}
 @supports(height:100dvh){main{height:calc(100dvh - var(--headerH) - var(--navH))}}
 @media(max-width:430px){:root{--dockBase423:60px}.brandMark{width:36px;height:36px}.build{font-size:10.5px;padding:6px 8px}.gpsStatusBar{padding:9px 10px}.gpsStatusBar p{font-size:12px}.settingsScreen423 .settingsPill{font-size:13px;min-height:37px;padding:8px 13px}.settingsContent423 .compactPane{padding:12px}.settingsContent423 input,.settingsContent423 textarea,.settingsContent423 select{font-size:14px;min-height:41px}.settingsContent423 .checkRow{font-size:13px;min-height:41px}nav button{min-height:52px;max-height:56px}nav button span:first-child{font-size:22px}}
 @media(max-width:360px){.gpsStatusBar{display:grid;grid-template-columns:1fr;gap:7px}.gpsStatusBar p{white-space:normal}.gpsStatusBar .smallBtn{width:100%}.settingsContent423 .settingField{grid-template-columns:1fr}.settingsScreen423 .settingsPill{font-size:12.5px;padding:8px 12px}}
+
+/* Build 0.42.5 Bottom nav micro-lift */
+nav button{margin-bottom:4px}
+@media(max-width:430px){nav button{margin-bottom:5px}}

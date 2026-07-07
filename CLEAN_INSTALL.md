@@ -6,4 +6,4 @@
 4. Commit and push the changed files.
 5. After GitHub Pages deploys, hard-refresh the browser. On iPhone, remove and re-add the home-screen shortcut if cached PWA layout or icons appear stale.
 
-Build 0.42.4 is an emergency boot fix for the 0.42.3 Loading FireVault hang.
+Build 0.42.5 brings the bottom menu icons up slightly while keeping the 0.42.4 Loading FireVault fix intact.
