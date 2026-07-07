@@ -67,3 +67,6 @@ nav button span:last-child{font-size:12px}
 .statusDone .statusDot{background:var(--green)}
 .priorityCritical{color:#fecaca;font-weight:950}
 .priorityHigh{color:#fed7aa;font-weight:950}
+
+.reportBox{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;white-space:pre-wrap;min-height:100%;line-height:1.35}
+.reportActions{display:grid;grid-template-columns:1fr 1fr;gap:8px}

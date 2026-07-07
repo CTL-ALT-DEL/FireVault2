@@ -68,7 +68,7 @@ function route(v){ view = v; mode = null; render(); }
 
 function render(){
   try{
-    const routes = {home, sites, siteDetail, siteForm, docs, docForm, imageViewer, library, resourceForm, jobMode, visits, visitDetail, tasks, taskForm, deficiencies, deficiencyForm, settings, diagnostics};
+    const routes = {home, sites, siteDetail, siteForm, docs, docForm, imageViewer, library, resourceForm, jobMode, visits, visitDetail, tasks, taskForm, deficiencies, deficiencyForm, report, settings, diagnostics};
     (routes[view] || home)();
     if(view === "jobMode") startJobTimer(); else stopJobTimer();
     setActiveNav();
@@ -93,7 +93,7 @@ function showError(err){
 
 function setActiveNav(){
   document.querySelectorAll("nav button").forEach(b => b.classList.remove("active"));
-  const section = ["siteDetail","siteForm","docs","docForm","imageViewer","jobMode","visits","visitDetail","tasks","taskForm","deficiencies","deficiencyForm"].includes(view) ? "sites" : view;
+  const section = ["siteDetail","siteForm","docs","docForm","imageViewer","jobMode","visits","visitDetail","tasks","taskForm","deficiencies","deficiencyForm","report"].includes(view) ? "sites" : view;
   document.getElementById("nav-"+section)?.classList.add("active");
 }
 
@@ -254,7 +254,7 @@ function siteDetail(){
     </div>
     <div class="grid2">
       <button class="tile" id="defBtn"><strong>Deficiencies</strong><span>${s.deficiencies.length} items</span></button>
-      <button class="tile" id="addTaskBtn"><strong>＋ Task</strong><span>Follow-up item</span></button>
+      <button class="tile" id="reportBtn"><strong>Report</strong><span>Copy / download</span></button>
     </div>
     <div class="card ${s.lat&&s.lng?"gpsGood":"gpsWarn"}">
       <h2>Location</h2>
@@ -271,7 +271,7 @@ function siteDetail(){
   document.getElementById("visitsBtn").onclick = () => { view="visits"; render(); };
   document.getElementById("tasksBtn").onclick = () => { view="tasks"; render(); };
   document.getElementById("defBtn").onclick = () => { view="deficiencies"; render(); };
-  document.getElementById("addTaskBtn").onclick = () => { mode=null; view="taskForm"; render(); };
+  document.getElementById("reportBtn").onclick = () => { view="report"; render(); };
   document.getElementById("gpsBtn").onclick = () => { view="siteForm"; render(); };
   document.getElementById("appleMapBtn").onclick = () => openAppleMaps(s);
   document.getElementById("googleMapBtn").onclick = () => openGoogleMaps(s);
@@ -730,6 +730,116 @@ function deficiencyForm(){
 }
 
 
+
+function buildSiteReport(s){
+  ensureSite(s);
+  const cfg = data.settings.reports || {};
+  const tech = data.settings.technician || {};
+  const lines = [];
+  lines.push(cfg.title || "FireVault Service Report");
+  lines.push("");
+  if(cfg.includeTechnician !== false){
+    lines.push("TECHNICIAN");
+    lines.push("Name: " + (tech.name || ""));
+    if(tech.company) lines.push("Company: " + tech.company);
+    if(tech.phone) lines.push("Phone: " + tech.phone);
+    if(tech.email) lines.push("Email: " + tech.email);
+    if(tech.license) lines.push("License/Cert: " + tech.license);
+    lines.push("");
+  }
+
+  lines.push("SITE");
+  lines.push("Name: " + (s.name || ""));
+  lines.push("Address: " + fullAddress(s));
+  lines.push("Panel: " + [s.panelManufacturer, s.panelModel].filter(Boolean).join(" "));
+  if(s.facpLocation) lines.push("FACP Location: " + s.facpLocation);
+  if(s.monitoring) lines.push("Monitoring: " + s.monitoring);
+  lines.push("GPS: " + (s.lat && s.lng ? s.lat + ", " + s.lng : "Not set"));
+  if(cfg.includeMapLink !== false) lines.push("Map: https://maps.apple.com/?q=" + encodeURIComponent(s.lat&&s.lng ? s.lat+","+s.lng : fullAddress(s)));
+  lines.push("");
+
+  lines.push("SITE NOTES");
+  lines.push(s.notes || "No site notes recorded.");
+  lines.push("");
+
+  if(cfg.includeTasks !== false){
+    lines.push("FOLLOW-UP TASKS (" + s.tasks.length + ")");
+    if(s.tasks.length){
+      s.tasks.forEach((t,i)=>lines.push(`${i+1}. [${t.status||"Open"} / ${t.priority||"Normal"}] ${t.title||""}${t.due ? " - Due " + t.due : ""}${t.notes ? " - " + t.notes : ""}`));
+    }else lines.push("None recorded.");
+    lines.push("");
+  }
+
+  if(cfg.includeDeficiencies !== false){
+    lines.push("DEFICIENCIES (" + s.deficiencies.length + ")");
+    if(s.deficiencies.length){
+      s.deficiencies.forEach((d,i)=>lines.push(`${i+1}. [${d.status||"Open"} / ${d.severity||"Needs Review"}] ${d.description||""}${d.location ? " - " + d.location : ""}${d.recommendation ? " - " + d.recommendation : ""}`));
+    }else lines.push("None recorded.");
+    lines.push("");
+  }
+
+  lines.push("EQUIPMENT (" + s.equipment.length + ")");
+  if(s.equipment.length){
+    s.equipment.forEach((e,i)=>lines.push(`${i+1}. ${e.type||""} ${e.make||""} ${e.model||""} ${e.location ? "- " + e.location : ""}`));
+  }else lines.push("None recorded.");
+  lines.push("");
+
+  lines.push("DOCS / PHOTOS (" + s.docs.length + ")");
+  if(s.docs.length){
+    s.docs.forEach((d,i)=>lines.push(`${i+1}. ${d.type||"File"} - ${d.title||"Untitled"}${d.location ? " - " + d.location : ""}${d.imageData ? " - Photo attached" : ""}${d.url ? " - " + d.url : ""}`));
+  }else lines.push("None recorded.");
+  lines.push("");
+
+  lines.push("RECENT VISITS (" + s.visits.length + ")");
+  if(s.visits.length){
+    const limit = cfg.format === "summary" ? 3 : 10;
+    s.visits.slice(0,limit).forEach((v,i)=>{
+      lines.push(`${i+1}. ${v.date || ""} ${v.startedAt ? fmtTime(v.startedAt) : ""}`);
+      lines.push((v.summary || "").split("\\n").slice(0, cfg.format === "summary" ? 2 : 12).join("\\n"));
+      lines.push("");
+    });
+  }else lines.push("No visit history recorded.");
+
+  return lines.join("\\n");
+}
+
+function report(){
+  const s = getSite();
+  if(!s) return route("sites");
+  const text = buildSiteReport(s);
+  html(`<div class="screen">
+    <div class="row"><button class="back ghost" id="reportBack">←</button><h1>Site Report</h1></div>
+    <div class="card">
+      <h2>${esc(s.name || "Site")}</h2>
+      <p>Copy this report into a ticket, email, or service notes.</p>
+      <div class="reportActions"><button class="primary" id="copyReport">Copy Report</button><button class="ghost" id="downloadReport">Download TXT</button></div>
+    </div>
+    <textarea id="reportText" class="grow reportBox">${esc(text)}</textarea>
+  </div>`);
+  document.getElementById("reportBack").onclick = () => route("siteDetail");
+  document.getElementById("copyReport").onclick = copyReport;
+  document.getElementById("downloadReport").onclick = downloadReport;
+}
+
+function copyReport(){
+  const el = document.getElementById("reportText");
+  el.focus();
+  el.select();
+  el.setSelectionRange(0,999999);
+  document.execCommand("copy");
+  alert("Report copied.");
+}
+
+function downloadReport(){
+  const s = getSite();
+  const blob = new Blob([document.getElementById("reportText").value], {type:"text/plain"});
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "firevault-" + (s.name || "site").replace(/[^a-z0-9]+/gi,"-").toLowerCase() + "-report.txt";
+  a.click();
+}
+
+
 function library(){
   html(`<div class="screen">
     <div class="row"><div><h1>Library</h1><p>Manufacturer resources, panel notes, links, and cheat sheets.</p></div><button class="primary" id="addResource">＋ Add</button></div>
@@ -972,7 +1082,7 @@ function saveSettingsFromVisibleTab(){
 }
 
 function diagnostics(){
-  html(`<div class="screen"><div class="row"><button class="back ghost" id="backHome">←</button><h1>Diagnostics</h1></div><div class="card grow errorBox"><p>Build: ${BUILD}</p><p>Sites: ${data.sites.length}</p><p>Sites with GPS: ${data.sites.filter(s=>s.lat&&s.lng).length}</p><p>Active Job: ${activeJob ? activeJob.siteName : "None"}</p><p>Total Tasks: ${data.sites.reduce((n,s)=>n+(s.tasks||[]).length,0)}</p><p>Total Deficiencies: ${data.sites.reduce((n,s)=>n+(s.deficiencies||[]).length,0)}</p><p>Storage key: ${KEY}</p><p>Modules loaded successfully.</p></div></div>`);
+  html(`<div class="screen"><div class="row"><button class="back ghost" id="backHome">←</button><h1>Diagnostics</h1></div><div class="card grow errorBox"><p>Build: ${BUILD}</p><p>Sites: ${data.sites.length}</p><p>Sites with GPS: ${data.sites.filter(s=>s.lat&&s.lng).length}</p><p>Active Job: ${activeJob ? activeJob.siteName : "None"}</p><p>Total Tasks: ${data.sites.reduce((n,s)=>n+(s.tasks||[]).length,0)}</p><p>Total Deficiencies: ${data.sites.reduce((n,s)=>n+(s.deficiencies||[]).length,0)}</p><p>Report Title: ${esc(data.settings.reports.title)}</p><p>Storage key: ${KEY}</p><p>Modules loaded successfully.</p></div></div>`);
   document.getElementById("backHome").onclick = () => route("home");
 }
 
@@ -980,19 +1090,19 @@ function exportJson(){
   const blob = new Blob([JSON.stringify(data,null,2)], {type:"application/json"});
   const a = document.createElement("a");
   a.href = URL.createObjectURL(blob);
-  a.download = "firevault-backup-build-0.34.0.json";
+  a.download = "firevault-backup-build-0.35.0.json";
   a.click();
 }
 
 function showChangelog(){
   alert(`FireVault Build ${BUILD}
 
-- Tasks / Deficiencies module restored
-- Add/Edit/Delete tasks per site
-- Open Tasks dashboard shortcut works
-- Deficiency tracker restored
-- Optional task creation from new deficiencies
-- Diagnostics includes task/deficiency counts`);
+- Reports module restored
+- Site Report button on site vault
+- Copy Report
+- Download TXT report
+- Uses Report Settings options
+- Includes technician, map link, tasks, deficiencies, docs, and visits`);
 }
 
 render();
