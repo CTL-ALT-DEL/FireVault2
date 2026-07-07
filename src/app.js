@@ -1283,32 +1283,52 @@ function jobMode(){
   };
 }
 
-function settings(){
-  const tabs=[
-    ["tech","Tech"],["gps","GPS"],["reports","Report"],["email","Email"],
-    ["overlay","Photos"],["themes","Theme"],["advanced","Advanced"],["backup","Backup"],["about","About"]
+function settingsTabs(){
+  return [
+    ["tech","Technician","Name, company, phone, email, and license information used in reports."],
+    ["gps","GPS / Maps","Location capture, map provider, nearby radius, and GPS report visibility."],
+    ["reports","Reports","Default report title, format, and included report sections."],
+    ["email","Email","Default recipients, subject template, signature template, and tag tools."],
+    ["overlay","Photo Overlay","Photo stamp alignment, size, accent color, and logo visibility."],
+    ["themes","Theme","Theme presets, accent color, 3D controls, text size, and haptics."],
+    ["advanced","Advanced","Optional future modules marked with an asterisk when services are required."],
+    ["backup","Backup","Export, import, data safety snapshot, restore tools, and danger zone."],
+    ["about","About","Build information, storage key, and FireVault roadmap notes."]
   ];
+}
+
+function settings(){
+  const tabs=settingsTabs();
   const active=tabs.find(t=>t[0]===settingsTab)||tabs[0];
-  html(`<div class="screen settingsScreen settingsScreen409 settingsScreen423 settingsScreen448 settingsScreen449">
-    <div class="settingsMiniHead">
-      <div class="settingsMiniTitle"><h1>Settings</h1><p>${active[1]}</p></div>
-      <button class="ghost iconBtn settingsInfoBtn" id="diagBtn" title="Diagnostics" aria-label="Diagnostics">ⓘ</button>
-    </div>
-    <div class="settingsPickerRail" id="settingsPickerRail" aria-label="Settings sections">${tabs.map(t=>`<button class="settingsPill ${settingsTab===t[0]?"active":""}" data-tab="${t[0]}">${t[1]}</button>`).join("")}</div>
-    <div class="settingsContent settingsContent409 settingsContent423 settingsContent448 settingsContent449 grow">${settingsPanel()}</div>
-  </div>`);
-  const rail=document.getElementById("settingsPickerRail");
-  if(rail){
-    rail.scrollLeft=settingsRailScroll;
-    rail.addEventListener("scroll",()=>{ settingsRailScroll=rail.scrollLeft; }, {passive:true});
+  const inDetail = mode === "settingsDetail";
+  if(!inDetail){
+    html(`<div class="screen settingsHomeScreen settingsHomeScreen451">
+      <div class="settingsHomeHero451 card">
+        <div><h1>Settings</h1><p>Choose a settings area. Each option opens full screen with a Save button and a back arrow.</p></div>
+        <button class="ghost iconBtn settingsInfoBtn" id="diagBtn" title="Diagnostics" aria-label="Diagnostics">ⓘ</button>
+      </div>
+      <div class="settingsChoiceGrid451 grow" aria-label="Settings choices">
+        ${tabs.map((t,i)=>`<button class="settingsChoice451" data-tab="${t[0]}"><span class="settingsChoiceIcon451">${["👤","⌖","▤","✉","▧","◐","⚡","⇅","ⓘ"][i]}</span><strong>${t[1]}</strong><small>${t[2]}</small><b>Open →</b></button>`).join("")}
+        <button class="settingsChoice451 settingsChoiceUtility451" id="diagnosticsChoice"><span class="settingsChoiceIcon451">⌁</span><strong>Diagnostics</strong><small>Build, storage, GPS, module, task, report, and vault health details.</small><b>Open →</b></button>
+      </div>
+    </div>`);
+    document.querySelectorAll(".settingsChoice451[data-tab]").forEach(b=>b.onclick=()=>{ settingsTab=b.dataset.tab; mode="settingsDetail"; settings(); });
+    document.getElementById("diagBtn").onclick=()=>route("diagnostics");
+    document.getElementById("diagnosticsChoice").onclick=()=>route("diagnostics");
+    return;
   }
-  document.querySelectorAll(".settingsPill").forEach(b=>b.onclick=()=>{
-    const currentRail=document.getElementById("settingsPickerRail");
-    if(currentRail) settingsRailScroll=currentRail.scrollLeft;
-    settingsTab=b.dataset.tab;
-    settings();
-  });
-  document.getElementById("diagBtn").onclick=()=>route("diagnostics");
+  const saveable=!['backup','about'].includes(settingsTab);
+  html(`<div class="screen settingsDetailScreen451 settingsScreen settingsScreen448 settingsScreen449">
+    <div class="settingsDetailTop451">
+      <button class="ghost settingsBack451" id="settingsBackBtn">← Settings</button>
+      <div class="settingsDetailTitle451"><h1>${active[1]}</h1><p>${active[2]}</p></div>
+      ${saveable?`<button class="primary settingsTopSave451" id="saveSettingsTop">Save</button>`:`<button class="ghost settingsTopSave451" id="settingsDoneBtn">Choices</button>`}
+    </div>
+    <div class="settingsDetailBody451 grow settingsContent448 settingsContent449">${settingsPanel()}</div>
+  </div>`);
+  document.getElementById("settingsBackBtn").onclick=()=>{ mode=null; settings(); };
+  const done=document.getElementById("settingsDoneBtn"); if(done) done.onclick=()=>{ mode=null; settings(); };
+  const saveTop=document.getElementById("saveSettingsTop"); if(saveTop) saveTop.onclick=saveSettings;
   wireSettingsPanel();
 }
 function fieldBlock(label, inner, note=""){
@@ -1477,17 +1497,17 @@ function saveSettings(){
 function diagnostics(){ const taskRows=allTaskRows(); const taskCounts=taskFilterCounts(taskRows); const totalTasks=taskRows.length; const serviceTasks=taskRows.filter(r=>r.t.source==="Service Call").length; const totalDef=data.sites.reduce((n,s)=>n+(s.deficiencies||[]).length,0); const openDefTotal=data.sites.reduce((n,s)=>n+(s.deficiencies||[]).filter(d=>(d.status||"Open")!=="Closed").length,0); const closedDefTotal=data.sites.reduce((n,s)=>n+(s.deficiencies||[]).filter(d=>(d.status||"Open")==="Closed").length,0); const totalVisits=data.sites.reduce((n,s)=>n+(s.visits||[]).length,0); const totalContacts=data.sites.reduce((n,s)=>n+(s.contacts||[]).length,0); const totalDocs=data.sites.reduce((n,s)=>n+(s.docs||[]).length,0); const totalReportDeliveries=data.sites.reduce((n,s)=>n+(s.reportDeliveries||[]).length,0); const reportFollowUps=allTaskRows().filter(r=>r.t.source==="Report Delivery" && !taskIsDone(r.t)).length; const totalChecklist=data.sites.reduce((n,s)=>n+(s.checklist||[]).length,0); const checklistIssues=data.sites.reduce((n,s)=>n+(s.checklist||[]).filter(i=>i.status==="Issue").length,0); const completedInspections=data.sites.reduce((n,s)=>n+(s.visits||[]).filter(v=>v.type==="Inspection Checklist").length,0); const healthWarn=data.sites.filter(s=>siteHealth(s).cls==="healthWarn").length; const healthWatch=data.sites.filter(s=>siteHealth(s).cls==="healthWatch").length; const attentionTotal=attentionRows().length; html(`<div class="screen"><div class="row"><button class="back ghost" id="backHome">←</button><h1>Diagnostics</h1></div><div class="card grow errorBox"><p>Build: ${BUILD}</p><p>Sites: ${data.sites.length}</p><p>Total Tasks: ${totalTasks}</p><p>Open Tasks: ${taskCounts.open}</p><p>Due Today: ${taskCounts.today}</p><p>Overdue Tasks: ${taskCounts.overdue}</p><p>Service Follow-Ups: ${serviceTasks}</p><p>Total Deficiencies: ${totalDef}</p><p>Open Deficiencies: ${openDefTotal}</p><p>Closed Deficiencies: ${closedDefTotal}</p><p>Total Visits: ${totalVisits}</p><p>Total Contacts: ${totalContacts}</p><p>Total Documents: ${totalDocs}</p><p>Report Deliveries: ${totalReportDeliveries}</p><p>Report Follow-Ups: ${reportFollowUps}</p><p>Checklist Items: ${totalChecklist}</p><p>Checklist Issues: ${checklistIssues}</p><p>Completed Inspections: ${completedInspections}</p><p>Attention Sites: ${healthWarn}</p><p>Watch Sites: ${healthWatch}</p><p>Attention Queue: ${attentionTotal}</p><p>Active Job: ${activeJob ? esc(activeJob.siteName) : "None"}</p><p>Current Theme: ${esc(data.settings.theme.name)}</p><p>Accent: ${esc(data.settings.theme.accentColor)}</p><p>Advanced AI Enabled: ${data.settings.advanced?.aiTechnician ? "Yes" : "No"}</p><p>GPS Tools: ${data.settings.gps?.enabled !== false ? "Enabled" : "Hidden"}</p><p>Nearby Radius: ${nearbyRadiusMiles()} mi</p><p>Haptics: ${data.settings.app?.haptics !== false ? "Enabled" : "Off"}</p><p>Import/Export: Ready</p><p>Storage key: ${KEY}</p><p>Modules loaded successfully.</p></div></div>`); document.getElementById("backHome").onclick=()=>route("home"); }
 function showChangelog(){
   const notes = [
-    "Created a 0.45.0 stability checkpoint instead of adding another large module.",
-    "Added a compact dashboard Stability Check card with sites, visits, GPS-saved count, and last-export visibility.",
-    "Kept the dashboard focused on field actions while making backup status easier to see.",
-    "Tightened the dashboard hero spacing and build badge presentation.",
+    "Redesigned Settings into a main choices page instead of cramped top tabs.",
+    "Each settings area now opens full screen with a back arrow to Settings choices.",
+    "Added a top Save button for editable settings pages.",
+    "Kept Backup and About as full-screen utility pages with return navigation.",
     "Preserved the Loading FireVault boot watchdog and all current vault modules."
   ];
   const overlay=document.createElement("div");
   overlay.className="releaseOverlay";
   overlay.innerHTML=`<div class="releaseSheet" role="dialog" aria-modal="true" aria-label="FireVault release notes">
     <div class="releaseHead"><div><strong>FireVault</strong><span>Build ${BUILD}</span></div><button class="ghost iconBtn" id="closeRelease" aria-label="Close release notes">×</button></div>
-    <div class="releaseBody"><h2>Release Notes</h2><p class="releaseIntro">stability checkpoint and dashboard status polish.</p><ul>${notes.map(n=>`<li>${esc(n)}</li>`).join("")}</ul></div>
+    <div class="releaseBody"><h2>Release Notes</h2><p class="releaseIntro">settings full-screen redesign and navigation polish.</p><ul>${notes.map(n=>`<li>${esc(n)}</li>`).join("")}</ul></div>
   </div>`;
   document.body.appendChild(overlay);
   const close=()=>overlay.remove();
