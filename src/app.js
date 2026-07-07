@@ -559,7 +559,7 @@ function home(){
   const dataHealth = data.sites.length ? "Vault Ready" : "Add First Site";
   const now = new Date();
   html(`<div class="screen homeScreen450">
-    <div class="homeHero450"><div><div class="todayDay"><h1>${now.toLocaleDateString([], {weekday:"long"})}</h1></div><p>${fmtDate(now)} • Modular field dashboard</p></div><span class="pill homeBuildPill450">Build ${BUILD}</span></div>
+    <div class="homeHero450"><div><div class="todayDay"><h1>${now.toLocaleDateString([], {weekday:"long"})}</h1></div><p>${fmtDate(now)} • Modular field dashboard</p></div></div>
     <div class="grid3">
       <div class="card tile metricCard" id="sitesCard"><strong>${data.sites.length}</strong><span>Sites</span></div>
       <div class="card tile metricCard taskMetricCard" id="tasksCard"><strong>${openTasks}</strong><span>${taskCounts.overdue ? `${taskCounts.overdue} overdue` : taskCounts.today ? `${taskCounts.today} due today` : "Open Tasks"}</span></div>
@@ -1308,8 +1308,8 @@ function settings(){
         <button class="ghost iconBtn settingsInfoBtn" id="diagBtn" title="Diagnostics" aria-label="Diagnostics">ⓘ</button>
       </div>
       <div class="settingsChoiceGrid451 grow" aria-label="Settings choices">
-        ${tabs.map((t,i)=>`<button class="settingsChoice451" data-tab="${t[0]}"><span class="settingsChoiceIcon451">${["👤","⌖","▤","✉","▧","◐","⚡","⇅","ⓘ"][i]}</span><span class="settingsChoiceText451"><strong>${t[1]}</strong><small>${t[2]}</small></span><span class="settingsChoiceArrow451" aria-hidden="true">›</span></button>`).join("")}
-        <button class="settingsChoice451 settingsChoiceUtility451" id="diagnosticsChoice"><span class="settingsChoiceIcon451">⌁</span><span class="settingsChoiceText451"><strong>Diagnostics</strong><small>Build, storage, GPS, module, task, report, and vault health details.</small></span><span class="settingsChoiceArrow451" aria-hidden="true">›</span></button>
+        ${tabs.map((t,i)=>`<button class="settingsChoice451" data-tab="${t[0]}"><span class="settingsChoiceIcon451">${["👤","⌖","▤","✉","▧","◐","⚡","⇅","ⓘ"][i]}</span><strong>${t[1]}</strong><small>${t[2]}</small><b>Open →</b></button>`).join("")}
+        <button class="settingsChoice451 settingsChoiceUtility451" id="diagnosticsChoice"><span class="settingsChoiceIcon451">⌁</span><strong>Diagnostics</strong><small>Build, storage, GPS, module, task, report, and vault health details.</small><b>Open →</b></button>
       </div>
     </div>`);
     document.querySelectorAll(".settingsChoice451[data-tab]").forEach(b=>b.onclick=()=>{ settingsTab=b.dataset.tab; mode="settingsDetail"; settings(); });

@@ -1,7 +1,19 @@
-# Clean Install Notes — FireVault Build 0.45.3
+# Clean Install Notes — FireVault Build 0.45.1
 
-This ZIP is a clean-root package. Copy the contents into the repository root that contains `index.html`, `manifest.json`, `src/`, and `assets/`.
+Use this ZIP as a clean root package. Do not copy the outer `firevault-build-*` folder into your repository.
 
-Do not place this folder inside another FireVault build folder.
+## Expected root files
 
-After deployment, hard-refresh the browser. On iPhone home-screen installs, delete and re-add the shortcut if old cached PWA styling remains.
+```text
+index.html
+manifest.json
+src/
+assets/
+README.md
+CLEAN_INSTALL.md
+.gitignore
+```
+
+## Install reminder
+
+Copy the contents of this ZIP into the GitHub Pages project root, replacing the old files. The app still uses the existing FireVault local storage key, so existing browser data should remain compatible.

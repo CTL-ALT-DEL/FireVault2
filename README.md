@@ -1,20 +1,18 @@
-# FireVault Build 0.45.3
+# FireVault Build 0.45.4
 
-Build 0.45.3 is a Settings detail-header and color-contrast polish build. It keeps the full-screen Settings workflow and fixes the submenu Save button placement so Save stays on the far right instead of stacking under the return arrow.
+Build 0.45.4 is a dashboard layout polish build. It removes the duplicate in-page build / revision pill from the home screen and improves page spacing so dashboard content stays visible above the bottom menu area.
 
-## Updated
+## What changed
 
-- Visible app version advanced to 0.45.3.
-- Moved the Settings submenu Save button to the far right of the top header.
-- Kept the Settings return arrow on the far left.
-- Prevented the Save button from wrapping underneath the return button on narrow iPhone screens.
-- Improved Settings header contrast, button contrast, card depth, and text readability.
-- Optimized Settings color balance with darker panels, brighter labels, cleaner neutral surfaces, and stronger accent treatment only where it helps.
-- Preserved the full-screen Settings detail workflow from 0.45.1 and choice-card cleanup from 0.45.3.
-- Preserved Backup Center, Report Center, Site Detail polish, Attention Queue, Deficiency Center, GPS/Nearby, haptics, refined 3D controls, and the Loading FireVault boot watchdog.
+- Visible app version advanced to 0.45.4.
+- Removed the duplicate dashboard build / revision pill under the date header.
+- Kept the main build / revision button in the top header.
+- Improved home-screen vertical layout so content does not get hidden behind the bottom menu bar.
+- Added extra safe bottom spacing and internal scrolling for the dashboard when content runs tall on iPhone screens.
+- Preserved the improved full-screen Settings workflow and recent color / contrast polish.
 
-## Suggested commit message
+Suggested commit message:
 
 ```text
-Build 0.45.3 settings header save alignment and contrast polish
+Build 0.45.4 dashboard duplicate build pill removal and bottom spacing fix
 ```
