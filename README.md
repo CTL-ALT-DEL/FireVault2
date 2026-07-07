@@ -1,21 +1,15 @@
-# FireVault Build 0.44.1
+# FireVault Build 0.44.2
 
-Build 0.44.1 adds a professional per-site Report Center with a cleaner preview, health summary, share/copy/download actions, and one-tap email subject copying.
+Build 0.44.2 adds Report Delivery Tools to the per-site Report Center.
 
 ## Clean install reminder
 Copy the contents of this ZIP into the GitHub Pages project root. Do not commit nested `firevault-build-*` folders.
 
 ## Build notes
-- Visible app version advanced to 0.44.1.
-- Added a Report Center screen with health, open task, deficiency, and equipment issue counters.
-- Added report preview cards for Site, Service, Equipment, and Checklist sections.
-- Added Share / Copy, Copy TXT, Download, and Copy Subject actions.
-- Preserves Deficiency Center filters, Inspection Checklist completion, Visit History, Site Health, Attention Queue, Equipment, Contacts, Documents, GPS/Nearby, haptics, refined 3D controls, and the Loading FireVault boot watchdog.
-
-
-## Build 0.44.1
-
-- Added Report Package section toggles to the Report Center.
-- Share, copy, and download now honor the active report package selection.
-- Report package choices persist locally and can be reset from the report screen.
-- Preserved the 0.44.0 Professional Report Center and earlier field modules.
+- Visible app version advanced to 0.44.2.
+- Added an **Email Draft** action in Report Center.
+- Email Draft uses saved Email Settings for default recipient, CC, subject template, and the active report package body.
+- Added a per-site **Delivery Log** for report share/copy/download/email actions.
+- Added **Log Sent** for reports delivered outside the app.
+- Diagnostics now counts saved report delivery events.
+- Preserves Report Package Builder, Professional Report Center, Deficiency Center, Inspection Checklist completion, Site Health, Attention Queue, Equipment, Contacts, Documents, GPS/Nearby, haptics, refined 3D controls, and the Loading FireVault boot watchdog.
