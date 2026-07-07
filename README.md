@@ -1,16 +1,14 @@
-# FireVault Build 0.14.0 — Daily Timecard Summary
+# FireVault Build 0.15.0 — Quick Note Templates
 
 Root-level package for GitHub Pages.
 
 ## Changes
-- Daily Timecard Summary screen
-- Select a date and collect all visits for that day
-- Shows arrival/departure when Job Mode created the visit
-- Calculates recorded time on site
-- Copy summary button
-- Download TXT button
+- Quick Note Templates in Job Mode
+- Templates: Ground Fault, NAC Trouble, Battery, Communicator, Device Replaced, System Tested, Deficiency Found, Water Damage
+- Template events are timestamped into the live service timeline
+- Template tags carry into visit history
 - Preserves previous local storage data
 
 Suggested commit:
 
-`Build 0.14.0 daily timecard summary`
+`Build 0.15.0 quick note templates`
