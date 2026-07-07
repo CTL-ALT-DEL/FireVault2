@@ -32,7 +32,7 @@ nav button{background:transparent;border:0;color:var(--muted);display:flex;flex-
 </style>
 </head>
 <body>
-<header><div class="brand"><div class="logo">🔥</div><div>FIREVAULT</div></div><button class="build" onclick="showChangelog()">Build 0.16.0</button></header>
+<header><div class="brand"><div class="logo">🔥</div><div>FIREVAULT</div></div><button class="build" onclick="showChangelog()">Build 0.17.0</button></header>
 <main id="app"></main>
 <nav>
 <button id="nav-home" onclick="go('home')"><span>🏠</span><span>Today</span></button>
@@ -41,7 +41,7 @@ nav button{background:transparent;border:0;color:var(--muted);display:flex;flex-
 <button id="nav-settings" onclick="go('settings')"><span>⚙️</span><span>Settings</span></button>
 </nav>
 <script>
-const BUILD="0.16.0"; const KEY="firevault_vault_build_030"; const ACTIVE="firevault_active_job_080";
+const BUILD="0.17.0"; const KEY="firevault_vault_build_030"; const ACTIVE="firevault_active_job_080";
 let data=load(), activeJob=loadActive(), view="home", selected=null, mode=null, timer=null;
 function load(){const raw=localStorage.getItem(KEY);if(raw){try{return JSON.parse(raw)}catch(e){}}return{sites:[],resources:[{m:"Fire-Lite",n:"Manual links, trouble notes, walk-test reminders."},{m:"Notifier",n:"Panel notes, programming reminders, common issues."},{m:"Silent Knight",n:"Model notes, NAC quirks, communicator references."},{m:"Edwards / EST",n:"EST3 / EST4 notes, mapping, node information."},{m:"Potter",n:"Programming notes, compatibility, field observations."}]}}
 function save(){localStorage.setItem(KEY,JSON.stringify(data))}function loadActive(){const raw=localStorage.getItem(ACTIVE);if(raw){try{return JSON.parse(raw)}catch(e){}}return null}function saveActive(){activeJob?localStorage.setItem(ACTIVE,JSON.stringify(activeJob)):localStorage.removeItem(ACTIVE)}
@@ -49,7 +49,7 @@ function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2
 function app(html){document.getElementById("app").innerHTML=html;active();if(view==="job")startTick();else stopTick()}function active(){document.querySelectorAll("nav button").forEach(b=>b.classList.remove("active"));let n=document.getElementById("nav-"+(["site","form","visits","issues","equipment","equipmentForm","access","accessForm","docs","docForm","job"].includes(view)?"sites":view));if(n)n.classList.add("active")}
 function go(v){view=v;mode=null;render()}function site(){return data.sites.find(s=>s.id===selected)}function siteById(id){return data.sites.find(s=>s.id===id)}
 function ensureArrays(s){if(!s)return s;s.visits=s.visits||[];s.knownIssues=s.knownIssues||[];s.equipment=s.equipment||[];s.contacts=s.contacts||[];s.docs=s.docs||[];s.deficiencies=s.deficiencies||[];return s}
-function render(){({home,sites,library,settings,site:siteDash,form,visits,issues,equipment,equipmentForm,access,accessForm,docs,docForm,job,importer,knowledge,report,timecard,templates,deficiencies,deficiencyForm}[view]||home)()}function val(id){return document.getElementById(id).value.trim()}
+function render(){({home,sites,library,settings,site:siteDash,form,visits,issues,equipment,equipmentForm,access,accessForm,docs,docForm,job,importer,knowledge,report,timecard,templates,deficiencies,deficiencyForm,resourceForm}[view]||home)()}function val(id){return document.getElementById(id).value.trim()}
 function fullAddress(s){
   const structured=[s.street,s.city,s.state,s.zip].filter(Boolean).join(", ");
   return structured || s.address || "No address entered";
@@ -362,7 +362,8 @@ function runKnowledgeSearch(){
    s.contacts.forEach(c=>{if(JSON.stringify(c).toLowerCase().includes(q))results.push({site:s,type:"Access / Contact",text:`${c.type} ${c.name||""} ${c.phone||""} ${c.detail||""}`})});
    s.docs.forEach(d=>{if(JSON.stringify(d).toLowerCase().includes(q))results.push({site:s,type:"Docs / Photos",text:`${d.type} ${d.title||""} ${d.location||""}`})});
  });
- box.innerHTML=results.length?results.slice(0,50).map(r=>`<div class="card siteItem" onclick="openSite('${r.site.id}')"><div class="row"><h2>${esc(r.site.name)}</h2><span class="pill">${esc(r.type)}</span></div><p>${esc(r.text).slice(0,220)}</p></div>`).join(""):`<div class="empty">No matches found.</div>`;
+ (data.resources||[]).forEach((r,idx)=>{if(JSON.stringify(r).toLowerCase().includes(q))results.push({resource:true,idx,type:"Library",text:`${r.m||""} ${r.panel||r.t||""}: ${r.n||r.notes||""}`})});
+ box.innerHTML=results.length?results.slice(0,50).map(r=>r.resource?`<div class="card siteItem" onclick="mode='${r.idx}';view='resourceForm';render()"><div class="row"><h2>Resource Library</h2><span class="pill">${esc(r.type)}</span></div><p>${esc(r.text).slice(0,220)}</p></div>`:`<div class="card siteItem" onclick="openSite('${r.site.id}')"><div class="row"><h2>${esc(r.site.name)}</h2><span class="pill">${esc(r.type)}</span></div><p>${esc(r.text).slice(0,220)}</p></div>`).join(""):`<div class="empty">No matches found.</div>`;
 }
 
 function importer(){
@@ -409,18 +410,59 @@ function runImport(){
  go("sites");
 }
 
-function library(){app(`<div class="screen"><h1>Library</h1><p>Manufacturer resources and cheat sheets.</p><div class="list grow">${data.resources.map(r=>`<div class="card"><h2>${esc(r.m)}</h2><p>${esc(r.n)}</p></div>`).join("")}</div></div>`)}
+function library(){
+ app(`<div class="screen">
+  <div class="row"><div><h1>Library</h1><p>Manufacturer resources and cheat sheets.</p></div><button class="primary" onclick="mode=null;view='resourceForm';render()">＋ Add</button></div>
+  <input class="search" id="rq" placeholder="Search manufacturer, panel, trouble code, link..." oninput="filterResources()">
+  <div id="resourceList" class="list grow">${resourceList(data.resources||[])}</div>
+ </div>`)
+}
+function resourceList(list){
+ if(!list.length)return `<div class="empty">No resources yet. Add a manufacturer or panel note.</div>`;
+ return list.map((r,idx)=>`<div class="card docLine">
+  <div class="row"><h2>${esc(r.m||r.manufacturer||"Resource")}</h2><button class="ghost" onclick="mode='${idx}';view='resourceForm';render()">Edit</button></div>
+  <p><strong>${esc(r.panel||r.t||"General")}</strong></p>
+  <p>${esc(r.n||r.notes||"")}</p>
+  ${r.url?`<a class="btn ghost" href="${esc(r.url)}" target="_blank">Open Link</a>`:""}
+ </div>`).join("");
+}
+function filterResources(){
+ const q=val("rq").toLowerCase();
+ document.getElementById("resourceList").innerHTML=resourceList((data.resources||[]).filter(r=>JSON.stringify(r).toLowerCase().includes(q)));
+}
+function resourceForm(){
+ const r=mode!==null && data.resources[Number(mode)] ? data.resources[Number(mode)] : {};
+ app(`<div class="screen">
+  <div class="row"><button class="back ghost" onclick="go('library')">←</button><h1>${mode!==null?"Edit Resource":"Add Resource"}</h1></div>
+  <div class="form grow">
+    <div><label>Manufacturer</label><input id="rm" value="${esc(r.m||r.manufacturer)}" placeholder="Fire-Lite, Notifier, EST..."></div>
+    <div><label>Panel / Topic</label><input id="rpanel" value="${esc(r.panel||r.t)}" placeholder="ES-200X, EST4, Ground Faults..."></div>
+    <div><label>URL / Manual Link</label><input id="rurl" value="${esc(r.url)}" placeholder="Optional link to manual or reference"></div>
+    <div><label>Notes / Cheat Sheet</label><textarea id="rn" placeholder="Programming notes, reset steps, trouble code tips...">${esc(r.n||r.notes)}</textarea></div>
+  </div>
+  <button class="primary" onclick="saveResource()">Save Resource</button>
+ </div>`)
+}
+function saveResource(){
+ const obj={m:val("rm")||"Unknown Manufacturer",panel:val("rpanel"),url:val("rurl"),n:val("rn"),updatedAt:new Date().toISOString()};
+ data.resources=data.resources||[];
+ if(mode!==null && data.resources[Number(mode)]) data.resources[Number(mode)]={...data.resources[Number(mode)],...obj};
+ else data.resources.unshift({...obj,id:uid(),createdAt:new Date().toISOString()});
+ save();mode=null;go("library");
+}
+
 function settings(){app(`<div class="screen"><h1>Settings</h1><div class="card"><h2>Backup</h2><p>Export before major changes.</p><button class="primary" onclick="exportData()">Export Backup</button><br><br><input type="file" accept="application/json" onchange="importData(event)"></div><div class="card"><h2>Reset</h2><button class="danger" onclick="resetData()">Clear Local Data</button></div></div>`)}
-function exportData(){let blob=new Blob([JSON.stringify(data,null,2)],{type:"application/json"});let a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="firevault-backup-build-0.16.0.json";a.click()}
+function exportData(){let blob=new Blob([JSON.stringify(data,null,2)],{type:"application/json"});let a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="firevault-backup-build-0.17.0.json";a.click()}
 function importData(e){let f=e.target.files[0];if(!f)return;let r=new FileReader();r.onload=()=>{try{data=JSON.parse(r.result);save();alert("Imported.");go("home")}catch(err){alert("Import failed.")}};r.readAsText(f)}
 function resetData(){if(confirm("Clear all local FireVault data?")){localStorage.removeItem(KEY);localStorage.removeItem(ACTIVE);data=load();activeJob=null;go("home")}}
 function showChangelog(){alert(`FireVault Build ${BUILD}
 
-- Deficiency Tracker
-- Add/Edit deficiencies per site
-- Status, severity, system, location, description, recommendation
-- Deficiency template in Job Mode creates real site deficiency
-- Deficiencies included in site reports and knowledge search
+- Editable Resource Library
+- Add/Edit manufacturer resources
+- Manual URL/link field
+- Panel/topic field
+- Resource search inside Library
+- Resources included in Knowledge Search
 - Preserves previous local data`)}
 render()
 </script>
