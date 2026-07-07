@@ -1,10 +1,10 @@
 {
   "name": "firevault2",
-  "version": "2.0.0",
+  "version": "0.1.0",
   "private": true,
-  "type": "module",
+  "description": "FireVault - field knowledge system for fire alarm technicians",
   "scripts": {
-    "dev": "vite --host 0.0.0.0",
+    "start": "vite --host 0.0.0.0",
     "build": "vite build",
     "preview": "vite preview --host 0.0.0.0"
   },
