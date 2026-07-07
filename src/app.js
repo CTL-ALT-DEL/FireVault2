@@ -146,6 +146,22 @@ function durationText(startIso,endIso){
   return h ? `${h}h ${m}m` : `${m}m`;
 }
 function eventTime(iso){ return new Date(iso).toLocaleTimeString([], {hour:"numeric", minute:"2-digit"}); }
+function visitDateLabel(v){
+  if(v?.startedAt) return new Date(v.startedAt).toLocaleDateString([], {month:"short", day:"numeric", year:"numeric"});
+  return v?.date || fmtDate();
+}
+function visitTimeRange(v){
+  if(!v?.startedAt) return "Time not saved";
+  const start=eventTime(v.startedAt);
+  const end=v.endedAt ? eventTime(v.endedAt) : "open";
+  return `${start} – ${end}`;
+}
+function visitNotesPreview(v, lines=2){
+  return (v?.notes || "").split("\n").filter(Boolean).slice(0,lines).join(" • ") || "No visit notes saved.";
+}
+function visitReportBlock(v){
+  return `${visitDateLabel(v)} • ${visitTimeRange(v)} • ${durationText(v.startedAt,v.endedAt)}\n${v.notes || "No visit notes saved."}`;
+}
 function addJobEvent(note){
   if(!activeJob) return;
   activeJob.events = Array.isArray(activeJob.events) ? activeJob.events : [];
@@ -154,11 +170,11 @@ function addJobEvent(note){
 }
 function startJobTimer(){ stopJobTimer(); jobTimer=setInterval(()=>{ const el=document.getElementById("jobElapsed"); if(el && activeJob) el.textContent=elapsedText(activeJob.startedAt); },1000); }
 function stopJobTimer(){ if(jobTimer){ clearInterval(jobTimer); jobTimer=null; } }
-function setActiveNav(){ document.querySelectorAll("nav button").forEach(b=>b.classList.remove("active")); const section=["siteDetail","siteForm","tasks","taskForm","deficiencies","deficiencyForm","report","jobMode","nearbySites"].includes(view)?"sites":view; document.getElementById("nav-"+section)?.classList.add("active"); }
+function setActiveNav(){ document.querySelectorAll("nav button").forEach(b=>b.classList.remove("active")); const section=["siteDetail","visits","visitDetail","siteForm","tasks","taskForm","deficiencies","deficiencyForm","report","jobMode","nearbySites"].includes(view)?"sites":view; document.getElementById("nav-"+section)?.classList.add("active"); }
 
 function render(){
   try{
-    const routes = {home, sites, nearbySites, siteDetail, siteForm, tasks, taskForm, deficiencies, deficiencyForm, report, library, resourceForm, jobMode, settings, diagnostics};
+    const routes = {home, sites, nearbySites, siteDetail, visits, visitDetail, siteForm, tasks, taskForm, deficiencies, deficiencyForm, report, library, resourceForm, jobMode, settings, diagnostics};
     (routes[view] || home)();
     view === "jobMode" ? startJobTimer() : stopJobTimer();
     setActiveNav();
@@ -192,7 +208,7 @@ function home(){
       <button class="ghost tile" id="diagBtn"><strong>Diagnostics</strong><span>Build status</span></button>
     </div>
     ${activeJob ? `<div class="card activeJobMini"><div class="row"><div><h2>Service Call Active</h2><p>${esc(activeJob.siteName)} • <span id="jobElapsed">${elapsedText(activeJob.startedAt)}</span></p></div><button class="primary" id="resumeJobBtn">Open</button></div></div>` : ""}
-    <div class="card grow"><h2>Build ${BUILD}</h2><p>Bottom navigation is lowered for iPhone home-screen use.</p><p>Button haptic feedback is now enabled where the browser supports it.</p></div>
+    <div class="card grow"><h2>Build ${BUILD}</h2><p>Visit history is now easier to open, review, copy, and remove from each site.</p><p>Reports include recent completed service visits.</p></div>
   </div>`);
   document.getElementById("sitesCard").onclick=()=>route("sites");
   document.getElementById("tasksCard").onclick=()=>{selectedSiteId=null; route("tasks");};
@@ -238,6 +254,7 @@ function siteDetail(){
   const s=site(); if(!s){ route("sites"); return; }
   const open=(s.tasks||[]).filter(t=>(t.status||"Open")!=="Done").length;
   const def=(s.deficiencies||[]).filter(d=>(d.status||"Open")!=="Closed").length;
+  const siteVisits=Array.isArray(s.visits) ? s.visits : [];
   html(`<div class="screen"><div class="row"><button class="back ghost" id="backBtn">←</button><button class="ghost" id="editBtn">Edit</button></div>
     <div class="card redline"><h1>${esc(s.name)}</h1><p>${esc(fullAddress(s))}</p><p>${esc([s.panelManufacturer,s.panelModel].filter(Boolean).join(" ")||"Panel not entered")}</p></div>
     <div class="grid2">
@@ -247,7 +264,7 @@ function siteDetail(){
       <button class="ghost tile" id="defBtn"><strong>${def}</strong><span>Deficiencies</span></button>
     </div>
     <div class="card gpsCard"><div class="row"><div><h2>GPS / Maps</h2><p>${esc(gpsLine(s))}</p></div>${data.settings.gps?.enabled===false?"":`<button id="captureGpsBtn" class="primary smallBtn">Capture GPS</button>`}</div><div class="mapActions"><button id="appleBtn" class="ghost">Apple Maps</button><button id="googleBtn" class="ghost">Google Maps</button></div></div>
-    <div class="card recentVisitsCard"><div class="row"><div><h2>Recent Visits</h2><p>${(s.visits||[]).length ? `${(s.visits||[]).length} saved visit${(s.visits||[]).length===1?"":"s"}` : "No completed visits yet."}</p></div></div>${(s.visits||[]).slice(0,3).map(v=>`<div class="visitMini"><strong>${esc(v.date || fmtDate(new Date(v.startedAt||Date.now())))}</strong><span>${esc(durationText(v.startedAt,v.endedAt))}</span><p>${esc((v.notes||"").split("\n").slice(0,2).join(" • ") || "No visit notes saved.")}</p></div>`).join("")}</div>
+    <div class="card recentVisitsCard visitLogCard"><div class="row"><div><h2>Visit History</h2><p>${siteVisits.length ? `${siteVisits.length} completed visit${siteVisits.length===1?"":"s"}` : "No completed visits yet."}</p></div>${siteVisits.length?`<button class="ghost smallBtn" id="allVisitsBtn">View All</button>`:""}</div>${siteVisits.length?siteVisits.slice(0,3).map(v=>`<button class="visitMini visitMiniButton" data-visit="${esc(v.id)}"><strong>${esc(visitDateLabel(v))}</strong><span>${esc(durationText(v.startedAt,v.endedAt))}</span><p>${esc(visitNotesPreview(v,2))}</p></button>`).join(""):`<p class="fieldNote">Finish a Job Mode service call and it will appear here.</p>`}</div>
     <div class="card grow"><h2>Site Notes</h2><p>${esc(s.notes || "No notes entered.")}</p></div>
   </div>`);
   document.getElementById("backBtn").onclick=()=>route("sites");
@@ -259,6 +276,35 @@ function siteDetail(){
   const gpsBtn=document.getElementById("captureGpsBtn"); if(gpsBtn) gpsBtn.onclick=captureGpsForSite;
   document.getElementById("appleBtn").onclick=()=>window.open(mapUrl(s,"apple"),"_blank");
   document.getElementById("googleBtn").onclick=()=>window.open(mapUrl(s,"google"),"_blank");
+  const allVisits=document.getElementById("allVisitsBtn"); if(allVisits) allVisits.onclick=()=>route("visits");
+  document.querySelectorAll(".visitMiniButton").forEach(b=>b.onclick=()=>{mode=b.dataset.visit; route("visitDetail");});
+}
+
+function visits(){
+  const s=site(); if(!s){ route("sites"); return; }
+  const siteVisits=Array.isArray(s.visits) ? s.visits : [];
+  html(`<div class="screen visitLogScreen"><div class="row"><button class="back ghost" id="backBtn">←</button><h1>Visit Log</h1></div>
+    <div class="card visitLogHero"><h2>${esc(s.name)}</h2><p>${siteVisits.length ? `${siteVisits.length} completed service visit${siteVisits.length===1?"":"s"}` : "No completed visits yet."}</p><button class="primary smallBtn" id="startVisitBtn">Start New Visit</button></div>
+    <div class="list grow">${siteVisits.length?siteVisits.map(v=>`<button class="card visitLogItem" data-visit="${esc(v.id)}"><div class="row"><div><h2>${esc(visitDateLabel(v))}</h2><p>${esc(visitTimeRange(v))} • ${esc(durationText(v.startedAt,v.endedAt))}</p></div><span class="pill">Open</span></div><p>${esc(visitNotesPreview(v,3))}</p></button>`).join(""):`<div class="empty">Use Job Mode to create the first visit log for this site.</div>`}</div>
+  </div>`);
+  document.getElementById("backBtn").onclick=()=>route("siteDetail");
+  document.getElementById("startVisitBtn").onclick=startJob;
+  document.querySelectorAll(".visitLogItem").forEach(b=>b.onclick=()=>{mode=b.dataset.visit; route("visitDetail");});
+}
+
+function visitDetail(){
+  const s=site(); if(!s){ route("sites"); return; }
+  const siteVisits=Array.isArray(s.visits) ? s.visits : [];
+  const v=siteVisits.find(x=>x.id===mode) || siteVisits[0];
+  if(!v){ route("visits"); return; }
+  const text=`${s.name}\n${visitReportBlock(v)}`;
+  html(`<div class="screen visitDetailScreen"><div class="row"><button class="back ghost" id="backBtn">←</button><h1>Visit Detail</h1></div>
+    <div class="card visitDetailHero"><h2>${esc(visitDateLabel(v))}</h2><p>${esc(visitTimeRange(v))}</p><div class="grid2 visitActions"><button class="primary" id="copyVisitBtn">Copy Visit</button><button class="danger" id="deleteVisitBtn">Delete</button></div></div>
+    <div class="card grow visitFullNotes"><h2>Service Timeline</h2><pre>${esc(v.notes || "No visit notes saved.")}</pre></div>
+  </div>`);
+  document.getElementById("backBtn").onclick=()=>route("visits");
+  document.getElementById("copyVisitBtn").onclick=async()=>{await navigator.clipboard.writeText(text); toast("Visit copied.");};
+  document.getElementById("deleteVisitBtn").onclick=()=>{ if(confirm("Delete this saved visit?")){ s.visits=siteVisits.filter(x=>x.id!==v.id); save(); toast("Visit deleted."); route("visits"); } };
 }
 
 function siteForm(){
@@ -318,7 +364,42 @@ function deficiencyForm(){
 
 function reportText(s){
   const set=data.settings, tech=set.technician||{};
-  return `${set.reports.title}\nGenerated: ${new Date().toLocaleString()}\n\nSITE\n${s.name}\n${fullAddress(s)}\nPanel: ${[s.panelManufacturer,s.panelModel].filter(Boolean).join(" ")||"Not entered"}\nGPS: ${data.settings.gps?.includeInReports===false?"Hidden in Settings":gpsLine(s)}\nMap: ${mapUrl(s,(set.gps&&set.gps.mapProvider)||"apple")}\n\nTECHNICIAN\n${tech.name||""}\n${tech.company||""}\n${tech.phone||""}\n${tech.email||""}\n\nTASKS\n${(s.tasks||[]).map(t=>`- ${t.status||"Open"}: ${t.title}${t.due?` due ${t.due}`:""}`).join("\n")||"No tasks"}\n\nDEFICIENCIES\n${(s.deficiencies||[]).map(d=>`- ${d.status||"Open"}: ${d.priority||"Normal"} - ${d.title}`).join("\n")||"No deficiencies"}\n\nNOTES\n${s.notes||"No notes"}\n\nEMAIL SUBJECT\n${renderTemplate(set.email.defaultSubject,s)}\n\nSIGNATURE\n${renderTemplate(set.email.signature,s)}`;
+  const visits=(s.visits||[]).slice(0,5).map(v=>visitReportBlock(v)).join("\n\n") || "No completed visits";
+  return `${set.reports.title}
+Generated: ${new Date().toLocaleString()}
+
+SITE
+${s.name}
+${fullAddress(s)}
+Panel: ${[s.panelManufacturer,s.panelModel].filter(Boolean).join(" ")||"Not entered"}
+GPS: ${data.settings.gps?.includeInReports===false?"Hidden in Settings":gpsLine(s)}
+Map: ${mapUrl(s,(set.gps&&set.gps.mapProvider)||"apple")}
+
+TECHNICIAN
+${tech.name||""}
+${tech.company||""}
+${tech.phone||""}
+${tech.email||""}
+
+VISITS
+${visits}
+
+TASKS
+${(s.tasks||[]).map(t=>`- ${t.status||"Open"}: ${t.title}${t.due?` due ${t.due}`:""}`).join("
+")||"No tasks"}
+
+DEFICIENCIES
+${(s.deficiencies||[]).map(d=>`- ${d.status||"Open"}: ${d.priority||"Normal"} - ${d.title}`).join("
+")||"No deficiencies"}
+
+NOTES
+${s.notes||"No notes"}
+
+EMAIL SUBJECT
+${renderTemplate(set.email.defaultSubject,s)}
+
+SIGNATURE
+${renderTemplate(set.email.signature,s)}`;
 }
 function renderTemplate(t,s){ const tech=data.settings.technician||{}; return String(t||"").replaceAll("{site_name}",s.name||"").replaceAll("{date}",fmtDate()).replaceAll("{technician}",tech.name||"").replaceAll("{company}",tech.company||"").replaceAll("{phone}",tech.phone||"").replaceAll("{email}",tech.email||""); }
 function report(){ const s=site(); if(!s){route("sites"); return;} const txt=reportText(s); html(`<div class="screen"><div class="row"><button class="back ghost" id="backBtn">←</button><h1>Report</h1></div><div class="reportActions"><button class="primary" id="copyBtn">Copy Report</button><button class="ghost" id="downloadBtn">Download TXT</button></div><div class="card reportBox grow">${esc(txt)}</div></div>`); document.getElementById("backBtn").onclick=()=>route("siteDetail"); document.getElementById("copyBtn").onclick=async()=>{await navigator.clipboard.writeText(txt); toast("Report copied.");}; document.getElementById("downloadBtn").onclick=()=>downloadBlob(`firevault-report-${(s.name||"site").replace(/\W+/g,"-")}.txt`,txt); }
@@ -485,18 +566,18 @@ function saveSettings(){
 function diagnostics(){ const totalTasks=data.sites.reduce((n,s)=>n+(s.tasks||[]).length,0); const totalDef=data.sites.reduce((n,s)=>n+(s.deficiencies||[]).length,0); const totalVisits=data.sites.reduce((n,s)=>n+(s.visits||[]).length,0); html(`<div class="screen"><div class="row"><button class="back ghost" id="backHome">←</button><h1>Diagnostics</h1></div><div class="card grow errorBox"><p>Build: ${BUILD}</p><p>Sites: ${data.sites.length}</p><p>Total Tasks: ${totalTasks}</p><p>Total Deficiencies: ${totalDef}</p><p>Total Visits: ${totalVisits}</p><p>Active Job: ${activeJob ? esc(activeJob.siteName) : "None"}</p><p>Current Theme: ${esc(data.settings.theme.name)}</p><p>Accent: ${esc(data.settings.theme.accentColor)}</p><p>Advanced AI Enabled: ${data.settings.advanced?.aiTechnician ? "Yes" : "No"}</p><p>GPS Tools: ${data.settings.gps?.enabled !== false ? "Enabled" : "Hidden"}</p><p>Nearby Radius: ${nearbyRadiusMiles()} mi</p><p>Haptics: ${data.settings.app?.haptics !== false ? "Enabled" : "Off"}</p><p>Import/Export: Ready</p><p>Storage key: ${KEY}</p><p>Modules loaded successfully.</p></div></div>`); document.getElementById("backHome").onclick=()=>route("home"); }
 function showChangelog(){
   const notes = [
-    "Build number advanced to 0.41.9 across the header, manifest, diagnostics, and release notes.",
-    "Moved the bottom menu icon bar lower inside the iPhone safe area to reduce the blank space above the home indicator.",
-    "Added haptic button feedback through the browser vibration API when supported by the device.",
-    "Added a Theme setting to turn haptic button feedback on or off.",
-    "Kept Settings pill-tab scroll memory from 0.41.8.",
-    "Kept Nearby Sites, GPS capture, map actions, and GPS report support."
+    "Build number advanced to 0.42.0 across the header, manifest, diagnostics, and release notes.",
+    "Added a real Visit Log for each site with tappable completed service visits.",
+    "Added Visit Detail view with full service timeline, copy visit, and delete visit actions.",
+    "Updated site detail Recent Visits into a cleaner Visit History card.",
+    "Reports now include the latest completed service visits.",
+    "Preserved haptic-ready controls, Nearby Sites, GPS capture, map actions, and the Settings pill-tab layout."
   ];
   const overlay=document.createElement("div");
   overlay.className="releaseOverlay";
   overlay.innerHTML=`<div class="releaseSheet" role="dialog" aria-modal="true" aria-label="FireVault release notes">
     <div class="releaseHead"><div><strong>FireVault</strong><span>Build ${BUILD}</span></div><button class="ghost iconBtn" id="closeRelease" aria-label="Close release notes">×</button></div>
-    <div class="releaseBody"><h2>Release Notes</h2><p class="releaseIntro">Bottom menu safe-area tune and haptic button feedback.</p><ul>${notes.map(n=>`<li>${esc(n)}</li>`).join("")}</ul></div>
+    <div class="releaseBody"><h2>Release Notes</h2><p class="releaseIntro">Visit history viewer and report timeline upgrade.</p><ul>${notes.map(n=>`<li>${esc(n)}</li>`).join("")}</ul></div>
   </div>`;
   document.body.appendChild(overlay);
   const close=()=>overlay.remove();

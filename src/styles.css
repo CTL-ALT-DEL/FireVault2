@@ -266,3 +266,18 @@ button:active,.btn:active,label.checkRow:active{transform:translateY(1px) scale(
 @supports(height:100svh){main{height:calc(100svh - var(--headerH) - var(--navH))}}
 @supports(height:100dvh){main{height:calc(100dvh - var(--headerH) - var(--navH))}}
 @media(max-width:430px){:root{--navH:calc(68px + max(var(--safeBottom),8px))}nav{padding-bottom:max(3px,calc(var(--safeBottom) * .16))}nav button{min-height:54px;max-height:60px;padding-bottom:4px}}
+
+
+/* Build 0.42.0 Visit Log viewer and report timeline polish */
+.visitLogCard{border-left-color:var(--cyan)}
+.visitMiniButton{width:100%;appearance:none;background:transparent;color:inherit;border:0;border-top:1px solid rgba(255,255,255,.075);border-radius:0;text-align:left;cursor:pointer}
+.visitMiniButton:hover,.visitMiniButton:focus-visible{background:rgba(255,255,255,.04);outline:none}
+.visitMiniButton:first-of-type{margin-top:8px}
+.visitLogHero{border-left:3px solid var(--accent);display:grid;gap:8px}
+.visitLogHero h2,.visitDetailHero h2{font-size:18px;margin:0}
+.visitLogHero p,.visitDetailHero p{font-size:13px;line-height:1.35;color:var(--muted);margin:0}
+.visitLogItem{width:100%;text-align:left;display:block;cursor:pointer;border-left:3px solid var(--cyan)}
+.visitLogItem h2{font-size:16px;margin:0 0 4px}.visitLogItem p{font-size:12.5px;line-height:1.35;color:var(--muted);margin:0;overflow-wrap:anywhere}
+.visitDetailHero{border-left:3px solid var(--accent)}
+.visitActions{margin-top:10px}.visitFullNotes pre{white-space:pre-wrap;overflow-wrap:anywhere;font-family:inherit;font-size:13px;line-height:1.45;color:#dde6f2;margin:10px 0 0}
+@media(max-width:430px){.visitLogHero h2,.visitDetailHero h2{font-size:17px}.visitLogItem h2{font-size:15px}.visitFullNotes pre{font-size:12.5px}.visitActions{grid-template-columns:1fr 1fr}}
