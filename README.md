@@ -1,15 +1,15 @@
-# FireVault Build 0.31.0 — GPS / Maps Module
+# FireVault Build 0.32.0 — UI Branding Pass
 
 Root-level package for GitHub Pages.
 
 ## Changes
-- Restores GPS / Maps features in the modular app
-- Latitude and longitude fields on Site form
-- Use Current GPS button
-- Nearby Site scan on Today screen
-- Apple Maps and Google Maps buttons in Site detail
-- Diagnostics shows GPS site count
+- Professional FireVault iPhone Home Screen icon
+- Adds apple-touch-icon and manifest icons
+- Larger bottom navigation icons
+- Today header now shows day of week and full date
+- Sites / Visits / Open Tasks dashboard cards are tappable
+- Branding preview added in Settings → Backup
 
 Suggested commit:
 
-`Build 0.31.0 gps maps module`
+`Build 0.32.0 ui branding pass`

@@ -28,7 +28,7 @@ label{font-size:11px;color:var(--muted);font-weight:900;text-transform:uppercase
 .pill{font-size:12px;border:1px solid rgba(255,255,255,.09);background:rgba(255,255,255,.065);border-radius:999px;padding:5px 8px;display:inline-flex;margin:2px}
 .empty{border:1px dashed var(--line);border-radius:16px;padding:16px;text-align:center;color:var(--muted)}.back{padding:8px 10px;border-radius:12px}
 nav{min-height:var(--navH);position:fixed;bottom:0;left:0;right:0;display:grid;grid-template-columns:repeat(4,1fr);background:rgba(11,13,16,.96);border-top:1px solid rgba(255,255,255,.08);padding:7px 8px calc(7px + env(safe-area-inset-bottom));z-index:50}
-nav button{background:transparent;border:0;color:var(--muted);display:flex;flex-direction:column;gap:4px;align-items:center;justify-content:center;padding:6px 3px;font-size:12px}
+nav button{background:transparent;border:0;color:var(--muted);display:flex;flex-direction:column;gap:4px;align-items:center;justify-content:center;padding:5px 3px;font-size:12px}
 nav button.active{background:rgba(239,68,68,.14);color:#fff}.siteItem{cursor:pointer}.redline{border-left:4px solid var(--red)}.docLine{border-left:4px solid var(--cyan)}.issue{border-left:4px solid var(--amber)}.visit{border-left:4px solid var(--blue)}
 .thumb{width:100%;max-height:220px;object-fit:contain;background:#07090c;border-radius:14px;border:1px solid rgba(255,255,255,.08);margin-top:8px}
 .photoBox{border:1px dashed var(--line);border-radius:14px;padding:10px;text-align:center}
@@ -43,3 +43,12 @@ nav button.active{background:rgba(239,68,68,.14);color:#fff}.siteItem{cursor:poi
 .gpsGood{border-left:4px solid var(--green)}
 .gpsWarn{border-left:4px solid var(--amber)}
 .mapActions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}
+
+nav button span:first-child{font-size:25px;line-height:1}
+nav button span:last-child{font-size:12px}
+.metricCard{cursor:pointer;transition:transform .08s ease, background .12s ease}
+.metricCard:active{transform:scale(.98);background:rgba(239,68,68,.12)}
+.todayDate{font-size:14px;color:var(--muted);font-weight:800;letter-spacing:.03em}
+.todayDay{font-size:26px;font-weight:950;margin:0}
+.compactVisit{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.brandIconPreview{width:72px;height:72px;border-radius:18px;border:1px solid rgba(255,255,255,.12)}

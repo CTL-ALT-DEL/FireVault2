@@ -102,15 +102,32 @@ function nearbySitesFrom(lat,lng){
     .sort((a,b)=>a.ft-b.ft);
 }
 
+function todayLabel(){
+  const now = new Date();
+  return {
+    day: now.toLocaleDateString([], {weekday:"long"}),
+    date: now.toLocaleDateString([], {month:"long", day:"numeric", year:"numeric"})
+  };
+}
+
+function openVisitsPlaceholder(){
+  alert("Visit History module is coming next. This card is now wired as a shortcut.");
+}
+
+function openTasksPlaceholder(){
+  alert("Tasks module is coming back in an upcoming modular build. This card is now wired as a shortcut.");
+}
+
 function home(){
   const visits = data.sites.flatMap(s => (s.visits||[]).map(v => ({...v, site:s.name})));
   const openTasks = data.sites.reduce((n,s)=>n+(s.tasks||[]).filter(t => (t.status||"Open") !== "Done").length,0);
+  const today = todayLabel();
   html(`<div class="screen">
-    <div><h1>Today</h1><p>Modular recovery build. Stable core rebuilt from the last working version.</p></div>
+    <div><div class="todayDay">${today.day}</div><div class="todayDate">${today.date}</div><p>Field dashboard for today’s service work.</p></div>
     <div class="grid3">
-      <div class="card tile"><strong>${data.sites.length}</strong><span>Sites</span></div>
-      <div class="card tile"><strong>${visits.length}</strong><span>Visits</span></div>
-      <div class="card tile"><strong>${openTasks}</strong><span>Open Tasks</span></div>
+      <div class="card tile metricCard" id="sitesCard"><strong>${data.sites.length}</strong><span>Sites</span></div>
+      <div class="card tile metricCard" id="visitsCard"><strong>${visits.length}</strong><span>Visits</span></div>
+      <div class="card tile metricCard" id="tasksCard"><strong>${openTasks}</strong><span>Open Tasks</span></div>
     </div>
     <div class="grid2">
       <button class="primary tile" id="nearbyBtn"><strong>📍 Nearby Site</strong><span>Use GPS to match location</span></button>
@@ -119,6 +136,9 @@ function home(){
     <div id="nearbyBox"></div>
     <div class="card grow"><h2>GPS / Maps Module</h2><p>Use GPS on site records, scan nearby sites, and open map navigation from the site vault.</p><button class="ghost" id="diagBtn">Diagnostics</button></div>
   </div>`);
+  document.getElementById("sitesCard").onclick = () => route("sites");
+  document.getElementById("visitsCard").onclick = openVisitsPlaceholder;
+  document.getElementById("tasksCard").onclick = openTasksPlaceholder;
   document.getElementById("addSiteBtn").onclick = () => { selectedSiteId=null; view="siteForm"; render(); };
   document.getElementById("diagBtn").onclick = () => { view="diagnostics"; render(); };
   document.getElementById("nearbyBtn").onclick = scanNearbySites;
@@ -496,6 +516,11 @@ function drawSettingsTab(){
 
   if(settingsTab === "backup"){
     panel.innerHTML = `<div class="card">
+      <div class="sectionTitle"><h2>App Icon / Branding</h2><span class="pill">New</span></div>
+      <p class="settingHint">This is the icon used when FireVault is saved to the iPhone Home Screen.</p>
+      <img class="brandIconPreview" src="assets/apple-touch-icon.png" alt="FireVault icon">
+    </div>
+    <div class="card">
       <div class="sectionTitle"><h2>Backup / Export</h2><span class="pill">Important</span></div>
       <p class="settingHint">Export JSON often. CSV export will be restored in an upcoming modular build.</p>
       <button class="primary" id="exportJson">Export JSON Backup</button>
@@ -551,19 +576,19 @@ function exportJson(){
   const blob = new Blob([JSON.stringify(data,null,2)], {type:"application/json"});
   const a = document.createElement("a");
   a.href = URL.createObjectURL(blob);
-  a.download = "firevault-backup-build-0.31.0.json";
+  a.download = "firevault-backup-build-0.32.0.json";
   a.click();
 }
 
 function showChangelog(){
   alert(`FireVault Build ${BUILD}
 
-- GPS / Maps module restored
-- Latitude and longitude fields on Site form
-- Use Current GPS button
-- Nearby Site scan on Today screen
-- Apple Maps and Google Maps buttons
-- Diagnostics shows GPS site count`);
+- Professional FireVault iPhone Home Screen icon
+- Apple touch icon and PWA manifest icons
+- Larger bottom navigation icons
+- Today header now shows day and full date
+- Sites / Visits / Open Tasks cards are tappable
+- Branding preview added in Settings → Backup`);
 }
 
 render();
