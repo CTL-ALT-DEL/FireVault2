@@ -1,16 +1,15 @@
-# FireVault Build 0.40.7 — Settings Nano Layout Pass
+# FireVault Build 0.40.8 — Settings Dock Layout Pass
 
-This build continues the modular FireVault roadmap from 0.40.6.
+This build continues the modular FireVault roadmap from 0.40.7.
 
 ## Updated
 
-- Advanced visible build number to **0.40.7**.
-- Redesigned the Settings page for better use of small iPhone-sized space.
-- Replaced the Settings microbar with an even smaller nano header.
-- Rebuilt Settings submenu buttons into compact icon chips.
-- Improved left alignment, justification, label spacing, and field grouping across all Settings subpages.
-- Reduced settings control heights, card padding, checkbox rows, theme preset rows, and about cards.
-- Kept compact release notes formatting from 0.40.6.
+- Advanced visible build number to **0.40.8**.
+- Rebuilt Settings around a full-width dock layout instead of wasting space with a side-rail layout.
+- Compressed Settings submenu navigation into a horizontal section tray with smaller labels and cleaner alignment.
+- Reworked Settings fields into compact row-based label/input alignment where screen width allows.
+- Tightened Report, Email, Photo Overlay, Theme, Advanced, Backup, and About subpage spacing.
+- Kept release notes small, left justified, and easier to read on iPhone.
 - Kept the selected #8 Flame Icon logo and cache-busted app assets.
 - Preserved the modular storage key: `firevault_vault_build_030`.
 - Kept the clean root package format with no nested build folders.
@@ -21,4 +20,4 @@ Delete any old extracted folders named `firevault-build-*` from your local proje
 
 Suggested commit message:
 
-`Build 0.40.7 settings nano layout compact submenus`
+`Build 0.40.8 settings dock layout row compression`
