@@ -10,7 +10,7 @@
     :root{
       --bg:#0b0d10; --panel:#151922; --panel2:#1d2330; --line:#303747;
       --text:#f4f7fb; --muted:#a7b0c0; --red:#ef4444; --amber:#f59e0b;
-      --green:#22c55e; --blue:#38bdf8; --radius:18px;
+      --green:#22c55e; --blue:#38bdf8; --purple:#a78bfa; --radius:18px;
     }
     *{box-sizing:border-box}
     html,body{height:100%}
@@ -60,13 +60,14 @@
     .issue{border-left:4px solid var(--amber)}
     .visit{border-left:4px solid var(--blue)}
     .equip{border-left:4px solid var(--green)}
+    .accessLine{border-left:4px solid var(--purple)}
     .redline{border-left:4px solid var(--red)}
   </style>
 </head>
 <body>
 <header>
   <div class="brand"><div class="logo">🔥</div><div>FIREVAULT</div></div>
-  <button class="build" onclick="showChangelog()">Build 0.5.0</button>
+  <button class="build" onclick="showChangelog()">Build 0.6.0</button>
 </header>
 <main id="app"></main>
 <nav>
@@ -77,7 +78,7 @@
 </nav>
 
 <script>
-const BUILD="0.5.0";
+const BUILD="0.6.0";
 const KEY="firevault_vault_build_030";
 let data=load();
 let view="home", selected=null, mode=null;
@@ -97,11 +98,11 @@ function save(){localStorage.setItem(KEY,JSON.stringify(data))}
 function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,7)}
 function esc(s){return String(s||"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#039;"}[m]))}
 function app(html){document.getElementById("app").innerHTML=html; active()}
-function active(){document.querySelectorAll("nav button").forEach(b=>b.classList.remove("active")); let n=document.getElementById("nav-"+(view==="site"||view==="form"||view==="visits"||view==="issues"||view==="equipment"||view==="equipmentForm"||view==="access"?"sites":view)); if(n)n.classList.add("active")}
+function active(){document.querySelectorAll("nav button").forEach(b=>b.classList.remove("active")); let n=document.getElementById("nav-"+(view==="site"||view==="form"||view==="visits"||view==="issues"||view==="equipment"||view==="equipmentForm"||view==="access"||view==="accessForm"?"sites":view)); if(n)n.classList.add("active")}
 function go(v){view=v; mode=null; render()}
 function site(){return data.sites.find(s=>s.id===selected)}
-function ensureArrays(s){s.visits=s.visits||[];s.knownIssues=s.knownIssues||[];s.equipment=s.equipment||[];return s}
-function render(){({home,sites,library,settings,site:siteDash,form,visits,issues,equipment,equipmentForm,access}[view]||home)()}
+function ensureArrays(s){if(!s)return s;s.visits=s.visits||[];s.knownIssues=s.knownIssues||[];s.equipment=s.equipment||[];s.contacts=s.contacts||[];return s}
+function render(){({home,sites,library,settings,site:siteDash,form,visits,issues,equipment,equipmentForm,access,accessForm}[view]||home)()}
 
 function home(){
  const visits=data.sites.flatMap(s=>(s.visits||[]).map(v=>({...v,site:s.name}))).sort((a,b)=>b.date.localeCompare(a.date));
@@ -130,7 +131,7 @@ function home(){
 function sites(){
  app(`<div class="screen">
   <div class="row"><div><h1>Sites</h1><p>Customer vaults sorted for quick access.</p></div><button class="primary" onclick="newSite()">＋ Add</button></div>
-  <input class="search" id="q" placeholder="Search site, panel, equipment, issue, notes..." oninput="filter()">
+  <input class="search" id="q" placeholder="Search site, panel, contact, access, issue..." oninput="filter()">
   <div id="siteList" class="list grow">${siteList(data.sites)}</div>
  </div>`)
 }
@@ -139,7 +140,7 @@ function siteList(list){
  return list.map(s=>{ensureArrays(s);return `<div class="card siteItem" onclick="openSite('${s.id}')">
   <div class="row"><h2>${esc(s.name)}</h2><span class="pill">${esc(s.panelManufacturer||"Panel TBD")}</span></div>
   <p>${esc(s.address||"No address")}</p>
-  <span class="pill">${esc(s.panelModel||"Model TBD")}</span><span class="pill">Visits ${s.visits.length}</span><span class="pill">Issues ${s.knownIssues.length}</span><span class="pill">Equip ${s.equipment.length}</span>
+  <span class="pill">${esc(s.panelModel||"Model TBD")}</span><span class="pill">Visits ${s.visits.length}</span><span class="pill">Issues ${s.knownIssues.length}</span><span class="pill">Contacts ${s.contacts.length}</span>
  </div>`}).join("")
 }
 function filter(){let q=document.getElementById("q").value.toLowerCase();document.getElementById("siteList").innerHTML=siteList(data.sites.filter(s=>JSON.stringify(s).toLowerCase().includes(q)))}
@@ -160,20 +161,17 @@ function siteDash(){
     <button class="tile" onclick="view='visits';render()"><strong>Visits</strong><span>${s.visits.length} records</span></button>
     <button class="tile" onclick="view='issues';render()"><strong>Known Issues</strong><span>${s.knownIssues.length} items</span></button>
     <button class="tile" onclick="view='equipment';render()"><strong>Equipment</strong><span>${s.equipment.length} records</span></button>
-    <button class="tile" onclick="view='access';render()"><strong>Access</strong><span>Keys / contacts</span></button>
+    <button class="tile" onclick="view='access';render()"><strong>Access</strong><span>${s.contacts.length} contacts</span></button>
   </div>
   <div class="card grow">
     <h2>Site Snapshot</h2>
     <p><strong>FACP:</strong> ${esc(s.facpLocation||"Not entered")}</p>
     <p><strong>Monitoring:</strong> ${esc(s.monitoring||"Not entered")}</p>
-    <p><strong>Primary Equipment:</strong> ${esc(primaryEquipment(s))}</p>
+    <p><strong>Primary Contact:</strong> ${esc(primaryContact(s))}</p>
   </div>
  </div>`)
 }
-function primaryEquipment(s){
- if((s.equipment||[]).length) return s.equipment.slice(0,2).map(e=>`${e.type}: ${e.make||""} ${e.model||""}`.trim()).join(" / ");
- return `${s.panelManufacturer||"Panel TBD"} ${s.panelModel||""}`.trim() || "Not entered";
-}
+function primaryContact(s){return (s.contacts&&s.contacts[0]) ? `${s.contacts[0].name||"Unnamed"} ${s.contacts[0].phone||""}`.trim() : "Not entered"}
 function editSite(){view="form";render()}
 
 function form(){
@@ -186,7 +184,7 @@ function form(){
     <div class="grid2"><div><label>Manufacturer</label><input id="panelManufacturer" value="${esc(s.panelManufacturer)}" placeholder="EST"></div><div><label>Model</label><input id="panelModel" value="${esc(s.panelModel)}" placeholder="EST4"></div></div>
     <div><label>FACP Location</label><input id="facpLocation" value="${esc(s.facpLocation)}" placeholder="Electrical room"></div>
     <div><label>Monitoring</label><input id="monitoring" value="${esc(s.monitoring)}" placeholder="Central station / communicator"></div>
-    <div><label>Access</label><textarea id="access" placeholder="Keys, codes, contacts">${esc(s.access)}</textarea></div>
+    <div><label>Legacy Access Note</label><textarea id="access" placeholder="Old-style access note">${esc(s.access)}</textarea></div>
     <div><label>Notes</label><textarea id="notes" placeholder="Important site notes">${esc(s.notes)}</textarea></div>
   </div>
   <button class="primary" onclick="saveSite()">Save Site</button>
@@ -196,7 +194,7 @@ function val(id){return document.getElementById(id).value.trim()}
 function saveSite(){
  const obj={name:val("name")||"Unnamed Site",address:val("address"),panelManufacturer:val("panelManufacturer"),panelModel:val("panelModel"),facpLocation:val("facpLocation"),monitoring:val("monitoring"),access:val("access"),notes:val("notes"),updatedAt:new Date().toISOString()};
  if(selected){let i=data.sites.findIndex(x=>x.id===selected);data.sites[i]={...data.sites[i],...obj}}
- else{selected=uid();data.sites.unshift({...obj,id:selected,createdAt:new Date().toISOString(),visits:[],knownIssues:[],equipment:[]})}
+ else{selected=uid();data.sites.unshift({...obj,id:selected,createdAt:new Date().toISOString(),visits:[],knownIssues:[],equipment:[],contacts:[]})}
  save(); view="site"; render()
 }
 
@@ -267,17 +265,55 @@ function saveEquipment(){
 }
 
 function access(){
- const s=site(); if(!s)return go("sites");
- app(`<div class="screen"><div class="row"><button class="back ghost" onclick="view='site';render()">←</button><h1>Access</h1></div>
- <div class="card grow"><h2>Access Instructions</h2><p>${esc(s.access||"No access instructions entered.")}</p></div></div>`)
+ const s=ensureArrays(site()); if(!s)return go("sites");
+ app(`<div class="screen">
+  <div class="row"><button class="back ghost" onclick="view='site';render()">←</button><h1>Access</h1><button class="primary" onclick="mode=null;view='accessForm';render()">＋ Add</button></div>
+  <div class="card tight accessLine">
+    <h2>Legacy Access Note</h2>
+    <p>${esc(s.access||"No legacy access note entered.")}</p>
+  </div>
+  <div class="list grow">
+    ${s.contacts.length?s.contacts.map(c=>`<div class="card accessLine">
+      <div class="row"><h2>${esc(c.type)}</h2><button class="ghost" onclick="mode='${c.id}';view='accessForm';render()">Edit</button></div>
+      <p><strong>${esc(c.name||"Unnamed")}</strong></p>
+      <span class="pill">${esc(c.phone||"No phone")}</span>
+      <span class="pill">${esc(c.detail||"No detail")}</span>
+      <p>${esc(c.notes||"")}</p>
+    </div>`).join(""):`<div class="empty">No structured access/contact records yet. Add manager, maintenance, Knox Box, gate code, key location, or monitoring contact.</div>`}
+  </div>
+ </div>`)
+}
+function accessForm(){
+ const s=ensureArrays(site()); if(!s)return go("sites");
+ const c=mode?s.contacts.find(x=>x.id===mode):{};
+ app(`<div class="screen">
+  <div class="row"><button class="back ghost" onclick="view='access';render()">←</button><h1>${mode?"Edit Access":"Add Access"}</h1></div>
+  <div class="form grow">
+    <div><label>Type</label><select id="ctype">
+      ${["Site Contact","Maintenance","Property Manager","Monitoring Company","Knox Box","Lockbox","Gate Code","Key Location","After-Hours Contact","Other"].map(t=>`<option ${c.type===t?"selected":""}>${t}</option>`).join("")}
+    </select></div>
+    <div><label>Name / Label</label><input id="cname" value="${esc(c.name)}" placeholder="Maintenance / Main Office / Knox Box #3"></div>
+    <div><label>Phone / Code</label><input id="cphone" value="${esc(c.phone)}" placeholder="Phone number, extension, or code"></div>
+    <div><label>Detail</label><input id="cdetail" value="${esc(c.detail)}" placeholder="Front desk, north gate, mechanical room..."></div>
+    <div><label>Notes</label><textarea id="cnotes" placeholder="Any special access instructions or warnings">${esc(c.notes)}</textarea></div>
+  </div>
+  <button class="primary" onclick="saveContact()">Save Access Record</button>
+ </div>`)
+}
+function saveContact(){
+ const s=ensureArrays(site());
+ const obj={type:val("ctype"),name:val("cname"),phone:val("cphone"),detail:val("cdetail"),notes:val("cnotes"),updatedAt:new Date().toISOString()};
+ if(mode){let i=s.contacts.findIndex(x=>x.id===mode);s.contacts[i]={...s.contacts[i],...obj}}
+ else{s.contacts.unshift({...obj,id:uid(),createdAt:new Date().toISOString()})}
+ save(); mode=null; view="access"; render()
 }
 
 function library(){app(`<div class="screen"><h1>Library</h1><p>Manufacturer resources and cheat sheets.</p><div class="list grow">${data.resources.map(r=>`<div class="card"><h2>${esc(r.m)}</h2><p>${esc(r.n)}</p></div>`).join("")}</div></div>`)}
 function settings(){app(`<div class="screen"><h1>Settings</h1><div class="card"><h2>Backup</h2><p>Export before major changes.</p><button class="primary" onclick="exportData()">Export Backup</button><br><br><input type="file" accept="application/json" onchange="importData(event)"></div><div class="card"><h2>Reset</h2><button class="danger" onclick="resetData()">Clear Local Data</button></div></div>`)}
-function exportData(){let blob=new Blob([JSON.stringify(data,null,2)],{type:"application/json"});let a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="firevault-backup-build-0.5.0.json";a.click()}
+function exportData(){let blob=new Blob([JSON.stringify(data,null,2)],{type:"application/json"});let a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="firevault-backup-build-0.6.0.json";a.click()}
 function importData(e){let f=e.target.files[0];if(!f)return;let r=new FileReader();r.onload=()=>{try{data=JSON.parse(r.result);save();alert("Imported.");go("home")}catch(err){alert("Import failed.")}};r.readAsText(f)}
 function resetData(){if(confirm("Clear all local FireVault data?")){localStorage.removeItem(KEY);data=load();go("home")}}
-function showChangelog(){alert(`FireVault Build ${BUILD}\n\n- Structured equipment records\n- Add/Edit equipment items\n- Equipment count on site cards\n- Equipment summary on site dashboard\n- Search includes equipment data\n- Preserves Build 0.3/0.4 local data`)}
+function showChangelog(){alert(`FireVault Build ${BUILD}\n\n- Structured access/contact records\n- Add/Edit contacts, lockboxes, gate codes, key locations\n- Access count on site dashboard and site cards\n- Search includes access/contact records\n- Preserves previous local data`)}
 render()
 </script>
 </body>

@@ -1,15 +1,14 @@
-# FireVault Build 0.5.0
+# FireVault Build 0.6.0
 
 Root-level package for GitHub Pages.
 
 ## Changes
-- Structured equipment records
-- Add/Edit equipment items
-- Equipment count on site cards
-- Equipment summary on site dashboard
-- Search includes equipment data
-- Preserves Build 0.3 / 0.4 local storage data
+- Structured access/contact records
+- Add/Edit contacts, lockboxes, gate codes, key locations, monitoring contacts
+- Access/contact count on site cards and site dashboard
+- Search includes access/contact data
+- Preserves previous local storage data
 
 Suggested commit:
 
-`Build 0.5.0 structured equipment records`
+`Build 0.6.0 structured access contacts`
