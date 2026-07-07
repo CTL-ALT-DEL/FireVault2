@@ -1,19 +1,23 @@
-# Clean Install Notes — FireVault 0.43.7
+# Clean Install Reminder
 
-This ZIP is a clean root package. The top-level contents should be copied directly into the FireVault project root.
+This is a clean-root FireVault package.
 
-Expected root contents:
+Copy these files into the GitHub Pages project root:
+
+- `index.html`
+- `manifest.json`
+- `src/`
+- `assets/`
+- `README.md`
+- `.gitignore`
+
+Do **not** copy the extracted folder itself into the repository.
+
+Delete any nested folders named like:
 
 ```text
-index.html
-manifest.json
-src/
-assets/
-README.md
-CLEAN_INSTALL.md
-.gitignore
+firevault-build-*
+fv4*
 ```
 
-Build 0.43.7 adds the per-site Inspection Checklist workflow. It keeps the same localStorage key so existing FireVault data should remain compatible.
-
-Before committing, delete any extracted folders named like `firevault-build-*` from inside the repo.
+Build 0.43.8 keeps the existing storage key so current browser data remains compatible.
