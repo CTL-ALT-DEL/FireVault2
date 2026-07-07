@@ -1,15 +1,15 @@
-# FireVault Build 0.4.0
+# FireVault Build 0.5.0
 
 Root-level package for GitHub Pages.
 
 ## Changes
-- No-scroll field layout
-- One screen = one job
-- Site dashboard replaces long site detail page
-- Separate screens for Visits, Known Issues, Equipment, and Access
-- Larger touch targets for field use
-- Preserves Build 0.3 local storage data
+- Structured equipment records
+- Add/Edit equipment items
+- Equipment count on site cards
+- Equipment summary on site dashboard
+- Search includes equipment data
+- Preserves Build 0.3 / 0.4 local storage data
 
 Suggested commit:
 
-`Build 0.4.0 no-scroll field layout`
+`Build 0.5.0 structured equipment records`
