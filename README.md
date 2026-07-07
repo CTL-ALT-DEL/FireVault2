@@ -2,23 +2,23 @@
 
 FireVault is a local-first field knowledge system for fire alarm technicians.
 
-## Version 0.3
+## Version 2.0 Foundation
 
-This build adds the first real Site Vault experience:
+This build includes:
 
 - Dashboard
-- Sites search
-- Add/Edit Site
-- Site Detail tabs
-- Overview
-- Visits
-- Known Issues
-- Equipment
-- Contacts/Access
-- Resource Library
-- Export/import JSON backup
+- Customer/site records
+- Add/edit site form
+- Site detail view
+- Visit history
+- Known issues
+- Fire alarm system information
+- Access notes
+- Local browser storage
+- Export/import backup
+- Resource library starter
 
-## Run locally
+## Install
 
 ```bash
 npm install
@@ -30,3 +30,7 @@ npm run dev
 ```bash
 npm run build
 ```
+
+## Development rule
+
+One feature at a time. Test. Commit. Push.
