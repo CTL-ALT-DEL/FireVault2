@@ -1,16 +1,16 @@
-# FireVault Build 0.38.0 — Daily Summary / Breadcrumbs Module
+# FireVault Build 0.39.0 — Professional Settings / Theme Foundation
 
 Root-level package for GitHub Pages.
 
 ## Changes
-- Daily Summary screen
-- List of sites visited by date
-- Manual Drop Crumb GPS capture
-- Route point timeline
-- Apple Maps and Google Maps route helpers
-- Copy daily summary
-- Breadcrumb count in Diagnostics
+- Professional Settings layout pass
+- Cleaner Settings hero and sections
+- Photo Overlay preview panel
+- More compact Technician layout
+- Email default subject and signature tags
+- New Themes tab
+- Theme preferences saved in backup data
 
 Suggested commit:
 
-`Build 0.38.0 daily summary breadcrumbs`
+`Build 0.39.0 professional settings theme foundation`

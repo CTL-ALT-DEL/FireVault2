@@ -1286,14 +1286,17 @@ function settings(){
     ["pdf","🧾","PDF"],
     ["email","✉️","Email"],
     ["app","⚙️","App"],
+    ["themes","🎨","Themes"],
     ["advanced","⭐","Advanced"],
     ["backup","💾","Backup"]
   ];
 
   html(`<div class="screen">
-    <div class="row">
-      <div><h1>Settings</h1><p>Customize FireVault by section.</p></div>
-      <button class="ghost" id="saveSettingsTop">Save</button>
+    <div class="card settingsHero">
+      <div class="row">
+        <div><h1>Settings</h1><p>Customize FireVault by section. Each tab saves independently.</p></div>
+        <button class="ghost" id="saveSettingsTop">Save</button>
+      </div>
     </div>
     <div class="tabs">
       ${tabNames.map(([key,icon,label]) => `<button class="tabBtn ${settingsTab===key?"active":""}" data-tab="${key}">${icon}<br>${label}</button>`).join("")}
@@ -1318,33 +1321,31 @@ function drawSettingsTab(){
   const panel = document.getElementById("settingsPanel");
 
   if(settingsTab === "tech"){
-    panel.innerHTML = `<div class="card">
-      <div class="sectionTitle"><h2>Technician Information</h2><span class="pill">Reports</span></div>
-      <p class="settingHint">Used later for reports, PDFs, email signatures, and technician identification.</p>
-      <label>Name</label><input id="techName" value="${esc(t.name)}">
-      <label>Company</label><input id="techCompany" value="${esc(t.company)}">
-      <label>Phone</label><input id="techPhone" value="${esc(t.phone)}">
-      <label>Email</label><input id="techEmail" value="${esc(t.email)}">
+    panel.innerHTML = `<div class="card settingGroup">
+      <div class="sectionTitle"><h2>Technician Profile</h2><span class="pill">Reports</span></div>
+      <p class="settingHint">Used for reports, PDFs, email signatures, and photo tags later.</p>
+      <div class="compactField"><div><label>Name</label><input id="techName" value="${esc(t.name)}"></div><div><label>Company</label><input id="techCompany" value="${esc(t.company)}"></div></div>
+      <div class="compactField"><div><label>Phone</label><input id="techPhone" value="${esc(t.phone)}"></div><div><label>Email</label><input id="techEmail" value="${esc(t.email)}"></div></div>
       <label>License / Certification</label><input id="techLicense" value="${esc(t.license)}">
     </div>`;
   }
 
   if(settingsTab === "photo"){
-    panel.innerHTML = `<div class="card">
+    panel.innerHTML = `<div class="card settingGroup">
       <div class="sectionTitle"><h2>Photo Overlay</h2><span class="pill">Active</span></div>
-      <p class="settingHint">Controls the FireVault stamp added to new uploaded photos.</p>
-      <label><input type="checkbox" id="f_site" ${field("site")}> Site</label>
-      <label><input type="checkbox" id="f_date" ${field("date")}> Date</label>
-      <label><input type="checkbox" id="f_time" ${field("time")}> Time</label>
-      <label><input type="checkbox" id="f_panel" ${field("panel")}> Panel</label>
-      <label><input type="checkbox" id="f_address" ${field("address")}> Address</label>
-      <label><input type="checkbox" id="f_gps" ${field("gps")}> GPS</label>
-      <label>Alignment</label><select id="ovAlign"><option value="bottom" ${o.alignment==="bottom"?"selected":""}>Bottom</option><option value="top" ${o.alignment==="top"?"selected":""}>Top</option></select>
-      <label>Font Size</label><select id="ovFont"><option value="small" ${o.fontSize==="small"?"selected":""}>Small</option><option value="medium" ${o.fontSize==="medium"?"selected":""}>Medium</option><option value="large" ${o.fontSize==="large"?"selected":""}>Large</option></select>
-      <label>Text Color</label><input id="ovText" type="color" value="${esc(o.textColor)}">
-      <label>Accent Color</label><input id="ovAccent" type="color" value="${esc(o.accentColor)}">
-      <label><input type="checkbox" id="ovLogo" ${o.showLogo!==false?"checked":""}> Show Logo</label>
-      <label><input type="checkbox" id="ovTagline" ${o.showTagline!==false?"checked":""}> Show Tagline</label>
+      <div class="previewPanel"><div class="previewOverlay ${o.alignment==="top"?"top":""}" style="color:${esc(o.textColor||"#ffffff")}"><span style="color:${esc(o.accentColor||"#ef4444")}">FIRE</span>VAULT<br>Site: ABC Building<br>Date: Today</div></div>
+      <h2>Fields</h2>
+      <div class="grid2">
+        <label><input type="checkbox" id="f_site" ${field("site")}> Site</label>
+        <label><input type="checkbox" id="f_date" ${field("date")}> Date</label>
+        <label><input type="checkbox" id="f_time" ${field("time")}> Time</label>
+        <label><input type="checkbox" id="f_panel" ${field("panel")}> Panel</label>
+        <label><input type="checkbox" id="f_address" ${field("address")}> Address</label>
+        <label><input type="checkbox" id="f_gps" ${field("gps")}> GPS</label>
+      </div>
+      <div class="compactField"><div><label>Alignment</label><select id="ovAlign"><option value="bottom" ${o.alignment==="bottom"?"selected":""}>Bottom</option><option value="top" ${o.alignment==="top"?"selected":""}>Top</option></select></div><div><label>Font Size</label><select id="ovFont"><option value="small" ${o.fontSize==="small"?"selected":""}>Small</option><option value="medium" ${o.fontSize==="medium"?"selected":""}>Medium</option><option value="large" ${o.fontSize==="large"?"selected":""}>Large</option></select></div></div>
+      <div class="compactField"><div><label>Text Color</label><input id="ovText" type="color" value="${esc(o.textColor)}"></div><div><label>Accent Color</label><input id="ovAccent" type="color" value="${esc(o.accentColor)}"></div></div>
+      <div class="grid2"><label><input type="checkbox" id="ovLogo" ${o.showLogo!==false?"checked":""}> Show Logo</label><label><input type="checkbox" id="ovTagline" ${o.showTagline!==false?"checked":""}> Show Tagline</label></div>
     </div>`;
   }
 
@@ -1389,8 +1390,9 @@ function drawSettingsTab(){
       <div class="sectionTitle"><h2>Email Defaults</h2><span class="pill">Future</span></div>
       <label>Default To</label><input id="emailTo" value="${esc(e.defaultTo)}">
       <label>Default CC</label><input id="emailCc" value="${esc(e.cc)}">
-      <label>Subject Prefix</label><input id="emailPrefix" value="${esc(e.subjectPrefix)}">
+      <div class="compactField"><div><label>Subject Prefix</label><input id="emailPrefix" value="${esc(e.subjectPrefix)}"></div><div><label>Default Subject</label><input id="emailSubject" value="${esc(e.defaultSubject||"FireVault Report - {site_name} - {date}")}"></div></div>
       <label>Signature</label><textarea id="emailSig">${esc(e.signature)}</textarea>
+      <div class="card tight"><h2>Available Tags</h2><div class="tagHelp">{site_name} {date} {technician} {company}<br>{phone} {email} {panel} {address}<br>{job_time}</div></div>
     </div>`;
   }
 
@@ -1401,6 +1403,30 @@ function drawSettingsTab(){
       <label>Distance Unit</label><select id="distanceUnit"><option value="feet" ${a.distanceUnit==="feet"?"selected":""}>Feet</option><option value="miles" ${a.distanceUnit==="miles"?"selected":""}>Miles</option></select>
       <label><input type="checkbox" id="confirmDeletes" ${a.confirmDeletes?"checked":""}> Confirm Deletes</label>
       <label><input type="checkbox" id="backupReminder" ${a.autoBackupReminder?"checked":""}> Backup reminders</label>
+    </div>`;
+  }
+
+  if(settingsTab === "themes"){
+    const th = data.settings.theme || {};
+    panel.innerHTML = `<div class="card settingGroup">
+      <div class="sectionTitle"><h2>Theme Customization</h2><span class="pill">New</span></div>
+      <p class="settingHint">Theme options are saved now. More visual theme application will be added as the UI matures.</p>
+      <label>Theme</label>
+      <select id="themeName">
+        <option value="firevault-dark" ${th.name==="firevault-dark"?"selected":""}>FireVault Dark</option>
+        <option value="firevault-red" ${th.name==="firevault-red"?"selected":""}>FireVault Red</option>
+        <option value="industrial-blue" ${th.name==="industrial-blue"?"selected":""}>Industrial Blue</option>
+        <option value="night-shift" ${th.name==="night-shift"?"selected":""}>Night Shift</option>
+        <option value="high-contrast" ${th.name==="high-contrast"?"selected":""}>High Contrast</option>
+      </select>
+      <div class="compactField"><div><label>Accent Color</label><input id="themeAccent" type="color" value="${esc(th.accentColor||"#ef4444")}"></div><div><label>Button Style</label><select id="buttonStyle"><option value="rounded" ${th.buttonStyle==="rounded"?"selected":""}>Rounded</option><option value="square" ${th.buttonStyle==="square"?"selected":""}>Square</option><option value="pill" ${th.buttonStyle==="pill"?"selected":""}>Pill</option></select></div></div>
+      <label>Card Style</label><select id="cardStyle"><option value="glass" ${th.cardStyle==="glass"?"selected":""}>Glass</option><option value="solid" ${th.cardStyle==="solid"?"selected":""}>Solid</option><option value="outlined" ${th.cardStyle==="outlined"?"selected":""}>Outlined</option></select>
+      <div class="grid2">
+        <label><input type="checkbox" id="themeHighContrast" ${th.highContrast?"checked":""}> High Contrast</label>
+        <label><input type="checkbox" id="themeLargeText" ${th.largeText?"checked":""}> Larger Text</label>
+        <label><input type="checkbox" id="themeCompact" ${th.compactLayout?"checked":""}> Compact Layout</label>
+      </div>
+      <div class="card tight"><h2>Preview</h2><p><span class="themeSwatch" style="background:${esc(th.accentColor||"#ef4444")}"></span>${esc(th.name||"firevault-dark")}</p></div>
     </div>`;
   }
 
@@ -1469,10 +1495,45 @@ function saveSettingsFromVisibleTab(){
     s.pdf = {...s.pdf,paperSize:val("paperSize"),orientation:val("pdfOrientation"),photoSize:val("photoSize"),includeLogo:checked("pdfLogo"),footerText:val("footerText")};
   }
   if(settingsTab === "email"){
-    s.email = {...s.email,defaultTo:val("emailTo"),cc:val("emailCc"),subjectPrefix:val("emailPrefix"),signature:val("emailSig")};
+    s.email = {...s.email,defaultTo:val("emailTo"),cc:val("emailCc"),subjectPrefix:val("emailPrefix"),defaultSubject:val("emailSubject"),signature:val("emailSig")};
   }
   if(settingsTab === "app"){
     s.app = {...s.app,defaultScreen:val("defaultScreen"),distanceUnit:val("distanceUnit"),confirmDeletes:checked("confirmDeletes"),autoBackupReminder:checked("backupReminder")};
+  }
+  if(settingsTab === "themes"){
+    const th = data.settings.theme || {};
+    panel.innerHTML = `<div class="card settingGroup">
+      <div class="sectionTitle"><h2>Theme Customization</h2><span class="pill">New</span></div>
+      <p class="settingHint">Theme options are saved now. More visual theme application will be added as the UI matures.</p>
+      <label>Theme</label>
+      <select id="themeName">
+        <option value="firevault-dark" ${th.name==="firevault-dark"?"selected":""}>FireVault Dark</option>
+        <option value="firevault-red" ${th.name==="firevault-red"?"selected":""}>FireVault Red</option>
+        <option value="industrial-blue" ${th.name==="industrial-blue"?"selected":""}>Industrial Blue</option>
+        <option value="night-shift" ${th.name==="night-shift"?"selected":""}>Night Shift</option>
+        <option value="high-contrast" ${th.name==="high-contrast"?"selected":""}>High Contrast</option>
+      </select>
+      <div class="compactField"><div><label>Accent Color</label><input id="themeAccent" type="color" value="${esc(th.accentColor||"#ef4444")}"></div><div><label>Button Style</label><select id="buttonStyle"><option value="rounded" ${th.buttonStyle==="rounded"?"selected":""}>Rounded</option><option value="square" ${th.buttonStyle==="square"?"selected":""}>Square</option><option value="pill" ${th.buttonStyle==="pill"?"selected":""}>Pill</option></select></div></div>
+      <label>Card Style</label><select id="cardStyle"><option value="glass" ${th.cardStyle==="glass"?"selected":""}>Glass</option><option value="solid" ${th.cardStyle==="solid"?"selected":""}>Solid</option><option value="outlined" ${th.cardStyle==="outlined"?"selected":""}>Outlined</option></select>
+      <div class="grid2">
+        <label><input type="checkbox" id="themeHighContrast" ${th.highContrast?"checked":""}> High Contrast</label>
+        <label><input type="checkbox" id="themeLargeText" ${th.largeText?"checked":""}> Larger Text</label>
+        <label><input type="checkbox" id="themeCompact" ${th.compactLayout?"checked":""}> Compact Layout</label>
+      </div>
+      <div class="card tight"><h2>Preview</h2><p><span class="themeSwatch" style="background:${esc(th.accentColor||"#ef4444")}"></span>${esc(th.name||"firevault-dark")}</p></div>
+    </div>`;
+  }
+
+  if(settingsTab === "themes"){
+    s.theme = {
+      name:val("themeName"),
+      accentColor:val("themeAccent"),
+      highContrast:checked("themeHighContrast"),
+      largeText:checked("themeLargeText"),
+      compactLayout:checked("themeCompact"),
+      buttonStyle:val("buttonStyle"),
+      cardStyle:val("cardStyle")
+    };
   }
   if(settingsTab === "advanced"){
     s.advanced = {
@@ -1496,19 +1557,19 @@ function diagnostics(){
 }
 
 function exportJson(){
-  downloadBlob("firevault-backup-build-0.38.0.json", JSON.stringify(data,null,2), "application/json");
+  downloadBlob("firevault-backup-build-0.39.0.json", JSON.stringify(data,null,2), "application/json");
 }
 
 function showChangelog(){
   alert(`FireVault Build ${BUILD}
 
-- Daily Summary / Breadcrumbs module
-- Daily visited-sites list
-- Manual Drop Crumb GPS capture
-- Route points timeline
-- Apple Maps and Google Maps route helpers
-- Copy daily summary
-- Breadcrumb count in Diagnostics`);
+- Professional Settings pass
+- Cleaner Settings hero and sections
+- Photo Overlay preview panel
+- More compact Technician layout
+- Email default subject and signature tags
+- New Themes tab
+- Theme preferences saved in backup data`);
 }
 
 render();

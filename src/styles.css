@@ -87,3 +87,12 @@ nav button span:last-child{font-size:12px}
 .routePath{border-left:2px dashed rgba(56,189,248,.45);margin-left:6px;padding-left:13px}
 .summaryStat{display:flex;flex-direction:column;gap:2px}
 .summaryStat strong{font-size:20px}
+
+.settingsHero{background:linear-gradient(135deg,rgba(239,68,68,.18),rgba(56,189,248,.08));border-color:rgba(239,68,68,.30)}
+.settingGroup{border-left:4px solid rgba(239,68,68,.65)}
+.compactField{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.themeSwatch{width:32px;height:32px;border-radius:10px;border:1px solid rgba(255,255,255,.15);display:inline-block;vertical-align:middle;margin-right:8px}
+.previewPanel{background:#07090c;border-radius:16px;border:1px solid rgba(255,255,255,.09);min-height:150px;position:relative;overflow:hidden;margin:8px 0}
+.previewOverlay{position:absolute;left:0;right:0;bottom:0;padding:10px 12px;background:linear-gradient(90deg,rgba(0,0,0,.86),rgba(127,29,29,.62));font-weight:850}
+.previewOverlay.top{top:0;bottom:auto}
+.tagHelp{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:12px;line-height:1.35;color:var(--muted)}
