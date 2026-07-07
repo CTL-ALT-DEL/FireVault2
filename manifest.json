@@ -7,7 +7,7 @@
   "orientation": "portrait",
   "background_color": "#0b0d10",
   "theme_color": "#101216",
-  "description": "Field knowledge system for fire alarm technicians. Build 0.41.0 with service-call quick events.",
+  "description": "Field knowledge system for fire alarm technicians. Build 0.41.1 with service-call quick events.",
   "icons": [
     {
       "src": "assets/icon-192.png",
