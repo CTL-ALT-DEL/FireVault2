@@ -296,7 +296,7 @@ button:active,.btn:active,label.checkRow:active{transform:translateY(1px) scale(
 @media(max-width:430px){.jobActionGrid{grid-template-columns:1fr 1fr;gap:7px}.jobActionGrid button{min-height:36px;font-size:11.8px}.jobFollowCard{padding:10px}.serviceTaskPill{font-size:10px}}
 @media(max-width:350px){.jobActionGrid{grid-template-columns:1fr}}
 
-/* Build 0.42.3 Task Center filters and quick actions */
+/* Build 0.42.4 Task Center filters and quick actions */
 .taskMetricCard{border-left:3px solid var(--amber)}
 .tasksScreen422{gap:9px}
 .taskTopRow{align-items:center;gap:10px}
@@ -328,7 +328,7 @@ button:active,.btn:active,label.checkRow:active{transform:translateY(1px) scale(
 @media(max-width:350px){.taskFilterPill span{max-width:72px;overflow:hidden;text-overflow:ellipsis}.taskQuickActions{grid-template-columns:1fr;display:grid}}
 
 
-/* Build 0.42.3 iPhone shell, GPS visibility, and Settings readability polish */
+/* Build 0.42.4 iPhone shell, GPS visibility, and Settings readability polish */
 :root{
   --safeBottom423:env(safe-area-inset-bottom,0px);
   --dockBase423:62px;

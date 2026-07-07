@@ -9,14 +9,14 @@
   <meta name="apple-mobile-web-app-title" content="FireVault" />
   <title>FireVault</title>
   <link rel="manifest" href="manifest.json" />
-  <link rel="apple-touch-icon" href="assets/apple-touch-icon.png?v=0.42.3" />
-  <link rel="icon" type="image/png" href="assets/favicon.png?v=0.42.3" />
-  <link rel="stylesheet" href="src/styles.css?v=0.42.3" />
+  <link rel="apple-touch-icon" href="assets/apple-touch-icon.png?v=0.42.4" />
+  <link rel="icon" type="image/png" href="assets/favicon.png?v=0.42.4" />
+  <link rel="stylesheet" href="src/styles.css?v=0.42.4" />
 </head>
 <body>
   <header>
-    <div class="brand"><img class="brandMark" src="assets/favicon.png?v=0.42.3" alt=""><div><div>FIREVAULT</div><small>Field Vault System</small></div></div>
-    <button class="build" id="buildButton">Build 0.42.3</button>
+    <div class="brand"><img class="brandMark" src="assets/favicon.png?v=0.42.4" alt=""><div><div>FIREVAULT</div><small>Field Vault System</small></div></div>
+    <button class="build" id="buildButton">Build 0.42.4</button>
   </header>
 
   <main id="app">
@@ -30,6 +30,18 @@
     <button id="nav-settings" data-route="settings"><span>⚙</span><span>Settings</span></button>
   </nav>
 
-  <script type="module" src="src/app.js?v=0.42.3"></script>
+
+  <script>
+    window.__FIREVAULT_BOOTED = false;
+    window.addEventListener('error', function(e){ window.__FIREVAULT_LAST_ERROR = e.message || String(e.error || e); });
+    window.addEventListener('unhandledrejection', function(e){ window.__FIREVAULT_LAST_ERROR = String(e.reason || e); });
+    setTimeout(function(){
+      var app = document.getElementById('app');
+      if (!window.__FIREVAULT_BOOTED && app && /Loading FireVault/i.test(app.textContent || '')) {
+        app.innerHTML = '<div class="screen"><div class="card errorBox"><h1>FireVault did not finish loading</h1><p>The app module did not boot. Hard refresh the browser or redeploy the latest build files.</p><p>' + (window.__FIREVAULT_LAST_ERROR || 'No browser error was reported.') + '</p></div></div>';
+      }
+    }, 3500);
+  </script>
+  <script type="module" src="src/app.js?v=0.42.4"></script>
 </body>
 </html>
