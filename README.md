@@ -1,14 +1,15 @@
-# FireVault Build 0.6.0
+# FireVault Build 0.7.0
 
 Root-level package for GitHub Pages.
 
 ## Changes
-- Structured access/contact records
-- Add/Edit contacts, lockboxes, gate codes, key locations, monitoring contacts
-- Access/contact count on site cards and site dashboard
-- Search includes access/contact data
+- Docs / Photos section per site
+- Add/Edit file records
+- Categories: Panel Photo, Trouble Screenshot, Riser Diagram, Map/Floor Plan, Battery Label, Inspection Report, Manual Link, Cloud File Link
+- Optional URL/link field
+- Docs count on dashboard, site cards, and site vault
 - Preserves previous local storage data
 
 Suggested commit:
 
-`Build 0.6.0 structured access contacts`
+`Build 0.7.0 docs photos records`
