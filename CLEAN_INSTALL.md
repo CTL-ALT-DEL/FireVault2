@@ -1,7 +1,7 @@
-# Clean Install Notes — FireVault 0.43.1
+# Clean Install
 
-Copy the contents of this ZIP directly into the GitHub Pages project root.
+Copy only the contents of this ZIP into the FireVault GitHub Pages project root.
 
-Do not copy the outer `firevault-build-*` folder into the repo.
+Do not copy the outer `firevault-build-*` folder into your repo.
 
-Keep using the same FireVault storage key so existing local data remains compatible. Export a backup before replacing deployed files.
+If testing on iPhone home screen, deploy first, then delete and re-add the home-screen shortcut if iOS keeps cached layout behavior.

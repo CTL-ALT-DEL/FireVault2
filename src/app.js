@@ -10,6 +10,7 @@ let lastEmailTemplateField = "emailSubject";
 let taskFilter = "open";
 let activeJob = loadActiveJob();
 let nearbyState = null;
+let siteSearch = "";
 let jobTimer = null;
 const QUICK_EVENTS = ["Arrived on site","Opened panel","Panel normal","Trouble active","Ground fault active","Device tested","Customer update","Parts needed"];
 const EMAIL_TAGS = [
@@ -108,6 +109,16 @@ function distanceLabel(m){
 }
 function gpsSiteDistances(lat,lng){
   return data.sites.filter(hasGps).map(s=>({s,meters:distanceMeters(lat,lng,Number(s.gps.lat),Number(s.gps.lng))})).sort((a,b)=>a.meters-b.meters);
+}
+function siteSearchBlob(s){
+  ensureSite(s);
+  const parts=[s.name, fullAddress(s), s.panelManufacturer, s.panelModel, s.notes];
+  (s.contacts||[]).forEach(c=>parts.push(c.name,c.company,c.role,c.phone,c.email,c.type,c.accessNotes,c.notes));
+  (s.equipment||[]).forEach(e=>parts.push(e.type,e.status,e.location,e.make,e.model,e.serial,e.notes));
+  (s.docs||[]).forEach(d=>parts.push(d.type,d.title,d.ref,d.url,d.notes));
+  (s.tasks||[]).forEach(t=>parts.push(t.title,t.status,t.notes,t.source));
+  (s.deficiencies||[]).forEach(d=>parts.push(d.title,d.priority,d.status,d.notes));
+  return parts.filter(Boolean).join(" ").toLowerCase();
 }
 function detectNearbySites(){
   if(data.settings.gps?.enabled===false){ toast("GPS tools are hidden in Settings."); return; }
@@ -297,7 +308,7 @@ function home(){
       <button class="ghost tile" id="diagBtn"><strong>Diagnostics</strong><span>Build status</span></button>
     </div>
     ${activeJob ? `<div class="card activeJobMini"><div class="row"><div><h2>Service Call Active</h2><p>${esc(activeJob.siteName)} • <span id="jobElapsed">${elapsedText(activeJob.startedAt)}</span></p></div><button class="primary" id="resumeJobBtn">Open</button></div></div>` : ""}
-    <div class="card grow"><h2>Build ${BUILD}</h2><p>Site Documents Vault is now available.</p><p>Store panel manuals, permit links, inspection forms, account notes, and other site-specific references inside each customer vault.</p></div>
+    <div class="card grow"><h2>Build ${BUILD}</h2><p>Site Finder is now available.</p><p>Search across site names, addresses, panels, contacts, equipment, documents, tasks, deficiencies, and notes from the Sites screen.</p></div>
   </div>`);
   document.getElementById("sitesCard").onclick=()=>route("sites");
   document.getElementById("tasksCard").onclick=()=>{selectedSiteId=null; route("tasks");};
@@ -316,12 +327,29 @@ function home(){
 
 function sites(){
   const gpsSavedCount = data.sites.filter(hasGps).length;
-  html(`<div class="screen sitesScreen423"><div class="row"><h1>Sites</h1><div class="miniActions"><button class="ghost smallBtn" id="nearBtn">Nearby</button><button class="primary" id="addBtn">＋</button></div></div>
+  html(`<div class="screen sitesScreen423 sitesScreen432"><div class="row"><h1>Sites</h1><div class="miniActions"><button class="ghost smallBtn" id="nearBtn">Nearby</button><button class="primary" id="addBtn">＋</button></div></div>
+    <div class="card siteFinderCard"><div class="siteFinderTop"><input id="siteSearch" type="search" placeholder="Search sites, panels, contacts, equipment..." value="${esc(siteSearch)}" autocomplete="off"><button class="ghost smallBtn" id="clearSiteSearch">Clear</button></div><div class="siteFinderHint"><span id="siteSearchCount">${data.sites.length} site${data.sites.length===1?"":"s"}</span><span>Searches all saved vault details</span></div></div>
     <div class="card gpsStatusBar"><div><strong>GPS / Nearby</strong><p>${gpsSavedCount} site${gpsSavedCount===1?"":"s"} with GPS saved • radius ${nearbyRadiusMiles()} mi</p></div><button class="ghost smallBtn" id="gpsStripScan">Scan Nearby</button></div>
-    <div class="list grow">${data.sites.length?data.sites.map(s=>`<div class="card siteItem redline" data-id="${s.id}"><div class="row"><div><h2>${esc(s.name||"Unnamed Site")}</h2><p>${esc(fullAddress(s))}</p><p>${esc([s.panelManufacturer,s.panelModel].filter(Boolean).join(" ")||"Panel not entered")}</p></div><div class="sitePills"><span class="pill">${(s.tasks||[]).length} tasks</span><span class="pill ${hasGps(s)?"gpsPill":"noGpsPill"}">${hasGps(s)?"GPS saved":"No GPS"}</span></div></div></div>`).join(""):`<div class="empty">No sites yet. Add your first customer vault.</div>`}</div></div>`);
+    <div class="list grow siteSearchList">${data.sites.length?data.sites.map(s=>`<div class="card siteItem redline" data-id="${esc(s.id)}" data-search="${esc(siteSearchBlob(s))}"><div class="row"><div><h2>${esc(s.name||"Unnamed Site")}</h2><p>${esc(fullAddress(s))}</p><p>${esc([s.panelManufacturer,s.panelModel].filter(Boolean).join(" ")||"Panel not entered")}</p></div><div class="sitePills"><span class="pill">${(s.tasks||[]).filter(t=>(t.status||"Open")!=="Done").length} open</span><span class="pill">${(s.equipment||[]).length} equip</span><span class="pill ${hasGps(s)?"gpsPill":"noGpsPill"}">${hasGps(s)?"GPS saved":"No GPS"}</span></div></div></div>`).join(""):`<div class="empty">No sites yet. Add your first customer vault.</div>`}</div></div>`);
   document.getElementById("addBtn").onclick=()=>{selectedSiteId=null; mode=null; route("siteForm");};
   document.getElementById("nearBtn").onclick=detectNearbySites;
   document.getElementById("gpsStripScan").onclick=detectNearbySites;
+  const searchEl=document.getElementById("siteSearch");
+  const clearBtn=document.getElementById("clearSiteSearch");
+  const countEl=document.getElementById("siteSearchCount");
+  const applySiteSearch=()=>{
+    siteSearch=(searchEl?.value||"").trim().toLowerCase();
+    let shown=0;
+    document.querySelectorAll(".siteSearchList .siteItem").forEach(el=>{
+      const ok=!siteSearch || (el.dataset.search||"").includes(siteSearch);
+      el.hidden=!ok;
+      if(ok) shown++;
+    });
+    if(countEl) countEl.textContent = `${shown} of ${data.sites.length} site${data.sites.length===1?"":"s"}`;
+    if(clearBtn) clearBtn.style.visibility = siteSearch ? "visible" : "hidden";
+  };
+  if(searchEl){ searchEl.oninput=applySiteSearch; applySiteSearch(); }
+  if(clearBtn) clearBtn.onclick=()=>{ if(searchEl){ searchEl.value=""; searchEl.focus(); } applySiteSearch(); };
   document.querySelectorAll(".siteItem").forEach(el=>el.onclick=()=>{selectedSiteId=el.dataset.id; route("siteDetail");});
 }
 
@@ -899,17 +927,17 @@ function saveSettings(){
 function diagnostics(){ const taskRows=allTaskRows(); const taskCounts=taskFilterCounts(taskRows); const totalTasks=taskRows.length; const serviceTasks=taskRows.filter(r=>r.t.source==="Service Call").length; const totalDef=data.sites.reduce((n,s)=>n+(s.deficiencies||[]).length,0); const totalVisits=data.sites.reduce((n,s)=>n+(s.visits||[]).length,0); const totalContacts=data.sites.reduce((n,s)=>n+(s.contacts||[]).length,0); const totalDocs=data.sites.reduce((n,s)=>n+(s.docs||[]).length,0); html(`<div class="screen"><div class="row"><button class="back ghost" id="backHome">←</button><h1>Diagnostics</h1></div><div class="card grow errorBox"><p>Build: ${BUILD}</p><p>Sites: ${data.sites.length}</p><p>Total Tasks: ${totalTasks}</p><p>Open Tasks: ${taskCounts.open}</p><p>Due Today: ${taskCounts.today}</p><p>Overdue Tasks: ${taskCounts.overdue}</p><p>Service Follow-Ups: ${serviceTasks}</p><p>Total Deficiencies: ${totalDef}</p><p>Total Visits: ${totalVisits}</p><p>Total Contacts: ${totalContacts}</p><p>Total Documents: ${totalDocs}</p><p>Active Job: ${activeJob ? esc(activeJob.siteName) : "None"}</p><p>Current Theme: ${esc(data.settings.theme.name)}</p><p>Accent: ${esc(data.settings.theme.accentColor)}</p><p>Advanced AI Enabled: ${data.settings.advanced?.aiTechnician ? "Yes" : "No"}</p><p>GPS Tools: ${data.settings.gps?.enabled !== false ? "Enabled" : "Hidden"}</p><p>Nearby Radius: ${nearbyRadiusMiles()} mi</p><p>Haptics: ${data.settings.app?.haptics !== false ? "Enabled" : "Off"}</p><p>Import/Export: Ready</p><p>Storage key: ${KEY}</p><p>Modules loaded successfully.</p></div></div>`); document.getElementById("backHome").onclick=()=>route("home"); }
 function showChangelog(){
   const notes = [
-    "Added Site Documents Vault for each saved site.",
-    "Added document/link types for panel manuals, permits, inspection forms, monitoring accounts, drawings, and code references.",
-    "Added quick Open Link and Copy actions for saved document references.",
-    "Added document summary cards on the Site Detail screen.",
-    "Reports now include a Documents / Links section."
+    "Added Site Finder search on the Sites screen.",
+    "Search now checks site names, addresses, panel details, contacts, equipment, documents, tasks, deficiencies, and notes.",
+    "Added live result counts and a quick Clear button.",
+    "Site rows now show open-task and equipment counts for faster triage.",
+    "Preserved Documents / Links Vault, Contacts & Access Vault, Equipment Vault, GPS/Nearby, and Visit Log features."
   ];
   const overlay=document.createElement("div");
   overlay.className="releaseOverlay";
   overlay.innerHTML=`<div class="releaseSheet" role="dialog" aria-modal="true" aria-label="FireVault release notes">
     <div class="releaseHead"><div><strong>FireVault</strong><span>Build ${BUILD}</span></div><button class="ghost iconBtn" id="closeRelease" aria-label="Close release notes">×</button></div>
-    <div class="releaseBody"><h2>Release Notes</h2><p class="releaseIntro">site documents and links vault starter.</p><ul>${notes.map(n=>`<li>${esc(n)}</li>`).join("")}</ul></div>
+    <div class="releaseBody"><h2>Release Notes</h2><p class="releaseIntro">site finder and vault-wide search.</p><ul>${notes.map(n=>`<li>${esc(n)}</li>`).join("")}</ul></div>
   </div>`;
   document.body.appendChild(overlay);
   const close=()=>overlay.remove();
