@@ -1,7 +1,7 @@
-# Clean Install Notes — FireVault 0.43.3
+# Clean Install Notes
 
-Copy the files inside this ZIP directly into the project root.
+Copy the contents of this package directly into the repository root.
 
-Do not commit extracted folders named `firevault-build-*`.
+Do not commit extracted folders such as `firevault-build-*` into the app project.
 
-This build preserves the existing local storage key so current browser data remains compatible.
+This build preserves the existing localStorage key so current FireVault data should remain compatible.
