@@ -1,10 +1,10 @@
-# FireVault Build 0.41.1 - GPS Restore / Settings Readability
+# FireVault Build 0.41.2 - GPS Restore / Settings Readability
 
 This clean root package continues the modular FireVault build from 0.41.0.
 
 ## Updated
 
-- Advanced visible build number to 0.41.1.
+- Advanced visible build number to 0.41.2.
 - Restored GPS/location tools on Site Detail and Site Edit/Add screens.
 - Added Capture GPS for customer sites using browser geolocation.
 - Added GPS coordinate display, accuracy, and saved timestamp.
@@ -25,3 +25,9 @@ This clean root package continues the modular FireVault build from 0.41.0.
 - README.md
 - CLEAN_INSTALL.md
 - .gitignore
+
+
+## Build 0.41.2
+- Emergency startup repair after 0.41.1 could remain on Loading FireVault.
+- Added guarded module import and boot watchdog diagnostics.
+- Keeps GPS restore and Settings readability changes from 0.41.1.

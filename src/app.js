@@ -130,6 +130,7 @@ function render(){
 }
 
 function showError(err){
+  window.__firevaultBooted = true;
   console.error(err);
   html(`<div class="screen"><div class="card errorBox"><h1>FireVault Diagnostics</h1><p>The app caught an error instead of going black.</p><p>${esc(err?.stack || err?.message || err)}</p><button class="primary" onclick="location.reload()">Reload App</button></div></div>`);
 }
@@ -153,7 +154,7 @@ function home(){
       <button class="ghost tile" id="diagBtn"><strong>Diagnostics</strong><span>Build status</span></button>
     </div>
     ${activeJob ? `<div class="card activeJobMini"><div class="row"><div><h2>Service Call Active</h2><p>${esc(activeJob.siteName)} • <span id="jobElapsed">${elapsedText(activeJob.startedAt)}</span></p></div><button class="primary" id="resumeJobBtn">Open</button></div></div>` : ""}
-    <div class="card grow"><h2>Build 0.41.1</h2><p>GPS tools are restored for site coordinates, map links, reports, and service-call events.</p><p>Settings spacing has been eased back for readability while keeping the minimalist pill tabs.</p></div>
+    <div class="card grow"><h2>Build 0.41.2</h2><p>GPS tools are restored for site coordinates, map links, reports, and service-call events.</p><p>Settings spacing has been eased back for readability while keeping the minimalist pill tabs.</p></div>
   </div>`);
   document.getElementById("sitesCard").onclick=()=>route("sites");
   document.getElementById("tasksCard").onclick=()=>{selectedSiteId=null; route("tasks");};
@@ -396,7 +397,7 @@ function saveSettings(){
 function diagnostics(){ const totalTasks=data.sites.reduce((n,s)=>n+(s.tasks||[]).length,0); const totalDef=data.sites.reduce((n,s)=>n+(s.deficiencies||[]).length,0); html(`<div class="screen"><div class="row"><button class="back ghost" id="backHome">←</button><h1>Diagnostics</h1></div><div class="card grow errorBox"><p>Build: ${BUILD}</p><p>Sites: ${data.sites.length}</p><p>Total Tasks: ${totalTasks}</p><p>Total Deficiencies: ${totalDef}</p><p>Active Job: ${activeJob ? esc(activeJob.siteName) : "None"}</p><p>Current Theme: ${esc(data.settings.theme.name)}</p><p>Accent: ${esc(data.settings.theme.accentColor)}</p><p>Advanced AI Enabled: ${data.settings.advanced?.aiTechnician ? "Yes" : "No"}</p><p>Import/Export: Ready</p><p>Storage key: ${KEY}</p><p>Modules loaded successfully.</p></div></div>`); document.getElementById("backHome").onclick=()=>route("home"); }
 function showChangelog(){
   const notes = [
-    "Build number advanced to 0.41.1 across the header, dashboard, manifest, and diagnostics.",
+    "Build number advanced to 0.41.2 across the header, dashboard, manifest, and diagnostics.",
     "Restored GPS tools on site detail and site edit screens.",
     "Added Capture GPS, Apple Maps, Google Maps, and GPS service-call event support.",
     "Reports now include saved GPS coordinates when available.",
@@ -415,3 +416,4 @@ function showChangelog(){
   overlay.addEventListener("click",e=>{ if(e.target===overlay) close(); });
 }
 render();
+window.__firevaultBooted = true;
