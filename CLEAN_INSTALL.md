@@ -1,14 +1,7 @@
-# Clean install note
+# Clean Install
 
-Your screenshot shows old extracted build folders sitting inside the project root.
-
-Delete these local folders before copying in the new build:
-
-- `firevault-build-0.40.1-modular-root`
-- `firevault-build-0.40.2-modular-root`
-- `firevault-build-0.40.3-modular-root`
-- any other `firevault-build-*` folders
-
-Then copy/extract this ZIP into the project root so the root contains `index.html`, `manifest.json`, `src/`, `assets/`, and optional project files like `package.json`.
-
-Do not drag the entire unzipped build folder into the project. Open the ZIP or folder and copy the contents into the project root.
+1. Delete any old extracted `firevault-build-*` folders from your project root.
+2. Do not use builds 0.41.0, 0.41.1, or 0.41.2.
+3. Copy this ZIP contents into the actual app root.
+4. Commit and deploy.
+5. Hard-refresh the browser or clear site data if the old loading screen is cached.

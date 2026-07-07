@@ -52,70 +52,6 @@ function saveActiveJob(){ activeJob ? localStorage.setItem(ACTIVE_JOB_KEY, JSON.
 function fmtDate(d=new Date()){ return d.toLocaleDateString([], {month:"short", day:"numeric", year:"numeric"}); }
 function todayIso(){ return new Date().toISOString().slice(0,10); }
 function elapsedText(startIso){ const ms=Date.now()-new Date(startIso).getTime(); const h=Math.floor(ms/3600000); const m=Math.floor((ms%3600000)/60000); const s=Math.floor((ms%60000)/1000); return h?`${h}:${String(m).padStart(2,"0")}:${String(s).padStart(2,"0")}`:`${m}:${String(s).padStart(2,"0")}`; }
-function timeShort(iso){ return new Date(iso).toLocaleTimeString([], {hour:"numeric",minute:"2-digit"}); }
-function dateShort(iso){ return new Date(iso).toLocaleDateString([], {month:"short",day:"numeric",year:"numeric"}); }
-function durationText(startIso,endIso){
-  if(!startIso || !endIso) return "";
-  const ms=Math.max(0,new Date(endIso).getTime()-new Date(startIso).getTime());
-  const h=Math.floor(ms/3600000); const m=Math.round((ms%3600000)/60000);
-  return h?`${h}h ${m}m`:`${m}m`;
-}
-function visitNotes(v){
-  if(Array.isArray(v.events) && v.events.length) return v.events.map(e=>`${timeShort(e.time)} - ${e.note}`).join("\n");
-  return v.notes || "No visit notes saved.";
-}
-function recentVisits(s){
-  const visits=(s.visits||[]).slice(0,3);
-  if(!visits.length) return `<div class="card grow visitSummaryCard"><h2>Recent Visits</h2><p>No visits saved yet. Start Job will build a service-call timeline here.</p></div>`;
-  return `<div class="card grow visitSummaryCard"><div class="row"><h2>Recent Visits</h2><span class="pill">${visits.length} shown</span></div><div class="siteVisitList">${visits.map(v=>`<div class="visitMini"><strong>${dateShort(v.startedAt||v.date||new Date())}</strong><span>${durationText(v.startedAt,v.endedAt)||"Visit saved"}</span><p>${esc(v.summary || (v.notes||"").split("\n")[0] || "Service visit")}</p></div>`).join("")}</div></div>`;
-}
-
-function gpsLabel(s){
-  return s?.gps?.lat && s?.gps?.lng ? `${Number(s.gps.lat).toFixed(6)}, ${Number(s.gps.lng).toFixed(6)}` : "No GPS coordinate saved.";
-}
-function gpsMeta(s){
-  if(!s?.gps?.lat || !s?.gps?.lng) return "Use Capture GPS when standing at the customer site.";
-  const parts=[];
-  if(s.gps.accuracy) parts.push(`±${Math.round(s.gps.accuracy)} ft`);
-  if(s.gps.capturedAt) parts.push(`Saved ${new Date(s.gps.capturedAt).toLocaleString()}`);
-  return parts.join(" • ") || "GPS coordinate saved.";
-}
-function mapTarget(s){
-  return s?.gps?.lat && s?.gps?.lng ? `${s.gps.lat},${s.gps.lng}` : fullAddress(s);
-}
-function captureGpsForSite(s, done){
-  if(!navigator.geolocation){ alert("GPS is not available in this browser."); return; }
-  toast("Getting GPS location…");
-  navigator.geolocation.getCurrentPosition(pos=>{
-    s.gps={lat:+pos.coords.latitude.toFixed(7),lng:+pos.coords.longitude.toFixed(7),accuracy:pos.coords.accuracy?Math.round(pos.coords.accuracy*3.28084):null,capturedAt:new Date().toISOString()};
-    save();
-    toast("GPS saved to site.");
-    if(done) done(); else render();
-  },err=>{ alert("GPS failed: "+(err.message||"Permission denied or unavailable.")); },{enableHighAccuracy:true,timeout:12000,maximumAge:30000});
-}
-function captureGpsToForm(){
-  if(!navigator.geolocation){ alert("GPS is not available in this browser."); return; }
-  toast("Getting GPS location…");
-  navigator.geolocation.getCurrentPosition(pos=>{
-    document.getElementById("gpsLat").value=(+pos.coords.latitude.toFixed(7));
-    document.getElementById("gpsLng").value=(+pos.coords.longitude.toFixed(7));
-    document.getElementById("gpsAcc").value=pos.coords.accuracy?Math.round(pos.coords.accuracy*3.28084):"";
-    document.getElementById("gpsAt").value=new Date().toISOString();
-    const status=document.getElementById("gpsStatus");
-    if(status) status.textContent=`Saved in form: ${Number(pos.coords.latitude).toFixed(6)}, ${Number(pos.coords.longitude).toFixed(6)}`;
-    toast("GPS added to form.");
-  },err=>{ alert("GPS failed: "+(err.message||"Permission denied or unavailable.")); },{enableHighAccuracy:true,timeout:12000,maximumAge:30000});
-}
-function addGpsEvent(){
-  if(!activeJob || !navigator.geolocation){ alert("GPS is not available for this service call."); return; }
-  toast("Getting GPS event…");
-  navigator.geolocation.getCurrentPosition(pos=>{
-    const lat=+pos.coords.latitude.toFixed(7), lng=+pos.coords.longitude.toFixed(7);
-    const acc=pos.coords.accuracy?Math.round(pos.coords.accuracy*3.28084):null;
-    addJobEvent(`GPS captured: ${lat}, ${lng}${acc?` • ±${acc} ft`:""}`);
-  },err=>{ alert("GPS failed: "+(err.message||"Permission denied or unavailable.")); },{enableHighAccuracy:true,timeout:12000,maximumAge:30000});
-}
-
 function startJobTimer(){ stopJobTimer(); jobTimer=setInterval(()=>{ const el=document.getElementById("jobElapsed"); if(el && activeJob) el.textContent=elapsedText(activeJob.startedAt); },1000); }
 function stopJobTimer(){ if(jobTimer){ clearInterval(jobTimer); jobTimer=null; } }
 function setActiveNav(){ document.querySelectorAll("nav button").forEach(b=>b.classList.remove("active")); const section=["siteDetail","siteForm","tasks","taskForm","deficiencies","deficiencyForm","report","jobMode"].includes(view)?"sites":view; document.getElementById("nav-"+section)?.classList.add("active"); }
@@ -130,7 +66,6 @@ function render(){
 }
 
 function showError(err){
-  window.__firevaultBooted = true;
   console.error(err);
   html(`<div class="screen"><div class="card errorBox"><h1>FireVault Diagnostics</h1><p>The app caught an error instead of going black.</p><p>${esc(err?.stack || err?.message || err)}</p><button class="primary" onclick="location.reload()">Reload App</button></div></div>`);
 }
@@ -154,7 +89,7 @@ function home(){
       <button class="ghost tile" id="diagBtn"><strong>Diagnostics</strong><span>Build status</span></button>
     </div>
     ${activeJob ? `<div class="card activeJobMini"><div class="row"><div><h2>Service Call Active</h2><p>${esc(activeJob.siteName)} • <span id="jobElapsed">${elapsedText(activeJob.startedAt)}</span></p></div><button class="primary" id="resumeJobBtn">Open</button></div></div>` : ""}
-    <div class="card grow"><h2>Build 0.41.2</h2><p>GPS tools are restored for site coordinates, map links, reports, and service-call events.</p><p>Settings spacing has been eased back for readability while keeping the minimalist pill tabs.</p></div>
+    <div class="card grow"><h2>Build 0.41.3</h2><p>Stability rollback build: restored the last known-good 0.40.9 core while keeping the minimalist Settings pill-tab picker.</p><p>0.41.0, 0.41.1, and 0.41.2 are treated as bad startup builds and should be skipped.</p></div>
   </div>`);
   document.getElementById("sitesCard").onclick=()=>route("sites");
   document.getElementById("tasksCard").onclick=()=>{selectedSiteId=null; route("tasks");};
@@ -185,8 +120,7 @@ function siteDetail(){
       <button class="ghost tile" id="taskBtn"><strong>${open}</strong><span>Open Tasks</span></button>
       <button class="ghost tile" id="defBtn"><strong>${def}</strong><span>Deficiencies</span></button>
     </div>
-    <div class="card siteNotesCard"><h2>Site Notes</h2><p>${esc(s.notes || "No notes entered.")}</p></div>
-    <div class="card gpsCard"><div class="row"><div><h2>GPS / Maps</h2><p>${esc(gpsLabel(s))}</p><p>${esc(gpsMeta(s))}</p></div><span class="pill">GPS</span></div><div class="mapActions three"><button id="gpsBtn" class="primary">Capture GPS</button><button id="appleBtn" class="ghost">Apple Maps</button><button id="googleBtn" class="ghost">Google Maps</button></div></div>${recentVisits(s)}
+    <div class="card grow"><h2>Site Notes</h2><p>${esc(s.notes || "No notes entered.")}</p><div class="mapActions"><button id="appleBtn" class="ghost">Apple Maps</button><button id="googleBtn" class="ghost">Google Maps</button></div></div>
   </div>`);
   document.getElementById("backBtn").onclick=()=>route("sites");
   document.getElementById("editBtn").onclick=()=>{mode="edit"; route("siteForm");};
@@ -194,24 +128,20 @@ function siteDetail(){
   document.getElementById("defBtn").onclick=()=>route("deficiencies");
   document.getElementById("reportBtn").onclick=()=>route("report");
   document.getElementById("jobBtn").onclick=startJob;
-  document.getElementById("gpsBtn").onclick=()=>captureGpsForSite(s,()=>route("siteDetail"));
-  document.getElementById("appleBtn").onclick=()=>window.open("https://maps.apple.com/?q="+encodeURIComponent(mapTarget(s)),"_blank");
-  document.getElementById("googleBtn").onclick=()=>window.open("https://www.google.com/maps/search/?api=1&query="+encodeURIComponent(mapTarget(s)),"_blank");
+  document.getElementById("appleBtn").onclick=()=>window.open("https://maps.apple.com/?q="+encodeURIComponent(fullAddress(s)),"_blank");
+  document.getElementById("googleBtn").onclick=()=>window.open("https://www.google.com/maps/search/?api=1&query="+encodeURIComponent(fullAddress(s)),"_blank");
 }
 
 function siteForm(){
   const s = mode==="edit" ? site() : {};
   html(`<div class="screen"><div class="row"><button class="back ghost" id="backBtn">←</button><h1>${mode==="edit"?"Edit":"Add"} Site</h1></div><div class="form grow">
     <div class="card"><label>Name</label><input id="name" value="${esc(s.name||"")}"><label>Street</label><input id="street" value="${esc(s.street||"")}"><div class="compactField"><div><label>City</label><input id="city" value="${esc(s.city||"")}"></div><div><label>State</label><input id="state" value="${esc(s.state||"")}"></div></div><label>ZIP</label><input id="zip" value="${esc(s.zip||"")}"></div>
-    <div class="card gpsFormCard"><div class="row"><div><h2>GPS Coordinate</h2><p id="gpsStatus">${esc(gpsLabel(s))}</p></div><button class="ghost" id="captureFormGpsBtn" type="button">Use Current GPS</button></div><input type="hidden" id="gpsLat" value="${esc(s.gps?.lat||"")}"><input type="hidden" id="gpsLng" value="${esc(s.gps?.lng||"")}"><input type="hidden" id="gpsAcc" value="${esc(s.gps?.accuracy||"")}"><input type="hidden" id="gpsAt" value="${esc(s.gps?.capturedAt||"")}"></div>
     <div class="card"><div class="compactField"><div><label>Panel Make</label><input id="pm" value="${esc(s.panelManufacturer||"")}"></div><div><label>Panel Model</label><input id="model" value="${esc(s.panelModel||"")}"></div></div><label>Notes</label><textarea id="notes">${esc(s.notes||"")}</textarea></div>
     <button class="primary" id="saveBtn">Save Site</button>${mode==="edit"?`<button class="danger" id="delBtn">Delete Site</button>`:""}
   </div></div>`);
   document.getElementById("backBtn").onclick=()=>{route(mode==="edit"?"siteDetail":"sites")};
-  document.getElementById("captureFormGpsBtn").onclick=captureGpsToForm;
   document.getElementById("saveBtn").onclick=()=>{
     const obj={name:val("name")||"Unnamed Site",street:val("street"),city:val("city"),state:val("state"),zip:val("zip"),panelManufacturer:val("pm"),panelModel:val("model"),notes:raw("notes")};
-    if(val("gpsLat") && val("gpsLng")) obj.gps={lat:Number(val("gpsLat")),lng:Number(val("gpsLng")),accuracy:val("gpsAcc")?Number(val("gpsAcc")):null,capturedAt:val("gpsAt")||new Date().toISOString()};
     if(mode==="edit" && s){ Object.assign(s,obj); } else { const n=ensureSite({...obj,id:uid(),createdAt:new Date().toISOString()}); data.sites.unshift(n); selectedSiteId=n.id; }
     save(); route("siteDetail");
   };
@@ -254,44 +184,7 @@ function deficiencyForm(){
 
 function reportText(s){
   const set=data.settings, tech=set.technician||{};
-  const visitBlock=(s.visits||[]).slice(0,5).map(v=>`- ${dateShort(v.startedAt||v.date||new Date())}${durationText(v.startedAt,v.endedAt)?` • ${durationText(v.startedAt,v.endedAt)}`:""}
-${visitNotes(v)}`).join("
-
-")||"No saved visits";
-  return `${set.reports.title}
-Generated: ${new Date().toLocaleString()}
-
-SITE
-${s.name}
-${fullAddress(s)}
-Panel: ${[s.panelManufacturer,s.panelModel].filter(Boolean).join(" ")||"Not entered"}
-GPS: ${s.gps?.lat && s.gps?.lng ? `${s.gps.lat}, ${s.gps.lng}${s.gps.accuracy?` (±${s.gps.accuracy} ft)`:""}` : "Not captured"}
-
-TECHNICIAN
-${tech.name||""}
-${tech.company||""}
-${tech.phone||""}
-${tech.email||""}
-
-TASKS
-${(s.tasks||[]).map(t=>`- ${t.status||"Open"}: ${t.title}${t.due?` due ${t.due}`:""}`).join("
-")||"No tasks"}
-
-DEFICIENCIES
-${(s.deficiencies||[]).map(d=>`- ${d.status||"Open"}: ${d.priority||"Normal"} - ${d.title}`).join("
-")||"No deficiencies"}
-
-VISITS
-${visitBlock}
-
-NOTES
-${s.notes||"No notes"}
-
-EMAIL SUBJECT
-${renderTemplate(set.email.defaultSubject,s)}
-
-SIGNATURE
-${renderTemplate(set.email.signature,s)}`;
+  return `${set.reports.title}\nGenerated: ${new Date().toLocaleString()}\n\nSITE\n${s.name}\n${fullAddress(s)}\nPanel: ${[s.panelManufacturer,s.panelModel].filter(Boolean).join(" ")||"Not entered"}\n\nTECHNICIAN\n${tech.name||""}\n${tech.company||""}\n${tech.phone||""}\n${tech.email||""}\n\nTASKS\n${(s.tasks||[]).map(t=>`- ${t.status||"Open"}: ${t.title}${t.due?` due ${t.due}`:""}`).join("\n")||"No tasks"}\n\nDEFICIENCIES\n${(s.deficiencies||[]).map(d=>`- ${d.status||"Open"}: ${d.priority||"Normal"} - ${d.title}`).join("\n")||"No deficiencies"}\n\nNOTES\n${s.notes||"No notes"}\n\nEMAIL SUBJECT\n${renderTemplate(set.email.defaultSubject,s)}\n\nSIGNATURE\n${renderTemplate(set.email.signature,s)}`;
 }
 function renderTemplate(t,s){ const tech=data.settings.technician||{}; return String(t||"").replaceAll("{site_name}",s.name||"").replaceAll("{date}",fmtDate()).replaceAll("{technician}",tech.name||"").replaceAll("{company}",tech.company||"").replaceAll("{phone}",tech.phone||"").replaceAll("{email}",tech.email||""); }
 function report(){ const s=site(); if(!s){route("sites"); return;} const txt=reportText(s); html(`<div class="screen"><div class="row"><button class="back ghost" id="backBtn">←</button><h1>Report</h1></div><div class="reportActions"><button class="primary" id="copyBtn">Copy Report</button><button class="ghost" id="downloadBtn">Download TXT</button></div><div class="card reportBox grow">${esc(txt)}</div></div>`); document.getElementById("backBtn").onclick=()=>route("siteDetail"); document.getElementById("copyBtn").onclick=async()=>{await navigator.clipboard.writeText(txt); toast("Report copied.");}; document.getElementById("downloadBtn").onclick=()=>downloadBlob(`firevault-report-${(s.name||"site").replace(/\W+/g,"-")}.txt`,txt); }
@@ -299,48 +192,12 @@ function report(){ const s=site(); if(!s){route("sites"); return;} const txt=rep
 function library(){ html(`<div class="screen"><div class="row"><h1>Library</h1><button class="primary" id="addBtn">＋</button></div><div class="list grow">${data.resources.length?data.resources.map(r=>`<div class="card docLine siteItem" data-id="${r.id}"><h2>${esc(r.m||"Resource")}</h2><p>${esc(r.n||"")}</p><p>${esc(r.url||"")}</p></div>`).join(""):`<div class="empty">No resources yet.</div>`}</div></div>`); document.getElementById("addBtn").onclick=()=>{mode=null; route("resourceForm");}; document.querySelectorAll(".siteItem").forEach(el=>el.onclick=()=>{mode=el.dataset.id; route("resourceForm");}); }
 function resourceForm(){ const r=mode?data.resources.find(x=>x.id===mode):{}; html(`<div class="screen"><div class="row"><button class="back ghost" id="backBtn">←</button><h1>${mode?"Edit":"Add"} Resource</h1></div><div class="form grow"><div class="card"><label>Manufacturer</label><input id="m" value="${esc(r.m||"")}"><label>Name / Model</label><input id="n" value="${esc(r.n||"")}"><label>URL / Notes</label><textarea id="url">${esc(r.url||"")}</textarea></div><button class="primary" id="saveBtn">Save Resource</button>${mode?`<button class="danger" id="delBtn">Delete Resource</button>`:""}</div></div>`); document.getElementById("backBtn").onclick=()=>route("library"); document.getElementById("saveBtn").onclick=()=>{const obj={m:val("m"),n:val("n"),url:raw("url")}; if(mode) Object.assign(r,obj); else data.resources.unshift({...obj,id:uid()}); save(); route("library");}; const del=document.getElementById("delBtn"); if(del) del.onclick=()=>{data.resources=data.resources.filter(x=>x.id!==mode); save(); route("library");}; }
 
-function startJob(){
-  const s=site();
-  activeJob={siteId:s.id,siteName:s.name,startedAt:new Date().toISOString(),events:[{time:new Date().toISOString(),note:"Job started"}]};
-  saveActiveJob();
-  route("jobMode");
-}
-function addJobEvent(note){
-  activeJob.events=Array.isArray(activeJob.events)?activeJob.events:[];
-  activeJob.events.unshift({time:new Date().toISOString(),note});
-  saveActiveJob();
-  render();
-}
-function finishActiveVisit(){
-  const s=site(); if(!s||!activeJob) return;
-  const summary=prompt("Final visit summary:","Service visit completed.");
-  if(summary===null) return;
-  const endedAt=new Date().toISOString();
-  const events=[...(activeJob.events||[])].reverse();
-  const notes=[summary||"Service visit completed",...events.map(e=>`${timeShort(e.time)} - ${e.note}`)].filter(Boolean).join("
-");
-  s.visits=s.visits||[];
-  s.visits.unshift({id:uid(),date:todayIso(),startedAt:activeJob.startedAt,endedAt,summary:summary||"Service visit completed",events,notes});
-  activeJob=null;
-  saveActiveJob();
-  save();
-  toast("Visit saved.");
-  route("siteDetail");
-}
-function jobMode(){
-  const s=site(); if(!s||!activeJob){route("siteDetail"); return;}
-  const quick=["Arrived on site","Opened panel","Panel normal","Trouble active","Ground fault active","Device tested","Customer update","Parts needed"];
-  html(`<div class="screen jobScreen"><div class="row"><button class="back ghost" id="backBtn">←</button><h1>Service Call</h1></div><div class="card jobTimerCard"><div><h2>${esc(s.name)}</h2><p>Live visit timer</p></div><div class="timer" id="jobElapsed">${elapsedText(activeJob.startedAt)}</div></div><div class="quickEventGrid">${quick.map(q=>`<button class="ghost quickEventBtn" data-note="${esc(q)}">${esc(q)}</button>`).join("")}</div><div class="grid3"><button class="ghost" id="noteBtn">Custom Event</button><button class="ghost" id="gpsEventBtn">GPS Event</button><button class="primary" id="finishBtn">Finish Visit</button></div><div class="list grow eventTimeline">${(activeJob.events||[]).map(e=>`<div class="card visit eventCard"><strong>${timeShort(e.time)}</strong><p>${esc(e.note)}</p></div>`).join("")}</div></div>`);
-  document.getElementById("backBtn").onclick=()=>route("siteDetail");
-  document.querySelectorAll(".quickEventBtn").forEach(btn=>btn.onclick=()=>addJobEvent(btn.dataset.note));
-  document.getElementById("noteBtn").onclick=()=>{const note=prompt("Event note:","Checked panel"); if(note) addJobEvent(note);};
-  document.getElementById("gpsEventBtn").onclick=addGpsEvent;
-  document.getElementById("finishBtn").onclick=finishActiveVisit;
-}
+function startJob(){ const s=site(); activeJob={siteId:s.id,siteName:s.name,startedAt:new Date().toISOString(),events:[{time:new Date().toISOString(),note:"Job started"}]}; saveActiveJob(); route("jobMode"); }
+function jobMode(){ const s=site(); if(!s||!activeJob){route("siteDetail"); return;} html(`<div class="screen"><div class="row"><button class="back ghost" id="backBtn">←</button><h1>Job Mode</h1></div><div class="card"><h2>${esc(s.name)}</h2><div class="timer" id="jobElapsed">${elapsedText(activeJob.startedAt)}</div></div><div class="grid2"><button class="ghost" id="noteBtn">Add Event</button><button class="primary" id="finishBtn">Finish Visit</button></div><div class="list grow">${(activeJob.events||[]).map(e=>`<div class="card visit"><strong>${new Date(e.time).toLocaleTimeString([], {hour:"numeric",minute:"2-digit"})}</strong><p>${esc(e.note)}</p></div>`).join("")}</div></div>`); document.getElementById("backBtn").onclick=()=>route("siteDetail"); document.getElementById("noteBtn").onclick=()=>{const note=prompt("Event note:","Checked panel"); if(note){activeJob.events.unshift({time:new Date().toISOString(),note}); saveActiveJob(); render();}}; document.getElementById("finishBtn").onclick=()=>{s.visits=s.visits||[]; s.visits.unshift({id:uid(),date:todayIso(),startedAt:activeJob.startedAt,endedAt:new Date().toISOString(),notes:(activeJob.events||[]).map(e=>`${new Date(e.time).toLocaleTimeString([], {hour:"numeric",minute:"2-digit"})} - ${e.note}`).join("\n")}); activeJob=null; saveActiveJob(); save(); toast("Visit saved."); route("siteDetail");}; }
 
 function settings(){
   const tabs=[
-    ["tech","Tech"],["reports","Report"],["email","Email"],["gps","GPS"],["overlay","Photos"],
+    ["tech","Tech"],["reports","Report"],["email","Email"],["overlay","Photos"],
     ["themes","Theme"],["advanced","Advanced"],["backup","Backup"],["about","About"]
   ];
   const active=tabs.find(t=>t[0]===settingsTab)||tabs[0];
@@ -367,8 +224,6 @@ function settingsPanel(){
   if(settingsTab==="tech") return `<div class="settingsStack"><div class="card settingGroup compactPane"><div class="paneHead"><h2>Technician Profile</h2><button class="primary saveMini" id="saveSettings">Save</button></div><p class="paneNote">Used on reports, email tags, and future photo stamps.</p><div class="settingsGrid">${fieldBlock("Name",`<input id="techName" value="${esc(tech.name)}">`)}${fieldBlock("Company",`<input id="techCompany" value="${esc(tech.company)}">`)}${fieldBlock("Phone",`<input id="techPhone" value="${esc(tech.phone)}">`)}${fieldBlock("Email",`<input id="techEmail" value="${esc(tech.email)}">`)}${fieldBlock("License / ID",`<input id="techLicense" value="${esc(tech.license)}">`)}</div></div></div>`;
   if(settingsTab==="reports") return `<div class="settingsStack"><div class="card settingGroup compactPane"><div class="paneHead"><h2>Report Defaults</h2><button class="primary saveMini" id="saveSettings">Save</button></div><p class="paneNote">Controls generated site reports.</p><div class="settingsGrid">${fieldBlock("Report Title",`<input id="reportTitle" value="${esc(r.title)}">`)}${fieldBlock("Format",`<select id="reportFormat"><option ${r.format==="detailed"?"selected":""}>detailed</option><option ${r.format==="compact"?"selected":""}>compact</option></select>`)}</div><div class="settingsList">${checkBlock("repTech","Include technician profile",r.includeTechnician)}${checkBlock("repTasks","Include open and completed tasks",r.includeTasks)}${checkBlock("repDef","Include deficiencies",r.includeDeficiencies)}</div></div></div>`;
   if(settingsTab==="email") return `<div class="settingsStack"><div class="card settingGroup compactPane"><div class="paneHead"><h2>Email Defaults</h2><button class="primary saveMini" id="saveSettings">Save</button></div><p class="paneNote">Default recipient, subject, and signature tags.</p><div class="settingsGrid">${fieldBlock("Default To",`<input id="emailTo" value="${esc(email.defaultTo)}">`)}${fieldBlock("CC",`<input id="emailCc" value="${esc(email.cc)}">`)}</div>${fieldBlock("Default Subject",`<input id="emailSubject" value="${esc(email.defaultSubject)}">`)}${fieldBlock("Signature Tag",`<textarea id="emailSig">${esc(email.signature)}</textarea>`,`Tags: {site_name}, {date}, {technician}, {company}, {phone}, {email}`)}</div></div>`;
-
-  if(settingsTab==="gps") return `<div class="settingsStack"><div class="card settingGroup compactPane"><div class="paneHead"><h2>GPS / Location</h2><button class="primary saveMini" id="saveSettings">Save</button></div><p class="paneNote">Restores field location tools for site coordinates, map links, reports, and service-call events.</p><div class="settingsGrid">${fieldBlock("Map Provider",`<select id="gpsProvider"><option value="apple" ${s.gps.mapProvider!=="google"?"selected":""}>apple</option><option value="google" ${s.gps.mapProvider==="google"?"selected":""}>google</option></select>`)}</div><div class="settingsList twoCol">${checkBlock("gpsEnabled","Enable GPS tools",s.gps.enabled)}${checkBlock("gpsCapture","Capture site GPS",s.gps.captureSiteGps)}${checkBlock("gpsReport","Include GPS in reports",s.gps.includeGpsInReports)}${checkBlock("gpsAccuracy","Show accuracy",s.gps.includeAccuracy)}${checkBlock("gpsPrompt","Prompt on new site",s.gps.promptOnNewSite)}${checkBlock("gpsEvents","Service-call GPS events",s.gps.serviceCallGpsEvents)}</div></div></div>`;
   if(settingsTab==="overlay") return `<div class="settingsStack"><div class="card settingGroup compactPane"><div class="paneHead"><h2>Photo Overlay</h2><button class="primary saveMini" id="saveSettings">Save</button></div><p class="paneNote">Preview and format the field photo stamp.</p><div class="previewPanel compactPreview"><div class="previewOverlay ${o.alignment==="top"?"top":""}">FIREVAULT • Site • Date • Time</div></div><div class="settingsGrid">${fieldBlock("Alignment",`<select id="ovAlign"><option ${o.alignment==="bottom"?"selected":""}>bottom</option><option ${o.alignment==="top"?"selected":""}>top</option></select>`)}${fieldBlock("Font Size",`<select id="ovSize"><option ${o.fontSize==="small"?"selected":""}>small</option><option ${o.fontSize==="medium"?"selected":""}>medium</option><option ${o.fontSize==="large"?"selected":""}>large</option></select>`)}${fieldBlock("Accent Color",`<input id="ovAccent" type="color" value="${esc(o.accentColor)}">`)}</div><div class="settingsList">${checkBlock("ovLogo","Show FireVault logo on overlay",o.showLogo)}</div></div></div>`;
   if(settingsTab==="themes") return `<div class="settingsStack"><div class="card settingGroup compactPane"><div class="paneHead"><h2>Theme Engine</h2><button class="primary saveMini" id="saveSettings">Apply</button></div><p class="paneNote">Quick presets and live UI controls.</p><div class="presetGrid">${Object.entries(themePresets).map(([key,p])=>`<button class="ghost presetBtn" data-preset="${key}"><span class="themeSwatch" style="background:${p.accentColor}"></span><span>${p.label}</span></button>`).join("")}</div><div class="settingsGrid">${fieldBlock("Theme",`<select id="themeName">${Object.entries(themePresets).map(([key,p])=>`<option value="${key}" ${t.name===key?"selected":""}>${p.label}</option>`).join("")}</select>`)}${fieldBlock("Accent Color",`<input id="themeAccent" type="color" value="${esc(t.accentColor||"#ef4444")}">`)}${fieldBlock("Buttons",`<select id="buttonStyle"><option value="rounded" ${t.buttonStyle!=="squared"?"selected":""}>rounded</option><option value="squared" ${t.buttonStyle==="squared"?"selected":""}>squared</option></select>`)}${fieldBlock("Cards",`<select id="cardStyle"><option value="glass" ${t.cardStyle!=="solid"?"selected":""}>glass</option><option value="solid" ${t.cardStyle==="solid"?"selected":""}>solid</option></select>`)}</div><div class="settingsList">${checkBlock("themeHighContrast","High contrast support",t.highContrast)}${checkBlock("themeLargeText","Larger text",t.largeText)}${checkBlock("themeCompact","Compact layout",t.compactLayout)}</div></div></div>`;
   if(settingsTab==="advanced") return `<div class="settingsStack"><div class="card settingGroup compactPane"><div class="paneHead"><h2>Advanced Features</h2><button class="primary saveMini" id="saveSettings">Save</button></div><p class="paneNote"><span class="featureStar">*</span> Requires outside services, permissions, APIs, or future backend modules.</p><div class="settingsList twoCol">${[["advAi","aiTechnician","AI Technician"],["advReverse","reverseAddressLookup","Reverse Address Lookup *"],["advCloud","cloudBackup","Cloud Backup *"],["advVoice","voiceTranscription","Voice Transcription *"],["advOcr","ocrReader","OCR Reader *"],["advEmail","emailGateway","Email Gateway *"],["advWeather","weather","Weather Context *"],["advTraffic","traffic","Traffic / Routing *"]].map(x=>checkBlock(x[0],x[2],a[x[1]])).join("")}</div></div></div>`;
@@ -387,7 +242,6 @@ function saveSettings(){
   if(settingsTab==="tech") s.technician={name:val("techName"),company:val("techCompany"),phone:val("techPhone"),email:val("techEmail"),license:val("techLicense"),defaultRole:"Fire Alarm Technician"};
   if(settingsTab==="reports") s.reports={...s.reports,title:val("reportTitle")||"FireVault Service Report",format:val("reportFormat"),includeTechnician:checked("repTech"),includeTasks:checked("repTasks"),includeDeficiencies:checked("repDef")};
   if(settingsTab==="email") s.email={...s.email,defaultTo:val("emailTo"),cc:val("emailCc"),defaultSubject:val("emailSubject"),signature:raw("emailSig")};
-  if(settingsTab==="gps") s.gps={...s.gps,enabled:checked("gpsEnabled"),captureSiteGps:checked("gpsCapture"),includeGpsInReports:checked("gpsReport"),includeAccuracy:checked("gpsAccuracy"),promptOnNewSite:checked("gpsPrompt"),serviceCallGpsEvents:checked("gpsEvents"),mapProvider:val("gpsProvider")};
   if(settingsTab==="overlay") s.overlay={...s.overlay,alignment:val("ovAlign"),fontSize:val("ovSize"),accentColor:val("ovAccent"),showLogo:checked("ovLogo")};
   if(settingsTab==="themes") s.theme={name:val("themeName"),accentColor:val("themeAccent"),highContrast:checked("themeHighContrast"),largeText:checked("themeLargeText"),compactLayout:checked("themeCompact"),buttonStyle:val("buttonStyle"),cardStyle:val("cardStyle")};
   if(settingsTab==="advanced") s.advanced={aiTechnician:checked("advAi"),reverseAddressLookup:checked("advReverse"),cloudBackup:checked("advCloud"),voiceTranscription:checked("advVoice"),ocrReader:checked("advOcr"),emailGateway:checked("advEmail"),weather:checked("advWeather"),traffic:checked("advTraffic")};
@@ -397,18 +251,18 @@ function saveSettings(){
 function diagnostics(){ const totalTasks=data.sites.reduce((n,s)=>n+(s.tasks||[]).length,0); const totalDef=data.sites.reduce((n,s)=>n+(s.deficiencies||[]).length,0); html(`<div class="screen"><div class="row"><button class="back ghost" id="backHome">←</button><h1>Diagnostics</h1></div><div class="card grow errorBox"><p>Build: ${BUILD}</p><p>Sites: ${data.sites.length}</p><p>Total Tasks: ${totalTasks}</p><p>Total Deficiencies: ${totalDef}</p><p>Active Job: ${activeJob ? esc(activeJob.siteName) : "None"}</p><p>Current Theme: ${esc(data.settings.theme.name)}</p><p>Accent: ${esc(data.settings.theme.accentColor)}</p><p>Advanced AI Enabled: ${data.settings.advanced?.aiTechnician ? "Yes" : "No"}</p><p>Import/Export: Ready</p><p>Storage key: ${KEY}</p><p>Modules loaded successfully.</p></div></div>`); document.getElementById("backHome").onclick=()=>route("home"); }
 function showChangelog(){
   const notes = [
-    "Build number advanced to 0.41.2 across the header, dashboard, manifest, and diagnostics.",
-    "Restored GPS tools on site detail and site edit screens.",
-    "Added Capture GPS, Apple Maps, Google Maps, and GPS service-call event support.",
-    "Reports now include saved GPS coordinates when available.",
-    "Added a dedicated GPS settings tab.",
-    "Relaxed Settings font sizes and spacing so the minimalist layout is easier to read."
+    "Build number advanced to 0.41.3 across the header, dashboard, manifest, and diagnostics.",
+    "Rolled the app core back to the last known-good 0.40.9 baseline.",
+    "Marked 0.41.0, 0.41.1, and 0.41.2 as bad startup builds to skip.",
+    "Kept the minimalist Settings pill-tab picker without the blank top boxes.",
+    "Kept Settings readable and slightly less compressed than the overly tight pass.",
+    "Kept compact release notes formatting, the selected #8 Flame Icon logo, and the existing modular storage key."
   ];
   const overlay=document.createElement("div");
   overlay.className="releaseOverlay";
   overlay.innerHTML=`<div class="releaseSheet" role="dialog" aria-modal="true" aria-label="FireVault release notes">
     <div class="releaseHead"><div><strong>FireVault</strong><span>Build ${BUILD}</span></div><button class="ghost iconBtn" id="closeRelease" aria-label="Close release notes">×</button></div>
-    <div class="releaseBody"><h2>Release Notes</h2><p class="releaseIntro">GPS tools restored and Settings readability improved.</p><ul>${notes.map(n=>`<li>${esc(n)}</li>`).join("")}</ul></div>
+    <div class="releaseBody"><h2>Release Notes</h2><p class="releaseIntro">Minimalist Settings pill-tab picker and compact subpage cleanup.</p><ul>${notes.map(n=>`<li>${esc(n)}</li>`).join("")}</ul></div>
   </div>`;
   document.body.appendChild(overlay);
   const close=()=>overlay.remove();
@@ -416,4 +270,3 @@ function showChangelog(){
   overlay.addEventListener("click",e=>{ if(e.target===overlay) close(); });
 }
 render();
-window.__firevaultBooted = true;

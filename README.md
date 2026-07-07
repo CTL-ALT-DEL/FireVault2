@@ -1,33 +1,23 @@
-# FireVault Build 0.41.2 - GPS Restore / Settings Readability
+# FireVault Build 0.41.3
 
-This clean root package continues the modular FireVault build from 0.41.0.
+Emergency stability rollback build.
 
-## Updated
+## Important
 
-- Advanced visible build number to 0.41.2.
-- Restored GPS/location tools on Site Detail and Site Edit/Add screens.
-- Added Capture GPS for customer sites using browser geolocation.
-- Added GPS coordinate display, accuracy, and saved timestamp.
-- Map buttons now prefer saved GPS coordinates when available.
-- Added a GPS Event button in live Service Call mode.
-- Reports now include saved GPS coordinates.
-- Added a dedicated GPS tab inside Settings.
-- Increased Settings font sizes and spacing so the minimalist pill-tab layout is easier to read.
-- Kept the selected #8 FireVault flame logo.
-- Preserved storage key: firevault_vault_build_030.
+Builds 0.41.0, 0.41.1, and 0.41.2 should be skipped because they introduced a startup/loading failure on some deployments.
 
-## Clean root contents
+## Source Baseline
 
-- index.html
-- manifest.json
-- src/
-- assets/
-- README.md
-- CLEAN_INSTALL.md
-- .gitignore
+This build is based on the last known-good 0.40.9 app core, then advanced to 0.41.3 with a small Settings readability adjustment.
 
+## Included
 
-## Build 0.41.2
-- Emergency startup repair after 0.41.1 could remain on Loading FireVault.
-- Added guarded module import and boot watchdog diagnostics.
-- Keeps GPS restore and Settings readability changes from 0.41.1.
+- Clean root package.
+- Minimalist Settings pill tabs retained.
+- Settings font and spacing slightly relaxed.
+- Selected #8 Flame Icon retained.
+- Existing storage key retained: firevault_vault_build_030.
+
+## Next Lane
+
+Reintroduce GPS tools carefully in a separate build after startup is confirmed stable.
