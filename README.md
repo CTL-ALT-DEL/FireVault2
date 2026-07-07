@@ -1,15 +1,14 @@
-# FireVault Build 0.42.0
+# FireVault Build 0.42.1
 
-Visit Log viewer and report timeline upgrade.
+Service follow-up workflow build.
 
-## Changes
-- Adds a real Visit Log for each site.
-- Recent Visits on the site detail page are now tappable.
-- Adds a Visit Detail screen with full service timeline.
-- Adds Copy Visit and Delete Visit actions.
-- Reports now include the latest completed service visits.
-- Preserves haptic-ready controls, Nearby Sites, GPS capture, map actions, Settings pill-tabs, and the clean root package format.
-- Preserves the existing FireVault storage key.
+## Updates
+- Added Job Mode Service Follow-Up actions.
+- Added Parts Needed workflow from the active service call screen.
+- Parts Needed and Follow-Up actions create open site tasks immediately.
+- Service-call-created tasks now show a Service Call badge in the Tasks list.
+- Reports mark service-call-created tasks with a Service Call source tag.
+- Preserved Visit Log, Nearby Sites, GPS tools, haptics, and Settings pill-tabs.
 
 ## Install
-Copy these files into the project root that contains package.json, src, public, index.html, manifest.json, and assets. Do not copy the outer folder itself into your repo.
+Use the clean-root ZIP contents in the GitHub Pages project root. Do not nest build folders.

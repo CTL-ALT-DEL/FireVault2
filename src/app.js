@@ -168,6 +168,30 @@ function addJobEvent(note){
   activeJob.events.unshift({time:new Date().toISOString(), note});
   saveActiveJob();
 }
+function addServiceFollowUp(kind="Follow-up"){
+  const s=site();
+  if(!s || !activeJob){ toast("Start a job first."); return; }
+  const defaultTitle = kind === "Parts Needed" ? "Parts needed" : "Follow up from service call";
+  const title = prompt(`${kind} task title:`, defaultTitle);
+  if(!title) return;
+  const notes = prompt("Task notes:", `${kind} created during service call on ${fmtDate()} for ${s.name || "site"}.`) || "";
+  s.tasks = Array.isArray(s.tasks) ? s.tasks : [];
+  s.tasks.unshift({
+    id:uid(),
+    title: kind === "Parts Needed" && !title.toLowerCase().startsWith("parts") ? `Parts needed: ${title}` : title,
+    status:"Open",
+    due:"",
+    notes,
+    source:"Service Call",
+    sourceStartedAt:activeJob.startedAt,
+    createdAt:new Date().toISOString()
+  });
+  addJobEvent(`${kind}: ${title}`);
+  save();
+  saveActiveJob();
+  toast(`${kind} task added.`);
+  render();
+}
 function startJobTimer(){ stopJobTimer(); jobTimer=setInterval(()=>{ const el=document.getElementById("jobElapsed"); if(el && activeJob) el.textContent=elapsedText(activeJob.startedAt); },1000); }
 function stopJobTimer(){ if(jobTimer){ clearInterval(jobTimer); jobTimer=null; } }
 function setActiveNav(){ document.querySelectorAll("nav button").forEach(b=>b.classList.remove("active")); const section=["siteDetail","visits","visitDetail","siteForm","tasks","taskForm","deficiencies","deficiencyForm","report","jobMode","nearbySites"].includes(view)?"sites":view; document.getElementById("nav-"+section)?.classList.add("active"); }
@@ -208,7 +232,7 @@ function home(){
       <button class="ghost tile" id="diagBtn"><strong>Diagnostics</strong><span>Build status</span></button>
     </div>
     ${activeJob ? `<div class="card activeJobMini"><div class="row"><div><h2>Service Call Active</h2><p>${esc(activeJob.siteName)} • <span id="jobElapsed">${elapsedText(activeJob.startedAt)}</span></p></div><button class="primary" id="resumeJobBtn">Open</button></div></div>` : ""}
-    <div class="card grow"><h2>Build ${BUILD}</h2><p>Visit history is now easier to open, review, copy, and remove from each site.</p><p>Reports include recent completed service visits.</p></div>
+    <div class="card grow"><h2>Build ${BUILD}</h2><p>Job Mode can now create follow-up tasks and parts-needed tasks without leaving the service call.</p><p>Tasks created during a visit are marked as service follow-ups.</p></div>
   </div>`);
   document.getElementById("sitesCard").onclick=()=>route("sites");
   document.getElementById("tasksCard").onclick=()=>{selectedSiteId=null; route("tasks");};
@@ -331,7 +355,7 @@ function siteForm(){
 function tasks(){
   const rows=[]; data.sites.forEach(s=>ensureSite(s).tasks.forEach(t=>rows.push({s,t})));
   const filtered = selectedSiteId ? rows.filter(r=>r.s.id===selectedSiteId) : rows;
-  html(`<div class="screen"><div class="row"><button class="back ghost" id="backBtn">←</button><h1>Tasks</h1><button class="primary" id="addBtn">＋</button></div><div class="list grow">${filtered.length?filtered.map(r=>`<div class="card siteItem ${(r.t.status||"Open")==="Done"?"taskDone":"taskOpen"}" data-site="${r.s.id}" data-id="${r.t.id}"><h2>${esc(r.t.title||"Task")}</h2><p>${esc(r.s.name)} • ${esc(r.t.status||"Open")} • ${esc(r.t.due||"No due date")}</p><p>${esc(r.t.notes||"")}</p></div>`).join(""):`<div class="empty">No tasks found.</div>`}</div></div>`);
+  html(`<div class="screen tasksScreen421"><div class="row"><button class="back ghost" id="backBtn">←</button><h1>Tasks</h1><button class="primary" id="addBtn">＋</button></div><div class="list grow">${filtered.length?filtered.map(r=>`<div class="card siteItem ${(r.t.status||"Open")==="Done"?"taskDone":"taskOpen"}" data-site="${r.s.id}" data-id="${r.t.id}"><div class="row"><div><h2>${esc(r.t.title||"Task")}</h2><p>${esc(r.s.name)} • ${esc(r.t.status||"Open")} • ${esc(r.t.due||"No due date")}</p></div>${r.t.source?`<span class="pill serviceTaskPill">${esc(r.t.source)}</span>`:""}</div><p>${esc(r.t.notes||"")}</p></div>`).join(""):`<div class="empty">No tasks found.</div>`}</div></div>`);
   document.getElementById("backBtn").onclick=()=>selectedSiteId?route("siteDetail"):route("home");
   document.getElementById("addBtn").onclick=()=>{mode=null; route("taskForm");};
   document.querySelectorAll(".siteItem").forEach(el=>el.onclick=()=>{selectedSiteId=el.dataset.site; mode=el.dataset.id; route("taskForm");});
@@ -385,7 +409,7 @@ VISITS
 ${visits}
 
 TASKS
-${(s.tasks||[]).map(t=>`- ${t.status||"Open"}: ${t.title}${t.due?` due ${t.due}`:""}`).join("
+${(s.tasks||[]).map(t=>`- ${t.status||"Open"}: ${t.title}${t.source?` [${t.source}]`:""}${t.due?` due ${t.due}`:""}`).join("
 ")||"No tasks"}
 
 DEFICIENCIES
@@ -423,13 +447,15 @@ function jobMode(){
   const events = Array.isArray(activeJob.events) ? activeJob.events : [];
   html(`<div class="screen serviceCallScreen"><div class="row"><button class="back ghost" id="backBtn">←</button><h1>Job Mode</h1></div>
     <div class="card serviceTimerCard"><h2>${esc(s.name)}</h2><div class="timer" id="jobElapsed">${elapsedText(activeJob.startedAt)}</div><p>Started ${esc(eventTime(activeJob.startedAt))}</p></div>
-    <div class="card quickEventCard"><h2>Quick Events</h2><div class="quickEventGrid">${QUICK_EVENTS.map(q=>`<button class="ghost quickEventBtn" data-note="${esc(q)}">${esc(q)}</button>`).join("")}</div></div>
-    <div class="grid2"><button class="ghost" id="noteBtn">Custom Event</button><button class="primary" id="finishBtn">Finish Visit</button></div>
+    <div class="card quickEventCard"><div class="row"><h2>Quick Events</h2><span class="pill">${events.length} events</span></div><div class="quickEventGrid">${QUICK_EVENTS.map(q=>`<button class="ghost quickEventBtn" data-note="${esc(q)}">${esc(q)}</button>`).join("")}</div></div>
+    <div class="card jobFollowCard"><h2>Service Follow-Up</h2><p>Create action items while the job is still fresh. These save as open tasks for this site.</p><div class="jobActionGrid"><button class="ghost" id="noteBtn">Custom Event</button><button class="ghost" id="followBtn">Follow-Up Task</button><button class="ghost" id="partsBtn">Parts Needed</button><button class="primary" id="finishBtn">Finish Visit</button></div></div>
     <div class="list grow serviceEventList">${events.length?events.map(e=>`<div class="card visit"><strong>${esc(eventTime(e.time))}</strong><p>${esc(e.note)}</p></div>`).join(""):`<div class="empty">No events yet.</div>`}</div>
   </div>`);
   document.getElementById("backBtn").onclick=()=>route("siteDetail");
-  document.querySelectorAll(".quickEventBtn").forEach(b=>b.onclick=()=>{addJobEvent(b.dataset.note); render();});
+  document.querySelectorAll(".quickEventBtn").forEach(b=>b.onclick=()=>{ if(b.dataset.note === "Parts needed") addServiceFollowUp("Parts Needed"); else {addJobEvent(b.dataset.note); render();} });
   document.getElementById("noteBtn").onclick=()=>{const note=prompt("Event note:","Checked panel"); if(note){addJobEvent(note); render();}};
+  document.getElementById("followBtn").onclick=()=>addServiceFollowUp("Follow-up");
+  document.getElementById("partsBtn").onclick=()=>addServiceFollowUp("Parts Needed");
   document.getElementById("finishBtn").onclick=()=>{
     s.visits=s.visits||[];
     const endedAt=new Date().toISOString();
@@ -563,21 +589,21 @@ function saveSettings(){
   save(); toast("Settings saved."); settings();
 }
 
-function diagnostics(){ const totalTasks=data.sites.reduce((n,s)=>n+(s.tasks||[]).length,0); const totalDef=data.sites.reduce((n,s)=>n+(s.deficiencies||[]).length,0); const totalVisits=data.sites.reduce((n,s)=>n+(s.visits||[]).length,0); html(`<div class="screen"><div class="row"><button class="back ghost" id="backHome">←</button><h1>Diagnostics</h1></div><div class="card grow errorBox"><p>Build: ${BUILD}</p><p>Sites: ${data.sites.length}</p><p>Total Tasks: ${totalTasks}</p><p>Total Deficiencies: ${totalDef}</p><p>Total Visits: ${totalVisits}</p><p>Active Job: ${activeJob ? esc(activeJob.siteName) : "None"}</p><p>Current Theme: ${esc(data.settings.theme.name)}</p><p>Accent: ${esc(data.settings.theme.accentColor)}</p><p>Advanced AI Enabled: ${data.settings.advanced?.aiTechnician ? "Yes" : "No"}</p><p>GPS Tools: ${data.settings.gps?.enabled !== false ? "Enabled" : "Hidden"}</p><p>Nearby Radius: ${nearbyRadiusMiles()} mi</p><p>Haptics: ${data.settings.app?.haptics !== false ? "Enabled" : "Off"}</p><p>Import/Export: Ready</p><p>Storage key: ${KEY}</p><p>Modules loaded successfully.</p></div></div>`); document.getElementById("backHome").onclick=()=>route("home"); }
+function diagnostics(){ const totalTasks=data.sites.reduce((n,s)=>n+(s.tasks||[]).length,0); const serviceTasks=data.sites.reduce((n,s)=>n+(s.tasks||[]).filter(t=>t.source==="Service Call").length,0); const totalDef=data.sites.reduce((n,s)=>n+(s.deficiencies||[]).length,0); const totalVisits=data.sites.reduce((n,s)=>n+(s.visits||[]).length,0); html(`<div class="screen"><div class="row"><button class="back ghost" id="backHome">←</button><h1>Diagnostics</h1></div><div class="card grow errorBox"><p>Build: ${BUILD}</p><p>Sites: ${data.sites.length}</p><p>Total Tasks: ${totalTasks}</p><p>Service Follow-Ups: ${serviceTasks}</p><p>Total Deficiencies: ${totalDef}</p><p>Total Visits: ${totalVisits}</p><p>Active Job: ${activeJob ? esc(activeJob.siteName) : "None"}</p><p>Current Theme: ${esc(data.settings.theme.name)}</p><p>Accent: ${esc(data.settings.theme.accentColor)}</p><p>Advanced AI Enabled: ${data.settings.advanced?.aiTechnician ? "Yes" : "No"}</p><p>GPS Tools: ${data.settings.gps?.enabled !== false ? "Enabled" : "Hidden"}</p><p>Nearby Radius: ${nearbyRadiusMiles()} mi</p><p>Haptics: ${data.settings.app?.haptics !== false ? "Enabled" : "Off"}</p><p>Import/Export: Ready</p><p>Storage key: ${KEY}</p><p>Modules loaded successfully.</p></div></div>`); document.getElementById("backHome").onclick=()=>route("home"); }
 function showChangelog(){
   const notes = [
-    "Build number advanced to 0.42.0 across the header, manifest, diagnostics, and release notes.",
-    "Added a real Visit Log for each site with tappable completed service visits.",
-    "Added Visit Detail view with full service timeline, copy visit, and delete visit actions.",
-    "Updated site detail Recent Visits into a cleaner Visit History card.",
-    "Reports now include the latest completed service visits.",
-    "Preserved haptic-ready controls, Nearby Sites, GPS capture, map actions, and the Settings pill-tab layout."
+    "Build number advanced to 0.42.1 across the header, manifest, diagnostics, and release notes.",
+    "Added Service Follow-Up actions inside Job Mode.",
+    "Added Parts Needed workflow that creates open site tasks without leaving the service call.",
+    "Tasks created during service calls are labeled as Service Call follow-ups.",
+    "Reports now mark tasks created from active service calls.",
+    "Preserved Visit Log, haptic-ready controls, Nearby Sites, GPS capture, and Settings pill-tabs."
   ];
   const overlay=document.createElement("div");
   overlay.className="releaseOverlay";
   overlay.innerHTML=`<div class="releaseSheet" role="dialog" aria-modal="true" aria-label="FireVault release notes">
     <div class="releaseHead"><div><strong>FireVault</strong><span>Build ${BUILD}</span></div><button class="ghost iconBtn" id="closeRelease" aria-label="Close release notes">×</button></div>
-    <div class="releaseBody"><h2>Release Notes</h2><p class="releaseIntro">Visit history viewer and report timeline upgrade.</p><ul>${notes.map(n=>`<li>${esc(n)}</li>`).join("")}</ul></div>
+    <div class="releaseBody"><h2>Release Notes</h2><p class="releaseIntro">Service follow-up and parts-needed workflow.</p><ul>${notes.map(n=>`<li>${esc(n)}</li>`).join("")}</ul></div>
   </div>`;
   document.body.appendChild(overlay);
   const close=()=>overlay.remove();
