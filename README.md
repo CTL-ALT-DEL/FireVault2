@@ -1,15 +1,14 @@
-# FireVault Build 0.24.0 — Site Map Tools
+# FireVault Build 0.25.0 — CSV Export
 
 Root-level package for GitHub Pages.
 
 ## Changes
-- Apple Maps button inside each site vault
-- Google Maps button inside each site vault
-- Uses saved GPS when available
-- Falls back to formatted address
-- Site Reports include a map link
+- Export Sites CSV
+- Export Visits CSV
+- Spreadsheet-friendly backup files
+- JSON backup still available
 - Preserves previous local storage data
 
 Suggested commit:
 
-`Build 0.24.0 site map tools`
+`Build 0.25.0 csv export`

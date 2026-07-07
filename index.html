@@ -32,7 +32,7 @@ nav button{background:transparent;border:0;color:var(--muted);display:flex;flex-
 </style>
 </head>
 <body>
-<header><div class="brand"><div class="logo">🔥</div><div>FIREVAULT</div></div><button class="build" onclick="showChangelog()">Build 0.24.0</button></header>
+<header><div class="brand"><div class="logo">🔥</div><div>FIREVAULT</div></div><button class="build" onclick="showChangelog()">Build 0.25.0</button></header>
 <main id="app"></main>
 <nav>
 <button id="nav-home" onclick="go('home')"><span>🏠</span><span>Today</span></button>
@@ -41,7 +41,7 @@ nav button{background:transparent;border:0;color:var(--muted);display:flex;flex-
 <button id="nav-settings" onclick="go('settings')"><span>⚙️</span><span>Settings</span></button>
 </nav>
 <script>
-const BUILD="0.24.0"; const KEY="firevault_vault_build_030"; const ACTIVE="firevault_active_job_080";
+const BUILD="0.25.0"; const KEY="firevault_vault_build_030"; const ACTIVE="firevault_active_job_080";
 let data=load(), activeJob=loadActive(), view="home", selected=null, mode=null, timer=null, currentDocImageData="";
 function load(){const raw=localStorage.getItem(KEY);if(raw){try{return JSON.parse(raw)}catch(e){}}return{sites:[],resources:[{m:"Fire-Lite",n:"Manual links, trouble notes, walk-test reminders."},{m:"Notifier",n:"Panel notes, programming reminders, common issues."},{m:"Silent Knight",n:"Model notes, NAC quirks, communicator references."},{m:"Edwards / EST",n:"EST3 / EST4 notes, mapping, node information."},{m:"Potter",n:"Programming notes, compatibility, field observations."}]}}
 function save(){localStorage.setItem(KEY,JSON.stringify(data))}function loadActive(){const raw=localStorage.getItem(ACTIVE);if(raw){try{return JSON.parse(raw)}catch(e){}}return null}function saveActive(){activeJob?localStorage.setItem(ACTIVE,JSON.stringify(activeJob)):localStorage.removeItem(ACTIVE)}
@@ -713,18 +713,53 @@ function saveResource(){
  save();mode=null;if(selected){view="siteResources";render()}else{go("library")}
 }
 
-function settings(){app(`<div class="screen"><h1>Settings</h1><div class="card"><h2>Backup</h2><p>Export before major changes.</p><button class="primary" onclick="exportData()">Export Backup</button><br><br><input type="file" accept="application/json" onchange="importData(event)"></div><div class="card"><h2>Reset</h2><button class="danger" onclick="resetData()">Clear Local Data</button></div></div>`)}
-function exportData(){let blob=new Blob([JSON.stringify(data,null,2)],{type:"application/json"});let a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="firevault-backup-build-0.24.0.json";a.click()}
+function settings(){app(`<div class="screen"><h1>Settings</h1><div class="card"><h2>Backup</h2><p>Export before major changes.</p><button class="primary" onclick="exportData()">Export JSON Backup</button><br><br><div class="grid2"><button class="ghost" onclick="exportSitesCSV()">Export Sites CSV</button><button class="ghost" onclick="exportVisitsCSV()">Export Visits CSV</button></div><br><input type="file" accept="application/json" onchange="importData(event)"></div><div class="card"><h2>Reset</h2><button class="danger" onclick="resetData()">Clear Local Data</button></div></div>`)}
+
+function csvEscape(v){
+ const s=String(v??"");
+ return `"${s.replace(/"/g,'""')}"`;
+}
+function exportSitesCSV(){
+ const headers=["Name","Street","City","State","ZIP","Legacy Address","Panel Manufacturer","Panel Model","FACP Location","Monitoring","Latitude","Longitude","Visits","Known Issues","Deficiencies","Open Tasks","Equipment","Contacts","Docs"];
+ const rows=data.sites.map(s=>{
+   ensureArrays(s);
+   return [
+    s.name,s.street,s.city,s.state,s.zip,s.address,s.panelManufacturer,s.panelModel,s.facpLocation,s.monitoring,s.lat,s.lng,
+    s.visits.length,s.knownIssues.length,s.deficiencies.length,(s.tasks||[]).filter(t=>(t.status||"Open")!=="Done").length,s.equipment.length,s.contacts.length,s.docs.length
+   ].map(csvEscape).join(",");
+ });
+ const csv=[headers.map(csvEscape).join(","),...rows].join("\n");
+ const blob=new Blob([csv],{type:"text/csv"});
+ const a=document.createElement("a");
+ a.href=URL.createObjectURL(blob);
+ a.download="firevault-sites-export.csv";
+ a.click();
+}
+function exportVisitsCSV(){
+ const headers=["Date","Site","Address","Started","Ended","Summary","Tags"];
+ const rows=[];
+ data.sites.forEach(s=>{
+   ensureArrays(s);
+   s.visits.forEach(v=>rows.push([v.date,s.name,fullAddress(s),v.startedAt||"",v.endedAt||"",v.summary||"",(v.tags||[]).join("; ")]));
+ });
+ const csv=[headers.map(csvEscape).join(","),...rows.map(r=>r.map(csvEscape).join(","))].join("\n");
+ const blob=new Blob([csv],{type:"text/csv"});
+ const a=document.createElement("a");
+ a.href=URL.createObjectURL(blob);
+ a.download="firevault-visits-export.csv";
+ a.click();
+}
+
+function exportData(){let blob=new Blob([JSON.stringify(data,null,2)],{type:"application/json"});let a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="firevault-backup-build-0.25.0.json";a.click()}
 function importData(e){let f=e.target.files[0];if(!f)return;let r=new FileReader();r.onload=()=>{try{data=JSON.parse(r.result);save();alert("Imported.");go("home")}catch(err){alert("Import failed.")}};r.readAsText(f)}
 function resetData(){if(confirm("Clear all local FireVault data?")){localStorage.removeItem(KEY);localStorage.removeItem(ACTIVE);data=load();activeJob=null;go("home")}}
 function showChangelog(){alert(`FireVault Build ${BUILD}
 
-- Site Map Tools
-- Apple Maps button inside each site vault
-- Google Maps button inside each site vault
-- Uses saved GPS when available
-- Falls back to formatted address
-- Site Reports now include a map link
+- CSV Export Tools
+- Export Sites CSV
+- Export Visits CSV
+- Spreadsheet-friendly backup files
+- JSON backup still available
 - Preserves previous local data`)}
 render()
 </script>
