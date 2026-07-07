@@ -1,14 +1,15 @@
-# FireVault Build 0.23.0 — FireVault Photo Overlay
+# FireVault Build 0.24.0 — Site Map Tools
 
 Root-level package for GitHub Pages.
 
 ## Changes
-- New photos are stamped before saving
-- Overlay includes FireVault branding, site name, and date/time
-- Works for Docs / Photos uploads
-- Works for Job Mode photo capture
-- Existing photos remain unchanged
+- Apple Maps button inside each site vault
+- Google Maps button inside each site vault
+- Uses saved GPS when available
+- Falls back to formatted address
+- Site Reports include a map link
+- Preserves previous local storage data
 
 Suggested commit:
 
-`Build 0.23.0 firevault photo overlay`
+`Build 0.24.0 site map tools`

@@ -32,7 +32,7 @@ nav button{background:transparent;border:0;color:var(--muted);display:flex;flex-
 </style>
 </head>
 <body>
-<header><div class="brand"><div class="logo">🔥</div><div>FIREVAULT</div></div><button class="build" onclick="showChangelog()">Build 0.23.0</button></header>
+<header><div class="brand"><div class="logo">🔥</div><div>FIREVAULT</div></div><button class="build" onclick="showChangelog()">Build 0.24.0</button></header>
 <main id="app"></main>
 <nav>
 <button id="nav-home" onclick="go('home')"><span>🏠</span><span>Today</span></button>
@@ -41,7 +41,7 @@ nav button{background:transparent;border:0;color:var(--muted);display:flex;flex-
 <button id="nav-settings" onclick="go('settings')"><span>⚙️</span><span>Settings</span></button>
 </nav>
 <script>
-const BUILD="0.23.0"; const KEY="firevault_vault_build_030"; const ACTIVE="firevault_active_job_080";
+const BUILD="0.24.0"; const KEY="firevault_vault_build_030"; const ACTIVE="firevault_active_job_080";
 let data=load(), activeJob=loadActive(), view="home", selected=null, mode=null, timer=null, currentDocImageData="";
 function load(){const raw=localStorage.getItem(KEY);if(raw){try{return JSON.parse(raw)}catch(e){}}return{sites:[],resources:[{m:"Fire-Lite",n:"Manual links, trouble notes, walk-test reminders."},{m:"Notifier",n:"Panel notes, programming reminders, common issues."},{m:"Silent Knight",n:"Model notes, NAC quirks, communicator references."},{m:"Edwards / EST",n:"EST3 / EST4 notes, mapping, node information."},{m:"Potter",n:"Programming notes, compatibility, field observations."}]}}
 function save(){localStorage.setItem(KEY,JSON.stringify(data))}function loadActive(){const raw=localStorage.getItem(ACTIVE);if(raw){try{return JSON.parse(raw)}catch(e){}}return null}function saveActive(){activeJob?localStorage.setItem(ACTIVE,JSON.stringify(activeJob)):localStorage.removeItem(ACTIVE)}
@@ -129,6 +129,22 @@ function resourceMatchesSite(r,s){
 }
 function matchingResources(s){
   return (data.resources||[]).map((r,idx)=>({r,idx})).filter(x=>resourceMatchesSite(x.r,s));
+}
+function mapQuery(s){
+  if(s.lat&&s.lng)return `${s.lat},${s.lng}`;
+  return encodeURIComponent(fullAddress(s));
+}
+function openMapForSite(siteId){
+  const s=ensureArrays(siteById(siteId)||site());
+  if(!s)return;
+  const q=mapQuery(s);
+  window.open(`https://maps.apple.com/?q=${q}`,"_blank");
+}
+function openGoogleMapForSite(siteId){
+  const s=ensureArrays(siteById(siteId)||site());
+  if(!s)return;
+  const q=mapQuery(s);
+  window.open(`https://www.google.com/maps/search/?api=1&query=${q}`,"_blank");
 }
 function getLocation(cb){
  if(!navigator.geolocation){alert("GPS is not available in this browser.");return}
@@ -503,6 +519,7 @@ function buildReportText(s){
  lines.push(`FACP LOCATION: ${s.facpLocation||""}`);
  lines.push(`MONITORING: ${s.monitoring||""}`);
  lines.push(`GPS: ${s.lat&&s.lng ? s.lat+", "+s.lng : "Not set"}`);
+ lines.push(`MAP: ${s.lat&&s.lng ? "https://maps.apple.com/?q="+s.lat+","+s.lng : "https://maps.apple.com/?q="+encodeURIComponent(fullAddress(s))}`);
  lines.push(``);
  lines.push(`SITE NOTES:`);
  lines.push(s.notes||"No site notes recorded.");
@@ -697,17 +714,18 @@ function saveResource(){
 }
 
 function settings(){app(`<div class="screen"><h1>Settings</h1><div class="card"><h2>Backup</h2><p>Export before major changes.</p><button class="primary" onclick="exportData()">Export Backup</button><br><br><input type="file" accept="application/json" onchange="importData(event)"></div><div class="card"><h2>Reset</h2><button class="danger" onclick="resetData()">Clear Local Data</button></div></div>`)}
-function exportData(){let blob=new Blob([JSON.stringify(data,null,2)],{type:"application/json"});let a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="firevault-backup-build-0.23.0.json";a.click()}
+function exportData(){let blob=new Blob([JSON.stringify(data,null,2)],{type:"application/json"});let a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="firevault-backup-build-0.24.0.json";a.click()}
 function importData(e){let f=e.target.files[0];if(!f)return;let r=new FileReader();r.onload=()=>{try{data=JSON.parse(r.result);save();alert("Imported.");go("home")}catch(err){alert("Import failed.")}};r.readAsText(f)}
 function resetData(){if(confirm("Clear all local FireVault data?")){localStorage.removeItem(KEY);localStorage.removeItem(ACTIVE);data=load();activeJob=null;go("home")}}
 function showChangelog(){alert(`FireVault Build ${BUILD}
 
-- FireVault Photo Overlay
-- New photos are stamped before saving
-- Overlay includes FireVault branding, site name, and date/time
-- Works for Docs / Photos uploads
-- Works for Job Mode photo capture
-- Keeps existing photos unchanged`)}
+- Site Map Tools
+- Apple Maps button inside each site vault
+- Google Maps button inside each site vault
+- Uses saved GPS when available
+- Falls back to formatted address
+- Site Reports now include a map link
+- Preserves previous local data`)}
 render()
 </script>
 </body>
