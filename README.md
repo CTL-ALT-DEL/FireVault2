@@ -1,15 +1,13 @@
-# FireVault Build 0.22.0 — Follow-Up Tasks
+# FireVault Build 0.22.1 — Photo Upload Hotfix
 
 Root-level package for GitHub Pages.
 
-## Changes
-- Add/Edit follow-up tasks per site
-- Status, priority, due date, notes
-- Optional task creation from deficiencies
-- Open task count on Today and site vault
-- Tasks included in Site Report and Knowledge Search
-- Preserves previous local storage data
+## Fixes
+- Fixes photo selection corrupting the top/title field
+- Save File now returns to Docs / Photos
+- Adds Delete button for Docs / Photos records
+- Keeps existing photos and data intact
 
 Suggested commit:
 
-`Build 0.22.0 follow up tasks`
+`Build 0.22.1 photo upload hotfix`
