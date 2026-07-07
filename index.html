@@ -32,7 +32,7 @@ nav button{background:transparent;border:0;color:var(--muted);display:flex;flex-
 </style>
 </head>
 <body>
-<header><div class="brand"><div class="logo">🔥</div><div>FIREVAULT</div></div><button class="build" onclick="showChangelog()">Build 0.17.0</button></header>
+<header><div class="brand"><div class="logo">🔥</div><div>FIREVAULT</div></div><button class="build" onclick="showChangelog()">Build 0.18.0</button></header>
 <main id="app"></main>
 <nav>
 <button id="nav-home" onclick="go('home')"><span>🏠</span><span>Today</span></button>
@@ -41,7 +41,7 @@ nav button{background:transparent;border:0;color:var(--muted);display:flex;flex-
 <button id="nav-settings" onclick="go('settings')"><span>⚙️</span><span>Settings</span></button>
 </nav>
 <script>
-const BUILD="0.17.0"; const KEY="firevault_vault_build_030"; const ACTIVE="firevault_active_job_080";
+const BUILD="0.18.0"; const KEY="firevault_vault_build_030"; const ACTIVE="firevault_active_job_080";
 let data=load(), activeJob=loadActive(), view="home", selected=null, mode=null, timer=null;
 function load(){const raw=localStorage.getItem(KEY);if(raw){try{return JSON.parse(raw)}catch(e){}}return{sites:[],resources:[{m:"Fire-Lite",n:"Manual links, trouble notes, walk-test reminders."},{m:"Notifier",n:"Panel notes, programming reminders, common issues."},{m:"Silent Knight",n:"Model notes, NAC quirks, communicator references."},{m:"Edwards / EST",n:"EST3 / EST4 notes, mapping, node information."},{m:"Potter",n:"Programming notes, compatibility, field observations."}]}}
 function save(){localStorage.setItem(KEY,JSON.stringify(data))}function loadActive(){const raw=localStorage.getItem(ACTIVE);if(raw){try{return JSON.parse(raw)}catch(e){}}return null}function saveActive(){activeJob?localStorage.setItem(ACTIVE,JSON.stringify(activeJob)):localStorage.removeItem(ACTIVE)}
@@ -49,13 +49,22 @@ function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2
 function app(html){document.getElementById("app").innerHTML=html;active();if(view==="job")startTick();else stopTick()}function active(){document.querySelectorAll("nav button").forEach(b=>b.classList.remove("active"));let n=document.getElementById("nav-"+(["site","form","visits","issues","equipment","equipmentForm","access","accessForm","docs","docForm","job"].includes(view)?"sites":view));if(n)n.classList.add("active")}
 function go(v){view=v;mode=null;render()}function site(){return data.sites.find(s=>s.id===selected)}function siteById(id){return data.sites.find(s=>s.id===id)}
 function ensureArrays(s){if(!s)return s;s.visits=s.visits||[];s.knownIssues=s.knownIssues||[];s.equipment=s.equipment||[];s.contacts=s.contacts||[];s.docs=s.docs||[];s.deficiencies=s.deficiencies||[];return s}
-function render(){({home,sites,library,settings,site:siteDash,form,visits,issues,equipment,equipmentForm,access,accessForm,docs,docForm,job,importer,knowledge,report,timecard,templates,deficiencies,deficiencyForm,resourceForm}[view]||home)()}function val(id){return document.getElementById(id).value.trim()}
+function render(){({home,sites,library,settings,site:siteDash,form,visits,issues,equipment,equipmentForm,access,accessForm,docs,docForm,job,importer,knowledge,report,timecard,templates,deficiencies,deficiencyForm,resourceForm,siteResources}[view]||home)()}function val(id){return document.getElementById(id).value.trim()}
 function fullAddress(s){
   const structured=[s.street,s.city,s.state,s.zip].filter(Boolean).join(", ");
   return structured || s.address || "No address entered";
 }
 function shortCityState(s){
   return [s.city,s.state,s.zip].filter(Boolean).join(", ");
+}
+function resourceMatchesSite(r,s){
+  const hay=JSON.stringify(r||{}).toLowerCase();
+  const make=(s.panelManufacturer||"").toLowerCase();
+  const model=(s.panelModel||"").toLowerCase();
+  return (make && hay.includes(make)) || (model && hay.includes(model));
+}
+function matchingResources(s){
+  return (data.resources||[]).map((r,idx)=>({r,idx})).filter(x=>resourceMatchesSite(x.r,s));
 }
 function getLocation(cb){
  if(!navigator.geolocation){alert("GPS is not available in this browser.");return}
@@ -90,7 +99,7 @@ function sites(){app(`<div class="screen"><div class="row"><div><h1>Sites</h1><p
 function siteList(list){if(!list.length)return `<div class="empty">No sites yet. Tap Add.</div>`;return list.map(s=>{ensureArrays(s);return `<div class="card siteItem" onclick="openSite('${s.id}')"><div class="row"><h2>${esc(s.name)}</h2><span class="pill">${esc(s.panelManufacturer||"Panel TBD")}</span></div><p>${esc(fullAddress(s))}</p><span class="pill">${esc(s.panelModel||"Model TBD")}</span><span class="pill">Visits ${s.visits.length}</span><span class="pill">Issues ${s.knownIssues.length}</span><span class="pill">Docs ${s.docs.length}</span><span class="pill">Def ${s.deficiencies.length}</span></div>`}).join("")}
 function filter(){let q=val("q").toLowerCase();document.getElementById("siteList").innerHTML=siteList(data.sites.filter(s=>JSON.stringify(s).toLowerCase().includes(q)))}function newSite(){selected=null;view="form";render()}function openSite(id){selected=id;ensureArrays(site());view="site";render()}
 
-function siteDash(){const s=ensureArrays(site());if(!s)return go("sites");let isActive=activeJob&&activeJob.siteId===s.id;app(`<div class="screen"><div class="row"><button class="back ghost" onclick="go('sites')">←</button><button class="ghost" onclick="editSite()">Edit</button></div><div class="card redline"><h1>${esc(s.name)}</h1><p>${esc(fullAddress(s))}</p><span class="pill">🔥 ${esc(s.panelManufacturer||"Manufacturer TBD")}</span><span class="pill">${esc(s.panelModel||"Model TBD")}</span></div><button class="${isActive?'success':'primary'} tile" onclick="${isActive?"view='job';render()":"startJob()"}"><strong>${isActive?'OPEN ACTIVE CALL':'▶ START SERVICE CALL'}</strong><span>${isActive?'Timer is running':'Create live timeline and arrival timestamp'}</span></button><div class="grid2"><button class="tile" onclick="view='visits';render()"><strong>Visits</strong><span>${s.visits.length} records</span></button><button class="tile" onclick="view='issues';render()"><strong>Known Issues</strong><span>${s.knownIssues.length} items</span></button><button class="tile" onclick="view='equipment';render()"><strong>Equipment</strong><span>${s.equipment.length} records</span></button><button class="tile" onclick="view='docs';render()"><strong>Docs / Photos</strong><span>${s.docs.length} records</span></button></div><div class="card grow"><h2>Site Snapshot</h2><p><strong>FACP:</strong> ${esc(s.facpLocation||"Not entered")}</p><p><strong>Monitoring:</strong> ${esc(s.monitoring||"Not entered")}</p><p><strong>City/State:</strong> ${esc(shortCityState(s)||"Not entered")}</p><p><strong>GPS:</strong> ${s.lat&&s.lng?esc(s.lat+", "+s.lng):"Not set"}</p><p><strong>Known Issues:</strong> ${s.knownIssues.length?s.knownIssues.slice(0,2).map(i=>i.text).join(" / "):"None"}</p></div></div>`)}
+function siteDash(){const s=ensureArrays(site());if(!s)return go("sites");let isActive=activeJob&&activeJob.siteId===s.id;app(`<div class="screen"><div class="row"><button class="back ghost" onclick="go('sites')">←</button><button class="ghost" onclick="editSite()">Edit</button></div><div class="card redline"><h1>${esc(s.name)}</h1><p>${esc(fullAddress(s))}</p><span class="pill">🔥 ${esc(s.panelManufacturer||"Manufacturer TBD")}</span><span class="pill">${esc(s.panelModel||"Model TBD")}</span></div><button class="${isActive?'success':'primary'} tile" onclick="${isActive?"view='job';render()":"startJob()"}"><strong>${isActive?'OPEN ACTIVE CALL':'▶ START SERVICE CALL'}</strong><span>${isActive?'Timer is running':'Create live timeline and arrival timestamp'}</span></button><div class="grid2"><button class="tile" onclick="view='visits';render()"><strong>Visits</strong><span>${s.visits.length} records</span></button><button class="tile" onclick="view='issues';render()"><strong>Known Issues</strong><span>${s.knownIssues.length} items</span></button><button class="tile" onclick="view='equipment';render()"><strong>Equipment</strong><span>${s.equipment.length} records</span></button><button class="tile" onclick="view='docs';render()"><strong>Docs / Photos</strong><span>${s.docs.length} records</span></button></div><div class="card grow"><h2>Site Snapshot</h2><p><strong>FACP:</strong> ${esc(s.facpLocation||"Not entered")}</p><p><strong>Monitoring:</strong> ${esc(s.monitoring||"Not entered")}</p><p><strong>City/State:</strong> ${esc(shortCityState(s)||"Not entered")}</p><p><strong>GPS:</strong> ${s.lat&&s.lng?esc(s.lat+", "+s.lng):"Not set"}</p><p><strong>Matched Resources:</strong> ${matchingResources(s).length}</p><p><strong>Known Issues:</strong> ${s.knownIssues.length?s.knownIssues.slice(0,2).map(i=>i.text).join(" / "):"None"}</p></div></div>`)}
 function startJob(){const s=ensureArrays(site());if(activeJob&&!confirm("Another service call is active. Replace it?"))return;
  const begin=(lat,lng)=>{activeJob={id:uid(),siteId:s.id,siteName:s.name,startedAt:new Date().toISOString(),lat:lat||"",lng:lng||"",events:[{id:uid(),time:new Date().toISOString(),type:"Arrived",text:lat?`Service call started at GPS ${lat.toFixed(5)}, ${lng.toFixed(5)}`:"Service call started"}]};saveActive();view="job";render()}
  if(navigator.geolocation){navigator.geolocation.getCurrentPosition(pos=>begin(pos.coords.latitude,pos.coords.longitude),()=>begin(null,null),{enableHighAccuracy:true,timeout:8000,maximumAge:30000})}else begin(null,null)
@@ -410,6 +419,33 @@ function runImport(){
  go("sites");
 }
 
+
+function siteResources(){
+ const s=ensureArrays(site()); if(!s)return go("sites");
+ const matches=matchingResources(s);
+ const all=(data.resources||[]).map((r,idx)=>({r,idx}));
+ app(`<div class="screen">
+  <div class="row"><button class="back ghost" onclick="view='site';render()">←</button><h1>Resources</h1><button class="primary" onclick="mode=null;view='resourceForm';render()">＋ Add</button></div>
+  <div class="card tight">
+    <h2>${esc(s.panelManufacturer||"Panel")} ${esc(s.panelModel||"")}</h2>
+    <p>${matches.length} resource match${matches.length===1?"":"es"} for this site. Matches are based on manufacturer/model text.</p>
+  </div>
+  <div class="list grow">
+    ${matches.length?matches.map(x=>resourceCard(x.r,x.idx)).join(""):`<div class="empty">No matching resources yet. Add a resource using the panel manufacturer or model name.</div>`}
+    <div class="card"><h2>All Library Resources</h2><p>Use this if the automatic match missed something.</p></div>
+    ${all.filter(x=>!matches.some(m=>m.idx===x.idx)).slice(0,20).map(x=>resourceCard(x.r,x.idx)).join("")}
+  </div>
+ </div>`)
+}
+function resourceCard(r,idx){
+ return `<div class="card docLine">
+  <div class="row"><h2>${esc(r.m||r.manufacturer||"Resource")}</h2><button class="ghost" onclick="mode='${idx}';view='resourceForm';render()">Edit</button></div>
+  <p><strong>${esc(r.panel||r.t||"General")}</strong></p>
+  <p>${esc(r.n||r.notes||"")}</p>
+  ${r.url?`<a class="btn ghost" href="${esc(r.url)}" target="_blank">Open Link</a>`:""}
+ </div>`;
+}
+
 function library(){
  app(`<div class="screen">
   <div class="row"><div><h1>Library</h1><p>Manufacturer resources and cheat sheets.</p></div><button class="primary" onclick="mode=null;view='resourceForm';render()">＋ Add</button></div>
@@ -419,12 +455,7 @@ function library(){
 }
 function resourceList(list){
  if(!list.length)return `<div class="empty">No resources yet. Add a manufacturer or panel note.</div>`;
- return list.map((r,idx)=>`<div class="card docLine">
-  <div class="row"><h2>${esc(r.m||r.manufacturer||"Resource")}</h2><button class="ghost" onclick="mode='${idx}';view='resourceForm';render()">Edit</button></div>
-  <p><strong>${esc(r.panel||r.t||"General")}</strong></p>
-  <p>${esc(r.n||r.notes||"")}</p>
-  ${r.url?`<a class="btn ghost" href="${esc(r.url)}" target="_blank">Open Link</a>`:""}
- </div>`).join("");
+ return list.map((r,idx)=>resourceCard(r,idx)).join("");
 }
 function filterResources(){
  const q=val("rq").toLowerCase();
@@ -448,21 +479,20 @@ function saveResource(){
  data.resources=data.resources||[];
  if(mode!==null && data.resources[Number(mode)]) data.resources[Number(mode)]={...data.resources[Number(mode)],...obj};
  else data.resources.unshift({...obj,id:uid(),createdAt:new Date().toISOString()});
- save();mode=null;go("library");
+ save();mode=null;if(selected){view="siteResources";render()}else{go("library")}
 }
 
 function settings(){app(`<div class="screen"><h1>Settings</h1><div class="card"><h2>Backup</h2><p>Export before major changes.</p><button class="primary" onclick="exportData()">Export Backup</button><br><br><input type="file" accept="application/json" onchange="importData(event)"></div><div class="card"><h2>Reset</h2><button class="danger" onclick="resetData()">Clear Local Data</button></div></div>`)}
-function exportData(){let blob=new Blob([JSON.stringify(data,null,2)],{type:"application/json"});let a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="firevault-backup-build-0.17.0.json";a.click()}
+function exportData(){let blob=new Blob([JSON.stringify(data,null,2)],{type:"application/json"});let a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="firevault-backup-build-0.18.0.json";a.click()}
 function importData(e){let f=e.target.files[0];if(!f)return;let r=new FileReader();r.onload=()=>{try{data=JSON.parse(r.result);save();alert("Imported.");go("home")}catch(err){alert("Import failed.")}};r.readAsText(f)}
 function resetData(){if(confirm("Clear all local FireVault data?")){localStorage.removeItem(KEY);localStorage.removeItem(ACTIVE);data=load();activeJob=null;go("home")}}
 function showChangelog(){alert(`FireVault Build ${BUILD}
 
-- Editable Resource Library
-- Add/Edit manufacturer resources
-- Manual URL/link field
-- Panel/topic field
-- Resource search inside Library
-- Resources included in Knowledge Search
+- Panel Match Resources
+- Site vault now has Resources button
+- Automatically matches library resources by panel manufacturer/model
+- Shows matched resources first
+- Add/Edit resources from inside a site
 - Preserves previous local data`)}
 render()
 </script>

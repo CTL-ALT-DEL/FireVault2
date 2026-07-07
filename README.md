@@ -1,16 +1,14 @@
-# FireVault Build 0.17.0 — Editable Resource Library
+# FireVault Build 0.18.0 — Panel Match Resources
 
 Root-level package for GitHub Pages.
 
 ## Changes
-- Editable Resource Library
-- Add/Edit manufacturer resources
-- Manual URL/link field
-- Panel/topic field
-- Resource search inside Library
-- Resources included in Knowledge Search
+- Site vault now has Resources button
+- Automatically matches library resources by panel manufacturer/model
+- Shows matched resources first
+- Add/Edit resources from inside a site
 - Preserves previous local storage data
 
 Suggested commit:
 
-`Build 0.17.0 editable resource library`
+`Build 0.18.0 panel match resources`
