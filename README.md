@@ -2,40 +2,31 @@
 
 FireVault is a local-first field knowledge system for fire alarm technicians.
 
-## Version 1 Goal
-Create customer sites, save panel/access notes, add visit history, and export/import backups.
+## Version 0.3
 
-## What is included
-- React + Vite app
-- Mobile-friendly interface
-- Today dashboard
-- Sites list and search
+This build adds the first real Site Vault experience:
+
+- Dashboard
+- Sites search
 - Add/Edit Site
-- Site detail page
-- Visit history
-- Resource library
-- Local browser storage
-- Export/import backup
-- PWA manifest
-
-## What is not included yet
-- Firebase login
-- Cloud sync
-- Photos
-- GPS matching
-- Background location
-- AI search
+- Site Detail tabs
+- Overview
+- Visits
+- Known Issues
+- Equipment
+- Contacts/Access
+- Resource Library
+- Export/import JSON backup
 
 ## Run locally
+
 ```bash
 npm install
 npm run dev
 ```
 
 ## Build
+
 ```bash
 npm run build
 ```
-
-## Development rule
-Build one feature, test it, commit it, then move to the next feature.
