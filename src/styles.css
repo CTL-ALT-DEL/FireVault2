@@ -747,3 +747,58 @@ nav button:active{transform:translateY(1px) scale(.992)}
   .sitesScreen432 .siteItem .row{display:grid;grid-template-columns:1fr;gap:8px}
   .sitesScreen432 .sitePills{max-width:100%;justify-content:flex-start}
 }
+
+/* Build 0.43.3 Site Health Snapshot + neutral bevel cleanup */
+.redline,.docLine,.issue,.visit,.taskOpen,.taskDone,.deficiencyCard,.errorBox,
+.settingGroup,.equipmentMiniCard,.equipmentHero,.equipmentItem,.equipmentLine,
+.contactsMiniCard,.contactsHero,.contactItem,.contactLine,
+.docsMiniCard,.docsHero,.docFormCard,.docVaultItem,.docLineMini{
+  border-left-width:1px!important;
+  border-left-color:var(--fv427Rim)!important;
+}
+.healthSnapshotCard{
+  display:grid;
+  gap:10px;
+  padding:12px!important;
+  background:linear-gradient(180deg,var(--fv427FaceTop),var(--fv427FaceBottom))!important;
+  border:1px solid var(--fv427Rim)!important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.085),inset 0 -1px 0 rgba(0,0,0,.42),0 2px 0 var(--fv427Lip),0 11px 18px var(--fv427Shadow)!important;
+}
+.healthSnapshotTop{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;align-items:center}
+.healthSnapshotTop h2{margin:0 0 3px;font-size:17px;line-height:1.1}
+.healthSnapshotTop p{margin:0;color:var(--muted);font-size:12.4px;line-height:1.35;overflow-wrap:anywhere}
+.healthScore{
+  min-width:62px;
+  min-height:44px;
+  border-radius:15px;
+  display:grid;
+  place-items:center;
+  font-size:18px;
+  font-weight:950;
+  color:#fff;
+  background:linear-gradient(180deg,#253044,#101720);
+  border:1px solid rgba(255,255,255,.105);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.08),0 2px 0 #05070b,0 8px 14px rgba(0,0,0,.28);
+}
+.healthBars{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px}
+.healthBars span{display:grid;gap:2px;min-height:40px;padding:7px 8px;border-radius:13px;background:rgba(0,0,0,.18);border:1px solid rgba(255,255,255,.07);font-size:10.8px;text-transform:uppercase;letter-spacing:.055em;color:var(--muted);font-weight:850;text-align:center}
+.healthBars strong{font-size:17px;line-height:1;color:#fff;letter-spacing:0;text-transform:none}
+.healthPill{font-weight:950!important;border-color:rgba(255,255,255,.11)!important}
+.healthOk{background:linear-gradient(180deg,rgba(22,163,74,.24),rgba(15,23,42,.82))!important}
+.healthWatch{background:linear-gradient(180deg,rgba(245,158,11,.22),rgba(15,23,42,.82))!important}
+.healthWarn{background:linear-gradient(180deg,rgba(239,68,68,.24),rgba(15,23,42,.82))!important}
+.healthInfo{background:linear-gradient(180deg,rgba(56,189,248,.22),rgba(15,23,42,.82))!important}
+.healthSnapshotCard.healthOk .healthScore{box-shadow:inset 0 1px 0 rgba(255,255,255,.08),0 2px 0 #05070b,0 0 0 1px rgba(34,197,94,.18),0 8px 14px rgba(0,0,0,.28)}
+.healthSnapshotCard.healthWatch .healthScore{box-shadow:inset 0 1px 0 rgba(255,255,255,.08),0 2px 0 #05070b,0 0 0 1px rgba(245,158,11,.18),0 8px 14px rgba(0,0,0,.28)}
+.healthSnapshotCard.healthWarn .healthScore{box-shadow:inset 0 1px 0 rgba(255,255,255,.08),0 2px 0 #05070b,0 0 0 1px rgba(239,68,68,.18),0 8px 14px rgba(0,0,0,.28)}
+@media(max-width:430px){
+  .healthSnapshotCard{padding:10px!important;gap:8px}
+  .healthSnapshotTop{grid-template-columns:1fr auto;gap:8px}
+  .healthSnapshotTop h2{font-size:16px}
+  .healthSnapshotTop p{font-size:11.8px}
+  .healthScore{min-width:56px;min-height:40px;font-size:16px;border-radius:14px}
+  .healthBars{gap:6px}
+  .healthBars span{min-height:37px;padding:6px 5px;font-size:10px}
+  .healthBars strong{font-size:15px}
+  .sitesScreen432 .sitePills{gap:6px}
+}

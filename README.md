@@ -1,14 +1,15 @@
-# FireVault Build 0.43.2
+# FireVault Build 0.43.3
 
-Site Finder build for quickly locating saved customer vaults after the site record system has grown.
+Site Health Snapshot build for faster field triage across growing customer vaults.
 
 ## Updates
-- Advanced visible version to 0.43.2.
-- Added Site Finder search on the Sites screen.
-- Search checks site names, addresses, panel details, contacts, equipment, documents, tasks, deficiencies, and notes.
-- Added live result counts and a quick Clear button.
-- Site rows now show open-task and equipment counts for faster field triage.
-- Preserved the Loading FireVault fix, refined 3D controls, GPS/Nearby Sites, Task Center, Visit Log, Equipment Vault, Contacts & Access Vault, Documents / Links Vault, haptics, and map tools.
+- Advanced visible version to 0.43.3.
+- Added Site Health Snapshot badges on the Sites screen.
+- Site Detail now shows a health card with score, open tasks, deficiencies, and equipment issues.
+- Reports now include a Health line for quick customer/site triage.
+- Diagnostics now counts Attention and Watch sites.
+- Neutralized remaining left-edge rail styling so cards/buttons keep the cleaner 3D bevel look.
+- Preserved Site Finder, Documents / Links Vault, Contacts & Access Vault, Equipment Vault, GPS/Nearby, Task Center, Visit Log, haptics, and map tools.
 
 ## Install
 Copy the contents of this ZIP into the GitHub Pages project root. Do not copy the folder itself into the repo.

@@ -110,6 +110,41 @@ function distanceLabel(m){
 function gpsSiteDistances(lat,lng){
   return data.sites.filter(hasGps).map(s=>({s,meters:distanceMeters(lat,lng,Number(s.gps.lat),Number(s.gps.lng))})).sort((a,b)=>a.meters-b.meters);
 }
+function siteHealth(s){
+  ensureSite(s);
+  const openTasks=(s.tasks||[]).filter(t=>!taskIsDone(t));
+  const overdue=openTasks.filter(t=>taskDueState(t)==="overdue").length;
+  const dueToday=openTasks.filter(t=>taskDueState(t)==="today").length;
+  const openDef=(s.deficiencies||[]).filter(d=>(d.status||"Open")!=="Closed");
+  const critical=openDef.filter(d=>(d.priority||"").toLowerCase()==="critical").length;
+  const equipmentIssues=(s.equipment||[]).filter(e=>/(needs|issue|trouble|fail|offline|attention)/i.test(e.status||"")).length;
+  const missingGps=!hasGps(s);
+  let score=100;
+  score-=Math.min(40, overdue*14);
+  score-=Math.min(30, openDef.length*10);
+  score-=Math.min(24, equipmentIssues*12);
+  score-=Math.min(12, dueToday*4);
+  if(missingGps) score-=5;
+  score=Math.max(0, Math.round(score));
+  let label="Normal";
+  let cls="healthOk";
+  if(critical || overdue || equipmentIssues){ label="Attention"; cls="healthWarn"; }
+  else if(openDef.length || openTasks.length || dueToday){ label="Watch"; cls="healthWatch"; }
+  else if(missingGps){ label="GPS Needed"; cls="healthInfo"; }
+  const details=[];
+  if(overdue) details.push(`${overdue} overdue task${overdue===1?"":"s"}`);
+  if(dueToday) details.push(`${dueToday} due today`);
+  if(openDef.length) details.push(`${openDef.length} open deficienc${openDef.length===1?"y":"ies"}`);
+  if(equipmentIssues) details.push(`${equipmentIssues} equipment issue${equipmentIssues===1?"":"s"}`);
+  if(missingGps) details.push("GPS missing");
+  if(!details.length) details.push("No open issues detected");
+  return {score,label,cls,details,openTasks:openTasks.length,overdue,dueToday,openDef:openDef.length,equipmentIssues,missingGps};
+}
+function siteHealthLine(s){
+  const h=siteHealth(s);
+  return `${h.label} • ${h.score}% • ${h.details.slice(0,2).join(" • ")}`;
+}
+
 function siteSearchBlob(s){
   ensureSite(s);
   const parts=[s.name, fullAddress(s), s.panelManufacturer, s.panelModel, s.notes];
@@ -308,7 +343,7 @@ function home(){
       <button class="ghost tile" id="diagBtn"><strong>Diagnostics</strong><span>Build status</span></button>
     </div>
     ${activeJob ? `<div class="card activeJobMini"><div class="row"><div><h2>Service Call Active</h2><p>${esc(activeJob.siteName)} • <span id="jobElapsed">${elapsedText(activeJob.startedAt)}</span></p></div><button class="primary" id="resumeJobBtn">Open</button></div></div>` : ""}
-    <div class="card grow"><h2>Build ${BUILD}</h2><p>Site Finder is now available.</p><p>Search across site names, addresses, panels, contacts, equipment, documents, tasks, deficiencies, and notes from the Sites screen.</p></div>
+    <div class="card grow"><h2>Build ${BUILD}</h2><p>Site Health Snapshot is now active.</p><p>Sites now show a fast health badge based on overdue tasks, open deficiencies, equipment issues, and missing GPS.</p></div>
   </div>`);
   document.getElementById("sitesCard").onclick=()=>route("sites");
   document.getElementById("tasksCard").onclick=()=>{selectedSiteId=null; route("tasks");};
@@ -327,10 +362,11 @@ function home(){
 
 function sites(){
   const gpsSavedCount = data.sites.filter(hasGps).length;
+  const attentionCount = data.sites.filter(s=>siteHealth(s).cls === "healthWarn").length;
   html(`<div class="screen sitesScreen423 sitesScreen432"><div class="row"><h1>Sites</h1><div class="miniActions"><button class="ghost smallBtn" id="nearBtn">Nearby</button><button class="primary" id="addBtn">＋</button></div></div>
     <div class="card siteFinderCard"><div class="siteFinderTop"><input id="siteSearch" type="search" placeholder="Search sites, panels, contacts, equipment..." value="${esc(siteSearch)}" autocomplete="off"><button class="ghost smallBtn" id="clearSiteSearch">Clear</button></div><div class="siteFinderHint"><span id="siteSearchCount">${data.sites.length} site${data.sites.length===1?"":"s"}</span><span>Searches all saved vault details</span></div></div>
-    <div class="card gpsStatusBar"><div><strong>GPS / Nearby</strong><p>${gpsSavedCount} site${gpsSavedCount===1?"":"s"} with GPS saved • radius ${nearbyRadiusMiles()} mi</p></div><button class="ghost smallBtn" id="gpsStripScan">Scan Nearby</button></div>
-    <div class="list grow siteSearchList">${data.sites.length?data.sites.map(s=>`<div class="card siteItem redline" data-id="${esc(s.id)}" data-search="${esc(siteSearchBlob(s))}"><div class="row"><div><h2>${esc(s.name||"Unnamed Site")}</h2><p>${esc(fullAddress(s))}</p><p>${esc([s.panelManufacturer,s.panelModel].filter(Boolean).join(" ")||"Panel not entered")}</p></div><div class="sitePills"><span class="pill">${(s.tasks||[]).filter(t=>(t.status||"Open")!=="Done").length} open</span><span class="pill">${(s.equipment||[]).length} equip</span><span class="pill ${hasGps(s)?"gpsPill":"noGpsPill"}">${hasGps(s)?"GPS saved":"No GPS"}</span></div></div></div>`).join(""):`<div class="empty">No sites yet. Add your first customer vault.</div>`}</div></div>`);
+    <div class="card gpsStatusBar"><div><strong>GPS / Nearby</strong><p>${gpsSavedCount} site${gpsSavedCount===1?"":"s"} with GPS saved • ${attentionCount} need attention • radius ${nearbyRadiusMiles()} mi</p></div><button class="ghost smallBtn" id="gpsStripScan">Scan Nearby</button></div>
+    <div class="list grow siteSearchList">${data.sites.length?data.sites.map(s=>`<div class="card siteItem redline" data-id="${esc(s.id)}" data-search="${esc(siteSearchBlob(s))}"><div class="row"><div><h2>${esc(s.name||"Unnamed Site")}</h2><p>${esc(fullAddress(s))}</p><p>${esc([s.panelManufacturer,s.panelModel].filter(Boolean).join(" ")||"Panel not entered")}</p></div><div class="sitePills"><span class="pill healthPill ${siteHealth(s).cls}">${siteHealth(s).label} ${siteHealth(s).score}%</span><span class="pill">${(s.tasks||[]).filter(t=>(t.status||"Open")!=="Done").length} open</span><span class="pill">${(s.equipment||[]).length} equip</span><span class="pill ${hasGps(s)?"gpsPill":"noGpsPill"}">${hasGps(s)?"GPS saved":"No GPS"}</span></div></div></div>`).join(""):`<div class="empty">No sites yet. Add your first customer vault.</div>`}</div></div>`);
   document.getElementById("addBtn").onclick=()=>{selectedSiteId=null; mode=null; route("siteForm");};
   document.getElementById("nearBtn").onclick=detectNearbySites;
   document.getElementById("gpsStripScan").onclick=detectNearbySites;
@@ -378,8 +414,10 @@ function siteDetail(){
   const equipment=Array.isArray(s.equipment) ? s.equipment : [];
   const contacts=Array.isArray(s.contacts) ? s.contacts : [];
   const docs=Array.isArray(s.docs) ? s.docs : [];
+  const health=siteHealth(s);
   html(`<div class="screen"><div class="row"><button class="back ghost" id="backBtn">←</button><button class="ghost" id="editBtn">Edit</button></div>
     <div class="card redline"><h1>${esc(s.name)}</h1><p>${esc(fullAddress(s))}</p><p>${esc([s.panelManufacturer,s.panelModel].filter(Boolean).join(" ")||"Panel not entered")}</p></div>
+    <div class="card healthSnapshotCard ${health.cls}"><div class="healthSnapshotTop"><div><h2>Site Health</h2><p>${esc(health.details.join(" • "))}</p></div><span class="healthScore">${health.score}%</span></div><div class="healthBars"><span><strong>${health.openTasks}</strong> Open</span><span><strong>${health.openDef}</strong> Def</span><span><strong>${health.equipmentIssues}</strong> Equip</span></div></div>
     <div class="grid2">
       <button class="primary tile" id="jobBtn"><strong>Start Job</strong><span>Live service call</span></button>
       <button class="ghost tile" id="reportBtn"><strong>Report</strong><span>Copy/download</span></button>
@@ -726,6 +764,7 @@ ${fullAddress(s)}
 Panel: ${[s.panelManufacturer,s.panelModel].filter(Boolean).join(" ")||"Not entered"}
 GPS: ${data.settings.gps?.includeInReports===false?"Hidden in Settings":gpsLine(s)}
 Map: ${mapUrl(s,(set.gps&&set.gps.mapProvider)||"apple")}
+Health: ${siteHealthLine(s)}
 
 TECHNICIAN
 ${tech.name||""}
@@ -924,20 +963,20 @@ function saveSettings(){
   save(); toast("Settings saved."); settings();
 }
 
-function diagnostics(){ const taskRows=allTaskRows(); const taskCounts=taskFilterCounts(taskRows); const totalTasks=taskRows.length; const serviceTasks=taskRows.filter(r=>r.t.source==="Service Call").length; const totalDef=data.sites.reduce((n,s)=>n+(s.deficiencies||[]).length,0); const totalVisits=data.sites.reduce((n,s)=>n+(s.visits||[]).length,0); const totalContacts=data.sites.reduce((n,s)=>n+(s.contacts||[]).length,0); const totalDocs=data.sites.reduce((n,s)=>n+(s.docs||[]).length,0); html(`<div class="screen"><div class="row"><button class="back ghost" id="backHome">←</button><h1>Diagnostics</h1></div><div class="card grow errorBox"><p>Build: ${BUILD}</p><p>Sites: ${data.sites.length}</p><p>Total Tasks: ${totalTasks}</p><p>Open Tasks: ${taskCounts.open}</p><p>Due Today: ${taskCounts.today}</p><p>Overdue Tasks: ${taskCounts.overdue}</p><p>Service Follow-Ups: ${serviceTasks}</p><p>Total Deficiencies: ${totalDef}</p><p>Total Visits: ${totalVisits}</p><p>Total Contacts: ${totalContacts}</p><p>Total Documents: ${totalDocs}</p><p>Active Job: ${activeJob ? esc(activeJob.siteName) : "None"}</p><p>Current Theme: ${esc(data.settings.theme.name)}</p><p>Accent: ${esc(data.settings.theme.accentColor)}</p><p>Advanced AI Enabled: ${data.settings.advanced?.aiTechnician ? "Yes" : "No"}</p><p>GPS Tools: ${data.settings.gps?.enabled !== false ? "Enabled" : "Hidden"}</p><p>Nearby Radius: ${nearbyRadiusMiles()} mi</p><p>Haptics: ${data.settings.app?.haptics !== false ? "Enabled" : "Off"}</p><p>Import/Export: Ready</p><p>Storage key: ${KEY}</p><p>Modules loaded successfully.</p></div></div>`); document.getElementById("backHome").onclick=()=>route("home"); }
+function diagnostics(){ const taskRows=allTaskRows(); const taskCounts=taskFilterCounts(taskRows); const totalTasks=taskRows.length; const serviceTasks=taskRows.filter(r=>r.t.source==="Service Call").length; const totalDef=data.sites.reduce((n,s)=>n+(s.deficiencies||[]).length,0); const totalVisits=data.sites.reduce((n,s)=>n+(s.visits||[]).length,0); const totalContacts=data.sites.reduce((n,s)=>n+(s.contacts||[]).length,0); const totalDocs=data.sites.reduce((n,s)=>n+(s.docs||[]).length,0); const healthWarn=data.sites.filter(s=>siteHealth(s).cls==="healthWarn").length; const healthWatch=data.sites.filter(s=>siteHealth(s).cls==="healthWatch").length; html(`<div class="screen"><div class="row"><button class="back ghost" id="backHome">←</button><h1>Diagnostics</h1></div><div class="card grow errorBox"><p>Build: ${BUILD}</p><p>Sites: ${data.sites.length}</p><p>Total Tasks: ${totalTasks}</p><p>Open Tasks: ${taskCounts.open}</p><p>Due Today: ${taskCounts.today}</p><p>Overdue Tasks: ${taskCounts.overdue}</p><p>Service Follow-Ups: ${serviceTasks}</p><p>Total Deficiencies: ${totalDef}</p><p>Total Visits: ${totalVisits}</p><p>Total Contacts: ${totalContacts}</p><p>Total Documents: ${totalDocs}</p><p>Attention Sites: ${healthWarn}</p><p>Watch Sites: ${healthWatch}</p><p>Active Job: ${activeJob ? esc(activeJob.siteName) : "None"}</p><p>Current Theme: ${esc(data.settings.theme.name)}</p><p>Accent: ${esc(data.settings.theme.accentColor)}</p><p>Advanced AI Enabled: ${data.settings.advanced?.aiTechnician ? "Yes" : "No"}</p><p>GPS Tools: ${data.settings.gps?.enabled !== false ? "Enabled" : "Hidden"}</p><p>Nearby Radius: ${nearbyRadiusMiles()} mi</p><p>Haptics: ${data.settings.app?.haptics !== false ? "Enabled" : "Off"}</p><p>Import/Export: Ready</p><p>Storage key: ${KEY}</p><p>Modules loaded successfully.</p></div></div>`); document.getElementById("backHome").onclick=()=>route("home"); }
 function showChangelog(){
   const notes = [
-    "Added Site Finder search on the Sites screen.",
-    "Search now checks site names, addresses, panel details, contacts, equipment, documents, tasks, deficiencies, and notes.",
-    "Added live result counts and a quick Clear button.",
-    "Site rows now show open-task and equipment counts for faster triage.",
-    "Preserved Documents / Links Vault, Contacts & Access Vault, Equipment Vault, GPS/Nearby, and Visit Log features."
+    "Added Site Health Snapshot badges on the Sites screen.",
+    "Site Detail now shows a health card with score, open tasks, deficiencies, and equipment issues.",
+    "Reports now include a Health line for quick customer/site triage.",
+    "Diagnostics now counts Attention and Watch sites.",
+    "Preserved Site Finder, Documents / Links Vault, Contacts & Access Vault, Equipment Vault, GPS/Nearby, and Visit Log features."
   ];
   const overlay=document.createElement("div");
   overlay.className="releaseOverlay";
   overlay.innerHTML=`<div class="releaseSheet" role="dialog" aria-modal="true" aria-label="FireVault release notes">
     <div class="releaseHead"><div><strong>FireVault</strong><span>Build ${BUILD}</span></div><button class="ghost iconBtn" id="closeRelease" aria-label="Close release notes">×</button></div>
-    <div class="releaseBody"><h2>Release Notes</h2><p class="releaseIntro">site finder and vault-wide search.</p><ul>${notes.map(n=>`<li>${esc(n)}</li>`).join("")}</ul></div>
+    <div class="releaseBody"><h2>Release Notes</h2><p class="releaseIntro">site health snapshot and triage badges.</p><ul>${notes.map(n=>`<li>${esc(n)}</li>`).join("")}</ul></div>
   </div>`;
   document.body.appendChild(overlay);
   const close=()=>overlay.remove();
