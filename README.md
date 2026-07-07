@@ -1,4 +1,4 @@
-# FireVault Build 0.41.8
+# FireVault Build 0.41.9
 
 Email Defaults designer and Settings tab position fix.
 
@@ -13,3 +13,10 @@ Email Defaults designer and Settings tab position fix.
 
 ## Install
 Copy these files into the project root that contains package.json, src, public, index.html, manifest.json, and assets. Do not copy the outer folder itself into your repo.
+
+
+## Build 0.41.9
+- Lowered bottom menu icon bar for iPhone home-screen use.
+- Added haptic button feedback where supported by the browser/device.
+- Added a haptics toggle under Settings → Theme.
+- Preserved Nearby Sites and GPS tools.
