@@ -1,4 +1,4 @@
-# Clean Install - FireVault Build 0.43.9
+# Clean Install - FireVault Build 0.44.0
 
 1. Export/backup your current FireVault data from the app before replacing files.
 2. Delete old extracted local folders that start with `firevault-build-`.

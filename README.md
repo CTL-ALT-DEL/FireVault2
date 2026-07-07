@@ -1,14 +1,13 @@
-# FireVault Build 0.43.9
+# FireVault Build 0.44.0
 
-Build 0.43.9 adds a redesigned Deficiency Center with severity filters, checklist-source visibility, quick Close/Reopen actions, and improved diagnostics counts.
+Build 0.44.0 adds a professional per-site Report Center with a cleaner preview, health summary, share/copy/download actions, and one-tap email subject copying.
 
 ## Clean install reminder
 Copy the contents of this ZIP into the GitHub Pages project root. Do not commit nested `firevault-build-*` folders.
 
 ## Build notes
-- Visible app version advanced to 0.43.9.
-- Deficiencies now have Open, Critical, High+, Checklist, Closed, and All filters.
-- Deficiency cards now support quick Close / Reopen without opening the edit form.
-- Checklist-created deficiencies are easier to identify.
-- Diagnostics separates open and closed deficiency totals.
-- Preserves the 0.42.4 Loading FireVault boot watchdog and all current Vault modules.
+- Visible app version advanced to 0.44.0.
+- Added a Report Center screen with health, open task, deficiency, and equipment issue counters.
+- Added report preview cards for Site, Service, Equipment, and Checklist sections.
+- Added Share / Copy, Copy TXT, Download, and Copy Subject actions.
+- Preserves Deficiency Center filters, Inspection Checklist completion, Visit History, Site Health, Attention Queue, Equipment, Contacts, Documents, GPS/Nearby, haptics, refined 3D controls, and the Loading FireVault boot watchdog.
