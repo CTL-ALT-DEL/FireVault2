@@ -1,13 +1,14 @@
 {
   "name": "FireVault",
   "short_name": "FireVault",
+  "id": "firevault-field-vault",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
   "orientation": "portrait",
   "background_color": "#0b0d10",
   "theme_color": "#101216",
-  "description": "Field knowledge system for fire alarm technicians. Build 0.42.2.",
+  "description": "Field knowledge system for fire alarm technicians. Build 0.42.3.",
   "icons": [
     {
       "src": "assets/icon-192.png",

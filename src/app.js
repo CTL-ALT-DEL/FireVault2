@@ -297,7 +297,7 @@ function home(){
       <button class="ghost tile" id="diagBtn"><strong>Diagnostics</strong><span>Build status</span></button>
     </div>
     ${activeJob ? `<div class="card activeJobMini"><div class="row"><div><h2>Service Call Active</h2><p>${esc(activeJob.siteName)} • <span id="jobElapsed">${elapsedText(activeJob.startedAt)}</span></p></div><button class="primary" id="resumeJobBtn">Open</button></div></div>` : ""}
-    <div class="card grow"><h2>Build ${BUILD}</h2><p>Task Center now filters open, overdue, due today, service-call, and completed tasks.</p><p>Use quick actions to mark tasks done or reopen them without opening the edit form.</p></div>
+    <div class="card grow"><h2>Build ${BUILD}</h2><p>iPhone shell polish, Settings readability, and GPS visibility have been tuned.</p><p>Nearby Sites and GPS tools are now easier to find from the dashboard, Sites page, and Settings.</p></div>
   </div>`);
   document.getElementById("sitesCard").onclick=()=>route("sites");
   document.getElementById("tasksCard").onclick=()=>{selectedSiteId=null; route("tasks");};
@@ -315,10 +315,13 @@ function home(){
 }
 
 function sites(){
-  html(`<div class="screen"><div class="row"><h1>Sites</h1><div class="miniActions"><button class="ghost smallBtn" id="nearBtn">Nearby</button><button class="primary" id="addBtn">＋</button></div></div>
+  const gpsSavedCount = data.sites.filter(hasGps).length;
+  html(`<div class="screen sitesScreen423"><div class="row"><h1>Sites</h1><div class="miniActions"><button class="ghost smallBtn" id="nearBtn">Nearby</button><button class="primary" id="addBtn">＋</button></div></div>
+    <div class="card gpsStatusBar"><div><strong>GPS / Nearby</strong><p>${gpsSavedCount} site${gpsSavedCount===1?"":"s"} with GPS saved • radius ${nearbyRadiusMiles()} mi</p></div><button class="ghost smallBtn" id="gpsStripScan">Scan Nearby</button></div>
     <div class="list grow">${data.sites.length?data.sites.map(s=>`<div class="card siteItem redline" data-id="${s.id}"><div class="row"><div><h2>${esc(s.name||"Unnamed Site")}</h2><p>${esc(fullAddress(s))}</p><p>${esc([s.panelManufacturer,s.panelModel].filter(Boolean).join(" ")||"Panel not entered")}</p></div><div class="sitePills"><span class="pill">${(s.tasks||[]).length} tasks</span><span class="pill ${hasGps(s)?"gpsPill":"noGpsPill"}">${hasGps(s)?"GPS saved":"No GPS"}</span></div></div></div>`).join(""):`<div class="empty">No sites yet. Add your first customer vault.</div>`}</div></div>`);
   document.getElementById("addBtn").onclick=()=>{selectedSiteId=null; mode=null; route("siteForm");};
   document.getElementById("nearBtn").onclick=detectNearbySites;
+  document.getElementById("gpsStripScan").onclick=detectNearbySites;
   document.querySelectorAll(".siteItem").forEach(el=>el.onclick=()=>{selectedSiteId=el.dataset.id; route("siteDetail");});
 }
 
@@ -548,17 +551,17 @@ function jobMode(){
 
 function settings(){
   const tabs=[
-    ["tech","Tech"],["reports","Report"],["email","Email"],["overlay","Photos"],
-    ["gps","GPS"],["themes","Theme"],["advanced","Advanced"],["backup","Backup"],["about","About"]
+    ["tech","Tech"],["gps","GPS"],["reports","Report"],["email","Email"],
+    ["overlay","Photos"],["themes","Theme"],["advanced","Advanced"],["backup","Backup"],["about","About"]
   ];
   const active=tabs.find(t=>t[0]===settingsTab)||tabs[0];
-  html(`<div class="screen settingsScreen settingsScreen409">
+  html(`<div class="screen settingsScreen settingsScreen409 settingsScreen423">
     <div class="settingsMiniHead">
       <div class="settingsMiniTitle"><h1>Settings</h1><p>${active[1]}</p></div>
       <button class="ghost iconBtn settingsInfoBtn" id="diagBtn" title="Diagnostics" aria-label="Diagnostics">ⓘ</button>
     </div>
     <div class="settingsPickerRail" id="settingsPickerRail" aria-label="Settings sections">${tabs.map(t=>`<button class="settingsPill ${settingsTab===t[0]?"active":""}" data-tab="${t[0]}">${t[1]}</button>`).join("")}</div>
-    <div class="settingsContent settingsContent409 grow">${settingsPanel()}</div>
+    <div class="settingsContent settingsContent409 settingsContent423 grow">${settingsPanel()}</div>
   </div>`);
   const rail=document.getElementById("settingsPickerRail");
   if(rail){
@@ -674,18 +677,18 @@ function saveSettings(){
 function diagnostics(){ const taskRows=allTaskRows(); const taskCounts=taskFilterCounts(taskRows); const totalTasks=taskRows.length; const serviceTasks=taskRows.filter(r=>r.t.source==="Service Call").length; const totalDef=data.sites.reduce((n,s)=>n+(s.deficiencies||[]).length,0); const totalVisits=data.sites.reduce((n,s)=>n+(s.visits||[]).length,0); html(`<div class="screen"><div class="row"><button class="back ghost" id="backHome">←</button><h1>Diagnostics</h1></div><div class="card grow errorBox"><p>Build: ${BUILD}</p><p>Sites: ${data.sites.length}</p><p>Total Tasks: ${totalTasks}</p><p>Open Tasks: ${taskCounts.open}</p><p>Due Today: ${taskCounts.today}</p><p>Overdue Tasks: ${taskCounts.overdue}</p><p>Service Follow-Ups: ${serviceTasks}</p><p>Total Deficiencies: ${totalDef}</p><p>Total Visits: ${totalVisits}</p><p>Active Job: ${activeJob ? esc(activeJob.siteName) : "None"}</p><p>Current Theme: ${esc(data.settings.theme.name)}</p><p>Accent: ${esc(data.settings.theme.accentColor)}</p><p>Advanced AI Enabled: ${data.settings.advanced?.aiTechnician ? "Yes" : "No"}</p><p>GPS Tools: ${data.settings.gps?.enabled !== false ? "Enabled" : "Hidden"}</p><p>Nearby Radius: ${nearbyRadiusMiles()} mi</p><p>Haptics: ${data.settings.app?.haptics !== false ? "Enabled" : "Off"}</p><p>Import/Export: Ready</p><p>Storage key: ${KEY}</p><p>Modules loaded successfully.</p></div></div>`); document.getElementById("backHome").onclick=()=>route("home"); }
 function showChangelog(){
   const notes = [
-    "Build number advanced to 0.42.2 across the header, manifest, diagnostics, and release notes.",
-    "Added Task Center filters for open, due today, overdue, service-call, completed, and all tasks.",
-    "Added quick Done/Reopen actions directly from the task list.",
-    "Added task urgency badges and improved due-date sorting.",
-    "Dashboard task tile now highlights overdue or due-today work.",
-    "Preserved Visit Log, service follow-ups, haptics, Nearby Sites, GPS capture, and Settings pill-tabs."
+    "Build number advanced to 0.42.3 across the header, manifest, diagnostics, and release notes.",
+    "Tuned the iPhone home-screen shell to reduce bottom dock blank space and keep the menu bar visually anchored.",
+    "Made Settings slightly larger and less cramped while keeping the minimalist pill-tab approach.",
+    "Moved the GPS tab forward in Settings so it is easier to find on iPhone.",
+    "Added a GPS / Nearby status strip to the Sites page with direct Scan Nearby access.",
+    "Preserved Task Center filters, Visit Log, service follow-ups, haptics, Nearby Sites, GPS capture, and map actions."
   ];
   const overlay=document.createElement("div");
   overlay.className="releaseOverlay";
   overlay.innerHTML=`<div class="releaseSheet" role="dialog" aria-modal="true" aria-label="FireVault release notes">
     <div class="releaseHead"><div><strong>FireVault</strong><span>Build ${BUILD}</span></div><button class="ghost iconBtn" id="closeRelease" aria-label="Close release notes">×</button></div>
-    <div class="releaseBody"><h2>Release Notes</h2><p class="releaseIntro">Task Center filters and quick actions.</p><ul>${notes.map(n=>`<li>${esc(n)}</li>`).join("")}</ul></div>
+    <div class="releaseBody"><h2>Release Notes</h2><p class="releaseIntro">iPhone shell polish, Settings readability, and GPS visibility.</p><ul>${notes.map(n=>`<li>${esc(n)}</li>`).join("")}</ul></div>
   </div>`;
   document.body.appendChild(overlay);
   const close=()=>overlay.remove();

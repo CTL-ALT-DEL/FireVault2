@@ -296,7 +296,7 @@ button:active,.btn:active,label.checkRow:active{transform:translateY(1px) scale(
 @media(max-width:430px){.jobActionGrid{grid-template-columns:1fr 1fr;gap:7px}.jobActionGrid button{min-height:36px;font-size:11.8px}.jobFollowCard{padding:10px}.serviceTaskPill{font-size:10px}}
 @media(max-width:350px){.jobActionGrid{grid-template-columns:1fr}}
 
-/* Build 0.42.2 Task Center filters and quick actions */
+/* Build 0.42.3 Task Center filters and quick actions */
 .taskMetricCard{border-left:3px solid var(--amber)}
 .tasksScreen422{gap:9px}
 .taskTopRow{align-items:center;gap:10px}
@@ -326,3 +326,33 @@ button:active,.btn:active,label.checkRow:active{transform:translateY(1px) scale(
 .taskQuickActions .smallBtn{min-height:31px;padding:6px 10px;font-size:11.5px;border-radius:999px}
 @media(max-width:430px){.tasksScreen422{gap:8px}.taskTopRow h1{font-size:21px}.taskTopRow p{font-size:12px}.taskFilterPill{min-height:32px;padding:6px 9px;font-size:11.5px}.taskCard{padding:10px}.taskCardMain{grid-template-columns:1fr;gap:6px}.taskBadges{flex-direction:row;align-items:center;justify-content:flex-start;flex-wrap:wrap;min-width:0}.taskQuickActions{justify-content:stretch}.taskQuickActions .smallBtn{flex:1;justify-content:center}.taskCard h2{font-size:15.5px}.taskCard p{font-size:12.2px}}
 @media(max-width:350px){.taskFilterPill span{max-width:72px;overflow:hidden;text-overflow:ellipsis}.taskQuickActions{grid-template-columns:1fr;display:grid}}
+
+
+/* Build 0.42.3 iPhone shell, GPS visibility, and Settings readability polish */
+:root{
+  --safeBottom423:env(safe-area-inset-bottom,0px);
+  --dockBase423:62px;
+  --navH:calc(var(--dockBase423) + max(var(--safeBottom423),0px));
+}
+html,body{background:#0b0d10!important}
+body{background-color:#0b0d10!important}
+body::after{height:max(var(--safeBottom423),12px);background:#0b0d10!important;z-index:79;pointer-events:none}
+main{height:calc(100dvh - var(--headerH) - var(--navH));padding-bottom:8px}
+nav{
+  height:var(--navH);min-height:var(--navH);bottom:0;
+  padding:5px 8px max(2px,calc(var(--safeBottom423) * .12));
+  align-items:end;background:linear-gradient(180deg,#10141b,#07090d 68%,#0b0d10);
+  box-shadow:0 -10px 28px rgba(0,0,0,.34);isolation:isolate;
+}
+nav::before{content:"";position:absolute;left:0;right:0;bottom:0;height:max(var(--safeBottom423),12px);background:#0b0d10;z-index:-1}
+nav button{min-height:54px;max-height:58px;padding:3px 3px 4px;border-radius:16px}
+nav button span:first-child{font-size:23px}
+nav button span:last-child{font-size:11.5px;line-height:1}
+.sitesScreen423{gap:9px}
+.gpsStatusBar{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 11px;border-left:3px solid var(--cyan);background:linear-gradient(180deg,rgba(34,211,238,.08),rgba(255,255,255,.028))}
+.gpsStatusBar div{min-width:0}.gpsStatusBar strong{display:block;font-size:14px;line-height:1.1;margin-bottom:3px}.gpsStatusBar p{font-size:12.5px;line-height:1.25;margin:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.gpsStatusBar .smallBtn{flex:0 0 auto;min-height:34px;padding:7px 10px;border-radius:999px;font-size:12px}
+.settingsScreen423{gap:9px}.settingsScreen423 .settingsMiniHead{min-height:42px;padding:8px 9px}.settingsScreen423 .settingsMiniTitle h1{font-size:22px}.settingsScreen423 .settingsMiniTitle p{font-size:12.5px;line-height:1.2}.settingsScreen423 .settingsPickerRail{gap:8px;padding:3px 2px 10px;margin:0 -2px}.settingsScreen423 .settingsPill{font-size:13.5px;min-height:38px;padding:9px 14px;border-radius:999px}.settingsContent423 .compactPane{padding:13px}.settingsContent423 .paneHead{margin-bottom:8px}.settingsContent423 .paneHead h2{font-size:18px}.settingsContent423 .paneNote{font-size:12.5px!important;line-height:1.35!important;margin-bottom:11px!important}.settingsContent423 .settingField label,.settingsContent423 label:not(.checkRow){font-size:11.2px!important}.settingsContent423 input,.settingsContent423 textarea,.settingsContent423 select{min-height:42px;font-size:14.5px;padding:9px 11px}.settingsContent423 textarea{min-height:82px}.settingsContent423 .checkRow{min-height:42px;font-size:13.5px;padding:9px 11px}.settingsContent423 .fieldNote{font-size:11.8px;line-height:1.35}.settingsContent423 .presetBtn{min-height:43px;font-size:13.5px}.settingsContent423 .saveMini{min-height:36px;font-size:12.5px;padding:8px 13px}.settingsContent423 .emailControl input,.settingsContent423 .emailControl textarea{font-size:14.5px}.settingsContent423 .emailTagChip{font-size:12.5px;min-height:34px}.settingsContent423 .emailPreviewLine span{font-size:13.5px}.settingsContent423 .emailPreviewSignature{font-size:13px}
+@supports(height:100svh){main{height:calc(100svh - var(--headerH) - var(--navH))}}
+@supports(height:100dvh){main{height:calc(100dvh - var(--headerH) - var(--navH))}}
+@media(max-width:430px){:root{--dockBase423:60px}.brandMark{width:36px;height:36px}.build{font-size:10.5px;padding:6px 8px}.gpsStatusBar{padding:9px 10px}.gpsStatusBar p{font-size:12px}.settingsScreen423 .settingsPill{font-size:13px;min-height:37px;padding:8px 13px}.settingsContent423 .compactPane{padding:12px}.settingsContent423 input,.settingsContent423 textarea,.settingsContent423 select{font-size:14px;min-height:41px}.settingsContent423 .checkRow{font-size:13px;min-height:41px}nav button{min-height:52px;max-height:56px}nav button span:first-child{font-size:22px}}
+@media(max-width:360px){.gpsStatusBar{display:grid;grid-template-columns:1fr;gap:7px}.gpsStatusBar p{white-space:normal}.gpsStatusBar .smallBtn{width:100%}.settingsContent423 .settingField{grid-template-columns:1fr}.settingsScreen423 .settingsPill{font-size:12.5px;padding:8px 12px}}
