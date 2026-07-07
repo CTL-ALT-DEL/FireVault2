@@ -1,23 +1,19 @@
-# Clean Install Reminder
+# Clean Install - FireVault Build 0.43.9
 
-This is a clean-root FireVault package.
+1. Export/backup your current FireVault data from the app before replacing files.
+2. Delete old extracted local folders that start with `firevault-build-`.
+3. Copy the files from this ZIP into the repository root.
+4. Commit and deploy to GitHub Pages.
+5. Hard refresh the browser. On iPhone home-screen PWA, delete and re-add the shortcut if cached shell spacing persists.
 
-Copy these files into the GitHub Pages project root:
-
-- `index.html`
-- `manifest.json`
-- `src/`
-- `assets/`
-- `README.md`
-- `.gitignore`
-
-Do **not** copy the extracted folder itself into the repository.
-
-Delete any nested folders named like:
+Expected project root contents:
 
 ```text
-firevault-build-*
-fv4*
+index.html
+manifest.json
+src/
+assets/
+README.md
+CLEAN_INSTALL.md
+.gitignore
 ```
-
-Build 0.43.8 keeps the existing storage key so current browser data remains compatible.

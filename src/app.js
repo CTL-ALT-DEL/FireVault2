@@ -8,6 +8,7 @@ let settingsTab = "tech";
 let settingsRailScroll = 0;
 let lastEmailTemplateField = "emailSubject";
 let taskFilter = "open";
+let deficiencyFilter = "open";
 let activeJob = loadActiveJob();
 let nearbyState = null;
 let siteSearch = "";
@@ -568,7 +569,7 @@ function home(){
       <button class="ghost tile" id="diagBtn"><strong>Diagnostics</strong><span>Build status</span></button>
     </div>
     ${activeJob ? `<div class="card activeJobMini"><div class="row"><div><h2>Service Call Active</h2><p>${esc(activeJob.siteName)} • <span id="jobElapsed">${elapsedText(activeJob.startedAt)}</span></p></div><button class="primary" id="resumeJobBtn">Open</button></div></div>` : ""}
-    <div class="card grow"><h2>Build ${BUILD}</h2><p>Inspection completion workflow is active.</p><p>Open any site checklist, mark items OK / Issue / N/A, then tap Complete Inspection to save the round into Visit History.</p></div>
+    <div class="card grow"><h2>Build ${BUILD}</h2><p>Deficiency Center workflow is active.</p><p>Open Deficiencies to filter by severity, checklist source, and closed status, or close/reopen items directly from the list.</p></div>
   </div>`);
   document.getElementById("sitesCard").onclick=()=>route("sites");
   document.getElementById("tasksCard").onclick=()=>{selectedSiteId=null; route("tasks");};
@@ -979,20 +980,96 @@ function taskForm(){
   const del=document.getElementById("delBtn"); if(del) del.onclick=()=>{s.tasks=s.tasks.filter(x=>x.id!==mode); save(); route("tasks");};
 }
 
+function allDeficiencyRows(){
+  const rows=[];
+  data.sites.forEach(s=>ensureSite(s).deficiencies.forEach(d=>rows.push({s,d})));
+  return rows;
+}
+function deficiencyClosed(d){ return (d.status||"Open") === "Closed"; }
+function deficiencySeverityRank(d){
+  const p=(d.priority||"Normal").toLowerCase();
+  if(p==="critical") return 0;
+  if(p==="high") return 1;
+  return 2;
+}
+function deficiencyAgeLine(d){
+  const created=d.createdAt ? new Date(d.createdAt) : null;
+  if(!created || Number.isNaN(created.getTime())) return "No date saved";
+  const days=Math.max(0, Math.floor((Date.now()-created.getTime())/86400000));
+  if(days===0) return "Created today";
+  if(days===1) return "Created yesterday";
+  return `Open ${days} days`;
+}
+function deficiencyFilterCounts(rows){
+  return {
+    open: rows.filter(r=>!deficiencyClosed(r.d)).length,
+    critical: rows.filter(r=>!deficiencyClosed(r.d) && (r.d.priority||"")==="Critical").length,
+    high: rows.filter(r=>!deficiencyClosed(r.d) && ["Critical","High"].includes(r.d.priority||"")).length,
+    checklist: rows.filter(r=>!deficiencyClosed(r.d) && r.d.checklistId).length,
+    closed: rows.filter(r=>deficiencyClosed(r.d)).length,
+    all: rows.length
+  };
+}
+function deficiencyMatchesFilter(r, filter){
+  if(filter==="all") return true;
+  if(filter==="closed") return deficiencyClosed(r.d);
+  if(filter==="critical") return !deficiencyClosed(r.d) && (r.d.priority||"")==="Critical";
+  if(filter==="high") return !deficiencyClosed(r.d) && ["Critical","High"].includes(r.d.priority||"");
+  if(filter==="checklist") return !deficiencyClosed(r.d) && !!r.d.checklistId;
+  return !deficiencyClosed(r.d);
+}
+function resolveDeficiency(siteId, defId){
+  const s=ensureSite(data.sites.find(x=>x.id===siteId));
+  const d=(s.deficiencies||[]).find(x=>x.id===defId);
+  if(!d) return;
+  d.status="Closed"; d.resolvedAt=new Date().toISOString();
+  save(); toast("Deficiency closed."); deficiencies();
+}
+function reopenDeficiency(siteId, defId){
+  const s=ensureSite(data.sites.find(x=>x.id===siteId));
+  const d=(s.deficiencies||[]).find(x=>x.id===defId);
+  if(!d) return;
+  d.status="Open"; delete d.resolvedAt;
+  save(); toast("Deficiency reopened."); deficiencies();
+}
+function deficiencyCard(r){
+  const d=r.d;
+  const closed=deficiencyClosed(d);
+  const sev=(d.priority||"Normal").toLowerCase();
+  return `<div class="card siteItem deficiencyCard439 ${closed?"defClosed":""} def-${esc(sev)}" data-site="${esc(r.s.id)}" data-id="${esc(d.id)}">
+    <div class="defCardTop"><div><h2>${esc(d.title||"Deficiency")}</h2><p>${esc(r.s.name||"Site")} • ${esc(deficiencyAgeLine(d))}</p></div><span class="pill ${closed?"defDonePill":sev==="critical"?"dangerPill":sev==="high"?"todayPill":""}">${esc(closed?"Closed":(d.priority||"Normal"))}</span></div>
+    ${d.notes?`<p class="defNotes">${esc(d.notes)}</p>`:""}
+    <div class="defMeta">${d.checklistId?`<span>Checklist Issue</span>`:""}${d.resolvedAt?`<span>Closed ${esc(new Date(d.resolvedAt).toLocaleDateString())}</span>`:""}<span>${esc(d.status||"Open")}</span></div>
+    <div class="defQuickActions"><button class="ghost smallBtn defSiteBtn" data-site="${esc(r.s.id)}">Site</button><button class="${closed?"ghost":"primary"} smallBtn defResolveBtn" data-site="${esc(r.s.id)}" data-id="${esc(d.id)}">${closed?"Reopen":"Close"}</button></div>
+  </div>`;
+}
 function deficiencies(){
-  const rows=[]; data.sites.forEach(s=>ensureSite(s).deficiencies.forEach(d=>rows.push({s,d})));
-  const filtered = selectedSiteId ? rows.filter(r=>r.s.id===selectedSiteId) : rows;
-  html(`<div class="screen"><div class="row"><button class="back ghost" id="backBtn">←</button><h1>Deficiencies</h1><button class="primary" id="addBtn">＋</button></div><div class="list grow">${filtered.length?filtered.map(r=>`<div class="card siteItem deficiencyCard" data-site="${r.s.id}" data-id="${r.d.id}"><h2>${esc(r.d.title||"Deficiency")}</h2><p>${esc(r.s.name)} • ${esc(r.d.priority||"Normal")} • ${esc(r.d.status||"Open")}</p><p>${esc(r.d.notes||"")}</p></div>`).join(""):`<div class="empty">No deficiencies found.</div>`}</div></div>`);
+  const rows=allDeficiencyRows();
+  const scoped = selectedSiteId ? rows.filter(r=>r.s.id===selectedSiteId) : rows;
+  const counts=deficiencyFilterCounts(scoped);
+  const filters=[
+    ["open","Open",counts.open], ["critical","Critical",counts.critical], ["high","High+",counts.high],
+    ["checklist","Checklist",counts.checklist], ["closed","Closed",counts.closed], ["all","All",counts.all]
+  ];
+  if(!counts[deficiencyFilter] && deficiencyFilter!=="open" && deficiencyFilter!=="all") deficiencyFilter="open";
+  const filtered=scoped.filter(r=>deficiencyMatchesFilter(r, deficiencyFilter)).sort((a,b)=>deficiencySeverityRank(a.d)-deficiencySeverityRank(b.d) || (deficiencyClosed(a.d)-deficiencyClosed(b.d)) || (new Date(b.d.createdAt||0)-new Date(a.d.createdAt||0)));
+  html(`<div class="screen deficiencyScreen439"><div class="row defTopRow"><button class="back ghost" id="backBtn">←</button><div><h1>Deficiency Center</h1><p>${selectedSiteId ? esc(site()?.name || "Site deficiencies") : "Open issues across all sites"}</p></div><button class="primary" id="addBtn">＋</button></div>
+    <div class="card defHero439"><div><strong>${counts.open}</strong><span>Open</span></div><div><strong>${counts.critical}</strong><span>Critical</span></div><div><strong>${counts.checklist}</strong><span>Checklist</span></div><div><strong>${counts.closed}</strong><span>Closed</span></div></div>
+    <div class="defFilterRail" id="defFilterRail">${filters.map(f=>`<button class="defFilterPill ${deficiencyFilter===f[0]?"active":""}" data-filter="${f[0]}"><span>${f[1]}</span><strong>${f[2]}</strong></button>`).join("")}</div>
+    <div class="list grow defList439">${filtered.length?filtered.map(deficiencyCard).join(""):`<div class="empty">No deficiencies in this view.</div>`}</div></div>`);
   document.getElementById("backBtn").onclick=()=>selectedSiteId?route("siteDetail"):route("home");
   document.getElementById("addBtn").onclick=()=>{mode=null; route("deficiencyForm");};
-  document.querySelectorAll(".siteItem").forEach(el=>el.onclick=()=>{selectedSiteId=el.dataset.site; mode=el.dataset.id; route("deficiencyForm");});
+  document.querySelectorAll(".defFilterPill").forEach(b=>b.onclick=()=>{deficiencyFilter=b.dataset.filter; deficiencies();});
+  document.querySelectorAll(".deficiencyCard439").forEach(el=>el.onclick=()=>{selectedSiteId=el.dataset.site; mode=el.dataset.id; route("deficiencyForm");});
+  document.querySelectorAll(".defResolveBtn").forEach(b=>b.onclick=e=>{e.stopPropagation(); const d=allDeficiencyRows().find(r=>r.s.id===b.dataset.site && r.d.id===b.dataset.id)?.d; if(!d) return; if(deficiencyClosed(d)) reopenDeficiency(b.dataset.site,b.dataset.id); else resolveDeficiency(b.dataset.site,b.dataset.id);});
+  document.querySelectorAll(".defSiteBtn").forEach(b=>b.onclick=e=>{e.stopPropagation(); selectedSiteId=b.dataset.site; route("siteDetail");});
 }
 function deficiencyForm(){
   const s = selectedSiteId ? site() : data.sites[0]; if(!s){ alert("Add a site first."); route("sites"); return; }
   const d = mode ? (s.deficiencies||[]).find(x=>x.id===mode) : {};
   html(`<div class="screen"><div class="row"><button class="back ghost" id="backBtn">←</button><h1>${mode?"Edit":"Add"} Deficiency</h1></div><div class="form grow"><div class="card"><label>Site</label><select id="sitePick">${data.sites.map(x=>`<option value="${x.id}" ${x.id===s.id?"selected":""}>${esc(x.name)}</option>`).join("")}</select><label>Title</label><input id="title" value="${esc(d.title||"")}"><div class="compactField"><div><label>Priority</label><select id="priority">${["Normal","High","Critical"].map(x=>`<option ${d.priority===x?"selected":""}>${x}</option>`).join("")}</select></div><div><label>Status</label><select id="status"><option ${d.status!=="Closed"?"selected":""}>Open</option><option ${d.status==="Closed"?"selected":""}>Closed</option></select></div></div><label>Notes</label><textarea id="notes">${esc(d.notes||"")}</textarea><label><input type="checkbox" id="makeTask" ${!mode?"checked":""}> Create matching follow-up task</label></div><button class="primary" id="saveBtn">Save Deficiency</button>${mode?`<button class="danger" id="delBtn">Delete Deficiency</button>`:""}</div></div>`);
   document.getElementById("backBtn").onclick=()=>route("deficiencies");
-  document.getElementById("saveBtn").onclick=()=>{ const target=ensureSite(data.sites.find(x=>x.id===val("sitePick"))); const obj={title:val("title")||"Untitled Deficiency",priority:val("priority"),status:val("status"),notes:raw("notes")}; target.deficiencies=target.deficiencies||[]; if(mode){ Object.assign(d,obj); } else { target.deficiencies.unshift({...obj,id:uid(),createdAt:new Date().toISOString()}); if(checked("makeTask")){target.tasks.unshift({id:uid(),title:"Resolve: "+obj.title,status:"Open",due:"",notes:obj.notes,createdAt:new Date().toISOString()});} } selectedSiteId=target.id; save(); route("deficiencies"); };
+  document.getElementById("saveBtn").onclick=()=>{ const target=ensureSite(data.sites.find(x=>x.id===val("sitePick"))); const obj={title:val("title")||"Untitled Deficiency",priority:val("priority"),status:val("status"),notes:raw("notes")}; target.deficiencies=target.deficiencies||[]; if(mode){ const wasClosed=deficiencyClosed(d); Object.assign(d,obj); if(obj.status==="Closed" && !wasClosed) d.resolvedAt=new Date().toISOString(); if(obj.status!=="Closed") delete d.resolvedAt; } else { const created={...obj,id:uid(),createdAt:new Date().toISOString()}; if(created.status==="Closed") created.resolvedAt=new Date().toISOString(); target.deficiencies.unshift(created); if(checked("makeTask")){target.tasks.unshift({id:uid(),title:"Resolve: "+obj.title,status:"Open",due:"",notes:obj.notes,createdAt:new Date().toISOString()});} } selectedSiteId=target.id; save(); route("deficiencies"); };
   const del=document.getElementById("delBtn"); if(del) del.onclick=()=>{s.deficiencies=s.deficiencies.filter(x=>x.id!==mode); save(); route("deficiencies");};
 }
 
@@ -1214,20 +1291,21 @@ function saveSettings(){
   save(); toast("Settings saved."); settings();
 }
 
-function diagnostics(){ const taskRows=allTaskRows(); const taskCounts=taskFilterCounts(taskRows); const totalTasks=taskRows.length; const serviceTasks=taskRows.filter(r=>r.t.source==="Service Call").length; const totalDef=data.sites.reduce((n,s)=>n+(s.deficiencies||[]).length,0); const totalVisits=data.sites.reduce((n,s)=>n+(s.visits||[]).length,0); const totalContacts=data.sites.reduce((n,s)=>n+(s.contacts||[]).length,0); const totalDocs=data.sites.reduce((n,s)=>n+(s.docs||[]).length,0); const totalChecklist=data.sites.reduce((n,s)=>n+(s.checklist||[]).length,0); const checklistIssues=data.sites.reduce((n,s)=>n+(s.checklist||[]).filter(i=>i.status==="Issue").length,0); const completedInspections=data.sites.reduce((n,s)=>n+(s.visits||[]).filter(v=>v.type==="Inspection Checklist").length,0); const healthWarn=data.sites.filter(s=>siteHealth(s).cls==="healthWarn").length; const healthWatch=data.sites.filter(s=>siteHealth(s).cls==="healthWatch").length; const attentionTotal=attentionRows().length; html(`<div class="screen"><div class="row"><button class="back ghost" id="backHome">←</button><h1>Diagnostics</h1></div><div class="card grow errorBox"><p>Build: ${BUILD}</p><p>Sites: ${data.sites.length}</p><p>Total Tasks: ${totalTasks}</p><p>Open Tasks: ${taskCounts.open}</p><p>Due Today: ${taskCounts.today}</p><p>Overdue Tasks: ${taskCounts.overdue}</p><p>Service Follow-Ups: ${serviceTasks}</p><p>Total Deficiencies: ${totalDef}</p><p>Total Visits: ${totalVisits}</p><p>Total Contacts: ${totalContacts}</p><p>Total Documents: ${totalDocs}</p><p>Checklist Items: ${totalChecklist}</p><p>Checklist Issues: ${checklistIssues}</p><p>Completed Inspections: ${completedInspections}</p><p>Attention Sites: ${healthWarn}</p><p>Watch Sites: ${healthWatch}</p><p>Attention Queue: ${attentionTotal}</p><p>Active Job: ${activeJob ? esc(activeJob.siteName) : "None"}</p><p>Current Theme: ${esc(data.settings.theme.name)}</p><p>Accent: ${esc(data.settings.theme.accentColor)}</p><p>Advanced AI Enabled: ${data.settings.advanced?.aiTechnician ? "Yes" : "No"}</p><p>GPS Tools: ${data.settings.gps?.enabled !== false ? "Enabled" : "Hidden"}</p><p>Nearby Radius: ${nearbyRadiusMiles()} mi</p><p>Haptics: ${data.settings.app?.haptics !== false ? "Enabled" : "Off"}</p><p>Import/Export: Ready</p><p>Storage key: ${KEY}</p><p>Modules loaded successfully.</p></div></div>`); document.getElementById("backHome").onclick=()=>route("home"); }
+function diagnostics(){ const taskRows=allTaskRows(); const taskCounts=taskFilterCounts(taskRows); const totalTasks=taskRows.length; const serviceTasks=taskRows.filter(r=>r.t.source==="Service Call").length; const totalDef=data.sites.reduce((n,s)=>n+(s.deficiencies||[]).length,0); const openDefTotal=data.sites.reduce((n,s)=>n+(s.deficiencies||[]).filter(d=>(d.status||"Open")!=="Closed").length,0); const closedDefTotal=data.sites.reduce((n,s)=>n+(s.deficiencies||[]).filter(d=>(d.status||"Open")==="Closed").length,0); const totalVisits=data.sites.reduce((n,s)=>n+(s.visits||[]).length,0); const totalContacts=data.sites.reduce((n,s)=>n+(s.contacts||[]).length,0); const totalDocs=data.sites.reduce((n,s)=>n+(s.docs||[]).length,0); const totalChecklist=data.sites.reduce((n,s)=>n+(s.checklist||[]).length,0); const checklistIssues=data.sites.reduce((n,s)=>n+(s.checklist||[]).filter(i=>i.status==="Issue").length,0); const completedInspections=data.sites.reduce((n,s)=>n+(s.visits||[]).filter(v=>v.type==="Inspection Checklist").length,0); const healthWarn=data.sites.filter(s=>siteHealth(s).cls==="healthWarn").length; const healthWatch=data.sites.filter(s=>siteHealth(s).cls==="healthWatch").length; const attentionTotal=attentionRows().length; html(`<div class="screen"><div class="row"><button class="back ghost" id="backHome">←</button><h1>Diagnostics</h1></div><div class="card grow errorBox"><p>Build: ${BUILD}</p><p>Sites: ${data.sites.length}</p><p>Total Tasks: ${totalTasks}</p><p>Open Tasks: ${taskCounts.open}</p><p>Due Today: ${taskCounts.today}</p><p>Overdue Tasks: ${taskCounts.overdue}</p><p>Service Follow-Ups: ${serviceTasks}</p><p>Total Deficiencies: ${totalDef}</p><p>Open Deficiencies: ${openDefTotal}</p><p>Closed Deficiencies: ${closedDefTotal}</p><p>Total Visits: ${totalVisits}</p><p>Total Contacts: ${totalContacts}</p><p>Total Documents: ${totalDocs}</p><p>Checklist Items: ${totalChecklist}</p><p>Checklist Issues: ${checklistIssues}</p><p>Completed Inspections: ${completedInspections}</p><p>Attention Sites: ${healthWarn}</p><p>Watch Sites: ${healthWatch}</p><p>Attention Queue: ${attentionTotal}</p><p>Active Job: ${activeJob ? esc(activeJob.siteName) : "None"}</p><p>Current Theme: ${esc(data.settings.theme.name)}</p><p>Accent: ${esc(data.settings.theme.accentColor)}</p><p>Advanced AI Enabled: ${data.settings.advanced?.aiTechnician ? "Yes" : "No"}</p><p>GPS Tools: ${data.settings.gps?.enabled !== false ? "Enabled" : "Hidden"}</p><p>Nearby Radius: ${nearbyRadiusMiles()} mi</p><p>Haptics: ${data.settings.app?.haptics !== false ? "Enabled" : "Off"}</p><p>Import/Export: Ready</p><p>Storage key: ${KEY}</p><p>Modules loaded successfully.</p></div></div>`); document.getElementById("backHome").onclick=()=>route("home"); }
 function showChangelog(){
   const notes = [
-    "Added Complete Inspection on per-site checklists to save the current checklist round into Visit History.",
-    "Added New Round to clear checklist statuses while keeping checklist items and notes.",
-    "Checklist tools now show the last saved inspection date, completion percentage, and issue count.",
-    "Diagnostics now counts completed inspection checklist visits.",
-    "Preserved Issue-to-Deficiency automation, Field Snapshot, Site Health, Attention Queue, Equipment, Contacts, Documents, GPS/Nearby, and Visit Log features."
+    "Added a redesigned Deficiency Center with Open, Critical, High+, Checklist, Closed, and All filters.",
+    "Added quick Close / Reopen actions directly on deficiency cards.",
+    "Added open, critical, checklist, and closed deficiency summary counters.",
+    "Checklist-created deficiencies are now easier to identify from the deficiency list.",
+    "Diagnostics now separates open and closed deficiency totals.",
+    "Preserved Inspection Checklist completion, Visit History, Site Health, Attention Queue, Equipment, Contacts, Documents, GPS/Nearby, and refined 3D controls."
   ];
   const overlay=document.createElement("div");
   overlay.className="releaseOverlay";
   overlay.innerHTML=`<div class="releaseSheet" role="dialog" aria-modal="true" aria-label="FireVault release notes">
     <div class="releaseHead"><div><strong>FireVault</strong><span>Build ${BUILD}</span></div><button class="ghost iconBtn" id="closeRelease" aria-label="Close release notes">×</button></div>
-    <div class="releaseBody"><h2>Release Notes</h2><p class="releaseIntro">inspection checklist completion and visit-history workflow.</p><ul>${notes.map(n=>`<li>${esc(n)}</li>`).join("")}</ul></div>
+    <div class="releaseBody"><h2>Release Notes</h2><p class="releaseIntro">deficiency-center filtering and quick close workflow.</p><ul>${notes.map(n=>`<li>${esc(n)}</li>`).join("")}</ul></div>
   </div>`;
   document.body.appendChild(overlay);
   const close=()=>overlay.remove();
