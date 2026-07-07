@@ -1,7 +1,13 @@
-# Clean Install - FireVault 0.44.7
+# Clean Install - FireVault 0.44.8
 
-1. Export a FireVault backup from Settings before replacing files.
-2. Delete old extracted `firevault-build-*` folders from the project root.
-3. Copy the contents of this ZIP directly into the project root.
-4. Commit and deploy.
-5. Hard refresh the browser. On iPhone, delete and re-add the home-screen shortcut if the old PWA shell is cached.
+Upload the contents of this ZIP into the GitHub Pages project root.
+
+Expected root files:
+- index.html
+- manifest.json
+- src/
+- assets/
+- README.md
+- CLEAN_INSTALL.md
+
+Do not commit nested firevault-build-* folders.

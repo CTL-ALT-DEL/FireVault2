@@ -1287,13 +1287,13 @@ function settings(){
     ["overlay","Photos"],["themes","Theme"],["advanced","Advanced"],["backup","Backup"],["about","About"]
   ];
   const active=tabs.find(t=>t[0]===settingsTab)||tabs[0];
-  html(`<div class="screen settingsScreen settingsScreen409 settingsScreen423">
+  html(`<div class="screen settingsScreen settingsScreen409 settingsScreen423 settingsScreen448">
     <div class="settingsMiniHead">
       <div class="settingsMiniTitle"><h1>Settings</h1><p>${active[1]}</p></div>
       <button class="ghost iconBtn settingsInfoBtn" id="diagBtn" title="Diagnostics" aria-label="Diagnostics">ⓘ</button>
     </div>
     <div class="settingsPickerRail" id="settingsPickerRail" aria-label="Settings sections">${tabs.map(t=>`<button class="settingsPill ${settingsTab===t[0]?"active":""}" data-tab="${t[0]}">${t[1]}</button>`).join("")}</div>
-    <div class="settingsContent settingsContent409 settingsContent423 grow">${settingsPanel()}</div>
+    <div class="settingsContent settingsContent409 settingsContent423 settingsContent448 grow">${settingsPanel()}</div>
   </div>`);
   const rail=document.getElementById("settingsPickerRail");
   if(rail){
