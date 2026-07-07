@@ -1,14 +1,14 @@
-# FireVault Build 0.42.1
+# FireVault Build 0.42.2
 
-Service follow-up workflow build.
+Task Center action build.
 
 ## Updates
-- Added Job Mode Service Follow-Up actions.
-- Added Parts Needed workflow from the active service call screen.
-- Parts Needed and Follow-Up actions create open site tasks immediately.
-- Service-call-created tasks now show a Service Call badge in the Tasks list.
-- Reports mark service-call-created tasks with a Service Call source tag.
-- Preserved Visit Log, Nearby Sites, GPS tools, haptics, and Settings pill-tabs.
+- Added Task Center filters for Open, Today, Overdue, Service, Done, and All.
+- Added quick Done/Reopen controls directly on task cards.
+- Added task urgency badges and better due-date sorting.
+- Dashboard task tile now calls out overdue or due-today work.
+- Diagnostics now reports open, due-today, and overdue task totals.
+- Preserved Visit Log, service follow-up workflow, GPS/Nearby Sites, haptics, and Settings pill-tabs.
 
 ## Install
 Use the clean-root ZIP contents in the GitHub Pages project root. Do not nest build folders.

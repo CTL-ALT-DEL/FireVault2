@@ -295,3 +295,34 @@ button:active,.btn:active,label.checkRow:active{transform:translateY(1px) scale(
 .tasksScreen421 .siteItem p{overflow-wrap:anywhere}
 @media(max-width:430px){.jobActionGrid{grid-template-columns:1fr 1fr;gap:7px}.jobActionGrid button{min-height:36px;font-size:11.8px}.jobFollowCard{padding:10px}.serviceTaskPill{font-size:10px}}
 @media(max-width:350px){.jobActionGrid{grid-template-columns:1fr}}
+
+/* Build 0.42.2 Task Center filters and quick actions */
+.taskMetricCard{border-left:3px solid var(--amber)}
+.tasksScreen422{gap:9px}
+.taskTopRow{align-items:center;gap:10px}
+.taskTopRow>div{min-width:0;flex:1}
+.taskTopRow h1{margin:0;font-size:23px;letter-spacing:-.02em}
+.taskTopRow p{margin:2px 0 0;color:var(--muted);font-size:12.5px;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.taskFilterRail{display:flex;gap:7px;overflow-x:auto;overflow-y:hidden;padding:1px 0 8px;margin:0 -1px 0;scrollbar-width:none;border-bottom:1px solid rgba(255,255,255,.06)}
+.taskFilterRail::-webkit-scrollbar{display:none}
+.taskFilterPill{flex:0 0 auto;min-height:34px;display:inline-flex;align-items:center;gap:7px;padding:7px 10px;border-radius:999px;border:1px solid rgba(255,255,255,.09);background:rgba(255,255,255,.035);color:var(--muted);box-shadow:none;font-size:12px;font-weight:900;line-height:1;white-space:nowrap}
+.taskFilterPill strong{display:inline-flex;align-items:center;justify-content:center;min-width:20px;height:20px;padding:0 6px;border-radius:999px;background:rgba(255,255,255,.07);color:#fff;font-size:11px;line-height:1}
+.taskFilterPill.active{background:color-mix(in srgb,var(--accent) 20%, rgba(255,255,255,.045));border-color:color-mix(in srgb,var(--accent) 48%, rgba(255,255,255,.1));color:#fff}
+.taskFilterPill.active strong{background:color-mix(in srgb,var(--accent) 42%, rgba(255,255,255,.08))}
+.taskList{gap:8px}
+.taskCard{display:grid;gap:8px;padding:11px 12px;border-left:3px solid rgba(255,255,255,.13);cursor:pointer;text-align:left}
+.taskCard.taskOpen{border-left-color:var(--cyan)}
+.taskCard.taskDone{opacity:.72;border-left-color:var(--green)}
+.taskCard.taskOverdue{border-left-color:var(--accent);background:linear-gradient(180deg,rgba(239,68,68,.09),rgba(255,255,255,.035))}
+.taskCard.taskToday{border-left-color:var(--amber);background:linear-gradient(180deg,rgba(245,158,11,.08),rgba(255,255,255,.035))}
+.taskCardMain{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;align-items:flex-start}
+.taskCard h2{font-size:16px;line-height:1.18;margin:0 0 4px;overflow-wrap:anywhere}
+.taskCard p{margin:0;color:var(--muted);font-size:12.5px;line-height:1.32;overflow-wrap:anywhere}
+.taskNotes{padding-top:1px;color:#d9e4f2!important}
+.taskBadges{display:flex;flex-direction:column;align-items:flex-end;gap:5px;min-width:max-content}
+.dangerPill{background:rgba(239,68,68,.16);border-color:rgba(239,68,68,.32);color:#ffd0d0}
+.todayPill{background:rgba(245,158,11,.16);border-color:rgba(245,158,11,.32);color:#ffe0a6}
+.taskQuickActions{display:flex;justify-content:flex-end;gap:7px;border-top:1px solid rgba(255,255,255,.07);padding-top:8px}
+.taskQuickActions .smallBtn{min-height:31px;padding:6px 10px;font-size:11.5px;border-radius:999px}
+@media(max-width:430px){.tasksScreen422{gap:8px}.taskTopRow h1{font-size:21px}.taskTopRow p{font-size:12px}.taskFilterPill{min-height:32px;padding:6px 9px;font-size:11.5px}.taskCard{padding:10px}.taskCardMain{grid-template-columns:1fr;gap:6px}.taskBadges{flex-direction:row;align-items:center;justify-content:flex-start;flex-wrap:wrap;min-width:0}.taskQuickActions{justify-content:stretch}.taskQuickActions .smallBtn{flex:1;justify-content:center}.taskCard h2{font-size:15.5px}.taskCard p{font-size:12.2px}}
+@media(max-width:350px){.taskFilterPill span{max-width:72px;overflow:hidden;text-overflow:ellipsis}.taskQuickActions{grid-template-columns:1fr;display:grid}}

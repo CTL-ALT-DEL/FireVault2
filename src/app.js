@@ -7,6 +7,7 @@ let mode = null;
 let settingsTab = "tech";
 let settingsRailScroll = 0;
 let lastEmailTemplateField = "emailSubject";
+let taskFilter = "open";
 let activeJob = loadActiveJob();
 let nearbyState = null;
 let jobTimer = null;
@@ -138,6 +139,68 @@ function loadActiveJob(){ try{ const raw = localStorage.getItem(ACTIVE_JOB_KEY);
 function saveActiveJob(){ activeJob ? localStorage.setItem(ACTIVE_JOB_KEY, JSON.stringify(activeJob)) : localStorage.removeItem(ACTIVE_JOB_KEY); }
 function fmtDate(d=new Date()){ return d.toLocaleDateString([], {month:"short", day:"numeric", year:"numeric"}); }
 function todayIso(){ return new Date().toISOString().slice(0,10); }
+function localDateString(d=new Date()){
+  const y=d.getFullYear();
+  const m=String(d.getMonth()+1).padStart(2,"0");
+  const day=String(d.getDate()).padStart(2,"0");
+  return `${y}-${m}-${day}`;
+}
+function taskIsDone(t){ return (t?.status || "Open") === "Done"; }
+function taskDueState(t){
+  if(taskIsDone(t)) return "done";
+  if(!t?.due) return "none";
+  const today=localDateString();
+  if(t.due < today) return "overdue";
+  if(t.due === today) return "today";
+  return "upcoming";
+}
+function taskDueLabel(t){
+  const state=taskDueState(t);
+  if(state === "done") return "Completed";
+  if(state === "overdue") return `Overdue ${t.due}`;
+  if(state === "today") return "Due today";
+  if(state === "upcoming") return `Due ${t.due}`;
+  return "No due date";
+}
+function allTaskRows(){
+  const rows=[];
+  data.sites.forEach(s=>ensureSite(s).tasks.forEach(t=>rows.push({s,t,state:taskDueState(t)})));
+  return rows;
+}
+function taskFilterCounts(rows){
+  return {
+    all: rows.length,
+    open: rows.filter(r=>!taskIsDone(r.t)).length,
+    today: rows.filter(r=>r.state === "today").length,
+    overdue: rows.filter(r=>r.state === "overdue").length,
+    service: rows.filter(r=>r.t.source === "Service Call" && !taskIsDone(r.t)).length,
+    done: rows.filter(r=>taskIsDone(r.t)).length
+  };
+}
+function taskMatchesFilter(r, filter){
+  if(filter === "all") return true;
+  if(filter === "open") return !taskIsDone(r.t);
+  if(filter === "today") return r.state === "today";
+  if(filter === "overdue") return r.state === "overdue";
+  if(filter === "service") return r.t.source === "Service Call" && !taskIsDone(r.t);
+  if(filter === "done") return taskIsDone(r.t);
+  return true;
+}
+function taskSortValue(r){
+  if(taskIsDone(r.t)) return `9-${r.t.due || "9999-99-99"}`;
+  if(r.state === "overdue") return `0-${r.t.due}`;
+  if(r.state === "today") return `1-${r.t.due}`;
+  if(r.state === "upcoming") return `2-${r.t.due}`;
+  return "3-9999-99-99";
+}
+function toggleTaskDone(siteId, taskId){
+  const s=data.sites.find(x=>x.id===siteId);
+  const t=s?.tasks?.find(x=>x.id===taskId);
+  if(!t) return;
+  if(taskIsDone(t)){ t.status="Open"; delete t.completedAt; toast("Task reopened."); }
+  else { t.status="Done"; t.completedAt=new Date().toISOString(); toast("Task completed."); }
+  save(); render();
+}
 function elapsedText(startIso){ const ms=Date.now()-new Date(startIso).getTime(); const h=Math.floor(ms/3600000); const m=Math.floor((ms%3600000)/60000); const s=Math.floor((ms%60000)/1000); return h?`${h}:${String(m).padStart(2,"0")}:${String(s).padStart(2,"0")}`:`${m}:${String(s).padStart(2,"0")}`; }
 function durationText(startIso,endIso){
   if(!startIso || !endIso) return "Duration not saved";
@@ -212,7 +275,9 @@ function showError(err){
 
 function home(){
   const visits = data.sites.flatMap(s => (s.visits||[]).map(v => ({...v, site:s.name})));
-  const openTasks = data.sites.reduce((n,s)=>n+(s.tasks||[]).filter(t => (t.status||"Open") !== "Done").length,0);
+  const taskRows = allTaskRows();
+  const taskCounts = taskFilterCounts(taskRows);
+  const openTasks = taskCounts.open;
   const def = data.sites.reduce((n,s)=>n+(s.deficiencies||[]).filter(d => (d.status||"Open") !== "Closed").length,0);
   const gpsSites = data.sites.filter(hasGps).length;
   const now = new Date();
@@ -220,7 +285,7 @@ function home(){
     <div><div class="todayDay"><h1>${now.toLocaleDateString([], {weekday:"long"})}</h1></div><p>${fmtDate(now)} • Modular field dashboard</p></div>
     <div class="grid3">
       <div class="card tile metricCard" id="sitesCard"><strong>${data.sites.length}</strong><span>Sites</span></div>
-      <div class="card tile metricCard" id="tasksCard"><strong>${openTasks}</strong><span>Open Tasks</span></div>
+      <div class="card tile metricCard taskMetricCard" id="tasksCard"><strong>${openTasks}</strong><span>${taskCounts.overdue ? `${taskCounts.overdue} overdue` : taskCounts.today ? `${taskCounts.today} due today` : "Open Tasks"}</span></div>
       <div class="card tile metricCard" id="defCard"><strong>${def}</strong><span>Deficiencies</span></div>
     </div>
     <div class="grid2 homeActionGrid">
@@ -232,7 +297,7 @@ function home(){
       <button class="ghost tile" id="diagBtn"><strong>Diagnostics</strong><span>Build status</span></button>
     </div>
     ${activeJob ? `<div class="card activeJobMini"><div class="row"><div><h2>Service Call Active</h2><p>${esc(activeJob.siteName)} • <span id="jobElapsed">${elapsedText(activeJob.startedAt)}</span></p></div><button class="primary" id="resumeJobBtn">Open</button></div></div>` : ""}
-    <div class="card grow"><h2>Build ${BUILD}</h2><p>Job Mode can now create follow-up tasks and parts-needed tasks without leaving the service call.</p><p>Tasks created during a visit are marked as service follow-ups.</p></div>
+    <div class="card grow"><h2>Build ${BUILD}</h2><p>Task Center now filters open, overdue, due today, service-call, and completed tasks.</p><p>Use quick actions to mark tasks done or reopen them without opening the edit form.</p></div>
   </div>`);
   document.getElementById("sitesCard").onclick=()=>route("sites");
   document.getElementById("tasksCard").onclick=()=>{selectedSiteId=null; route("tasks");};
@@ -353,13 +418,30 @@ function siteForm(){
 }
 
 function tasks(){
-  const rows=[]; data.sites.forEach(s=>ensureSite(s).tasks.forEach(t=>rows.push({s,t})));
-  const filtered = selectedSiteId ? rows.filter(r=>r.s.id===selectedSiteId) : rows;
-  html(`<div class="screen tasksScreen421"><div class="row"><button class="back ghost" id="backBtn">←</button><h1>Tasks</h1><button class="primary" id="addBtn">＋</button></div><div class="list grow">${filtered.length?filtered.map(r=>`<div class="card siteItem ${(r.t.status||"Open")==="Done"?"taskDone":"taskOpen"}" data-site="${r.s.id}" data-id="${r.t.id}"><div class="row"><div><h2>${esc(r.t.title||"Task")}</h2><p>${esc(r.s.name)} • ${esc(r.t.status||"Open")} • ${esc(r.t.due||"No due date")}</p></div>${r.t.source?`<span class="pill serviceTaskPill">${esc(r.t.source)}</span>`:""}</div><p>${esc(r.t.notes||"")}</p></div>`).join(""):`<div class="empty">No tasks found.</div>`}</div></div>`);
+  const rows=allTaskRows();
+  const scoped = selectedSiteId ? rows.filter(r=>r.s.id===selectedSiteId) : rows;
+  const counts = taskFilterCounts(scoped);
+  const filters=[
+    ["open","Open",counts.open],["today","Today",counts.today],["overdue","Overdue",counts.overdue],
+    ["service","Service",counts.service],["done","Done",counts.done],["all","All",counts.all]
+  ];
+  if(selectedSiteId && taskFilter === "service" && !counts.service) taskFilter="open";
+  const filtered=scoped.filter(r=>taskMatchesFilter(r, taskFilter)).sort((a,b)=>taskSortValue(a).localeCompare(taskSortValue(b)) || (a.t.title||"").localeCompare(b.t.title||""));
+  html(`<div class="screen tasksScreen422"><div class="row taskTopRow"><button class="back ghost" id="backBtn">←</button><div><h1>Task Center</h1><p>${selectedSiteId ? esc(site()?.name || "Site tasks") : "All site follow-ups"}</p></div><button class="primary" id="addBtn">＋</button></div>
+    <div class="taskFilterRail" id="taskFilterRail">${filters.map(f=>`<button class="taskFilterPill ${taskFilter===f[0]?"active":""}" data-filter="${f[0]}"><span>${f[1]}</span><strong>${f[2]}</strong></button>`).join("")}</div>
+    <div class="list grow taskList">${filtered.length?filtered.map(r=>`<div class="card taskCard ${taskIsDone(r.t)?"taskDone":"taskOpen"} ${r.state==="overdue"?"taskOverdue":""} ${r.state==="today"?"taskToday":""}" data-site="${r.s.id}" data-id="${r.t.id}">
+      <div class="taskCardMain"><div><h2>${esc(r.t.title||"Task")}</h2><p>${esc(r.s.name)} • ${esc(taskDueLabel(r.t))}</p></div><div class="taskBadges"><span class="pill ${r.state==="overdue"?"dangerPill":r.state==="today"?"todayPill":""}">${esc(taskIsDone(r.t)?"Done":r.state==="none"?"Open":r.state)}</span>${r.t.source?`<span class="pill serviceTaskPill">${esc(r.t.source)}</span>`:""}</div></div>
+      ${r.t.notes?`<p class="taskNotes">${esc(r.t.notes)}</p>`:""}
+      <div class="taskQuickActions"><button class="ghost smallBtn taskSiteBtn" data-site="${r.s.id}">Site</button><button class="${taskIsDone(r.t)?"ghost":"primary"} smallBtn taskDoneBtn" data-site="${r.s.id}" data-id="${r.t.id}">${taskIsDone(r.t)?"Reopen":"Done"}</button></div>
+    </div>`).join(""):`<div class="empty">No tasks in this view.</div>`}</div></div>`);
   document.getElementById("backBtn").onclick=()=>selectedSiteId?route("siteDetail"):route("home");
   document.getElementById("addBtn").onclick=()=>{mode=null; route("taskForm");};
-  document.querySelectorAll(".siteItem").forEach(el=>el.onclick=()=>{selectedSiteId=el.dataset.site; mode=el.dataset.id; route("taskForm");});
+  document.querySelectorAll(".taskFilterPill").forEach(b=>b.onclick=()=>{taskFilter=b.dataset.filter; tasks();});
+  document.querySelectorAll(".taskCard").forEach(el=>el.onclick=()=>{selectedSiteId=el.dataset.site; mode=el.dataset.id; route("taskForm");});
+  document.querySelectorAll(".taskDoneBtn").forEach(b=>b.onclick=e=>{e.stopPropagation(); toggleTaskDone(b.dataset.site,b.dataset.id);});
+  document.querySelectorAll(".taskSiteBtn").forEach(b=>b.onclick=e=>{e.stopPropagation(); selectedSiteId=b.dataset.site; route("siteDetail");});
 }
+
 function taskForm(){
   const s = selectedSiteId ? site() : data.sites[0]; if(!s){ alert("Add a site first."); route("sites"); return; }
   const t = mode ? (s.tasks||[]).find(x=>x.id===mode) : {};
@@ -589,21 +671,21 @@ function saveSettings(){
   save(); toast("Settings saved."); settings();
 }
 
-function diagnostics(){ const totalTasks=data.sites.reduce((n,s)=>n+(s.tasks||[]).length,0); const serviceTasks=data.sites.reduce((n,s)=>n+(s.tasks||[]).filter(t=>t.source==="Service Call").length,0); const totalDef=data.sites.reduce((n,s)=>n+(s.deficiencies||[]).length,0); const totalVisits=data.sites.reduce((n,s)=>n+(s.visits||[]).length,0); html(`<div class="screen"><div class="row"><button class="back ghost" id="backHome">←</button><h1>Diagnostics</h1></div><div class="card grow errorBox"><p>Build: ${BUILD}</p><p>Sites: ${data.sites.length}</p><p>Total Tasks: ${totalTasks}</p><p>Service Follow-Ups: ${serviceTasks}</p><p>Total Deficiencies: ${totalDef}</p><p>Total Visits: ${totalVisits}</p><p>Active Job: ${activeJob ? esc(activeJob.siteName) : "None"}</p><p>Current Theme: ${esc(data.settings.theme.name)}</p><p>Accent: ${esc(data.settings.theme.accentColor)}</p><p>Advanced AI Enabled: ${data.settings.advanced?.aiTechnician ? "Yes" : "No"}</p><p>GPS Tools: ${data.settings.gps?.enabled !== false ? "Enabled" : "Hidden"}</p><p>Nearby Radius: ${nearbyRadiusMiles()} mi</p><p>Haptics: ${data.settings.app?.haptics !== false ? "Enabled" : "Off"}</p><p>Import/Export: Ready</p><p>Storage key: ${KEY}</p><p>Modules loaded successfully.</p></div></div>`); document.getElementById("backHome").onclick=()=>route("home"); }
+function diagnostics(){ const taskRows=allTaskRows(); const taskCounts=taskFilterCounts(taskRows); const totalTasks=taskRows.length; const serviceTasks=taskRows.filter(r=>r.t.source==="Service Call").length; const totalDef=data.sites.reduce((n,s)=>n+(s.deficiencies||[]).length,0); const totalVisits=data.sites.reduce((n,s)=>n+(s.visits||[]).length,0); html(`<div class="screen"><div class="row"><button class="back ghost" id="backHome">←</button><h1>Diagnostics</h1></div><div class="card grow errorBox"><p>Build: ${BUILD}</p><p>Sites: ${data.sites.length}</p><p>Total Tasks: ${totalTasks}</p><p>Open Tasks: ${taskCounts.open}</p><p>Due Today: ${taskCounts.today}</p><p>Overdue Tasks: ${taskCounts.overdue}</p><p>Service Follow-Ups: ${serviceTasks}</p><p>Total Deficiencies: ${totalDef}</p><p>Total Visits: ${totalVisits}</p><p>Active Job: ${activeJob ? esc(activeJob.siteName) : "None"}</p><p>Current Theme: ${esc(data.settings.theme.name)}</p><p>Accent: ${esc(data.settings.theme.accentColor)}</p><p>Advanced AI Enabled: ${data.settings.advanced?.aiTechnician ? "Yes" : "No"}</p><p>GPS Tools: ${data.settings.gps?.enabled !== false ? "Enabled" : "Hidden"}</p><p>Nearby Radius: ${nearbyRadiusMiles()} mi</p><p>Haptics: ${data.settings.app?.haptics !== false ? "Enabled" : "Off"}</p><p>Import/Export: Ready</p><p>Storage key: ${KEY}</p><p>Modules loaded successfully.</p></div></div>`); document.getElementById("backHome").onclick=()=>route("home"); }
 function showChangelog(){
   const notes = [
-    "Build number advanced to 0.42.1 across the header, manifest, diagnostics, and release notes.",
-    "Added Service Follow-Up actions inside Job Mode.",
-    "Added Parts Needed workflow that creates open site tasks without leaving the service call.",
-    "Tasks created during service calls are labeled as Service Call follow-ups.",
-    "Reports now mark tasks created from active service calls.",
-    "Preserved Visit Log, haptic-ready controls, Nearby Sites, GPS capture, and Settings pill-tabs."
+    "Build number advanced to 0.42.2 across the header, manifest, diagnostics, and release notes.",
+    "Added Task Center filters for open, due today, overdue, service-call, completed, and all tasks.",
+    "Added quick Done/Reopen actions directly from the task list.",
+    "Added task urgency badges and improved due-date sorting.",
+    "Dashboard task tile now highlights overdue or due-today work.",
+    "Preserved Visit Log, service follow-ups, haptics, Nearby Sites, GPS capture, and Settings pill-tabs."
   ];
   const overlay=document.createElement("div");
   overlay.className="releaseOverlay";
   overlay.innerHTML=`<div class="releaseSheet" role="dialog" aria-modal="true" aria-label="FireVault release notes">
     <div class="releaseHead"><div><strong>FireVault</strong><span>Build ${BUILD}</span></div><button class="ghost iconBtn" id="closeRelease" aria-label="Close release notes">×</button></div>
-    <div class="releaseBody"><h2>Release Notes</h2><p class="releaseIntro">Service follow-up and parts-needed workflow.</p><ul>${notes.map(n=>`<li>${esc(n)}</li>`).join("")}</ul></div>
+    <div class="releaseBody"><h2>Release Notes</h2><p class="releaseIntro">Task Center filters and quick actions.</p><ul>${notes.map(n=>`<li>${esc(n)}</li>`).join("")}</ul></div>
   </div>`;
   document.body.appendChild(overlay);
   const close=()=>overlay.remove();
