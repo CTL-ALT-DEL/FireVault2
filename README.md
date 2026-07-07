@@ -1,15 +1,15 @@
-# FireVault Build 0.19.0 — Photo Uploads
+# FireVault Build 0.20.0 — Job Mode Photo Capture
 
 Root-level package for GitHub Pages.
 
 ## Changes
-- Photo Uploads for Docs / Photos
-- Attach actual images to site records
-- Image preview before saving
-- Thumbnails in Docs / Photos list
-- Photos included in export backup as local image data
+- Job Mode Photo Capture
+- Photo button opens camera/file picker
+- Captured photos save into the site Docs / Photos section
+- Photo event is timestamped into the live service timeline
+- Photos carry into visit history when the call is finished
 - Preserves previous local storage data
 
 Suggested commit:
 
-`Build 0.19.0 photo uploads`
+`Build 0.20.0 job mode photo capture`
