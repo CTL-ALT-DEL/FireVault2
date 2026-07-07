@@ -1,14 +1,14 @@
-# FireVault Build 0.9.0 — Arrival Intelligence
+# FireVault Build 0.10.0 — Structured Site Address
 
 Root-level package for GitHub Pages.
 
 ## Changes
-- Save GPS coordinates to customer sites
-- Use Current GPS button on site form
-- Nearby Site scan on Today screen
-- Service Call records arrival GPS when available
+- Site address now has Street / City / State / ZIP
+- Keeps old single-line address data compatible
+- Site cards and dashboard use formatted address
+- Search includes city/state/zip
 - Preserves previous local storage data
 
 Suggested commit:
 
-`Build 0.9.0 arrival intelligence`
+`Build 0.10.0 structured site address`
