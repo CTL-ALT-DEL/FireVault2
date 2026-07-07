@@ -1,15 +1,15 @@
-# FireVault Build 0.30.0 — Modular Resource Library
+# FireVault Build 0.31.0 — GPS / Maps Module
 
 Root-level package for GitHub Pages.
 
 ## Changes
-- Restores editable Resource Library in the modular app
-- Add/Edit/Delete manufacturer resources
-- Resource search
-- Manual URL/link field
-- Panel/topic notes
-- Existing resource data preserved
+- Restores GPS / Maps features in the modular app
+- Latitude and longitude fields on Site form
+- Use Current GPS button
+- Nearby Site scan on Today screen
+- Apple Maps and Google Maps buttons in Site detail
+- Diagnostics shows GPS site count
 
 Suggested commit:
 
-`Build 0.30.0 modular resource library`
+`Build 0.31.0 gps maps module`

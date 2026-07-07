@@ -53,6 +53,55 @@ function setActiveNav(){
   document.getElementById("nav-"+section)?.classList.add("active");
 }
 
+
+function getCurrentGps(cb){
+  if(!navigator.geolocation){
+    alert("GPS is not available in this browser.");
+    return;
+  }
+  navigator.geolocation.getCurrentPosition(
+    pos => cb(pos.coords.latitude, pos.coords.longitude),
+    err => alert("GPS failed: " + err.message),
+    {enableHighAccuracy:true, timeout:12000, maximumAge:30000}
+  );
+}
+
+function distanceFeet(lat1,lng1,lat2,lng2){
+  if(!lat1 || !lng1 || !lat2 || !lng2) return null;
+  const R=6371000;
+  const toRad=x=>x*Math.PI/180;
+  const dLat=toRad(Number(lat2)-Number(lat1));
+  const dLng=toRad(Number(lng2)-Number(lng1));
+  const a=Math.sin(dLat/2)**2 + Math.cos(toRad(Number(lat1))) * Math.cos(toRad(Number(lat2))) * Math.sin(dLng/2)**2;
+  const meters=R*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a));
+  return Math.round(meters*3.28084);
+}
+
+function formatDistance(ft){
+  if(ft === null || ft === undefined) return "";
+  return ft > 5280 ? (ft/5280).toFixed(1)+" mi" : ft+" ft";
+}
+
+function mapQuery(s){
+  if(s.lat && s.lng) return encodeURIComponent(s.lat + "," + s.lng);
+  return encodeURIComponent(fullAddress(s));
+}
+
+function openAppleMaps(s){
+  window.open("https://maps.apple.com/?q=" + mapQuery(s), "_blank");
+}
+
+function openGoogleMaps(s){
+  window.open("https://www.google.com/maps/search/?api=1&query=" + mapQuery(s), "_blank");
+}
+
+function nearbySitesFrom(lat,lng){
+  return data.sites
+    .map(s => ({site:s, ft:distanceFeet(lat,lng,s.lat,s.lng)}))
+    .filter(x => x.ft !== null)
+    .sort((a,b)=>a.ft-b.ft);
+}
+
 function home(){
   const visits = data.sites.flatMap(s => (s.visits||[]).map(v => ({...v, site:s.name})));
   const openTasks = data.sites.reduce((n,s)=>n+(s.tasks||[]).filter(t => (t.status||"Open") !== "Done").length,0);
@@ -64,13 +113,34 @@ function home(){
       <div class="card tile"><strong>${openTasks}</strong><span>Open Tasks</span></div>
     </div>
     <div class="grid2">
-      <button class="primary tile" id="addSiteBtn"><strong>＋ Add Site</strong><span>Create customer vault</span></button>
-      <button class="ghost tile" id="diagBtn"><strong>Diagnostics</strong><span>Error tools</span></button>
+      <button class="primary tile" id="nearbyBtn"><strong>📍 Nearby Site</strong><span>Use GPS to match location</span></button>
+      <button class="ghost tile" id="addSiteBtn"><strong>＋ Add Site</strong><span>Create customer vault</span></button>
     </div>
-    <div class="card grow"><h2>Recovery Status</h2><p>The app is now split into modules: storage, photos, styles, and app logic. Future builds will patch smaller files instead of one giant HTML file.</p></div>
+    <div id="nearbyBox"></div>
+    <div class="card grow"><h2>GPS / Maps Module</h2><p>Use GPS on site records, scan nearby sites, and open map navigation from the site vault.</p><button class="ghost" id="diagBtn">Diagnostics</button></div>
   </div>`);
   document.getElementById("addSiteBtn").onclick = () => { selectedSiteId=null; view="siteForm"; render(); };
   document.getElementById("diagBtn").onclick = () => { view="diagnostics"; render(); };
+  document.getElementById("nearbyBtn").onclick = scanNearbySites;
+}
+
+function scanNearbySites(){
+  const box = document.getElementById("nearbyBox");
+  if(box) box.innerHTML = `<div class="card">Checking GPS...</div>`;
+  getCurrentGps((lat,lng)=>{
+    const matches = nearbySitesFrom(lat,lng).slice(0,5);
+    if(!box) return;
+    if(!matches.length){
+      box.innerHTML = `<div class="card gpsWarn"><h2>No GPS site match</h2><p>Add GPS coordinates to customer sites using Edit Site → Use Current GPS.</p></div>`;
+      return;
+    }
+    box.innerHTML = `<div class="card gpsGood"><h2>Nearby Sites</h2>${matches.map(x=>`<div class="card tight siteItem nearbyPick" data-id="${x.site.id}"><strong>${esc(x.site.name)}</strong><p>${formatDistance(x.ft)} away</p></div>`).join("")}</div>`;
+    document.querySelectorAll(".nearbyPick").forEach(el => el.onclick = () => {
+      selectedSiteId = el.dataset.id;
+      view = "siteDetail";
+      render();
+    });
+  });
 }
 
 function sites(){
@@ -106,16 +176,24 @@ function siteDetail(){
     <div class="card redline"><h1>${esc(s.name)}</h1><p>${esc(fullAddress(s))}</p><span class="pill">${esc(s.panelManufacturer||"Panel TBD")}</span><span class="pill">${esc(s.panelModel||"Model TBD")}</span></div>
     <div class="grid2">
       <button class="tile" id="docsBtn"><strong>Docs / Photos</strong><span>${s.docs.length} records</span></button>
-      <button class="tile" id="mapBtn"><strong>Map</strong><span>${s.lat&&s.lng?"GPS saved":"Address"}</span></button>
+      <button class="tile" id="gpsBtn"><strong>GPS</strong><span>${s.lat&&s.lng?"Saved":"Not set"}</span></button>
       <button class="tile"><strong>Visits</strong><span>${s.visits.length} records</span></button>
       <button class="tile"><strong>Tasks</strong><span>${s.tasks.length} items</span></button>
+    </div>
+    <div class="card ${s.lat&&s.lng?"gpsGood":"gpsWarn"}">
+      <h2>Location</h2>
+      <p>${esc(fullAddress(s))}</p>
+      <p><strong>GPS:</strong> ${s.lat&&s.lng?esc(s.lat+", "+s.lng):"Not saved"}</p>
+      <div class="mapActions"><button class="ghost" id="appleMapBtn">Apple Maps</button><button class="ghost" id="googleMapBtn">Google Maps</button></div>
     </div>
     <div class="card grow"><h2>Site Notes</h2><p>${esc(s.notes || "No site notes yet.")}</p></div>
   </div>`);
   document.getElementById("backSites").onclick = () => route("sites");
   document.getElementById("editSite").onclick = () => { view="siteForm"; render(); };
   document.getElementById("docsBtn").onclick = () => { view="docs"; render(); };
-  document.getElementById("mapBtn").onclick = () => window.open(`https://maps.apple.com/?q=${encodeURIComponent(s.lat&&s.lng ? s.lat+","+s.lng : fullAddress(s))}`,"_blank");
+  document.getElementById("gpsBtn").onclick = () => { view="siteForm"; render(); };
+  document.getElementById("appleMapBtn").onclick = () => openAppleMaps(s);
+  document.getElementById("googleMapBtn").onclick = () => openGoogleMaps(s);
 }
 
 function siteForm(){
@@ -128,15 +206,23 @@ function siteForm(){
       <div class="grid2"><div><label>City</label><input id="city" value="${esc(s.city)}"></div><div><label>State</label><input id="state" value="${esc(s.state)}"></div></div>
       <label>ZIP</label><input id="zip" value="${esc(s.zip)}">
       <div class="grid2"><div><label>Manufacturer</label><input id="panelManufacturer" value="${esc(s.panelManufacturer)}"></div><div><label>Model</label><input id="panelModel" value="${esc(s.panelModel)}"></div></div>
+      <div class="grid2"><div><label>Latitude</label><input id="lat" value="${esc(s.lat)}" placeholder="GPS latitude"></div><div><label>Longitude</label><input id="lng" value="${esc(s.lng)}" placeholder="GPS longitude"></div></div>
+      <button class="ghost" id="useGps">📍 Use Current GPS For Site</button>
       <label>Notes</label><textarea id="notes">${esc(s.notes)}</textarea>
     </div>
     <button class="primary" id="saveSite">Save Site</button>
   </div>`);
   document.getElementById("cancelSite").onclick = () => selectedSiteId ? route("siteDetail") : route("sites");
+  document.getElementById("useGps").onclick = () => {
+    getCurrentGps((lat,lng)=>{
+      document.getElementById("lat").value = lat.toFixed(6);
+      document.getElementById("lng").value = lng.toFixed(6);
+    });
+  };
   document.getElementById("saveSite").onclick = () => {
     const obj = {
       name: val("name") || "Unnamed Site", street: val("street"), city: val("city"), state: val("state"), zip: val("zip"),
-      address: val("street"), panelManufacturer: val("panelManufacturer"), panelModel: val("panelModel"), notes: val("notes")
+      address: val("street"), panelManufacturer: val("panelManufacturer"), panelModel: val("panelModel"), lat: val("lat"), lng: val("lng"), notes: val("notes")
     };
     if(selectedSiteId){
       Object.assign(getSite(), obj);
@@ -457,7 +543,7 @@ function saveSettingsFromVisibleTab(){
 }
 
 function diagnostics(){
-  html(`<div class="screen"><div class="row"><button class="back ghost" id="backHome">←</button><h1>Diagnostics</h1></div><div class="card grow errorBox"><p>Build: ${BUILD}</p><p>Sites: ${data.sites.length}</p><p>Storage key: ${KEY}</p><p>Modules loaded successfully.</p></div></div>`);
+  html(`<div class="screen"><div class="row"><button class="back ghost" id="backHome">←</button><h1>Diagnostics</h1></div><div class="card grow errorBox"><p>Build: ${BUILD}</p><p>Sites: ${data.sites.length}</p><p>Sites with GPS: ${data.sites.filter(s=>s.lat&&s.lng).length}</p><p>Storage key: ${KEY}</p><p>Modules loaded successfully.</p></div></div>`);
   document.getElementById("backHome").onclick = () => route("home");
 }
 
@@ -465,19 +551,19 @@ function exportJson(){
   const blob = new Blob([JSON.stringify(data,null,2)], {type:"application/json"});
   const a = document.createElement("a");
   a.href = URL.createObjectURL(blob);
-  a.download = "firevault-backup-build-0.30.0.json";
+  a.download = "firevault-backup-build-0.31.0.json";
   a.click();
 }
 
 function showChangelog(){
   alert(`FireVault Build ${BUILD}
 
-- Modular Resource Library restored
-- Add/Edit/Delete manufacturer resources
-- Search resources
-- Manual URL/link field
-- Panel/topic notes
-- Existing resource data preserved`);
+- GPS / Maps module restored
+- Latitude and longitude fields on Site form
+- Use Current GPS button
+- Nearby Site scan on Today screen
+- Apple Maps and Google Maps buttons
+- Diagnostics shows GPS site count`);
 }
 
 render();
