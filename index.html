@@ -32,7 +32,7 @@ nav button{background:transparent;border:0;color:var(--muted);display:flex;flex-
 </style>
 </head>
 <body>
-<header><div class="brand"><div class="logo">🔥</div><div>FIREVAULT</div></div><button class="build" onclick="showChangelog()">Build 0.12.0</button></header>
+<header><div class="brand"><div class="logo">🔥</div><div>FIREVAULT</div></div><button class="build" onclick="showChangelog()">Build 0.13.0</button></header>
 <main id="app"></main>
 <nav>
 <button id="nav-home" onclick="go('home')"><span>🏠</span><span>Today</span></button>
@@ -41,7 +41,7 @@ nav button{background:transparent;border:0;color:var(--muted);display:flex;flex-
 <button id="nav-settings" onclick="go('settings')"><span>⚙️</span><span>Settings</span></button>
 </nav>
 <script>
-const BUILD="0.12.0"; const KEY="firevault_vault_build_030"; const ACTIVE="firevault_active_job_080";
+const BUILD="0.13.0"; const KEY="firevault_vault_build_030"; const ACTIVE="firevault_active_job_080";
 let data=load(), activeJob=loadActive(), view="home", selected=null, mode=null, timer=null;
 function load(){const raw=localStorage.getItem(KEY);if(raw){try{return JSON.parse(raw)}catch(e){}}return{sites:[],resources:[{m:"Fire-Lite",n:"Manual links, trouble notes, walk-test reminders."},{m:"Notifier",n:"Panel notes, programming reminders, common issues."},{m:"Silent Knight",n:"Model notes, NAC quirks, communicator references."},{m:"Edwards / EST",n:"EST3 / EST4 notes, mapping, node information."},{m:"Potter",n:"Programming notes, compatibility, field observations."}]}}
 function save(){localStorage.setItem(KEY,JSON.stringify(data))}function loadActive(){const raw=localStorage.getItem(ACTIVE);if(raw){try{return JSON.parse(raw)}catch(e){}}return null}function saveActive(){activeJob?localStorage.setItem(ACTIVE,JSON.stringify(activeJob)):localStorage.removeItem(ACTIVE)}
@@ -49,7 +49,7 @@ function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2
 function app(html){document.getElementById("app").innerHTML=html;active();if(view==="job")startTick();else stopTick()}function active(){document.querySelectorAll("nav button").forEach(b=>b.classList.remove("active"));let n=document.getElementById("nav-"+(["site","form","visits","issues","equipment","equipmentForm","access","accessForm","docs","docForm","job"].includes(view)?"sites":view));if(n)n.classList.add("active")}
 function go(v){view=v;mode=null;render()}function site(){return data.sites.find(s=>s.id===selected)}function siteById(id){return data.sites.find(s=>s.id===id)}
 function ensureArrays(s){if(!s)return s;s.visits=s.visits||[];s.knownIssues=s.knownIssues||[];s.equipment=s.equipment||[];s.contacts=s.contacts||[];s.docs=s.docs||[];return s}
-function render(){({home,sites,library,settings,site:siteDash,form,visits,issues,equipment,equipmentForm,access,accessForm,docs,docForm,job,importer,knowledge}[view]||home)()}function val(id){return document.getElementById(id).value.trim()}
+function render(){({home,sites,library,settings,site:siteDash,form,visits,issues,equipment,equipmentForm,access,accessForm,docs,docForm,job,importer,knowledge,report}[view]||home)()}function val(id){return document.getElementById(id).value.trim()}
 function fullAddress(s){
   const structured=[s.street,s.city,s.state,s.zip].filter(Boolean).join(", ");
   return structured || s.address || "No address entered";
@@ -119,6 +119,71 @@ function docForm(){const s=ensureArrays(site());const d=mode?s.docs.find(x=>x.id
 function saveDoc(){const s=ensureArrays(site());const obj={type:val("dtype"),title:val("dtitle"),location:val("dlocation"),url:val("durl"),notes:val("dnotes")};if(mode){let i=s.docs.findIndex(x=>x.id===mode);s.docs[i]={...s.docs[i],...obj}}else{s.docs.unshift({...obj,id:uid()})}save();mode=null;view="docs";render()}
 function genericList(title,arr,formView,line,body){const s=ensureArrays(site());if(!s)return go("sites");app(`<div class="screen"><div class="row"><button class="back ghost" onclick="view='site';render()">←</button><h1>${title}</h1><button class="primary" onclick="mode=null;view='${formView}';render()">＋ Add</button></div><div class="list grow">${s[arr].length?s[arr].map(x=>`<div class="card ${line}"><div class="row"><h2>${body(x)}</h2><button class="ghost" onclick="mode='${x.id}';view='${formView}';render()">Edit</button></div><p>${esc(x.notes||"")}</p></div>`).join(""):`<div class="empty">No records yet.</div>`}</div></div>`)}
 
+
+
+function buildReportText(s){
+ ensureArrays(s);
+ const latestVisit=s.visits[0];
+ const lines=[];
+ lines.push(`FIREVAULT SITE REPORT`);
+ lines.push(``);
+ lines.push(`SITE: ${s.name||""}`);
+ lines.push(`ADDRESS: ${fullAddress(s)}`);
+ lines.push(`PANEL: ${(s.panelManufacturer||"")} ${(s.panelModel||"")}`.trim());
+ lines.push(`FACP LOCATION: ${s.facpLocation||""}`);
+ lines.push(`MONITORING: ${s.monitoring||""}`);
+ lines.push(`GPS: ${s.lat&&s.lng ? s.lat+", "+s.lng : "Not set"}`);
+ lines.push(``);
+ lines.push(`SITE NOTES:`);
+ lines.push(s.notes||"No site notes recorded.");
+ lines.push(``);
+ lines.push(`KNOWN ISSUES (${s.knownIssues.length}):`);
+ if(s.knownIssues.length) s.knownIssues.slice(0,10).forEach((i,n)=>lines.push(`${n+1}. ${i.text}`)); else lines.push("None recorded.");
+ lines.push(``);
+ lines.push(`EQUIPMENT (${s.equipment.length}):`);
+ if(s.equipment.length) s.equipment.forEach((e,n)=>lines.push(`${n+1}. ${e.type||""} - ${(e.make||"")} ${(e.model||"")} - ${e.location||""} ${e.notes? "- "+e.notes:""}`)); else lines.push("None recorded.");
+ lines.push(``);
+ lines.push(`ACCESS / CONTACTS (${s.contacts.length}):`);
+ if(s.contacts.length) s.contacts.forEach((c,n)=>lines.push(`${n+1}. ${c.type||""} - ${c.name||""} - ${c.phone||""} - ${c.detail||""} ${c.notes? "- "+c.notes:""}`)); else lines.push("None recorded.");
+ lines.push(``);
+ lines.push(`DOCS / PHOTOS (${s.docs.length}):`);
+ if(s.docs.length) s.docs.forEach((d,n)=>lines.push(`${n+1}. ${d.type||""} - ${d.title||""} - ${d.location||""} ${d.url? "- "+d.url:""}`)); else lines.push("None recorded.");
+ lines.push(``);
+ lines.push(`LATEST VISIT:`);
+ if(latestVisit) lines.push(`${latestVisit.date||""}\n${latestVisit.summary||""}`); else lines.push("No visit history recorded.");
+ return lines.join("\n");
+}
+function report(){
+ const s=ensureArrays(site()); if(!s)return go("sites");
+ const text=buildReportText(s);
+ app(`<div class="screen">
+  <div class="row"><button class="back ghost" onclick="view='site';render()">←</button><h1>Site Report</h1></div>
+  <div class="card">
+    <h2>${esc(s.name)}</h2>
+    <p>Copy this summary into a ticket, email, or service notes.</p>
+    <div class="grid2">
+      <button class="primary" onclick="copyReport()">Copy Report</button>
+      <button class="ghost" onclick="downloadReport()">Download TXT</button>
+    </div>
+  </div>
+  <textarea id="reportText" class="grow" style="min-height:0;white-space:pre-wrap">${esc(text)}</textarea>
+ </div>`)
+}
+function copyReport(){
+ const el=document.getElementById("reportText");
+ el.select();
+ el.setSelectionRange(0,999999);
+ document.execCommand("copy");
+ alert("Report copied.");
+}
+function downloadReport(){
+ const s=site();
+ const blob=new Blob([document.getElementById("reportText").value],{type:"text/plain"});
+ const a=document.createElement("a");
+ a.href=URL.createObjectURL(blob);
+ a.download=`firevault-${(s.name||"site").replace(/[^a-z0-9]+/gi,"-").toLowerCase()}-report.txt`;
+ a.click();
+}
 
 function knowledge(){
  app(`<div class="screen">
@@ -191,15 +256,16 @@ function runImport(){
 
 function library(){app(`<div class="screen"><h1>Library</h1><p>Manufacturer resources and cheat sheets.</p><div class="list grow">${data.resources.map(r=>`<div class="card"><h2>${esc(r.m)}</h2><p>${esc(r.n)}</p></div>`).join("")}</div></div>`)}
 function settings(){app(`<div class="screen"><h1>Settings</h1><div class="card"><h2>Backup</h2><p>Export before major changes.</p><button class="primary" onclick="exportData()">Export Backup</button><br><br><input type="file" accept="application/json" onchange="importData(event)"></div><div class="card"><h2>Reset</h2><button class="danger" onclick="resetData()">Clear Local Data</button></div></div>`)}
-function exportData(){let blob=new Blob([JSON.stringify(data,null,2)],{type:"application/json"});let a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="firevault-backup-build-0.12.0.json";a.click()}
+function exportData(){let blob=new Blob([JSON.stringify(data,null,2)],{type:"application/json"});let a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="firevault-backup-build-0.13.0.json";a.click()}
 function importData(e){let f=e.target.files[0];if(!f)return;let r=new FileReader();r.onload=()=>{try{data=JSON.parse(r.result);save();alert("Imported.");go("home")}catch(err){alert("Import failed.")}};r.readAsText(f)}
 function resetData(){if(confirm("Clear all local FireVault data?")){localStorage.removeItem(KEY);localStorage.removeItem(ACTIVE);data=load();activeJob=null;go("home")}}
 function showChangelog(){alert(`FireVault Build ${BUILD}
 
-- Knowledge Search screen
-- Searches sites, notes, known issues, visits, equipment, contacts, and docs
-- Tap a result to open the customer vault
-- Adds quick Knowledge Search button on Today screen
+- Site Report Generator
+- Creates copyable customer/site summary
+- Includes address, panel, GPS, notes, known issues, equipment, access, docs, and latest visit
+- Copy Report button
+- Download TXT button
 - Preserves previous local data`)}
 render()
 </script>

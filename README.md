@@ -1,14 +1,15 @@
-# FireVault Build 0.12.0 — Knowledge Search
+# FireVault Build 0.13.0 — Service Report Generator
 
 Root-level package for GitHub Pages.
 
 ## Changes
-- Global Knowledge Search
-- Searches sites, notes, known issues, visits, equipment, contacts, and docs/photos
-- Tap result to open the matching customer vault
-- Quick search button on Today screen
+- Site Report Generator
+- Copyable customer/site summary
+- Includes address, panel, GPS, notes, known issues, equipment, access, docs/photos, and latest visit
+- Copy Report button
+- Download TXT button
 - Preserves previous local storage data
 
 Suggested commit:
 
-`Build 0.12.0 knowledge search`
+`Build 0.13.0 service report generator`
