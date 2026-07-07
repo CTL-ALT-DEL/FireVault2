@@ -7,32 +7,32 @@
   <title>FireVault</title>
   <link rel="manifest" href="manifest.json" />
   <style>
-    :root{--bg:#0b0d10;--panel:#151922;--panel2:#1d2330;--line:#303747;--text:#f4f7fb;--muted:#a7b0c0;--red:#ef4444;--amber:#f59e0b;--green:#22c55e;--blue:#38bdf8;--purple:#a78bfa;--cyan:#22d3ee;--radius:18px}
+    :root{--bg:#0b0d10;--panel:#151922;--panel2:#1d2330;--line:#303747;--text:#f4f7fb;--muted:#a7b0c0;--red:#ef4444;--amber:#f59e0b;--green:#22c55e;--blue:#38bdf8;--purple:#a78bfa;--cyan:#22d3ee;--radius:18px;--headerH:62px;--navH:calc(72px + env(safe-area-inset-bottom))}
     *{box-sizing:border-box} html,body{height:100%}
     body{margin:0;background:radial-gradient(circle at top left,rgba(239,68,68,.17),transparent 35%),linear-gradient(180deg,#11151d,#090b0f);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;overflow:hidden}
     header{height:62px;padding:10px 14px;display:flex;align-items:center;justify-content:space-between;background:rgba(11,13,16,.92);border-bottom:1px solid rgba(255,255,255,.07);backdrop-filter:blur(16px)}
     .brand{display:flex;align-items:center;gap:10px;font-weight:950;letter-spacing:.08em}.logo{width:38px;height:38px;border-radius:13px;display:grid;place-items:center;background:linear-gradient(135deg,#ef4444,#7f1d1d)}
     .build{font-size:12px;color:var(--muted);background:transparent;border:1px solid var(--line);border-radius:999px;padding:7px 10px}
-    main{height:calc(100vh - 134px);padding:12px;overflow:hidden;max-width:900px;margin:0 auto}
+    main{height:calc(100dvh - var(--headerH) - var(--navH));padding:12px 12px 18px;overflow:hidden;max-width:900px;margin:0 auto}
     h1{font-size:23px;margin:0 0 4px;line-height:1.1} h2{font-size:17px;margin:0 0 8px} h3{font-size:14px;margin:0 0 5px}
     p{color:var(--muted);margin:4px 0;line-height:1.25;font-size:14px}.screen{height:100%;display:flex;flex-direction:column;gap:10px}
     .card{background:linear-gradient(180deg,rgba(255,255,255,.06),rgba(255,255,255,.025));border:1px solid rgba(255,255,255,.08);border-radius:var(--radius);padding:12px}.tight{padding:10px}
     .row{display:flex;align-items:center;justify-content:space-between;gap:8px}.wrap{flex-wrap:wrap}.grid2{display:grid;grid-template-columns:1fr 1fr;gap:9px}.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
-    .grow{flex:1;min-height:0}.list{overflow:auto;min-height:0;padding-right:2px}
+    .grow{flex:1;min-height:0}.list{overflow:auto;min-height:0;padding-right:2px;padding-bottom:18px}
     button,.btn{border:1px solid rgba(255,255,255,.09);border-radius:15px;background:var(--panel2);color:var(--text);padding:11px 12px;font-weight:850;cursor:pointer;font-size:14px;text-decoration:none}
     .primary{background:linear-gradient(135deg,#ef4444,#991b1b)}.ghost{background:rgba(255,255,255,.045)}.danger{background:rgba(239,68,68,.14);color:#fecaca}
     .tile{min-height:72px;text-align:left;display:flex;flex-direction:column;justify-content:center}.tile strong{font-size:17px}.tile span{color:var(--muted);font-size:12px;margin-top:3px}
     input,textarea,select{width:100%;background:#0d1118;border:1px solid var(--line);border-radius:13px;padding:10px;color:var(--text);font:inherit}textarea{min-height:72px;resize:none}
-    label{font-size:11px;color:var(--muted);font-weight:900;text-transform:uppercase;letter-spacing:.08em}.form{display:grid;gap:8px;overflow:auto;min-height:0}
+    label{font-size:11px;color:var(--muted);font-weight:900;text-transform:uppercase;letter-spacing:.08em}.form{display:grid;gap:8px;overflow:auto;min-height:0;padding-bottom:18px}
     .pill{font-size:12px;border:1px solid rgba(255,255,255,.09);background:rgba(255,255,255,.065);border-radius:999px;padding:5px 8px;display:inline-flex;margin:2px}.muted{color:var(--muted)}
     .empty{border:1px dashed var(--line);border-radius:16px;padding:16px;text-align:center;color:var(--muted)}.siteItem{cursor:pointer}.search{margin-bottom:8px}.back{padding:8px 10px;border-radius:12px}
-    nav{height:72px;position:fixed;bottom:0;left:0;right:0;display:grid;grid-template-columns:repeat(4,1fr);background:rgba(11,13,16,.96);border-top:1px solid rgba(255,255,255,.08);padding:7px 8px calc(7px + env(safe-area-inset-bottom))}
+    nav{min-height:var(--navH);position:fixed;bottom:0;left:0;right:0;display:grid;grid-template-columns:repeat(4,1fr);background:rgba(11,13,16,.96);border-top:1px solid rgba(255,255,255,.08);padding:7px 8px calc(7px + env(safe-area-inset-bottom));z-index:50}
     nav button{background:transparent;border:0;color:var(--muted);display:flex;flex-direction:column;gap:4px;align-items:center;justify-content:center;padding:6px 3px;font-size:12px}nav button.active{background:rgba(239,68,68,.14);color:#fff}
     .issue{border-left:4px solid var(--amber)}.visit{border-left:4px solid var(--blue)}.equip{border-left:4px solid var(--green)}.accessLine{border-left:4px solid var(--purple)}.docLine{border-left:4px solid var(--cyan)}.redline{border-left:4px solid var(--red)}
   </style>
 </head>
 <body>
-<header><div class="brand"><div class="logo">🔥</div><div>FIREVAULT</div></div><button class="build" onclick="showChangelog()">Build 0.7.0</button></header>
+<header><div class="brand"><div class="logo">🔥</div><div>FIREVAULT</div></div><button class="build" onclick="showChangelog()">Build 0.7.1</button></header>
 <main id="app"></main>
 <nav>
   <button id="nav-home" onclick="go('home')"><span>🏠</span><span>Today</span></button>
@@ -41,7 +41,7 @@
   <button id="nav-settings" onclick="go('settings')"><span>⚙️</span><span>Settings</span></button>
 </nav>
 <script>
-const BUILD="0.7.0"; const KEY="firevault_vault_build_030";
+const BUILD="0.7.1"; const KEY="firevault_vault_build_030";
 let data=load(), view="home", selected=null, mode=null;
 function load(){const raw=localStorage.getItem(KEY); if(raw){try{return JSON.parse(raw)}catch(e){}} return {sites:[],resources:[{m:"Fire-Lite",n:"Manual links, trouble notes, walk-test reminders."},{m:"Notifier",n:"Panel notes, programming reminders, common issues."},{m:"Silent Knight",n:"Model notes, NAC quirks, communicator references."},{m:"Edwards / EST",n:"EST3 / EST4 notes, mapping, node information."},{m:"Potter",n:"Programming notes, compatibility, field observations."}]}}
 function save(){localStorage.setItem(KEY,JSON.stringify(data))} function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,7)}
@@ -83,7 +83,7 @@ function saveDoc(){const s=ensureArrays(site());const obj={type:val("dtype"),tit
 
 function library(){app(`<div class="screen"><h1>Library</h1><p>Manufacturer resources and cheat sheets.</p><div class="list grow">${data.resources.map(r=>`<div class="card"><h2>${esc(r.m)}</h2><p>${esc(r.n)}</p></div>`).join("")}</div></div>`)}
 function settings(){app(`<div class="screen"><h1>Settings</h1><div class="card"><h2>Backup</h2><p>Export before major changes.</p><button class="primary" onclick="exportData()">Export Backup</button><br><br><input type="file" accept="application/json" onchange="importData(event)"></div><div class="card"><h2>Reset</h2><button class="danger" onclick="resetData()">Clear Local Data</button></div></div>`)}
-function exportData(){let blob=new Blob([JSON.stringify(data,null,2)],{type:"application/json"});let a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="firevault-backup-build-0.7.0.json";a.click()}
+function exportData(){let blob=new Blob([JSON.stringify(data,null,2)],{type:"application/json"});let a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="firevault-backup-build-0.7.1.json";a.click()}
 function importData(e){let f=e.target.files[0];if(!f)return;let r=new FileReader();r.onload=()=>{try{data=JSON.parse(r.result);save();alert("Imported.");go("home")}catch(err){alert("Import failed.")}};r.readAsText(f)}
 function resetData(){if(confirm("Clear all local FireVault data?")){localStorage.removeItem(KEY);data=load();go("home")}}
 function showChangelog(){alert(`FireVault Build ${BUILD}\n\n- Docs / Photos section\n- Add/Edit file records\n- File categories for panel photos, reports, maps, battery labels, links\n- Docs count on dashboard, site card, and site vault\n- Preserves previous local data`)}

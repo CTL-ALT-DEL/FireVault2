@@ -1,15 +1,13 @@
-# FireVault Build 0.7.0
+# FireVault Build 0.7.1
 
 Root-level package for GitHub Pages.
 
-## Changes
-- Docs / Photos section per site
-- Add/Edit file records
-- Categories: Panel Photo, Trouble Screenshot, Riser Diagram, Map/Floor Plan, Battery Label, Inspection Report, Manual Link, Cloud File Link
-- Optional URL/link field
-- Docs count on dashboard, site cards, and site vault
-- Preserves previous local storage data
+## Hotfix
+- Fixes bottom navigation overlap
+- Adds safe bottom spacing for scrollable lists and forms
+- Uses dynamic mobile viewport height
+- Preserves all Build 0.7.0 functionality and local data
 
 Suggested commit:
 
-`Build 0.7.0 docs photos records`
+`Build 0.7.1 fix bottom nav overlap`
