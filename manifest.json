@@ -8,7 +8,7 @@
   "orientation": "portrait",
   "background_color": "#0b0d10",
   "theme_color": "#101216",
-  "description": "Field knowledge system for fire alarm technicians. Build 0.46.4.",
+  "description": "Field knowledge system for fire alarm technicians. Build 0.46.5.",
   "icons": [
     {
       "src": "assets/icon-192.png",

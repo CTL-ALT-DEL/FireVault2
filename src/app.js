@@ -505,6 +505,39 @@ async function addRouteEvent(type,label,siteId="",notes=""){
   toast(`${label||type} added.`);
   routeLog();
 }
+function editRouteEvent(id){
+  if(!activeRoute){ toast("No active route day."); return; }
+  const ev=(activeRoute.events||[]).find(x=>x.id===id);
+  if(!ev){ toast("Waypoint not found."); return; }
+  const label=prompt("Edit waypoint title", ev.label||ev.type||"Waypoint");
+  if(label===null) return;
+  const notes=prompt("Edit waypoint notes", ev.notes||"");
+  if(notes===null) return;
+  ev.label=(label.trim()||ev.label||ev.type||"Waypoint");
+  ev.notes=notes.trim();
+  saveActiveRoute();
+  toast("Waypoint updated.");
+  routeLog();
+}
+function deleteRouteEvent(id){
+  if(!activeRoute){ toast("No active route day."); return; }
+  const ev=(activeRoute.events||[]).find(x=>x.id===id);
+  if(!ev){ toast("Waypoint not found."); return; }
+  if(!confirm(`Delete waypoint "${ev.label||ev.type||"Waypoint"}"?`)) return;
+  activeRoute.events=(activeRoute.events||[]).filter(x=>x.id!==id);
+  saveActiveRoute();
+  toast("Waypoint deleted.");
+  routeLog();
+}
+function undoLastRouteEvent(){
+  if(!activeRoute || !(activeRoute.events||[]).length){ toast("No waypoint to remove."); return; }
+  const ev=activeRoute.events[activeRoute.events.length-1];
+  if(!confirm(`Remove last waypoint "${ev.label||ev.type||"Waypoint"}"?`)) return;
+  activeRoute.events.pop();
+  saveActiveRoute();
+  toast("Last waypoint removed.");
+  routeLog();
+}
 async function startRouteDay(){
   if(activeRoute){ route("routeLog"); return; }
   activeRoute={id:uid(),date:localDateString(),startedAt:new Date().toISOString(),endedAt:null,events:[]};
@@ -759,6 +792,7 @@ function routeLog(){
       ${active?`<button class="danger" id="endRouteBtn">End Day / Save</button>`:`<button class="primary" id="startRouteBtn">Start Day</button>`}
       <button class="ghost" id="copyRouteBtn" ${active||saved[0]?"":"disabled"}>Copy Report</button>
       <button class="ghost" id="downloadRouteBtn" ${active||saved[0]?"":"disabled"}>Download Report</button>
+      ${active?`<button class="ghost" id="undoRouteBtn" ${events.length?"":"disabled"}>Undo Last Point</button>`:""}
     </div>
     ${(active||saved[0])?`<div class="card routeReportPreview464"><div><h2>Daily Report Summary</h2><p>${esc(routeSummaryLine(active||saved[0]))}</p></div>${routeDirectionsLink(active||saved[0])?`<a class="btn ghost" href="${esc(routeDirectionsLink(active||saved[0]))}" target="_blank" rel="noopener">Open Route Map</a>`:""}</div>`:""}
     ${active?`<div class="card routeQuick462">
@@ -772,7 +806,7 @@ function routeLog(){
       <p class="fieldNote">GPS capture works while FireVault is open. iPhone home-screen web apps may limit background tracking.</p>
     </div>`:""}
     <div class="list grow routeList462">
-      ${active?`<div class="routeSectionTitle462"><strong>Today</strong><span>${routeDateLabel(active.startedAt)}</span></div>${events.length?events.map(routeEventCard).join(""):`<div class="empty">No route points yet. Add a waypoint or site stop.</div>`}`:`<div class="routeSectionTitle462"><strong>Saved Route Days</strong><span>Newest first</span></div>${saved.length?saved.map(routeHistoryCard).join(""):`<div class="empty">No saved route days yet.</div>`}`}
+      ${active?`<div class="routeSectionTitle462"><strong>Today</strong><span>${routeDateLabel(active.startedAt)}</span></div>${events.length?events.map(e=>routeEventCard(e,true)).join(""):`<div class="empty">No route points yet. Add a waypoint or site stop.</div>`}`:`<div class="routeSectionTitle462"><strong>Saved Route Days</strong><span>Newest first</span></div>${saved.length?saved.map(routeHistoryCard).join(""):`<div class="empty">No saved route days yet.</div>`}`}
     </div>
   </div>`);
   document.getElementById("backBtn").onclick=()=>route("home");
@@ -780,6 +814,7 @@ function routeLog(){
   const end=document.getElementById("endRouteBtn"); if(end) end.onclick=endRouteDay;
   const copy=document.getElementById("copyRouteBtn"); if(copy) copy.onclick=()=>copyRouteReport(activeRoute||saved[0]);
   const download=document.getElementById("downloadRouteBtn"); if(download) download.onclick=()=>downloadRouteReport(activeRoute||saved[0]);
+  const undo=document.getElementById("undoRouteBtn"); if(undo) undo.onclick=undoLastRouteEvent;
   const arrived=document.getElementById("arrivedBtn"); if(arrived) arrived.onclick=()=>{ const id=val("routeSiteSelect"); if(!id){toast("Select a site first."); return;} const s=data.sites.find(x=>x.id===id); addRouteEvent("Arrived",`Arrived: ${s?.name||"Site"}`,id); };
   const left=document.getElementById("leftBtn"); if(left) left.onclick=()=>{ const id=val("routeSiteSelect"); if(!id){toast("Select a site first."); return;} const s=data.sites.find(x=>x.id===id); addRouteEvent("Left Site",`Left: ${s?.name||"Site"}`,id); };
   const waypoint=document.getElementById("waypointBtn"); if(waypoint) waypoint.onclick=()=>{ const note=prompt("Waypoint note", "Manual waypoint")||"Manual waypoint"; addRouteEvent("Waypoint",note); };
@@ -787,10 +822,12 @@ function routeLog(){
   document.querySelectorAll("[data-copy-route]").forEach(b=>b.onclick=()=>{ const log=saved.find(x=>x.id===b.dataset.copyRoute); if(log) copyRouteReport(log); });
   document.querySelectorAll("[data-download-route]").forEach(b=>b.onclick=()=>{ const log=saved.find(x=>x.id===b.dataset.downloadRoute); if(log) downloadRouteReport(log); });
   document.querySelectorAll("[data-delete-route]").forEach(b=>b.onclick=()=>{ const id=b.dataset.deleteRoute; if(confirm("Delete this saved route day?")){ data.routeLogs=(data.routeLogs||[]).filter(x=>x.id!==id); save(); routeLog(); } });
+  document.querySelectorAll("[data-edit-route-event]").forEach(b=>b.onclick=()=>editRouteEvent(b.dataset.editRouteEvent));
+  document.querySelectorAll("[data-delete-route-event]").forEach(b=>b.onclick=()=>deleteRouteEvent(b.dataset.deleteRouteEvent));
 }
-function routeEventCard(e){
+function routeEventCard(e,editable=false){
   const link=routeMapLink(e);
-  return `<div class="card routeEventCard462"><div class="routeEventTop462"><div><h2>${esc(e.label||e.type)}</h2><p>${routeEventTime(e.at)}${e.siteName?` • ${esc(e.siteName)}`:""}</p></div><span class="pill">${esc(e.type||"Stop")}</span></div><p>${esc(routeGpsText(e))}</p>${e.address?`<p>${esc(e.address)}</p>`:""}${e.nearestSite?`<p class="fieldNote">Nearest saved site: ${esc(e.nearestSite)} (${esc(e.nearestDistance)})</p>`:""}${link?`<a class="btn ghost routeMapBtn462" href="${esc(link)}" target="_blank" rel="noopener">Open Map</a>`:""}</div>`;
+  return `<div class="card routeEventCard462 routeEventCard465"><div class="routeEventTop462"><div><h2>${esc(e.label||e.type)}</h2><p>${routeEventTime(e.at)}${e.siteName?` • ${esc(e.siteName)}`:""}</p></div><span class="pill">${esc(e.type||"Stop")}</span></div><p>${esc(routeGpsText(e))}</p>${e.address?`<p>${esc(e.address)}</p>`:""}${e.nearestSite?`<p class="fieldNote">Nearest saved site: ${esc(e.nearestSite)} (${esc(e.nearestDistance)})</p>`:""}${e.notes?`<p class="routeNote465">${esc(e.notes)}</p>`:""}<div class="routeEventFooter465">${link?`<a class="btn ghost routeMapBtn462" href="${esc(link)}" target="_blank" rel="noopener">Open Map</a>`:""}${editable?`<button class="ghost" data-edit-route-event="${esc(e.id)}">Edit</button><button class="danger" data-delete-route-event="${esc(e.id)}">Delete</button>`:""}</div></div>`;
 }
 function routeHistoryCard(log){
   const events=log.events||[];
@@ -1986,11 +2023,11 @@ function diagnostics(){
 }
 function showChangelog(){
   const notes = [
-    "Added estimated route distance to Daily Route reports.",
-    "Added active route Download Report button.",
-    "Added Daily Report Summary card with route duration, site count, and distance.",
-    "Added route map / directions links for active and saved route days.",
-    "Improved saved route day summaries while preserving the recording LED."
+    "Added active Daily Route waypoint editing.",
+    "Added active Daily Route waypoint delete controls.",
+    "Added Undo Last Point for quick field corrections.",
+    "Waypoint notes now display directly on route timeline cards.",
+    "Preserved route distance, report download, map links, and the blinking recording LED."
   ];
   const overlay=document.createElement("div");
   overlay.className="releaseOverlay";
