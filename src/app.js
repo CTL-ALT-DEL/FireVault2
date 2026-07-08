@@ -641,6 +641,65 @@ function downloadRouteReport(log=activeRoute){
   downloadBlob(name, routeReportText(log));
 }
 
+function routeCsvEscape(v){
+  const s=String(v ?? "");
+  return /[",\n]/.test(s) ? `"${s.replace(/"/g,'""')}"` : s;
+}
+function routeCsvText(log=activeRoute){
+  if(!log) return "Time,Type,Label,Site,Address,Latitude,Longitude,Accuracy,Nearest Site,Nearest Distance,Notes,Map Link\n";
+  const header=["Time","Type","Label","Site","Address","Latitude","Longitude","Accuracy","Nearest Site","Nearest Distance","Notes","Map Link"];
+  const rows=(log.events||[]).map(e=>[
+    e.at ? new Date(e.at).toLocaleString() : "",
+    e.type||"",
+    e.label||"",
+    e.siteName||"",
+    e.address||"",
+    Number.isFinite(Number(e.lat)) ? Number(e.lat).toFixed(6) : "",
+    Number.isFinite(Number(e.lng)) ? Number(e.lng).toFixed(6) : "",
+    Number.isFinite(Number(e.accuracy)) ? Math.round(Number(e.accuracy)) : "",
+    e.nearestSite||"",
+    e.nearestDistance||"",
+    e.notes||"",
+    routeMapLink(e)||""
+  ]);
+  return [header, ...rows].map(r=>r.map(routeCsvEscape).join(",")).join("\n");
+}
+function downloadRouteCsv(log=activeRoute){
+  const name=`firevault-route-${(log?.date||localDateString())}.csv`;
+  downloadBlob(name, routeCsvText(log), "text/csv");
+  toast("Route CSV downloaded.");
+}
+function routeCustomerSummaryText(log=activeRoute){
+  if(!log) return "No route day selected.";
+  const events=log.events||[];
+  const siteNames=[...new Set(events.filter(e=>e.siteName).map(e=>e.siteName))];
+  const lines=[
+    `FireVault Daily Work Route Summary`,
+    `Date: ${routeDateLabel(log.startedAt||new Date())}`,
+    `Time: ${log.startedAt?routeEventTime(log.startedAt):"Not started"} - ${log.endedAt?routeEventTime(log.endedAt):"Active"}`,
+    `Duration: ${routeDuration(log.startedAt,log.endedAt)}`,
+    `Stops Recorded: ${events.length}`,
+    `Sites Visited: ${siteNames.length ? siteNames.join(", ") : "None recorded"}`,
+    `Estimated Route Distance: ${routeDistanceLabel(log)}`,
+    ``,
+    `Stop Timeline:`
+  ];
+  if(!events.length) lines.push(`- No stops recorded.`);
+  events.forEach((e,i)=>{
+    const stopName=e.siteName ? `${e.label||e.type} - ${e.siteName}` : (e.label||e.type||"Stop");
+    lines.push(`${i+1}. ${routeEventTime(e.at)} - ${stopName}`);
+    if(e.notes) lines.push(`   Notes: ${e.notes}`);
+  });
+  lines.push(``, `Generated from FireVault Build ${BUILD}`);
+  return lines.join("\n");
+}
+function copyRouteCustomerSummary(log=activeRoute){
+  const text=routeCustomerSummaryText(log);
+  if(navigator.clipboard?.writeText){
+    navigator.clipboard.writeText(text).then(()=>toast("Customer summary copied."),()=>toast("Clipboard unavailable."));
+  }else toast("Clipboard unavailable.");
+}
+
 function fmtDate(d=new Date()){ return d.toLocaleDateString([], {month:"short", day:"numeric", year:"numeric"}); }
 function todayIso(){ return new Date().toISOString().slice(0,10); }
 function localDateString(d=new Date()){
@@ -836,9 +895,11 @@ function routeLog(){
       ${active?`<button class="danger" id="endRouteBtn">End Day / Save</button>`:`<button class="primary" id="startRouteBtn">Start Day</button>`}
       <button class="ghost" id="copyRouteBtn" ${active||saved[0]?"":"disabled"}>Copy Report</button>
       <button class="ghost" id="downloadRouteBtn" ${active||saved[0]?"":"disabled"}>Download Report</button>
+      <button class="ghost" id="csvRouteBtn" ${active||saved[0]?"":"disabled"}>CSV Export</button>
+      <button class="ghost" id="summaryRouteBtn" ${active||saved[0]?"":"disabled"}>Customer Summary</button>
       ${active?`<button class="ghost" id="undoRouteBtn" ${events.length?"":"disabled"}>Undo Last Point</button>`:""}
     </div>
-    ${(active||saved[0])?`<div class="card routeReportPreview464"><div><h2>Daily Report Summary</h2><p>${esc(routeSummaryLine(active||saved[0]))}</p></div>${routeDirectionsLink(active||saved[0])?`<a class="btn ghost" href="${esc(routeDirectionsLink(active||saved[0]))}" target="_blank" rel="noopener">Open Route Map</a>`:""}</div>`:""}
+    ${(active||saved[0])?`<div class="card routeReportPreview464 routeReportPreview467"><div><h2>Daily Report Summary</h2><p>${esc(routeSummaryLine(active||saved[0]))}</p><p class="fieldNote">Export as TXT, CSV, or copy a cleaner customer summary.</p></div>${routeDirectionsLink(active||saved[0])?`<a class="btn ghost" href="${esc(routeDirectionsLink(active||saved[0]))}" target="_blank" rel="noopener">Open Route Map</a>`:""}</div>`:""}
     ${active?`<div class="card routeQuick462">
       <div class="routeSitePick462"><label>Site Stop</label><select id="routeSiteSelect"><option value="">Select saved site...</option>${siteOptions}</select></div>
       <div class="grid2">
@@ -860,6 +921,8 @@ function routeLog(){
   const end=document.getElementById("endRouteBtn"); if(end) end.onclick=endRouteDay;
   const copy=document.getElementById("copyRouteBtn"); if(copy) copy.onclick=()=>copyRouteReport(activeRoute||saved[0]);
   const download=document.getElementById("downloadRouteBtn"); if(download) download.onclick=()=>downloadRouteReport(activeRoute||saved[0]);
+  const csv=document.getElementById("csvRouteBtn"); if(csv) csv.onclick=()=>downloadRouteCsv(activeRoute||saved[0]);
+  const summary=document.getElementById("summaryRouteBtn"); if(summary) summary.onclick=()=>copyRouteCustomerSummary(activeRoute||saved[0]);
   const undo=document.getElementById("undoRouteBtn"); if(undo) undo.onclick=undoLastRouteEvent;
   const arrived=document.getElementById("arrivedBtn"); if(arrived) arrived.onclick=()=>{ const id=val("routeSiteSelect"); if(!id){toast("Select a site first."); return;} const s=data.sites.find(x=>x.id===id); addRouteEvent("Arrived",`Arrived: ${s?.name||"Site"}`,id); };
   const left=document.getElementById("leftBtn"); if(left) left.onclick=()=>{ const id=val("routeSiteSelect"); if(!id){toast("Select a site first."); return;} const s=data.sites.find(x=>x.id===id); addRouteEvent("Left Site",`Left: ${s?.name||"Site"}`,id); };
@@ -871,6 +934,8 @@ function routeLog(){
   const sugClear=document.getElementById("clearSuggestionBtn"); if(sugClear) sugClear.onclick=clearRouteSuggestion;
   document.querySelectorAll("[data-copy-route]").forEach(b=>b.onclick=()=>{ const log=saved.find(x=>x.id===b.dataset.copyRoute); if(log) copyRouteReport(log); });
   document.querySelectorAll("[data-download-route]").forEach(b=>b.onclick=()=>{ const log=saved.find(x=>x.id===b.dataset.downloadRoute); if(log) downloadRouteReport(log); });
+  document.querySelectorAll("[data-csv-route]").forEach(b=>b.onclick=()=>{ const log=saved.find(x=>x.id===b.dataset.csvRoute); if(log) downloadRouteCsv(log); });
+  document.querySelectorAll("[data-summary-route]").forEach(b=>b.onclick=()=>{ const log=saved.find(x=>x.id===b.dataset.summaryRoute); if(log) copyRouteCustomerSummary(log); });
   document.querySelectorAll("[data-delete-route]").forEach(b=>b.onclick=()=>{ const id=b.dataset.deleteRoute; if(confirm("Delete this saved route day?")){ data.routeLogs=(data.routeLogs||[]).filter(x=>x.id!==id); save(); routeLog(); } });
   document.querySelectorAll("[data-edit-route-event]").forEach(b=>b.onclick=()=>editRouteEvent(b.dataset.editRouteEvent));
   document.querySelectorAll("[data-delete-route-event]").forEach(b=>b.onclick=()=>deleteRouteEvent(b.dataset.deleteRouteEvent));
@@ -883,7 +948,7 @@ function routeHistoryCard(log){
   const events=log.events||[];
   const sites=events.filter(e=>e.siteName).map(e=>e.siteName);
   const unique=[...new Set(sites)];
-  return `<div class="card routeHistoryCard462"><div class="routeEventTop462"><div><h2>${routeDateLabel(log.startedAt||log.date)}</h2><p>${routeSummaryLine(log)}</p></div><span class="pill">${log.endedAt?"Saved":"Active"}</span></div><p>${unique.length?esc(unique.slice(0,4).join(", ")):"No site stops recorded."}</p><div class="grid3 routeHistoryActions462"><button class="ghost" data-copy-route="${esc(log.id)}">Copy</button><button class="ghost" data-download-route="${esc(log.id)}">Download</button><button class="danger" data-delete-route="${esc(log.id)}">Delete</button></div>${routeDirectionsLink(log)?`<a class="btn ghost routeMapBtn462" href="${esc(routeDirectionsLink(log))}" target="_blank" rel="noopener">Open Route Map</a>`:""}</div>`;
+  return `<div class="card routeHistoryCard462"><div class="routeEventTop462"><div><h2>${routeDateLabel(log.startedAt||log.date)}</h2><p>${routeSummaryLine(log)}</p></div><span class="pill">${log.endedAt?"Saved":"Active"}</span></div><p>${unique.length?esc(unique.slice(0,4).join(", ")):"No site stops recorded."}</p><div class="routeHistoryActions462 routeHistoryActions467"><button class="ghost" data-copy-route="${esc(log.id)}">Copy</button><button class="ghost" data-download-route="${esc(log.id)}">TXT</button><button class="ghost" data-csv-route="${esc(log.id)}">CSV</button><button class="ghost" data-summary-route="${esc(log.id)}">Summary</button><button class="danger" data-delete-route="${esc(log.id)}">Delete</button></div>${routeDirectionsLink(log)?`<a class="btn ghost routeMapBtn462" href="${esc(routeDirectionsLink(log))}" target="_blank" rel="noopener">Open Route Map</a>`:""}</div>`;
 }
 
 function attentionQueue(){
@@ -2073,11 +2138,11 @@ function diagnostics(){
 }
 function showChangelog(){
   const notes = [
-    "Added Check Nearest Site inside Daily Route.",
-    "Daily Route can now suggest the closest saved GPS site while recording.",
-    "Suggested Site Stop card includes distance, address, GPS accuracy, and quick Arrived / Left actions.",
-    "Using the suggested stop clears the suggestion automatically after it records the waypoint.",
-    "Preserved waypoint edit, delete, undo, report download, and blinking recording LED tools."
+    "Added CSV export for Daily Route reports.",
+    "Added customer-friendly Daily Route summary copy.",
+    "Saved route days now have Copy, TXT, CSV, Summary, and Delete controls.",
+    "Active route days can now export TXT, CSV, or customer summary before ending the day.",
+    "Preserved nearest-site suggestions and the blinking recording LED."
   ];
   const overlay=document.createElement("div");
   overlay.className="releaseOverlay";
