@@ -1,4 +1,4 @@
-export const BUILD = "0.47.5";
+export const BUILD = "0.47.6";
 export const KEY = "firevault_vault_build_030";
 export const ACTIVE_JOB_KEY = "firevault_active_job_modular";
 
@@ -30,6 +30,22 @@ export function normalize(data){
   const featureDefaults = {dailyRoute:true, library:false, reports:false, equipment:false, diagnostics:false, advancedGps:false, attention:false, routeReview:false, csvExports:false, backupRepair:false};
   data.settings.visibility = {...featureDefaults, ...(data.settings.visibility || {})};
   data.settings.theme = data.settings.theme || {name:"firevault-dark", accentColor:"#ef4444", highContrast:false, largeText:false, compactLayout:false, buttonStyle:"rounded", cardStyle:"glass"};
+  data.settings.modules = data.settings.modules || {
+    visits:true,
+    photos:true,
+    notes:true,
+    tasks:true,
+    deficiencies:true,
+    reports:true,
+    library:true,
+    gpsNearby:true,
+    breadcrumbs:false,
+    jobMode:true,
+    aiTechnician:false,
+    importExport:true,
+    diagnostics:false
+  };
+
   data.settings.advanced = data.settings.advanced || {aiTechnician:false, reverseAddressLookup:false, cloudBackup:false, voiceTranscription:false, ocrReader:false, emailGateway:false, weather:false, traffic:false};
   data.settings.gps = {enabled:true, mapProvider:"apple", highAccuracy:true, includeInReports:true, nearbyRadiusMiles:1, ...(data.settings.gps || {})};
   data.sites.forEach(ensureSite);
