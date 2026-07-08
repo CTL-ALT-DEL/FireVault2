@@ -501,6 +501,7 @@ async function addRouteEvent(type,label,siteId="",notes=""){
     }
   }
   route.events.push(ev);
+  if(route.nearbySuggestion && siteId && route.nearbySuggestion.siteId===siteId) delete route.nearbySuggestion;
   saveActiveRoute();
   toast(`${label||type} added.`);
   routeLog();
@@ -537,6 +538,48 @@ function undoLastRouteEvent(){
   saveActiveRoute();
   toast("Last waypoint removed.");
   routeLog();
+}
+function routeSuggestion(){
+  if(!activeRoute?.nearbySuggestion) return null;
+  const n=activeRoute.nearbySuggestion;
+  const s=data.sites.find(x=>x.id===n.siteId);
+  if(!s) return null;
+  return {n,s};
+}
+async function checkRouteNearestSite(){
+  if(!activeRoute){ toast("Start Daily Route first."); return; }
+  if(!data.sites.some(hasGps)){ toast("No saved GPS sites yet."); return; }
+  toast("Checking nearest saved site...");
+  const gps=await getGpsPosition();
+  if(!gps){ toast("GPS check unavailable."); return; }
+  const nearest=gpsSiteDistances(gps.lat,gps.lng)[0];
+  if(!nearest){ toast("No nearby site match found."); return; }
+  activeRoute.nearbySuggestion={
+    siteId:nearest.s.id,
+    siteName:nearest.s.name||"Unnamed Site",
+    address:fullAddress(nearest.s),
+    meters:Math.round(nearest.meters),
+    distance:distanceLabel(nearest.meters),
+    lat:gps.lat,
+    lng:gps.lng,
+    accuracy:gps.accuracy||0,
+    checkedAt:new Date().toISOString()
+  };
+  saveActiveRoute();
+  toast(`Nearest site: ${activeRoute.nearbySuggestion.siteName}`);
+  routeLog();
+}
+function clearRouteSuggestion(){
+  if(!activeRoute) return;
+  delete activeRoute.nearbySuggestion;
+  saveActiveRoute();
+  routeLog();
+}
+function routeUseSuggestion(kind){
+  const found=routeSuggestion();
+  if(!found){ toast("No suggested site available."); return; }
+  const label=kind==="Left Site" ? `Left: ${found.s.name||"Site"}` : `Arrived: ${found.s.name||"Site"}`;
+  addRouteEvent(kind,label,found.s.id);
 }
 async function startRouteDay(){
   if(activeRoute){ route("routeLog"); return; }
@@ -782,6 +825,7 @@ function routeLog(){
   const active=activeRoute;
   const siteOptions=data.sites.map(s=>`<option value="${esc(s.id)}">${esc(s.name||"Unnamed Site")}</option>`).join("");
   const events=active?.events||[];
+  const suggestion=active?routeSuggestion():null;
   html(`<div class="screen routeLogScreen462">
     <div class="row"><button class="back ghost" id="backBtn">←</button><h1>Daily Route</h1></div>
     <div class="card routeHero462 ${active?"active":"idle"}">
@@ -802,9 +846,11 @@ function routeLog(){
         <button class="ghost" id="leftBtn">Left Site</button>
         <button class="ghost" id="waypointBtn">Manual Waypoint</button>
         <button class="ghost" id="breakBtn">Break / Fuel / Parts</button>
+        <button class="ghost routeNearestBtn466" id="nearestBtn">Check Nearest Site</button>
       </div>
       <p class="fieldNote">GPS capture works while FireVault is open. iPhone home-screen web apps may limit background tracking.</p>
     </div>`:""}
+    ${suggestion?`<div class="card routeSuggestion466"><div><h2>Suggested Site Stop</h2><p><strong>${esc(suggestion.s.name||"Unnamed Site")}</strong> • ${esc(suggestion.n.distance)} away</p><p>${esc(suggestion.n.address||"No address saved")}</p><p class="fieldNote">Checked ${routeEventTime(suggestion.n.checkedAt)} • GPS accuracy ±${Math.round(Number(suggestion.n.accuracy)||0)} m</p></div><div class="grid3 routeSuggestionActions466"><button class="primary" id="suggestArriveBtn">Arrived</button><button class="ghost" id="suggestLeftBtn">Left</button><button class="ghost" id="clearSuggestionBtn">Clear</button></div></div>`:""}
     <div class="list grow routeList462">
       ${active?`<div class="routeSectionTitle462"><strong>Today</strong><span>${routeDateLabel(active.startedAt)}</span></div>${events.length?events.map(e=>routeEventCard(e,true)).join(""):`<div class="empty">No route points yet. Add a waypoint or site stop.</div>`}`:`<div class="routeSectionTitle462"><strong>Saved Route Days</strong><span>Newest first</span></div>${saved.length?saved.map(routeHistoryCard).join(""):`<div class="empty">No saved route days yet.</div>`}`}
     </div>
@@ -819,6 +865,10 @@ function routeLog(){
   const left=document.getElementById("leftBtn"); if(left) left.onclick=()=>{ const id=val("routeSiteSelect"); if(!id){toast("Select a site first."); return;} const s=data.sites.find(x=>x.id===id); addRouteEvent("Left Site",`Left: ${s?.name||"Site"}`,id); };
   const waypoint=document.getElementById("waypointBtn"); if(waypoint) waypoint.onclick=()=>{ const note=prompt("Waypoint note", "Manual waypoint")||"Manual waypoint"; addRouteEvent("Waypoint",note); };
   const br=document.getElementById("breakBtn"); if(br) br.onclick=()=>{ const note=prompt("Stop note", "Break / Fuel / Parts")||"Break / Fuel / Parts"; addRouteEvent("Stop",note); };
+  const nearest=document.getElementById("nearestBtn"); if(nearest) nearest.onclick=checkRouteNearestSite;
+  const sugArr=document.getElementById("suggestArriveBtn"); if(sugArr) sugArr.onclick=()=>routeUseSuggestion("Arrived");
+  const sugLeft=document.getElementById("suggestLeftBtn"); if(sugLeft) sugLeft.onclick=()=>routeUseSuggestion("Left Site");
+  const sugClear=document.getElementById("clearSuggestionBtn"); if(sugClear) sugClear.onclick=clearRouteSuggestion;
   document.querySelectorAll("[data-copy-route]").forEach(b=>b.onclick=()=>{ const log=saved.find(x=>x.id===b.dataset.copyRoute); if(log) copyRouteReport(log); });
   document.querySelectorAll("[data-download-route]").forEach(b=>b.onclick=()=>{ const log=saved.find(x=>x.id===b.dataset.downloadRoute); if(log) downloadRouteReport(log); });
   document.querySelectorAll("[data-delete-route]").forEach(b=>b.onclick=()=>{ const id=b.dataset.deleteRoute; if(confirm("Delete this saved route day?")){ data.routeLogs=(data.routeLogs||[]).filter(x=>x.id!==id); save(); routeLog(); } });
@@ -2023,11 +2073,11 @@ function diagnostics(){
 }
 function showChangelog(){
   const notes = [
-    "Added active Daily Route waypoint editing.",
-    "Added active Daily Route waypoint delete controls.",
-    "Added Undo Last Point for quick field corrections.",
-    "Waypoint notes now display directly on route timeline cards.",
-    "Preserved route distance, report download, map links, and the blinking recording LED."
+    "Added Check Nearest Site inside Daily Route.",
+    "Daily Route can now suggest the closest saved GPS site while recording.",
+    "Suggested Site Stop card includes distance, address, GPS accuracy, and quick Arrived / Left actions.",
+    "Using the suggested stop clears the suggestion automatically after it records the waypoint.",
+    "Preserved waypoint edit, delete, undo, report download, and blinking recording LED tools."
   ];
   const overlay=document.createElement("div");
   overlay.className="releaseOverlay";
