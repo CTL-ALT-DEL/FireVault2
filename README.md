@@ -1,18 +1,22 @@
-# FireVault Build 0.46.3
+# FireVault Build 0.46.4
 
-Build 0.46.3 is a Daily Route recording status polish build.
+Build 0.46.4 is a Daily Route report polish build.
 
 ## What changed
 
-- Visible app version advanced to 0.46.3.
-- Added a blinking green LED to the left of the current day/date when Daily Route is actively recording.
-- The LED only appears while an active Daily Route session is running.
-- Kept the current day/date centered and bold.
-- Preserved Daily Route Log starter features from 0.46.2.
-- Preserved Diagnostics stability and bottom menu visibility fixes.
+- Visible app version advanced to 0.46.4.
+- Added estimated route distance to Daily Route reports.
+- Added **Download Report** for the active Daily Route session.
+- Added a **Daily Report Summary** card with route duration, waypoint count, site count, and distance.
+- Added route map / directions links for active and saved route days.
+- Improved saved route day summaries.
+- Preserved the blinking green Daily Route recording LED from 0.46.3.
+- Preserved route history copy / download / delete tools.
+
+Note: Route distance is estimated from captured GPS waypoints while FireVault is open.
 
 Suggested commit message:
 
 ```text
-Build 0.46.3 daily route recording LED
+Build 0.46.4 daily route report polish distance and map links
 ```

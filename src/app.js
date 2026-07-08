@@ -427,6 +427,40 @@ function routeDuration(start,end){
   if(m<60) return `${m} min`;
   return `${Math.floor(m/60)}h ${m%60}m`;
 }
+function routePointEvents(log=activeRoute){
+  return (log?.events||[]).filter(e=>Number.isFinite(Number(e.lat)) && Number.isFinite(Number(e.lng)));
+}
+function routeDistanceMetersTotal(log=activeRoute){
+  const pts=routePointEvents(log);
+  let total=0;
+  for(let i=1;i<pts.length;i++) total += distanceMeters(Number(pts[i-1].lat),Number(pts[i-1].lng),Number(pts[i].lat),Number(pts[i].lng));
+  return total;
+}
+function routeDistanceLabel(log=activeRoute){
+  const pts=routePointEvents(log);
+  if(pts.length<2) return "Not enough GPS points";
+  return distanceLabel(routeDistanceMetersTotal(log));
+}
+function routeDirectionsLink(log=activeRoute){
+  const pts=routePointEvents(log);
+  if(pts.length<2) return "";
+  const trimmed=pts.length>10 ? pts.filter((_,i)=>i===0||i===pts.length-1||i%Math.ceil(pts.length/8)===0).slice(0,10) : pts;
+  const origin=`${Number(trimmed[0].lat).toFixed(6)},${Number(trimmed[0].lng).toFixed(6)}`;
+  const dest=`${Number(trimmed[trimmed.length-1].lat).toFixed(6)},${Number(trimmed[trimmed.length-1].lng).toFixed(6)}`;
+  const mids=trimmed.slice(1,-1).map(e=>`${Number(e.lat).toFixed(6)},${Number(e.lng).toFixed(6)}`);
+  if(data.settings.gps?.mapProvider==="google"){
+    let url=`https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent(origin)}&destination=${encodeURIComponent(dest)}&travelmode=driving`;
+    if(mids.length) url += `&waypoints=${encodeURIComponent(mids.join("|"))}`;
+    return url;
+  }
+  return `https://maps.apple.com/?saddr=${encodeURIComponent(origin)}&daddr=${encodeURIComponent(dest)}`;
+}
+function routeSummaryLine(log=activeRoute){
+  if(!log) return "No route day selected.";
+  const events=log.events||[];
+  const siteCount=[...new Set(events.filter(e=>e.siteName).map(e=>e.siteName))].length;
+  return `${events.length} waypoint${events.length===1?"":"s"} • ${siteCount} site${siteCount===1?"":"s"} • ${routeDuration(log.startedAt,log.endedAt)} • ${routeDistanceLabel(log)}`;
+}
 function routeGpsText(ev){
   if(!ev || !Number.isFinite(Number(ev.lat)) || !Number.isFinite(Number(ev.lng))) return "No GPS";
   const acc=Number.isFinite(Number(ev.accuracy)) && Number(ev.accuracy)>0 ? ` ±${Math.round(Number(ev.accuracy))}m` : "";
@@ -500,8 +534,11 @@ function routeReportText(log=activeRoute){
     `Start: ${log.startedAt?routeEventTime(log.startedAt):"Not started"}`,
     `End: ${log.endedAt?routeEventTime(log.endedAt):"Active"}`,
     `Duration: ${routeDuration(log.startedAt,log.endedAt)}`,
+    `Estimated Route Distance: ${routeDistanceLabel(log)}`,
     `Waypoints: ${stops.length}`,
     `Site Stops: ${siteStops}`,
+    ``,
+    routeDirectionsLink(log) ? `Route Directions: ${routeDirectionsLink(log)}` : `Route Directions: Not enough GPS points`,
     ``,
     `STOPS / WAYPOINTS`
   ];
@@ -715,13 +752,15 @@ function routeLog(){
   html(`<div class="screen routeLogScreen462">
     <div class="row"><button class="back ghost" id="backBtn">←</button><h1>Daily Route</h1></div>
     <div class="card routeHero462 ${active?"active":"idle"}">
-      <div><strong>${active?"Route Active":"No Active Route"}</strong><span>${active?`${events.length} waypoint${events.length===1?"":"s"} • ${routeDuration(active.startedAt)}`:`${saved.length} saved day${saved.length===1?"":"s"}`}</span></div>
+      <div><strong>${active?"Route Active":"No Active Route"}</strong><span>${active?routeSummaryLine(active):`${saved.length} saved day${saved.length===1?"":"s"}`}</span></div>
       <p>${active?"Track stops, site arrivals, breaks, and manual GPS waypoints while the app is open.":"Start a route day to record sites visited and waypoints for a daily report."}</p>
     </div>
     <div class="routeControls462">
       ${active?`<button class="danger" id="endRouteBtn">End Day / Save</button>`:`<button class="primary" id="startRouteBtn">Start Day</button>`}
       <button class="ghost" id="copyRouteBtn" ${active||saved[0]?"":"disabled"}>Copy Report</button>
+      <button class="ghost" id="downloadRouteBtn" ${active||saved[0]?"":"disabled"}>Download Report</button>
     </div>
+    ${(active||saved[0])?`<div class="card routeReportPreview464"><div><h2>Daily Report Summary</h2><p>${esc(routeSummaryLine(active||saved[0]))}</p></div>${routeDirectionsLink(active||saved[0])?`<a class="btn ghost" href="${esc(routeDirectionsLink(active||saved[0]))}" target="_blank" rel="noopener">Open Route Map</a>`:""}</div>`:""}
     ${active?`<div class="card routeQuick462">
       <div class="routeSitePick462"><label>Site Stop</label><select id="routeSiteSelect"><option value="">Select saved site...</option>${siteOptions}</select></div>
       <div class="grid2">
@@ -740,6 +779,7 @@ function routeLog(){
   const start=document.getElementById("startRouteBtn"); if(start) start.onclick=startRouteDay;
   const end=document.getElementById("endRouteBtn"); if(end) end.onclick=endRouteDay;
   const copy=document.getElementById("copyRouteBtn"); if(copy) copy.onclick=()=>copyRouteReport(activeRoute||saved[0]);
+  const download=document.getElementById("downloadRouteBtn"); if(download) download.onclick=()=>downloadRouteReport(activeRoute||saved[0]);
   const arrived=document.getElementById("arrivedBtn"); if(arrived) arrived.onclick=()=>{ const id=val("routeSiteSelect"); if(!id){toast("Select a site first."); return;} const s=data.sites.find(x=>x.id===id); addRouteEvent("Arrived",`Arrived: ${s?.name||"Site"}`,id); };
   const left=document.getElementById("leftBtn"); if(left) left.onclick=()=>{ const id=val("routeSiteSelect"); if(!id){toast("Select a site first."); return;} const s=data.sites.find(x=>x.id===id); addRouteEvent("Left Site",`Left: ${s?.name||"Site"}`,id); };
   const waypoint=document.getElementById("waypointBtn"); if(waypoint) waypoint.onclick=()=>{ const note=prompt("Waypoint note", "Manual waypoint")||"Manual waypoint"; addRouteEvent("Waypoint",note); };
@@ -756,7 +796,7 @@ function routeHistoryCard(log){
   const events=log.events||[];
   const sites=events.filter(e=>e.siteName).map(e=>e.siteName);
   const unique=[...new Set(sites)];
-  return `<div class="card routeHistoryCard462"><div class="routeEventTop462"><div><h2>${routeDateLabel(log.startedAt||log.date)}</h2><p>${routeDuration(log.startedAt,log.endedAt)} • ${events.length} waypoint${events.length===1?"":"s"} • ${unique.length} site${unique.length===1?"":"s"}</p></div><span class="pill">${log.endedAt?"Saved":"Active"}</span></div><p>${unique.length?esc(unique.slice(0,4).join(", ")):"No site stops recorded."}</p><div class="grid3 routeHistoryActions462"><button class="ghost" data-copy-route="${esc(log.id)}">Copy</button><button class="ghost" data-download-route="${esc(log.id)}">Download</button><button class="danger" data-delete-route="${esc(log.id)}">Delete</button></div></div>`;
+  return `<div class="card routeHistoryCard462"><div class="routeEventTop462"><div><h2>${routeDateLabel(log.startedAt||log.date)}</h2><p>${routeSummaryLine(log)}</p></div><span class="pill">${log.endedAt?"Saved":"Active"}</span></div><p>${unique.length?esc(unique.slice(0,4).join(", ")):"No site stops recorded."}</p><div class="grid3 routeHistoryActions462"><button class="ghost" data-copy-route="${esc(log.id)}">Copy</button><button class="ghost" data-download-route="${esc(log.id)}">Download</button><button class="danger" data-delete-route="${esc(log.id)}">Delete</button></div>${routeDirectionsLink(log)?`<a class="btn ghost routeMapBtn462" href="${esc(routeDirectionsLink(log))}" target="_blank" rel="noopener">Open Route Map</a>`:""}</div>`;
 }
 
 function attentionQueue(){
@@ -1946,17 +1986,17 @@ function diagnostics(){
 }
 function showChangelog(){
   const notes = [
-    "Added a blinking green Daily Route recording LED on the dashboard.",
-    "The LED appears to the left of the current day/date while Daily Route is active.",
-    "Kept the centered bold day/date layout.",
-    "Preserved Daily Route Log starter tools and saved route reports.",
-    "Preserved Diagnostics stability and bottom menu visibility fixes."
+    "Added estimated route distance to Daily Route reports.",
+    "Added active route Download Report button.",
+    "Added Daily Report Summary card with route duration, site count, and distance.",
+    "Added route map / directions links for active and saved route days.",
+    "Improved saved route day summaries while preserving the recording LED."
   ];
   const overlay=document.createElement("div");
   overlay.className="releaseOverlay";
   overlay.innerHTML=`<div class="releaseSheet" role="dialog" aria-modal="true" aria-label="FireVault release notes">
     <div class="releaseHead"><div><strong>FireVault</strong><span>Build ${BUILD}</span></div><button class="ghost iconBtn" id="closeRelease" aria-label="Close release notes">×</button></div>
-    <div class="releaseBody"><h2>Release Notes</h2><p class="releaseIntro">daily route recording status LED polish.</p><ul>${notes.map(n=>`<li>${esc(n)}</li>`).join("")}</ul></div>
+    <div class="releaseBody"><h2>Release Notes</h2><p class="releaseIntro">daily route report polish with distance and map links.</p><ul>${notes.map(n=>`<li>${esc(n)}</li>`).join("")}</ul></div>
   </div>`;
   document.body.appendChild(overlay);
   const close=()=>overlay.remove();
