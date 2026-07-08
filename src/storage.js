@@ -1,4 +1,4 @@
-export const BUILD = "0.45.6";
+export const BUILD = "0.45.7";
 export const KEY = "firevault_vault_build_030";
 export const ACTIVE_JOB_KEY = "firevault_active_job_modular";
 
@@ -13,6 +13,8 @@ export function saveData(data){ normalize(data); localStorage.setItem(KEY, JSON.
 export function normalize(data){
   data.sites = Array.isArray(data.sites) ? data.sites : [];
   data.resources = Array.isArray(data.resources) ? data.resources : [];
+  data.resourceFolders = Array.isArray(data.resourceFolders) ? data.resourceFolders : ["Manuals","Forms","Links","Codes"];
+  if(!data.resourceFolders.length) data.resourceFolders = ["Manuals","Forms","Links","Codes"];
   data.breadcrumbs = Array.isArray(data.breadcrumbs) ? data.breadcrumbs : [];
   data.settings = data.settings || {};
   data.settings.overlay = data.settings.overlay || {fields:["site","date","time"], alignment:"bottom", fontSize:"medium", textColor:"#ffffff", accentColor:"#ef4444", showLogo:true, showTagline:true};

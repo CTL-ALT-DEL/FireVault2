@@ -12,6 +12,7 @@ let deficiencyFilter = "open";
 let activeJob = loadActiveJob();
 let nearbyState = null;
 let siteSearch = "";
+let libraryFolder = "all";
 let jobTimer = null;
 const QUICK_EVENTS = ["Arrived on site","Opened panel","Panel normal","Trouble active","Ground fault active","Device tested","Customer update","Parts needed"];
 const DEFAULT_CHECKLIST = [
@@ -559,7 +560,7 @@ function home(){
   const dataHealth = data.sites.length ? "Vault Ready" : "Add First Site";
   const now = new Date();
   html(`<div class="screen homeScreen450">
-    <div class="homeHero450"><div><div class="todayDay"><h1>${now.toLocaleDateString([], {weekday:"long"})}</h1></div><p>${fmtDate(now)} • Modular field dashboard</p></div></div>
+    <div class="homeHero450 homeHero457"><div class="homeDateBlock457"><div class="todayDay"><h1>${now.toLocaleDateString([], {weekday:"long"})}</h1></div><p class="homeDateLine457">${fmtDate(now)}</p></div></div>
     <div class="grid3">
       <div class="card tile metricCard" id="sitesCard"><strong>${data.sites.length}</strong><span>Sites</span></div>
       <div class="card tile metricCard taskMetricCard" id="tasksCard"><strong>${openTasks}</strong><span>${taskCounts.overdue ? `${taskCounts.overdue} overdue` : taskCounts.today ? `${taskCounts.today} due today` : "Open Tasks"}</span></div>
@@ -1247,8 +1248,133 @@ function report(){
   const resetSections=document.getElementById("resetReportSections"); if(resetSections) resetSections.onclick=()=>{ reportSectionPrefs=null; try{localStorage.removeItem(REPORT_SECTION_KEY);}catch{}; toast("Report package reset."); report(); };
 }
 
-function library(){ html(`<div class="screen"><div class="row"><h1>Library</h1><button class="primary" id="addBtn">＋</button></div><div class="list grow">${data.resources.length?data.resources.map(r=>`<div class="card docLine siteItem" data-id="${r.id}"><h2>${esc(r.m||"Resource")}</h2><p>${esc(r.n||"")}</p><p>${esc(r.url||"")}</p></div>`).join(""):`<div class="empty">No resources yet.</div>`}</div></div>`); document.getElementById("addBtn").onclick=()=>{mode=null; route("resourceForm");}; document.querySelectorAll(".siteItem").forEach(el=>el.onclick=()=>{mode=el.dataset.id; route("resourceForm");}); }
-function resourceForm(){ const r=mode?data.resources.find(x=>x.id===mode):{}; html(`<div class="screen"><div class="row"><button class="back ghost" id="backBtn">←</button><h1>${mode?"Edit":"Add"} Resource</h1></div><div class="form grow"><div class="card"><label>Manufacturer</label><input id="m" value="${esc(r.m||"")}"><label>Name / Model</label><input id="n" value="${esc(r.n||"")}"><label>URL / Notes</label><textarea id="url">${esc(r.url||"")}</textarea></div><button class="primary" id="saveBtn">Save Resource</button>${mode?`<button class="danger" id="delBtn">Delete Resource</button>`:""}</div></div>`); document.getElementById("backBtn").onclick=()=>route("library"); document.getElementById("saveBtn").onclick=()=>{const obj={m:val("m"),n:val("n"),url:raw("url")}; if(mode) Object.assign(r,obj); else data.resources.unshift({...obj,id:uid()}); save(); route("library");}; const del=document.getElementById("delBtn"); if(del) del.onclick=()=>{data.resources=data.resources.filter(x=>x.id!==mode); save(); route("library");}; }
+
+function ensureLibraryFolders(){
+  const defaults=["Manuals","Forms","Links","Codes"];
+  data.resourceFolders = Array.isArray(data.resourceFolders) ? data.resourceFolders.filter(Boolean) : [];
+  defaults.forEach(f=>{ if(!data.resourceFolders.includes(f)) data.resourceFolders.push(f); });
+  return data.resourceFolders;
+}
+function resourceFolderName(r){
+  return r?.folder || "Unfiled";
+}
+function libraryFolderRows(){
+  ensureLibraryFolders();
+  const base=[
+    {id:"all", label:"All", icon:"▦", count:data.resources.length},
+    {id:"unfiled", label:"Unfiled", icon:"◇", count:data.resources.filter(r=>!r.folder).length}
+  ];
+  return base.concat(data.resourceFolders.map(f=>({id:f, label:f, icon:"▤", count:data.resources.filter(r=>r.folder===f).length})));
+}
+function filteredResources(){
+  if(libraryFolder==="all") return data.resources;
+  if(libraryFolder==="unfiled") return data.resources.filter(r=>!r.folder);
+  return data.resources.filter(r=>r.folder===libraryFolder);
+}
+function canEditLibraryFolder(){
+  return !["all","unfiled"].includes(libraryFolder);
+}
+function addLibraryFolder(){
+  const name=prompt("New folder name");
+  if(!name) return;
+  const clean=name.trim();
+  if(!clean) return;
+  ensureLibraryFolders();
+  if(data.resourceFolders.some(f=>f.toLowerCase()===clean.toLowerCase())){ toast("Folder already exists."); return; }
+  data.resourceFolders.push(clean);
+  libraryFolder=clean;
+  save();
+  library();
+}
+function editLibraryFolder(){
+  if(!canEditLibraryFolder()){ toast("Select a custom folder first."); return; }
+  const next=prompt("Rename folder", libraryFolder);
+  if(!next) return;
+  const clean=next.trim();
+  if(!clean || clean===libraryFolder) return;
+  ensureLibraryFolders();
+  if(data.resourceFolders.some(f=>f.toLowerCase()===clean.toLowerCase())){ toast("Folder already exists."); return; }
+  data.resourceFolders=data.resourceFolders.map(f=>f===libraryFolder?clean:f);
+  data.resources.forEach(r=>{ if(r.folder===libraryFolder) r.folder=clean; });
+  libraryFolder=clean;
+  save();
+  library();
+}
+function deleteLibraryFolder(){
+  if(!canEditLibraryFolder()){ toast("Select a custom folder first."); return; }
+  const count=data.resources.filter(r=>r.folder===libraryFolder).length;
+  if(!confirm(`Delete folder "${libraryFolder}"? ${count} resource${count===1?"":"s"} will move to Unfiled.`)) return;
+  const old=libraryFolder;
+  data.resourceFolders=ensureLibraryFolders().filter(f=>f!==old);
+  data.resources.forEach(r=>{ if(r.folder===old) r.folder=""; });
+  libraryFolder="all";
+  save();
+  library();
+}
+function library(){
+  ensureLibraryFolders();
+  const rows=filteredResources();
+  const folders=libraryFolderRows();
+  const active=folders.find(f=>f.id===libraryFolder) || folders[0];
+  if(!folders.some(f=>f.id===libraryFolder)) libraryFolder="all";
+  html(`<div class="screen libraryScreen457">
+    <div class="libraryHero457 card">
+      <div><h1>Library</h1><p>Manuals, links, drawings, forms, and field references.</p></div>
+      <button class="primary" id="addBtn">＋ Resource</button>
+    </div>
+    <div class="libraryFolderBar457">
+      <button class="ghost smallBtn" id="addFolderBtn">＋ Folder</button>
+      <button class="ghost smallBtn" id="editFolderBtn" ${canEditLibraryFolder()?"":"disabled"}>Edit</button>
+      <button class="ghost smallBtn dangerLite457" id="deleteFolderBtn" ${canEditLibraryFolder()?"":"disabled"}>Delete</button>
+    </div>
+    <div class="libraryTabs457" aria-label="Library folders">
+      ${folders.map(f=>`<button class="libraryTab457 ${f.id===libraryFolder?"active":""}" data-folder="${esc(f.id)}"><span>${f.icon}</span><strong>${esc(f.label)}</strong><em>${f.count}</em></button>`).join("")}
+    </div>
+    <div class="libraryFolderTitle457"><strong>${esc(active?.label || "All")}</strong><span>${rows.length} resource${rows.length===1?"":"s"}</span></div>
+    <div class="list grow libraryList457">
+      ${rows.length?rows.map(r=>`<div class="card libraryResource457 siteItem" data-id="${esc(r.id)}"><div><h2>${esc(r.n||r.m||"Resource")}</h2><p>${esc(r.m||"Manufacturer not entered")} • ${esc(resourceFolderName(r))}</p><p>${esc(r.url||"No URL or notes entered.")}</p></div><span class="libraryEditPill457">Edit</span></div>`).join(""):`<div class="empty">No resources in this folder yet.</div>`}
+    </div>
+  </div>`);
+  document.getElementById("addBtn").onclick=()=>{mode=null; route("resourceForm");};
+  document.getElementById("addFolderBtn").onclick=addLibraryFolder;
+  document.getElementById("editFolderBtn").onclick=editLibraryFolder;
+  document.getElementById("deleteFolderBtn").onclick=deleteLibraryFolder;
+  document.querySelectorAll(".libraryTab457").forEach(el=>el.onclick=()=>{ libraryFolder=el.dataset.folder; library(); });
+  document.querySelectorAll(".siteItem").forEach(el=>el.onclick=()=>{mode=el.dataset.id; route("resourceForm");});
+}
+function resourceForm(){
+  ensureLibraryFolders();
+  const r=mode?data.resources.find(x=>x.id===mode):{};
+  const selectedFolder = mode ? (r.folder || "") : (canEditLibraryFolder() ? libraryFolder : "");
+  html(`<div class="screen resourceForm457">
+    <div class="row"><button class="back ghost" id="backBtn">←</button><h1>${mode?"Edit":"Add"} Resource</h1></div>
+    <div class="form grow">
+      <div class="card resourceEditCard457">
+        <label>Folder</label>
+        <select id="folder"><option value="">Unfiled</option>${ensureLibraryFolders().map(f=>`<option value="${esc(f)}" ${selectedFolder===f?"selected":""}>${esc(f)}</option>`).join("")}</select>
+        <label>Manufacturer / Source</label>
+        <input id="m" value="${esc(r.m||"")}" placeholder="Notifier, Silent Knight, NFPA, customer portal...">
+        <label>Name / Model / Title</label>
+        <input id="n" value="${esc(r.n||"")}" placeholder="Manual, drawing, form, link title...">
+        <label>URL / Notes</label>
+        <textarea id="url" placeholder="Paste link or add field notes">${esc(r.url||"")}</textarea>
+      </div>
+      <button class="primary" id="saveBtn">Save Resource</button>
+      ${mode?`<button class="danger" id="delBtn">Delete Resource</button>`:""}
+    </div>
+  </div>`);
+  document.getElementById("backBtn").onclick=()=>route("library");
+  document.getElementById("saveBtn").onclick=()=>{
+    const obj={folder:val("folder"),m:val("m"),n:val("n"),url:raw("url")};
+    if(mode) Object.assign(r,obj);
+    else data.resources.unshift({...obj,id:uid()});
+    if(obj.folder) libraryFolder=obj.folder;
+    save();
+    route("library");
+  };
+  const del=document.getElementById("delBtn");
+  if(del) del.onclick=()=>{data.resources=data.resources.filter(x=>x.id!==mode); save(); route("library");};
+}
 
 function startJob(){
   const s=site();
