@@ -676,7 +676,7 @@ function home(){
   const dataHealth = data.sites.length ? "Vault Ready" : "Add First Site";
   const now = new Date();
   html(`<div class="screen homeScreen450">
-    <div class="homeHero450 homeHero457"><div class="homeDateBlock457"><div class="todayDay"><h1>${now.toLocaleDateString([], {weekday:"long"})}</h1></div><p class="homeDateLine457">${fmtDate(now)}</p></div></div>
+    <div class="homeHero450 homeHero457 homeHero463"><div class="homeDateWrap463">${activeRoute?`<span class="routeLed463" aria-label="Daily route recording"></span>`:""}<div class="homeDateBlock457"><div class="todayDay"><h1>${now.toLocaleDateString([], {weekday:"long"})}</h1></div><p class="homeDateLine457">${fmtDate(now)}</p></div></div></div>
     <div class="grid3">
       <div class="card tile metricCard" id="sitesCard"><strong>${data.sites.length}</strong><span>Sites</span></div>
       <div class="card tile metricCard taskMetricCard" id="tasksCard"><strong>${openTasks}</strong><span>${taskCounts.overdue ? `${taskCounts.overdue} overdue` : taskCounts.today ? `${taskCounts.today} due today` : "Open Tasks"}</span></div>
@@ -1946,17 +1946,17 @@ function diagnostics(){
 }
 function showChangelog(){
   const notes = [
-    "Added Daily Route Log starter workflow.",
-    "Added Start Day / End Day route sessions.",
-    "Added manual waypoint, break/fuel/parts, arrived site, and left site route buttons.",
-    "Added saved route day history with copy, download, and delete actions.",
-    "Route reports include ordered stops, timestamps, GPS coordinates, nearest saved site, and map links."
+    "Added a blinking green Daily Route recording LED on the dashboard.",
+    "The LED appears to the left of the current day/date while Daily Route is active.",
+    "Kept the centered bold day/date layout.",
+    "Preserved Daily Route Log starter tools and saved route reports.",
+    "Preserved Diagnostics stability and bottom menu visibility fixes."
   ];
   const overlay=document.createElement("div");
   overlay.className="releaseOverlay";
   overlay.innerHTML=`<div class="releaseSheet" role="dialog" aria-modal="true" aria-label="FireVault release notes">
     <div class="releaseHead"><div><strong>FireVault</strong><span>Build ${BUILD}</span></div><button class="ghost iconBtn" id="closeRelease" aria-label="Close release notes">×</button></div>
-    <div class="releaseBody"><h2>Release Notes</h2><p class="releaseIntro">daily route log starter and waypoint report tools.</p><ul>${notes.map(n=>`<li>${esc(n)}</li>`).join("")}</ul></div>
+    <div class="releaseBody"><h2>Release Notes</h2><p class="releaseIntro">daily route recording status LED polish.</p><ul>${notes.map(n=>`<li>${esc(n)}</li>`).join("")}</ul></div>
   </div>`;
   document.body.appendChild(overlay);
   const close=()=>overlay.remove();

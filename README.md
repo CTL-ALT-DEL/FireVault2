@@ -1,36 +1,18 @@
-# FireVault Build 0.46.2
+# FireVault Build 0.46.3
 
-Build 0.46.2 is the Daily Route Log Starter build.
+Build 0.46.3 is a Daily Route recording status polish build.
 
 ## What changed
 
-- Visible app version advanced to 0.46.2.
-- Added **Daily Route** tile on the main dashboard.
-- Added **Start Day** and **End Day / Save** route sessions.
-- Added active route actions:
-  - Arrived Site
-  - Left Site
-  - Manual Waypoint
-  - Break / Fuel / Parts
-- Added GPS capture for route waypoints while the app is open.
-- Added saved daily route history.
-- Added copy / download / delete actions for saved route days.
-- Daily route reports include:
-  - Date
-  - Start / end time
-  - Duration
-  - Ordered stops
-  - Site names
-  - GPS coordinates
-  - Nearest saved site when available
-  - Apple Maps or Google Maps links
-- Added route day count to Diagnostics.
-- Preserved the 0.46.1 Diagnostics bottom menu visibility fix.
-
-Important iPhone note: browser/PWA background GPS is limited. This starter uses foreground route logging while FireVault is open.
+- Visible app version advanced to 0.46.3.
+- Added a blinking green LED to the left of the current day/date when Daily Route is actively recording.
+- The LED only appears while an active Daily Route session is running.
+- Kept the current day/date centered and bold.
+- Preserved Daily Route Log starter features from 0.46.2.
+- Preserved Diagnostics stability and bottom menu visibility fixes.
 
 Suggested commit message:
 
 ```text
-Build 0.46.2 daily route log starter
+Build 0.46.3 daily route recording LED
 ```
