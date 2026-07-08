@@ -1056,7 +1056,7 @@ function home(){
     ${appMode()==="simple"?`<div class="card simpleViewNotice472 simpleViewNotice473"><div><h2>Simple View Active</h2><p>FireVault is keeping the dashboard clean. Current preset: <strong>${esc(currentPresetName474())}</strong>.</p></div><div class="simpleNoticeActions473"><button class="ghost smallBtn" id="manageViewBtn472">Manage View</button><button class="primary smallBtn" id="advancedNowBtn473">Advanced</button></div></div>${simpleToolsMarkup473()}`:""}
     ${activeRoute ? `<div class="card activeRouteMini468 ${activeRoute.paused?"activeRoutePaused470":""}"><div class="activeRouteHead468"><div><h2><span class="${activeRoute.paused?"routeLed470 routeLedPaused470":"routeLed463"} miniLed468"></span>${activeRoute.paused?"Daily Route Paused":"Daily Route Recording"}</h2><p>${esc(routeSummaryLine(activeRoute))}</p></div><button class="primary smallBtn" id="openRouteMiniBtn">Open</button></div><div class="activeRouteStats468"><div><strong>${(activeRoute.events||[]).length}</strong><span>Waypoints</span></div><div><strong>${routeDuration(activeRoute.startedAt)}</strong><span>Time</span></div><div><strong>${esc(routeDistanceLabel(activeRoute))}</strong><span>Distance</span></div></div><div class="activeRouteActions468"><button class="ghost smallBtn" id="homeRoutePointBtn" ${activeRoute.paused?"disabled":""}>Waypoint</button><button class="ghost smallBtn" id="homeRouteNearestBtn" ${activeRoute.paused?"disabled":""}>Nearest</button><button class="${activeRoute.paused?"primary":"ghost"} smallBtn" id="homeRoutePauseBtn">${activeRoute.paused?"Resume":"Pause"}</button><button class="danger smallBtn" id="homeRouteEndBtn">End / Save</button></div></div>` : ""}
     ${activeJob ? `<div class="card activeJobMini"><div class="row"><div><h2>Service Call Active</h2><p>${esc(activeJob.siteName)} • <span id="jobElapsed">${elapsedText(activeJob.startedAt)}</span></p></div><button class="primary" id="resumeJobBtn">Open</button></div></div>` : ""}
-    <div class="card grow homeStatus450"><div class="homeStatusHead450"><h2>Stability Checkpoint</h2><span>${dataHealth}</span></div><div class="homeStatusGrid450"><div><strong>${data.sites.length}</strong><span>Sites</span></div><div><strong>${visits.length}</strong><span>Visits</span></div><div><strong>${gpsSites}</strong><span>GPS Saved</span></div></div><p>Current build focuses on app polish, visual consistency, and safer update habits.</p><p class="fieldNote">Last backup export: ${esc(lastExport)}</p></div>
+    <div class="buildRevisionSpacer475" aria-hidden="true"></div>
   </div>`);
   document.getElementById("sitesCard").onclick=()=>route("sites");
   document.getElementById("tasksCard").onclick=()=>{selectedSiteId=null; route("tasks");};
@@ -2380,11 +2380,11 @@ function diagnostics(){
 }
 function showChangelog(){
   const notes = [
-    "Added Quick View Presets for Simple View / Feature Visibility.",
-    "Added Minimal Daily, Route Logger, Service Tech, Inspector, and Power Mode presets.",
-    "Each preset changes app mode and visible feature toggles in one tap.",
-    "Simple View now shows the current preset name on the dashboard.",
-    "Preserved the More Tools drawer and all Daily Route features."
+    "Removed the dashboard Stability Checkpoint section for a cleaner Simple View.",
+    "Made the top Build revision button glow green as the app health indicator.",
+    "The Build button still opens release notes when tapped.",
+    "Kept App Health and repair details available inside Diagnostics.",
+    "Preserved Quick View Presets, Feature Visibility, and Daily Route tools."
   ];
   const overlay=document.createElement("div");
   overlay.className="releaseOverlay";

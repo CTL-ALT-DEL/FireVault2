@@ -1,25 +1,18 @@
-# FireVault Build 0.47.4
+# FireVault Build 0.47.5
 
-Build 0.47.4 is a Simple View setup polish build.
+Build 0.47.5 is a cleaner dashboard / green build revision status build.
 
 ## What changed
 
-- Visible app version advanced to 0.47.4.
-- Added **Quick View Presets** inside Settings → Simple View.
-- Added one-tap presets:
-  - Minimal Daily
-  - Route Logger
-  - Service Tech
-  - Inspector
-  - Power Mode
-- Presets update the app mode and feature visibility toggles together.
-- Simple View dashboard now shows the current preset name.
-- Kept manual feature toggles for fine-tuning after a preset is applied.
-- Preserved the More Tools drawer from 0.47.3.
-- Preserved Daily Route, saved route search/review, pause/resume, mileage, CSV export, and dashboard recording LED.
+- Visible app version advanced to 0.47.5.
+- Removed the dashboard **Stability Checkpoint** section.
+- Made the top **Build revision** button glow green so it acts as the quick app-health indicator.
+- Kept the Build button clickable for release notes / revision history.
+- Kept deeper App Health and repair details available inside Diagnostics.
+- Preserved Simple View, Quick View Presets, Feature Visibility, More Tools, and Daily Route features.
 
 Suggested commit message:
 
 ```text
-Build 0.47.4 quick view presets simple setup polish
+Build 0.47.5 green build revision status cleaner dashboard
 ```
