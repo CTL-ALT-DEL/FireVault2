@@ -1,26 +1,33 @@
-# FireVault Build 0.47.1
+# FireVault Build 0.47.2
 
-Build 0.47.1 is a saved Daily Route review and search polish build.
+Build 0.47.2 is the Simple View / Feature Visibility build.
 
 ## What changed
 
-- Visible app version advanced to 0.47.1.
-- Added search for saved Daily Route history.
-- Search matches saved routes by date, site, vehicle, notes, waypoint label, event type, address, and nearest-site text.
-- Added expandable **Review** panels on saved route day cards.
-- Review panels show:
-  - Total route points
-  - Site count
-  - Estimated GPS distance
-  - Odometer miles when entered
-  - Stop sequence
-  - Compact waypoint timeline
-  - Map links for individual points
-- Improved saved route day cards with clearer stop sequence display.
-- Preserved pause/resume status, vehicle mileage, CSV export, customer summary, route dashboard controls, and blinking route LED.
+- Visible app version advanced to 0.47.2.
+- Added **Simple View / Feature Visibility** in Settings.
+- Added app display modes:
+  - Simple View
+  - Advanced View
+  - Technician Power Mode
+- Added feature toggles for:
+  - Daily Route
+  - Advanced GPS
+  - Attention Queue
+  - Library
+  - Reports
+  - Equipment Vault
+  - Route Review Panels
+  - CSV / Export Tools
+  - Diagnostics
+  - Backup / Repair
+- Simple View now hides nonessential dashboard tiles unless enabled.
+- Library bottom-tab can be hidden in Simple View.
+- Added a small Simple View dashboard notice with quick access to Manage View.
+- Preserved saved Daily Route review/search, pause/resume, vehicle mileage, CSV export, and the recording LED.
 
 Suggested commit message:
 
 ```text
-Build 0.47.1 saved daily route review and search
+Build 0.47.2 simple view feature visibility controls
 ```

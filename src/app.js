@@ -44,6 +44,40 @@ const themePresets = {
   "amoled-black": {label:"AMOLED Black", accentColor:"#ef4444"}
 };
 
+const FEATURE_DEFAULTS = {dailyRoute:true, library:false, reports:false, equipment:false, diagnostics:false, advancedGps:false, attention:false, routeReview:false, csvExports:false, backupRepair:false};
+const FEATURE_LABELS = [
+  ["dailyRoute","Daily Route","Route day logging, active route card, waypoint tools, and saved route days."],
+  ["advancedGps","Advanced GPS","GPS / Maps dashboard tools, nearby site detection, and GPS capture cards."],
+  ["attention","Attention Queue","Priority review shortcut for open tasks, deficiencies, and site health warnings."],
+  ["library","Library","Global library tab for manuals, links, forms, codes, and folders."],
+  ["reports","Report Center","Site report tools, report delivery actions, and generated report packages."],
+  ["equipment","Equipment Vault","Panel, communicator, power supply, and equipment inventory screens."],
+  ["routeReview","Route Review Panels","Expandable saved Daily Route review panels and compact waypoint timelines."],
+  ["csvExports","CSV / Export Tools","CSV route exports and advanced export buttons."],
+  ["diagnostics","Diagnostics","Stability checkpoint, repair tools, and technical vault health details."],
+  ["backupRepair","Backup / Repair","Backup center, import/export, repair, and danger-zone tools."]
+];
+function appMode(){ return data.settings.app?.viewMode || "simple"; }
+function visibility(){ data.settings.visibility = {...FEATURE_DEFAULTS, ...(data.settings.visibility || {})}; return data.settings.visibility; }
+function featureOn(key){
+  const mode=appMode();
+  const v=visibility();
+  if(mode === "power") return true;
+  if(mode === "advanced") return v[key] !== false;
+  return v[key] === true;
+}
+function featureClass(key, extra=""){ return `${extra||""}${featureOn(key)?"":" featureHidden472"}`.trim(); }
+function hiddenIf(condition){ return condition ? " featureHidden472" : ""; }
+function applyFeatureVisibility(){
+  const mode=appMode();
+  document.body.classList.toggle("view-simple472", mode === "simple");
+  document.body.classList.toggle("view-advanced472", mode === "advanced");
+  document.body.classList.toggle("view-power472", mode === "power");
+  const navLibrary=document.getElementById("nav-library");
+  if(navLibrary) navLibrary.style.display = featureOn("library") ? "" : "none";
+}
+function setViewMode(mode){ data.settings.app={...(data.settings.app||{}),viewMode:mode}; save(); toast(`${mode === "power" ? "Technician Power Mode" : mode === "advanced" ? "Advanced View" : "Simple View"} enabled.`); route("home"); }
+
 applyTheme();
 document.getElementById("buildButton").addEventListener("click", showChangelog);
 document.querySelectorAll("nav button").forEach(btn => btn.addEventListener("click", () => route(btn.dataset.route)));
@@ -55,7 +89,15 @@ function site(){ return data.sites.find(s => s.id === selectedSiteId); }
 function val(id){ return document.getElementById(id)?.value?.trim() || ""; }
 function raw(id){ return document.getElementById(id)?.value || ""; }
 function checked(id){ return !!document.getElementById(id)?.checked; }
-function route(v){ view = v; mode = null; render(); }
+function route(v){
+  if(v === "library" && !featureOn("library")){ toast("Library is hidden in Simple View. Turn it on in Settings → Simple View."); v="home"; }
+  if(v === "diagnostics" && !featureOn("diagnostics")){ toast("Diagnostics is hidden in Simple View. Turn it on in Settings → Simple View."); v="settings"; }
+  if((v === "report") && !featureOn("reports")){ toast("Reports are hidden in Simple View."); v="siteDetail"; }
+  if(["equipmentList","equipmentForm"].includes(v) && !featureOn("equipment")){ toast("Equipment Vault is hidden in Simple View."); v="siteDetail"; }
+  if((v === "nearbySites") && !featureOn("advancedGps")){ toast("Advanced GPS is hidden in Simple View."); v="home"; }
+  if((v === "routeLog") && !activeRoute && !featureOn("dailyRoute")){ toast("Daily Route is hidden in Simple View."); v="home"; }
+  view = v; mode = null; render();
+}
 function html(content){ appEl.innerHTML = content; }
 function toast(msg){ const t=document.createElement("div"); t.className="toast"; t.textContent=msg; document.body.appendChild(t); setTimeout(()=>t.remove(),1800); }
 function haptic(ms=12){
@@ -411,6 +453,7 @@ function applyTheme(){
   if(t.accentColor) body.style.setProperty("--accent", t.accentColor);
   const meta = document.querySelector('meta[name="theme-color"]');
   if(meta) meta.setAttribute("content", t.accentColor || "#101216");
+  applyFeatureVisibility();
 }
 
 function loadActiveJob(){ try{ const raw = localStorage.getItem(ACTIVE_JOB_KEY); return raw ? JSON.parse(raw) : null; } catch{ return null; } }
@@ -909,6 +952,7 @@ function render(){
     const routes = {home, routeLog, sites, nearbySites, attention:attentionQueue, siteDetail, visits, visitDetail, checklist, siteForm, contactsList, contactForm, siteDocs, siteDocForm, equipmentList, equipmentForm, tasks, taskForm, deficiencies, deficiencyForm, report, library, resourceForm, jobMode, settings, diagnostics};
     (routes[view] || home)();
     view === "jobMode" ? startJobTimer() : stopJobTimer();
+    applyFeatureVisibility();
     setActiveNav();
   }catch(err){ showError(err); }
 }
@@ -938,11 +982,12 @@ function home(){
     </div>
     <div class="grid2 homeActionGrid">
       <button class="primary tile" id="addSiteBtn"><strong>＋ Add Site</strong><span>Create customer vault</span></button>
-      <button class="ghost tile gpsHomeTile" id="gpsHomeBtn"><strong>⌖ GPS / Maps</strong><span>${gpsSites} site${gpsSites===1?"":"s"} with GPS</span></button>
-      <button class="ghost tile nearbyHomeTile" id="nearbyHomeBtn"><strong>◎ Nearby Sites</strong><span>Detect saved sites near me</span></button>
-      <button class="ghost tile attentionHomeTile" id="attentionHomeBtn"><strong>⚠ Attention Queue</strong><span>${attentionList.length ? `${attentionList.length} site${attentionList.length===1?"":"s"} to review` : "No priority issues"}</span></button>
-      <button class="ghost tile routeHomeTile462" id="routeLogBtn"><strong>◇ Daily Route</strong><span>${activeRoute ? `${(activeRoute.events||[]).length} active waypoints` : `${(data.routeLogs||[]).length} saved route days`}</span></button>
+      <button class="ghost tile gpsHomeTile ${featureOn("advancedGps")?"":"featureHidden472"}" id="gpsHomeBtn"><strong>⌖ GPS / Maps</strong><span>${gpsSites} site${gpsSites===1?"":"s"} with GPS</span></button>
+      <button class="ghost tile nearbyHomeTile ${featureOn("advancedGps")?"":"featureHidden472"}" id="nearbyHomeBtn"><strong>◎ Nearby Sites</strong><span>Detect saved sites near me</span></button>
+      <button class="ghost tile attentionHomeTile ${featureOn("attention")?"":"featureHidden472"}" id="attentionHomeBtn"><strong>⚠ Attention Queue</strong><span>${attentionList.length ? `${attentionList.length} site${attentionList.length===1?"":"s"} to review` : "No priority issues"}</span></button>
+      <button class="ghost tile routeHomeTile462 ${(featureOn("dailyRoute")||activeRoute)?"":"featureHidden472"}" id="routeLogBtn"><strong>◇ Daily Route</strong><span>${activeRoute ? `${(activeRoute.events||[]).length} active waypoints` : `${(data.routeLogs||[]).length} saved route days`}</span></button>
     </div>
+    ${appMode()==="simple"?`<div class="card simpleViewNotice472"><div><h2>Simple View</h2><p>Advanced FireVault tools are hidden until you need them.</p></div><button class="ghost smallBtn" id="manageViewBtn472">Manage View</button></div>`:""}
     ${activeRoute ? `<div class="card activeRouteMini468 ${activeRoute.paused?"activeRoutePaused470":""}"><div class="activeRouteHead468"><div><h2><span class="${activeRoute.paused?"routeLed470 routeLedPaused470":"routeLed463"} miniLed468"></span>${activeRoute.paused?"Daily Route Paused":"Daily Route Recording"}</h2><p>${esc(routeSummaryLine(activeRoute))}</p></div><button class="primary smallBtn" id="openRouteMiniBtn">Open</button></div><div class="activeRouteStats468"><div><strong>${(activeRoute.events||[]).length}</strong><span>Waypoints</span></div><div><strong>${routeDuration(activeRoute.startedAt)}</strong><span>Time</span></div><div><strong>${esc(routeDistanceLabel(activeRoute))}</strong><span>Distance</span></div></div><div class="activeRouteActions468"><button class="ghost smallBtn" id="homeRoutePointBtn" ${activeRoute.paused?"disabled":""}>Waypoint</button><button class="ghost smallBtn" id="homeRouteNearestBtn" ${activeRoute.paused?"disabled":""}>Nearest</button><button class="${activeRoute.paused?"primary":"ghost"} smallBtn" id="homeRoutePauseBtn">${activeRoute.paused?"Resume":"Pause"}</button><button class="danger smallBtn" id="homeRouteEndBtn">End / Save</button></div></div>` : ""}
     ${activeJob ? `<div class="card activeJobMini"><div class="row"><div><h2>Service Call Active</h2><p>${esc(activeJob.siteName)} • <span id="jobElapsed">${elapsedText(activeJob.startedAt)}</span></p></div><button class="primary" id="resumeJobBtn">Open</button></div></div>` : ""}
     <div class="card grow homeStatus450"><div class="homeStatusHead450"><h2>Stability Checkpoint</h2><span>${dataHealth}</span></div><div class="homeStatusGrid450"><div><strong>${data.sites.length}</strong><span>Sites</span></div><div><strong>${visits.length}</strong><span>Visits</span></div><div><strong>${gpsSites}</strong><span>GPS Saved</span></div></div><p>Current build focuses on app polish, visual consistency, and safer update habits.</p><p class="fieldNote">Last backup export: ${esc(lastExport)}</p></div>
@@ -958,6 +1003,7 @@ function home(){
   document.getElementById("nearbyHomeBtn").onclick=detectNearbySites;
   document.getElementById("attentionHomeBtn").onclick=()=>route("attention");
   document.getElementById("routeLogBtn").onclick=()=>route("routeLog");
+  const manageView=document.getElementById("manageViewBtn472"); if(manageView) manageView.onclick=()=>{settingsTab="visibility"; mode="settingsDetail"; route("settings");};
   const openRouteMini=document.getElementById("openRouteMiniBtn"); if(openRouteMini) openRouteMini.onclick=()=>route("routeLog");
   const homeRoutePoint=document.getElementById("homeRoutePointBtn"); if(homeRoutePoint) homeRoutePoint.onclick=()=>{ const note=prompt("Waypoint note", "Manual waypoint")||"Manual waypoint"; addRouteEvent("Waypoint", note); };
   const homeRouteNearest=document.getElementById("homeRouteNearestBtn"); if(homeRouteNearest) homeRouteNearest.onclick=checkRouteNearestSite;
@@ -984,11 +1030,11 @@ function routeLog(){
       ${active?`<button class="danger" id="endRouteBtn">End Day / Save</button><button class="${paused?"primary":"ghost"}" id="${paused?"resumeRouteBtn":"pauseRouteBtn"}">${paused?"Resume Route":"Pause Route"}</button>`:`<button class="primary" id="startRouteBtn">Start Day</button>`}
       <button class="ghost" id="copyRouteBtn" ${active||saved[0]?"":"disabled"}>Copy Report</button>
       <button class="ghost" id="downloadRouteBtn" ${active||saved[0]?"":"disabled"}>Download Report</button>
-      <button class="ghost" id="csvRouteBtn" ${active||saved[0]?"":"disabled"}>CSV Export</button>
+      <button class="ghost ${featureOn("csvExports")?"":"featureHidden472"}" id="csvRouteBtn" ${active||saved[0]?"":"disabled"}>CSV Export</button>
       <button class="ghost" id="summaryRouteBtn" ${active||saved[0]?"":"disabled"}>Customer Summary</button>
       ${active?`<button class="ghost" id="undoRouteBtn" ${events.length?"":"disabled"}>Undo Last Point</button>`:""}
     </div>
-    ${(active||saved[0])?`<div class="card routeReportPreview464 routeReportPreview467"><div><h2>Daily Report Summary</h2><p>${esc(routeSummaryLine(active||saved[0]))}</p><p class="fieldNote">Export as TXT, CSV, or copy a cleaner customer summary.</p></div>${routeDirectionsLink(active||saved[0])?`<a class="btn ghost" href="${esc(routeDirectionsLink(active||saved[0]))}" target="_blank" rel="noopener">Open Route Map</a>`:""}</div>`:""}
+    ${(active||saved[0])?`<div class="card routeReportPreview464 routeReportPreview467"><div><h2>Daily Report Summary</h2><p>${esc(routeSummaryLine(active||saved[0]))}</p><p class="fieldNote">Export as TXT${featureOn("csvExports")?", CSV":""}, or copy a cleaner customer summary.</p></div>${routeDirectionsLink(active||saved[0])?`<a class="btn ghost" href="${esc(routeDirectionsLink(active||saved[0]))}" target="_blank" rel="noopener">Open Route Map</a>`:""}</div>`:""}
     ${active?`<div class="card routeDetails469"><div class="routeDetailsHead469"><div><h2>Vehicle / Mileage</h2><p>${esc(routeOdometerLabel(active))}</p></div><button class="primary smallBtn" id="saveRouteDetailsBtn">Save Details</button></div><div class="routeOdoGrid469"><div><label>Vehicle</label><input id="routeVehicle" value="${esc(active.vehicle||"")}" placeholder="Truck / van / unit #"></div><div><label>Start Odometer</label><input id="routeStartOdo" type="number" inputmode="decimal" step="0.1" value="${esc(active.startOdometer??"")}" placeholder="Optional"></div><div><label>End Odometer</label><input id="routeEndOdo" type="number" inputmode="decimal" step="0.1" value="${esc(active.endOdometer??"")}" placeholder="Optional"></div></div><label>Day Notes</label><textarea id="routeDayNotes" placeholder="General notes for today’s route report...">${esc(active.dayNotes||"")}</textarea></div>`:""}
     ${active?`<div class="card routeQuick462 ${paused?"routeQuickPaused470":""}">
       <div class="routeSitePick462"><label>Site Stop</label><select id="routeSiteSelect"><option value="">Select saved site...</option>${siteOptions}</select></div>
@@ -1070,7 +1116,7 @@ function routeHistoryCard(log){
   const events=log.events||[];
   const unique=routeSiteSequence(log);
   const reviewOpen=routeReviewId===log.id;
-  return `<div class="card routeHistoryCard462 routeHistoryCard471 ${reviewOpen?"openReview471":""}"><div class="routeEventTop462"><div><h2>${routeDateLabel(log.startedAt||log.date)}</h2><p>${routeSummaryLine(log)}</p></div><span class="pill">${log.endedAt?"Saved":"Active"}</span></div><p>${unique.length?esc(unique.slice(0,5).join(" → ")):"No site stops recorded."}</p>${routeOdometerMiles(log)!==null?`<p class="fieldNote">${esc(routeOdometerLabel(log))}${log.vehicle?` • ${esc(log.vehicle)}`:""}</p>`:""}<div class="routeHistoryActions462 routeHistoryActions467 routeHistoryActions471"><button class="primary" data-review-route="${esc(log.id)}">${reviewOpen?"Hide":"Review"}</button><button class="ghost" data-copy-route="${esc(log.id)}">Copy</button><button class="ghost" data-download-route="${esc(log.id)}">TXT</button><button class="ghost" data-csv-route="${esc(log.id)}">CSV</button><button class="ghost" data-summary-route="${esc(log.id)}">Summary</button><button class="danger" data-delete-route="${esc(log.id)}">Delete</button></div>${routeDirectionsLink(log)?`<a class="btn ghost routeMapBtn462" href="${esc(routeDirectionsLink(log))}" target="_blank" rel="noopener">Open Route Map</a>`:""}${reviewOpen?routeReviewPanel(log):""}</div>`;
+  return `<div class="card routeHistoryCard462 routeHistoryCard471 ${reviewOpen?"openReview471":""}"><div class="routeEventTop462"><div><h2>${routeDateLabel(log.startedAt||log.date)}</h2><p>${routeSummaryLine(log)}</p></div><span class="pill">${log.endedAt?"Saved":"Active"}</span></div><p>${unique.length?esc(unique.slice(0,5).join(" → ")):"No site stops recorded."}</p>${routeOdometerMiles(log)!==null?`<p class="fieldNote">${esc(routeOdometerLabel(log))}${log.vehicle?` • ${esc(log.vehicle)}`:""}</p>`:""}<div class="routeHistoryActions462 routeHistoryActions467 routeHistoryActions471"><button class="primary ${featureOn("routeReview")?"":"featureHidden472"}" data-review-route="${esc(log.id)}">${reviewOpen?"Hide":"Review"}</button><button class="ghost" data-copy-route="${esc(log.id)}">Copy</button><button class="ghost" data-download-route="${esc(log.id)}">TXT</button><button class="ghost ${featureOn("csvExports")?"":"featureHidden472"}" data-csv-route="${esc(log.id)}">CSV</button><button class="ghost" data-summary-route="${esc(log.id)}">Summary</button><button class="danger" data-delete-route="${esc(log.id)}">Delete</button></div>${routeDirectionsLink(log)?`<a class="btn ghost routeMapBtn462" href="${esc(routeDirectionsLink(log))}" target="_blank" rel="noopener">Open Route Map</a>`:""}${(reviewOpen&&featureOn("routeReview"))?routeReviewPanel(log):""}</div>`;
 }
 
 function attentionQueue(){
@@ -1149,19 +1195,19 @@ function siteDetail(){
     <div class="card snapshotCard"><div><h2>Field Snapshot</h2><p>One-tap summary with address, GPS, contacts/access, open tasks, deficiencies, equipment attention, documents, and notes.</p></div><button class="primary smallBtn" id="copySnapshotCardBtn">Share / Copy</button></div>
     <div class="grid2 siteActionGrid446">
       <button class="primary tile" id="jobBtn"><strong>Start Job</strong><span>Live service call</span></button>
-      <button class="ghost tile" id="reportBtn"><strong>Report</strong><span>Copy/download</span></button>
+      <button class="ghost tile ${featureOn("reports")?"":"featureHidden472"}" id="reportBtn"><strong>Report</strong><span>Copy/download</span></button>
       <button class="ghost tile snapshotTile" id="snapshotBtn"><strong>Snapshot</strong><span>Share field summary</span></button>
       <button class="ghost tile checklistTile" id="checklistBtn"><strong>${checklistItems.length ? checkStats.progress + "%" : "New"}</strong><span>Checklist</span></button>
       <button class="ghost tile" id="taskBtn"><strong>${open}</strong><span>Open Tasks</span></button>
       <button class="ghost tile" id="defBtn"><strong>${def}</strong><span>Deficiencies</span></button>
-      <button class="ghost tile" id="equipmentBtn"><strong>${equipment.length}</strong><span>Equipment</span></button>
+      <button class="ghost tile ${featureOn("equipment")?"":"featureHidden472"}" id="equipmentBtn"><strong>${equipment.length}</strong><span>Equipment</span></button>
       <button class="ghost tile" id="contactsBtn"><strong>${contacts.length}</strong><span>Contacts / Access</span></button>
       <button class="ghost tile" id="docsBtn"><strong>${docs.length}</strong><span>Documents / Links</span></button>
     </div>
-    <div class="card gpsCard"><div class="row"><div><h2>GPS / Maps</h2><p>${esc(gpsLine(s))}</p></div>${data.settings.gps?.enabled===false?"":`<button id="captureGpsBtn" class="primary smallBtn">Capture GPS</button>`}</div><div class="mapActions"><button id="appleBtn" class="ghost">Apple Maps</button><button id="googleBtn" class="ghost">Google Maps</button></div></div>
+    <div class="card gpsCard ${featureOn("advancedGps")?"":"featureHidden472"}"><div class="row"><div><h2>GPS / Maps</h2><p>${esc(gpsLine(s))}</p></div>${data.settings.gps?.enabled===false?"":`<button id="captureGpsBtn" class="primary smallBtn">Capture GPS</button>`}</div><div class="mapActions"><button id="appleBtn" class="ghost">Apple Maps</button><button id="googleBtn" class="ghost">Google Maps</button></div></div>
     <div class="card checklistMiniCard"><div class="row"><div><h2>Inspection Checklist</h2><p>${checklistItems.length ? `${checkStats.progress}% complete • ${checkStats.issue} issue${checkStats.issue===1?"":"s"} • ${checkStats.pending} pending • ${checklistLastSavedLine(s)}` : "Default fire alarm field checklist ready to start."}</p></div><button class="ghost smallBtn" id="manageChecklistBtn">Open</button></div><div class="checkMiniBar"><span style="width:${checkStats.progress}%"></span></div></div>
     <div class="card contactsMiniCard"><div class="row"><div><h2>Contacts & Access</h2><p>${contacts.length ? `${contacts.length} saved contact${contacts.length===1?"":"s"}` : "Customer, access, gate, and after-hours details."}</p></div><button class="ghost smallBtn" id="manageContactsBtn">Manage</button></div>${contacts.length?contacts.slice(0,3).map(c=>`<button class="contactLine" data-contact="${esc(c.id)}"><strong>${esc(contactTitle(c))}</strong><span>${esc(contactMeta(c))}</span></button>`).join(""):`<p class="fieldNote">Add customer contacts, access codes, lockbox notes, or monitoring center details here.</p>`}</div>
-    <div class="card equipmentMiniCard"><div class="row"><div><h2>Equipment Vault</h2><p>${equipment.length ? `${equipment.length} saved equipment item${equipment.length===1?"":"s"}` : "Panel, communicator, power supply, and device notes."}</p></div><button class="ghost smallBtn" id="manageEquipmentBtn">Manage</button></div>${equipment.length?equipment.slice(0,3).map(e=>`<button class="equipmentLine" data-eq="${esc(e.id)}"><strong>${esc(equipmentTitle(e))}</strong><span>${esc(e.location||e.type||"No location entered")}</span></button>`).join(""):`<p class="fieldNote">Add the panel, communicator, power supplies, and important site equipment here.</p>`}</div>
+    <div class="card equipmentMiniCard ${featureOn("equipment")?"":"featureHidden472"}"><div class="row"><div><h2>Equipment Vault</h2><p>${equipment.length ? `${equipment.length} saved equipment item${equipment.length===1?"":"s"}` : "Panel, communicator, power supply, and device notes."}</p></div><button class="ghost smallBtn" id="manageEquipmentBtn">Manage</button></div>${equipment.length?equipment.slice(0,3).map(e=>`<button class="equipmentLine" data-eq="${esc(e.id)}"><strong>${esc(equipmentTitle(e))}</strong><span>${esc(e.location||e.type||"No location entered")}</span></button>`).join(""):`<p class="fieldNote">Add the panel, communicator, power supplies, and important site equipment here.</p>`}</div>
     <div class="card docsMiniCard"><div class="row"><div><h2>Documents / Links</h2><p>${docs.length ? `${docs.length} saved document${docs.length===1?"":"s"}` : "Manuals, permits, forms, and site reference links."}</p></div><button class="ghost smallBtn" id="manageDocsBtn">Manage</button></div>${docs.length?docs.slice(0,3).map(d=>`<button class="docLineMini" data-doc="${esc(d.id)}"><strong>${esc(docTitle(d))}</strong><span>${esc(docMeta(d))}</span></button>`).join(""):`<p class="fieldNote">Add PDF links, panel manuals, account references, permit numbers, or inspection form notes here.</p>`}</div>
     <div class="card recentVisitsCard visitLogCard"><div class="row"><div><h2>Visit History</h2><p>${siteVisits.length ? `${siteVisits.length} completed visit${siteVisits.length===1?"":"s"}` : "No completed visits yet."}</p></div>${siteVisits.length?`<button class="ghost smallBtn" id="allVisitsBtn">View All</button>`:""}</div>${siteVisits.length?siteVisits.slice(0,3).map(v=>`<button class="visitMini visitMiniButton" data-visit="${esc(v.id)}"><strong>${esc(visitDateLabel(v))}</strong><span>${esc(durationText(v.startedAt,v.endedAt))}</span><p>${esc(visitNotesPreview(v,2))}</p></button>`).join(""):`<p class="fieldNote">Finish a Job Mode service call and it will appear here.</p>`}</div>
     <div class="card grow"><h2>Site Notes</h2><p>${esc(s.notes || "No notes entered.")}</p></div>
@@ -1902,6 +1948,7 @@ function settingsTabs(){
     ["email","Email","Default recipients, subject template, signature template, and tag tools."],
     ["overlay","Photo Overlay","Photo stamp alignment, size, accent color, and logo visibility."],
     ["themes","Theme","Theme presets, accent color, 3D controls, text size, and haptics."],
+    ["visibility","Simple View","App mode and feature visibility for a cleaner default screen."],
     ["advanced","Advanced","Optional future modules marked with an asterisk when services are required."],
     ["backup","Backup","Export, import, data safety snapshot, restore tools, and danger zone."],
     ["about","About","Build information, storage key, and FireVault roadmap notes."]
@@ -1919,7 +1966,7 @@ function settings(){
         <button class="ghost iconBtn settingsInfoBtn" id="diagBtn" title="Diagnostics" aria-label="Diagnostics">ⓘ</button>
       </div>
       <div class="settingsChoiceGrid451 grow" aria-label="Settings choices">
-        ${tabs.map((t,i)=>`<button class="settingsChoice451 settingsChoice455 settingsChoice456" data-tab="${t[0]}"><span class="settingsChoiceIcon451">${["👤","⌖","▤","✉","▧","◐","⚡","⇅","ⓘ"][i]}</span><span class="settingsChoiceText456"><strong>${t[1]}</strong><small>${t[2]}</small></span><span class="settingsChoiceArrow455">›</span></button>`).join("")}
+        ${tabs.map((t,i)=>`<button class="settingsChoice451 settingsChoice455 settingsChoice456" data-tab="${t[0]}"><span class="settingsChoiceIcon451">${["👤","⌖","▤","✉","▧","◐","☰","⚡","⇅","ⓘ"][i]}</span><span class="settingsChoiceText456"><strong>${t[1]}</strong><small>${t[2]}</small></span><span class="settingsChoiceArrow455">›</span></button>`).join("")}
         <button class="settingsChoice451 settingsChoice455 settingsChoice456 settingsChoiceUtility451" id="diagnosticsChoice"><span class="settingsChoiceIcon451">⌁</span><span class="settingsChoiceText456"><strong>Diagnostics</strong><small>Build, storage, GPS, module, task, report, and vault health details.</small></span><span class="settingsChoiceArrow455">›</span></button>
       </div>
     </div>`);
@@ -2079,6 +2126,7 @@ function settingsPanel(){
   if(settingsTab==="overlay") return `<div class="settingsStack"><div class="card settingGroup compactPane"><div class="paneHead"><h2>Photo Overlay</h2><button class="primary saveMini" id="saveSettings">Save</button></div><p class="paneNote">Preview and format the field photo stamp.</p><div class="previewPanel compactPreview"><div class="previewOverlay ${o.alignment==="top"?"top":""}">FIREVAULT • Site • Date • Time</div></div><div class="settingsGrid">${fieldBlock("Alignment",`<select id="ovAlign"><option ${o.alignment==="bottom"?"selected":""}>bottom</option><option ${o.alignment==="top"?"selected":""}>top</option></select>`)}${fieldBlock("Font Size",`<select id="ovSize"><option ${o.fontSize==="small"?"selected":""}>small</option><option ${o.fontSize==="medium"?"selected":""}>medium</option><option ${o.fontSize==="large"?"selected":""}>large</option></select>`)}${fieldBlock("Accent Color",`<input id="ovAccent" type="color" value="${esc(o.accentColor)}">`)}</div><div class="settingsList">${checkBlock("ovLogo","Show FireVault logo on overlay",o.showLogo)}</div></div></div>`;
   if(settingsTab==="gps") return `<div class="settingsStack"><div class="card settingGroup compactPane gpsSettingsPane"><div class="paneHead"><h2>GPS / Maps</h2><button class="primary saveMini" id="saveSettings">Save</button></div><p class="paneNote">Restored GPS tools. Coordinates are saved locally inside each site record.</p><div class="settingsGrid">${fieldBlock("Default Map",`<select id="gpsMapProvider"><option value="apple" ${gps.mapProvider!=="google"?"selected":""}>Apple Maps</option><option value="google" ${gps.mapProvider==="google"?"selected":""}>Google Maps</option></select>`)}${fieldBlock("GPS Accuracy",`<select id="gpsHighAccuracy"><option value="true" ${gps.highAccuracy!==false?"selected":""}>High accuracy</option><option value="false" ${gps.highAccuracy===false?"selected":""}>Standard</option></select>`)}${fieldBlock("Nearby Radius",`<input id="gpsNearbyRadius" inputmode="decimal" value="${esc(gps.nearbyRadiusMiles||1)}">`,`Miles for Nearby Sites detection`)}</div><div class="settingsList">${checkBlock("gpsEnabled","Show GPS capture buttons on site pages",gps.enabled!==false)}${checkBlock("gpsReports","Include GPS coordinates in reports",gps.includeInReports!==false)}</div><p class="fieldNote">Browser GPS works only when allowed by the phone/browser and served from HTTPS.</p></div></div>`;
   if(settingsTab==="themes") return `<div class="settingsStack"><div class="card settingGroup compactPane"><div class="paneHead"><h2>Theme Engine</h2><button class="primary saveMini" id="saveSettings">Apply</button></div><p class="paneNote">Quick presets and live UI controls.</p><div class="presetGrid">${Object.entries(themePresets).map(([key,p])=>`<button class="ghost presetBtn" data-preset="${key}"><span class="themeSwatch" style="background:${p.accentColor}"></span><span>${p.label}</span></button>`).join("")}</div><div class="settingsGrid">${fieldBlock("Theme",`<select id="themeName">${Object.entries(themePresets).map(([key,p])=>`<option value="${key}" ${t.name===key?"selected":""}>${p.label}</option>`).join("")}</select>`)}${fieldBlock("Accent Color",`<input id="themeAccent" type="color" value="${esc(t.accentColor||"#ef4444")}">`)}${fieldBlock("Buttons",`<select id="buttonStyle"><option value="rounded" ${t.buttonStyle!=="squared"?"selected":""}>rounded</option><option value="squared" ${t.buttonStyle==="squared"?"selected":""}>squared</option></select>`)}${fieldBlock("Cards",`<select id="cardStyle"><option value="glass" ${t.cardStyle!=="solid"?"selected":""}>glass</option><option value="solid" ${t.cardStyle==="solid"?"selected":""}>solid</option></select>`)}</div><div class="settingsList">${checkBlock("themeHighContrast","High contrast support",t.highContrast)}${checkBlock("themeLargeText","Larger text",t.largeText)}${checkBlock("themeCompact","Compact layout",t.compactLayout)}${checkBlock("themeHaptics","Haptic button feedback",s.app?.haptics!==false)}</div></div></div>`;
+  if(settingsTab==="visibility") { const mode=appMode(); const v=visibility(); return `<div class="settingsStack simpleSettings472"><div class="card settingGroup compactPane simpleHero472"><div class="paneHead"><div><h2>Simple View / Feature Visibility</h2><p class="paneNote">Keep FireVault feature-rich, but only show the tools you need day-to-day.</p></div><button class="primary saveMini" id="saveSettings">Save</button></div><div class="settingsGrid">${fieldBlock("App Mode",`<select id="viewMode"><option value="simple" ${mode==="simple"?"selected":""}>Simple View</option><option value="advanced" ${mode==="advanced"?"selected":""}>Advanced View</option><option value="power" ${mode==="power"?"selected":""}>Technician Power Mode</option></select>`,`Simple hides nonessential tools. Advanced shows most modules. Power shows everything.`)}</div><div class="viewModeQuick472"><button class="ghost" data-view-mode="simple">Simple</button><button class="ghost" data-view-mode="advanced">Advanced</button><button class="ghost" data-view-mode="power">Power</button></div></div><div class="card settingGroup compactPane"><div class="paneHead"><h2>Visible Features</h2></div><p class="paneNote">These toggles mainly affect Simple View. Advanced View shows most modules unless switched off. Power Mode ignores these and shows everything.</p><div class="settingsList featureList472">${FEATURE_LABELS.map(([key,label,note])=>`<label class="checkRow featureCheck472"><input type="checkbox" id="vis_${key}" ${v[key]?"checked":""}><span><strong>${esc(label)}</strong><small>${esc(note)}</small></span></label>`).join("")}</div></div></div>`; }
   if(settingsTab==="advanced") return `<div class="settingsStack"><div class="card settingGroup compactPane"><div class="paneHead"><h2>Advanced Features</h2><button class="primary saveMini" id="saveSettings">Save</button></div><p class="paneNote"><span class="featureStar">*</span> Requires outside services, permissions, APIs, or future backend modules.</p><div class="settingsList twoCol">${[["advAi","aiTechnician","AI Technician"],["advReverse","reverseAddressLookup","Reverse Address Lookup *"],["advCloud","cloudBackup","Cloud Backup *"],["advVoice","voiceTranscription","Voice Transcription *"],["advOcr","ocrReader","OCR Reader *"],["advEmail","emailGateway","Email Gateway *"],["advWeather","weather","Weather Context *"],["advTraffic","traffic","Traffic / Routing *"]].map(x=>checkBlock(x[0],x[2],a[x[1]])).join("")}</div></div></div>`;
   if(settingsTab==="backup") return backupSettingsPanel();
   return `<div class="settingsStack"><div class="card settingGroup compactPane"><div class="paneHead"><h2>About FireVault</h2></div><p class="paneNote">A modular field knowledge system for fire alarm technicians.</p><div class="aboutGrid"><div><strong>Build</strong><span>${BUILD}</span></div><div><strong>Storage key</strong><span>${KEY}</span></div><div><strong>Roadmap lane</strong><span>Modular foundation, settings polish, iPhone PWA, deeper service-call modules.</span></div></div></div></div>`;
@@ -2088,6 +2136,7 @@ function wireSettingsPanel(){
   ["emailSubject","emailSig"].forEach(id=>{ const el=document.getElementById(id); if(el){ el.addEventListener("focus",()=>lastEmailTemplateField=id); el.addEventListener("input",updateEmailPreview); } });
   document.querySelectorAll(".emailTagChip").forEach(b=>b.onclick=()=>{ const target=document.getElementById(lastEmailTemplateField) || document.getElementById("emailSubject"); insertAtCursor(target, b.dataset.emailTag || ""); });
   document.querySelectorAll(".presetBtn").forEach(b=>b.onclick=()=>{ const p=themePresets[b.dataset.preset]; data.settings.theme.name=b.dataset.preset; data.settings.theme.accentColor=p.accentColor; if(p.highContrast) data.settings.theme.highContrast=true; save(); settings(); toast("Theme applied."); });
+  document.querySelectorAll("[data-view-mode]").forEach(b=>b.onclick=()=>setViewMode(b.dataset.viewMode));
   const exportBtn=document.getElementById("exportBtn"); if(exportBtn) exportBtn.onclick=()=>{ const stamp=new Date().toISOString().slice(0,10); localStorage.setItem("firevault_last_backup_export", new Date().toLocaleString()); downloadBlob(`firevault-backup-${stamp}-build-${BUILD}.json`, JSON.stringify(data,null,2), "application/json"); toast("Backup exported."); settings(); };
   const copyBackupSummaryBtn=document.getElementById("copyBackupSummaryBtn"); if(copyBackupSummaryBtn) copyBackupSummaryBtn.onclick=async()=>{ try{ await navigator.clipboard.writeText(backupSummaryText()); toast("Backup summary copied."); }catch{ toast("Clipboard unavailable."); } };
   const importFile=document.getElementById("importFile"); if(importFile) importFile.onchange=e=>{ const f=e.target.files[0]; if(!f)return; const r=new FileReader(); r.onload=()=>{try{data=loadData(); Object.assign(data, JSON.parse(r.result)); saveData(data); data=loadData(); applyTheme(); toast("Backup imported."); route("home");}catch{alert("Import failed.");}}; r.readAsText(f); };
@@ -2100,7 +2149,8 @@ function saveSettings(){
   if(settingsTab==="email") s.email={...s.email,defaultTo:val("emailTo"),cc:val("emailCc"),defaultSubject:val("emailSubject"),signature:raw("emailSig")};
   if(settingsTab==="overlay") s.overlay={...s.overlay,alignment:val("ovAlign"),fontSize:val("ovSize"),accentColor:val("ovAccent"),showLogo:checked("ovLogo")};
   if(settingsTab==="gps") s.gps={enabled:checked("gpsEnabled"),mapProvider:val("gpsMapProvider")||"apple",highAccuracy:val("gpsHighAccuracy")!=="false",includeInReports:checked("gpsReports"),nearbyRadiusMiles:Number(val("gpsNearbyRadius"))||1};
-  if(settingsTab==="themes") { s.theme={name:val("themeName"),accentColor:val("themeAccent"),highContrast:checked("themeHighContrast"),largeText:checked("themeLargeText"),compactLayout:checked("themeCompact"),buttonStyle:val("buttonStyle"),cardStyle:val("cardStyle")}; s.app={...(s.app||{}),haptics:checked("themeHaptics")}; }
+  if(settingsTab==="themes") { s.theme={name:val("themeName"),accentColor:val("themeAccent"),highContrast:checked("themeHighContrast"),largeText:checked("themeLargeText"),compactLayout:checked("themeCompact"),buttonStyle:val("buttonStyle"),cardStyle:val("cardStyle")}; s.app={...(s.app||{}),haptics:checked("themeHaptics"),viewMode:s.app?.viewMode||"simple"}; }
+  if(settingsTab==="visibility") { s.app={...(s.app||{}),viewMode:val("viewMode")||"simple"}; const next={...visibility()}; FEATURE_LABELS.forEach(([key])=>next[key]=checked("vis_"+key)); s.visibility=next; }
   if(settingsTab==="advanced") s.advanced={aiTechnician:checked("advAi"),reverseAddressLookup:checked("advReverse"),cloudBackup:checked("advCloud"),voiceTranscription:checked("advVoice"),ocrReader:checked("advOcr"),emailGateway:checked("advEmail"),weather:checked("advWeather"),traffic:checked("advTraffic")};
   save(); toast("Settings saved."); settings();
 }
@@ -2260,11 +2310,11 @@ function diagnostics(){
 }
 function showChangelog(){
   const notes = [
-    "Added saved Daily Route review panels.",
-    "Added route history search by site, vehicle, notes, date, or waypoint text.",
-    "Saved route cards now show stop sequence and expandable point timelines.",
-    "Review panels include points, sites, GPS distance, odometer miles, and map links.",
-    "Preserved Daily Route pause/resume status, vehicle mileage, CSV export, and dashboard controls."
+    "Added Simple View / Feature Visibility settings.",
+    "Added Simple, Advanced, and Technician Power Mode display options.",
+    "Hidden nonessential dashboard tiles in Simple View while keeping the modules available.",
+    "Added feature toggles for Daily Route, Library, Reports, Equipment, Diagnostics, GPS, CSV exports, and route reviews.",
+    "Added a Simple View notice on the dashboard with quick access to Manage View."
   ];
   const overlay=document.createElement("div");
   overlay.className="releaseOverlay";
