@@ -1,4 +1,4 @@
-export const BUILD = "0.46.1";
+export const BUILD = "0.46.2";
 export const KEY = "firevault_vault_build_030";
 export const ACTIVE_JOB_KEY = "firevault_active_job_modular";
 
@@ -16,6 +16,7 @@ export function normalize(data){
   data.resourceFolders = Array.isArray(data.resourceFolders) ? data.resourceFolders : ["Manuals","Forms","Links","Codes"];
   if(!data.resourceFolders.length) data.resourceFolders = ["Manuals","Forms","Links","Codes"];
   data.breadcrumbs = Array.isArray(data.breadcrumbs) ? data.breadcrumbs : [];
+  data.routeLogs = Array.isArray(data.routeLogs) ? data.routeLogs : [];
   data.settings = data.settings || {};
   data.settings.overlay = data.settings.overlay || {fields:["site","date","time"], alignment:"bottom", fontSize:"medium", textColor:"#ffffff", accentColor:"#ef4444", showLogo:true, showTagline:true};
   data.settings.technician = data.settings.technician || {name:"", company:"", phone:"", email:"", license:"", defaultRole:"Fire Alarm Technician"};

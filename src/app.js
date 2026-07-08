@@ -10,6 +10,7 @@ let lastEmailTemplateField = "emailSubject";
 let taskFilter = "open";
 let deficiencyFilter = "open";
 let activeJob = loadActiveJob();
+let activeRoute = loadActiveRoute();
 let nearbyState = null;
 let siteSearch = "";
 let libraryFolder = "all";
@@ -412,6 +413,121 @@ function applyTheme(){
 
 function loadActiveJob(){ try{ const raw = localStorage.getItem(ACTIVE_JOB_KEY); return raw ? JSON.parse(raw) : null; } catch{ return null; } }
 function saveActiveJob(){ activeJob ? localStorage.setItem(ACTIVE_JOB_KEY, JSON.stringify(activeJob)) : localStorage.removeItem(ACTIVE_JOB_KEY); }
+
+const ACTIVE_ROUTE_KEY = "firevault_active_route_day";
+function loadActiveRoute(){ try{ const raw = localStorage.getItem(ACTIVE_ROUTE_KEY); return raw ? JSON.parse(raw) : null; } catch{ return null; } }
+function saveActiveRoute(){ activeRoute ? localStorage.setItem(ACTIVE_ROUTE_KEY, JSON.stringify(activeRoute)) : localStorage.removeItem(ACTIVE_ROUTE_KEY); }
+function routeEventTime(iso){ try{return new Date(iso).toLocaleTimeString([], {hour:"numeric",minute:"2-digit"});}catch{return "";} }
+function routeDateLabel(iso){ try{return new Date(iso).toLocaleDateString([], {weekday:"short",month:"short",day:"numeric",year:"numeric"});}catch{return "";} }
+function routeDuration(start,end){
+  if(!start) return "Not started";
+  const a=new Date(start).getTime(), b=end?new Date(end).getTime():Date.now();
+  if(!Number.isFinite(a)||!Number.isFinite(b)||b<a) return "0 min";
+  const m=Math.round((b-a)/60000);
+  if(m<60) return `${m} min`;
+  return `${Math.floor(m/60)}h ${m%60}m`;
+}
+function routeGpsText(ev){
+  if(!ev || !Number.isFinite(Number(ev.lat)) || !Number.isFinite(Number(ev.lng))) return "No GPS";
+  const acc=Number.isFinite(Number(ev.accuracy)) && Number(ev.accuracy)>0 ? ` ±${Math.round(Number(ev.accuracy))}m` : "";
+  return `${Number(ev.lat).toFixed(6)}, ${Number(ev.lng).toFixed(6)}${acc}`;
+}
+function routeMapLink(ev){
+  if(!ev || !Number.isFinite(Number(ev.lat)) || !Number.isFinite(Number(ev.lng))) return "";
+  const q=encodeURIComponent(`${Number(ev.lat).toFixed(6)},${Number(ev.lng).toFixed(6)}`);
+  return (data.settings.gps?.mapProvider==="google") ? `https://www.google.com/maps/search/?api=1&query=${q}` : `https://maps.apple.com/?q=${q}`;
+}
+function getGpsPosition(){
+  return new Promise((resolve)=>{
+    if(data.settings.gps?.enabled===false || !navigator.geolocation){ resolve(null); return; }
+    navigator.geolocation.getCurrentPosition(pos=>resolve({
+      lat:Number(pos.coords.latitude.toFixed(6)),
+      lng:Number(pos.coords.longitude.toFixed(6)),
+      accuracy:Math.round(pos.coords.accuracy||0)
+    }),()=>resolve(null),gpsOptions());
+  });
+}
+function ensureActiveRoute(){
+  if(activeRoute) return activeRoute;
+  activeRoute={id:uid(),date:localDateString(),startedAt:new Date().toISOString(),endedAt:null,events:[]};
+  saveActiveRoute();
+  return activeRoute;
+}
+async function addRouteEvent(type,label,siteId="",notes=""){
+  const route=ensureActiveRoute();
+  toast("Capturing route point...");
+  const gps=await getGpsPosition();
+  const s=siteId?data.sites.find(x=>x.id===siteId):null;
+  const ev={id:uid(),type,label:label||type,siteId:siteId||"",siteName:s?.name||"",address:s?fullAddress(s):"",notes:notes||"",at:new Date().toISOString(),...(gps||{})};
+  if(gps && data.sites.some(hasGps)){
+    const nearest=gpsSiteDistances(gps.lat,gps.lng)[0];
+    if(nearest){
+      ev.nearestSite=nearest.s.name||"Unnamed Site";
+      ev.nearestDistance=distanceLabel(nearest.meters);
+    }
+  }
+  route.events.push(ev);
+  saveActiveRoute();
+  toast(`${label||type} added.`);
+  routeLog();
+}
+async function startRouteDay(){
+  if(activeRoute){ route("routeLog"); return; }
+  activeRoute={id:uid(),date:localDateString(),startedAt:new Date().toISOString(),endedAt:null,events:[]};
+  saveActiveRoute();
+  await addRouteEvent("Start Day","Start Day");
+}
+async function endRouteDay(){
+  if(!activeRoute){ toast("No active route day."); return; }
+  await addRouteEvent("End Day","End Day");
+  activeRoute.endedAt=new Date().toISOString();
+  data.routeLogs=data.routeLogs||[];
+  data.routeLogs.unshift(activeRoute);
+  data.routeLogs=data.routeLogs.slice(0,90);
+  activeRoute=null;
+  saveActiveRoute();
+  save();
+  toast("Daily route saved.");
+  routeLog();
+}
+function routeReportText(log=activeRoute){
+  if(!log) return "No active route log.";
+  const stops=log.events||[];
+  const siteStops=stops.filter(e=>e.siteName).length;
+  const lines=[
+    `FIREVAULT DAILY ROUTE REPORT`,
+    `Date: ${routeDateLabel(log.startedAt||new Date())}`,
+    `Start: ${log.startedAt?routeEventTime(log.startedAt):"Not started"}`,
+    `End: ${log.endedAt?routeEventTime(log.endedAt):"Active"}`,
+    `Duration: ${routeDuration(log.startedAt,log.endedAt)}`,
+    `Waypoints: ${stops.length}`,
+    `Site Stops: ${siteStops}`,
+    ``,
+    `STOPS / WAYPOINTS`
+  ];
+  if(!stops.length) lines.push("- No waypoints recorded.");
+  stops.forEach((e,i)=>{
+    lines.push(`${i+1}. ${routeEventTime(e.at)} - ${e.label||e.type}${e.siteName?` - ${e.siteName}`:""}`);
+    if(e.address) lines.push(`   Address: ${e.address}`);
+    lines.push(`   GPS: ${routeGpsText(e)}`);
+    const link=routeMapLink(e); if(link) lines.push(`   Map: ${link}`);
+    if(e.nearestSite) lines.push(`   Nearby: ${e.nearestSite} (${e.nearestDistance})`);
+    if(e.notes) lines.push(`   Notes: ${e.notes}`);
+  });
+  lines.push(``, `Generated by FireVault Build ${BUILD} on ${new Date().toLocaleString()}`);
+  return lines.join("\n");
+}
+function copyRouteReport(log=activeRoute){
+  const text=routeReportText(log);
+  if(navigator.clipboard?.writeText){
+    navigator.clipboard.writeText(text).then(()=>toast("Route report copied."),()=>toast("Clipboard unavailable."));
+  }else toast("Clipboard unavailable.");
+}
+function downloadRouteReport(log=activeRoute){
+  const name=`firevault-route-${(log?.date||localDateString())}.txt`;
+  downloadBlob(name, routeReportText(log));
+}
+
 function fmtDate(d=new Date()){ return d.toLocaleDateString([], {month:"short", day:"numeric", year:"numeric"}); }
 function todayIso(){ return new Date().toISOString().slice(0,10); }
 function localDateString(d=new Date()){
@@ -532,11 +648,11 @@ function addServiceFollowUp(kind="Follow-up"){
 }
 function startJobTimer(){ stopJobTimer(); jobTimer=setInterval(()=>{ const el=document.getElementById("jobElapsed"); if(el && activeJob) el.textContent=elapsedText(activeJob.startedAt); },1000); }
 function stopJobTimer(){ if(jobTimer){ clearInterval(jobTimer); jobTimer=null; } }
-function setActiveNav(){ document.querySelectorAll("nav button").forEach(b=>b.classList.remove("active")); const section=["siteDetail","visits","visitDetail","checklist","siteForm","contactsList","contactForm","siteDocs","siteDocForm","equipmentList","equipmentForm","tasks","taskForm","deficiencies","deficiencyForm","report","jobMode","nearbySites","attention"].includes(view)?"sites":view; document.getElementById("nav-"+section)?.classList.add("active"); }
+function setActiveNav(){ document.querySelectorAll("nav button").forEach(b=>b.classList.remove("active")); const section=view==="routeLog"?"home":(["siteDetail","visits","visitDetail","checklist","siteForm","contactsList","contactForm","siteDocs","siteDocForm","equipmentList","equipmentForm","tasks","taskForm","deficiencies","deficiencyForm","report","jobMode","nearbySites","attention"].includes(view)?"sites":view); document.getElementById("nav-"+section)?.classList.add("active"); }
 
 function render(){
   try{
-    const routes = {home, sites, nearbySites, attention:attentionQueue, siteDetail, visits, visitDetail, checklist, siteForm, contactsList, contactForm, siteDocs, siteDocForm, equipmentList, equipmentForm, tasks, taskForm, deficiencies, deficiencyForm, report, library, resourceForm, jobMode, settings, diagnostics};
+    const routes = {home, routeLog, sites, nearbySites, attention:attentionQueue, siteDetail, visits, visitDetail, checklist, siteForm, contactsList, contactForm, siteDocs, siteDocForm, equipmentList, equipmentForm, tasks, taskForm, deficiencies, deficiencyForm, report, library, resourceForm, jobMode, settings, diagnostics};
     (routes[view] || home)();
     view === "jobMode" ? startJobTimer() : stopJobTimer();
     setActiveNav();
@@ -571,6 +687,7 @@ function home(){
       <button class="ghost tile gpsHomeTile" id="gpsHomeBtn"><strong>⌖ GPS / Maps</strong><span>${gpsSites} site${gpsSites===1?"":"s"} with GPS</span></button>
       <button class="ghost tile nearbyHomeTile" id="nearbyHomeBtn"><strong>◎ Nearby Sites</strong><span>Detect saved sites near me</span></button>
       <button class="ghost tile attentionHomeTile" id="attentionHomeBtn"><strong>⚠ Attention Queue</strong><span>${attentionList.length ? `${attentionList.length} site${attentionList.length===1?"":"s"} to review` : "No priority issues"}</span></button>
+      <button class="ghost tile routeHomeTile462" id="routeLogBtn"><strong>◇ Daily Route</strong><span>${activeRoute ? `${(activeRoute.events||[]).length} active waypoints` : `${(data.routeLogs||[]).length} saved route days`}</span></button>
     </div>
     ${activeJob ? `<div class="card activeJobMini"><div class="row"><div><h2>Service Call Active</h2><p>${esc(activeJob.siteName)} • <span id="jobElapsed">${elapsedText(activeJob.startedAt)}</span></p></div><button class="primary" id="resumeJobBtn">Open</button></div></div>` : ""}
     <div class="card grow homeStatus450"><div class="homeStatusHead450"><h2>Stability Checkpoint</h2><span>${dataHealth}</span></div><div class="homeStatusGrid450"><div><strong>${data.sites.length}</strong><span>Sites</span></div><div><strong>${visits.length}</strong><span>Visits</span></div><div><strong>${gpsSites}</strong><span>GPS Saved</span></div></div><p>Current build focuses on app polish, visual consistency, and safer update habits.</p><p class="fieldNote">Last backup export: ${esc(lastExport)}</p></div>
@@ -585,7 +702,61 @@ function home(){
   };
   document.getElementById("nearbyHomeBtn").onclick=detectNearbySites;
   document.getElementById("attentionHomeBtn").onclick=()=>route("attention");
+  document.getElementById("routeLogBtn").onclick=()=>route("routeLog");
   const rb=document.getElementById("resumeJobBtn"); if(rb) rb.onclick=()=>{selectedSiteId=activeJob.siteId; route("jobMode");};
+}
+
+
+function routeLog(){
+  const saved=(data.routeLogs||[]);
+  const active=activeRoute;
+  const siteOptions=data.sites.map(s=>`<option value="${esc(s.id)}">${esc(s.name||"Unnamed Site")}</option>`).join("");
+  const events=active?.events||[];
+  html(`<div class="screen routeLogScreen462">
+    <div class="row"><button class="back ghost" id="backBtn">←</button><h1>Daily Route</h1></div>
+    <div class="card routeHero462 ${active?"active":"idle"}">
+      <div><strong>${active?"Route Active":"No Active Route"}</strong><span>${active?`${events.length} waypoint${events.length===1?"":"s"} • ${routeDuration(active.startedAt)}`:`${saved.length} saved day${saved.length===1?"":"s"}`}</span></div>
+      <p>${active?"Track stops, site arrivals, breaks, and manual GPS waypoints while the app is open.":"Start a route day to record sites visited and waypoints for a daily report."}</p>
+    </div>
+    <div class="routeControls462">
+      ${active?`<button class="danger" id="endRouteBtn">End Day / Save</button>`:`<button class="primary" id="startRouteBtn">Start Day</button>`}
+      <button class="ghost" id="copyRouteBtn" ${active||saved[0]?"":"disabled"}>Copy Report</button>
+    </div>
+    ${active?`<div class="card routeQuick462">
+      <div class="routeSitePick462"><label>Site Stop</label><select id="routeSiteSelect"><option value="">Select saved site...</option>${siteOptions}</select></div>
+      <div class="grid2">
+        <button class="primary" id="arrivedBtn">Arrived Site</button>
+        <button class="ghost" id="leftBtn">Left Site</button>
+        <button class="ghost" id="waypointBtn">Manual Waypoint</button>
+        <button class="ghost" id="breakBtn">Break / Fuel / Parts</button>
+      </div>
+      <p class="fieldNote">GPS capture works while FireVault is open. iPhone home-screen web apps may limit background tracking.</p>
+    </div>`:""}
+    <div class="list grow routeList462">
+      ${active?`<div class="routeSectionTitle462"><strong>Today</strong><span>${routeDateLabel(active.startedAt)}</span></div>${events.length?events.map(routeEventCard).join(""):`<div class="empty">No route points yet. Add a waypoint or site stop.</div>`}`:`<div class="routeSectionTitle462"><strong>Saved Route Days</strong><span>Newest first</span></div>${saved.length?saved.map(routeHistoryCard).join(""):`<div class="empty">No saved route days yet.</div>`}`}
+    </div>
+  </div>`);
+  document.getElementById("backBtn").onclick=()=>route("home");
+  const start=document.getElementById("startRouteBtn"); if(start) start.onclick=startRouteDay;
+  const end=document.getElementById("endRouteBtn"); if(end) end.onclick=endRouteDay;
+  const copy=document.getElementById("copyRouteBtn"); if(copy) copy.onclick=()=>copyRouteReport(activeRoute||saved[0]);
+  const arrived=document.getElementById("arrivedBtn"); if(arrived) arrived.onclick=()=>{ const id=val("routeSiteSelect"); if(!id){toast("Select a site first."); return;} const s=data.sites.find(x=>x.id===id); addRouteEvent("Arrived",`Arrived: ${s?.name||"Site"}`,id); };
+  const left=document.getElementById("leftBtn"); if(left) left.onclick=()=>{ const id=val("routeSiteSelect"); if(!id){toast("Select a site first."); return;} const s=data.sites.find(x=>x.id===id); addRouteEvent("Left Site",`Left: ${s?.name||"Site"}`,id); };
+  const waypoint=document.getElementById("waypointBtn"); if(waypoint) waypoint.onclick=()=>{ const note=prompt("Waypoint note", "Manual waypoint")||"Manual waypoint"; addRouteEvent("Waypoint",note); };
+  const br=document.getElementById("breakBtn"); if(br) br.onclick=()=>{ const note=prompt("Stop note", "Break / Fuel / Parts")||"Break / Fuel / Parts"; addRouteEvent("Stop",note); };
+  document.querySelectorAll("[data-copy-route]").forEach(b=>b.onclick=()=>{ const log=saved.find(x=>x.id===b.dataset.copyRoute); if(log) copyRouteReport(log); });
+  document.querySelectorAll("[data-download-route]").forEach(b=>b.onclick=()=>{ const log=saved.find(x=>x.id===b.dataset.downloadRoute); if(log) downloadRouteReport(log); });
+  document.querySelectorAll("[data-delete-route]").forEach(b=>b.onclick=()=>{ const id=b.dataset.deleteRoute; if(confirm("Delete this saved route day?")){ data.routeLogs=(data.routeLogs||[]).filter(x=>x.id!==id); save(); routeLog(); } });
+}
+function routeEventCard(e){
+  const link=routeMapLink(e);
+  return `<div class="card routeEventCard462"><div class="routeEventTop462"><div><h2>${esc(e.label||e.type)}</h2><p>${routeEventTime(e.at)}${e.siteName?` • ${esc(e.siteName)}`:""}</p></div><span class="pill">${esc(e.type||"Stop")}</span></div><p>${esc(routeGpsText(e))}</p>${e.address?`<p>${esc(e.address)}</p>`:""}${e.nearestSite?`<p class="fieldNote">Nearest saved site: ${esc(e.nearestSite)} (${esc(e.nearestDistance)})</p>`:""}${link?`<a class="btn ghost routeMapBtn462" href="${esc(link)}" target="_blank" rel="noopener">Open Map</a>`:""}</div>`;
+}
+function routeHistoryCard(log){
+  const events=log.events||[];
+  const sites=events.filter(e=>e.siteName).map(e=>e.siteName);
+  const unique=[...new Set(sites)];
+  return `<div class="card routeHistoryCard462"><div class="routeEventTop462"><div><h2>${routeDateLabel(log.startedAt||log.date)}</h2><p>${routeDuration(log.startedAt,log.endedAt)} • ${events.length} waypoint${events.length===1?"":"s"} • ${unique.length} site${unique.length===1?"":"s"}</p></div><span class="pill">${log.endedAt?"Saved":"Active"}</span></div><p>${unique.length?esc(unique.slice(0,4).join(", ")):"No site stops recorded."}</p><div class="grid3 routeHistoryActions462"><button class="ghost" data-copy-route="${esc(log.id)}">Copy</button><button class="ghost" data-download-route="${esc(log.id)}">Download</button><button class="danger" data-delete-route="${esc(log.id)}">Delete</button></div></div>`;
 }
 
 function attentionQueue(){
@@ -1672,6 +1843,7 @@ function diagnosticsText(){
     `Deficiencies: ${totalDef}`,
     `Visits: ${totalVisits}`,
     `GPS Saved Sites: ${data.sites.filter(hasGps).length}`,
+    `Route Days: ${(data.routeLogs||[]).length}`,
     `Active Job: ${activeJob ? activeJob.siteName : "None"}`,
     `Storage Key: ${KEY}`,
     ``,
@@ -1765,7 +1937,7 @@ function diagnostics(){
     <div class="list grow diagnosticsList460">
       <div class="card"><h2>Stability Issues</h2>${stability.issues.length?`<ul>${stability.issues.map(i=>`<li>${esc(i)}</li>`).join("")}</ul>`:`<p>No issues found.</p>`}</div>
       <div class="card"><h2>Checks Passed</h2><ul>${stability.pass.map(p=>`<li>${esc(p)}</li>`).join("")}</ul></div>
-      <div class="card errorBox"><p>Build: ${BUILD}</p><p>Total Tasks: ${totalTasks}</p><p>Due Today: ${taskCounts.today}</p><p>Service Follow-Ups: ${serviceTasks}</p><p>Total Deficiencies: ${totalDef}</p><p>Closed Deficiencies: ${closedDefTotal}</p><p>Total Contacts: ${totalContacts}</p><p>Total Documents: ${totalDocs}</p><p>Report Deliveries: ${totalReportDeliveries}</p><p>Report Follow-Ups: ${reportFollowUps}</p><p>Checklist Items: ${totalChecklist}</p><p>Checklist Issues: ${checklistIssues}</p><p>Completed Inspections: ${completedInspections}</p><p>Attention Sites: ${healthWarn}</p><p>Watch Sites: ${healthWatch}</p><p>Active Job: ${activeJob ? esc(activeJob.siteName) : "None"}</p><p>Current Theme: ${esc(data.settings.theme.name)}</p><p>Accent: ${esc(data.settings.theme.accentColor)}</p><p>GPS Tools: ${data.settings.gps?.enabled !== false ? "Enabled" : "Hidden"}</p><p>Nearby Radius: ${nearbyRadiusMiles()} mi</p><p>Haptics: ${data.settings.app?.haptics !== false ? "Enabled" : "Off"}</p><p>Last Stability Check: ${esc(lastCheck)}</p><p>Storage key: ${KEY}</p><p>Modules loaded successfully.</p></div>
+      <div class="card errorBox"><p>Build: ${BUILD}</p><p>Total Tasks: ${totalTasks}</p><p>Due Today: ${taskCounts.today}</p><p>Service Follow-Ups: ${serviceTasks}</p><p>Total Deficiencies: ${totalDef}</p><p>Closed Deficiencies: ${closedDefTotal}</p><p>Total Contacts: ${totalContacts}</p><p>Total Documents: ${totalDocs}</p><p>Report Deliveries: ${totalReportDeliveries}</p><p>Report Follow-Ups: ${reportFollowUps}</p><p>Checklist Items: ${totalChecklist}</p><p>Checklist Issues: ${checklistIssues}</p><p>Completed Inspections: ${completedInspections}</p><p>Attention Sites: ${healthWarn}</p><p>Watch Sites: ${healthWatch}</p><p>Active Job: ${activeJob ? esc(activeJob.siteName) : "None"}</p><p>Current Theme: ${esc(data.settings.theme.name)}</p><p>Accent: ${esc(data.settings.theme.accentColor)}</p><p>Route Days: ${(data.routeLogs||[]).length}</p><p>GPS Tools: ${data.settings.gps?.enabled !== false ? "Enabled" : "Hidden"}</p><p>Nearby Radius: ${nearbyRadiusMiles()} mi</p><p>Haptics: ${data.settings.app?.haptics !== false ? "Enabled" : "Off"}</p><p>Last Stability Check: ${esc(lastCheck)}</p><p>Storage key: ${KEY}</p><p>Modules loaded successfully.</p></div>
     </div>
   </div>`);
   document.getElementById("backHome").onclick=()=>route("home");
@@ -1774,17 +1946,17 @@ function diagnostics(){
 }
 function showChangelog(){
   const notes = [
-    "Added a 0.46.1 Stability Checkpoint inside Diagnostics.",
-    "Added route/data sanity checks for sites, resources, GPS, settings, and active service calls.",
-    "Added Repair Vault to normalize site/resource structures and clear orphaned active jobs.",
-    "Added Copy Diagnostics for quick troubleshooting notes.",
-    "Preserved the current visual polish, splash screen, Library folder tools, and Settings fixes."
+    "Added Daily Route Log starter workflow.",
+    "Added Start Day / End Day route sessions.",
+    "Added manual waypoint, break/fuel/parts, arrived site, and left site route buttons.",
+    "Added saved route day history with copy, download, and delete actions.",
+    "Route reports include ordered stops, timestamps, GPS coordinates, nearest saved site, and map links."
   ];
   const overlay=document.createElement("div");
   overlay.className="releaseOverlay";
   overlay.innerHTML=`<div class="releaseSheet" role="dialog" aria-modal="true" aria-label="FireVault release notes">
     <div class="releaseHead"><div><strong>FireVault</strong><span>Build ${BUILD}</span></div><button class="ghost iconBtn" id="closeRelease" aria-label="Close release notes">×</button></div>
-    <div class="releaseBody"><h2>Release Notes</h2><p class="releaseIntro">stability checkpoint, diagnostics repair, and bug-sweep polish.</p><ul>${notes.map(n=>`<li>${esc(n)}</li>`).join("")}</ul></div>
+    <div class="releaseBody"><h2>Release Notes</h2><p class="releaseIntro">daily route log starter and waypoint report tools.</p><ul>${notes.map(n=>`<li>${esc(n)}</li>`).join("")}</ul></div>
   </div>`;
   document.body.appendChild(overlay);
   const close=()=>overlay.remove();
