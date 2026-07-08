@@ -495,6 +495,36 @@ function saveRouteDetails469(){
   toast("Route details saved.");
   routeLog();
 }
+
+function routePauseStatusLine(log=activeRoute){
+  if(!log) return "No route active";
+  if(log.endedAt) return "Saved";
+  return log.paused ? "Paused" : "Recording";
+}
+function pauseRouteDay(){
+  if(!activeRoute){ toast("Start Daily Route first."); return; }
+  if(activeRoute.paused){ toast("Route is already paused."); return; }
+  const now=new Date().toISOString();
+  activeRoute.paused=true;
+  activeRoute.pausedAt=now;
+  activeRoute.events=activeRoute.events||[];
+  activeRoute.events.push({id:uid(),type:"Paused",label:"Route Paused",notes:"Recording paused.",at:now});
+  saveActiveRoute();
+  toast("Daily Route paused.");
+  if(view === "routeLog") routeLog(); else render();
+}
+function resumeRouteDay(){
+  if(!activeRoute){ toast("Start Daily Route first."); return; }
+  if(!activeRoute.paused){ toast("Route is already recording."); return; }
+  const now=new Date().toISOString();
+  activeRoute.paused=false;
+  activeRoute.resumedAt=now;
+  activeRoute.events=activeRoute.events||[];
+  activeRoute.events.push({id:uid(),type:"Resumed",label:"Route Resumed",notes:"Recording resumed.",at:now});
+  saveActiveRoute();
+  toast("Daily Route resumed.");
+  if(view === "routeLog") routeLog(); else render();
+}
 function routeGpsText(ev){
   if(!ev || !Number.isFinite(Number(ev.lat)) || !Number.isFinite(Number(ev.lng))) return "No GPS";
   const acc=Number.isFinite(Number(ev.accuracy)) && Number(ev.accuracy)>0 ? ` ±${Math.round(Number(ev.accuracy))}m` : "";
@@ -523,6 +553,11 @@ function ensureActiveRoute(){
 }
 async function addRouteEvent(type,label,siteId="",notes=""){
   const route=ensureActiveRoute();
+  const allowedWhilePaused=["Paused","Resumed","End Day"];
+  if(route.paused && !allowedWhilePaused.includes(type)){
+    toast("Daily Route is paused. Resume recording first.");
+    return;
+  }
   toast("Capturing route point...");
   const gps=await getGpsPosition();
   const s=siteId?data.sites.find(x=>x.id===siteId):null;
@@ -582,6 +617,7 @@ function routeSuggestion(){
 }
 async function checkRouteNearestSite(){
   if(!activeRoute){ toast("Start Daily Route first."); return; }
+  if(activeRoute.paused){ toast("Daily Route is paused. Resume recording first."); return; }
   if(!data.sites.some(hasGps)){ toast("No saved GPS sites yet."); return; }
   toast("Checking nearest saved site...");
   const gps=await getGpsPosition();
@@ -624,6 +660,7 @@ async function startRouteDay(){
 async function endRouteDay(){
   if(!activeRoute){ toast("No active route day."); return; }
   await addRouteEvent("End Day","End Day");
+  activeRoute.paused=false;
   activeRoute.endedAt=new Date().toISOString();
   data.routeLogs=data.routeLogs||[];
   data.routeLogs.unshift(activeRoute);
@@ -643,6 +680,7 @@ function routeReportText(log=activeRoute){
     `Date: ${routeDateLabel(log.startedAt||new Date())}`,
     `Start: ${log.startedAt?routeEventTime(log.startedAt):"Not started"}`,
     `End: ${log.endedAt?routeEventTime(log.endedAt):"Active"}`,
+    `Status: ${routePauseStatusLine(log)}`,
     `Duration: ${routeDuration(log.startedAt,log.endedAt)}`,
     `Estimated Route Distance: ${routeDistanceLabel(log)}`,
     ...routeOdometerReportLines(log),
@@ -890,7 +928,7 @@ function home(){
   const dataHealth = data.sites.length ? "Vault Ready" : "Add First Site";
   const now = new Date();
   html(`<div class="screen homeScreen450">
-    <div class="homeHero450 homeHero457 homeHero463"><div class="homeDateWrap463">${activeRoute?`<span class="routeLed463" aria-label="Daily route recording"></span>`:""}<div class="homeDateBlock457"><div class="todayDay"><h1>${now.toLocaleDateString([], {weekday:"long"})}</h1></div><p class="homeDateLine457">${fmtDate(now)}</p></div></div></div>
+    <div class="homeHero450 homeHero457 homeHero463"><div class="homeDateWrap463">${activeRoute?`<span class="${activeRoute.paused?"routeLed470 routeLedPaused470":"routeLed463"}" aria-label="${activeRoute.paused?"Daily route paused":"Daily route recording"}"></span>`:""}<div class="homeDateBlock457"><div class="todayDay"><h1>${now.toLocaleDateString([], {weekday:"long"})}</h1></div><p class="homeDateLine457">${fmtDate(now)}</p></div></div></div>
     <div class="grid3">
       <div class="card tile metricCard" id="sitesCard"><strong>${data.sites.length}</strong><span>Sites</span></div>
       <div class="card tile metricCard taskMetricCard" id="tasksCard"><strong>${openTasks}</strong><span>${taskCounts.overdue ? `${taskCounts.overdue} overdue` : taskCounts.today ? `${taskCounts.today} due today` : "Open Tasks"}</span></div>
@@ -903,7 +941,7 @@ function home(){
       <button class="ghost tile attentionHomeTile" id="attentionHomeBtn"><strong>⚠ Attention Queue</strong><span>${attentionList.length ? `${attentionList.length} site${attentionList.length===1?"":"s"} to review` : "No priority issues"}</span></button>
       <button class="ghost tile routeHomeTile462" id="routeLogBtn"><strong>◇ Daily Route</strong><span>${activeRoute ? `${(activeRoute.events||[]).length} active waypoints` : `${(data.routeLogs||[]).length} saved route days`}</span></button>
     </div>
-    ${activeRoute ? `<div class="card activeRouteMini468"><div class="activeRouteHead468"><div><h2><span class="routeLed463 miniLed468"></span>Daily Route Recording</h2><p>${esc(routeSummaryLine(activeRoute))}</p></div><button class="primary smallBtn" id="openRouteMiniBtn">Open</button></div><div class="activeRouteStats468"><div><strong>${(activeRoute.events||[]).length}</strong><span>Waypoints</span></div><div><strong>${routeDuration(activeRoute.startedAt)}</strong><span>Time</span></div><div><strong>${esc(routeDistanceLabel(activeRoute))}</strong><span>Distance</span></div></div><div class="activeRouteActions468"><button class="ghost smallBtn" id="homeRoutePointBtn">Waypoint</button><button class="ghost smallBtn" id="homeRouteNearestBtn">Nearest</button><button class="danger smallBtn" id="homeRouteEndBtn">End / Save</button></div></div>` : ""}
+    ${activeRoute ? `<div class="card activeRouteMini468 ${activeRoute.paused?"activeRoutePaused470":""}"><div class="activeRouteHead468"><div><h2><span class="${activeRoute.paused?"routeLed470 routeLedPaused470":"routeLed463"} miniLed468"></span>${activeRoute.paused?"Daily Route Paused":"Daily Route Recording"}</h2><p>${esc(routeSummaryLine(activeRoute))}</p></div><button class="primary smallBtn" id="openRouteMiniBtn">Open</button></div><div class="activeRouteStats468"><div><strong>${(activeRoute.events||[]).length}</strong><span>Waypoints</span></div><div><strong>${routeDuration(activeRoute.startedAt)}</strong><span>Time</span></div><div><strong>${esc(routeDistanceLabel(activeRoute))}</strong><span>Distance</span></div></div><div class="activeRouteActions468"><button class="ghost smallBtn" id="homeRoutePointBtn" ${activeRoute.paused?"disabled":""}>Waypoint</button><button class="ghost smallBtn" id="homeRouteNearestBtn" ${activeRoute.paused?"disabled":""}>Nearest</button><button class="${activeRoute.paused?"primary":"ghost"} smallBtn" id="homeRoutePauseBtn">${activeRoute.paused?"Resume":"Pause"}</button><button class="danger smallBtn" id="homeRouteEndBtn">End / Save</button></div></div>` : ""}
     ${activeJob ? `<div class="card activeJobMini"><div class="row"><div><h2>Service Call Active</h2><p>${esc(activeJob.siteName)} • <span id="jobElapsed">${elapsedText(activeJob.startedAt)}</span></p></div><button class="primary" id="resumeJobBtn">Open</button></div></div>` : ""}
     <div class="card grow homeStatus450"><div class="homeStatusHead450"><h2>Stability Checkpoint</h2><span>${dataHealth}</span></div><div class="homeStatusGrid450"><div><strong>${data.sites.length}</strong><span>Sites</span></div><div><strong>${visits.length}</strong><span>Visits</span></div><div><strong>${gpsSites}</strong><span>GPS Saved</span></div></div><p>Current build focuses on app polish, visual consistency, and safer update habits.</p><p class="fieldNote">Last backup export: ${esc(lastExport)}</p></div>
   </div>`);
@@ -921,6 +959,7 @@ function home(){
   const openRouteMini=document.getElementById("openRouteMiniBtn"); if(openRouteMini) openRouteMini.onclick=()=>route("routeLog");
   const homeRoutePoint=document.getElementById("homeRoutePointBtn"); if(homeRoutePoint) homeRoutePoint.onclick=()=>{ const note=prompt("Waypoint note", "Manual waypoint")||"Manual waypoint"; addRouteEvent("Waypoint", note); };
   const homeRouteNearest=document.getElementById("homeRouteNearestBtn"); if(homeRouteNearest) homeRouteNearest.onclick=checkRouteNearestSite;
+  const homeRoutePause=document.getElementById("homeRoutePauseBtn"); if(homeRoutePause) homeRoutePause.onclick=()=> activeRoute?.paused ? resumeRouteDay() : pauseRouteDay();
   const homeRouteEnd=document.getElementById("homeRouteEndBtn"); if(homeRouteEnd) homeRouteEnd.onclick=()=>{ if(confirm("End and save today’s route?")) endRouteDay(); };
   const rb=document.getElementById("resumeJobBtn"); if(rb) rb.onclick=()=>{selectedSiteId=activeJob.siteId; route("jobMode");};
 }
@@ -931,15 +970,16 @@ function routeLog(){
   const active=activeRoute;
   const siteOptions=data.sites.map(s=>`<option value="${esc(s.id)}">${esc(s.name||"Unnamed Site")}</option>`).join("");
   const events=active?.events||[];
+  const paused=!!active?.paused;
   const suggestion=active?routeSuggestion():null;
   html(`<div class="screen routeLogScreen462">
     <div class="row"><button class="back ghost" id="backBtn">←</button><h1>Daily Route</h1></div>
-    <div class="card routeHero462 ${active?"active":"idle"}">
-      <div><strong>${active?"Route Active":"No Active Route"}</strong><span>${active?routeSummaryLine(active):`${saved.length} saved day${saved.length===1?"":"s"}`}</span></div>
-      <p>${active?"Track stops, site arrivals, breaks, and manual GPS waypoints while the app is open.":"Start a route day to record sites visited and waypoints for a daily report."}</p>
+    <div class="card routeHero462 ${active?(paused?"paused470":"active"):"idle"}">
+      <div><strong>${active?(paused?"Route Paused":"Route Active"):"No Active Route"}</strong><span>${active?routeSummaryLine(active):`${saved.length} saved day${saved.length===1?"":"s"}`}</span></div>
+      <p>${active?(paused?"Recording is paused. Resume when you want FireVault to capture the next stop or waypoint.":"Track stops, site arrivals, breaks, and manual GPS waypoints while the app is open."):"Start a route day to record sites visited and waypoints for a daily report."}</p>
     </div>
     <div class="routeControls462">
-      ${active?`<button class="danger" id="endRouteBtn">End Day / Save</button>`:`<button class="primary" id="startRouteBtn">Start Day</button>`}
+      ${active?`<button class="danger" id="endRouteBtn">End Day / Save</button><button class="${paused?"primary":"ghost"}" id="${paused?"resumeRouteBtn":"pauseRouteBtn"}">${paused?"Resume Route":"Pause Route"}</button>`:`<button class="primary" id="startRouteBtn">Start Day</button>`}
       <button class="ghost" id="copyRouteBtn" ${active||saved[0]?"":"disabled"}>Copy Report</button>
       <button class="ghost" id="downloadRouteBtn" ${active||saved[0]?"":"disabled"}>Download Report</button>
       <button class="ghost" id="csvRouteBtn" ${active||saved[0]?"":"disabled"}>CSV Export</button>
@@ -948,16 +988,16 @@ function routeLog(){
     </div>
     ${(active||saved[0])?`<div class="card routeReportPreview464 routeReportPreview467"><div><h2>Daily Report Summary</h2><p>${esc(routeSummaryLine(active||saved[0]))}</p><p class="fieldNote">Export as TXT, CSV, or copy a cleaner customer summary.</p></div>${routeDirectionsLink(active||saved[0])?`<a class="btn ghost" href="${esc(routeDirectionsLink(active||saved[0]))}" target="_blank" rel="noopener">Open Route Map</a>`:""}</div>`:""}
     ${active?`<div class="card routeDetails469"><div class="routeDetailsHead469"><div><h2>Vehicle / Mileage</h2><p>${esc(routeOdometerLabel(active))}</p></div><button class="primary smallBtn" id="saveRouteDetailsBtn">Save Details</button></div><div class="routeOdoGrid469"><div><label>Vehicle</label><input id="routeVehicle" value="${esc(active.vehicle||"")}" placeholder="Truck / van / unit #"></div><div><label>Start Odometer</label><input id="routeStartOdo" type="number" inputmode="decimal" step="0.1" value="${esc(active.startOdometer??"")}" placeholder="Optional"></div><div><label>End Odometer</label><input id="routeEndOdo" type="number" inputmode="decimal" step="0.1" value="${esc(active.endOdometer??"")}" placeholder="Optional"></div></div><label>Day Notes</label><textarea id="routeDayNotes" placeholder="General notes for today’s route report...">${esc(active.dayNotes||"")}</textarea></div>`:""}
-    ${active?`<div class="card routeQuick462">
+    ${active?`<div class="card routeQuick462 ${paused?"routeQuickPaused470":""}">
       <div class="routeSitePick462"><label>Site Stop</label><select id="routeSiteSelect"><option value="">Select saved site...</option>${siteOptions}</select></div>
       <div class="grid2">
-        <button class="primary" id="arrivedBtn">Arrived Site</button>
-        <button class="ghost" id="leftBtn">Left Site</button>
-        <button class="ghost" id="waypointBtn">Manual Waypoint</button>
-        <button class="ghost" id="breakBtn">Break / Fuel / Parts</button>
-        <button class="ghost routeNearestBtn466" id="nearestBtn">Check Nearest Site</button>
+        <button class="primary" id="arrivedBtn" ${paused?"disabled":""}>Arrived Site</button>
+        <button class="ghost" id="leftBtn" ${paused?"disabled":""}>Left Site</button>
+        <button class="ghost" id="waypointBtn" ${paused?"disabled":""}>Manual Waypoint</button>
+        <button class="ghost" id="breakBtn" ${paused?"disabled":""}>Break / Fuel / Parts</button>
+        <button class="ghost routeNearestBtn466" id="nearestBtn" ${paused?"disabled":""}>Check Nearest Site</button>
       </div>
-      <p class="fieldNote">GPS capture works while FireVault is open. iPhone home-screen web apps may limit background tracking.</p>
+      <p class="fieldNote">${paused?"Route is paused. Resume to add site stops, waypoints, or nearest-site checks.":"GPS capture works while FireVault is open. iPhone home-screen web apps may limit background tracking."}</p>
     </div>`:""}
     ${suggestion?`<div class="card routeSuggestion466"><div><h2>Suggested Site Stop</h2><p><strong>${esc(suggestion.s.name||"Unnamed Site")}</strong> • ${esc(suggestion.n.distance)} away</p><p>${esc(suggestion.n.address||"No address saved")}</p><p class="fieldNote">Checked ${routeEventTime(suggestion.n.checkedAt)} • GPS accuracy ±${Math.round(Number(suggestion.n.accuracy)||0)} m</p></div><div class="grid3 routeSuggestionActions466"><button class="primary" id="suggestArriveBtn">Arrived</button><button class="ghost" id="suggestLeftBtn">Left</button><button class="ghost" id="clearSuggestionBtn">Clear</button></div></div>`:""}
     <div class="list grow routeList462">
@@ -967,6 +1007,8 @@ function routeLog(){
   document.getElementById("backBtn").onclick=()=>route("home");
   const start=document.getElementById("startRouteBtn"); if(start) start.onclick=startRouteDay;
   const end=document.getElementById("endRouteBtn"); if(end) end.onclick=endRouteDay;
+  const pause=document.getElementById("pauseRouteBtn"); if(pause) pause.onclick=pauseRouteDay;
+  const resume=document.getElementById("resumeRouteBtn"); if(resume) resume.onclick=resumeRouteDay;
   const copy=document.getElementById("copyRouteBtn"); if(copy) copy.onclick=()=>copyRouteReport(activeRoute||saved[0]);
   const download=document.getElementById("downloadRouteBtn"); if(download) download.onclick=()=>downloadRouteReport(activeRoute||saved[0]);
   const csv=document.getElementById("csvRouteBtn"); if(csv) csv.onclick=()=>downloadRouteCsv(activeRoute||saved[0]);
@@ -2187,11 +2229,11 @@ function diagnostics(){
 }
 function showChangelog(){
   const notes = [
-    "Added Vehicle / Mileage details to Daily Route.",
-    "Route reports can now include vehicle, start odometer, end odometer, odometer miles, and day notes.",
-    "Saved route history shows odometer mileage when entered.",
-    "CSV exports now include day-level mileage details.",
-    "Preserved dashboard route controls, nearest-site suggestions, and the blinking recording LED."
+    "Added Daily Route Pause / Resume controls.",
+    "Paused routes show an amber LED instead of the green recording LED.",
+    "Dashboard route controls now include Pause / Resume.",
+    "Route report text now includes recording status.",
+    "Waypoint and nearest-site capture are blocked while route recording is paused."
   ];
   const overlay=document.createElement("div");
   overlay.className="releaseOverlay";

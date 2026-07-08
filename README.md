@@ -1,23 +1,22 @@
-# FireVault Build 0.46.9
+# FireVault Build 0.47.0
 
-Build 0.46.9 is a Daily Route vehicle and mileage logging build.
+Build 0.47.0 is the Daily Route pause / resume polish build.
 
 ## What changed
 
-- Visible app version advanced to 0.46.9.
-- Added **Vehicle / Mileage** details to active Daily Route.
-- Added fields for:
-  - Vehicle / truck / unit number
-  - Start odometer
-  - End odometer
-  - Day notes
-- Daily Route reports now include vehicle, odometer readings, calculated odometer miles, and day notes.
-- Saved route history now shows odometer mileage when entered.
-- CSV exports now include day-level mileage fields.
-- Preserved dashboard route controls, nearest-site suggestions, active-route exports, waypoint edit/delete/undo, and the blinking recording LED.
+- Visible app version advanced to 0.47.0.
+- Added **Pause Route** and **Resume Route** controls for active Daily Route sessions.
+- Added dashboard Pause / Resume control inside the active Daily Route card.
+- The dashboard LED now reflects route state:
+  - Green blinking LED = route recording
+  - Amber pulsing LED = route paused
+- Waypoint capture and nearest-site checks are blocked while the route is paused.
+- Route reports now include recording status.
+- Pause and Resume are added to the route timeline as events.
+- Preserved vehicle / odometer logging, CSV export, customer summary, nearest-site suggestions, and route dashboard controls.
 
 Suggested commit message:
 
 ```text
-Build 0.46.9 daily route vehicle mileage and odometer logging
+Build 0.47.0 daily route pause resume status
 ```
