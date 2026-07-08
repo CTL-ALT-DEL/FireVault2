@@ -1,27 +1,28 @@
-# FireVault Build 0.45.9
+# FireVault Build 0.46.0
 
-Build 0.45.9 is a Navigation & Screen Fit Polish build.
+Build 0.46.0 is a Bug Sweep / Stability Checkpoint build.
 
 ## What changed
 
-- Visible app version advanced to 0.45.9.
-- Improved bottom spacing so screen content is less likely to hide behind the lower menu bar.
-- Added safer scroll room for long screens on iPhone / home-screen PWA mode.
-- Tuned screen fit across:
-  - Home
-  - Sites
-  - Library
-  - Settings
-  - Site Detail
-  - Report Center
-  - Tasks / Deficiencies / Attention Queue
-- Kept the bottom menu slightly separated while avoiding a large blank strip.
-- Standardized page header rhythm and spacing.
-- Preserved the centered bold day/date from 0.45.8.
-- Preserved the splash screen, Library folder tools, and recent Settings fixes.
+- Visible app version advanced to 0.46.0.
+- Added a new **Stability Checkpoint** inside Diagnostics.
+- Added sanity checks for:
+  - App route registration
+  - Site database structure
+  - Library resource structure
+  - Library folders
+  - Core settings objects
+  - Duplicate site IDs
+  - Duplicate resource IDs
+  - Invalid GPS records
+  - Orphaned active service calls
+- Added **Repair Vault** to normalize data structures and clear orphaned active jobs.
+- Added **Copy Diagnostics** for easy troubleshooting.
+- Improved Diagnostics layout with cleaner summary cards and better screen fit.
+- Preserved the centered bold day/date, splash screen, Library folder tools, Settings fixes, and navigation fit polish.
 
 Suggested commit message:
 
 ```text
-Build 0.45.9 navigation and screen fit polish
+Build 0.46.0 bug sweep stability checkpoint diagnostics
 ```

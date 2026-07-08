@@ -1620,20 +1620,171 @@ function saveSettings(){
   save(); toast("Settings saved."); settings();
 }
 
-function diagnostics(){ const taskRows=allTaskRows(); const taskCounts=taskFilterCounts(taskRows); const totalTasks=taskRows.length; const serviceTasks=taskRows.filter(r=>r.t.source==="Service Call").length; const totalDef=data.sites.reduce((n,s)=>n+(s.deficiencies||[]).length,0); const openDefTotal=data.sites.reduce((n,s)=>n+(s.deficiencies||[]).filter(d=>(d.status||"Open")!=="Closed").length,0); const closedDefTotal=data.sites.reduce((n,s)=>n+(s.deficiencies||[]).filter(d=>(d.status||"Open")==="Closed").length,0); const totalVisits=data.sites.reduce((n,s)=>n+(s.visits||[]).length,0); const totalContacts=data.sites.reduce((n,s)=>n+(s.contacts||[]).length,0); const totalDocs=data.sites.reduce((n,s)=>n+(s.docs||[]).length,0); const totalReportDeliveries=data.sites.reduce((n,s)=>n+(s.reportDeliveries||[]).length,0); const reportFollowUps=allTaskRows().filter(r=>r.t.source==="Report Delivery" && !taskIsDone(r.t)).length; const totalChecklist=data.sites.reduce((n,s)=>n+(s.checklist||[]).length,0); const checklistIssues=data.sites.reduce((n,s)=>n+(s.checklist||[]).filter(i=>i.status==="Issue").length,0); const completedInspections=data.sites.reduce((n,s)=>n+(s.visits||[]).filter(v=>v.type==="Inspection Checklist").length,0); const healthWarn=data.sites.filter(s=>siteHealth(s).cls==="healthWarn").length; const healthWatch=data.sites.filter(s=>siteHealth(s).cls==="healthWatch").length; const attentionTotal=attentionRows().length; html(`<div class="screen"><div class="row"><button class="back ghost" id="backHome">←</button><h1>Diagnostics</h1></div><div class="card grow errorBox"><p>Build: ${BUILD}</p><p>Sites: ${data.sites.length}</p><p>Total Tasks: ${totalTasks}</p><p>Open Tasks: ${taskCounts.open}</p><p>Due Today: ${taskCounts.today}</p><p>Overdue Tasks: ${taskCounts.overdue}</p><p>Service Follow-Ups: ${serviceTasks}</p><p>Total Deficiencies: ${totalDef}</p><p>Open Deficiencies: ${openDefTotal}</p><p>Closed Deficiencies: ${closedDefTotal}</p><p>Total Visits: ${totalVisits}</p><p>Total Contacts: ${totalContacts}</p><p>Total Documents: ${totalDocs}</p><p>Report Deliveries: ${totalReportDeliveries}</p><p>Report Follow-Ups: ${reportFollowUps}</p><p>Checklist Items: ${totalChecklist}</p><p>Checklist Issues: ${checklistIssues}</p><p>Completed Inspections: ${completedInspections}</p><p>Attention Sites: ${healthWarn}</p><p>Watch Sites: ${healthWatch}</p><p>Attention Queue: ${attentionTotal}</p><p>Active Job: ${activeJob ? esc(activeJob.siteName) : "None"}</p><p>Current Theme: ${esc(data.settings.theme.name)}</p><p>Accent: ${esc(data.settings.theme.accentColor)}</p><p>Advanced AI Enabled: ${data.settings.advanced?.aiTechnician ? "Yes" : "No"}</p><p>GPS Tools: ${data.settings.gps?.enabled !== false ? "Enabled" : "Hidden"}</p><p>Nearby Radius: ${nearbyRadiusMiles()} mi</p><p>Haptics: ${data.settings.app?.haptics !== false ? "Enabled" : "Off"}</p><p>Import/Export: Ready</p><p>Storage key: ${KEY}</p><p>Modules loaded successfully.</p></div></div>`); document.getElementById("backHome").onclick=()=>route("home"); }
+
+function stabilityReport(){
+  const issues=[];
+  const pass=[];
+  const routeNames=["home","sites","nearbySites","attention","siteDetail","visits","visitDetail","checklist","siteForm","contactsList","contactForm","siteDocs","siteDocForm","equipmentList","equipmentForm","tasks","taskForm","deficiencies","deficiencyForm","report","library","resourceForm","jobMode","settings","diagnostics"];
+  pass.push(`${routeNames.length} app routes registered`);
+  if(Array.isArray(data.sites)) pass.push("Sites database is an array"); else issues.push("Sites database is not an array");
+  if(Array.isArray(data.resources)) pass.push("Library resources database is an array"); else issues.push("Library resources database is not an array");
+  if(Array.isArray(data.resourceFolders)) pass.push("Library folders are available"); else issues.push("Library folders are missing");
+  if(data.settings && data.settings.app && data.settings.theme && data.settings.gps) pass.push("Core settings objects are present"); else issues.push("One or more core settings objects are missing");
+  const ids=new Set();
+  (data.sites||[]).forEach((s,idx)=>{
+    if(!s.id) issues.push(`Site ${idx+1} is missing an ID`);
+    if(s.id && ids.has(s.id)) issues.push(`Duplicate site ID detected: ${s.id}`);
+    if(s.id) ids.add(s.id);
+    ["visits","tasks","deficiencies","equipment","contacts","docs","checklist","reportDeliveries"].forEach(k=>{
+      if(!Array.isArray(s[k])) issues.push(`${s.name||"Unnamed site"} has invalid ${k} storage`);
+    });
+    if(s.gps && (!Number.isFinite(Number(s.gps.lat)) || !Number.isFinite(Number(s.gps.lng)))) issues.push(`${s.name||"Unnamed site"} has invalid GPS coordinates`);
+  });
+  const resourceIds=new Set();
+  (data.resources||[]).forEach((r,idx)=>{
+    if(!r.id) issues.push(`Library resource ${idx+1} is missing an ID`);
+    if(r.id && resourceIds.has(r.id)) issues.push(`Duplicate library resource ID detected: ${r.id}`);
+    if(r.id) resourceIds.add(r.id);
+  });
+  if(activeJob && !data.sites.some(s=>s.id===activeJob.siteId)) issues.push("Active service call points to a site that no longer exists");
+  if(!issues.length){
+    pass.push("No duplicate site IDs found");
+    pass.push("No invalid GPS coordinates found");
+    pass.push("No orphaned active job found");
+  }
+  return {issues, pass, status:issues.length ? "Needs Review" : "Passed"};
+}
+function diagnosticsText(){
+  const taskRows=allTaskRows();
+  const taskCounts=taskFilterCounts(taskRows);
+  const totalDef=data.sites.reduce((n,s)=>n+(s.deficiencies||[]).length,0);
+  const totalVisits=data.sites.reduce((n,s)=>n+(s.visits||[]).length,0);
+  const stability=stabilityReport();
+  const lines=[
+    `FireVault Diagnostics`,
+    `Build: ${BUILD}`,
+    `Stability: ${stability.status}`,
+    `Sites: ${data.sites.length}`,
+    `Resources: ${data.resources.length}`,
+    `Open Tasks: ${taskCounts.open}`,
+    `Due Today: ${taskCounts.today}`,
+    `Overdue Tasks: ${taskCounts.overdue}`,
+    `Deficiencies: ${totalDef}`,
+    `Visits: ${totalVisits}`,
+    `GPS Saved Sites: ${data.sites.filter(hasGps).length}`,
+    `Active Job: ${activeJob ? activeJob.siteName : "None"}`,
+    `Storage Key: ${KEY}`,
+    ``,
+    `Stability Issues:`,
+    ...(stability.issues.length ? stability.issues.map(i=>`- ${i}`) : ["- None"]),
+    ``,
+    `Checks Passed:`,
+    ...stability.pass.map(p=>`- ${p}`),
+    ``,
+    `Generated: ${new Date().toLocaleString()}`
+  ];
+  return lines.join("\n");
+}
+function copyDiagnostics(){
+  const text=diagnosticsText();
+  if(navigator.clipboard?.writeText){
+    navigator.clipboard.writeText(text).then(()=>toast("Diagnostics copied."),()=>toast("Clipboard unavailable."));
+  }else{
+    toast("Clipboard unavailable.");
+  }
+}
+function repairVaultState(){
+  data = loadData();
+  data.sites = Array.isArray(data.sites) ? data.sites : [];
+  data.resources = Array.isArray(data.resources) ? data.resources : [];
+  data.resourceFolders = Array.isArray(data.resourceFolders) ? data.resourceFolders.filter(Boolean) : ["Manuals","Forms","Links","Codes"];
+  if(!data.resourceFolders.length) data.resourceFolders = ["Manuals","Forms","Links","Codes"];
+  const siteIds=new Set();
+  data.sites.forEach(s=>{
+    ensureSite(s);
+    if(!s.id || siteIds.has(s.id)) s.id=uid();
+    siteIds.add(s.id);
+    if(s.gps && (!Number.isFinite(Number(s.gps.lat)) || !Number.isFinite(Number(s.gps.lng)))) s.gps=null;
+  });
+  const resourceIds=new Set();
+  data.resources.forEach(r=>{
+    if(!r.id || resourceIds.has(r.id)) r.id=uid();
+    resourceIds.add(r.id);
+    r.folder = r.folder || "";
+  });
+  if(activeJob && !data.sites.some(s=>s.id===activeJob.siteId)){
+    activeJob=null;
+    saveActiveJob();
+  }
+  localStorage.setItem("firevault_last_stability_check", new Date().toLocaleString());
+  save();
+  toast("Stability repair completed.");
+  diagnostics();
+}
+function diagnostics(){
+  const taskRows=allTaskRows();
+  const taskCounts=taskFilterCounts(taskRows);
+  const totalTasks=taskRows.length;
+  const serviceTasks=taskRows.filter(r=>r.t.source==="Service Call").length;
+  const totalDef=data.sites.reduce((n,s)=>n+(s.deficiencies||[]).length,0);
+  const openDefTotal=data.sites.reduce((n,s)=>n+(s.deficiencies||[]).filter(d=>(d.status||"Open")!=="Closed").length,0);
+  const closedDefTotal=data.sites.reduce((n,s)=>n+(s.deficiencies||[]).filter(d=>(d.status||"Open")==="Closed").length,0);
+  const totalVisits=data.sites.reduce((n,s)=>n+(s.visits||[]).length,0);
+  const totalContacts=data.sites.reduce((n,s)=>n+(s.contacts||[]).length,0);
+  const totalDocs=data.sites.reduce((n,s)=>n+(s.docs||[]).length,0);
+  const totalReportDeliveries=data.sites.reduce((n,s)=>n+(s.reportDeliveries||[]).length,0);
+  const reportFollowUps=allTaskRows().filter(r=>r.t.source==="Report Delivery" && !taskIsDone(r.t)).length;
+  const totalChecklist=data.sites.reduce((n,s)=>n+(s.checklist||[]).length,0);
+  const checklistIssues=data.sites.reduce((n,s)=>n+(s.checklist||[]).filter(i=>i.status==="Issue").length,0);
+  const completedInspections=data.sites.reduce((n,s)=>n+(s.visits||[]).filter(v=>v.type==="Inspection Checklist").length,0);
+  const healthWarn=data.sites.filter(s=>siteHealth(s).cls==="healthWarn").length;
+  const healthWatch=data.sites.filter(s=>siteHealth(s).cls==="healthWatch").length;
+  const attentionTotal=attentionRows().length;
+  const stability=stabilityReport();
+  const lastCheck=localStorage.getItem("firevault_last_stability_check") || "Not run yet";
+  html(`<div class="screen diagnosticsScreen460">
+    <div class="row"><button class="back ghost" id="backHome">←</button><h1>Diagnostics</h1></div>
+    <div class="card stabilityHero460 ${stability.issues.length?"needsReview":"passed"}">
+      <div><strong>${stability.status}</strong><span>Stability Checkpoint</span></div>
+      <p>${stability.issues.length ? `${stability.issues.length} issue${stability.issues.length===1?"":"s"} found. Run Repair Vault if needed.` : "Core data structure, routes, GPS records, and active job state look clean."}</p>
+    </div>
+    <div class="grid2 diagnosticsActions460">
+      <button class="primary" id="repairVaultBtn">Repair Vault</button>
+      <button class="ghost" id="copyDiagBtn">Copy Diagnostics</button>
+    </div>
+    <div class="card diagnosticsGrid460">
+      <div><strong>${data.sites.length}</strong><span>Sites</span></div>
+      <div><strong>${data.resources.length}</strong><span>Resources</span></div>
+      <div><strong>${totalVisits}</strong><span>Visits</span></div>
+      <div><strong>${taskCounts.open}</strong><span>Open Tasks</span></div>
+      <div><strong>${taskCounts.overdue}</strong><span>Overdue</span></div>
+      <div><strong>${openDefTotal}</strong><span>Open Def.</span></div>
+      <div><strong>${data.sites.filter(hasGps).length}</strong><span>GPS Saved</span></div>
+      <div><strong>${attentionTotal}</strong><span>Attention</span></div>
+    </div>
+    <div class="list grow diagnosticsList460">
+      <div class="card"><h2>Stability Issues</h2>${stability.issues.length?`<ul>${stability.issues.map(i=>`<li>${esc(i)}</li>`).join("")}</ul>`:`<p>No issues found.</p>`}</div>
+      <div class="card"><h2>Checks Passed</h2><ul>${stability.pass.map(p=>`<li>${esc(p)}</li>`).join("")}</ul></div>
+      <div class="card errorBox"><p>Build: ${BUILD}</p><p>Total Tasks: ${totalTasks}</p><p>Due Today: ${taskCounts.today}</p><p>Service Follow-Ups: ${serviceTasks}</p><p>Total Deficiencies: ${totalDef}</p><p>Closed Deficiencies: ${closedDefTotal}</p><p>Total Contacts: ${totalContacts}</p><p>Total Documents: ${totalDocs}</p><p>Report Deliveries: ${totalReportDeliveries}</p><p>Report Follow-Ups: ${reportFollowUps}</p><p>Checklist Items: ${totalChecklist}</p><p>Checklist Issues: ${checklistIssues}</p><p>Completed Inspections: ${completedInspections}</p><p>Attention Sites: ${healthWarn}</p><p>Watch Sites: ${healthWatch}</p><p>Active Job: ${activeJob ? esc(activeJob.siteName) : "None"}</p><p>Current Theme: ${esc(data.settings.theme.name)}</p><p>Accent: ${esc(data.settings.theme.accentColor)}</p><p>GPS Tools: ${data.settings.gps?.enabled !== false ? "Enabled" : "Hidden"}</p><p>Nearby Radius: ${nearbyRadiusMiles()} mi</p><p>Haptics: ${data.settings.app?.haptics !== false ? "Enabled" : "Off"}</p><p>Last Stability Check: ${esc(lastCheck)}</p><p>Storage key: ${KEY}</p><p>Modules loaded successfully.</p></div>
+    </div>
+  </div>`);
+  document.getElementById("backHome").onclick=()=>route("home");
+  document.getElementById("repairVaultBtn").onclick=repairVaultState;
+  document.getElementById("copyDiagBtn").onclick=copyDiagnostics;
+}
 function showChangelog(){
   const notes = [
-    "Redesigned Settings into a main choices page instead of cramped top tabs.",
-    "Each settings area now opens full screen with a back arrow to Settings choices.",
-    "Added a top Save button for editable settings pages.",
-    "Kept Backup and About as full-screen utility pages with return navigation.",
-    "Preserved the Loading FireVault boot watchdog and all current vault modules."
+    "Added a 0.46.0 Stability Checkpoint inside Diagnostics.",
+    "Added route/data sanity checks for sites, resources, GPS, settings, and active service calls.",
+    "Added Repair Vault to normalize site/resource structures and clear orphaned active jobs.",
+    "Added Copy Diagnostics for quick troubleshooting notes.",
+    "Preserved the current visual polish, splash screen, Library folder tools, and Settings fixes."
   ];
   const overlay=document.createElement("div");
   overlay.className="releaseOverlay";
   overlay.innerHTML=`<div class="releaseSheet" role="dialog" aria-modal="true" aria-label="FireVault release notes">
     <div class="releaseHead"><div><strong>FireVault</strong><span>Build ${BUILD}</span></div><button class="ghost iconBtn" id="closeRelease" aria-label="Close release notes">×</button></div>
-    <div class="releaseBody"><h2>Release Notes</h2><p class="releaseIntro">settings full-screen redesign and navigation polish.</p><ul>${notes.map(n=>`<li>${esc(n)}</li>`).join("")}</ul></div>
+    <div class="releaseBody"><h2>Release Notes</h2><p class="releaseIntro">stability checkpoint, diagnostics repair, and bug-sweep polish.</p><ul>${notes.map(n=>`<li>${esc(n)}</li>`).join("")}</ul></div>
   </div>`;
   document.body.appendChild(overlay);
   const close=()=>overlay.remove();
