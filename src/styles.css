@@ -938,7 +938,7 @@ nav button:active{transform:translateY(1px) scale(.992)}
 .reportDeliveryEmpty{font-size:12px;color:var(--muted);padding:9px 10px;border:1px dashed rgba(255,255,255,.13);border-radius:13px;background:rgba(255,255,255,.025);}
 @media(max-width:560px){.reportActionGrid442{grid-template-columns:repeat(2,minmax(0,1fr));}.reportActionGrid442 #shareBtn{grid-column:1 / -1}.reportDeliveryHead{align-items:center}.reportDeliveryRow{grid-template-columns:1fr}.reportDeliveryRow time{justify-self:start}.reportReadyCard442 small{white-space:normal}}
 
-/* Build 0.47.0 Report delivery receipts and follow-up tasks */
+/* Build 0.47.1 Report delivery receipts and follow-up tasks */
 .reportDeliveryCard444 .reportDeliveryHead{align-items:flex-start;}
 .reportDeliveryHeadActions{display:flex;gap:7px;align-items:center;flex:0 0 auto;}
 .reportDeliveryReceiptBtn{width:100%;text-align:left;color:var(--text);font:inherit;cursor:pointer;}
@@ -946,7 +946,7 @@ nav button:active{transform:translateY(1px) scale(.992)}
 .reportDeliveryReceiptBtn:active{transform:translateY(1px);}
 @media(max-width:560px){.reportDeliveryCard444 .reportDeliveryHead{display:grid;grid-template-columns:1fr;gap:9px}.reportDeliveryHeadActions{display:grid;grid-template-columns:1fr 1fr;width:100%}.reportDeliveryHeadActions .smallBtn{width:100%}}
 
-/* Build 0.47.0 Visual Consistency Pass - professional field-tool surface system */
+/* Build 0.47.1 Visual Consistency Pass - professional field-tool surface system */
 :root{
   --fv445Top:#242d3d;
   --fv445Bottom:#121923;
@@ -1111,7 +1111,7 @@ nav button span:last-child{font-size:11.2px!important;font-weight:850;}
 }
 
 
-/* Build 0.47.0 Site Detail polish - professional customer vault command page */
+/* Build 0.47.1 Site Detail polish - professional customer vault command page */
 .siteDetailScreen446{gap:10px;}
 .siteTopBar{align-items:center;justify-content:space-between;margin-bottom:-2px;}
 .siteTopBar .back,.siteTopBar #editBtn{min-height:38px;border-radius:14px;padding:8px 13px;font-size:13px;font-weight:900;}
@@ -1165,7 +1165,7 @@ nav button span:last-child{font-size:11.2px!important;font-weight:850;}
   .siteDetailScreen446 .mapActions{grid-template-columns:1fr;}
 }
 
-/* Build 0.47.0 Report Center polish and readability pass */
+/* Build 0.47.1 Report Center polish and readability pass */
 .reportScreen447{gap:10px;}
 .reportScreen447 .reportTopRow{min-height:40px;gap:10px;}
 .reportScreen447 .reportTopRow .back{min-width:40px;min-height:40px;border-radius:14px;}
@@ -1212,7 +1212,7 @@ nav button span:last-child{font-size:11.2px!important;font-weight:850;}
   .reportBox447{font-size:11.5px!important;}
 }
 
-/* Build 0.47.0 Settings final readability and layout consistency pass */
+/* Build 0.47.1 Settings final readability and layout consistency pass */
 .settingsScreen448{
   gap:10px!important;
   text-align:left!important;
@@ -1474,7 +1474,7 @@ nav button span:last-child{font-size:11.2px!important;font-weight:850;}
   .settingsContent448 .checkRow{font-size:13.2px!important;}
 }
 
-/* Build 0.47.0 Backup Center polish + data safety snapshot */
+/* Build 0.47.1 Backup Center polish + data safety snapshot */
 .settingsScreen449 .settingsMiniTitle p{max-width:56vw}
 .backupCenter449{gap:12px!important}
 .backupCenter449 .compactPane{border-radius:18px!important;border-left:0!important}
@@ -1493,7 +1493,7 @@ nav button span:last-child{font-size:11.2px!important;font-weight:850;}
 @media(max-width:620px){.backupStats449{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.backupActionGrid449{grid-template-columns:1fr}.backupStats449 div{min-height:58px}.backupStats449 strong{font-size:20px}}
 
 
-/* Build 0.47.0 Stability Checkpoint - dashboard status polish */
+/* Build 0.47.1 Stability Checkpoint - dashboard status polish */
 .homeScreen450{gap:11px!important;}
 .homeHero450{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;}
 .homeHero450 p{font-size:13px;font-weight:800;color:#aeb9cc;margin-top:4px;}
@@ -1511,7 +1511,7 @@ nav button span:last-child{font-size:11.2px!important;font-weight:850;}
 @media(max-width:390px){.homeHero450{display:block}.homeBuildPill450{margin-top:8px}.homeStatusGrid450{gap:7px}.homeStatusGrid450 div{min-height:48px;padding:7px}.homeStatusGrid450 strong{font-size:18px}.homeStatusHead450{align-items:flex-start}.homeStatusHead450 span{font-size:10.8px}}
 
 
-/* Build 0.47.0 Settings full-screen redesign - main choices + detail pages */
+/* Build 0.47.1 Settings full-screen redesign - main choices + detail pages */
 .settingsHomeScreen451{
   gap:12px!important;
   padding-top:2px!important;
@@ -1755,7 +1755,7 @@ nav button span:last-child{font-size:11.2px!important;font-weight:850;}
 }
 
 
-/* Build 0.47.0 dashboard duplicate build pill removal + bottom visibility fix */
+/* Build 0.47.1 dashboard duplicate build pill removal + bottom visibility fix */
 .homeHero450{justify-content:flex-start!important;}
 .homeScreen450{overflow:auto!important; padding-bottom:calc(var(--navH) + 18px)!important; -webkit-overflow-scrolling:touch;}
 .homeScreen450 .homeStatus450{margin-bottom:4px!important;}
@@ -1768,7 +1768,7 @@ main{padding-bottom:8px!important;}
 }
 
 
-/* Build 0.47.0 Settings menu repair - horizontal icon/title and no OPEN labels */
+/* Build 0.47.1 Settings menu repair - horizontal icon/title and no OPEN labels */
 .settingsChoiceGrid451{
   grid-template-columns:repeat(2,minmax(0,1fr))!important;
   gap:10px!important;
@@ -1897,7 +1897,7 @@ main{padding-bottom:8px!important;}
 }
 
 
-/* Build 0.47.0 Settings tab vertical alignment polish */
+/* Build 0.47.1 Settings tab vertical alignment polish */
 .settingsChoice451.settingsChoice456{
   min-height:82px!important;
   padding:12px 42px 12px 12px!important;
@@ -1995,7 +1995,7 @@ main{padding-bottom:8px!important;}
 }
 
 
-/* Build 0.47.0 dashboard date, startup splash, and Library folders */
+/* Build 0.47.1 dashboard date, startup splash, and Library folders */
 .splashScreen457{
   min-height:100%;
   display:flex;
@@ -2265,7 +2265,7 @@ main{padding-bottom:8px!important;}
 }
 
 
-/* Build 0.47.0 Center-justified day/date block */
+/* Build 0.47.1 Center-justified day/date block */
 .homeHero457{
   display:flex!important;
   justify-content:center!important;
@@ -2299,7 +2299,7 @@ main{padding-bottom:8px!important;}
 }
 
 
-/* Build 0.47.0 Navigation & Screen Fit Polish */
+/* Build 0.47.1 Navigation & Screen Fit Polish */
 :root{
   --contentBottomPad459:calc(var(--navH) + 22px);
   --screenGap459:10px;
@@ -2463,7 +2463,7 @@ nav button{
 }
 
 
-/* Build 0.47.0 Stability Checkpoint / Diagnostics polish */
+/* Build 0.47.1 Stability Checkpoint / Diagnostics polish */
 .diagnosticsScreen460{
   gap:10px!important;
   overflow:hidden!important;
@@ -2574,7 +2574,7 @@ nav button{
 }
 
 
-/* Build 0.47.0 Diagnostics bottom menu visibility fix */
+/* Build 0.47.1 Diagnostics bottom menu visibility fix */
 .diagnosticsScreen460{
   overflow-y:auto!important;
   overflow-x:hidden!important;
@@ -2610,7 +2610,7 @@ nav button{
 }
 
 
-/* Build 0.47.0 Daily Route Log Starter */
+/* Build 0.47.1 Daily Route Log Starter */
 .routeHomeTile462{
   border-color:color-mix(in srgb,var(--blue) 36%, rgba(255,255,255,.09))!important;
 }
@@ -2747,7 +2747,7 @@ nav button{
 }
 
 
-/* Build 0.47.0 Daily Route recording LED */
+/* Build 0.47.1 Daily Route recording LED */
 .homeHero463{
   justify-content:center!important;
 }
@@ -2802,7 +2802,7 @@ nav button{
 }
 
 
-/* Build 0.47.0 Daily Route report polish */
+/* Build 0.47.1 Daily Route report polish */
 .routeControls462{
   grid-template-columns:1fr 1fr 1fr!important;
 }
@@ -2862,7 +2862,7 @@ nav button{
 }
 
 
-/* Build 0.47.0 Daily Route waypoint edit/delete polish */
+/* Build 0.47.1 Daily Route waypoint edit/delete polish */
 .routeControls462{
   grid-template-columns:1fr 1fr!important;
 }
@@ -2905,7 +2905,7 @@ nav button{
 }
 
 
-/* Build 0.47.0 Daily Route smart nearest-site suggestions */
+/* Build 0.47.1 Daily Route smart nearest-site suggestions */
 .routeNearestBtn466{
   grid-column:1 / -1;
   border-color:color-mix(in srgb,var(--green) 32%, rgba(255,255,255,.1))!important;
@@ -2954,7 +2954,7 @@ nav button{
 }
 
 
-/* Build 0.47.0 Daily Route export polish */
+/* Build 0.47.1 Daily Route export polish */
 .routeReportPreview467{
   border-left:0!important;
   background:linear-gradient(180deg,color-mix(in srgb,var(--blue) 12%, #202838),#101720)!important;
@@ -2988,7 +2988,7 @@ nav button{
 }
 
 
-/* Build 0.47.0 Active Daily Route dashboard card */
+/* Build 0.47.1 Active Daily Route dashboard card */
 .activeRouteMini468{
   display:grid;
   gap:10px;
@@ -3082,7 +3082,7 @@ nav button{
 }
 
 
-/* Build 0.47.0 Daily Route vehicle / mileage details */
+/* Build 0.47.1 Daily Route vehicle / mileage details */
 .routeDetails469{
   display:grid;
   gap:10px;
@@ -3136,7 +3136,7 @@ nav button{
 }
 
 
-/* Build 0.47.0 Daily Route pause / resume status */
+/* Build 0.47.1 Daily Route pause / resume status */
 .routeLed470{
   flex:0 0 auto;
   width:13px;
@@ -3178,4 +3178,142 @@ nav button{
 }
 @media(max-width:430px){
   .routeLed470{width:12px;height:12px;}
+}
+
+
+/* Build 0.47.1 Saved Daily Route review/search polish */
+.routeHistoryTools471{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) auto;
+  gap:8px;
+  flex:0 0 auto;
+}
+.routeHistoryTools471 input{
+  min-height:42px;
+}
+.routeHistoryTools471 button{
+  min-width:72px;
+  min-height:42px;
+}
+.routeHistoryCard471.openReview471{
+  border-color:color-mix(in srgb,var(--blue) 32%, rgba(255,255,255,.1))!important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.1),0 2px 0 #05070b,0 14px 28px rgba(0,0,0,.28)!important;
+}
+.routeHistoryActions471{
+  grid-template-columns:repeat(3,minmax(0,1fr))!important;
+}
+.routeReviewPanel471{
+  display:grid;
+  gap:9px;
+  margin-top:2px;
+  padding-top:10px;
+  border-top:1px solid rgba(255,255,255,.08);
+}
+.routeReviewStats471{
+  display:grid;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:7px;
+}
+.routeReviewStats471 div{
+  min-height:48px;
+  border-radius:14px;
+  background:linear-gradient(180deg,#202838,#101720);
+  border:1px solid rgba(255,255,255,.08);
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:3px;
+}
+.routeReviewStats471 strong{
+  color:#fff;
+  font-size:15px;
+  line-height:1;
+  font-weight:1000;
+}
+.routeReviewStats471 span{
+  color:#aeb9cc;
+  font-size:10px;
+  line-height:1;
+  text-transform:uppercase;
+  font-weight:900;
+  letter-spacing:.04em;
+}
+.routeReviewStops471{
+  padding:10px;
+  border-radius:14px;
+  background:rgba(255,255,255,.04);
+  border:1px solid rgba(255,255,255,.07);
+}
+.routeReviewStops471 strong{
+  display:block;
+  margin-bottom:5px;
+  font-size:12px;
+  text-transform:uppercase;
+  letter-spacing:.06em;
+  color:#dbeafe;
+}
+.routeReviewStops471 p{
+  font-size:12.5px!important;
+  line-height:1.32!important;
+  color:#dbe6f7!important;
+}
+.routeReviewTimeline471{
+  display:grid;
+  gap:6px;
+}
+.routeReviewMiniEvent471{
+  display:grid;
+  grid-template-columns:28px minmax(0,1fr) auto;
+  align-items:center;
+  gap:8px;
+  padding:8px;
+  border-radius:13px;
+  background:linear-gradient(180deg,#1a2230,#0f151f);
+  border:1px solid rgba(255,255,255,.07);
+}
+.routeReviewMiniEvent471 > span{
+  width:26px;
+  height:26px;
+  display:grid;
+  place-items:center;
+  border-radius:9px;
+  color:#fff;
+  background:rgba(255,255,255,.08);
+  font-size:11px;
+  font-weight:1000;
+}
+.routeReviewMiniEvent471 strong,
+.routeReviewMiniEvent471 small{
+  display:block;
+  min-width:0;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+.routeReviewMiniEvent471 strong{
+  color:#fff;
+  font-size:12.5px;
+  line-height:1.15;
+}
+.routeReviewMiniEvent471 small{
+  color:#aeb9cc;
+  font-size:11px;
+  line-height:1.15;
+  margin-top:2px;
+}
+.routeReviewMiniEvent471 a{
+  color:#dbeafe;
+  text-decoration:none;
+  font-size:11px;
+  font-weight:950;
+  padding:6px 8px;
+  border-radius:999px;
+  background:rgba(56,189,248,.12);
+  border:1px solid rgba(56,189,248,.22);
+}
+@media(max-width:430px){
+  .routeHistoryActions471{grid-template-columns:repeat(2,minmax(0,1fr))!important;}
+  .routeReviewStats471{grid-template-columns:repeat(2,minmax(0,1fr));}
+  .routeReviewMiniEvent471{grid-template-columns:26px minmax(0,1fr) auto; gap:6px;}
 }

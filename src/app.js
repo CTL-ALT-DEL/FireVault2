@@ -14,6 +14,8 @@ let activeRoute = loadActiveRoute();
 let nearbyState = null;
 let siteSearch = "";
 let libraryFolder = "all";
+let routeReviewId = "";
+let routeHistorySearch = "";
 let jobTimer = null;
 const QUICK_EVENTS = ["Arrived on site","Opened panel","Panel normal","Trouble active","Ground fault active","Device tested","Customer update","Parts needed"];
 const DEFAULT_CHECKLIST = [
@@ -1001,10 +1003,12 @@ function routeLog(){
     </div>`:""}
     ${suggestion?`<div class="card routeSuggestion466"><div><h2>Suggested Site Stop</h2><p><strong>${esc(suggestion.s.name||"Unnamed Site")}</strong> • ${esc(suggestion.n.distance)} away</p><p>${esc(suggestion.n.address||"No address saved")}</p><p class="fieldNote">Checked ${routeEventTime(suggestion.n.checkedAt)} • GPS accuracy ±${Math.round(Number(suggestion.n.accuracy)||0)} m</p></div><div class="grid3 routeSuggestionActions466"><button class="primary" id="suggestArriveBtn">Arrived</button><button class="ghost" id="suggestLeftBtn">Left</button><button class="ghost" id="clearSuggestionBtn">Clear</button></div></div>`:""}
     <div class="list grow routeList462">
-      ${active?`<div class="routeSectionTitle462"><strong>Today</strong><span>${routeDateLabel(active.startedAt)}</span></div>${events.length?events.map(e=>routeEventCard(e,true)).join(""):`<div class="empty">No route points yet. Add a waypoint or site stop.</div>`}`:`<div class="routeSectionTitle462"><strong>Saved Route Days</strong><span>Newest first</span></div>${saved.length?saved.map(routeHistoryCard).join(""):`<div class="empty">No saved route days yet.</div>`}`}
+      ${active?`<div class="routeSectionTitle462"><strong>Today</strong><span>${routeDateLabel(active.startedAt)}</span></div>${events.length?events.map(e=>routeEventCard(e,true)).join(""):`<div class="empty">No route points yet. Add a waypoint or site stop.</div>`}`:(()=>{const filtered=saved.filter(log=>routeReviewMatches(log,routeHistorySearch));return `<div class="routeHistoryTools471"><input id="routeHistorySearch" type="search" value="${esc(routeHistorySearch)}" placeholder="Search route history, site, vehicle, notes..."><button class="ghost" id="clearRouteSearchBtn" ${routeHistorySearch?"":"disabled"}>Clear</button></div><div class="routeSectionTitle462"><strong>Saved Route Days</strong><span>${filtered.length} of ${saved.length}</span></div>${filtered.length?filtered.map(routeHistoryCard).join(""):(saved.length?`<div class="empty">No saved route days match this search.</div>`:`<div class="empty">No saved route days yet.</div>`)} `})()}
     </div>
   </div>`);
   document.getElementById("backBtn").onclick=()=>route("home");
+  const routeSearch=document.getElementById("routeHistorySearch"); if(routeSearch) routeSearch.oninput=()=>{routeHistorySearch=routeSearch.value; routeLog();};
+  const routeSearchClear=document.getElementById("clearRouteSearchBtn"); if(routeSearchClear) routeSearchClear.onclick=()=>{routeHistorySearch=""; routeLog();};
   const start=document.getElementById("startRouteBtn"); if(start) start.onclick=startRouteDay;
   const end=document.getElementById("endRouteBtn"); if(end) end.onclick=endRouteDay;
   const pause=document.getElementById("pauseRouteBtn"); if(pause) pause.onclick=pauseRouteDay;
@@ -1023,6 +1027,7 @@ function routeLog(){
   const sugArr=document.getElementById("suggestArriveBtn"); if(sugArr) sugArr.onclick=()=>routeUseSuggestion("Arrived");
   const sugLeft=document.getElementById("suggestLeftBtn"); if(sugLeft) sugLeft.onclick=()=>routeUseSuggestion("Left Site");
   const sugClear=document.getElementById("clearSuggestionBtn"); if(sugClear) sugClear.onclick=clearRouteSuggestion;
+  document.querySelectorAll("[data-review-route]").forEach(b=>b.onclick=()=>{ routeReviewId = routeReviewId===b.dataset.reviewRoute ? "" : b.dataset.reviewRoute; routeLog(); });
   document.querySelectorAll("[data-copy-route]").forEach(b=>b.onclick=()=>{ const log=saved.find(x=>x.id===b.dataset.copyRoute); if(log) copyRouteReport(log); });
   document.querySelectorAll("[data-download-route]").forEach(b=>b.onclick=()=>{ const log=saved.find(x=>x.id===b.dataset.downloadRoute); if(log) downloadRouteReport(log); });
   document.querySelectorAll("[data-csv-route]").forEach(b=>b.onclick=()=>{ const log=saved.find(x=>x.id===b.dataset.csvRoute); if(log) downloadRouteCsv(log); });
@@ -1031,15 +1036,41 @@ function routeLog(){
   document.querySelectorAll("[data-edit-route-event]").forEach(b=>b.onclick=()=>editRouteEvent(b.dataset.editRouteEvent));
   document.querySelectorAll("[data-delete-route-event]").forEach(b=>b.onclick=()=>deleteRouteEvent(b.dataset.deleteRouteEvent));
 }
+
+function routeSiteSequence(log){
+  const names=(log?.events||[]).filter(e=>e.siteName).map(e=>e.siteName);
+  const seq=[];
+  names.forEach(n=>{ if(seq[seq.length-1]!==n) seq.push(n); });
+  return seq;
+}
+function routeReviewMatches(log, q){
+  if(!q) return true;
+  const hay=[log.date, log.vehicle, log.dayNotes, routeDateLabel(log.startedAt||log.date), routeSummaryLine(log), routeSiteSequence(log).join(" "), ...(log.events||[]).flatMap(e=>[e.label,e.type,e.siteName,e.address,e.notes,e.nearestSite])].join(" ").toLowerCase();
+  return hay.includes(q.toLowerCase());
+}
+function routeReviewStats(log){
+  const events=log?.events||[];
+  const seq=routeSiteSequence(log);
+  const start=events[0], end=events[events.length-1];
+  return {events,seq,start,end};
+}
+function routeReviewMiniEvent(e,i){
+  const link=routeMapLink(e);
+  return `<div class="routeReviewMiniEvent471"><span>${i+1}</span><div><strong>${esc(routeEventTime(e.at))} • ${esc(e.label||e.type)}</strong><small>${esc(e.siteName||e.notes||routeGpsText(e))}</small></div>${link?`<a href="${esc(link)}" target="_blank" rel="noopener">Map</a>`:""}</div>`;
+}
+function routeReviewPanel(log){
+  const st=routeReviewStats(log);
+  return `<div class="routeReviewPanel471"><div class="routeReviewStats471"><div><strong>${st.events.length}</strong><span>Points</span></div><div><strong>${st.seq.length}</strong><span>Sites</span></div><div><strong>${esc(routeDistanceLabel(log))}</strong><span>GPS Miles</span></div><div><strong>${esc(routeOdometerMiles(log)===null?"—":String(routeOdometerMiles(log)))}</strong><span>Odo Miles</span></div></div><div class="routeReviewStops471"><strong>Stop Sequence</strong><p>${st.seq.length?esc(st.seq.join(" → ")):"No site stop sequence recorded."}</p></div><div class="routeReviewTimeline471">${st.events.length?st.events.map(routeReviewMiniEvent).join(""):`<div class="empty">No saved points.</div>`}</div></div>`;
+}
 function routeEventCard(e,editable=false){
   const link=routeMapLink(e);
   return `<div class="card routeEventCard462 routeEventCard465"><div class="routeEventTop462"><div><h2>${esc(e.label||e.type)}</h2><p>${routeEventTime(e.at)}${e.siteName?` • ${esc(e.siteName)}`:""}</p></div><span class="pill">${esc(e.type||"Stop")}</span></div><p>${esc(routeGpsText(e))}</p>${e.address?`<p>${esc(e.address)}</p>`:""}${e.nearestSite?`<p class="fieldNote">Nearest saved site: ${esc(e.nearestSite)} (${esc(e.nearestDistance)})</p>`:""}${e.notes?`<p class="routeNote465">${esc(e.notes)}</p>`:""}<div class="routeEventFooter465">${link?`<a class="btn ghost routeMapBtn462" href="${esc(link)}" target="_blank" rel="noopener">Open Map</a>`:""}${editable?`<button class="ghost" data-edit-route-event="${esc(e.id)}">Edit</button><button class="danger" data-delete-route-event="${esc(e.id)}">Delete</button>`:""}</div></div>`;
 }
 function routeHistoryCard(log){
   const events=log.events||[];
-  const sites=events.filter(e=>e.siteName).map(e=>e.siteName);
-  const unique=[...new Set(sites)];
-  return `<div class="card routeHistoryCard462"><div class="routeEventTop462"><div><h2>${routeDateLabel(log.startedAt||log.date)}</h2><p>${routeSummaryLine(log)}</p></div><span class="pill">${log.endedAt?"Saved":"Active"}</span></div><p>${unique.length?esc(unique.slice(0,4).join(", ")):"No site stops recorded."}</p>${routeOdometerMiles(log)!==null?`<p class="fieldNote">${esc(routeOdometerLabel(log))}${log.vehicle?` • ${esc(log.vehicle)}`:""}</p>`:""}<div class="routeHistoryActions462 routeHistoryActions467"><button class="ghost" data-copy-route="${esc(log.id)}">Copy</button><button class="ghost" data-download-route="${esc(log.id)}">TXT</button><button class="ghost" data-csv-route="${esc(log.id)}">CSV</button><button class="ghost" data-summary-route="${esc(log.id)}">Summary</button><button class="danger" data-delete-route="${esc(log.id)}">Delete</button></div>${routeDirectionsLink(log)?`<a class="btn ghost routeMapBtn462" href="${esc(routeDirectionsLink(log))}" target="_blank" rel="noopener">Open Route Map</a>`:""}</div>`;
+  const unique=routeSiteSequence(log);
+  const reviewOpen=routeReviewId===log.id;
+  return `<div class="card routeHistoryCard462 routeHistoryCard471 ${reviewOpen?"openReview471":""}"><div class="routeEventTop462"><div><h2>${routeDateLabel(log.startedAt||log.date)}</h2><p>${routeSummaryLine(log)}</p></div><span class="pill">${log.endedAt?"Saved":"Active"}</span></div><p>${unique.length?esc(unique.slice(0,5).join(" → ")):"No site stops recorded."}</p>${routeOdometerMiles(log)!==null?`<p class="fieldNote">${esc(routeOdometerLabel(log))}${log.vehicle?` • ${esc(log.vehicle)}`:""}</p>`:""}<div class="routeHistoryActions462 routeHistoryActions467 routeHistoryActions471"><button class="primary" data-review-route="${esc(log.id)}">${reviewOpen?"Hide":"Review"}</button><button class="ghost" data-copy-route="${esc(log.id)}">Copy</button><button class="ghost" data-download-route="${esc(log.id)}">TXT</button><button class="ghost" data-csv-route="${esc(log.id)}">CSV</button><button class="ghost" data-summary-route="${esc(log.id)}">Summary</button><button class="danger" data-delete-route="${esc(log.id)}">Delete</button></div>${routeDirectionsLink(log)?`<a class="btn ghost routeMapBtn462" href="${esc(routeDirectionsLink(log))}" target="_blank" rel="noopener">Open Route Map</a>`:""}${reviewOpen?routeReviewPanel(log):""}</div>`;
 }
 
 function attentionQueue(){
@@ -2229,11 +2260,11 @@ function diagnostics(){
 }
 function showChangelog(){
   const notes = [
-    "Added Daily Route Pause / Resume controls.",
-    "Paused routes show an amber LED instead of the green recording LED.",
-    "Dashboard route controls now include Pause / Resume.",
-    "Route report text now includes recording status.",
-    "Waypoint and nearest-site capture are blocked while route recording is paused."
+    "Added saved Daily Route review panels.",
+    "Added route history search by site, vehicle, notes, date, or waypoint text.",
+    "Saved route cards now show stop sequence and expandable point timelines.",
+    "Review panels include points, sites, GPS distance, odometer miles, and map links.",
+    "Preserved Daily Route pause/resume status, vehicle mileage, CSV export, and dashboard controls."
   ];
   const overlay=document.createElement("div");
   overlay.className="releaseOverlay";

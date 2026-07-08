@@ -1,22 +1,26 @@
-# FireVault Build 0.47.0
+# FireVault Build 0.47.1
 
-Build 0.47.0 is the Daily Route pause / resume polish build.
+Build 0.47.1 is a saved Daily Route review and search polish build.
 
 ## What changed
 
-- Visible app version advanced to 0.47.0.
-- Added **Pause Route** and **Resume Route** controls for active Daily Route sessions.
-- Added dashboard Pause / Resume control inside the active Daily Route card.
-- The dashboard LED now reflects route state:
-  - Green blinking LED = route recording
-  - Amber pulsing LED = route paused
-- Waypoint capture and nearest-site checks are blocked while the route is paused.
-- Route reports now include recording status.
-- Pause and Resume are added to the route timeline as events.
-- Preserved vehicle / odometer logging, CSV export, customer summary, nearest-site suggestions, and route dashboard controls.
+- Visible app version advanced to 0.47.1.
+- Added search for saved Daily Route history.
+- Search matches saved routes by date, site, vehicle, notes, waypoint label, event type, address, and nearest-site text.
+- Added expandable **Review** panels on saved route day cards.
+- Review panels show:
+  - Total route points
+  - Site count
+  - Estimated GPS distance
+  - Odometer miles when entered
+  - Stop sequence
+  - Compact waypoint timeline
+  - Map links for individual points
+- Improved saved route day cards with clearer stop sequence display.
+- Preserved pause/resume status, vehicle mileage, CSV export, customer summary, route dashboard controls, and blinking route LED.
 
 Suggested commit message:
 
 ```text
-Build 0.47.0 daily route pause resume status
+Build 0.47.1 saved daily route review and search
 ```
