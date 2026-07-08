@@ -1,28 +1,25 @@
-# FireVault Build 0.47.3
+# FireVault Build 0.47.4
 
-Build 0.47.3 is a Simple View dashboard polish build.
+Build 0.47.4 is a Simple View setup polish build.
 
 ## What changed
 
-- Visible app version advanced to 0.47.3.
-- Improved Simple View so the dashboard feels cleaner and less crowded.
-- Added a **More Tools** drawer on the dashboard for hidden FireVault features.
-- Added one-tap enable/open controls for hidden tools:
-  - Daily Route
-  - GPS / Nearby
-  - Attention Queue
-  - Library
-  - Reports
-  - Equipment
-  - Diagnostics
-  - Backup / Repair
-- Added a quick **Advanced** button on the Simple View notice.
-- Tightened Simple View dashboard metric and action spacing.
-- Preserved the full Feature Visibility settings from 0.47.2.
-- Preserved all Daily Route tools, saved route search/review, pause/resume, mileage, CSV export, and dashboard recording LED.
+- Visible app version advanced to 0.47.4.
+- Added **Quick View Presets** inside Settings → Simple View.
+- Added one-tap presets:
+  - Minimal Daily
+  - Route Logger
+  - Service Tech
+  - Inspector
+  - Power Mode
+- Presets update the app mode and feature visibility toggles together.
+- Simple View dashboard now shows the current preset name.
+- Kept manual feature toggles for fine-tuning after a preset is applied.
+- Preserved the More Tools drawer from 0.47.3.
+- Preserved Daily Route, saved route search/review, pause/resume, mileage, CSV export, and dashboard recording LED.
 
 Suggested commit message:
 
 ```text
-Build 0.47.3 simple view dashboard hidden tools drawer
+Build 0.47.4 quick view presets simple setup polish
 ```
