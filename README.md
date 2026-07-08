@@ -1,28 +1,25 @@
-# FireVault Build 0.46.7
+# FireVault Build 0.46.8
 
-Build 0.46.7 is a Daily Route export polish build.
+Build 0.46.8 is an Active Daily Route dashboard controls build.
 
 ## What changed
 
-- Visible app version advanced to 0.46.7.
-- Added **CSV Export** for Daily Route reports.
-- Added **Customer Summary** copy for a cleaner, customer-friendly route recap.
-- Active Daily Route sessions can now output:
-  - Copy Report
-  - Download TXT
-  - CSV Export
-  - Customer Summary
-- Saved route days now include:
-  - Copy
-  - TXT
-  - CSV
-  - Summary
-  - Delete
-- CSV exports include timestamp, event type, label, site, address, latitude, longitude, accuracy, nearest site, notes, and map link.
-- Preserved nearest-site suggestions, waypoint edit/delete/undo, route distance estimates, and the blinking green recording LED.
+- Visible app version advanced to 0.46.8.
+- Added an active **Daily Route Recording** card on the main dashboard.
+- Dashboard card now shows:
+  - Waypoint count
+  - Active route time
+  - Estimated route distance
+- Added dashboard quick controls while a route is active:
+  - Open Route
+  - Waypoint
+  - Nearest
+  - End / Save
+- Daily Route waypoint and nearest-site actions can now update the dashboard without forcing the full Route screen open.
+- Preserved CSV export, customer summary, nearest-site suggestions, waypoint editing, and the blinking green recording LED.
 
 Suggested commit message:
 
 ```text
-Build 0.46.7 daily route CSV export and customer summary
+Build 0.46.8 active daily route dashboard controls
 ```

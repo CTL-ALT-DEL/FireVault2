@@ -504,7 +504,7 @@ async function addRouteEvent(type,label,siteId="",notes=""){
   if(route.nearbySuggestion && siteId && route.nearbySuggestion.siteId===siteId) delete route.nearbySuggestion;
   saveActiveRoute();
   toast(`${label||type} added.`);
-  routeLog();
+  if(view === "routeLog") routeLog(); else render();
 }
 function editRouteEvent(id){
   if(!activeRoute){ toast("No active route day."); return; }
@@ -567,7 +567,7 @@ async function checkRouteNearestSite(){
   };
   saveActiveRoute();
   toast(`Nearest site: ${activeRoute.nearbySuggestion.siteName}`);
-  routeLog();
+  if(view === "routeLog") routeLog(); else render();
 }
 function clearRouteSuggestion(){
   if(!activeRoute) return;
@@ -598,7 +598,7 @@ async function endRouteDay(){
   saveActiveRoute();
   save();
   toast("Daily route saved.");
-  routeLog();
+  if(view === "routeLog") routeLog(); else render();
 }
 function routeReportText(log=activeRoute){
   if(!log) return "No active route log.";
@@ -861,6 +861,7 @@ function home(){
       <button class="ghost tile attentionHomeTile" id="attentionHomeBtn"><strong>⚠ Attention Queue</strong><span>${attentionList.length ? `${attentionList.length} site${attentionList.length===1?"":"s"} to review` : "No priority issues"}</span></button>
       <button class="ghost tile routeHomeTile462" id="routeLogBtn"><strong>◇ Daily Route</strong><span>${activeRoute ? `${(activeRoute.events||[]).length} active waypoints` : `${(data.routeLogs||[]).length} saved route days`}</span></button>
     </div>
+    ${activeRoute ? `<div class="card activeRouteMini468"><div class="activeRouteHead468"><div><h2><span class="routeLed463 miniLed468"></span>Daily Route Recording</h2><p>${esc(routeSummaryLine(activeRoute))}</p></div><button class="primary smallBtn" id="openRouteMiniBtn">Open</button></div><div class="activeRouteStats468"><div><strong>${(activeRoute.events||[]).length}</strong><span>Waypoints</span></div><div><strong>${routeDuration(activeRoute.startedAt)}</strong><span>Time</span></div><div><strong>${esc(routeDistanceLabel(activeRoute))}</strong><span>Distance</span></div></div><div class="activeRouteActions468"><button class="ghost smallBtn" id="homeRoutePointBtn">Waypoint</button><button class="ghost smallBtn" id="homeRouteNearestBtn">Nearest</button><button class="danger smallBtn" id="homeRouteEndBtn">End / Save</button></div></div>` : ""}
     ${activeJob ? `<div class="card activeJobMini"><div class="row"><div><h2>Service Call Active</h2><p>${esc(activeJob.siteName)} • <span id="jobElapsed">${elapsedText(activeJob.startedAt)}</span></p></div><button class="primary" id="resumeJobBtn">Open</button></div></div>` : ""}
     <div class="card grow homeStatus450"><div class="homeStatusHead450"><h2>Stability Checkpoint</h2><span>${dataHealth}</span></div><div class="homeStatusGrid450"><div><strong>${data.sites.length}</strong><span>Sites</span></div><div><strong>${visits.length}</strong><span>Visits</span></div><div><strong>${gpsSites}</strong><span>GPS Saved</span></div></div><p>Current build focuses on app polish, visual consistency, and safer update habits.</p><p class="fieldNote">Last backup export: ${esc(lastExport)}</p></div>
   </div>`);
@@ -875,6 +876,10 @@ function home(){
   document.getElementById("nearbyHomeBtn").onclick=detectNearbySites;
   document.getElementById("attentionHomeBtn").onclick=()=>route("attention");
   document.getElementById("routeLogBtn").onclick=()=>route("routeLog");
+  const openRouteMini=document.getElementById("openRouteMiniBtn"); if(openRouteMini) openRouteMini.onclick=()=>route("routeLog");
+  const homeRoutePoint=document.getElementById("homeRoutePointBtn"); if(homeRoutePoint) homeRoutePoint.onclick=()=>{ const note=prompt("Waypoint note", "Manual waypoint")||"Manual waypoint"; addRouteEvent("Waypoint", note); };
+  const homeRouteNearest=document.getElementById("homeRouteNearestBtn"); if(homeRouteNearest) homeRouteNearest.onclick=checkRouteNearestSite;
+  const homeRouteEnd=document.getElementById("homeRouteEndBtn"); if(homeRouteEnd) homeRouteEnd.onclick=()=>{ if(confirm("End and save today’s route?")) endRouteDay(); };
   const rb=document.getElementById("resumeJobBtn"); if(rb) rb.onclick=()=>{selectedSiteId=activeJob.siteId; route("jobMode");};
 }
 
@@ -2138,11 +2143,11 @@ function diagnostics(){
 }
 function showChangelog(){
   const notes = [
-    "Added CSV export for Daily Route reports.",
-    "Added customer-friendly Daily Route summary copy.",
-    "Saved route days now have Copy, TXT, CSV, Summary, and Delete controls.",
-    "Active route days can now export TXT, CSV, or customer summary before ending the day.",
-    "Preserved nearest-site suggestions and the blinking recording LED."
+    "Added an active Daily Route recording card on the dashboard.",
+    "Dashboard now shows route duration, waypoint count, and estimated distance while recording.",
+    "Added dashboard quick controls for waypoint, nearest site check, and end/save route.",
+    "Daily Route actions can now update the dashboard without forcing the full Route screen open.",
+    "Preserved CSV export, customer summary, nearest-site suggestions, and the blinking green LED."
   ];
   const overlay=document.createElement("div");
   overlay.className="releaseOverlay";
