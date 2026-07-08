@@ -16,6 +16,7 @@ let siteSearch = "";
 let libraryFolder = "all";
 let routeReviewId = "";
 let routeHistorySearch = "";
+let simpleToolsOpen = false;
 let jobTimer = null;
 const QUICK_EVENTS = ["Arrived on site","Opened panel","Panel normal","Trouble active","Ground fault active","Device tested","Customer update","Parts needed"];
 const DEFAULT_CHECKLIST = [
@@ -77,6 +78,43 @@ function applyFeatureVisibility(){
   if(navLibrary) navLibrary.style.display = featureOn("library") ? "" : "none";
 }
 function setViewMode(mode){ data.settings.app={...(data.settings.app||{}),viewMode:mode}; save(); toast(`${mode === "power" ? "Technician Power Mode" : mode === "advanced" ? "Advanced View" : "Simple View"} enabled.`); route("home"); }
+
+function hiddenFeatureCount473(){ return FEATURE_LABELS.filter(([key])=>!featureOn(key)).length; }
+function simpleToolRows473(){
+  return [
+    ["dailyRoute","Daily Route","routeLog","Route day logging and saved route reports."],
+    ["advancedGps","GPS / Nearby","sites","GPS capture, map links, and nearby site detection."],
+    ["attention","Attention Queue","attention","Priority review list for sites needing attention."],
+    ["library","Library","library","Manuals, links, forms, codes, and folders."],
+    ["reports","Reports","sites","Enable reports, then open a site and tap Report."],
+    ["equipment","Equipment","sites","Enable equipment, then open a site vault."],
+    ["diagnostics","Diagnostics","diagnostics","Stability checkpoint and repair tools."],
+    ["backupRepair","Backup / Repair","settings","Backup, import/export, and vault safety tools."]
+  ];
+}
+function simpleToolsMarkup473(){
+  const hidden=hiddenFeatureCount473();
+  return `<div class="card simpleToolsCard473">
+    <button class="simpleToolsToggle473" id="simpleMoreBtn473"><span><strong>More Tools</strong><small>${hidden} hidden feature${hidden===1?"":"s"} available</small></span><em>${simpleToolsOpen?"Hide":"Show"}</em></button>
+    ${simpleToolsOpen?`<div class="simpleToolsDrawer473">${simpleToolRows473().map(([key,label,target,note])=>`<button class="ghost simpleToolBtn473 ${featureOn(key)?"enabled":""}" data-simple-feature="${esc(key)}" data-simple-target="${esc(target)}"><strong>${esc(label)}</strong><small>${featureOn(key)?"Visible now":esc(note)}</small></button>`).join("")}</div>`:""}
+  </div>`;
+}
+function enableSimpleFeature473(feature,target){
+  visibility()[feature]=true;
+  save();
+  if(target==="settings"){
+    settingsTab = feature === "backupRepair" ? "backup" : "visibility";
+    mode="settingsDetail";
+    toast(`${featureLabel473(feature)} enabled.`);
+    route("settings");
+    return;
+  }
+  if(feature === "reports" || feature === "equipment") toast(`${featureLabel473(feature)} enabled. Open a site to use it.`);
+  else toast(`${featureLabel473(feature)} enabled.`);
+  route(target);
+}
+function featureLabel473(feature){ return (FEATURE_LABELS.find(([k])=>k===feature)||[feature,feature])[1]; }
+
 
 applyTheme();
 document.getElementById("buildButton").addEventListener("click", showChangelog);
@@ -975,19 +1013,19 @@ function home(){
   const now = new Date();
   html(`<div class="screen homeScreen450">
     <div class="homeHero450 homeHero457 homeHero463"><div class="homeDateWrap463">${activeRoute?`<span class="${activeRoute.paused?"routeLed470 routeLedPaused470":"routeLed463"}" aria-label="${activeRoute.paused?"Daily route paused":"Daily route recording"}"></span>`:""}<div class="homeDateBlock457"><div class="todayDay"><h1>${now.toLocaleDateString([], {weekday:"long"})}</h1></div><p class="homeDateLine457">${fmtDate(now)}</p></div></div></div>
-    <div class="grid3">
+    <div class="grid3 ${appMode()==="simple"?"simpleMetricGrid473":""}">
       <div class="card tile metricCard" id="sitesCard"><strong>${data.sites.length}</strong><span>Sites</span></div>
       <div class="card tile metricCard taskMetricCard" id="tasksCard"><strong>${openTasks}</strong><span>${taskCounts.overdue ? `${taskCounts.overdue} overdue` : taskCounts.today ? `${taskCounts.today} due today` : "Open Tasks"}</span></div>
       <div class="card tile metricCard" id="defCard"><strong>${def}</strong><span>Deficiencies</span></div>
     </div>
-    <div class="grid2 homeActionGrid">
+    <div class="grid2 homeActionGrid ${appMode()==="simple"?"simpleActionGrid473":""}">
       <button class="primary tile" id="addSiteBtn"><strong>＋ Add Site</strong><span>Create customer vault</span></button>
       <button class="ghost tile gpsHomeTile ${featureOn("advancedGps")?"":"featureHidden472"}" id="gpsHomeBtn"><strong>⌖ GPS / Maps</strong><span>${gpsSites} site${gpsSites===1?"":"s"} with GPS</span></button>
       <button class="ghost tile nearbyHomeTile ${featureOn("advancedGps")?"":"featureHidden472"}" id="nearbyHomeBtn"><strong>◎ Nearby Sites</strong><span>Detect saved sites near me</span></button>
       <button class="ghost tile attentionHomeTile ${featureOn("attention")?"":"featureHidden472"}" id="attentionHomeBtn"><strong>⚠ Attention Queue</strong><span>${attentionList.length ? `${attentionList.length} site${attentionList.length===1?"":"s"} to review` : "No priority issues"}</span></button>
       <button class="ghost tile routeHomeTile462 ${(featureOn("dailyRoute")||activeRoute)?"":"featureHidden472"}" id="routeLogBtn"><strong>◇ Daily Route</strong><span>${activeRoute ? `${(activeRoute.events||[]).length} active waypoints` : `${(data.routeLogs||[]).length} saved route days`}</span></button>
     </div>
-    ${appMode()==="simple"?`<div class="card simpleViewNotice472"><div><h2>Simple View</h2><p>Advanced FireVault tools are hidden until you need them.</p></div><button class="ghost smallBtn" id="manageViewBtn472">Manage View</button></div>`:""}
+    ${appMode()==="simple"?`<div class="card simpleViewNotice472 simpleViewNotice473"><div><h2>Simple View Active</h2><p>FireVault is keeping the dashboard clean. Advanced tools stay tucked away until needed.</p></div><div class="simpleNoticeActions473"><button class="ghost smallBtn" id="manageViewBtn472">Manage View</button><button class="primary smallBtn" id="advancedNowBtn473">Advanced</button></div></div>${simpleToolsMarkup473()}`:""}
     ${activeRoute ? `<div class="card activeRouteMini468 ${activeRoute.paused?"activeRoutePaused470":""}"><div class="activeRouteHead468"><div><h2><span class="${activeRoute.paused?"routeLed470 routeLedPaused470":"routeLed463"} miniLed468"></span>${activeRoute.paused?"Daily Route Paused":"Daily Route Recording"}</h2><p>${esc(routeSummaryLine(activeRoute))}</p></div><button class="primary smallBtn" id="openRouteMiniBtn">Open</button></div><div class="activeRouteStats468"><div><strong>${(activeRoute.events||[]).length}</strong><span>Waypoints</span></div><div><strong>${routeDuration(activeRoute.startedAt)}</strong><span>Time</span></div><div><strong>${esc(routeDistanceLabel(activeRoute))}</strong><span>Distance</span></div></div><div class="activeRouteActions468"><button class="ghost smallBtn" id="homeRoutePointBtn" ${activeRoute.paused?"disabled":""}>Waypoint</button><button class="ghost smallBtn" id="homeRouteNearestBtn" ${activeRoute.paused?"disabled":""}>Nearest</button><button class="${activeRoute.paused?"primary":"ghost"} smallBtn" id="homeRoutePauseBtn">${activeRoute.paused?"Resume":"Pause"}</button><button class="danger smallBtn" id="homeRouteEndBtn">End / Save</button></div></div>` : ""}
     ${activeJob ? `<div class="card activeJobMini"><div class="row"><div><h2>Service Call Active</h2><p>${esc(activeJob.siteName)} • <span id="jobElapsed">${elapsedText(activeJob.startedAt)}</span></p></div><button class="primary" id="resumeJobBtn">Open</button></div></div>` : ""}
     <div class="card grow homeStatus450"><div class="homeStatusHead450"><h2>Stability Checkpoint</h2><span>${dataHealth}</span></div><div class="homeStatusGrid450"><div><strong>${data.sites.length}</strong><span>Sites</span></div><div><strong>${visits.length}</strong><span>Visits</span></div><div><strong>${gpsSites}</strong><span>GPS Saved</span></div></div><p>Current build focuses on app polish, visual consistency, and safer update habits.</p><p class="fieldNote">Last backup export: ${esc(lastExport)}</p></div>
@@ -1004,6 +1042,9 @@ function home(){
   document.getElementById("attentionHomeBtn").onclick=()=>route("attention");
   document.getElementById("routeLogBtn").onclick=()=>route("routeLog");
   const manageView=document.getElementById("manageViewBtn472"); if(manageView) manageView.onclick=()=>{settingsTab="visibility"; mode="settingsDetail"; route("settings");};
+  const advancedNow=document.getElementById("advancedNowBtn473"); if(advancedNow) advancedNow.onclick=()=>setViewMode("advanced");
+  const simpleMore=document.getElementById("simpleMoreBtn473"); if(simpleMore) simpleMore.onclick=()=>{simpleToolsOpen=!simpleToolsOpen; home();};
+  document.querySelectorAll("[data-simple-feature]").forEach(btn=>btn.onclick=()=>enableSimpleFeature473(btn.dataset.simpleFeature, btn.dataset.simpleTarget));
   const openRouteMini=document.getElementById("openRouteMiniBtn"); if(openRouteMini) openRouteMini.onclick=()=>route("routeLog");
   const homeRoutePoint=document.getElementById("homeRoutePointBtn"); if(homeRoutePoint) homeRoutePoint.onclick=()=>{ const note=prompt("Waypoint note", "Manual waypoint")||"Manual waypoint"; addRouteEvent("Waypoint", note); };
   const homeRouteNearest=document.getElementById("homeRouteNearestBtn"); if(homeRouteNearest) homeRouteNearest.onclick=checkRouteNearestSite;
@@ -2310,11 +2351,11 @@ function diagnostics(){
 }
 function showChangelog(){
   const notes = [
-    "Added Simple View / Feature Visibility settings.",
-    "Added Simple, Advanced, and Technician Power Mode display options.",
-    "Hidden nonessential dashboard tiles in Simple View while keeping the modules available.",
-    "Added feature toggles for Daily Route, Library, Reports, Equipment, Diagnostics, GPS, CSV exports, and route reviews.",
-    "Added a Simple View notice on the dashboard with quick access to Manage View."
+    "Improved Simple View with a cleaner dashboard rhythm.",
+    "Added a More Tools drawer for hidden FireVault modules.",
+    "Added one-tap enable/open actions for hidden tools from the dashboard.",
+    "Added an Advanced button for quick temporary access to the full app surface.",
+    "Preserved Simple View / Feature Visibility settings and all Daily Route tools."
   ];
   const overlay=document.createElement("div");
   overlay.className="releaseOverlay";
