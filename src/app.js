@@ -1774,7 +1774,7 @@ function diagnostics(){
 }
 function showChangelog(){
   const notes = [
-    "Added a 0.46.0 Stability Checkpoint inside Diagnostics.",
+    "Added a 0.46.1 Stability Checkpoint inside Diagnostics.",
     "Added route/data sanity checks for sites, resources, GPS, settings, and active service calls.",
     "Added Repair Vault to normalize site/resource structures and clear orphaned active jobs.",
     "Added Copy Diagnostics for quick troubleshooting notes.",
