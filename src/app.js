@@ -455,11 +455,45 @@ function routeDirectionsLink(log=activeRoute){
   }
   return `https://maps.apple.com/?saddr=${encodeURIComponent(origin)}&daddr=${encodeURIComponent(dest)}`;
 }
+function routeOdometerMiles(log=activeRoute){
+  const start=Number(log?.startOdometer);
+  const end=Number(log?.endOdometer);
+  if(!Number.isFinite(start) || !Number.isFinite(end) || end < start) return null;
+  return end-start;
+}
+function routeOdometerLabel(log=activeRoute){
+  const miles=routeOdometerMiles(log);
+  if(miles===null) return "Odometer not entered";
+  return `${miles>=100?miles.toFixed(0):miles.toFixed(1)} mi odometer`;
+}
+function routeOdometerReportLines(log=activeRoute){
+  const lines=[];
+  if(log?.vehicle) lines.push(`Vehicle: ${log.vehicle}`);
+  if(log?.startOdometer!==undefined && log?.startOdometer!=="") lines.push(`Start Odometer: ${log.startOdometer}`);
+  if(log?.endOdometer!==undefined && log?.endOdometer!=="") lines.push(`End Odometer: ${log.endOdometer}`);
+  const miles=routeOdometerMiles(log);
+  if(miles!==null) lines.push(`Odometer Miles: ${miles>=100?miles.toFixed(0):miles.toFixed(1)} mi`);
+  if(log?.dayNotes) lines.push(`Day Notes: ${String(log.dayNotes).replaceAll("\n"," | ")}`);
+  return lines;
+}
 function routeSummaryLine(log=activeRoute){
   if(!log) return "No route day selected.";
   const events=log.events||[];
   const siteCount=[...new Set(events.filter(e=>e.siteName).map(e=>e.siteName))].length;
-  return `${events.length} waypoint${events.length===1?"":"s"} • ${siteCount} site${siteCount===1?"":"s"} • ${routeDuration(log.startedAt,log.endedAt)} • ${routeDistanceLabel(log)}`;
+  const odo=routeOdometerMiles(log);
+  return `${events.length} waypoint${events.length===1?"":"s"} • ${siteCount} site${siteCount===1?"":"s"} • ${routeDuration(log.startedAt,log.endedAt)} • ${routeDistanceLabel(log)}${odo!==null?` • ${routeOdometerLabel(log)}`:""}`;
+}
+function saveRouteDetails469(){
+  if(!activeRoute){ toast("Start a route day first."); return; }
+  activeRoute.vehicle=val("routeVehicle");
+  const start=val("routeStartOdo");
+  const end=val("routeEndOdo");
+  activeRoute.startOdometer=start===""?"":Number(start);
+  activeRoute.endOdometer=end===""?"":Number(end);
+  activeRoute.dayNotes=raw("routeDayNotes").trim();
+  saveActiveRoute();
+  toast("Route details saved.");
+  routeLog();
 }
 function routeGpsText(ev){
   if(!ev || !Number.isFinite(Number(ev.lat)) || !Number.isFinite(Number(ev.lng))) return "No GPS";
@@ -483,7 +517,7 @@ function getGpsPosition(){
 }
 function ensureActiveRoute(){
   if(activeRoute) return activeRoute;
-  activeRoute={id:uid(),date:localDateString(),startedAt:new Date().toISOString(),endedAt:null,events:[]};
+  activeRoute={id:uid(),date:localDateString(),startedAt:new Date().toISOString(),endedAt:null,vehicle:"",startOdometer:"",endOdometer:"",dayNotes:"",events:[]};
   saveActiveRoute();
   return activeRoute;
 }
@@ -583,7 +617,7 @@ function routeUseSuggestion(kind){
 }
 async function startRouteDay(){
   if(activeRoute){ route("routeLog"); return; }
-  activeRoute={id:uid(),date:localDateString(),startedAt:new Date().toISOString(),endedAt:null,events:[]};
+  activeRoute={id:uid(),date:localDateString(),startedAt:new Date().toISOString(),endedAt:null,vehicle:"",startOdometer:"",endOdometer:"",dayNotes:"",events:[]};
   saveActiveRoute();
   await addRouteEvent("Start Day","Start Day");
 }
@@ -611,6 +645,7 @@ function routeReportText(log=activeRoute){
     `End: ${log.endedAt?routeEventTime(log.endedAt):"Active"}`,
     `Duration: ${routeDuration(log.startedAt,log.endedAt)}`,
     `Estimated Route Distance: ${routeDistanceLabel(log)}`,
+    ...routeOdometerReportLines(log),
     `Waypoints: ${stops.length}`,
     `Site Stops: ${siteStops}`,
     ``,
@@ -646,9 +681,15 @@ function routeCsvEscape(v){
   return /[",\n]/.test(s) ? `"${s.replace(/"/g,'""')}"` : s;
 }
 function routeCsvText(log=activeRoute){
-  if(!log) return "Time,Type,Label,Site,Address,Latitude,Longitude,Accuracy,Nearest Site,Nearest Distance,Notes,Map Link\n";
-  const header=["Time","Type","Label","Site","Address","Latitude","Longitude","Accuracy","Nearest Site","Nearest Distance","Notes","Map Link"];
+  if(!log) return "Vehicle,Start Odometer,End Odometer,Odometer Miles,Day Notes,Time,Type,Label,Site,Address,Latitude,Longitude,Accuracy,Nearest Site,Nearest Distance,Notes,Map Link\n";
+  const header=["Vehicle","Start Odometer","End Odometer","Odometer Miles","Day Notes","Time","Type","Label","Site","Address","Latitude","Longitude","Accuracy","Nearest Site","Nearest Distance","Notes","Map Link"];
+  const odo=routeOdometerMiles(log);
   const rows=(log.events||[]).map(e=>[
+    log.vehicle||"",
+    log.startOdometer??"",
+    log.endOdometer??"",
+    odo===null?"":(odo>=100?odo.toFixed(0):odo.toFixed(1)),
+    log.dayNotes||"",
     e.at ? new Date(e.at).toLocaleString() : "",
     e.type||"",
     e.label||"",
@@ -681,6 +722,7 @@ function routeCustomerSummaryText(log=activeRoute){
     `Stops Recorded: ${events.length}`,
     `Sites Visited: ${siteNames.length ? siteNames.join(", ") : "None recorded"}`,
     `Estimated Route Distance: ${routeDistanceLabel(log)}`,
+    ...routeOdometerReportLines(log),
     ``,
     `Stop Timeline:`
   ];
@@ -905,6 +947,7 @@ function routeLog(){
       ${active?`<button class="ghost" id="undoRouteBtn" ${events.length?"":"disabled"}>Undo Last Point</button>`:""}
     </div>
     ${(active||saved[0])?`<div class="card routeReportPreview464 routeReportPreview467"><div><h2>Daily Report Summary</h2><p>${esc(routeSummaryLine(active||saved[0]))}</p><p class="fieldNote">Export as TXT, CSV, or copy a cleaner customer summary.</p></div>${routeDirectionsLink(active||saved[0])?`<a class="btn ghost" href="${esc(routeDirectionsLink(active||saved[0]))}" target="_blank" rel="noopener">Open Route Map</a>`:""}</div>`:""}
+    ${active?`<div class="card routeDetails469"><div class="routeDetailsHead469"><div><h2>Vehicle / Mileage</h2><p>${esc(routeOdometerLabel(active))}</p></div><button class="primary smallBtn" id="saveRouteDetailsBtn">Save Details</button></div><div class="routeOdoGrid469"><div><label>Vehicle</label><input id="routeVehicle" value="${esc(active.vehicle||"")}" placeholder="Truck / van / unit #"></div><div><label>Start Odometer</label><input id="routeStartOdo" type="number" inputmode="decimal" step="0.1" value="${esc(active.startOdometer??"")}" placeholder="Optional"></div><div><label>End Odometer</label><input id="routeEndOdo" type="number" inputmode="decimal" step="0.1" value="${esc(active.endOdometer??"")}" placeholder="Optional"></div></div><label>Day Notes</label><textarea id="routeDayNotes" placeholder="General notes for today’s route report...">${esc(active.dayNotes||"")}</textarea></div>`:""}
     ${active?`<div class="card routeQuick462">
       <div class="routeSitePick462"><label>Site Stop</label><select id="routeSiteSelect"><option value="">Select saved site...</option>${siteOptions}</select></div>
       <div class="grid2">
@@ -929,6 +972,7 @@ function routeLog(){
   const csv=document.getElementById("csvRouteBtn"); if(csv) csv.onclick=()=>downloadRouteCsv(activeRoute||saved[0]);
   const summary=document.getElementById("summaryRouteBtn"); if(summary) summary.onclick=()=>copyRouteCustomerSummary(activeRoute||saved[0]);
   const undo=document.getElementById("undoRouteBtn"); if(undo) undo.onclick=undoLastRouteEvent;
+  const saveDetails=document.getElementById("saveRouteDetailsBtn"); if(saveDetails) saveDetails.onclick=saveRouteDetails469;
   const arrived=document.getElementById("arrivedBtn"); if(arrived) arrived.onclick=()=>{ const id=val("routeSiteSelect"); if(!id){toast("Select a site first."); return;} const s=data.sites.find(x=>x.id===id); addRouteEvent("Arrived",`Arrived: ${s?.name||"Site"}`,id); };
   const left=document.getElementById("leftBtn"); if(left) left.onclick=()=>{ const id=val("routeSiteSelect"); if(!id){toast("Select a site first."); return;} const s=data.sites.find(x=>x.id===id); addRouteEvent("Left Site",`Left: ${s?.name||"Site"}`,id); };
   const waypoint=document.getElementById("waypointBtn"); if(waypoint) waypoint.onclick=()=>{ const note=prompt("Waypoint note", "Manual waypoint")||"Manual waypoint"; addRouteEvent("Waypoint",note); };
@@ -953,7 +997,7 @@ function routeHistoryCard(log){
   const events=log.events||[];
   const sites=events.filter(e=>e.siteName).map(e=>e.siteName);
   const unique=[...new Set(sites)];
-  return `<div class="card routeHistoryCard462"><div class="routeEventTop462"><div><h2>${routeDateLabel(log.startedAt||log.date)}</h2><p>${routeSummaryLine(log)}</p></div><span class="pill">${log.endedAt?"Saved":"Active"}</span></div><p>${unique.length?esc(unique.slice(0,4).join(", ")):"No site stops recorded."}</p><div class="routeHistoryActions462 routeHistoryActions467"><button class="ghost" data-copy-route="${esc(log.id)}">Copy</button><button class="ghost" data-download-route="${esc(log.id)}">TXT</button><button class="ghost" data-csv-route="${esc(log.id)}">CSV</button><button class="ghost" data-summary-route="${esc(log.id)}">Summary</button><button class="danger" data-delete-route="${esc(log.id)}">Delete</button></div>${routeDirectionsLink(log)?`<a class="btn ghost routeMapBtn462" href="${esc(routeDirectionsLink(log))}" target="_blank" rel="noopener">Open Route Map</a>`:""}</div>`;
+  return `<div class="card routeHistoryCard462"><div class="routeEventTop462"><div><h2>${routeDateLabel(log.startedAt||log.date)}</h2><p>${routeSummaryLine(log)}</p></div><span class="pill">${log.endedAt?"Saved":"Active"}</span></div><p>${unique.length?esc(unique.slice(0,4).join(", ")):"No site stops recorded."}</p>${routeOdometerMiles(log)!==null?`<p class="fieldNote">${esc(routeOdometerLabel(log))}${log.vehicle?` • ${esc(log.vehicle)}`:""}</p>`:""}<div class="routeHistoryActions462 routeHistoryActions467"><button class="ghost" data-copy-route="${esc(log.id)}">Copy</button><button class="ghost" data-download-route="${esc(log.id)}">TXT</button><button class="ghost" data-csv-route="${esc(log.id)}">CSV</button><button class="ghost" data-summary-route="${esc(log.id)}">Summary</button><button class="danger" data-delete-route="${esc(log.id)}">Delete</button></div>${routeDirectionsLink(log)?`<a class="btn ghost routeMapBtn462" href="${esc(routeDirectionsLink(log))}" target="_blank" rel="noopener">Open Route Map</a>`:""}</div>`;
 }
 
 function attentionQueue(){
@@ -2143,11 +2187,11 @@ function diagnostics(){
 }
 function showChangelog(){
   const notes = [
-    "Added an active Daily Route recording card on the dashboard.",
-    "Dashboard now shows route duration, waypoint count, and estimated distance while recording.",
-    "Added dashboard quick controls for waypoint, nearest site check, and end/save route.",
-    "Daily Route actions can now update the dashboard without forcing the full Route screen open.",
-    "Preserved CSV export, customer summary, nearest-site suggestions, and the blinking green LED."
+    "Added Vehicle / Mileage details to Daily Route.",
+    "Route reports can now include vehicle, start odometer, end odometer, odometer miles, and day notes.",
+    "Saved route history shows odometer mileage when entered.",
+    "CSV exports now include day-level mileage details.",
+    "Preserved dashboard route controls, nearest-site suggestions, and the blinking recording LED."
   ];
   const overlay=document.createElement("div");
   overlay.className="releaseOverlay";

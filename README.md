@@ -1,25 +1,23 @@
-# FireVault Build 0.46.8
+# FireVault Build 0.46.9
 
-Build 0.46.8 is an Active Daily Route dashboard controls build.
+Build 0.46.9 is a Daily Route vehicle and mileage logging build.
 
 ## What changed
 
-- Visible app version advanced to 0.46.8.
-- Added an active **Daily Route Recording** card on the main dashboard.
-- Dashboard card now shows:
-  - Waypoint count
-  - Active route time
-  - Estimated route distance
-- Added dashboard quick controls while a route is active:
-  - Open Route
-  - Waypoint
-  - Nearest
-  - End / Save
-- Daily Route waypoint and nearest-site actions can now update the dashboard without forcing the full Route screen open.
-- Preserved CSV export, customer summary, nearest-site suggestions, waypoint editing, and the blinking green recording LED.
+- Visible app version advanced to 0.46.9.
+- Added **Vehicle / Mileage** details to active Daily Route.
+- Added fields for:
+  - Vehicle / truck / unit number
+  - Start odometer
+  - End odometer
+  - Day notes
+- Daily Route reports now include vehicle, odometer readings, calculated odometer miles, and day notes.
+- Saved route history now shows odometer mileage when entered.
+- CSV exports now include day-level mileage fields.
+- Preserved dashboard route controls, nearest-site suggestions, active-route exports, waypoint edit/delete/undo, and the blinking recording LED.
 
 Suggested commit message:
 
 ```text
-Build 0.46.8 active daily route dashboard controls
+Build 0.46.9 daily route vehicle mileage and odometer logging
 ```
