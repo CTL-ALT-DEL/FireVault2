@@ -19,6 +19,7 @@ let nearbyState = null;
 let siteSearch = "";
 let libraryFolder = "all";
 let docVaultFilter516 = "all";
+let docVaultSearch521 = "";
 let routeReviewId = "";
 let routeHistorySearch = "";
 let simpleToolsOpen = false;
@@ -2187,6 +2188,15 @@ function docMatchesVaultFilter516(d){
   if(docVaultFilter516 === "docs") return !docHasPhoto512(d) && !d.url;
   return true;
 }
+function docMatchesSearch521(d){
+  const q=String(docVaultSearch521||"").trim().toLowerCase();
+  if(!q) return true;
+  const hay=[d.type,d.title,d.ref,d.url,d.notes,d.imageName,d.imageStampedAt].filter(Boolean).join(" ").toLowerCase();
+  return hay.includes(q);
+}
+function docVaultSearchBar521(){
+  return `<div class="docSearchBar521"><span>⌕</span><input id="docVaultSearch521" value="${esc(docVaultSearch521)}" placeholder="Search photos, documents, links, notes..." autocomplete="off"><button type="button" class="ghost smallBtn" id="clearDocSearch521">Clear</button></div>`;
+}
 function docVaultFilterBar516(docs){
   const counts={
     all:docs.length,
@@ -2217,14 +2227,16 @@ function siteDocs(){
   const docs=s.docs;
   const linked=docs.filter(d=>d.url).length;
   const photos=docs.filter(docHasPhoto512).length;
-  const filteredDocs=docs.filter(docMatchesVaultFilter516);
-  const docListHtml = filteredDocs.length ? filteredDocs.map(siteDocCard519).join("") : `<div class="empty">No ${esc(docVaultFilterLabel516(docVaultFilter516).toLowerCase())} records found. Tap + to add a document, link, or field photo.</div>`;
+  const filteredDocs=docs.filter(docMatchesVaultFilter516).filter(docMatchesSearch521);
+  const docListHtml = filteredDocs.length ? filteredDocs.map(siteDocCard519).join("") : `<div class="empty">No ${esc(docVaultFilterLabel516(docVaultFilter516).toLowerCase())} records found${docVaultSearch521?` for “${esc(docVaultSearch521)}”`:""}. Tap + to add a document, link, or field photo.</div>`;
   html(`<div class="screen docsScreen docsScreen512 docsScreen516"><div class="row"><button class="back ghost" id="backBtn">←</button><div><h1>Documents / Photos</h1><p>${esc(s.name||"Site")}</p></div><button class="primary" id="addDocBtn">＋</button></div>
-    <div class="card docsHero docsHero516"><h2>Site Documents Vault</h2><p>Keep customer-specific references, links, and field photos. Use filters to quickly find photos, links, or regular documents.</p><div class="docStats"><span><strong>${docs.length}</strong>Total</span><span><strong>${photos}</strong>Photos</span><span><strong>${linked}</strong>Links</span></div>${docVaultFilterBar516(docs)}</div>
+    <div class="card docsHero docsHero516 docsHero521"><h2>Site Documents Vault</h2><p>Keep customer-specific references, links, and field photos. Use filters and search to quickly find photos, links, or regular documents.</p><div class="docStats"><span><strong>${docs.length}</strong>Total</span><span><strong>${photos}</strong>Photos</span><span><strong>${linked}</strong>Links</span></div>${docVaultSearchBar521()}${docVaultFilterBar516(docs)}</div>
     <div class="list grow docsList">${docListHtml}</div>
   </div>`);
   document.getElementById("backBtn").onclick=()=>route("siteDetail");
   document.getElementById("addDocBtn").onclick=()=>{mode=null; route("siteDocForm");};
+  const docSearch=document.getElementById("docVaultSearch521"); if(docSearch) docSearch.oninput=()=>{docVaultSearch521=docSearch.value; siteDocs();};
+  const clearDocSearch=document.getElementById("clearDocSearch521"); if(clearDocSearch) clearDocSearch.onclick=()=>{docVaultSearch521=""; siteDocs();};
   document.querySelectorAll(".docFilterBtn516").forEach(b=>b.onclick=e=>{e.stopPropagation(); docVaultFilter516=b.dataset.docFilter||"all"; siteDocs();});
   document.querySelectorAll(".docVaultItem").forEach(b=>b.onclick=()=>{mode=b.dataset.doc; route("siteDocForm");});
   document.querySelectorAll(".openDocLink").forEach(b=>b.onclick=e=>{e.stopPropagation(); window.open(b.dataset.url,"_blank");});
@@ -3603,7 +3615,7 @@ function diagnostics(){
 }
 function showChangelog(){
   const notes = [
-    "Advanced to Build 0.50.20 from the working Build 0.50.19 baseline.",
+    "Advanced to Build 0.50.21 from the stable Build 0.50.20 baseline.",
     "Added Startup Health diagnostics showing module-ready status, boot status, last good boot, last route, splash timing, and last startup error.",
     "Added Copy Startup Health so boot details can be copied quickly if the PWA ever fails again.",
     "Recorded last successful boot build and route locally after the app opens cleanly.",
