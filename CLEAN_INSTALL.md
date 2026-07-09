@@ -1,6 +1,6 @@
-# Clean Install Notes — FireVault Build 0.50.27
+# Clean Install Notes — FireVault Build 0.50.28
 
-This ZIP is intended to be used as the clean baseline for FireVault Build 0.50.27.
+This ZIP is intended to be used as the clean baseline for FireVault Build 0.50.28.
 
 ## Install
 
@@ -8,18 +8,18 @@ This ZIP is intended to be used as the clean baseline for FireVault Build 0.50.2
 2. Upload the extracted root files to the FireVault GitHub Pages branch/root.
 3. Commit all files together.
 4. Wait for GitHub Pages deployment to finish.
-5. Open the deployed PWA and confirm the visible build number shows `0.50.27`.
+5. Open the deployed PWA and confirm the visible build number shows `0.50.28`.
 6. On iPhone/iPad, refresh or reinstall the home-screen PWA if Safari keeps an older cached build.
 
 ## Build focus
 
-Build 0.50.27 keeps the stable 0.50.26 startup path and improves Customer Report Photo Selection:
+Build 0.50.28 keeps the stable 0.50.27 startup path and adds customer-facing photo captions:
 
-- Select All photos for the customer report.
-- Clear selected customer-report photos.
-- Copy a customer photo list summary.
-- View included photo stats.
-- Open selected-photo thumbnails in full photo preview.
+- Add a Customer Photo Caption on account photos.
+- Keep internal technician notes separate from customer-facing captions.
+- Include captions in customer report photo lists and generated report text.
+- Include captions in Photo Vault search and copied document/photo lists.
+- Show captions in the full-screen photo preview.
 
 ## Safety notes
 

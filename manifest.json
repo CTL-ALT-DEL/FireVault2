@@ -8,7 +8,7 @@
   "orientation": "any",
   "background_color": "#0b0d10",
   "theme_color": "#101216",
-  "description": "Field knowledge system for fire alarm technicians. Build 0.50.27 polishes customer report photo selection with select-all, clear, copy photo list, and included-photo preview.",
+  "description": "Field knowledge system for fire alarm technicians. Build 0.50.28 adds customer-facing photo captions for report-ready account photos while preserving the stable startup path.",
   "icons": [
     {
       "src": "assets/icon-192.png",

@@ -1976,7 +1976,10 @@ function reportPhotoCopyText527(s={}){
   selected.forEach((d,i)=>{
     lines.push(`${i+1}. ${reportPhotoLabel526(d)}`);
     if(d.linkedDeficiencyTitle) lines.push(`   Deficiency: ${d.linkedDeficiencyTitle}`);
-    if(d.notes) lines.push(`   Notes: ${String(d.notes).replaceAll("
+    if(d.customerCaption) lines.push(`   Customer caption: ${String(d.customerCaption).replaceAll("
+","
+   ")}`);
+    if(d.notes) lines.push(`   Internal notes: ${String(d.notes).replaceAll("
 ","
    ")}`);
   });
@@ -1992,17 +1995,20 @@ function reportPhotoSelector526(s={}){
   const {photos,selected,deficiency,beforeAfter}=reportPhotoSummary527(s);
   if(!photos.length) return `<div class="card reportPhotos526 reportPhotos527"><div class="reportPhotosHead526"><div><h2>Customer Report Photos</h2><p>No account photos saved yet. Add photos from the account screen or Photo Vault.</p></div><button class="ghost smallBtn" id="reportAddPhoto526">＋ Add Photo</button></div></div>`;
   const selectedSet = selected.slice(0,6).map(d=>`<button type="button" class="reportIncludedThumb527" data-doc="${esc(d.id)}">${docPhotoThumb512(d)}<span>${esc(reportPhotoLabel526(d))}</span></button>`).join("");
-  return `<div class="card reportPhotos526 reportPhotos527"><div class="reportPhotosHead526"><div><h2>Customer Report Photos</h2><p>${selected.length} of ${photos.length} photo${photos.length===1?"":"s"} selected for the customer package.</p></div><button class="ghost smallBtn" id="reportAddPhoto526">＋ Add Photo</button></div><div class="reportPhotoStats527"><span><strong>${selected.length}</strong> Included</span><span><strong>${deficiency}</strong> Deficiency</span><span><strong>${beforeAfter}</strong> Before / After</span></div><div class="reportPhotoActions527"><button type="button" class="ghost smallBtn" id="reportSelectAllPhotos527">Select All</button><button type="button" class="ghost smallBtn" id="reportClearPhotos527">Clear Selected</button><button type="button" class="ghost smallBtn" id="reportCopyPhotoList527">Copy Photo List</button></div>${selected.length?`<div class="reportIncludedStrip527">${selectedSet}${selected.length>6?`<em>+${selected.length-6} more selected</em>`:""}</div>`:`<p class="fieldNote">No photos selected yet. Tap photos below or use Select All.</p>`}<div class="reportPhotoGrid526 reportPhotoGrid527">${photos.map(d=>`<button type="button" class="reportPhotoPick526 ${photoReportSelected526(d)?"selected":""}" data-doc="${esc(d.id)}">${docPhotoThumb512(d)}<span>${esc(reportPhotoLabel526(d))}</span><em>${photoReportSelected526(d)?"Included":"Tap to include"}</em></button>`).join("")}</div><p class="fieldNote">Copy Photo List is useful when sending a customer summary before PDF/photo package support is added.</p></div>`;
+  return `<div class="card reportPhotos526 reportPhotos527"><div class="reportPhotosHead526"><div><h2>Customer Report Photos</h2><p>${selected.length} of ${photos.length} photo${photos.length===1?"":"s"} selected for the customer package.</p></div><button class="ghost smallBtn" id="reportAddPhoto526">＋ Add Photo</button></div><div class="reportPhotoStats527"><span><strong>${selected.length}</strong> Included</span><span><strong>${deficiency}</strong> Deficiency</span><span><strong>${beforeAfter}</strong> Before / After</span></div><div class="reportPhotoActions527"><button type="button" class="ghost smallBtn" id="reportSelectAllPhotos527">Select All</button><button type="button" class="ghost smallBtn" id="reportClearPhotos527">Clear Selected</button><button type="button" class="ghost smallBtn" id="reportCopyPhotoList527">Copy Photo List</button></div>${selected.length?`<div class="reportIncludedStrip527">${selectedSet}${selected.length>6?`<em>+${selected.length-6} more selected</em>`:""}</div>`:`<p class="fieldNote">No photos selected yet. Tap photos below or use Select All.</p>`}<div class="reportPhotoGrid526 reportPhotoGrid527">${photos.map(d=>`<button type="button" class="reportPhotoPick526 ${photoReportSelected526(d)?"selected":""}" data-doc="${esc(d.id)}">${docPhotoThumb512(d)}<span>${esc(reportPhotoLabel526(d))}</span>${d.customerCaption?`<small class="photoCaptionReady528">Caption ready</small>`:""}<em>${photoReportSelected526(d)?"Included":"Tap to include"}</em></button>`).join("")}</div><p class="fieldNote">Copy Photo List is useful when sending a customer summary before PDF/photo package support is added.</p></div>`;
 }
 function selectedReportPhotosText526(s={}){
   const photos=reportPhotos526(s);
   if(!photos.length) return "No photos selected for customer report";
-  return photos.map((d,i)=>`- Photo ${i+1}: ${reportPhotoLabel526(d)}${d.linkedDeficiencyTitle?` | Deficiency: ${d.linkedDeficiencyTitle}`:""}${d.notes?`
-  Notes: ${String(d.notes).replaceAll("
-","
-  ")}`:""}`).join("
-");
+  return photos.map((d,i)=>{
+    const lines=[`- Photo ${i+1}: ${reportPhotoLabel526(d)}`];
+    if(d.linkedDeficiencyTitle) lines.push(`  Deficiency: ${d.linkedDeficiencyTitle}`);
+    if(d.customerCaption) lines.push(`  Customer caption: ${String(d.customerCaption).replaceAll("\n","\n  ")}`);
+    if(d.notes) lines.push(`  Internal notes: ${String(d.notes).replaceAll("\n","\n  ")}`);
+    return lines.join("\n");
+  }).join("\n");
 }
+
 function photoCategoryHint524(cat){ return PHOTO_CATEGORY_HINTS_524[cat] || PHOTO_CATEGORY_HINTS_524.Other; }
 function photoCategoryChips524(active="Panel"){
   return `<div class="photoCategoryGrid524">${PHOTO_CATEGORIES_524.map(cat=>`<button type="button" class="photoCategoryChip524 ${active===cat?"active":""}" data-photo-category="${esc(cat)}"><strong>${esc(cat)}</strong><span>${esc(photoCategoryHint524(cat))}</span></button>`).join("")}</div>`;
@@ -2021,6 +2027,7 @@ function photoPreviewModal524(d){
   overlay.innerHTML=`<div class="photoModalSheet524">
     <div class="photoModalHead524"><div><strong>${esc(d.title||d.imageName||"Account Photo")}</strong><span>${esc(photoCategory524(d)||"Photo")} • ${esc(s.name||"Account")}</span></div><button class="ghost smallBtn" id="closePhotoPreview524">Close</button></div>
     <div class="photoModalImage524"><img src="${esc(d.imageData)}" alt="Full account photo preview"></div>
+    ${d.customerCaption?`<p class="photoModalCaption528"><strong>Customer Caption</strong>${esc(d.customerCaption)}</p>`:""}
     ${d.notes?`<p class="photoModalNotes524">${esc(d.notes)}</p>`:""}
     <div class="photoModalActions524"><button class="primary" id="modalOverlayPhoto524">Download With Overlay</button><button class="ghost" id="modalOriginalPhoto524">Download Original</button><button class="ghost" id="modalEditPhoto524">Edit Photo</button></div>
   </div>`;
@@ -2043,8 +2050,9 @@ function docMeta(d){
 }
 function docReportLine(d){
   const main=`- ${docTitle(d)}${d.ref?` | Ref ${d.ref}`:""}${d.date?` | ${d.date}`:""}${d.url?` | ${d.url}`:""}`;
+  const caption=d.customerCaption ? `\n  Customer Caption: ${String(d.customerCaption).replaceAll("\n","\n  ")}` : "";
   const notes=d.notes ? `\n  Notes: ${String(d.notes).replaceAll("\n","\n  ")}` : "";
-  return main + notes;
+  return main + caption + notes;
 }
 
 function docHasPhoto512(d){ return !!(d && d.imageData); }
@@ -2316,7 +2324,7 @@ function docMatchesVaultFilter516(d){
 function docMatchesSearch521(d){
   const q=String(docVaultSearch521||"").trim().toLowerCase();
   if(!q) return true;
-  const hay=[d.type,d.title,d.ref,d.url,d.notes,d.imageName,d.imageStampedAt,d.linkedDeficiencyTitle,d.linkedDeficiencyId].filter(Boolean).join(" ").toLowerCase();
+  const hay=[d.type,d.title,d.ref,d.url,d.notes,d.customerCaption,d.imageName,d.imageStampedAt,d.linkedDeficiencyTitle,d.linkedDeficiencyId].filter(Boolean).join(" ").toLowerCase();
   return hay.includes(q);
 }
 function docVaultSearchBar521(){
@@ -2338,7 +2346,7 @@ function docVaultSortControls522(){
 }
 function docVaultListText522(s, docs){
   const rows=docs&&docs.length ? docs : [];
-  return [`FireVault Document / Photo Vault`, `Site: ${s.name||"Site"}`, `Build: ${BUILD}`, `Records: ${rows.length}`, ``].concat(rows.map((d,i)=>`${i+1}. ${docTitle(d)}\n   ${docMeta(d)}${d.url?`\n   Link: ${d.url}`:""}${d.notes?`\n   Notes: ${String(d.notes).replaceAll("\n"," ")}`:""}`)).join("\n");
+  return [`FireVault Document / Photo Vault`, `Site: ${s.name||"Site"}`, `Build: ${BUILD}`, `Records: ${rows.length}`, ``].concat(rows.map((d,i)=>`${i+1}. ${docTitle(d)}\n   ${docMeta(d)}${d.url?`\n   Link: ${d.url}`:""}${d.customerCaption?`\n   Customer Caption: ${String(d.customerCaption).replaceAll("\n"," ")}`:""}${d.notes?`\n   Notes: ${String(d.notes).replaceAll("\n"," ")}`:""}`)).join("\n");
 }
 function docVaultFilterBar516(docs){
   const counts={
@@ -2389,6 +2397,7 @@ function siteDocs(){
   document.querySelectorAll(".openDocLink").forEach(b=>b.onclick=e=>{e.stopPropagation(); window.open(b.dataset.url,"_blank");});
   document.querySelectorAll(".copyDocRef").forEach(b=>b.onclick=async e=>{e.stopPropagation(); const d=docs.find(x=>x.id===b.dataset.doc); if(d){ await navigator.clipboard.writeText(`${docTitle(d)}
 ${d.url||""}
+${d.customerCaption?`Customer Caption: ${d.customerCaption}`:""}
 ${d.notes||""}`.trim()); toast("Document reference copied."); }});
   document.querySelectorAll(".previewDocPhotoBtn524").forEach(b=>b.onclick=e=>{e.stopPropagation(); const d=docs.find(x=>x.id===b.dataset.doc); if(d) photoPreviewModal524(d);});
   document.querySelectorAll(".overlayDocPhotoBtn512").forEach(b=>b.onclick=e=>{e.stopPropagation(); const d=docs.find(x=>x.id===b.dataset.doc); if(d) downloadPhotoWithOverlay512(d);});
@@ -2418,14 +2427,15 @@ function siteDocForm(){
     <label>Reference / Account / Permit #</label><input id="docRef" value="${esc(d.ref||"")}" placeholder="Account number, permit number, drawing ID...">
     <label>URL / Link</label><input id="docUrl" value="${esc(d.url||"")}" placeholder="https://...">
     ${docPhotoPreviewMarkup512(d)}
-    <label>Photo / Document Notes</label><textarea id="docNotes" class="photoNotesField524" placeholder="Photo location, device address, circuit, problem found, customer note, or report note...">${esc(d.notes||"")}</textarea></div>
+    <label>Photo / Document Notes</label><textarea id="docNotes" class="photoNotesField524" placeholder="Internal field notes: device address, circuit, problem found, parts needed...">${esc(d.notes||"")}</textarea>
+    <label>Customer Photo Caption</label><textarea id="docCustomerCaption528" class="photoCaptionField528" placeholder="Short customer-facing caption for reports, for example: Battery dated 2019 and due for replacement.">${esc(d.customerCaption||"")}</textarea><p class="fieldNote">Customer captions appear in customer report photo lists. Internal notes stay available for technician detail.</p></div>
     <button class="primary" id="saveDocBtn">Save Document</button>${mode && !isNewPhoto523?`<button class="danger" id="deleteDocBtn">Delete Document</button>`:""}
   </div></div>`);
   document.getElementById("backBtn").onclick=()=>route("siteDocs");
   wireDocPhotoControls512(d||{});
   document.getElementById("saveDocBtn").onclick=()=>{
     const imageData=docPhotoClearRequested512 ? "" : (docPhotoDraftDataUrl512 || d?.imageData || "");
-    const obj={type:val("docType"),title:val("docTitle")||"Untitled Reference",ref:isDefPhoto525?"Deficiency":val("docRef"),url:val("docUrl"),date:val("docDate"),notes:raw("docNotes"),imageData,imageName:imageData?(docPhotoDraftName512||d?.imageName||"Site photo"):"",photoCategory:imageData?(isDefPhoto525?"Deficiency":selectedPhotoCategory524()):"",useOverlayOnSave:checked("docUseOverlay524"),imageUpdatedAt:imageData?new Date().toISOString():"",updatedAt:new Date().toISOString(),linkedDeficiencyId:isDefPhoto525?linkedDefId525:(d?.linkedDeficiencyId||""),linkedDeficiencyTitle:isDefPhoto525?(linkedDef525?.title||""):(d?.linkedDeficiencyTitle||""),includeInCustomerReport:imageData?checked("docIncludeReport526"):false};
+    const obj={type:val("docType"),title:val("docTitle")||"Untitled Reference",ref:isDefPhoto525?"Deficiency":val("docRef"),url:val("docUrl"),date:val("docDate"),notes:raw("docNotes"),customerCaption:raw("docCustomerCaption528"),imageData,imageName:imageData?(docPhotoDraftName512||d?.imageName||"Site photo"):"",photoCategory:imageData?(isDefPhoto525?"Deficiency":selectedPhotoCategory524()):"",useOverlayOnSave:checked("docUseOverlay524"),imageUpdatedAt:imageData?new Date().toISOString():"",updatedAt:new Date().toISOString(),linkedDeficiencyId:isDefPhoto525?linkedDefId525:(d?.linkedDeficiencyId||""),linkedDeficiencyTitle:isDefPhoto525?(linkedDef525?.title||""):(d?.linkedDeficiencyTitle||""),includeInCustomerReport:imageData?checked("docIncludeReport526"):false};
     if(mode && !isNewPhoto523 && d){ Object.assign(d,obj); }
     else s.docs.unshift({...obj,id:uid(),createdAt:new Date().toISOString()});
     save(); toast(isDefPhoto525?"Deficiency photo saved.":"Document saved."); if(isDefPhoto525){ mode=linkedDefId525; route("deficiencyForm"); } else route("siteDocs");
@@ -3837,18 +3847,18 @@ function diagnostics(){
 }
 function showChangelog(){
   const notes = [
-    "Advanced to Build 0.50.27 from the stable Build 0.50.26 baseline.",
-    "Polished Customer Report Photo Selection in Report Center.",
-    "Added Select All, Clear Selected, and Copy Photo List actions for customer report photos.",
-    "Added included-photo summary stats for selected, deficiency, and before/after photos.",
-    "Added a selected-photo thumbnail strip that opens the full photo preview.",
-    "Preserved the stable startup path, 5-second splash timing, Startup Health diagnostics, Deficiency Photo Workflow, Photo Vault search/sort/filter tools, Photo Overlay tools, iPad autosizing, simple Home screen, Search Bar Concept #6, and excluded job-status workflow controls."
+    "Advanced to Build 0.50.28 from the stable Build 0.50.27 baseline.",
+    "Added Customer Photo Captions for report-ready photo descriptions.",
+    "Added a separate Customer Photo Caption field on account photo records.",
+    "Customer captions now appear in Customer Report Photo lists, Copy Photo List, and generated customer report text.",
+    "Full-screen photo preview now shows customer captions separately from internal notes.",
+    "Preserved the stable startup path, 5-second splash timing, Startup Health diagnostics, Customer Report Photo Selection, Deficiency Photo Workflow, Photo Vault search/sort/filter tools, Photo Overlay tools, iPad autosizing, simple Home screen, Search Bar Concept #6, and excluded job-status workflow controls."
   ];
   const overlay=document.createElement("div");
   overlay.className="releaseOverlay";
   overlay.innerHTML=`<div class="releaseSheet" role="dialog" aria-modal="true" aria-label="FireVault release notes">
     <div class="releaseHead"><div><strong>FireVault</strong><span>Build ${BUILD}</span></div><button class="ghost iconBtn" id="closeRelease" aria-label="Close release notes">×</button></div>
-    <div class="releaseBody"><h2>Release Notes</h2><p class="releaseIntro">Customer report photo selection polish.</p><ul>${notes.map(n=>`<li>${esc(n)}</li>`).join("")}</ul></div>
+    <div class="releaseBody"><h2>Release Notes</h2><p class="releaseIntro">Customer photo caption polish.</p><ul>${notes.map(n=>`<li>${esc(n)}</li>`).join("")}</ul></div>
   </div>`;
   document.body.appendChild(overlay);
   const close=()=>overlay.remove();
