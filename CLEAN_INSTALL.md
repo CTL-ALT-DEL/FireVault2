@@ -1,6 +1,6 @@
-# Clean Install Notes — FireVault Build 0.50.30
+# Clean Install Notes — FireVault Build 0.50.31
 
-This ZIP is intended to be used as the new clean baseline for FireVault Build 0.50.30.
+This ZIP is intended to be used as the new clean baseline for FireVault Build 0.50.31.
 
 ## Install
 
@@ -11,11 +11,11 @@ This ZIP is intended to be used as the new clean baseline for FireVault Build 0.
 
 ## Build focus
 
-Build 0.50.30 keeps the stable startup path and improves customer-report photo readiness:
+Build 0.50.31 keeps the stable startup path and improves customer-report photo review:
 
-- Customer Photo Ready Check.
-- Auto-Caption Missing.
-- Needs Caption indicators.
-- Ready / Needs Review status.
+- Copy Caption Checklist.
+- READY / NEEDS CAPTION checklist output.
+- Suggested captions for selected photos missing customer captions.
+- Existing Customer Photo Ready Check and Auto-Caption Missing preserved.
 
 Startup path, 5-second splash screen, iPad autosizing, simple Home screen, and Search Bar Concept #6 were preserved.
