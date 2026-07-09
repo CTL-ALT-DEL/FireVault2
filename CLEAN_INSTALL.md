@@ -1,6 +1,6 @@
-# Clean Install Notes — FireVault Build 0.50.9
+# Clean Install Notes — FireVault Build 0.50.10
 
-This ZIP is intended to be used as the new clean baseline for FireVault Build 0.50.9.
+This ZIP is intended to be used as the new clean baseline for FireVault Build 0.50.10.
 
 ## Install
 
@@ -12,12 +12,14 @@ This ZIP is intended to be used as the new clean baseline for FireVault Build 0.
 
 ## Build notes
 
-Build 0.50.9 keeps the 0.50.8 Daily Report / Site Notes draft-safety work and adds faster closeout actions:
+Build 0.50.10 keeps the 0.50.9 Daily Report / Site Notes closeout work and improves the Photo Overlay settings:
 
-- Site Notes now has **Save + Report** to save the current note and jump straight to Daily Report.
-- Daily Report now has **Notes Only** copy for a clean saved-note-only closeout text.
-- Notes Only copy warns when unsaved Site Note drafts still exist.
-- Autosaved Site Note drafts, Clear Draft, Report Ready Check, Unsaved Drafts, Full Report, Customer Copy, and TXT download remain in place.
+- Photo Overlay now shows an actual sample-photo preview with the real overlay rendered on top.
+- Overlay text can be edited as a template.
+- All available `{fields}` are shown as insert buttons.
+- Live preview updates as controls are changed.
+- Overlay controls now include position, font size, background style, opacity, accent color, text color, FireVault logo badge, and tagline.
+- Available fields include site, address, city, state, ZIP, date, time, technician, company, phone, email, license, GPS, and build number.
 - Home screen remains simple.
 - Search Bar Concept #6 remains unchanged.
 - iPad autosizing remains in place.

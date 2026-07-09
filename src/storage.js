@@ -1,4 +1,4 @@
-export const BUILD = "0.50.9";
+export const BUILD = "0.50.10";
 export const KEY = "firevault_vault_build_030";
 export const ACTIVE_JOB_KEY = "firevault_active_job_modular";
 
@@ -18,7 +18,16 @@ export function normalize(data){
   data.breadcrumbs = Array.isArray(data.breadcrumbs) ? data.breadcrumbs : [];
   data.routeLogs = Array.isArray(data.routeLogs) ? data.routeLogs : [];
   data.settings = data.settings || {};
-  data.settings.overlay = data.settings.overlay || {fields:["site","date","time"], alignment:"bottom", fontSize:"medium", textColor:"#ffffff", accentColor:"#ef4444", showLogo:true, showTagline:true};
+  data.settings.overlay = data.settings.overlay || {fields:["site","date","time"], alignment:"bottom", fontSize:"medium", textColor:"#ffffff", accentColor:"#ef4444", backgroundStyle:"bar", opacity:"85", template:"{site_name} • {date} • {time}", showLogo:true, showTagline:true};
+  data.settings.overlay.template = data.settings.overlay.template || "{site_name} • {date} • {time}";
+  data.settings.overlay.alignment = data.settings.overlay.alignment || "bottom";
+  data.settings.overlay.fontSize = data.settings.overlay.fontSize || "medium";
+  data.settings.overlay.textColor = data.settings.overlay.textColor || "#ffffff";
+  data.settings.overlay.accentColor = data.settings.overlay.accentColor || "#ef4444";
+  data.settings.overlay.backgroundStyle = data.settings.overlay.backgroundStyle || "bar";
+  data.settings.overlay.opacity = String(data.settings.overlay.opacity || "85");
+  data.settings.overlay.showLogo = data.settings.overlay.showLogo !== false;
+  data.settings.overlay.showTagline = data.settings.overlay.showTagline !== false;
   data.settings.technician = data.settings.technician || {name:"", company:"", phone:"", email:"", license:"", defaultRole:"Fire Alarm Technician"};
   data.settings.notifications = data.settings.notifications || {dailyReminder:false, reminderTime:"07:30", taskAlerts:true, inspectionAlerts:true, gpsPrompts:true};
   data.settings.reports = data.settings.reports || {title:"FireVault Service Report", includeTechnician:true, includePhotos:true, includeMapLink:true, includeDeficiencies:true, includeTasks:true, format:"detailed"};

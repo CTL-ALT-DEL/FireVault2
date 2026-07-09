@@ -45,6 +45,22 @@ const EMAIL_TAGS = [
   ["{site_name}","Site"], ["{date}","Date"], ["{technician}","Tech"],
   ["{company}","Company"], ["{phone}","Phone"], ["{email}","Email"]
 ];
+const OVERLAY_TAGS_510 = [
+  ["{site_name}","Site Name","Customer / site record name"],
+  ["{address}","Address","Full site address"],
+  ["{city}","City","Site city"],
+  ["{state}","State","Site state"],
+  ["{zip}","ZIP","Site ZIP code"],
+  ["{date}","Date","Current date"],
+  ["{time}","Time","Current time"],
+  ["{technician}","Technician","Technician profile name"],
+  ["{company}","Company","Technician profile company"],
+  ["{phone}","Phone","Technician profile phone"],
+  ["{email}","Email","Technician profile email"],
+  ["{license}","License","Technician license / ID"],
+  ["{gps}","GPS","Sample saved GPS coordinates"],
+  ["{build}","Build","Current FireVault build number"]
+];
 const REPORT_SECTION_KEY = "firevault_report_section_prefs";
 let reportSectionPrefs = loadReportSectionPrefs();
 const appEl = document.getElementById("app");
@@ -2328,7 +2344,28 @@ function reportText(s, opts=reportSectionState()){
   if(opts.email) sections.push(["EMAIL SUBJECT", renderTemplate(set.email.defaultSubject,s) || "FireVault Report"]), sections.push(["SIGNATURE", renderTemplate(set.email.signature,s) || "No signature template entered"]);
   return reportJoin(sections);
 }
-function renderTemplate(t,s){ const tech=data.settings.technician||{}; return String(t||"").replaceAll("{site_name}",s.name||"").replaceAll("{date}",fmtDate()).replaceAll("{technician}",tech.name||"").replaceAll("{company}",tech.company||"").replaceAll("{phone}",tech.phone||"").replaceAll("{email}",tech.email||""); }
+function renderTemplate(t,s={}){
+  const tech=data.settings.technician||{};
+  const now=new Date();
+  const gps=hasGps(s) ? `${Number(s.gps.lat).toFixed(6)}, ${Number(s.gps.lng).toFixed(6)}` : "No GPS saved";
+  const tokens={
+    "{site_name}":s.name||"",
+    "{address}":fullAddress(s),
+    "{city}":s.city||"",
+    "{state}":s.state||"",
+    "{zip}":s.zip||"",
+    "{date}":fmtDate(now),
+    "{time}":now.toLocaleTimeString([], {hour:"numeric",minute:"2-digit"}),
+    "{technician}":tech.name||"",
+    "{company}":tech.company||"",
+    "{phone}":tech.phone||"",
+    "{email}":tech.email||"",
+    "{license}":tech.license||"",
+    "{gps}":gps,
+    "{build}":BUILD
+  };
+  return Object.entries(tokens).reduce((out,[key,value])=>out.replaceAll(key,value), String(t||""));
+}
 function reportStats(s){
   ensureSite(s);
   const h=siteHealth(s);
@@ -2663,7 +2700,7 @@ function settingsTabs(){
     ["gps","GPS / Maps","Location capture, map provider, nearby radius, and GPS report visibility."],
     ["reports","Reports","Default report title, format, and included report sections."],
     ["email","Email","Default recipients, subject template, signature template, and tag tools."],
-    ["overlay","Photo Overlay","Photo stamp alignment, size, accent color, and logo visibility."],
+    ["overlay","Photo Overlay","Photo stamp preview, template fields, alignment, colors, and logo visibility."],
     ["themes","Theme","Theme presets, accent color, 3D controls, text size, and haptics."],
     ["visibility","Modules","Enable or disable FireVault modules for a cleaner field interface."],
     ["advanced","Advanced","Optional future modules marked with an asterisk when services are required."],
@@ -2836,12 +2873,122 @@ function updateEmailPreview(){
   if(subjectPreview && subject) subjectPreview.textContent=renderTemplate(subject.value, emailSampleSite()) || "FireVault Report";
   if(sigPreview && sig) sigPreview.innerHTML=esc(renderTemplate(sig.value, emailSampleSite())).replaceAll("\n","<br>") || "Signature preview";
 }
+function overlayDefaultTemplate510(){ return "{site_name} • {date} • {time}\n{technician} • {company}"; }
+function overlaySampleSite510(){
+  return {
+    name:"Acme Fire Panel",
+    street:"123 Main St",
+    city:"Casper",
+    state:"WY",
+    zip:"82601",
+    gps:{lat:42.8501,lng:-106.3252,accuracy:12,capturedAt:new Date().toISOString()}
+  };
+}
+function overlayCleanSetting510(o={}){
+  return {
+    template:o.template || overlayDefaultTemplate510(),
+    alignment:o.alignment || "bottom",
+    fontSize:o.fontSize || "medium",
+    accentColor:o.accentColor || "#ef4444",
+    textColor:o.textColor || "#ffffff",
+    backgroundStyle:o.backgroundStyle || "bar",
+    opacity:String(o.opacity || "85"),
+    showLogo:o.showLogo !== false,
+    showTagline:o.showTagline !== false
+  };
+}
+function overlayTagButtons510(){
+  return OVERLAY_TAGS_510.map(([tag,label,note])=>`<button type="button" class="overlayFieldChip510" data-overlay-tag="${esc(tag)}"><strong>${esc(tag)}</strong><span>${esc(label)}</span><small>${esc(note)}</small></button>`).join("");
+}
+function overlayPreviewMarkup510(o){
+  const set=overlayCleanSetting510(o);
+  const lines=esc(renderTemplate(set.template, overlaySampleSite510()) || "FireVault overlay preview").replaceAll("\n","<br>");
+  const style=`--ovAccent:${esc(set.accentColor)};--ovText:${esc(set.textColor)};--ovAlpha:${Math.max(20,Math.min(100,Number(set.opacity)||85))/100}`;
+  return `<div class="photoOverlayPreview510" style="${style}">
+    <div class="photoSampleScene510" aria-label="Sample fire alarm panel photo preview">
+      <div class="sampleWall510"></div>
+      <div class="samplePanel510"><span>FACP</span><b>ALARM</b><i>NORMAL</i><em>TROUBLE</em></div>
+      <div class="sampleConduit510 one"></div><div class="sampleConduit510 two"></div>
+      <div id="overlayLivePreview510" class="photoStamp510 align-${esc(set.alignment)} size-${esc(set.fontSize)} style-${esc(set.backgroundStyle)}">
+        ${set.showLogo?`<div class="photoStampLogo510">FV</div>`:""}
+        <div class="photoStampText510"><div>${lines}</div>${set.showTagline?`<small>FireVault Field Photo Overlay</small>`:""}</div>
+      </div>
+    </div>
+  </div>`;
+}
+function overlaySettingsPanel510(o){
+  const set=overlayCleanSetting510(o);
+  return `<div class="settingsStack overlaySettings510">
+    <div class="card settingGroup compactPane overlayEditor510">
+      <div class="paneHead"><div><h2>Photo Overlay</h2><p class="paneNote">Build the stamp that appears on field photos. Preview uses a sample panel image and actual overlay text.</p></div><button class="primary saveMini" id="saveSettings">Save</button></div>
+      ${overlayPreviewMarkup510(set)}
+      <div class="overlayControlGrid510">
+        ${fieldBlock("Overlay Text",`<textarea id="ovTemplate" class="overlayTemplate510" rows="4" placeholder="{site_name} • {date} • {time}">${esc(set.template)}</textarea>`,`Tap fields below to insert them into the overlay.`)}
+        <div class="overlayMiniControls510">
+          ${fieldBlock("Position",`<select id="ovAlign"><option value="bottom" ${set.alignment==="bottom"?"selected":""}>bottom</option><option value="top" ${set.alignment==="top"?"selected":""}>top</option><option value="middle" ${set.alignment==="middle"?"selected":""}>middle</option></select>`)}
+          ${fieldBlock("Font Size",`<select id="ovSize"><option value="small" ${set.fontSize==="small"?"selected":""}>small</option><option value="medium" ${set.fontSize==="medium"?"selected":""}>medium</option><option value="large" ${set.fontSize==="large"?"selected":""}>large</option></select>`)}
+          ${fieldBlock("Background",`<select id="ovBg"><option value="bar" ${set.backgroundStyle==="bar"?"selected":""}>bar</option><option value="card" ${set.backgroundStyle==="card"?"selected":""}>card</option><option value="minimal" ${set.backgroundStyle==="minimal"?"selected":""}>minimal</option></select>`)}
+          ${fieldBlock("Opacity",`<input id="ovOpacity" type="range" min="35" max="100" value="${esc(set.opacity)}">`,`Stamp background strength`)}
+          ${fieldBlock("Accent Color",`<input id="ovAccent" type="color" value="${esc(set.accentColor)}">`)}
+          ${fieldBlock("Text Color",`<input id="ovText" type="color" value="${esc(set.textColor)}">`)}
+        </div>
+      </div>
+      <div class="settingsList twoCol overlayToggles510">
+        ${checkBlock("ovLogo","Show FireVault logo badge",set.showLogo)}
+        ${checkBlock("ovTagline","Show FireVault tagline",set.showTagline)}
+      </div>
+    </div>
+    <div class="card compactPane overlayFieldsCard510">
+      <div class="paneHead"><div><h2>Available Overlay Fields</h2><p class="paneNote">Tap a field to insert it into the overlay text box.</p></div></div>
+      <div class="overlayFieldGrid510">${overlayTagButtons510()}</div>
+    </div>
+  </div>`;
+}
+function collectOverlayFromInputs510(){
+  return overlayCleanSetting510({
+    template:raw("ovTemplate") || overlayDefaultTemplate510(),
+    alignment:val("ovAlign") || "bottom",
+    fontSize:val("ovSize") || "medium",
+    accentColor:val("ovAccent") || "#ef4444",
+    textColor:val("ovText") || "#ffffff",
+    backgroundStyle:val("ovBg") || "bar",
+    opacity:val("ovOpacity") || "85",
+    showLogo:checked("ovLogo"),
+    showTagline:checked("ovTagline")
+  });
+}
+function updateOverlayPreview510(){
+  const holder=document.querySelector(".photoOverlayPreview510");
+  if(!holder) return;
+  const next=overlayPreviewMarkup510(collectOverlayFromInputs510());
+  const wrap=document.createElement("div");
+  wrap.innerHTML=next;
+  holder.replaceWith(wrap.firstElementChild);
+}
+function insertOverlayTag510(tag){
+  const target=document.getElementById("ovTemplate");
+  if(!target) return;
+  const start=Number.isFinite(target.selectionStart) ? target.selectionStart : target.value.length;
+  const end=Number.isFinite(target.selectionEnd) ? target.selectionEnd : target.value.length;
+  target.setRangeText(tag, start, end, "end");
+  target.focus();
+  target.dispatchEvent(new Event("input",{bubbles:true}));
+}
+function wireOverlaySettings510(){
+  ["ovTemplate","ovAlign","ovSize","ovBg","ovOpacity","ovAccent","ovText","ovLogo","ovTagline"].forEach(id=>{
+    const el=document.getElementById(id);
+    if(el) el.addEventListener(el.type==="checkbox"?"change":"input", updateOverlayPreview510);
+    if(el && el.tagName === "SELECT") el.addEventListener("change", updateOverlayPreview510);
+  });
+  document.querySelectorAll(".overlayFieldChip510").forEach(b=>b.onclick=()=>insertOverlayTag510(b.dataset.overlayTag||""));
+}
+
 function settingsPanel(){
   const s=data.settings, t=s.theme, tech=s.technician, email=s.email, r=s.reports, o=s.overlay, a=s.advanced, gps=s.gps||{};
   if(settingsTab==="tech") return `<div class="settingsStack"><div class="card settingGroup compactPane"><div class="paneHead"><h2>Technician Profile</h2><button class="primary saveMini" id="saveSettings">Save</button></div><p class="paneNote">Used on reports, email tags, and future photo stamps.</p><div class="settingsGrid">${fieldBlock("Name",`<input id="techName" value="${esc(tech.name)}">`)}${fieldBlock("Company",`<input id="techCompany" value="${esc(tech.company)}">`)}${fieldBlock("Phone",`<input id="techPhone" value="${esc(tech.phone)}">`)}${fieldBlock("Email",`<input id="techEmail" value="${esc(tech.email)}">`)}${fieldBlock("License / ID",`<input id="techLicense" value="${esc(tech.license)}">`)}</div></div></div>`;
   if(settingsTab==="reports") return `<div class="settingsStack"><div class="card settingGroup compactPane"><div class="paneHead"><h2>Report Defaults</h2><button class="primary saveMini" id="saveSettings">Save</button></div><p class="paneNote">Controls generated site reports.</p><div class="settingsGrid">${fieldBlock("Report Title",`<input id="reportTitle" value="${esc(r.title)}">`)}${fieldBlock("Format",`<select id="reportFormat"><option ${r.format==="detailed"?"selected":""}>detailed</option><option ${r.format==="compact"?"selected":""}>compact</option></select>`)}</div><div class="settingsList">${checkBlock("repTech","Include technician profile",r.includeTechnician)}${checkBlock("repTasks","Include open and completed tasks",r.includeTasks)}${checkBlock("repDef","Include deficiencies",r.includeDeficiencies)}</div></div></div>`;
   if(settingsTab==="email") return emailSettingsPanel(email);
-  if(settingsTab==="overlay") return `<div class="settingsStack"><div class="card settingGroup compactPane"><div class="paneHead"><h2>Photo Overlay</h2><button class="primary saveMini" id="saveSettings">Save</button></div><p class="paneNote">Preview and format the field photo stamp.</p><div class="previewPanel compactPreview"><div class="previewOverlay ${o.alignment==="top"?"top":""}">FIREVAULT • Site • Date • Time</div></div><div class="settingsGrid">${fieldBlock("Alignment",`<select id="ovAlign"><option ${o.alignment==="bottom"?"selected":""}>bottom</option><option ${o.alignment==="top"?"selected":""}>top</option></select>`)}${fieldBlock("Font Size",`<select id="ovSize"><option ${o.fontSize==="small"?"selected":""}>small</option><option ${o.fontSize==="medium"?"selected":""}>medium</option><option ${o.fontSize==="large"?"selected":""}>large</option></select>`)}${fieldBlock("Accent Color",`<input id="ovAccent" type="color" value="${esc(o.accentColor)}">`)}</div><div class="settingsList">${checkBlock("ovLogo","Show FireVault logo on overlay",o.showLogo)}</div></div></div>`;
+  if(settingsTab==="overlay") return overlaySettingsPanel510(o);
   if(settingsTab==="gps") return `<div class="settingsStack"><div class="card settingGroup compactPane gpsSettingsPane"><div class="paneHead"><h2>GPS / Maps</h2><button class="primary saveMini" id="saveSettings">Save</button></div><p class="paneNote">Restored GPS tools. Coordinates are saved locally inside each site record.</p><div class="settingsGrid">${fieldBlock("Default Map",`<select id="gpsMapProvider"><option value="apple" ${gps.mapProvider!=="google"?"selected":""}>Apple Maps</option><option value="google" ${gps.mapProvider==="google"?"selected":""}>Google Maps</option></select>`)}${fieldBlock("GPS Accuracy",`<select id="gpsHighAccuracy"><option value="true" ${gps.highAccuracy!==false?"selected":""}>High accuracy</option><option value="false" ${gps.highAccuracy===false?"selected":""}>Standard</option></select>`)}${fieldBlock("Nearby Radius",`<input id="gpsNearbyRadius" inputmode="decimal" value="${esc(gps.nearbyRadiusMiles||1)}">`,`Miles for Nearby Sites detection`)}</div><div class="settingsList">${checkBlock("gpsEnabled","Show GPS capture buttons on site pages",gps.enabled!==false)}${checkBlock("gpsReports","Include GPS coordinates in reports",gps.includeInReports!==false)}</div><p class="fieldNote">Browser GPS works only when allowed by the phone/browser and served from HTTPS.</p></div></div>`;
   if(settingsTab==="themes") return `<div class="settingsStack"><div class="card settingGroup compactPane"><div class="paneHead"><h2>Theme Engine</h2><button class="primary saveMini" id="saveSettings">Apply</button></div><p class="paneNote">Quick presets and live UI controls.</p><div class="presetGrid">${Object.entries(themePresets).map(([key,p])=>`<button class="ghost presetBtn" data-preset="${key}"><span class="themeSwatch" style="background:${p.accentColor}"></span><span>${p.label}</span></button>`).join("")}</div><div class="settingsGrid">${fieldBlock("Theme",`<select id="themeName">${Object.entries(themePresets).map(([key,p])=>`<option value="${key}" ${t.name===key?"selected":""}>${p.label}</option>`).join("")}</select>`)}${fieldBlock("Accent Color",`<input id="themeAccent" type="color" value="${esc(t.accentColor||"#ef4444")}">`)}${fieldBlock("Buttons",`<select id="buttonStyle"><option value="rounded" ${t.buttonStyle!=="squared"?"selected":""}>rounded</option><option value="squared" ${t.buttonStyle==="squared"?"selected":""}>squared</option></select>`)}${fieldBlock("Cards",`<select id="cardStyle"><option value="glass" ${t.cardStyle!=="solid"?"selected":""}>glass</option><option value="solid" ${t.cardStyle==="solid"?"selected":""}>solid</option></select>`)}</div><div class="settingsList">${checkBlock("themeHighContrast","High contrast support",t.highContrast)}${checkBlock("themeLargeText","Larger text",t.largeText)}${checkBlock("themeCompact","Compact layout",t.compactLayout)}${checkBlock("themeHaptics","Haptic button feedback",s.app?.haptics!==false)}</div></div></div>`;
   if(settingsTab==="visibility") { const mode=appMode(); const v=visibility(); return `<div class="settingsStack simpleSettings472"><div class="card settingGroup compactPane simpleHero472"><div class="paneHead"><div><h2>Modules / Simple View</h2><p class="paneNote">Turn major FireVault modules on or off. Disabled modules disappear from the interface until you enable them again here.</p></div><button class="primary saveMini" id="saveSettings">Save</button></div><div class="settingsGrid">${fieldBlock("App Mode",`<select id="viewMode"><option value="simple" ${mode==="simple"?"selected":""}>Simple View</option><option value="advanced" ${mode==="advanced"?"selected":""}>Advanced View</option><option value="power" ${mode==="power"?"selected":""}>Technician Power Mode</option></select>`,`Simple keeps the field interface clean. Advanced shows enabled modules. Power shows everything.`)}</div><div class="viewModeQuick472"><button class="ghost" data-view-mode="simple">Simple</button><button class="ghost" data-view-mode="advanced">Advanced</button><button class="ghost" data-view-mode="power">Power</button></div></div>${visibilityPresetCards474()}<div class="card settingGroup compactPane"><div class="paneHead"><h2>Modules</h2></div><p class="paneNote">Turn off anything you do not need. Disabled modules are removed from the dashboard, site screens, bottom tabs, and tool menus until enabled again.</p><div class="settingsList featureList472">${FEATURE_LABELS.map(([key,label,note])=>`<label class="checkRow featureCheck472"><input type="checkbox" id="vis_${key}" ${v[key]?"checked":""}><span><strong>${esc(label)}</strong><small>${esc(note)}</small></span></label>`).join("")}</div></div></div>`; }
@@ -2851,6 +2998,7 @@ function settingsPanel(){
 }
 function wireSettingsPanel(){
   const saveBtn=document.getElementById("saveSettings"); if(saveBtn) saveBtn.onclick=saveSettings;
+  if(settingsTab==="overlay") wireOverlaySettings510();
   ["emailSubject","emailSig"].forEach(id=>{ const el=document.getElementById(id); if(el){ el.addEventListener("focus",()=>lastEmailTemplateField=id); el.addEventListener("input",updateEmailPreview); } });
   document.querySelectorAll(".emailTagChip").forEach(b=>b.onclick=()=>{ const target=document.getElementById(lastEmailTemplateField) || document.getElementById("emailSubject"); insertAtCursor(target, b.dataset.emailTag || ""); });
   document.querySelectorAll(".presetBtn").forEach(b=>b.onclick=()=>{ const p=themePresets[b.dataset.preset]; data.settings.theme.name=b.dataset.preset; data.settings.theme.accentColor=p.accentColor; if(p.highContrast) data.settings.theme.highContrast=true; save(); settings(); toast("Theme applied."); });
@@ -2866,7 +3014,7 @@ function saveSettings(){
   if(settingsTab==="tech") s.technician={name:val("techName"),company:val("techCompany"),phone:val("techPhone"),email:val("techEmail"),license:val("techLicense"),defaultRole:"Fire Alarm Technician"};
   if(settingsTab==="reports") s.reports={...s.reports,title:val("reportTitle")||"FireVault Service Report",format:val("reportFormat"),includeTechnician:checked("repTech"),includeTasks:checked("repTasks"),includeDeficiencies:checked("repDef")};
   if(settingsTab==="email") s.email={...s.email,defaultTo:val("emailTo"),cc:val("emailCc"),defaultSubject:val("emailSubject"),signature:raw("emailSig")};
-  if(settingsTab==="overlay") s.overlay={...s.overlay,alignment:val("ovAlign"),fontSize:val("ovSize"),accentColor:val("ovAccent"),showLogo:checked("ovLogo")};
+  if(settingsTab==="overlay") s.overlay={...s.overlay,...collectOverlayFromInputs510()};
   if(settingsTab==="gps") s.gps={enabled:checked("gpsEnabled"),mapProvider:val("gpsMapProvider")||"apple",highAccuracy:val("gpsHighAccuracy")!=="false",includeInReports:checked("gpsReports"),nearbyRadiusMiles:Number(val("gpsNearbyRadius"))||1};
   if(settingsTab==="themes") { s.theme={name:val("themeName"),accentColor:val("themeAccent"),highContrast:checked("themeHighContrast"),largeText:checked("themeLargeText"),compactLayout:checked("themeCompact"),buttonStyle:val("buttonStyle"),cardStyle:val("cardStyle")}; s.app={...(s.app||{}),haptics:checked("themeHaptics"),viewMode:s.app?.viewMode||"simple"}; }
   if(settingsTab==="visibility") { s.app={...(s.app||{}),viewMode:val("viewMode")||"simple"}; const next={...visibility()}; FEATURE_LABELS.forEach(([key])=>next[key]=checked("vis_"+key)); s.visibility=next; }
@@ -3029,12 +3177,12 @@ function diagnostics(){
 }
 function showChangelog(){
   const notes = [
-    "Advanced to Build 0.50.9 from the uploaded 0.50.8 baseline.",
-    "Added Save + Report on the Site Notes composer so a note can be saved and the Daily Report opened in one tap.",
-    "Added a Notes Only copy action on Daily Report for a clean saved-note-only closeout text.",
-    "Notes Only copy includes an unsaved draft warning when draft text still exists for any site.",
-    "Kept the 0.50.8 autosaved Site Note drafts, Clear Draft control, Report Ready Check, and Unsaved Drafts section.",
-    "Kept the Home screen simple, preserved Search Bar Concept #6, preserved iPad autosizing, and did not bring back job-status workflow controls."
+    "Advanced to Build 0.50.10 from the uploaded 0.50.9 baseline.",
+    "Rebuilt Photo Overlay settings into a more functional editor with a real sample-photo preview.",
+    "Added an editable overlay template with tap-to-insert field chips for every available {field}.",
+    "Added live preview support for alignment, font size, accent color, text color, background style, opacity, logo, and tagline settings.",
+    "Added new overlay fields including address, city, state, ZIP, technician, company, phone, email, license, GPS, and build number.",
+    "Kept Daily Report / Site Notes closeout features, iPad autosizing, the simple Home screen, Search Bar Concept #6, and excluded job-status workflow controls."
   ];
   const overlay=document.createElement("div");
   overlay.className="releaseOverlay";

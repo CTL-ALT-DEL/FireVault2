@@ -8,7 +8,7 @@
   "orientation": "any",
   "background_color": "#0b0d10",
   "theme_color": "#101216",
-  "description": "Field knowledge system for fire alarm technicians. Build 0.50.9 with Daily Report closeout actions, Site Notes draft safety, and iPad autosizing.",
+  "description": "Field knowledge system for fire alarm technicians. Build 0.50.10 with functional Photo Overlay settings, live sample preview, Daily Report closeout actions, and iPad autosizing.",
   "icons": [
     {
       "src": "assets/icon-192.png",
