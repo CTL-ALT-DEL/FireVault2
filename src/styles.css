@@ -938,7 +938,7 @@ nav button:active{transform:translateY(1px) scale(.992)}
 .reportDeliveryEmpty{font-size:12px;color:var(--muted);padding:9px 10px;border:1px dashed rgba(255,255,255,.13);border-radius:13px;background:rgba(255,255,255,.025);}
 @media(max-width:560px){.reportActionGrid442{grid-template-columns:repeat(2,minmax(0,1fr));}.reportActionGrid442 #shareBtn{grid-column:1 / -1}.reportDeliveryHead{align-items:center}.reportDeliveryRow{grid-template-columns:1fr}.reportDeliveryRow time{justify-self:start}.reportReadyCard442 small{white-space:normal}}
 
-/* Build 0.48.2 Report delivery receipts and follow-up tasks */
+/* Build 0.48.3 Report delivery receipts and follow-up tasks */
 .reportDeliveryCard444 .reportDeliveryHead{align-items:flex-start;}
 .reportDeliveryHeadActions{display:flex;gap:7px;align-items:center;flex:0 0 auto;}
 .reportDeliveryReceiptBtn{width:100%;text-align:left;color:var(--text);font:inherit;cursor:pointer;}
@@ -946,7 +946,7 @@ nav button:active{transform:translateY(1px) scale(.992)}
 .reportDeliveryReceiptBtn:active{transform:translateY(1px);}
 @media(max-width:560px){.reportDeliveryCard444 .reportDeliveryHead{display:grid;grid-template-columns:1fr;gap:9px}.reportDeliveryHeadActions{display:grid;grid-template-columns:1fr 1fr;width:100%}.reportDeliveryHeadActions .smallBtn{width:100%}}
 
-/* Build 0.48.2 Visual Consistency Pass - professional field-tool surface system */
+/* Build 0.48.3 Visual Consistency Pass - professional field-tool surface system */
 :root{
   --fv445Top:#242d3d;
   --fv445Bottom:#121923;
@@ -1111,7 +1111,7 @@ nav button span:last-child{font-size:11.2px!important;font-weight:850;}
 }
 
 
-/* Build 0.48.2 Site Detail polish - professional customer vault command page */
+/* Build 0.48.3 Site Detail polish - professional customer vault command page */
 .siteDetailScreen446{gap:10px;}
 .siteTopBar{align-items:center;justify-content:space-between;margin-bottom:-2px;}
 .siteTopBar .back,.siteTopBar #editBtn{min-height:38px;border-radius:14px;padding:8px 13px;font-size:13px;font-weight:900;}
@@ -1165,7 +1165,7 @@ nav button span:last-child{font-size:11.2px!important;font-weight:850;}
   .siteDetailScreen446 .mapActions{grid-template-columns:1fr;}
 }
 
-/* Build 0.48.2 Report Center polish and readability pass */
+/* Build 0.48.3 Report Center polish and readability pass */
 .reportScreen447{gap:10px;}
 .reportScreen447 .reportTopRow{min-height:40px;gap:10px;}
 .reportScreen447 .reportTopRow .back{min-width:40px;min-height:40px;border-radius:14px;}
@@ -1212,7 +1212,7 @@ nav button span:last-child{font-size:11.2px!important;font-weight:850;}
   .reportBox447{font-size:11.5px!important;}
 }
 
-/* Build 0.48.2 Settings final readability and layout consistency pass */
+/* Build 0.48.3 Settings final readability and layout consistency pass */
 .settingsScreen448{
   gap:10px!important;
   text-align:left!important;
@@ -1474,7 +1474,7 @@ nav button span:last-child{font-size:11.2px!important;font-weight:850;}
   .settingsContent448 .checkRow{font-size:13.2px!important;}
 }
 
-/* Build 0.48.2 Backup Center polish + data safety snapshot */
+/* Build 0.48.3 Backup Center polish + data safety snapshot */
 .settingsScreen449 .settingsMiniTitle p{max-width:56vw}
 .backupCenter449{gap:12px!important}
 .backupCenter449 .compactPane{border-radius:18px!important;border-left:0!important}
@@ -1493,7 +1493,7 @@ nav button span:last-child{font-size:11.2px!important;font-weight:850;}
 @media(max-width:620px){.backupStats449{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.backupActionGrid449{grid-template-columns:1fr}.backupStats449 div{min-height:58px}.backupStats449 strong{font-size:20px}}
 
 
-/* Build 0.48.2 Stability Checkpoint - dashboard status polish */
+/* Build 0.48.3 Stability Checkpoint - dashboard status polish */
 .homeScreen450{gap:11px!important;}
 .homeHero450{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;}
 .homeHero450 p{font-size:13px;font-weight:800;color:#aeb9cc;margin-top:4px;}
@@ -1511,7 +1511,7 @@ nav button span:last-child{font-size:11.2px!important;font-weight:850;}
 @media(max-width:390px){.homeHero450{display:block}.homeBuildPill450{margin-top:8px}.homeStatusGrid450{gap:7px}.homeStatusGrid450 div{min-height:48px;padding:7px}.homeStatusGrid450 strong{font-size:18px}.homeStatusHead450{align-items:flex-start}.homeStatusHead450 span{font-size:10.8px}}
 
 
-/* Build 0.48.2 Settings full-screen redesign - main choices + detail pages */
+/* Build 0.48.3 Settings full-screen redesign - main choices + detail pages */
 .settingsHomeScreen451{
   gap:12px!important;
   padding-top:2px!important;
@@ -1755,7 +1755,7 @@ nav button span:last-child{font-size:11.2px!important;font-weight:850;}
 }
 
 
-/* Build 0.48.2 dashboard duplicate build pill removal + bottom visibility fix */
+/* Build 0.48.3 dashboard duplicate build pill removal + bottom visibility fix */
 .homeHero450{justify-content:flex-start!important;}
 .homeScreen450{overflow:auto!important; padding-bottom:calc(var(--navH) + 18px)!important; -webkit-overflow-scrolling:touch;}
 .homeScreen450 .homeStatus450{margin-bottom:4px!important;}
@@ -1768,7 +1768,7 @@ main{padding-bottom:8px!important;}
 }
 
 
-/* Build 0.48.2 Settings menu repair - horizontal icon/title and no OPEN labels */
+/* Build 0.48.3 Settings menu repair - horizontal icon/title and no OPEN labels */
 .settingsChoiceGrid451{
   grid-template-columns:repeat(2,minmax(0,1fr))!important;
   gap:10px!important;
@@ -1897,7 +1897,7 @@ main{padding-bottom:8px!important;}
 }
 
 
-/* Build 0.48.2 Settings tab vertical alignment polish */
+/* Build 0.48.3 Settings tab vertical alignment polish */
 .settingsChoice451.settingsChoice456{
   min-height:82px!important;
   padding:12px 42px 12px 12px!important;
@@ -1995,7 +1995,7 @@ main{padding-bottom:8px!important;}
 }
 
 
-/* Build 0.48.2 dashboard date, startup splash, and Library folders */
+/* Build 0.48.3 dashboard date, startup splash, and Library folders */
 .splashScreen457{
   min-height:100%;
   display:flex;
@@ -2265,7 +2265,7 @@ main{padding-bottom:8px!important;}
 }
 
 
-/* Build 0.48.2 Center-justified day/date block */
+/* Build 0.48.3 Center-justified day/date block */
 .homeHero457{
   display:flex!important;
   justify-content:center!important;
@@ -2299,7 +2299,7 @@ main{padding-bottom:8px!important;}
 }
 
 
-/* Build 0.48.2 Navigation & Screen Fit Polish */
+/* Build 0.48.3 Navigation & Screen Fit Polish */
 :root{
   --contentBottomPad459:calc(var(--navH) + 22px);
   --screenGap459:10px;
@@ -2463,7 +2463,7 @@ nav button{
 }
 
 
-/* Build 0.48.2 Stability Checkpoint / Diagnostics polish */
+/* Build 0.48.3 Stability Checkpoint / Diagnostics polish */
 .diagnosticsScreen460{
   gap:10px!important;
   overflow:hidden!important;
@@ -2574,7 +2574,7 @@ nav button{
 }
 
 
-/* Build 0.48.2 Diagnostics bottom menu visibility fix */
+/* Build 0.48.3 Diagnostics bottom menu visibility fix */
 .diagnosticsScreen460{
   overflow-y:auto!important;
   overflow-x:hidden!important;
@@ -2610,7 +2610,7 @@ nav button{
 }
 
 
-/* Build 0.48.2 Daily Route Log Starter */
+/* Build 0.48.3 Daily Route Log Starter */
 .routeHomeTile462{
   border-color:color-mix(in srgb,var(--blue) 36%, rgba(255,255,255,.09))!important;
 }
@@ -2747,7 +2747,7 @@ nav button{
 }
 
 
-/* Build 0.48.2 Daily Route recording LED */
+/* Build 0.48.3 Daily Route recording LED */
 .homeHero463{
   justify-content:center!important;
 }
@@ -2802,7 +2802,7 @@ nav button{
 }
 
 
-/* Build 0.48.2 Daily Route report polish */
+/* Build 0.48.3 Daily Route report polish */
 .routeControls462{
   grid-template-columns:1fr 1fr 1fr!important;
 }
@@ -2862,7 +2862,7 @@ nav button{
 }
 
 
-/* Build 0.48.2 Daily Route waypoint edit/delete polish */
+/* Build 0.48.3 Daily Route waypoint edit/delete polish */
 .routeControls462{
   grid-template-columns:1fr 1fr!important;
 }
@@ -2905,7 +2905,7 @@ nav button{
 }
 
 
-/* Build 0.48.2 Daily Route smart nearest-site suggestions */
+/* Build 0.48.3 Daily Route smart nearest-site suggestions */
 .routeNearestBtn466{
   grid-column:1 / -1;
   border-color:color-mix(in srgb,var(--green) 32%, rgba(255,255,255,.1))!important;
@@ -2954,7 +2954,7 @@ nav button{
 }
 
 
-/* Build 0.48.2 Daily Route export polish */
+/* Build 0.48.3 Daily Route export polish */
 .routeReportPreview467{
   border-left:0!important;
   background:linear-gradient(180deg,color-mix(in srgb,var(--blue) 12%, #202838),#101720)!important;
@@ -2988,7 +2988,7 @@ nav button{
 }
 
 
-/* Build 0.48.2 Active Daily Route dashboard card */
+/* Build 0.48.3 Active Daily Route dashboard card */
 .activeRouteMini468{
   display:grid;
   gap:10px;
@@ -3082,7 +3082,7 @@ nav button{
 }
 
 
-/* Build 0.48.2 Daily Route vehicle / mileage details */
+/* Build 0.48.3 Daily Route vehicle / mileage details */
 .routeDetails469{
   display:grid;
   gap:10px;
@@ -3136,7 +3136,7 @@ nav button{
 }
 
 
-/* Build 0.48.2 Daily Route pause / resume status */
+/* Build 0.48.3 Daily Route pause / resume status */
 .routeLed470{
   flex:0 0 auto;
   width:13px;
@@ -3181,7 +3181,7 @@ nav button{
 }
 
 
-/* Build 0.48.2 Saved Daily Route review/search polish */
+/* Build 0.48.3 Saved Daily Route review/search polish */
 .routeHistoryTools471{
   display:grid;
   grid-template-columns:minmax(0,1fr) auto;
@@ -3319,7 +3319,7 @@ nav button{
 }
 
 
-/* Build 0.48.2 Simple View / Feature Visibility */
+/* Build 0.48.3 Simple View / Feature Visibility */
 .featureHidden472{display:none!important;}
 .simpleViewNotice472{
   display:flex;
@@ -3355,7 +3355,7 @@ body.view-simple472 nav:has(#nav-library[style*="none"]) {grid-template-columns:
 }
 
 
-/* Build 0.48.2 Simple View dashboard drawer and hidden tools polish */
+/* Build 0.48.3 Simple View dashboard drawer and hidden tools polish */
 .view-simple472 .homeScreen450{
   gap:9px!important;
 }
@@ -3509,7 +3509,7 @@ body.view-simple472 nav:has(#nav-library[style*="none"]) {grid-template-columns:
 }
 
 
-/* Build 0.48.2 Quick View Presets / Simple View setup polish */
+/* Build 0.48.3 Quick View Presets / Simple View setup polish */
 .featurePresets474{
   display:grid;
   gap:10px;
@@ -3575,7 +3575,7 @@ body.view-simple472 nav:has(#nav-library[style*="none"]) {grid-template-columns:
 }
 
 
-/* Build 0.48.2 Green build revision status + remove dashboard Stability Checkpoint */
+/* Build 0.48.3 Green build revision status + remove dashboard Stability Checkpoint */
 .build{
   color:#dcfce7!important;
   border-color:rgba(34,197,94,.58)!important;
@@ -3617,7 +3617,7 @@ body.view-simple472 nav:has(#nav-library[style*="none"]) {grid-template-columns:
 }
 
 
-/* Build 0.48.2 Apple-inspired home search, Nearby Accounts, Modules, and customer screen cleanup */
+/* Build 0.48.3 Apple-inspired home search, Nearby Accounts, Modules, and customer screen cleanup */
 .homeScreen476{
   gap:12px!important;
   overflow:auto!important;
@@ -3708,7 +3708,7 @@ body.view-simple472 nav:has(#nav-library[style*="none"]) {grid-template-columns:
 }
 
 
-/* Build 0.48.2 Customer Account simplification */
+/* Build 0.48.3 Customer Account simplification */
 .siteDetailScreen477{
   gap:10px!important;
   overflow:auto!important;
@@ -4005,7 +4005,7 @@ body.view-simple472 nav:has(#nav-library[style*="none"]) {grid-template-columns:
 }
 
 
-/* Build 0.48.2 Home Screen Concept #2 — Apple-inspired dark dashboard */
+/* Build 0.48.3 Home Screen Concept #2 — Apple-inspired dark dashboard */
 .homeScreen478{
   position:relative;
   gap:11px!important;
@@ -4308,7 +4308,7 @@ body.view-simple472 nav:has(#nav-library[style*="none"]) {grid-template-columns:
 }
 
 
-/* Build 0.48.2 Apple concept restore: remove only unwanted app chrome on Home */
+/* Build 0.48.3 Apple concept restore: remove only unwanted app chrome on Home */
 body.homeFullscreen480{
   background:#07090f!important;
 }
@@ -4402,7 +4402,7 @@ body.homeFullscreen480 .homeModuleSummary478{
 }
 
 
-/* Build 0.48.2 Apple home refinement - keep concept proportions, remove awkward chrome */
+/* Build 0.48.3 Apple home refinement - keep concept proportions, remove awkward chrome */
 body.homeFullscreen480 main{
   max-width:430px!important;
   width:100%!important;
@@ -4514,7 +4514,7 @@ body.homeFullscreen480 .buildRevisionSpacer475{
 }
 
 
-/* Build 0.48.2 Apple home full-screen/PWA fit polish */
+/* Build 0.48.3 Apple home full-screen/PWA fit polish */
 .homeScreen478{
   overflow-y:auto!important;
   overflow-x:hidden!important;
@@ -4588,5 +4588,74 @@ body.homeFullscreen480 .buildRevisionSpacer475{
   }
   .homeInstallTip482 #homeInstallHide482{
     grid-column:2;
+  }
+}
+
+
+/* Build 0.48.3 Apple Home fit and release housekeeping polish */
+.homeScreen478{
+  scroll-padding-bottom:calc(var(--navH) + env(safe-area-inset-bottom) + 110px)!important;
+}
+.homeInstallTip482{
+  opacity:.92!important;
+  backdrop-filter:blur(10px);
+}
+.homeInstallTip482 strong{
+  font-size:12px!important;
+}
+.homeInstallTip482 span{
+  font-size:10.8px!important;
+  line-height:1.2!important;
+}
+.homeInstallTip482 .smallBtn{
+  min-width:44px!important;
+}
+.nearbyAccountsHero478,
+.recentAccountsPanel478,
+.appleSearchCard478,
+.statTile478{
+  transform:translateZ(0);
+}
+.recentAccountsPanel478{
+  scroll-margin-bottom:calc(var(--navH) + 120px)!important;
+}
+.recentList478 .homeAccountCard476:last-child{
+  padding-bottom:14px!important;
+}
+.floatingAdd478{
+  pointer-events:auto!important;
+}
+body.homeFullscreen480 .homeInstallTip482{
+  display:none!important;
+}
+body.homeFullscreen480 .recentAccountsPanel478{
+  margin-bottom:34px!important;
+}
+body.homeFullscreen480 .floatingAdd478{
+  bottom:calc(20px + env(safe-area-inset-bottom))!important;
+}
+@media(max-width:430px){
+  .homeInstallTip482{
+    margin-left:18px!important;
+    margin-right:18px!important;
+    padding:8px 8px 8px 10px!important;
+    border-radius:16px!important;
+  }
+  .homeInstallTip482 span{
+    display:none!important;
+  }
+  .homeScreen478{
+    padding-bottom:calc(var(--navH) + env(safe-area-inset-bottom) + 124px)!important;
+  }
+  .recentAccountsPanel478{
+    margin-bottom:38px!important;
+  }
+}
+@media(max-height:720px){
+  .homeInstallTip482{
+    display:none!important;
+  }
+  .homeScreen478{
+    gap:10px!important;
   }
 }

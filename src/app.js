@@ -2550,17 +2550,17 @@ function diagnostics(){
 }
 function showChangelog(){
   const notes = [
-    "Added a small full-screen Home Screen mode helper for Safari users.",
-    "Improved Apple-inspired Home spacing without squishing the layout.",
-    "Added extra safe-area breathing room for the floating add button and Recent Accounts.",
-    "Kept the Concept #2 style with customer search, Nearby Accounts, and Recent Accounts.",
-    "Preserved Modules, Daily Route, customer tools, and the green Build revision indicator."
+    "Advanced visible version and cache-busting references updated to 0.48.3.",
+    "Refined the Apple-inspired Home screen spacing without squishing the Concept #2 proportions.",
+    "Made the Safari/Home Screen helper smaller and less distracting.",
+    "Improved Recent Accounts bottom breathing room and floating add-button clearance.",
+    "Preserved Modules, Nearby Accounts, Daily Route tools, customer screen simplification, and green Build revision indicator."
   ];
   const overlay=document.createElement("div");
   overlay.className="releaseOverlay";
   overlay.innerHTML=`<div class="releaseSheet" role="dialog" aria-modal="true" aria-label="FireVault release notes">
     <div class="releaseHead"><div><strong>FireVault</strong><span>Build ${BUILD}</span></div><button class="ghost iconBtn" id="closeRelease" aria-label="Close release notes">×</button></div>
-    <div class="releaseBody"><h2>Release Notes</h2><p class="releaseIntro">daily route report polish with distance and map links.</p><ul>${notes.map(n=>`<li>${esc(n)}</li>`).join("")}</ul></div>
+    <div class="releaseBody"><h2>Release Notes</h2><p class="releaseIntro">Apple-inspired Home polish, screen fit, and version housekeeping.</p><ul>${notes.map(n=>`<li>${esc(n)}</li>`).join("")}</ul></div>
   </div>`;
   document.body.appendChild(overlay);
   const close=()=>overlay.remove();

@@ -1,18 +1,20 @@
-# FireVault Build 0.48.2
+# FireVault Build 0.48.3
 
-Build 0.48.2 is an Apple-inspired Home screen fit and full-screen helper polish build.
+Build 0.48.3 is an Apple-inspired Home screen polish and version housekeeping build.
 
 ## What changed
 
-- Visible app version advanced to 0.48.2.
-- Added a small Safari/Home Screen helper so it is clearer why the browser bars appear on iPhone.
-- Added one-tap instructions for opening FireVault from the iPhone Home Screen for the clean full-screen view.
-- Improved Home screen safe-area spacing without squishing the Concept #2 layout.
-- Added more breathing room for Recent Accounts and the floating add button.
-- Preserved the Apple-inspired customer search, Nearby Accounts, Recent Accounts, Modules, Daily Route, and green Build revision indicator.
+- Visible app version advanced to 0.48.3.
+- Updated cache-busting references in `index.html` to 0.48.3.
+- Updated release notes to match the current build.
+- Refined Apple-inspired Home spacing without squishing the Concept #2 proportions.
+- Made the Safari / Home Screen helper smaller and less distracting.
+- Improved bottom breathing room for Recent Accounts and the floating add button.
+- Kept the clean full-screen Home Screen behavior for installed iPhone PWA mode.
+- Preserved Modules, Nearby Accounts, Daily Route tools, customer screen simplification, and the green Build revision indicator.
 
 Suggested commit message:
 
 ```text
-Build 0.48.2 apple home full screen fit helper
+Build 0.48.3 apple home polish and release notes update
 ```
