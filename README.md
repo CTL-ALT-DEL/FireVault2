@@ -1,25 +1,20 @@
-# FireVault Build 0.49.4
+# FireVault Build 0.49.5
 
-Build 0.49.4 is a Site Notes polish build.
+Build 0.49.5 is a Home search bar redesign build.
 
 ## What changed
 
-- Visible app version advanced to 0.49.4.
-- Updated cache-busting references in `index.html` to 0.49.4.
+- Visible app version advanced to 0.49.5.
+- Updated cache-busting references in `index.html` to 0.49.5.
 - Updated release notes to match this build.
-- Polished the notes-only site workflow.
-- Added **Open** and **＋ Note** controls directly on the customer Site Notes card.
-- Added **Copy All Notes** from the Site Notes screen.
-- Added quick note types:
-  - Customer Update
-  - Parts Needed
-  - Access Note
-  - Testing Note
-- Improved saved note cards with better spacing and numbered note markers.
-- Preserved splash screen, left-logo/right-settings header, Home search, Modules, Daily Route tools, and the green version indicator.
+- Redesigned the main Home screen search bar.
+- Made the search icon larger and more prominent.
+- Improved search field spacing, contrast, and overall visual polish.
+- Improved the Cancel button styling and tap comfort.
+- Preserved Site Notes workflow, splash screen, Home header polish, Modules, and Daily Route tools.
 
 Suggested commit message:
 
 ```text
-Build 0.49.4 site notes polish quick note types
+Build 0.49.5 redesign home search bar
 ```

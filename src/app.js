@@ -1161,7 +1161,7 @@ function home(){
     </div>
 
     <div class="appleSearchCard478">
-      <div class="homeSearchBox476 homeSearchBox478"><span class="searchGlass478">⌕</span><input id="homeCustomerSearch476" type="search" value="${esc(siteSearch)}" placeholder="Search customers..." autocomplete="off"><button class="ghost smallBtn searchClear478 ${siteSearch?"activeSearchClear487":""}" id="clearHomeSearch476" ${siteSearch?"":"disabled"}>${siteSearch?"Cancel":""}</button></div>
+      <div class="homeSearchBox476 homeSearchBox478"><span class="searchGlass478" aria-hidden="true">🔎</span><input id="homeCustomerSearch476" type="search" value="${esc(siteSearch)}" placeholder="Search accounts, panel, address, contact..." autocomplete="off"><button class="ghost smallBtn searchClear478 ${siteSearch?"activeSearchClear487":""}" id="clearHomeSearch476" ${siteSearch?"":"disabled"}>${siteSearch?"Cancel":""}</button></div>
     </div>
 
     ${siteSearch?`<div class="card searchResultsPanel478" id="homeSearchResults476">${homeAccountRowsMarkup476()}</div>`:`<div id="homeSearchResults476" class="searchResultsPanel478 hiddenSearchResults478"></div>`}
@@ -2591,11 +2591,11 @@ function diagnostics(){
 }
 function showChangelog(){
   const notes = [
-    "Polished the Site Notes workflow for notes-only field use.",
-    "Added Copy All Notes on the Site Notes screen.",
-    "Added quick note types for customer update, parts needed, access note, and testing note.",
-    "Added an Open Notes shortcut from the customer account note card.",
-    "Preserved the splash screen, left-logo/right-settings header, Home search, Modules, Daily Route tools, and green version indicator."
+    "Redesigned the Home screen search bar with a more polished Apple-style look.",
+    "Made the search icon larger and more prominent.",
+    "Improved search field spacing, contrast, and tap comfort.",
+    "Improved the Cancel button styling so it feels more intentional and easier to tap.",
+    "Preserved Site Notes workflow, splash screen, Home header polish, Modules, and Daily Route tools."
   ];
   const overlay=document.createElement("div");
   overlay.className="releaseOverlay";
