@@ -1,19 +1,20 @@
-# Clean Install Notes — FireVault Build 0.50.32
+# Clean Install Notes — FireVault Build 0.50.33
 
-This ZIP is intended to be used as the new clean baseline for FireVault Build 0.50.32.
+This ZIP is intended to replace the failed 0.50.31 / 0.50.32 branch.
+
+## Important
+
+Build 0.50.33 was rebuilt from the last known stable 0.50.30 baseline because both 0.50.31 and 0.50.32 produced EOF errors at load.
 
 ## Install
 
 1. Extract the ZIP.
-2. Copy the extracted files to the root of the FireVault GitHub Pages repo.
-3. Commit and push to GitHub.
-4. On iPhone/iPad, reload the installed PWA or reinstall from Safari if cached files remain.
+2. Upload the contents to the root of the GitHub Pages branch/folder.
+3. Commit and wait for GitHub Pages deployment.
+4. On iPhone/iPad, reload the PWA. If an older cached build appears, remove the Home Screen app icon and add it again from Safari.
 
-## Notes
+## Layout repair
 
-Build 0.50.32 keeps the stable startup path and improves the splash/top bar layout:
-
-- Top static app bar is hidden during the splash screen.
-- Home logo / build / settings bar is pinned so it does not scroll away.
-- 5-second splash timing remains in place.
-- Startup Health and Safari EOF repair remain intact.
+- Splash screen stays clean without the top app bar.
+- Top app bar appears after the app opens.
+- Top app bar is fixed and should not scroll away with the main page.

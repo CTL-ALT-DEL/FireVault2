@@ -8,7 +8,7 @@
   "orientation": "any",
   "background_color": "#0b0d10",
   "theme_color": "#101216",
-  "description": "Field knowledge system for fire alarm technicians. Build 0.50.32 hides top chrome during splash and pins the Home top bar while preserving the stable startup path.",
+  "description": "Field knowledge system for fire alarm technicians. Build 0.50.33 is a stable startup rebuild with splash-screen top chrome repair.",
   "icons": [
     {
       "src": "assets/icon-192.png",
