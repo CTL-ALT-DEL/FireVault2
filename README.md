@@ -1,34 +1,32 @@
-# FireVault Build 0.50.26
+# FireVault Build 0.50.27
 
-Build 0.50.26 continues from the stable Build 0.50.25 baseline and adds Customer Report Photo Selection so account photos can be selected for the customer report package without disturbing the stable startup path.
+Build 0.50.27 continues from the stable Build 0.50.26 baseline and polishes Customer Report Photo Selection inside Report Center without changing the stable startup path.
 
 ## Changes
 
-- Visible app version advanced to 0.50.26.
-- Updated cache-busting references in `index.html` to 0.50.26.
-- Added Customer Report Photo Selection in Report Center.
-- Added Include in customer report checkbox on the account photo form.
-- Report Center now shows a customer-photo picker with selected / included status.
-- Selected photos are listed in the generated TXT customer report with category, title, deficiency link, and notes.
-- Preserved Deficiency Photo Workflow from Build 0.50.25.
-- Preserved Photo Vault search, filters, sorting, Copy List, overlay preview, Download With Overlay, and Download Original.
-- Preserved Startup Health diagnostics, 5-second splash timing, and the stable Safari EOF startup repair.
-- Preserved simple Home screen, Search Bar Concept #6, iPad autosizing, and hidden advanced modules.
-- Did not bring back Start Job / End Job / Arrived / Working / Complete workflow controls.
+- Visible app version advanced to 0.50.27.
+- Updated cache-busting references in `index.html` to 0.50.27.
+- Added Select All for customer report photos.
+- Added Clear Selected for customer report photos.
+- Added Copy Photo List for the selected customer-report photo set.
+- Added selected-photo summary stats for included photos, deficiency photos, and before/after photos.
+- Added selected-photo thumbnail strip that opens the full photo preview.
+- Preserved the stable startup path, 5-second splash screen, Startup Health diagnostics, Photo Vault search/sort/filter tools, Deficiency Photo Workflow, Photo Overlay tools, iPad autosizing, the simple Home screen, and Search Bar Concept #6.
+- Did not bring back Start Job / End Job / Arrived / Working / Complete workflow buttons.
 
 ## Validation
 
-Run from the ZIP root after extraction:
+Run these checks after extracting the ZIP:
 
 ```bash
 node --check src/storage.js
 node --check src/app.js
 python -m json.tool manifest.json >/dev/null
-zip -T firevault-build-0.50.26-modular-root.zip
+zip -T firevault-build-0.50.27-modular-root.zip
 ```
 
 ## Suggested commit message
 
 ```text
-Build 0.50.26 customer report photo selection
+Build 0.50.27 customer report photo selection polish
 ```
