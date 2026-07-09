@@ -1,24 +1,23 @@
-# FireVault Build 0.50.4
+# FireVault Build 0.50.5
 
-Build 0.50.4 polishes Site Notes Templates.
+Build 0.50.5 polishes the Daily Summary into a cleaner Daily Report workflow.
 
 ## What changed
 
-- Visible app version advanced to 0.50.4.
-- Updated cache-busting references in `index.html` to 0.50.4.
+- Visible app version advanced to 0.50.5.
+- Updated cache-busting references in `index.html` to 0.50.5.
 - Updated release notes to match this build.
-- Grouped Site Notes Templates into clearer categories:
-  - System
-  - Customer
-  - Follow-Up
-  - Testing
-- Improved template buttons with cleaner add indicators.
-- Improved template insertion so it targets the active note composer more reliably.
+- Renamed the Daily Summary screen presentation to **Daily Report**.
+- Added report actions:
+  - Copy Full Report
+  - Customer Copy
+  - TXT download
+- Added a report preview before copying.
 - Kept the Home screen simple.
-- Preserved Search Bar Concept #6, Site Notes, Daily Summary, Daily Route, Modules, and splash screen.
+- Preserved Search Bar Concept #6, Site Notes Templates, Daily Route, Modules, and splash screen.
 
 Suggested commit message:
 
 ```text
-Build 0.50.4 site notes template category polish
+Build 0.50.5 daily report polish
 ```
