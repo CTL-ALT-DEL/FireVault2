@@ -1423,28 +1423,28 @@ function siteDetail(){
   const showChecklistTool=appMode()!=='simple' || featureOn('reports');
   const toolCount=siteToolCount477();
   const nextAction = def ? `${def} deficiency${def===1?'':'ies'} need review` : open ? `${open} open task${open===1?'':'s'}` : 'Ready for service';
-  html(`<div class="screen siteDetailScreen477"><div class="row siteTopBar siteTopBar477"><button class="back ghost" id="backBtn">←</button><div class="siteTopTitle477"><strong>Customer Account</strong><span>${esc(appMode()==='simple'?'Simple View':'Modules enabled')}</span></div><button class="ghost" id="editBtn">Edit</button></div>
+  html(`<div class="screen siteDetailScreen477 siteDetailScreen489"><div class="row siteTopBar siteTopBar477 siteTopBar489"><button class="back ghost" id="backBtn">←</button><div class="siteTopTitle477"><strong>Account</strong><span>${esc(appMode()==='simple'?'Simple tools':'Modules on')}</span></div><button class="ghost" id="editBtn">Edit</button></div>
 
-    <div class="card siteHero477"><div class="siteHeroMain477"><span class="accountInitialLarge477">${esc((s.name||'?').slice(0,1).toUpperCase())}</span><div><h1>${esc(s.name||'Unnamed Account')}</h1><p>${esc(fullAddress(s))}</p><em>${esc(nextAction)}</em></div></div><div class="siteHealthDot477 ${health.cls}">${health.score}%</div></div>
+    <div class="card siteHero477 siteHero489"><div class="siteHeroMain477"><span class="accountInitialLarge477">${esc((s.name||'?').slice(0,1).toUpperCase())}</span><div><h1>${esc(s.name||'Unnamed Account')}</h1><p>${esc(fullAddress(s))}</p><em>${esc(nextAction)}</em></div></div><div class="siteHealthDot477 ${health.cls}">${health.score}%</div></div>
 
-    <div class="grid2 sitePrimaryActions477"><button class="primary tile" id="jobBtn"><strong>Start Job</strong><span>Begin service call</span></button><button class="ghost tile" id="snapshotBtn"><strong>Snapshot</strong><span>Copy field summary</span></button>${featureOn('advancedGps')?`<button class="ghost tile" id="navigateBtn477"><strong>Navigate</strong><span>Open maps</span></button>`:''}<button class="ghost tile" id="addTaskQuick477"><strong>Add Task</strong><span>Follow-up item</span></button></div>
+    <div class="grid2 sitePrimaryActions477 sitePrimaryActions489"><button class="primary tile" id="jobBtn"><strong>Start Job</strong><span>Begin service call</span></button><button class="ghost tile" id="snapshotBtn"><strong>Snapshot</strong><span>Copy field summary</span></button>${featureOn('advancedGps')?`<button class="ghost tile" id="navigateBtn477"><strong>Navigate</strong><span>Open maps</span></button>`:''}<button class="ghost tile" id="addTaskQuick477"><strong>Add Task</strong><span>Follow-up item</span></button></div>
 
-    <div class="card fieldCard477"><div class="siteCardHead477"><div><h2>Field Card</h2><p>Most-used account information first.</p></div><button class="ghost smallBtn" id="contactsQuick477">Contacts</button></div><div class="fieldGrid477">
+    <div class="card fieldCard477 fieldCard489"><div class="siteCardHead477"><div><h2>Field Card</h2><p>Most-used account information first.</p></div><button class="ghost smallBtn" id="contactsQuick477">Contacts</button></div><div class="fieldGrid477">
       ${fieldValue477('Panel', panel)}
       ${fieldValue477('Primary Contact', primary ? contactTitle(primary) : 'No contact saved', primary?.phone?`<button class="ghost microBtn477" id="callPrimary477">Call</button>`:'')}
       ${fieldValue477('Access', access)}
       ${fieldValue477('Last Visit', lastVisit ? `${visitDateLabel(lastVisit)} • ${durationText(lastVisit.startedAt,lastVisit.endedAt)}` : 'No completed visits')}
     </div></div>
 
-    <div class="grid3 siteQuickStats477"><button class="card tile" id="taskBtn"><strong>${open}</strong><span>Open Tasks</span></button><button class="card tile" id="defBtn"><strong>${def}</strong><span>Deficiencies</span></button><button class="card tile" id="visitsMini477"><strong>${siteVisits.length}</strong><span>Visits</span></button></div>
+    <div class="grid3 siteQuickStats477 siteQuickStats489"><button class="card tile" id="taskBtn"><strong>${open}</strong><span>Open Tasks</span></button><button class="card tile" id="defBtn"><strong>${def}</strong><span>Deficiencies</span></button><button class="card tile" id="visitsMini477"><strong>${siteVisits.length}</strong><span>Visits</span></button></div>
 
-    <div class="card siteNow477"><div class="siteNowHead477"><div><h2>Today’s Priority</h2><p>${esc(health.details.join(' • '))}</p></div><span>${health.score}%</span></div><div class="siteNowGrid477"><button id="openTasksMini476"><strong>${open}</strong><small>Open Tasks</small></button><button id="openDefMini476"><strong>${def}</strong><small>Deficiencies</small></button><button id="addDefQuick477"><strong>＋</strong><small>Add Deficiency</small></button></div></div>
+    <div class="card siteNow477 siteNow489"><div class="siteNowHead477"><div><h2>Today’s Priority</h2><p>${esc(health.details.join(' • '))}</p></div><span>${health.score}%</span></div><div class="siteNowGrid477"><button id="openTasksMini476"><strong>${open}</strong><small>Open Tasks</small></button><button id="openDefMini476"><strong>${def}</strong><small>Deficiencies</small></button><button id="addDefQuick477"><strong>＋</strong><small>Add Deficiency</small></button></div></div>
 
     <div class="card contactsMiniCard477 siteSimpleCard477"><div class="row"><div><h2>Contacts & Access</h2><p>${contacts.length ? `${contacts.length} saved contact${contacts.length===1?'':'s'}` : 'Customer, access, gate, and after-hours details.'}</p></div><button class="ghost smallBtn" id="manageContactsBtn">Manage</button></div>${contacts.length?contacts.slice(0,2).map(c=>`<button class="contactLine contactLine477" data-contact="${esc(c.id)}"><strong>${esc(contactTitle(c))}</strong><span>${esc(contactMeta(c))}</span>${c.accessNotes?`<em>${esc(c.accessNotes)}</em>`:''}</button>`).join(''):`<p class="fieldNote">Add customer contacts, access codes, lockbox notes, or monitoring center details here.</p>`}</div>
 
     <div class="card recentVisitsCard477 siteSimpleCard477"><div class="row"><div><h2>Recent Visit</h2><p>${lastVisit ? `${visitDateLabel(lastVisit)} • ${durationText(lastVisit.startedAt,lastVisit.endedAt)}` : 'No completed visits yet.'}</p></div>${siteVisits.length?`<button class="ghost smallBtn" id="allVisitsBtn">All</button>`:''}</div>${lastVisit?`<button class="visitMini visitMiniButton" data-visit="${esc(lastVisit.id)}"><strong>${esc(visitNotesPreview(lastVisit,1))}</strong><span>Open visit detail</span></button>`:`<p class="fieldNote">Finish a Job Mode service call and it will appear here.</p>`}</div>
 
-    ${toolCount?`<div class="card siteModulesCard477"><div class="siteModulesHead477"><h2>More Site Tools</h2><p>Disabled modules are removed from this account screen.</p></div><div class="grid2 siteModuleGrid477">
+    ${toolCount?`<div class="card siteModulesCard477 siteModulesCard489"><div class="siteModulesHead477"><h2>More Site Tools</h2><p>Disabled modules are removed from this account screen.</p></div><div class="grid2 siteModuleGrid477">
       ${featureOn('reports')?`<button class="ghost tile" id="reportBtn"><strong>Report</strong><span>Copy / download</span></button>`:''}
       ${showChecklistTool?`<button class="ghost tile" id="checklistBtn"><strong>${checklistItems.length ? checkStats.progress + '%' : 'New'}</strong><span>Checklist</span></button>`:''}
       ${featureOn('library')?`<button class="ghost tile" id="manageDocsBtn"><strong>${docs.length}</strong><span>Documents</span></button>`:''}
@@ -2564,17 +2564,17 @@ function diagnostics(){
 }
 function showChangelog(){
   const notes = [
-    "Reworked the Settings page header into a cleaner compact Apple-style bar.",
-    "Added a direct Modules shortcut at the top of Settings.",
-    "Simplified Settings detail headers so the back button, title, and Save button are not cramped.",
-    "Moved long Settings descriptions below the header instead of stuffing them into the top bar.",
-    "Preserved the Home search bar repair, Apple-inspired dashboard, Modules, Daily Route tools, and green Build indicator."
+    "Polished the customer/account screen to match the Apple-inspired Home direction.",
+    "Cleaned up the customer header, account card, Field Card, and Today’s Priority sections.",
+    "Improved quick-action button spacing for Start Job, Snapshot, Navigate, Add Task, and Add Deficiency.",
+    "Made More Site Tools feel like an optional module area instead of the main customer screen.",
+    "Preserved module-aware hiding, Home search repair, Daily Route tools, and the green Build indicator."
   ];
   const overlay=document.createElement("div");
   overlay.className="releaseOverlay";
   overlay.innerHTML=`<div class="releaseSheet" role="dialog" aria-modal="true" aria-label="FireVault release notes">
     <div class="releaseHead"><div><strong>FireVault</strong><span>Build ${BUILD}</span></div><button class="ghost iconBtn" id="closeRelease" aria-label="Close release notes">×</button></div>
-    <div class="releaseBody"><h2>Release Notes</h2><p class="releaseIntro">Settings header cleanup, Modules shortcut, and Home search polish.</p><ul>${notes.map(n=>`<li>${esc(n)}</li>`).join("")}</ul></div>
+    <div class="releaseBody"><h2>Release Notes</h2><p class="releaseIntro">Customer account polish, cleaner field card, and module-aware site tools.</p><ul>${notes.map(n=>`<li>${esc(n)}</li>`).join("")}</ul></div>
   </div>`;
   document.body.appendChild(overlay);
   const close=()=>overlay.remove();

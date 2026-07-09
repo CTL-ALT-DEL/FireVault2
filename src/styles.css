@@ -938,7 +938,7 @@ nav button:active{transform:translateY(1px) scale(.992)}
 .reportDeliveryEmpty{font-size:12px;color:var(--muted);padding:9px 10px;border:1px dashed rgba(255,255,255,.13);border-radius:13px;background:rgba(255,255,255,.025);}
 @media(max-width:560px){.reportActionGrid442{grid-template-columns:repeat(2,minmax(0,1fr));}.reportActionGrid442 #shareBtn{grid-column:1 / -1}.reportDeliveryHead{align-items:center}.reportDeliveryRow{grid-template-columns:1fr}.reportDeliveryRow time{justify-self:start}.reportReadyCard442 small{white-space:normal}}
 
-/* Build 0.48.8 Report delivery receipts and follow-up tasks */
+/* Build 0.48.9 Report delivery receipts and follow-up tasks */
 .reportDeliveryCard444 .reportDeliveryHead{align-items:flex-start;}
 .reportDeliveryHeadActions{display:flex;gap:7px;align-items:center;flex:0 0 auto;}
 .reportDeliveryReceiptBtn{width:100%;text-align:left;color:var(--text);font:inherit;cursor:pointer;}
@@ -946,7 +946,7 @@ nav button:active{transform:translateY(1px) scale(.992)}
 .reportDeliveryReceiptBtn:active{transform:translateY(1px);}
 @media(max-width:560px){.reportDeliveryCard444 .reportDeliveryHead{display:grid;grid-template-columns:1fr;gap:9px}.reportDeliveryHeadActions{display:grid;grid-template-columns:1fr 1fr;width:100%}.reportDeliveryHeadActions .smallBtn{width:100%}}
 
-/* Build 0.48.8 Visual Consistency Pass - professional field-tool surface system */
+/* Build 0.48.9 Visual Consistency Pass - professional field-tool surface system */
 :root{
   --fv445Top:#242d3d;
   --fv445Bottom:#121923;
@@ -1111,7 +1111,7 @@ nav button span:last-child{font-size:11.2px!important;font-weight:850;}
 }
 
 
-/* Build 0.48.8 Site Detail polish - professional customer vault command page */
+/* Build 0.48.9 Site Detail polish - professional customer vault command page */
 .siteDetailScreen446{gap:10px;}
 .siteTopBar{align-items:center;justify-content:space-between;margin-bottom:-2px;}
 .siteTopBar .back,.siteTopBar #editBtn{min-height:38px;border-radius:14px;padding:8px 13px;font-size:13px;font-weight:900;}
@@ -1165,7 +1165,7 @@ nav button span:last-child{font-size:11.2px!important;font-weight:850;}
   .siteDetailScreen446 .mapActions{grid-template-columns:1fr;}
 }
 
-/* Build 0.48.8 Report Center polish and readability pass */
+/* Build 0.48.9 Report Center polish and readability pass */
 .reportScreen447{gap:10px;}
 .reportScreen447 .reportTopRow{min-height:40px;gap:10px;}
 .reportScreen447 .reportTopRow .back{min-width:40px;min-height:40px;border-radius:14px;}
@@ -1212,7 +1212,7 @@ nav button span:last-child{font-size:11.2px!important;font-weight:850;}
   .reportBox447{font-size:11.5px!important;}
 }
 
-/* Build 0.48.8 Settings final readability and layout consistency pass */
+/* Build 0.48.9 Settings final readability and layout consistency pass */
 .settingsScreen448{
   gap:10px!important;
   text-align:left!important;
@@ -1474,7 +1474,7 @@ nav button span:last-child{font-size:11.2px!important;font-weight:850;}
   .settingsContent448 .checkRow{font-size:13.2px!important;}
 }
 
-/* Build 0.48.8 Backup Center polish + data safety snapshot */
+/* Build 0.48.9 Backup Center polish + data safety snapshot */
 .settingsScreen449 .settingsMiniTitle p{max-width:56vw}
 .backupCenter449{gap:12px!important}
 .backupCenter449 .compactPane{border-radius:18px!important;border-left:0!important}
@@ -1493,7 +1493,7 @@ nav button span:last-child{font-size:11.2px!important;font-weight:850;}
 @media(max-width:620px){.backupStats449{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.backupActionGrid449{grid-template-columns:1fr}.backupStats449 div{min-height:58px}.backupStats449 strong{font-size:20px}}
 
 
-/* Build 0.48.8 Stability Checkpoint - dashboard status polish */
+/* Build 0.48.9 Stability Checkpoint - dashboard status polish */
 .homeScreen450{gap:11px!important;}
 .homeHero450{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;}
 .homeHero450 p{font-size:13px;font-weight:800;color:#aeb9cc;margin-top:4px;}
@@ -1511,7 +1511,7 @@ nav button span:last-child{font-size:11.2px!important;font-weight:850;}
 @media(max-width:390px){.homeHero450{display:block}.homeBuildPill450{margin-top:8px}.homeStatusGrid450{gap:7px}.homeStatusGrid450 div{min-height:48px;padding:7px}.homeStatusGrid450 strong{font-size:18px}.homeStatusHead450{align-items:flex-start}.homeStatusHead450 span{font-size:10.8px}}
 
 
-/* Build 0.48.8 Settings full-screen redesign - main choices + detail pages */
+/* Build 0.48.9 Settings full-screen redesign - main choices + detail pages */
 .settingsHomeScreen451{
   gap:12px!important;
   padding-top:2px!important;
@@ -1755,7 +1755,7 @@ nav button span:last-child{font-size:11.2px!important;font-weight:850;}
 }
 
 
-/* Build 0.48.8 dashboard duplicate build pill removal + bottom visibility fix */
+/* Build 0.48.9 dashboard duplicate build pill removal + bottom visibility fix */
 .homeHero450{justify-content:flex-start!important;}
 .homeScreen450{overflow:auto!important; padding-bottom:calc(var(--navH) + 18px)!important; -webkit-overflow-scrolling:touch;}
 .homeScreen450 .homeStatus450{margin-bottom:4px!important;}
@@ -1768,7 +1768,7 @@ main{padding-bottom:8px!important;}
 }
 
 
-/* Build 0.48.8 Settings menu repair - horizontal icon/title and no OPEN labels */
+/* Build 0.48.9 Settings menu repair - horizontal icon/title and no OPEN labels */
 .settingsChoiceGrid451{
   grid-template-columns:repeat(2,minmax(0,1fr))!important;
   gap:10px!important;
@@ -1897,7 +1897,7 @@ main{padding-bottom:8px!important;}
 }
 
 
-/* Build 0.48.8 Settings tab vertical alignment polish */
+/* Build 0.48.9 Settings tab vertical alignment polish */
 .settingsChoice451.settingsChoice456{
   min-height:82px!important;
   padding:12px 42px 12px 12px!important;
@@ -1995,7 +1995,7 @@ main{padding-bottom:8px!important;}
 }
 
 
-/* Build 0.48.8 dashboard date, startup splash, and Library folders */
+/* Build 0.48.9 dashboard date, startup splash, and Library folders */
 .splashScreen457{
   min-height:100%;
   display:flex;
@@ -2265,7 +2265,7 @@ main{padding-bottom:8px!important;}
 }
 
 
-/* Build 0.48.8 Center-justified day/date block */
+/* Build 0.48.9 Center-justified day/date block */
 .homeHero457{
   display:flex!important;
   justify-content:center!important;
@@ -2299,7 +2299,7 @@ main{padding-bottom:8px!important;}
 }
 
 
-/* Build 0.48.8 Navigation & Screen Fit Polish */
+/* Build 0.48.9 Navigation & Screen Fit Polish */
 :root{
   --contentBottomPad459:calc(var(--navH) + 22px);
   --screenGap459:10px;
@@ -2463,7 +2463,7 @@ nav button{
 }
 
 
-/* Build 0.48.8 Stability Checkpoint / Diagnostics polish */
+/* Build 0.48.9 Stability Checkpoint / Diagnostics polish */
 .diagnosticsScreen460{
   gap:10px!important;
   overflow:hidden!important;
@@ -2574,7 +2574,7 @@ nav button{
 }
 
 
-/* Build 0.48.8 Diagnostics bottom menu visibility fix */
+/* Build 0.48.9 Diagnostics bottom menu visibility fix */
 .diagnosticsScreen460{
   overflow-y:auto!important;
   overflow-x:hidden!important;
@@ -2610,7 +2610,7 @@ nav button{
 }
 
 
-/* Build 0.48.8 Daily Route Log Starter */
+/* Build 0.48.9 Daily Route Log Starter */
 .routeHomeTile462{
   border-color:color-mix(in srgb,var(--blue) 36%, rgba(255,255,255,.09))!important;
 }
@@ -2747,7 +2747,7 @@ nav button{
 }
 
 
-/* Build 0.48.8 Daily Route recording LED */
+/* Build 0.48.9 Daily Route recording LED */
 .homeHero463{
   justify-content:center!important;
 }
@@ -2802,7 +2802,7 @@ nav button{
 }
 
 
-/* Build 0.48.8 Daily Route report polish */
+/* Build 0.48.9 Daily Route report polish */
 .routeControls462{
   grid-template-columns:1fr 1fr 1fr!important;
 }
@@ -2862,7 +2862,7 @@ nav button{
 }
 
 
-/* Build 0.48.8 Daily Route waypoint edit/delete polish */
+/* Build 0.48.9 Daily Route waypoint edit/delete polish */
 .routeControls462{
   grid-template-columns:1fr 1fr!important;
 }
@@ -2905,7 +2905,7 @@ nav button{
 }
 
 
-/* Build 0.48.8 Daily Route smart nearest-site suggestions */
+/* Build 0.48.9 Daily Route smart nearest-site suggestions */
 .routeNearestBtn466{
   grid-column:1 / -1;
   border-color:color-mix(in srgb,var(--green) 32%, rgba(255,255,255,.1))!important;
@@ -2954,7 +2954,7 @@ nav button{
 }
 
 
-/* Build 0.48.8 Daily Route export polish */
+/* Build 0.48.9 Daily Route export polish */
 .routeReportPreview467{
   border-left:0!important;
   background:linear-gradient(180deg,color-mix(in srgb,var(--blue) 12%, #202838),#101720)!important;
@@ -2988,7 +2988,7 @@ nav button{
 }
 
 
-/* Build 0.48.8 Active Daily Route dashboard card */
+/* Build 0.48.9 Active Daily Route dashboard card */
 .activeRouteMini468{
   display:grid;
   gap:10px;
@@ -3082,7 +3082,7 @@ nav button{
 }
 
 
-/* Build 0.48.8 Daily Route vehicle / mileage details */
+/* Build 0.48.9 Daily Route vehicle / mileage details */
 .routeDetails469{
   display:grid;
   gap:10px;
@@ -3136,7 +3136,7 @@ nav button{
 }
 
 
-/* Build 0.48.8 Daily Route pause / resume status */
+/* Build 0.48.9 Daily Route pause / resume status */
 .routeLed470{
   flex:0 0 auto;
   width:13px;
@@ -3181,7 +3181,7 @@ nav button{
 }
 
 
-/* Build 0.48.8 Saved Daily Route review/search polish */
+/* Build 0.48.9 Saved Daily Route review/search polish */
 .routeHistoryTools471{
   display:grid;
   grid-template-columns:minmax(0,1fr) auto;
@@ -3319,7 +3319,7 @@ nav button{
 }
 
 
-/* Build 0.48.8 Simple View / Feature Visibility */
+/* Build 0.48.9 Simple View / Feature Visibility */
 .featureHidden472{display:none!important;}
 .simpleViewNotice472{
   display:flex;
@@ -3355,7 +3355,7 @@ body.view-simple472 nav:has(#nav-library[style*="none"]) {grid-template-columns:
 }
 
 
-/* Build 0.48.8 Simple View dashboard drawer and hidden tools polish */
+/* Build 0.48.9 Simple View dashboard drawer and hidden tools polish */
 .view-simple472 .homeScreen450{
   gap:9px!important;
 }
@@ -3509,7 +3509,7 @@ body.view-simple472 nav:has(#nav-library[style*="none"]) {grid-template-columns:
 }
 
 
-/* Build 0.48.8 Quick View Presets / Simple View setup polish */
+/* Build 0.48.9 Quick View Presets / Simple View setup polish */
 .featurePresets474{
   display:grid;
   gap:10px;
@@ -3575,7 +3575,7 @@ body.view-simple472 nav:has(#nav-library[style*="none"]) {grid-template-columns:
 }
 
 
-/* Build 0.48.8 Green build revision status + remove dashboard Stability Checkpoint */
+/* Build 0.48.9 Green build revision status + remove dashboard Stability Checkpoint */
 .build{
   color:#dcfce7!important;
   border-color:rgba(34,197,94,.58)!important;
@@ -3617,7 +3617,7 @@ body.view-simple472 nav:has(#nav-library[style*="none"]) {grid-template-columns:
 }
 
 
-/* Build 0.48.8 Apple-inspired home search, Nearby Accounts, Modules, and customer screen cleanup */
+/* Build 0.48.9 Apple-inspired home search, Nearby Accounts, Modules, and customer screen cleanup */
 .homeScreen476{
   gap:12px!important;
   overflow:auto!important;
@@ -3708,7 +3708,7 @@ body.view-simple472 nav:has(#nav-library[style*="none"]) {grid-template-columns:
 }
 
 
-/* Build 0.48.8 Customer Account simplification */
+/* Build 0.48.9 Customer Account simplification */
 .siteDetailScreen477{
   gap:10px!important;
   overflow:auto!important;
@@ -4005,7 +4005,7 @@ body.view-simple472 nav:has(#nav-library[style*="none"]) {grid-template-columns:
 }
 
 
-/* Build 0.48.8 Home Screen Concept #2 — Apple-inspired dark dashboard */
+/* Build 0.48.9 Home Screen Concept #2 — Apple-inspired dark dashboard */
 .homeScreen478{
   position:relative;
   gap:11px!important;
@@ -4308,7 +4308,7 @@ body.view-simple472 nav:has(#nav-library[style*="none"]) {grid-template-columns:
 }
 
 
-/* Build 0.48.8 Apple concept restore: remove only unwanted app chrome on Home */
+/* Build 0.48.9 Apple concept restore: remove only unwanted app chrome on Home */
 body.homeFullscreen480{
   background:#07090f!important;
 }
@@ -4402,7 +4402,7 @@ body.homeFullscreen480 .homeModuleSummary478{
 }
 
 
-/* Build 0.48.8 Apple home refinement - keep concept proportions, remove awkward chrome */
+/* Build 0.48.9 Apple home refinement - keep concept proportions, remove awkward chrome */
 body.homeFullscreen480 main{
   max-width:430px!important;
   width:100%!important;
@@ -4514,7 +4514,7 @@ body.homeFullscreen480 .buildRevisionSpacer475{
 }
 
 
-/* Build 0.48.8 Apple home full-screen/PWA fit polish */
+/* Build 0.48.9 Apple home full-screen/PWA fit polish */
 .homeScreen478{
   overflow-y:auto!important;
   overflow-x:hidden!important;
@@ -4592,7 +4592,7 @@ body.homeFullscreen480 .buildRevisionSpacer475{
 }
 
 
-/* Build 0.48.8 Apple Home fit and release housekeeping polish */
+/* Build 0.48.9 Apple Home fit and release housekeeping polish */
 .homeScreen478{
   scroll-padding-bottom:calc(var(--navH) + env(safe-area-inset-bottom) + 110px)!important;
 }
@@ -4661,7 +4661,7 @@ body.homeFullscreen480 .floatingAdd478{
 }
 
 
-/* Build 0.48.8 Home customer search focus mode */
+/* Build 0.48.9 Home customer search focus mode */
 .homeSearchMode484{
   gap:10px!important;
 }
@@ -4732,7 +4732,7 @@ body.homeFullscreen480 .floatingAdd478{
 }
 
 
-/* Build 0.48.8 Home Search Focus polish */
+/* Build 0.48.9 Home Search Focus polish */
 .homeSearchMode484{
   overflow:auto!important;
   -webkit-overflow-scrolling:touch!important;
@@ -4831,7 +4831,7 @@ body.homeFullscreen480 .floatingAdd478{
 }
 
 
-/* Build 0.48.8 Apple home Recent/Nearby cleanup */
+/* Build 0.48.9 Apple home Recent/Nearby cleanup */
 .recentList486{
   display:grid!important;
   gap:9px!important;
@@ -4887,7 +4887,7 @@ body.homeFullscreen480 .floatingAdd478{
 }
 
 
-/* Build 0.48.8 Home search bar repair */
+/* Build 0.48.9 Home search bar repair */
 .homeSearchBox478{
   grid-template-columns:28px minmax(0,1fr) auto!important;
   gap:4px!important;
@@ -4977,7 +4977,7 @@ body.homeFullscreen480 .floatingAdd478{
 }
 
 
-/* Build 0.48.8 Settings header cleanup */
+/* Build 0.48.9 Settings header cleanup */
 .settingsHomeScreen488{
   gap:10px!important;
   padding-top:4px!important;
@@ -5104,4 +5104,243 @@ body.homeFullscreen480 .floatingAdd478{
   .settingsBack488{width:38px!important;min-width:38px!important;max-width:38px!important;height:38px!important;min-height:38px!important;}
   .settingsDetailTitle488 h1{font-size:19px!important;}
   .settingsTopSave488{min-height:36px!important;height:36px!important;padding:7px 12px!important;}
+}
+
+
+/* Build 0.48.9 Customer Account Polish */
+.siteDetailScreen489{
+  gap:12px!important;
+  padding:10px 12px calc(var(--navH) + 46px)!important;
+  background:
+    radial-gradient(circle at 50% 0%, rgba(255,255,255,.06), transparent 28%),
+    linear-gradient(180deg,#11161d 0%,#080b0f 48%,#08090d 100%)!important;
+}
+.siteTopBar489{
+  min-height:42px!important;
+  padding:0 1px!important;
+}
+.siteTopBar489 .back,
+.siteTopBar489 #editBtn{
+  min-height:36px!important;
+  border-radius:14px!important;
+  background:rgba(255,255,255,.06)!important;
+  border:1px solid rgba(255,255,255,.08)!important;
+  box-shadow:none!important;
+}
+.siteTopBar489 #editBtn{
+  padding:8px 12px!important;
+  font-size:12px!important;
+  font-weight:950!important;
+}
+.siteTopBar489 .siteTopTitle477 strong{
+  font-size:13.5px!important;
+  letter-spacing:.02em!important;
+}
+.siteTopBar489 .siteTopTitle477 span{
+  font-size:10px!important;
+  opacity:.86!important;
+}
+.siteHero489{
+  border-radius:26px!important;
+  padding:16px!important;
+  align-items:center!important;
+  background:
+    radial-gradient(circle at 18% 0%, color-mix(in srgb,var(--accent) 19%, transparent), transparent 42%),
+    linear-gradient(180deg,#263044,#121823)!important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.12),0 3px 0 #05070b,0 18px 34px rgba(0,0,0,.32)!important;
+}
+.siteHero489 .siteHeroMain477{
+  align-items:center!important;
+}
+.siteHero489 .accountInitialLarge477{
+  width:52px!important;
+  height:52px!important;
+  border-radius:19px!important;
+  font-size:23px!important;
+}
+.siteHero489 h1{
+  font-size:25px!important;
+  line-height:1.02!important;
+  margin-bottom:6px!important;
+}
+.siteHero489 p{
+  color:#d2dbe9!important;
+  font-size:13.5px!important;
+  line-height:1.28!important;
+}
+.siteHero489 em{
+  margin-top:9px!important;
+  background:rgba(255,255,255,.09)!important;
+  border-color:rgba(255,255,255,.12)!important;
+  color:#f8fafc!important;
+}
+.siteHero489 .siteHealthDot477{
+  width:48px!important;
+  min-width:48px!important;
+  height:48px!important;
+  border-radius:18px!important;
+  background:linear-gradient(180deg,color-mix(in srgb,var(--green) 20%, #263044),#111720)!important;
+  box-shadow:0 0 18px rgba(34,197,94,.18), inset 0 1px 0 rgba(255,255,255,.13)!important;
+}
+.sitePrimaryActions489{
+  grid-template-columns:repeat(2,minmax(0,1fr))!important;
+  gap:9px!important;
+}
+.sitePrimaryActions489 .tile{
+  min-height:62px!important;
+  border-radius:20px!important;
+  padding:11px 12px!important;
+}
+.sitePrimaryActions489 .tile strong{
+  font-size:14px!important;
+  line-height:1.05!important;
+}
+.sitePrimaryActions489 .tile span{
+  font-size:11.5px!important;
+  line-height:1.18!important;
+}
+.fieldCard489,
+.siteNow489,
+.siteModulesCard489,
+.siteSimpleCard477,
+.siteGpsCard477,
+.siteNotes477{
+  border-radius:22px!important;
+  background:linear-gradient(180deg,rgba(255,255,255,.075),rgba(255,255,255,.035))!important;
+  border:1px solid rgba(255,255,255,.09)!important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.08),0 10px 24px rgba(0,0,0,.22)!important;
+}
+.fieldCard489{
+  padding:14px!important;
+}
+.fieldCard489 .siteCardHead477{
+  align-items:center!important;
+  margin-bottom:1px!important;
+}
+.fieldCard489 .siteCardHead477 h2{
+  font-size:17px!important;
+}
+.fieldCard489 .siteCardHead477 p{
+  color:#aeb9cc!important;
+}
+.fieldCard489 #contactsQuick477{
+  min-height:34px!important;
+  padding:7px 10px!important;
+  border-radius:13px!important;
+}
+.fieldCard489 .fieldGrid477{
+  gap:9px!important;
+}
+.fieldCard489 .fieldValue477{
+  grid-template-columns:92px minmax(0,1fr) auto!important;
+  min-height:42px!important;
+  padding:10px 11px!important;
+  border-radius:16px!important;
+  background:rgba(7,11,17,.48)!important;
+  border-color:rgba(255,255,255,.075)!important;
+}
+.fieldCard489 .fieldValue477 span{
+  color:#95a2b3!important;
+  font-size:10.8px!important;
+}
+.fieldCard489 .fieldValue477 strong{
+  font-size:13.5px!important;
+  font-weight:900!important;
+}
+.siteQuickStats489{
+  gap:9px!important;
+}
+.siteQuickStats489 .tile{
+  min-height:60px!important;
+  border-radius:20px!important;
+  background:rgba(255,255,255,.055)!important;
+  border:1px solid rgba(255,255,255,.08)!important;
+  box-shadow:none!important;
+}
+.siteQuickStats489 strong{
+  font-size:21px!important;
+}
+.siteNow489{
+  padding:14px!important;
+}
+.siteNow489 .siteNowHead477{
+  margin-bottom:12px!important;
+}
+.siteNow489 .siteNowHead477 h2{
+  font-size:17px!important;
+}
+.siteNow489 .siteNowHead477 p{
+  color:#aeb9cc!important;
+}
+.siteNow489 .siteNowGrid477 button{
+  border-radius:17px!important;
+  min-height:56px!important;
+  background:rgba(7,11,17,.42)!important;
+}
+.contactsMiniCard477 .row,
+.recentVisitsCard477 .row,
+.equipmentMiniCard477 .row,
+.docsMiniCard477 .row{
+  align-items:center!important;
+}
+.contactLine477,
+.visitMiniButton,
+.equipmentLine,
+.docLineMini{
+  border-radius:17px!important;
+  background:rgba(7,11,17,.42)!important;
+}
+.siteModulesCard489{
+  opacity:.96;
+  padding:13px!important;
+}
+.siteModulesCard489 .siteModulesHead477{
+  padding:0 1px 2px!important;
+}
+.siteModulesCard489 .siteModulesHead477 h2{
+  font-size:16px!important;
+}
+.siteModulesCard489 .siteModulesHead477 p{
+  color:#98a5b8!important;
+}
+.siteModulesCard489 .siteModuleGrid477 .tile{
+  border-radius:18px!important;
+  min-height:58px!important;
+  background:rgba(7,11,17,.38)!important;
+}
+.siteNotes477{
+  margin-bottom:calc(var(--navH) + 16px)!important;
+}
+@media(max-width:430px){
+  .siteDetailScreen489{
+    padding:8px 10px calc(var(--navH) + 54px)!important;
+    gap:10px!important;
+  }
+  .siteHero489{
+    padding:14px!important;
+    border-radius:24px!important;
+  }
+  .siteHero489 .accountInitialLarge477{
+    width:46px!important;
+    height:46px!important;
+    border-radius:17px!important;
+    font-size:21px!important;
+  }
+  .siteHero489 h1{font-size:22px!important;}
+  .siteHero489 p{font-size:12.8px!important;}
+  .siteHero489 .siteHealthDot477{
+    width:42px!important;
+    min-width:42px!important;
+    height:42px!important;
+    border-radius:16px!important;
+    font-size:13px!important;
+  }
+  .sitePrimaryActions489{gap:8px!important;}
+  .sitePrimaryActions489 .tile{min-height:58px!important;padding:10px!important;}
+  .fieldCard489 .fieldValue477{
+    grid-template-columns:1fr!important;
+    align-items:start!important;
+    gap:5px!important;
+  }
+  .fieldCard489 .fieldValue477 .microBtn477{justify-self:start!important;}
 }
