@@ -1128,7 +1128,7 @@ function home(){
     <div class="homeChrome478">
       <button class="homeIcon478" id="modulesTopBtn476" aria-label="Modules">☰</button>
       <div class="brand478"><img src="assets/favicon.png?v=${BUILD}" alt="FireVault"><strong>FIREVAULT</strong></div>
-      <button class="homeIcon478 homeBell478" id="homeBell478" aria-label="Release notes">♧</button>
+      <button class="homeBuildPill481" id="homeBell478" aria-label="Release notes"><span></span>Build ${BUILD}</button>
     </div>
 
     <div class="todayBlock478">
@@ -2536,11 +2536,11 @@ function diagnostics(){
 }
 function showChangelog(){
   const notes = [
-    "Restored the Apple-inspired concept #2 proportions from 0.47.8.",
-    "Removed the extra global top header on the Home screen.",
-    "Removed the extra bottom app nav on the Home screen.",
-    "Kept the concept-style in-page menu, FireVault brand, search, Nearby Accounts, stats, and Recent Accounts.",
-    "Added full-screen Home layout mode so Safari/PWA chrome does not squeeze the design as badly."
+    "Refined the Apple-inspired home screen without squishing the layout.",
+    "Replaced the awkward top-right icon with a small green glowing Build pill.",
+    "Improved phone-width home screen centering and spacing.",
+    "Added safer bottom breathing room so Recent Accounts and the floating add button do not fight each other.",
+    "Preserved customer search, Nearby Accounts, Recent Accounts, Modules, and Daily Route tools."
   ];
   const overlay=document.createElement("div");
   overlay.className="releaseOverlay";
