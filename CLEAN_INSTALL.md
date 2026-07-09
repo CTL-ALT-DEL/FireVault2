@@ -1,33 +1,27 @@
-# Clean Install Notes — FireVault Build 0.50.24
+# Clean Install Notes — FireVault Build 0.50.25
 
-This ZIP is intended to be used as the clean baseline for FireVault Build 0.50.24.
+This ZIP is intended to be used as the clean baseline for FireVault Build 0.50.25.
 
 ## Install
 
 1. Extract the ZIP.
-2. Upload the extracted files to the root of the GitHub Pages branch.
-3. Commit all changed files.
-4. Wait for GitHub Pages to finish deploying.
-5. Open the deployed PWA and confirm the visible build number shows `0.50.24`.
-6. On iPhone/iPad, fully close and reopen the Home Screen PWA after deployment so cache-busted files load.
+2. Commit all files to the FireVault GitHub repository.
+3. Push to GitHub Pages.
+4. Clear browser/PWA cache if the previous build remains visible.
+5. Open the deployed PWA and confirm the visible build number shows `0.50.25`.
 
-## Build Notes
+## Build focus
 
-Build 0.50.24 keeps the working 0.50.23 baseline and polishes account photos:
+Build 0.50.25 keeps the stable 0.50.24 photo workflow and adds Deficiency Photo Workflow:
 
-- Clear Take Photo / Upload Photo wording.
-- Photo category buttons for Panel, NAC, Device, Communicator, Battery, Deficiency, Before, After, and Other.
-- Use Overlay toggle on account photos.
-- Better notes labeling for field photo notes.
-- Tap account thumbnails or Photo Vault Preview to open a full photo preview.
-- Full preview includes overlay download, original download, and edit actions.
-- Photo category badges are shown on thumbnails and Photo Vault rows.
-- Startup path, splash timing, Search Bar #6, iPad autosizing, and simple Home screen were preserved.
+- `Save + Add Photo` from the Deficiency form.
+- `+ Photo` quick action from deficiency cards.
+- Linked deficiency photo thumbnails on deficiency cards and edit screens.
+- Deficiency-linked photo records saved in the Photo Vault.
+- Photo Vault search includes deficiency-linked metadata.
 
-## Validation Checklist
+## Stability notes
 
-- `node --check src/storage.js`
-- `node --check src/app.js`
-- `manifest.json` JSON validation
-- ZIP integrity test
-- Extracted ZIP validation
+- Startup path was intentionally left alone.
+- The 5-second splash timing and startup watchdog are preserved.
+- JavaScript validation and ZIP integrity checks were run before release.

@@ -2252,7 +2252,7 @@ function docMatchesVaultFilter516(d){
 function docMatchesSearch521(d){
   const q=String(docVaultSearch521||"").trim().toLowerCase();
   if(!q) return true;
-  const hay=[d.type,d.title,d.ref,d.url,d.notes,d.imageName,d.imageStampedAt].filter(Boolean).join(" ").toLowerCase();
+  const hay=[d.type,d.title,d.ref,d.url,d.notes,d.imageName,d.imageStampedAt,d.linkedDeficiencyTitle,d.linkedDeficiencyId].filter(Boolean).join(" ").toLowerCase();
   return hay.includes(q);
 }
 function docVaultSearchBar521(){
@@ -2290,7 +2290,7 @@ function siteDocCard519(d){
   return `<div class="card docVaultItem docVaultItem512 docVaultItem516" data-doc="${esc(d.id)}">
     ${docPhotoThumb512(d)}
     <div class="docVaultText512">
-      <div class="row"><div><h2>${esc(docTitle(d))}</h2><p>${esc(docMeta(d))}</p>${docHasPhoto512(d)?`<p class="docPhotoMeta512"><span class="photoCategoryPill524">${esc(photoCategory524(d)||"Photo")}</span> ${esc(photoDocSummary512(d))}</p>`:""}</div><span class="pill">${esc(d.type||"Doc")}</span></div>
+      <div class="row"><div><h2>${esc(docTitle(d))}</h2><p>${esc(docMeta(d))}</p>${docHasPhoto512(d)?`<p class="docPhotoMeta512"><span class="photoCategoryPill524">${esc(photoCategory524(d)||"Photo")}</span> ${d.linkedDeficiencyTitle?`<span class="photoDefLink525">Deficiency: ${esc(d.linkedDeficiencyTitle)}</span>`:esc(photoDocSummary512(d))}</p>`:""}</div><span class="pill">${esc(d.type||"Doc")}</span></div>
       ${notesPreview?`<p class="docNotes">${notesPreview}</p>`:""}
       <div class="docQuickActions">
         ${d.url?`<button class="ghost smallBtn openDocLink" data-url="${esc(d.url)}">Open Link</button>`:""}
@@ -2335,17 +2335,20 @@ ${d.notes||""}`.trim()); toast("Document reference copied."); }});
 function siteDocForm(){
   const s=site(); if(!s){ route("sites"); return; }
   s.docs=Array.isArray(s.docs) ? s.docs : [];
-  const isNewPhoto523 = mode === "newPhoto";
+  const isDefPhoto525 = typeof mode === "string" && mode.startsWith("defPhoto:");
+  const linkedDefId525 = isDefPhoto525 ? mode.slice("defPhoto:".length) : "";
+  const linkedDef525 = linkedDefId525 ? (s.deficiencies||[]).find(x=>x.id===linkedDefId525) : null;
+  const isNewPhoto523 = mode === "newPhoto" || isDefPhoto525;
   const d=(mode && !isNewPhoto523) ? s.docs.find(x=>x.id===mode) : {};
   docPhotoDraftDataUrl512 = d?.imageData || "";
   docPhotoDraftName512 = d?.imageName || "";
   docPhotoClearRequested512 = false;
   const types=["Panel Manual","Permit","Inspection Form","Monitoring Account","Contract","Photo Set","Map / Drawing","Code Reference","Other"];
-  const formTitle523 = mode && !isNewPhoto523 ? "Edit Document / Photo" : isNewPhoto523 ? "Add Account Photo" : "Add Document / Link";
+  const formTitle523 = mode && !isNewPhoto523 ? "Edit Document / Photo" : isDefPhoto525 ? "Add Deficiency Photo" : isNewPhoto523 ? "Add Account Photo" : "Add Document / Link";
   const defaultType523 = isNewPhoto523 ? "Photo Set" : "Panel Manual";
-  const defaultTitle523 = isNewPhoto523 ? "Site Photo" : "";
+  const defaultTitle523 = isDefPhoto525 ? `Deficiency Photo - ${linkedDef525?.title||"Issue"}` : isNewPhoto523 ? "Site Photo" : "";
   html(`<div class="screen"><div class="row"><button class="back ghost" id="backBtn">←</button><h1>${formTitle523}</h1></div><div class="form grow">
-    ${isNewPhoto523?`<div class="card addPhotoHint523"><strong>Add Photo to Account</strong><span>Choose a photo, add a title or notes, then save it to this account’s Photo Vault.</span></div>`:""}
+    ${isNewPhoto523?`<div class="card addPhotoHint523"><strong>${isDefPhoto525?"Add Photo to Deficiency":"Add Photo to Account"}</strong><span>${isDefPhoto525?`This photo will be linked directly to: ${esc(linkedDef525?.title||"Deficiency")}.`:"Choose a photo, add a title or notes, then save it to this account’s Photo Vault."}</span></div>`:""}
     <div class="card docFormCard docFormCard512"><div class="compactField"><div><label>Type</label><select id="docType">${types.map(x=>`<option value="${esc(x)}" ${((d.type||defaultType523)===x)?"selected":""}>${esc(x)}</option>`).join("")}</select></div><div><label>Date / Revision</label><input id="docDate" value="${esc(d.date||"")}" placeholder="Rev, date, or version"></div></div>
     <label>Title</label><input id="docTitle" value="${esc(d.title||defaultTitle523)}" placeholder="Panel cabinet photo, SLC module, NAC wiring, deficiency photo...">
     <label>Reference / Account / Permit #</label><input id="docRef" value="${esc(d.ref||"")}" placeholder="Account number, permit number, drawing ID...">
@@ -2358,10 +2361,10 @@ function siteDocForm(){
   wireDocPhotoControls512(d||{});
   document.getElementById("saveDocBtn").onclick=()=>{
     const imageData=docPhotoClearRequested512 ? "" : (docPhotoDraftDataUrl512 || d?.imageData || "");
-    const obj={type:val("docType"),title:val("docTitle")||"Untitled Reference",ref:val("docRef"),url:val("docUrl"),date:val("docDate"),notes:raw("docNotes"),imageData,imageName:imageData?(docPhotoDraftName512||d?.imageName||"Site photo"):"",photoCategory:imageData?selectedPhotoCategory524():"",useOverlayOnSave:checked("docUseOverlay524"),imageUpdatedAt:imageData?new Date().toISOString():"",updatedAt:new Date().toISOString()};
+    const obj={type:val("docType"),title:val("docTitle")||"Untitled Reference",ref:isDefPhoto525?"Deficiency":val("docRef"),url:val("docUrl"),date:val("docDate"),notes:raw("docNotes"),imageData,imageName:imageData?(docPhotoDraftName512||d?.imageName||"Site photo"):"",photoCategory:imageData?(isDefPhoto525?"Deficiency":selectedPhotoCategory524()):"",useOverlayOnSave:checked("docUseOverlay524"),imageUpdatedAt:imageData?new Date().toISOString():"",updatedAt:new Date().toISOString(),linkedDeficiencyId:isDefPhoto525?linkedDefId525:(d?.linkedDeficiencyId||""),linkedDeficiencyTitle:isDefPhoto525?(linkedDef525?.title||""):(d?.linkedDeficiencyTitle||"")};
     if(mode && !isNewPhoto523 && d){ Object.assign(d,obj); }
     else s.docs.unshift({...obj,id:uid(),createdAt:new Date().toISOString()});
-    save(); toast("Document saved."); route("siteDocs");
+    save(); toast(isDefPhoto525?"Deficiency photo saved.":"Document saved."); if(isDefPhoto525){ mode=linkedDefId525; route("deficiencyForm"); } else route("siteDocs");
   };
   const del=document.getElementById("deleteDocBtn"); if(del) del.onclick=()=>{ if(confirm("Delete this document reference?")){ s.docs=s.docs.filter(x=>x.id!==mode); save(); toast("Document deleted."); route("siteDocs"); } };
 }
@@ -2641,15 +2644,64 @@ function reopenDeficiency(siteId, defId){
   d.status="Open"; delete d.resolvedAt;
   save(); toast("Deficiency reopened."); deficiencies();
 }
+function deficiencyPhotos525(s={}, d={}){
+  const defId=d?.id || "";
+  if(!defId) return [];
+  return (s.docs||[]).filter(doc=>docHasPhoto512(doc) && doc.linkedDeficiencyId===defId);
+}
+function deficiencyPhotoStrip525(s,d,limit=3){
+  const photos=deficiencyPhotos525(s,d);
+  if(!photos.length) return "";
+  return `<div class="defPhotoStrip525">${photos.slice(0,limit).map(doc=>`<button type="button" class="defPhotoThumb525" data-site="${esc(s.id)}" data-doc="${esc(doc.id)}">${docPhotoThumb512(doc)}<span>${esc(doc.title||doc.imageName||"Deficiency Photo")}</span></button>`).join("")}${photos.length>limit?`<em>+${photos.length-limit} more</em>`:""}</div>`;
+}
+function addDeficiencyPhoto525(siteId, defId){
+  const s=ensureSite(data.sites.find(x=>x.id===siteId));
+  const d=(s.deficiencies||[]).find(x=>x.id===defId);
+  if(!s || !d){ toast("Save the deficiency first, then add a photo."); return; }
+  selectedSiteId=s.id;
+  mode=`defPhoto:${d.id}`;
+  route("siteDocForm");
+}
+function saveDeficiencyFromForm525(openPhotoAfter=false){
+  const target=ensureSite(data.sites.find(x=>x.id===val("sitePick")) || site());
+  if(!target){ toast("Choose a site first."); return; }
+  target.deficiencies=target.deficiencies||[];
+  target.tasks=target.tasks||[];
+  const obj={title:val("title")||"Untitled Deficiency",priority:val("priority"),status:val("status"),notes:raw("notes"),updatedAt:new Date().toISOString()};
+  let savedDef=null;
+  if(mode && !String(mode).startsWith("defPhoto:")){
+    savedDef=target.deficiencies.find(x=>x.id===mode) || (site()?.deficiencies||[]).find(x=>x.id===mode);
+    if(savedDef){
+      const wasClosed=deficiencyClosed(savedDef);
+      Object.assign(savedDef,obj);
+      if(obj.status==="Closed" && !wasClosed) savedDef.resolvedAt=new Date().toISOString();
+      if(obj.status!=="Closed") delete savedDef.resolvedAt;
+    }
+  }
+  if(!savedDef){
+    savedDef={...obj,id:uid(),createdAt:new Date().toISOString()};
+    if(savedDef.status==="Closed") savedDef.resolvedAt=new Date().toISOString();
+    target.deficiencies.unshift(savedDef);
+    if(checked("makeTask")) target.tasks.unshift({id:uid(),title:"Resolve: "+obj.title,status:"Open",due:"",notes:obj.notes,createdAt:new Date().toISOString()});
+  }
+  selectedSiteId=target.id;
+  save();
+  if(openPhotoAfter){ toast("Deficiency saved. Add photo next."); addDeficiencyPhoto525(target.id,savedDef.id); return; }
+  toast("Deficiency saved.");
+  route("deficiencies");
+}
 function deficiencyCard(r){
   const d=r.d;
   const closed=deficiencyClosed(d);
   const sev=(d.priority||"Normal").toLowerCase();
-  return `<div class="card siteItem deficiencyCard439 ${closed?"defClosed":""} def-${esc(sev)}" data-site="${esc(r.s.id)}" data-id="${esc(d.id)}">
+  const photoCount=deficiencyPhotos525(r.s,d).length;
+  return `<div class="card siteItem deficiencyCard439 deficiencyCard525 ${closed?"defClosed":""} def-${esc(sev)}" data-site="${esc(r.s.id)}" data-id="${esc(d.id)}">
     <div class="defCardTop"><div><h2>${esc(d.title||"Deficiency")}</h2><p>${esc(r.s.name||"Site")} • ${esc(deficiencyAgeLine(d))}</p></div><span class="pill ${closed?"defDonePill":sev==="critical"?"dangerPill":sev==="high"?"todayPill":""}">${esc(closed?"Closed":(d.priority||"Normal"))}</span></div>
     ${d.notes?`<p class="defNotes">${esc(d.notes)}</p>`:""}
+    ${photoCount?`<p class="defPhotoCount525">${photoCount} linked deficiency photo${photoCount===1?"":"s"}</p>`:""}
+    ${deficiencyPhotoStrip525(r.s,d)}
     <div class="defMeta">${d.checklistId?`<span>Checklist Issue</span>`:""}${d.resolvedAt?`<span>Closed ${esc(new Date(d.resolvedAt).toLocaleDateString())}</span>`:""}<span>${esc(d.status||"Open")}</span></div>
-    <div class="defQuickActions"><button class="ghost smallBtn defSiteBtn" data-site="${esc(r.s.id)}">Site</button><button class="${closed?"ghost":"primary"} smallBtn defResolveBtn" data-site="${esc(r.s.id)}" data-id="${esc(d.id)}">${closed?"Reopen":"Close"}</button></div>
+    <div class="defQuickActions"><button class="ghost smallBtn defSiteBtn" data-site="${esc(r.s.id)}">Site</button><button class="ghost smallBtn defAddPhotoBtn525" data-site="${esc(r.s.id)}" data-id="${esc(d.id)}">＋ Photo</button><button class="${closed?"ghost":"primary"} smallBtn defResolveBtn" data-site="${esc(r.s.id)}" data-id="${esc(d.id)}">${closed?"Reopen":"Close"}</button></div>
   </div>`;
 }
 function deficiencies(){
@@ -2672,13 +2724,21 @@ function deficiencies(){
   document.querySelectorAll(".deficiencyCard439").forEach(el=>el.onclick=()=>{selectedSiteId=el.dataset.site; mode=el.dataset.id; route("deficiencyForm");});
   document.querySelectorAll(".defResolveBtn").forEach(b=>b.onclick=e=>{e.stopPropagation(); const d=allDeficiencyRows().find(r=>r.s.id===b.dataset.site && r.d.id===b.dataset.id)?.d; if(!d) return; if(deficiencyClosed(d)) reopenDeficiency(b.dataset.site,b.dataset.id); else resolveDeficiency(b.dataset.site,b.dataset.id);});
   document.querySelectorAll(".defSiteBtn").forEach(b=>b.onclick=e=>{e.stopPropagation(); selectedSiteId=b.dataset.site; route("siteDetail");});
+  document.querySelectorAll(".defAddPhotoBtn525").forEach(b=>b.onclick=e=>{e.stopPropagation(); addDeficiencyPhoto525(b.dataset.site,b.dataset.id);});
+  document.querySelectorAll(".defPhotoThumb525").forEach(b=>b.onclick=e=>{e.stopPropagation(); const s=ensureSite(data.sites.find(x=>x.id===b.dataset.site)); const doc=(s.docs||[]).find(x=>x.id===b.dataset.doc); if(doc) photoPreviewModal524(doc);});
 }
 function deficiencyForm(){
   const s = selectedSiteId ? site() : data.sites[0]; if(!s){ alert("Add a site first."); route("sites"); return; }
   const d = mode ? (s.deficiencies||[]).find(x=>x.id===mode) : {};
-  html(`<div class="screen"><div class="row"><button class="back ghost" id="backBtn">←</button><h1>${mode?"Edit":"Add"} Deficiency</h1></div><div class="form grow"><div class="card"><label>Site</label><select id="sitePick">${data.sites.map(x=>`<option value="${x.id}" ${x.id===s.id?"selected":""}>${esc(x.name)}</option>`).join("")}</select><label>Title</label><input id="title" value="${esc(d.title||"")}"><div class="compactField"><div><label>Priority</label><select id="priority">${["Normal","High","Critical"].map(x=>`<option ${d.priority===x?"selected":""}>${x}</option>`).join("")}</select></div><div><label>Status</label><select id="status"><option ${d.status!=="Closed"?"selected":""}>Open</option><option ${d.status==="Closed"?"selected":""}>Closed</option></select></div></div><label>Notes</label><textarea id="notes">${esc(d.notes||"")}</textarea><label><input type="checkbox" id="makeTask" ${!mode?"checked":""}> Create matching follow-up task</label></div><button class="primary" id="saveBtn">Save Deficiency</button>${mode?`<button class="danger" id="delBtn">Delete Deficiency</button>`:""}</div></div>`);
+  const linkedPhotos = d?.id ? deficiencyPhotos525(s,d) : [];
+  html(`<div class="screen deficiencyForm525"><div class="row"><button class="back ghost" id="backBtn">←</button><h1>${mode?"Edit":"Add"} Deficiency</h1></div><div class="form grow"><div class="card deficiencyFormCard525"><label>Site</label><select id="sitePick">${data.sites.map(x=>`<option value="${x.id}" ${x.id===s.id?"selected":""}>${esc(x.name)}</option>`).join("")}</select><label>Title</label><input id="title" value="${esc(d.title||"")}" placeholder="Smoke detector trouble, NAC open, battery date, ground fault..."><div class="compactField"><div><label>Priority</label><select id="priority">${["Normal","High","Critical"].map(x=>`<option ${d.priority===x?"selected":""}>${x}</option>`).join("")}</select></div><div><label>Status</label><select id="status"><option ${d.status!=="Closed"?"selected":""}>Open</option><option ${d.status==="Closed"?"selected":""}>Closed</option></select></div></div><label>Notes</label><textarea id="notes" placeholder="Problem found, device location, circuit, parts needed, customer impact...">${esc(d.notes||"")}</textarea>${!mode?`<label><input type="checkbox" id="makeTask" checked> Create matching follow-up task</label>`:""}</div>
+    <div class="card defPhotoPanel525"><div class="row"><div><h2>Deficiency Photos</h2><p>${linkedPhotos.length?`${linkedPhotos.length} photo${linkedPhotos.length===1?"":"s"} linked to this deficiency.`:"Attach proof photos, before/after photos, device photos, or wiring photos directly to this deficiency."}</p></div>${mode?`<button class="primary smallBtn" id="addDefPhoto525">＋ Add Photo</button>`:""}</div>${mode?deficiencyPhotoStrip525(s,d,6):`<p class="fieldNote">Save this deficiency first, or use Save + Add Photo below.</p>`}</div>
+    <button class="primary" id="saveBtn">Save Deficiency</button><button class="ghost" id="saveAddPhotoBtn525">Save + Add Photo</button>${mode?`<button class="danger" id="delBtn">Delete Deficiency</button>`:""}</div></div>`);
   document.getElementById("backBtn").onclick=()=>route("deficiencies");
-  document.getElementById("saveBtn").onclick=()=>{ const target=ensureSite(data.sites.find(x=>x.id===val("sitePick"))); const obj={title:val("title")||"Untitled Deficiency",priority:val("priority"),status:val("status"),notes:raw("notes")}; target.deficiencies=target.deficiencies||[]; if(mode){ const wasClosed=deficiencyClosed(d); Object.assign(d,obj); if(obj.status==="Closed" && !wasClosed) d.resolvedAt=new Date().toISOString(); if(obj.status!=="Closed") delete d.resolvedAt; } else { const created={...obj,id:uid(),createdAt:new Date().toISOString()}; if(created.status==="Closed") created.resolvedAt=new Date().toISOString(); target.deficiencies.unshift(created); if(checked("makeTask")){target.tasks.unshift({id:uid(),title:"Resolve: "+obj.title,status:"Open",due:"",notes:obj.notes,createdAt:new Date().toISOString()});} } selectedSiteId=target.id; save(); route("deficiencies"); };
+  document.getElementById("saveBtn").onclick=()=>saveDeficiencyFromForm525(false);
+  document.getElementById("saveAddPhotoBtn525").onclick=()=>saveDeficiencyFromForm525(true);
+  const addPhoto=document.getElementById("addDefPhoto525"); if(addPhoto) addPhoto.onclick=()=>addDeficiencyPhoto525(s.id,d.id);
+  document.querySelectorAll(".defPhotoThumb525").forEach(b=>b.onclick=e=>{e.preventDefault(); const doc=(s.docs||[]).find(x=>x.id===b.dataset.doc); if(doc) photoPreviewModal524(doc);});
   const del=document.getElementById("delBtn"); if(del) del.onclick=()=>{s.deficiencies=s.deficiencies.filter(x=>x.id!==mode); save(); route("deficiencies");};
 }
 
@@ -3704,18 +3764,18 @@ function diagnostics(){
 }
 function showChangelog(){
   const notes = [
-    "Advanced to Build 0.50.24 from the stable Build 0.50.23 baseline.",
-    "Polished Account Photos with clearer Take Photo / Upload Photo wording.",
-    "Added photo category buttons for Panel, NAC, Device, Communicator, Battery, Deficiency, Before, After, and Other.",
-    "Added a Use Overlay toggle and improved field-photo notes labeling.",
-    "Added full-screen photo preview from account thumbnails and Photo Vault records, with overlay download, original download, and edit actions.",
-    "Preserved the stable Safari EOF startup repair, 5-second splash timing, Startup Health diagnostics, Photo Vault search/sort/filter tools, Photo Overlay tools, iPad autosizing, simple Home screen, Search Bar Concept #6, and excluded job-status workflow controls."
+    "Advanced to Build 0.50.25 from the stable Build 0.50.24 baseline.",
+    "Added Deficiency Photo Workflow so photos can be linked directly to deficiencies.",
+    "Added Save + Add Photo on the Deficiency form and + Photo on deficiency cards.",
+    "Added linked photo thumbnail strips on deficiency cards and deficiency edit screens.",
+    "Deficiency photos now save into the site Photo Vault with category Deficiency and linked deficiency metadata.",
+    "Preserved the stable Safari EOF startup repair, 5-second splash timing, Startup Health diagnostics, Account Photos, Photo Vault search/sort/filter tools, Photo Overlay tools, iPad autosizing, simple Home screen, Search Bar Concept #6, and excluded job-status workflow controls."
   ];
   const overlay=document.createElement("div");
   overlay.className="releaseOverlay";
   overlay.innerHTML=`<div class="releaseSheet" role="dialog" aria-modal="true" aria-label="FireVault release notes">
     <div class="releaseHead"><div><strong>FireVault</strong><span>Build ${BUILD}</span></div><button class="ghost iconBtn" id="closeRelease" aria-label="Close release notes">×</button></div>
-    <div class="releaseBody"><h2>Release Notes</h2><p class="releaseIntro">Account photo category and preview polish.</p><ul>${notes.map(n=>`<li>${esc(n)}</li>`).join("")}</ul></div>
+    <div class="releaseBody"><h2>Release Notes</h2><p class="releaseIntro">Deficiency photo workflow.</p><ul>${notes.map(n=>`<li>${esc(n)}</li>`).join("")}</ul></div>
   </div>`;
   document.body.appendChild(overlay);
   const close=()=>overlay.remove();
