@@ -1,23 +1,26 @@
-# Clean Install Notes — FireVault Build 0.50.19
+# Clean Install Notes — FireVault Build 0.50.20
 
-This ZIP is intended to be used as the new clean baseline for FireVault Build 0.50.19.
+This ZIP is intended to be used as the clean baseline for FireVault Build 0.50.20.
 
-## Install
+## Clean install steps
 
-1. Extract the ZIP.
-2. Copy all files to the root of the GitHub Pages branch/repo.
-3. Commit and push.
-4. On iPhone/iPad, reload the PWA. If the old build is still cached, remove the Home Screen app icon and add it again from Safari.
+1. Extract this ZIP.
+2. Commit the full extracted root to the FireVault repository.
+3. Publish through GitHub Pages.
+4. On iPhone/iPad, hard refresh Safari or remove and re-add the Home Screen PWA if old cached files remain.
 
 ## Build notes
 
-Build 0.50.19 is a focused startup repair build:
+Build 0.50.20 keeps the working 0.50.19 startup repair and adds a Startup Health section in Diagnostics.
 
-- Fixes the Photo Vault document-list syntax pattern that caused `SyntaxError: Unexpected EOF` on app load.
-- Keeps the 5-second splash screen timing.
-- Preserves the startup watchdog.
-- Preserves Photo Vault filters and overlay export tools.
-- Preserves custom Photo Overlay logo support.
-- Preserves iPad autosizing.
-- Keeps Home simple and preserves Search Bar Concept #6.
-- Does not bring back job-status workflow controls.
+Startup Health records and displays:
+
+- module-ready status
+- booted status
+- last good boot time
+- last boot build
+- last route opened
+- splash screen minimum timing
+- last startup error, if one exists
+
+This build preserves the 5-second splash screen, Photo Vault tools, Photo Overlay tools, custom overlay logo support, iPad autosizing, simple Home screen, and Search Bar Concept #6.

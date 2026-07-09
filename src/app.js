@@ -3471,6 +3471,54 @@ function copyDiagnostics(){
     toast("Clipboard unavailable.");
   }
 }
+function startupHealthText520(){
+  const lastBoot=localStorage.getItem("firevault_last_boot_ok") || "Not recorded yet";
+  const lastBuild=localStorage.getItem("firevault_last_boot_build") || "Unknown";
+  const lastRoute=localStorage.getItem("firevault_last_boot_route") || "Unknown";
+  const lastError=localStorage.getItem("firevault_last_boot_error") || window.__FIREVAULT_LAST_ERROR || "None";
+  const minSplash=Number(window.__FIREVAULT_MIN_SPLASH_MS || 5000);
+  const moduleReady=window.__FIREVAULT_MODULE_READY ? "Yes" : "No";
+  const booted=window.__FIREVAULT_BOOTED ? "Yes" : "No";
+  return [
+    "FireVault Startup Health",
+    `Build: ${BUILD}`,
+    `Module Ready: ${moduleReady}`,
+    `Booted: ${booted}`,
+    `Last Good Boot: ${lastBoot}`,
+    `Last Boot Build: ${lastBuild}`,
+    `Last Route: ${lastRoute}`,
+    `Splash Minimum: ${Math.round(minSplash/1000)} seconds`,
+    `Last Boot Error: ${lastError}`,
+    `Generated: ${new Date().toLocaleString()}`
+  ].join("\n");
+}
+function startupHealthCard520(){
+  const lastBoot=localStorage.getItem("firevault_last_boot_ok") || "Not recorded yet";
+  const lastBuild=localStorage.getItem("firevault_last_boot_build") || "Unknown";
+  const lastRoute=localStorage.getItem("firevault_last_boot_route") || "Unknown";
+  const lastError=localStorage.getItem("firevault_last_boot_error") || window.__FIREVAULT_LAST_ERROR || "None";
+  const minSplash=Number(window.__FIREVAULT_MIN_SPLASH_MS || 5000);
+  const ok=window.__FIREVAULT_MODULE_READY && !window.__FIREVAULT_LAST_ERROR;
+  return `<div class="card startupHealth520 ${ok?"passed":"needsReview"}">
+    <div class="startupHealthHead520"><div><h2>Startup Health</h2><p>Boot confidence check for the splash screen, module load, and last successful app start.</p></div><span>${ok?"OK":"Review"}</span></div>
+    <div class="startupHealthGrid520">
+      <div><strong>${window.__FIREVAULT_MODULE_READY?"Yes":"No"}</strong><span>Module Ready</span></div>
+      <div><strong>${window.__FIREVAULT_BOOTED?"Yes":"No"}</strong><span>Booted</span></div>
+      <div><strong>${Math.round(minSplash/1000)} sec</strong><span>Splash Min</span></div>
+      <div><strong>${esc(lastBuild)}</strong><span>Last Build</span></div>
+    </div>
+    <p class="fieldNote">Last good boot: ${esc(lastBoot)} • Last route: ${esc(lastRoute)}</p>
+    <p class="fieldNote">Last startup error: ${esc(lastError)}</p>
+    <button class="ghost smallBtn" id="copyStartupHealth520">Copy Startup Health</button>
+  </div>`;
+}
+function copyStartupHealth520(){
+  if(navigator.clipboard?.writeText){
+    navigator.clipboard.writeText(startupHealthText520()).then(()=>toast("Startup health copied."),()=>toast("Clipboard unavailable."));
+  }else{
+    toast("Clipboard unavailable.");
+  }
+}
 function repairVaultState(){
   data = loadData();
   data.sites = Array.isArray(data.sites) ? data.sites : [];
@@ -3526,6 +3574,7 @@ function diagnostics(){
       <div><strong>${stability.status}</strong><span>Stability Checkpoint</span></div>
       <p>${stability.issues.length ? `${stability.issues.length} issue${stability.issues.length===1?"":"s"} found. Run Repair Vault if needed.` : "Core data structure, routes, GPS records, and active job state look clean."}</p>
     </div>
+    ${startupHealthCard520()}
     <div class="grid2 diagnosticsActions460">
       <button class="primary" id="repairVaultBtn">Repair Vault</button>
       <button class="ghost" id="copyDiagBtn">Copy Diagnostics</button>
@@ -3549,20 +3598,23 @@ function diagnostics(){
   document.getElementById("backHome").onclick=()=>route("home");
   document.getElementById("repairVaultBtn").onclick=repairVaultState;
   document.getElementById("copyDiagBtn").onclick=copyDiagnostics;
+  const startupBtn=document.getElementById("copyStartupHealth520");
+  if(startupBtn) startupBtn.onclick=copyStartupHealth520;
 }
 function showChangelog(){
   const notes = [
-    "Advanced to Build 0.50.19 from the Build 0.50.18 baseline.",
-    "Fixed the Photo Vault document-list newline syntax pattern that caused Safari/PWA SyntaxError: Unexpected EOF on app load.",
-    "Moved document card rendering into a safer helper so note previews no longer create broken JavaScript strings.",
-    "Kept the splash screen minimum display time at about 5 seconds.",
+    "Advanced to Build 0.50.20 from the working Build 0.50.19 baseline.",
+    "Added Startup Health diagnostics showing module-ready status, boot status, last good boot, last route, splash timing, and last startup error.",
+    "Added Copy Startup Health so boot details can be copied quickly if the PWA ever fails again.",
+    "Recorded last successful boot build and route locally after the app opens cleanly.",
+    "Preserved the stable Safari EOF startup repair and the 5-second splash screen timing.",
     "Preserved Photo Vault filters, Photo Overlay tools, custom overlay logo support, iPad autosizing, simple Home screen, Search Bar Concept #6, and excluded job-status workflow controls."
   ];
   const overlay=document.createElement("div");
   overlay.className="releaseOverlay";
   overlay.innerHTML=`<div class="releaseSheet" role="dialog" aria-modal="true" aria-label="FireVault release notes">
     <div class="releaseHead"><div><strong>FireVault</strong><span>Build ${BUILD}</span></div><button class="ghost iconBtn" id="closeRelease" aria-label="Close release notes">×</button></div>
-    <div class="releaseBody"><h2>Release Notes</h2><p class="releaseIntro">Safari EOF startup repair and 5-second splash preserved.</p><ul>${notes.map(n=>`<li>${esc(n)}</li>`).join("")}</ul></div>
+    <div class="releaseBody"><h2>Release Notes</h2><p class="releaseIntro">Startup health diagnostics and 5-second splash preserved.</p><ul>${notes.map(n=>`<li>${esc(n)}</li>`).join("")}</ul></div>
   </div>`;
   document.body.appendChild(overlay);
   const close=()=>overlay.remove();
@@ -3573,10 +3625,19 @@ function showChangelog(){
 
 function bootFireVault518(){
   try{
+    window.__FIREVAULT_MODULE_READY = true;
     render();
     window.__FIREVAULT_BOOTED = true;
+    localStorage.setItem("firevault_last_boot_ok", new Date().toLocaleString());
+    localStorage.setItem("firevault_last_boot_build", BUILD);
+    localStorage.setItem("firevault_last_boot_route", view || "home");
+    localStorage.removeItem("firevault_last_boot_error");
   }catch(err){
     window.__FIREVAULT_LAST_ERROR = err && err.message ? err.message : String(err);
+    try{
+      localStorage.setItem("firevault_last_boot_error", window.__FIREVAULT_LAST_ERROR);
+      localStorage.setItem("firevault_last_boot_build", BUILD);
+    }catch{}
     const app=document.getElementById("app");
     if(app){
       app.innerHTML=`<div class="screen"><div class="card errorBox"><h1>FireVault startup error</h1><p>The module loaded, but the app could not render.</p><p>${esc(window.__FIREVAULT_LAST_ERROR)}</p><button class="primary" onclick="location.reload()">Reload App</button></div></div>`;

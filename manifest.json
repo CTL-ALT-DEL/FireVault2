@@ -8,7 +8,7 @@
   "orientation": "any",
   "background_color": "#0b0d10",
   "theme_color": "#101216",
-  "description": "Field knowledge system for fire alarm technicians. Build 0.50.19 repairs the Photo Vault document list syntax issue that caused Safari/PWA EOF startup errors, while preserving the 5-second splash.",
+  "description": "Field knowledge system for fire alarm technicians. Build 0.50.20 adds startup health diagnostics while preserving the 5-second splash, Photo Vault workflow, and stable Safari boot repair.",
   "icons": [
     {
       "src": "assets/icon-192.png",
