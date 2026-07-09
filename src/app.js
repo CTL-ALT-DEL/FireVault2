@@ -20,6 +20,7 @@ let siteSearch = "";
 let libraryFolder = "all";
 let docVaultFilter516 = "all";
 let docVaultSearch521 = "";
+let docVaultSort522 = "recent";
 let routeReviewId = "";
 let routeHistorySearch = "";
 let simpleToolsOpen = false;
@@ -2197,6 +2198,24 @@ function docMatchesSearch521(d){
 function docVaultSearchBar521(){
   return `<div class="docSearchBar521"><span>⌕</span><input id="docVaultSearch521" value="${esc(docVaultSearch521)}" placeholder="Search photos, documents, links, notes..." autocomplete="off"><button type="button" class="ghost smallBtn" id="clearDocSearch521">Clear</button></div>`;
 }
+function docSortTime522(d){
+  const ts=Date.parse(d.imageUpdatedAt || d.createdAt || d.date || 0);
+  return Number.isFinite(ts) ? ts : 0;
+}
+function sortedDocs522(docs){
+  const rows=[...(docs||[])];
+  if(docVaultSort522 === "title") return rows.sort((a,b)=>docTitle(a).localeCompare(docTitle(b)) || docSortTime522(b)-docSortTime522(a));
+  if(docVaultSort522 === "type") return rows.sort((a,b)=>String(a.type||"").localeCompare(String(b.type||"")) || docTitle(a).localeCompare(docTitle(b)));
+  if(docVaultSort522 === "photos") return rows.sort((a,b)=>(Number(docHasPhoto512(b))-Number(docHasPhoto512(a))) || docSortTime522(b)-docSortTime522(a));
+  return rows.sort((a,b)=>docSortTime522(b)-docSortTime522(a));
+}
+function docVaultSortControls522(){
+  return `<div class="docSortBar522"><label for="docVaultSort522">Sort</label><select id="docVaultSort522"><option value="recent" ${docVaultSort522==="recent"?"selected":""}>Newest first</option><option value="photos" ${docVaultSort522==="photos"?"selected":""}>Photos first</option><option value="title" ${docVaultSort522==="title"?"selected":""}>Title A-Z</option><option value="type" ${docVaultSort522==="type"?"selected":""}>Type</option></select><button type="button" class="ghost smallBtn" id="copyDocVaultList522">Copy List</button></div>`;
+}
+function docVaultListText522(s, docs){
+  const rows=docs&&docs.length ? docs : [];
+  return [`FireVault Document / Photo Vault`, `Site: ${s.name||"Site"}`, `Build: ${BUILD}`, `Records: ${rows.length}`, ``].concat(rows.map((d,i)=>`${i+1}. ${docTitle(d)}\n   ${docMeta(d)}${d.url?`\n   Link: ${d.url}`:""}${d.notes?`\n   Notes: ${String(d.notes).replaceAll("\n"," ")}`:""}`)).join("\n");
+}
 function docVaultFilterBar516(docs){
   const counts={
     all:docs.length,
@@ -2227,16 +2246,18 @@ function siteDocs(){
   const docs=s.docs;
   const linked=docs.filter(d=>d.url).length;
   const photos=docs.filter(docHasPhoto512).length;
-  const filteredDocs=docs.filter(docMatchesVaultFilter516).filter(docMatchesSearch521);
+  const filteredDocs=sortedDocs522(docs.filter(docMatchesVaultFilter516).filter(docMatchesSearch521));
   const docListHtml = filteredDocs.length ? filteredDocs.map(siteDocCard519).join("") : `<div class="empty">No ${esc(docVaultFilterLabel516(docVaultFilter516).toLowerCase())} records found${docVaultSearch521?` for “${esc(docVaultSearch521)}”`:""}. Tap + to add a document, link, or field photo.</div>`;
   html(`<div class="screen docsScreen docsScreen512 docsScreen516"><div class="row"><button class="back ghost" id="backBtn">←</button><div><h1>Documents / Photos</h1><p>${esc(s.name||"Site")}</p></div><button class="primary" id="addDocBtn">＋</button></div>
-    <div class="card docsHero docsHero516 docsHero521"><h2>Site Documents Vault</h2><p>Keep customer-specific references, links, and field photos. Use filters and search to quickly find photos, links, or regular documents.</p><div class="docStats"><span><strong>${docs.length}</strong>Total</span><span><strong>${photos}</strong>Photos</span><span><strong>${linked}</strong>Links</span></div>${docVaultSearchBar521()}${docVaultFilterBar516(docs)}</div>
+    <div class="card docsHero docsHero516 docsHero521"><h2>Site Documents Vault</h2><p>Keep customer-specific references, links, and field photos. Use filters and search to quickly find photos, links, or regular documents.</p><div class="docStats"><span><strong>${docs.length}</strong>Total</span><span><strong>${photos}</strong>Photos</span><span><strong>${linked}</strong>Links</span></div>${docVaultSearchBar521()}${docVaultSortControls522()}${docVaultFilterBar516(docs)}</div>
     <div class="list grow docsList">${docListHtml}</div>
   </div>`);
   document.getElementById("backBtn").onclick=()=>route("siteDetail");
   document.getElementById("addDocBtn").onclick=()=>{mode=null; route("siteDocForm");};
   const docSearch=document.getElementById("docVaultSearch521"); if(docSearch) docSearch.oninput=()=>{docVaultSearch521=docSearch.value; siteDocs();};
   const clearDocSearch=document.getElementById("clearDocSearch521"); if(clearDocSearch) clearDocSearch.onclick=()=>{docVaultSearch521=""; siteDocs();};
+  const docSort=document.getElementById("docVaultSort522"); if(docSort) docSort.onchange=()=>{docVaultSort522=docSort.value||"recent"; siteDocs();};
+  const copyDocList=document.getElementById("copyDocVaultList522"); if(copyDocList) copyDocList.onclick=async()=>{try{await navigator.clipboard.writeText(docVaultListText522(s, filteredDocs)); toast("Document list copied.");}catch{toast("Clipboard unavailable.");}};
   document.querySelectorAll(".docFilterBtn516").forEach(b=>b.onclick=e=>{e.stopPropagation(); docVaultFilter516=b.dataset.docFilter||"all"; siteDocs();});
   document.querySelectorAll(".docVaultItem").forEach(b=>b.onclick=()=>{mode=b.dataset.doc; route("siteDocForm");});
   document.querySelectorAll(".openDocLink").forEach(b=>b.onclick=e=>{e.stopPropagation(); window.open(b.dataset.url,"_blank");});
@@ -2269,7 +2290,7 @@ function siteDocForm(){
   wireDocPhotoControls512(d||{});
   document.getElementById("saveDocBtn").onclick=()=>{
     const imageData=docPhotoClearRequested512 ? "" : (docPhotoDraftDataUrl512 || d?.imageData || "");
-    const obj={type:val("docType"),title:val("docTitle")||"Untitled Reference",ref:val("docRef"),url:val("docUrl"),date:val("docDate"),notes:raw("docNotes"),imageData,imageName:imageData?(docPhotoDraftName512||d?.imageName||"Site photo"):"",imageUpdatedAt:imageData?new Date().toISOString():""};
+    const obj={type:val("docType"),title:val("docTitle")||"Untitled Reference",ref:val("docRef"),url:val("docUrl"),date:val("docDate"),notes:raw("docNotes"),imageData,imageName:imageData?(docPhotoDraftName512||d?.imageName||"Site photo"):"",imageUpdatedAt:imageData?new Date().toISOString():"",updatedAt:new Date().toISOString()};
     if(mode && d){ Object.assign(d,obj); }
     else s.docs.unshift({...obj,id:uid(),createdAt:new Date().toISOString()});
     save(); toast("Document saved."); route("siteDocs");
@@ -3615,18 +3636,18 @@ function diagnostics(){
 }
 function showChangelog(){
   const notes = [
-    "Advanced to Build 0.50.21 from the stable Build 0.50.20 baseline.",
-    "Added Startup Health diagnostics showing module-ready status, boot status, last good boot, last route, splash timing, and last startup error.",
-    "Added Copy Startup Health so boot details can be copied quickly if the PWA ever fails again.",
-    "Recorded last successful boot build and route locally after the app opens cleanly.",
-    "Preserved the stable Safari EOF startup repair and the 5-second splash screen timing.",
-    "Preserved Photo Vault filters, Photo Overlay tools, custom overlay logo support, iPad autosizing, simple Home screen, Search Bar Concept #6, and excluded job-status workflow controls."
+    "Advanced to Build 0.50.22 from the stable Build 0.50.21 baseline.",
+    "Added Photo Vault sorting for newest first, photos first, title A-Z, and type.",
+    "Added Copy List on the Document / Photo Vault screen so filtered search results can be copied as a quick site reference index.",
+    "Updated saved document records with an updated timestamp for cleaner recent sorting.",
+    "Preserved the stable Safari EOF startup repair, 5-second splash screen timing, and Startup Health diagnostics.",
+    "Preserved Photo Vault search, filters, Photo Overlay tools, custom overlay logo support, iPad autosizing, simple Home screen, Search Bar Concept #6, and excluded job-status workflow controls."
   ];
   const overlay=document.createElement("div");
   overlay.className="releaseOverlay";
   overlay.innerHTML=`<div class="releaseSheet" role="dialog" aria-modal="true" aria-label="FireVault release notes">
     <div class="releaseHead"><div><strong>FireVault</strong><span>Build ${BUILD}</span></div><button class="ghost iconBtn" id="closeRelease" aria-label="Close release notes">×</button></div>
-    <div class="releaseBody"><h2>Release Notes</h2><p class="releaseIntro">Startup health diagnostics and 5-second splash preserved.</p><ul>${notes.map(n=>`<li>${esc(n)}</li>`).join("")}</ul></div>
+    <div class="releaseBody"><h2>Release Notes</h2><p class="releaseIntro">Photo Vault sort and copy-list polish.</p><ul>${notes.map(n=>`<li>${esc(n)}</li>`).join("")}</ul></div>
   </div>`;
   document.body.appendChild(overlay);
   const close=()=>overlay.remove();

@@ -1,29 +1,29 @@
-# Clean Install Notes — FireVault Build 0.50.21
+# Clean Install Notes — FireVault Build 0.50.22
 
-This ZIP is intended to be used as the clean baseline for FireVault Build 0.50.21.
+This ZIP is intended to be used as the clean baseline for FireVault Build 0.50.22.
 
-## Install
+## Recommended install
 
-1. Upload the ZIP contents to the root of the GitHub Pages branch.
-2. Keep the file structure exactly as provided.
-3. Commit the full extracted contents together.
-4. Open the deployed app after GitHub Pages finishes.
-5. If Safari or iPhone PWA cache holds an older build, reload Safari and reinstall the Home Screen shortcut if needed.
+1. Delete the old deployed files from the GitHub Pages branch or repository root.
+2. Copy the full contents of this ZIP into the repo root.
+3. Commit and push the full replacement.
+4. Open the deployed PWA and confirm the visible build number shows `0.50.22`.
+5. On iPhone/iPad, clear Safari/PWA cache if an older build remains stuck.
 
 ## Build focus
 
-Build 0.50.21 keeps the working 0.50.20 startup repair and adds Photo Vault search polish:
+Build 0.50.22 keeps the working 0.50.21 startup repair and adds Photo Vault workflow polish:
 
-- Search saved site photos, links, documents, references, and notes.
-- Clear search action on the Site Documents / Photos screen.
-- Preserved Photo Vault filter tabs and counts.
-- Preserved Startup Health diagnostics.
-- Preserved 5-second splash screen and startup watchdog.
-- Preserved Photo Overlay tools and custom overlay logo support.
-- Kept Home simple and Search Bar Concept #6 unchanged.
+- Photo Vault sorting by newest, photos first, title, or type.
+- Copy List for the currently filtered/searched/sorted document list.
+- Updated document timestamps for better recent sorting.
+- Existing Photo Vault search and filter tabs preserved.
+- Startup Health diagnostics and 5-second splash preserved.
+- Safari EOF startup repair preserved.
 
-## Do not regress
+## Validation performed
 
-- Do not bring back Start Job / End Job / Arrived / Working / Complete workflow buttons.
-- Do not simplify away the Photo Vault / Daily Report workflow.
-- Do not remove the startup watchdog or Startup Health diagnostics.
+- JavaScript syntax validation completed.
+- Manifest JSON validation completed.
+- ZIP integrity validation completed.
+- Extracted ZIP validation completed.
