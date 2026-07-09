@@ -45,7 +45,7 @@ const themePresets = {
   "amoled-black": {label:"AMOLED Black", accentColor:"#ef4444"}
 };
 
-const FEATURE_DEFAULTS = {dailyRoute:true, library:false, reports:false, equipment:false, diagnostics:false, advancedGps:false, attention:false, routeReview:false, csvExports:false, backupRepair:false};
+const FEATURE_DEFAULTS = {dailyRoute:true, library:false, reports:false, equipment:false, diagnostics:false, advancedGps:true, attention:false, routeReview:false, csvExports:false, backupRepair:false};
 const FEATURE_LABELS = [
   ["dailyRoute","Daily Route","Route day logging, active route card, waypoint tools, and saved route days."],
   ["advancedGps","Advanced GPS","GPS / Maps dashboard tools, nearby site detection, and GPS capture cards."],
@@ -144,6 +144,19 @@ function currentPresetName474(){
 }
 
 
+function ensureModuleBaseline476(){
+  data.settings.app = data.settings.app || {};
+  if(data.settings.app.modulesBaseline476) return;
+  const v=visibility();
+  v.dailyRoute=true;
+  v.advancedGps=true;
+  data.settings.visibility=v;
+  data.settings.app.modulesBaseline476=true;
+  saveData(data);
+}
+ensureModuleBaseline476();
+
+
 applyTheme();
 document.getElementById("buildButton").addEventListener("click", showChangelog);
 document.querySelectorAll("nav button").forEach(btn => btn.addEventListener("click", () => route(btn.dataset.route)));
@@ -155,11 +168,6 @@ function site(){ return data.sites.find(s => s.id === selectedSiteId); }
 function val(id){ return document.getElementById(id)?.value?.trim() || ""; }
 function raw(id){ return document.getElementById(id)?.value || ""; }
 function checked(id){ return !!document.getElementById(id)?.checked; }
-
-function modules(){ return (data.settings && data.settings.modules) || {}; }
-function moduleOn(name){ return modules()[name] !== false; }
-function recentSites(limit=4){ return data.sites.slice(0, limit); }
-
 function route(v){
   if(v === "library" && !featureOn("library")){ toast("Library is hidden in Simple View. Turn it on in Settings → Simple View."); v="home"; }
   if(v === "diagnostics" && !featureOn("diagnostics")){ toast("Diagnostics is hidden in Simple View. Turn it on in Settings → Simple View."); v="settings"; }
@@ -1033,86 +1041,128 @@ function showError(err){
   html(`<div class="screen"><div class="card errorBox"><h1>FireVault Diagnostics</h1><p>The app caught an error instead of going black.</p><p>${esc(err?.stack || err?.message || err)}</p><button class="primary" onclick="location.reload()">Reload App</button></div></div>`);
 }
 
-function todayLabel(){
-  const now = new Date();
-  return {day:now.toLocaleDateString([], {weekday:"long"}), date:now.toLocaleDateString([], {month:"long", day:"numeric", year:"numeric"})};
+
+function recentAccounts476(limit=5){
+  return [...(data.sites||[])].sort((a,b)=>recentSiteTime476(b)-recentSiteTime476(a)).slice(0,limit);
 }
-
+function recentSiteTime476(s){
+  const visits=Array.isArray(s.visits)?s.visits:[];
+  const times=visits.flatMap(v=>[v.endedAt,v.startedAt,v.date]).filter(Boolean).map(x=>new Date(x).getTime()).filter(Number.isFinite);
+  return times.length ? Math.max(...times) : 0;
+}
+function siteSearchText476(s){
+  ensureSite(s);
+  return [s.name,fullAddress(s),s.panelManufacturer,s.panelModel,s.notes,(s.contacts||[]).map(c=>[c.name,c.role,c.phone,c.email,c.accessNotes].join(' ')).join(' '),(s.equipment||[]).map(e=>[e.type,e.model,e.location,e.notes].join(' ')).join(' ')].join(' ').toLowerCase();
+}
+function homeSearchMatches476(){
+  const q=(siteSearch||'').trim().toLowerCase();
+  if(!q) return recentAccounts476(5);
+  return (data.sites||[]).filter(s=>siteSearchText476(s).includes(q)).slice(0,8);
+}
+function siteSubline476(s){
+  const parts=[];
+  const addr=fullAddress(s); if(addr && addr!=="No address entered") parts.push(addr);
+  const panel=[s.panelManufacturer,s.panelModel].filter(Boolean).join(' '); if(panel) parts.push(panel);
+  if(hasGps(s)) parts.push('GPS saved');
+  return parts.join(' • ') || 'No address or panel entered';
+}
+function siteActivityLine476(s){
+  const open=(s.tasks||[]).filter(t=>!taskIsDone(t)).length;
+  const def=(s.deficiencies||[]).filter(d=>(d.status||'Open')!=='Closed').length;
+  const visits=(s.visits||[]).length;
+  const bits=[];
+  if(open) bits.push(`${open} open task${open===1?'':'s'}`);
+  if(def) bits.push(`${def} deficienc${def===1?'y':'ies'}`);
+  if(visits) bits.push(`${visits} visit${visits===1?'':'s'}`);
+  return bits.join(' • ') || 'Ready';
+}
+function homeAccountRowsMarkup476(){
+  const q=(siteSearch||'').trim();
+  const rows=homeSearchMatches476();
+  const title=q?'Search Results':'Recent Accounts';
+  const empty=q?'No matching accounts found.':'No recent accounts yet.';
+  return `<div class="homeAccountSection476"><div class="homeSectionHead476"><strong>${title}</strong><span>${rows.length} account${rows.length===1?'':'s'}</span></div>${rows.length?rows.map(s=>`<button class="homeAccountCard476" data-home-site="${esc(s.id)}"><span class="accountInitial476">${esc((s.name||'?').slice(0,1).toUpperCase())}</span><span><strong>${esc(s.name||'Unnamed Site')}</strong><small>${esc(siteSubline476(s))}</small><em>${esc(siteActivityLine476(s))}</em></span></button>`).join(''):`<div class="empty homeEmpty476">${empty}</div>`}</div>`;
+}
+function homeNearbyMarkup476(){
+  if(!featureOn('advancedGps')) return '';
+  if(!data.sites.some(hasGps)) return `<div class="homeNearbyEmpty476"><p>No GPS-saved accounts yet. Open a customer account and capture GPS first.</p></div>`;
+  if(!nearbyState) return `<div class="homeNearbyEmpty476"><p>Check your current location and FireVault will surface nearby customer accounts.</p></div>`;
+  const rows=gpsSiteDistances(nearbyState.lat, nearbyState.lng).slice(0,4);
+  return rows.length?rows.map(r=>`<button class="nearbyAccountCard476" data-home-site="${esc(r.s.id)}"><span>⌖</span><strong>${esc(r.s.name||'Unnamed Site')}</strong><small>${esc(distanceLabel(r.meters))} away • ${esc(fullAddress(r.s))}</small></button>`).join(''):`<div class="homeNearbyEmpty476"><p>No saved GPS accounts found near this location.</p></div>`;
+}
+function renderHomeSearch476(){
+  const box=document.getElementById('homeSearchResults476');
+  if(box) box.innerHTML=homeAccountRowsMarkup476();
+}
+function checkNearbyHome476(){
+  if(data.settings.gps?.enabled===false){ toast('GPS tools are hidden in Settings.'); return; }
+  if(!navigator.geolocation){ toast('GPS is not available in this browser.'); return; }
+  if(!data.sites.some(hasGps)){ toast('No GPS-saved accounts yet.'); return; }
+  toast('Checking nearby accounts...');
+  navigator.geolocation.getCurrentPosition(pos=>{
+    nearbyState={lat:Number(pos.coords.latitude.toFixed(6)),lng:Number(pos.coords.longitude.toFixed(6)),accuracy:Math.round(pos.coords.accuracy||0),at:new Date().toISOString()};
+    home();
+  },err=>toast('Nearby check failed: ' + (err.message || 'permission denied')),gpsOptions());
+}
+function moduleStatus476(){
+  const visible=FEATURE_LABELS.filter(([k])=>featureOn(k)).length;
+  return `${visible} module${visible===1?'':'s'} visible`;
+}
 function home(){
-  const openTasks = data.sites.reduce((n,s)=>n+(s.tasks||[]).filter(t => (t.status||"Open") !== "Done").length,0);
-  const today = typeof todayLabel === "function" ? todayLabel() : {day:new Date().toLocaleDateString([], {weekday:"long"}), date:new Date().toLocaleDateString([], {month:"long", day:"numeric", year:"numeric"})};
-
-  app(`<div class="screen simpleHome">
-    <div>
-      <div class="todayDay">${today.day}</div>
-      <div class="todayDate">${today.date}</div>
+  const taskRows = allTaskRows();
+  const taskCounts = taskFilterCounts(taskRows);
+  const openTasks = taskCounts.open;
+  const def = data.sites.reduce((n,s)=>n+(s.deficiencies||[]).filter(d => (d.status||"Open") !== "Closed").length,0);
+  const gpsSites = data.sites.filter(hasGps).length;
+  const now = new Date();
+  html(`<div class="screen homeScreen476">
+    <div class="homeTop476">
+      <button class="ghost smallBtn modulesTopBtn476" id="modulesTopBtn476">Modules</button>
+      <div class="homeHero450 homeHero457 homeHero463 homeHero476"><div class="homeDateWrap463 homeDateWrap476">${activeRoute?`<span class="${activeRoute.paused?"routeLed470 routeLedPaused470":"routeLed463"}" aria-label="${activeRoute.paused?"Daily route paused":"Daily route recording"}"></span>`:""}<div class="homeDateBlock457"><div class="todayDay"><h1>${now.toLocaleDateString([], {weekday:"long"})}</h1></div><p class="homeDateLine457">${fmtDate(now)}</p></div></div></div>
     </div>
 
-    <div class="searchHero">
-      <h1>Find Customer</h1>
-      <p>Search, open nearby accounts, and add notes fast.</p>
-      <div class="bigSearch">
-        <span>🔍</span>
-        <input id="homeSearch" placeholder="Search customers...">
-      </div>
-      <div id="homeSearchResults" class="simpleList"></div>
+    <div class="card customerSearchHero476">
+      <div class="searchTitle476"><span>🔍</span><div><h1>Find Account</h1><p>Search customers, addresses, panels, contacts, access notes, or equipment.</p></div></div>
+      <div class="homeSearchBox476"><input id="homeCustomerSearch476" type="search" value="${esc(siteSearch)}" placeholder="Search customer accounts..." autocomplete="off"><button class="ghost smallBtn" id="clearHomeSearch476" ${siteSearch?"":"disabled"}>Clear</button></div>
+      <div id="homeSearchResults476">${homeAccountRowsMarkup476()}</div>
     </div>
 
-    ${moduleOn("gpsNearby") ? `<div class="card nearbyFeatured">
-      <div class="row"><div><h2>Nearby Accounts</h2><p>Use GPS to show accounts close to you.</p></div><button class="primary" id="nearbyBtn">Scan</button></div>
-      <div id="nearbyBox"></div>
-    </div>` : ""}
-
-    <div>
-      <div class="homeSectionTitle">Recent Accounts</div>
-      <div class="simpleList">
-        ${recentSites(4).length ? recentSites(4).map(s=>`<div class="card siteItem recentPick" data-id="${s.id}"><div class="row"><div><strong>${esc(s.name||"Unnamed Site")}</strong><p>${esc(fullAddress(s))}</p></div><span>›</span></div></div>`).join("") : `<div class="empty">No sites yet. Add your first customer.</div>`}
-      </div>
+    <div class="card nearbyAccountsHero476 ${featureOn("advancedGps")?"":"featureHidden472"}">
+      <div class="nearbyHead476"><div><h2>Nearby Accounts</h2><p>${nearbyState?`Last check ${new Date(nearbyState.at).toLocaleTimeString([], {hour:"numeric",minute:"2-digit"})} • GPS ±${nearbyState.accuracy||0}m`:`${gpsSites} account${gpsSites===1?"":"s"} with saved GPS`}</p></div><button class="primary smallBtn" id="checkNearbyHomeBtn476">Check Nearby</button></div>
+      <div class="nearbyList476">${homeNearbyMarkup476()}</div>
     </div>
 
-    <div class="quickHomeGrid">
-      <button class="primary tile" id="addSiteBtn"><strong>＋ New Account</strong><span>Create customer vault</span></button>
-      ${moduleOn("breadcrumbs") ? `<button class="ghost tile" id="dailyBtn"><strong>🧭 Daily Summary</strong><span>Route and breadcrumbs</span></button>` : ""}
-      ${moduleOn("breadcrumbs") ? `<button class="ghost tile" id="dropCrumbBtn"><strong>📌 Drop Crumb</strong><span>Manual GPS point</span></button>` : ""}
-      ${moduleOn("tasks") ? `<button class="ghost tile" id="tasksCard"><strong>${openTasks}</strong><span>Open Tasks</span></button>` : ""}
-    </div>
+    ${activeRoute ? `<div class="card activeRouteMini468 activeRouteMini476 ${activeRoute.paused?"activeRoutePaused470":""}"><div class="activeRouteHead468"><div><h2><span class="${activeRoute.paused?"routeLed470 routeLedPaused470":"routeLed463"} miniLed468"></span>${activeRoute.paused?"Daily Route Paused":"Daily Route Recording"}</h2><p>${esc(routeSummaryLine(activeRoute))}</p></div><button class="primary smallBtn" id="openRouteMiniBtn">Open</button></div><div class="activeRouteStats468"><div><strong>${(activeRoute.events||[]).length}</strong><span>Waypoints</span></div><div><strong>${routeDuration(activeRoute.startedAt)}</strong><span>Time</span></div><div><strong>${esc(routeDistanceLabel(activeRoute))}</strong><span>Distance</span></div></div><div class="activeRouteActions468"><button class="ghost smallBtn" id="homeRoutePointBtn" ${activeRoute.paused?"disabled":""}>Waypoint</button><button class="ghost smallBtn" id="homeRouteNearestBtn" ${activeRoute.paused?"disabled":""}>Nearest</button><button class="${activeRoute.paused?"primary":"ghost"} smallBtn" id="homeRoutePauseBtn">${activeRoute.paused?"Resume":"Pause"}</button><button class="danger smallBtn" id="homeRouteEndBtn">End / Save</button></div></div>` : ""}
+    ${activeJob ? `<div class="card activeJobMini"><div class="row"><div><h2>Service Call Active</h2><p>${esc(activeJob.siteName)} • <span id="jobElapsed">${elapsedText(activeJob.startedAt)}</span></p></div><button class="primary" id="resumeJobBtn">Open</button></div></div>` : ""}
 
-    ${(typeof activeJob !== "undefined" && activeJob && moduleOn("jobMode")) ? `<div class="card activeJobMini"><div class="row"><div><h2>Service Call Active</h2><p>${esc(activeJob.siteName)} • <span id="jobElapsed">${elapsedText(activeJob.startedAt)}</span></p></div><button class="primary" id="resumeJobBtn">Open</button></div></div>` : ""}
+    <div class="grid3 homeStats476">
+      <button class="card tile metricCard" id="sitesCard"><strong>${data.sites.length}</strong><span>Accounts</span></button>
+      <button class="card tile metricCard taskMetricCard" id="tasksCard"><strong>${openTasks}</strong><span>${taskCounts.overdue ? `${taskCounts.overdue} overdue` : taskCounts.today ? `${taskCounts.today} due today` : "Open Tasks"}</span></button>
+      <button class="card tile metricCard" id="defCard"><strong>${def}</strong><span>Deficiencies</span></button>
+    </div>
+    <div class="homeModuleSummary476"><button class="ghost" id="manageModulesBtn476"><strong>Modules</strong><span>${esc(moduleStatus476())} • disabled modules disappear from the interface</span></button><button class="primary" id="addSiteBtn">＋ Add Account</button></div>
+    <div class="buildRevisionSpacer475" aria-hidden="true"></div>
   </div>`);
 
-  document.getElementById("homeSearch").oninput = drawHomeSearchResults;
-  document.getElementById("addSiteBtn").onclick = () => { selectedSiteId=null; view="siteForm"; render(); };
-  document.getElementById("nearbyBtn")?.addEventListener("click", () => { if(typeof scanNearbySites === "function") scanNearbySites(); });
-  document.getElementById("dailyBtn")?.addEventListener("click", () => { view="dailySummary"; render(); });
-  document.getElementById("dropCrumbBtn")?.addEventListener("click", () => { if(typeof dropBreadcrumb === "function") dropBreadcrumb(); });
-  document.getElementById("tasksCard")?.addEventListener("click", () => { selectedSiteId=null; view="tasks"; render(); });
-  document.querySelectorAll(".recentPick").forEach(el => el.onclick = () => {
-    selectedSiteId = el.dataset.id;
-    view = "siteDetail";
-    render();
-  });
-  const resumeBtn = document.getElementById("resumeJobBtn");
-  if(resumeBtn) resumeBtn.onclick = () => {
-    selectedSiteId = activeJob.siteId;
-    view = "jobMode";
-    render();
-  };
+  const homeRoot=document.querySelector('.homeScreen476');
+  if(homeRoot) homeRoot.onclick=e=>{ const card=e.target.closest('[data-home-site]'); if(card){ selectedSiteId=card.dataset.homeSite; route('siteDetail'); } };
+  const search=document.getElementById('homeCustomerSearch476');
+  if(search){ search.oninput=()=>{ siteSearch=search.value; renderHomeSearch476(); const clear=document.getElementById('clearHomeSearch476'); if(clear) clear.disabled=!siteSearch; }; setTimeout(()=>{ try{ search.setSelectionRange(search.value.length, search.value.length); }catch{} },0); }
+  const clear=document.getElementById('clearHomeSearch476'); if(clear) clear.onclick=()=>{ siteSearch=''; home(); };
+  const checkNearby=document.getElementById('checkNearbyHomeBtn476'); if(checkNearby) checkNearby.onclick=checkNearbyHome476;
+  document.getElementById('modulesTopBtn476').onclick=()=>{settingsTab='visibility'; mode='settingsDetail'; route('settings');};
+  document.getElementById('manageModulesBtn476').onclick=()=>{settingsTab='visibility'; mode='settingsDetail'; route('settings');};
+  document.getElementById('sitesCard').onclick=()=>route('sites');
+  document.getElementById('tasksCard').onclick=()=>{selectedSiteId=null; route('tasks');};
+  document.getElementById('defCard').onclick=()=>{selectedSiteId=null; route('deficiencies');};
+  document.getElementById('addSiteBtn').onclick=()=>{selectedSiteId=null; mode=null; route('siteForm');};
+  const openRouteMini=document.getElementById('openRouteMiniBtn'); if(openRouteMini) openRouteMini.onclick=()=>route('routeLog');
+  const homeRoutePoint=document.getElementById('homeRoutePointBtn'); if(homeRoutePoint) homeRoutePoint.onclick=()=>{ const note=prompt('Waypoint note', 'Manual waypoint')||'Manual waypoint'; addRouteEvent('Waypoint', note); };
+  const homeRouteNearest=document.getElementById('homeRouteNearestBtn'); if(homeRouteNearest) homeRouteNearest.onclick=checkRouteNearestSite;
+  const homeRoutePause=document.getElementById('homeRoutePauseBtn'); if(homeRoutePause) homeRoutePause.onclick=()=> activeRoute?.paused ? resumeRouteDay() : pauseRouteDay();
+  const homeRouteEnd=document.getElementById('homeRouteEndBtn'); if(homeRouteEnd) homeRouteEnd.onclick=()=>{ if(confirm('End and save today’s route?')) endRouteDay(); };
+  const rb=document.getElementById('resumeJobBtn'); if(rb) rb.onclick=()=>{selectedSiteId=activeJob.siteId; route('jobMode');};
 }
-
-function drawHomeSearchResults(){
-  const q = (document.getElementById("homeSearch")?.value || "").toLowerCase().trim();
-  const box = document.getElementById("homeSearchResults");
-  if(!box) return;
-  if(!q){ box.innerHTML = ""; return; }
-  const results = data.sites.filter(s => JSON.stringify(s).toLowerCase().includes(q)).slice(0,6);
-  box.innerHTML = results.length ? `<div class="homeSectionTitle">Results</div>` + results.map(s => `<div class="card siteItem homeResult" data-id="${s.id}"><div class="row"><div><strong>${esc(s.name||"Unnamed Site")}</strong><p>${esc(fullAddress(s))}</p></div><span>›</span></div></div>`).join("") : `<div class="empty">No matching customers.</div>`;
-  document.querySelectorAll(".homeResult").forEach(el => el.onclick = () => {
-    selectedSiteId = el.dataset.id;
-    view = "siteDetail";
-    render();
-  });
-}
-
 
 function routeLog(){
   const saved=(data.routeLogs||[]);
@@ -1280,9 +1330,9 @@ function nearbySites(){
 }
 
 function siteDetail(){
-  const s=site(); if(!s){ route("sites"); return; }
-  const open=(s.tasks||[]).filter(t=>(t.status||"Open")!=="Done").length;
-  const def=(s.deficiencies||[]).filter(d=>(d.status||"Open")!=="Closed").length;
+  const s=site(); if(!s){ route('sites'); return; }
+  const open=(s.tasks||[]).filter(t=>(t.status||'Open')!=='Done').length;
+  const def=(s.deficiencies||[]).filter(d=>(d.status||'Open')!=='Closed').length;
   const siteVisits=Array.isArray(s.visits) ? s.visits : [];
   const equipment=Array.isArray(s.equipment) ? s.equipment : [];
   const contacts=Array.isArray(s.contacts) ? s.contacts : [];
@@ -1290,56 +1340,59 @@ function siteDetail(){
   const checklistItems=Array.isArray(s.checklist) ? s.checklist : [];
   const checkStats=checklistStats(s);
   const health=siteHealth(s);
-  html(`<div class="screen siteDetailScreen446"><div class="row siteTopBar"><button class="back ghost" id="backBtn">←</button><button class="ghost" id="editBtn">Edit</button></div>
-    <div class="card redline siteHero446"><h1>${esc(s.name)}</h1><p>${esc(fullAddress(s))}</p><p>${esc([s.panelManufacturer,s.panelModel].filter(Boolean).join(" ")||"Panel not entered")}</p></div>
-    <div class="card healthSnapshotCard ${health.cls}"><div class="healthSnapshotTop"><div><h2>Site Health</h2><p>${esc(health.details.join(" • "))}</p></div><span class="healthScore">${health.score}%</span></div><div class="healthBars"><span><strong>${health.openTasks}</strong> Open</span><span><strong>${health.openDef}</strong> Def</span><span><strong>${health.equipmentIssues}</strong> Equip</span></div></div>
-    <div class="card snapshotCard"><div><h2>Field Snapshot</h2><p>One-tap summary with address, GPS, contacts/access, open tasks, deficiencies, equipment attention, documents, and notes.</p></div><button class="primary smallBtn" id="copySnapshotCardBtn">Share / Copy</button></div>
-    <div class="grid2 siteActionGrid446">
-      <button class="primary tile" id="jobBtn"><strong>Start Job</strong><span>Live service call</span></button>
-      <button class="ghost tile ${featureOn("reports")?"":"featureHidden472"}" id="reportBtn"><strong>Report</strong><span>Copy/download</span></button>
-      <button class="ghost tile snapshotTile" id="snapshotBtn"><strong>Snapshot</strong><span>Share field summary</span></button>
-      <button class="ghost tile checklistTile" id="checklistBtn"><strong>${checklistItems.length ? checkStats.progress + "%" : "New"}</strong><span>Checklist</span></button>
-      <button class="ghost tile" id="taskBtn"><strong>${open}</strong><span>Open Tasks</span></button>
-      <button class="ghost tile" id="defBtn"><strong>${def}</strong><span>Deficiencies</span></button>
-      <button class="ghost tile ${featureOn("equipment")?"":"featureHidden472"}" id="equipmentBtn"><strong>${equipment.length}</strong><span>Equipment</span></button>
-      <button class="ghost tile" id="contactsBtn"><strong>${contacts.length}</strong><span>Contacts / Access</span></button>
-      <button class="ghost tile" id="docsBtn"><strong>${docs.length}</strong><span>Documents / Links</span></button>
-    </div>
-    <div class="card gpsCard ${featureOn("advancedGps")?"":"featureHidden472"}"><div class="row"><div><h2>GPS / Maps</h2><p>${esc(gpsLine(s))}</p></div>${data.settings.gps?.enabled===false?"":`<button id="captureGpsBtn" class="primary smallBtn">Capture GPS</button>`}</div><div class="mapActions"><button id="appleBtn" class="ghost">Apple Maps</button><button id="googleBtn" class="ghost">Google Maps</button></div></div>
-    <div class="card checklistMiniCard"><div class="row"><div><h2>Inspection Checklist</h2><p>${checklistItems.length ? `${checkStats.progress}% complete • ${checkStats.issue} issue${checkStats.issue===1?"":"s"} • ${checkStats.pending} pending • ${checklistLastSavedLine(s)}` : "Default fire alarm field checklist ready to start."}</p></div><button class="ghost smallBtn" id="manageChecklistBtn">Open</button></div><div class="checkMiniBar"><span style="width:${checkStats.progress}%"></span></div></div>
-    <div class="card contactsMiniCard"><div class="row"><div><h2>Contacts & Access</h2><p>${contacts.length ? `${contacts.length} saved contact${contacts.length===1?"":"s"}` : "Customer, access, gate, and after-hours details."}</p></div><button class="ghost smallBtn" id="manageContactsBtn">Manage</button></div>${contacts.length?contacts.slice(0,3).map(c=>`<button class="contactLine" data-contact="${esc(c.id)}"><strong>${esc(contactTitle(c))}</strong><span>${esc(contactMeta(c))}</span></button>`).join(""):`<p class="fieldNote">Add customer contacts, access codes, lockbox notes, or monitoring center details here.</p>`}</div>
-    <div class="card equipmentMiniCard ${featureOn("equipment")?"":"featureHidden472"}"><div class="row"><div><h2>Equipment Vault</h2><p>${equipment.length ? `${equipment.length} saved equipment item${equipment.length===1?"":"s"}` : "Panel, communicator, power supply, and device notes."}</p></div><button class="ghost smallBtn" id="manageEquipmentBtn">Manage</button></div>${equipment.length?equipment.slice(0,3).map(e=>`<button class="equipmentLine" data-eq="${esc(e.id)}"><strong>${esc(equipmentTitle(e))}</strong><span>${esc(e.location||e.type||"No location entered")}</span></button>`).join(""):`<p class="fieldNote">Add the panel, communicator, power supplies, and important site equipment here.</p>`}</div>
-    <div class="card docsMiniCard"><div class="row"><div><h2>Documents / Links</h2><p>${docs.length ? `${docs.length} saved document${docs.length===1?"":"s"}` : "Manuals, permits, forms, and site reference links."}</p></div><button class="ghost smallBtn" id="manageDocsBtn">Manage</button></div>${docs.length?docs.slice(0,3).map(d=>`<button class="docLineMini" data-doc="${esc(d.id)}"><strong>${esc(docTitle(d))}</strong><span>${esc(docMeta(d))}</span></button>`).join(""):`<p class="fieldNote">Add PDF links, panel manuals, account references, permit numbers, or inspection form notes here.</p>`}</div>
-    <div class="card recentVisitsCard visitLogCard"><div class="row"><div><h2>Visit History</h2><p>${siteVisits.length ? `${siteVisits.length} completed visit${siteVisits.length===1?"":"s"}` : "No completed visits yet."}</p></div>${siteVisits.length?`<button class="ghost smallBtn" id="allVisitsBtn">View All</button>`:""}</div>${siteVisits.length?siteVisits.slice(0,3).map(v=>`<button class="visitMini visitMiniButton" data-visit="${esc(v.id)}"><strong>${esc(visitDateLabel(v))}</strong><span>${esc(durationText(v.startedAt,v.endedAt))}</span><p>${esc(visitNotesPreview(v,2))}</p></button>`).join(""):`<p class="fieldNote">Finish a Job Mode service call and it will appear here.</p>`}</div>
-    <div class="card grow"><h2>Site Notes</h2><p>${esc(s.notes || "No notes entered.")}</p></div>
+  const lastVisit=siteVisits[0];
+  const panel=[s.panelManufacturer,s.panelModel].filter(Boolean).join(' ')||'Panel not entered';
+  const showAdvancedTools=appMode()!=='simple' || featureOn('reports') || featureOn('equipment') || featureOn('advancedGps');
+  html(`<div class="screen siteDetailScreen476"><div class="row siteTopBar siteTopBar476"><button class="back ghost" id="backBtn">←</button><button class="ghost" id="editBtn">Edit</button></div>
+    <div class="card siteHero476"><div><h1>${esc(s.name)}</h1><p>${esc(fullAddress(s))}</p><span>${esc(panel)}</span></div><div class="siteHealthDot476 ${health.cls}">${health.score}%</div></div>
+    <div class="grid3 siteQuickStats476"><button class="card tile" id="taskBtn"><strong>${open}</strong><span>Open Tasks</span></button><button class="card tile" id="defBtn"><strong>${def}</strong><span>Deficiencies</span></button><button class="card tile" id="contactsBtn"><strong>${contacts.length}</strong><span>Contacts</span></button></div>
+    <div class="grid2 sitePrimaryActions476"><button class="primary tile" id="jobBtn"><strong>Start Job</strong><span>Live service call</span></button><button class="ghost tile" id="snapshotBtn"><strong>Snapshot</strong><span>Copy field summary</span></button></div>
+
+    <div class="card siteNow476"><div class="siteNowHead476"><div><h2>Important Now</h2><p>${esc(health.details.join(' • '))}</p></div><span>${health.score}%</span></div><div class="siteNowGrid476"><button id="openTasksMini476"><strong>${open}</strong><small>Open Tasks</small></button><button id="openDefMini476"><strong>${def}</strong><small>Deficiencies</small></button><button id="visitsMini476"><strong>${siteVisits.length}</strong><small>Visits</small></button></div></div>
+
+    <div class="card contactsMiniCard siteSimpleCard476"><div class="row"><div><h2>Contacts & Access</h2><p>${contacts.length ? `${contacts.length} saved contact${contacts.length===1?'':'s'}` : 'Customer, access, gate, and after-hours details.'}</p></div><button class="ghost smallBtn" id="manageContactsBtn">Manage</button></div>${contacts.length?contacts.slice(0,3).map(c=>`<button class="contactLine" data-contact="${esc(c.id)}"><strong>${esc(contactTitle(c))}</strong><span>${esc(contactMeta(c))}</span></button>`).join(''):`<p class="fieldNote">Add customer contacts, access codes, lockbox notes, or monitoring center details here.</p>`}</div>
+
+    <div class="card recentVisitsCard visitLogCard siteSimpleCard476"><div class="row"><div><h2>Recent Visit</h2><p>${lastVisit ? `${visitDateLabel(lastVisit)} • ${durationText(lastVisit.startedAt,lastVisit.endedAt)}` : 'No completed visits yet.'}</p></div>${siteVisits.length?`<button class="ghost smallBtn" id="allVisitsBtn">All</button>`:''}</div>${lastVisit?`<button class="visitMini visitMiniButton" data-visit="${esc(lastVisit.id)}"><strong>${esc(visitNotesPreview(lastVisit,1))}</strong><span>Open visit detail</span></button>`:`<p class="fieldNote">Finish a Job Mode service call and it will appear here.</p>`}</div>
+
+    <div class="card docsMiniCard siteSimpleCard476"><div class="row"><div><h2>Documents / Links</h2><p>${docs.length ? `${docs.length} saved document${docs.length===1?'':'s'}` : 'Manuals, permits, forms, and site reference links.'}</p></div><button class="ghost smallBtn" id="manageDocsBtn">Manage</button></div>${docs.length?docs.slice(0,2).map(d=>`<button class="docLineMini" data-doc="${esc(d.id)}"><strong>${esc(docTitle(d))}</strong><span>${esc(docMeta(d))}</span></button>`).join(''):`<p class="fieldNote">Add panel manuals, permits, or site-specific references.</p>`}</div>
+
+    ${showAdvancedTools?`<div class="card siteModulesCard476"><div class="siteModulesHead476"><h2>Enabled Site Tools</h2><p>Only modules enabled in Settings → Modules appear here.</p></div><div class="grid2 siteModuleGrid476">
+      ${featureOn('reports')?`<button class="ghost tile" id="reportBtn"><strong>Report</strong><span>Copy/download</span></button>`:''}
+      <button class="ghost tile" id="checklistBtn"><strong>${checklistItems.length ? checkStats.progress + '%' : 'New'}</strong><span>Checklist</span></button>
+      ${featureOn('equipment')?`<button class="ghost tile" id="equipmentBtn"><strong>${equipment.length}</strong><span>Equipment</span></button>`:''}
+      ${featureOn('advancedGps')?`<button class="ghost tile" id="gpsToolsBtn"><strong>GPS</strong><span>${hasGps(s)?'Saved':'Capture / maps'}</span></button>`:''}
+    </div></div>`:''}
+
+    ${featureOn('advancedGps')?`<div class="card gpsCard siteGpsCard476"><div class="row"><div><h2>GPS / Maps</h2><p>${esc(gpsLine(s))}</p></div>${data.settings.gps?.enabled===false?'':`<button id="captureGpsBtn" class="primary smallBtn">Capture GPS</button>`}</div><div class="mapActions"><button id="appleBtn" class="ghost">Apple Maps</button><button id="googleBtn" class="ghost">Google Maps</button></div></div>`:''}
+    ${featureOn('equipment')?`<div class="card equipmentMiniCard siteSimpleCard476"><div class="row"><div><h2>Equipment Vault</h2><p>${equipment.length ? `${equipment.length} saved equipment item${equipment.length===1?'':'s'}` : 'Panel, communicator, power supply, and device notes.'}</p></div><button class="ghost smallBtn" id="manageEquipmentBtn">Manage</button></div>${equipment.length?equipment.slice(0,2).map(e=>`<button class="equipmentLine" data-eq="${esc(e.id)}"><strong>${esc(equipmentTitle(e))}</strong><span>${esc(e.location||e.type||'No location entered')}</span></button>`).join(''):`<p class="fieldNote">Add the panel, communicator, power supplies, and important equipment here.</p>`}</div>`:''}
+    <div class="card grow siteNotes476"><h2>Site Notes</h2><p>${esc(s.notes || 'No notes entered.')}</p></div>
   </div>`);
-  document.getElementById("backBtn").onclick=()=>route("sites");
-  document.getElementById("editBtn").onclick=()=>{mode="edit"; route("siteForm");};
-  document.getElementById("taskBtn").onclick=()=>route("tasks");
-  document.getElementById("defBtn").onclick=()=>route("deficiencies");
-  document.getElementById("equipmentBtn").onclick=()=>route("equipmentList");
-  document.getElementById("contactsBtn").onclick=()=>route("contactsList");
-  document.getElementById("docsBtn").onclick=()=>route("siteDocs");
-  document.getElementById("reportBtn").onclick=()=>route("report");
-  document.getElementById("snapshotBtn").onclick=shareSiteSnapshot;
-  document.getElementById("checklistBtn").onclick=()=>route("checklist");
-  const manageChecklist=document.getElementById("manageChecklistBtn"); if(manageChecklist) manageChecklist.onclick=()=>route("checklist");
-  document.getElementById("copySnapshotCardBtn").onclick=shareSiteSnapshot;
-  document.getElementById("jobBtn").onclick=startJob;
-  const gpsBtn=document.getElementById("captureGpsBtn"); if(gpsBtn) gpsBtn.onclick=captureGpsForSite;
-  document.getElementById("appleBtn").onclick=()=>window.open(mapUrl(s,"apple"),"_blank");
-  document.getElementById("googleBtn").onclick=()=>window.open(mapUrl(s,"google"),"_blank");
-  const manageContacts=document.getElementById("manageContactsBtn"); if(manageContacts) manageContacts.onclick=()=>route("contactsList");
-  document.querySelectorAll(".contactLine").forEach(b=>b.onclick=()=>{mode=b.dataset.contact; route("contactForm");});
-  const manageEq=document.getElementById("manageEquipmentBtn"); if(manageEq) manageEq.onclick=()=>route("equipmentList");
-  document.querySelectorAll(".equipmentLine").forEach(b=>b.onclick=()=>{mode=b.dataset.eq; route("equipmentForm");});
-  const manageDocs=document.getElementById("manageDocsBtn"); if(manageDocs) manageDocs.onclick=()=>route("siteDocs");
-  document.querySelectorAll(".docLineMini").forEach(b=>b.onclick=()=>{mode=b.dataset.doc; route("siteDocForm");});
-  const allVisits=document.getElementById("allVisitsBtn"); if(allVisits) allVisits.onclick=()=>route("visits");
-  document.querySelectorAll(".visitMiniButton").forEach(b=>b.onclick=()=>{mode=b.dataset.visit; route("visitDetail");});
+  document.getElementById('backBtn').onclick=()=>route('sites');
+  document.getElementById('editBtn').onclick=()=>{mode='edit'; route('siteForm');};
+  document.getElementById('taskBtn').onclick=()=>route('tasks');
+  document.getElementById('defBtn').onclick=()=>route('deficiencies');
+  document.getElementById('contactsBtn').onclick=()=>route('contactsList');
+  document.getElementById('openTasksMini476').onclick=()=>route('tasks');
+  document.getElementById('openDefMini476').onclick=()=>route('deficiencies');
+  document.getElementById('visitsMini476').onclick=()=>route('visits');
+  document.getElementById('snapshotBtn').onclick=shareSiteSnapshot;
+  document.getElementById('jobBtn').onclick=startJob;
+  const report=document.getElementById('reportBtn'); if(report) report.onclick=()=>route('report');
+  const checklist=document.getElementById('checklistBtn'); if(checklist) checklist.onclick=()=>route('checklist');
+  const equipmentBtn=document.getElementById('equipmentBtn'); if(equipmentBtn) equipmentBtn.onclick=()=>route('equipmentList');
+  const gpsTools=document.getElementById('gpsToolsBtn'); if(gpsTools) gpsTools.onclick=()=>{ const gps=document.querySelector('.siteGpsCard476'); if(gps) gps.scrollIntoView({behavior:'smooth',block:'center'}); };
+  const gpsBtn=document.getElementById('captureGpsBtn'); if(gpsBtn) gpsBtn.onclick=captureGpsForSite;
+  const apple=document.getElementById('appleBtn'); if(apple) apple.onclick=()=>window.open(mapUrl(s,'apple'),'_blank');
+  const google=document.getElementById('googleBtn'); if(google) google.onclick=()=>window.open(mapUrl(s,'google'),'_blank');
+  const manageContacts=document.getElementById('manageContactsBtn'); if(manageContacts) manageContacts.onclick=()=>route('contactsList');
+  document.querySelectorAll('.contactLine').forEach(b=>b.onclick=()=>{mode=b.dataset.contact; route('contactForm');});
+  const manageEq=document.getElementById('manageEquipmentBtn'); if(manageEq) manageEq.onclick=()=>route('equipmentList');
+  document.querySelectorAll('.equipmentLine').forEach(b=>b.onclick=()=>{mode=b.dataset.eq; route('equipmentForm');});
+  const manageDocs=document.getElementById('manageDocsBtn'); if(manageDocs) manageDocs.onclick=()=>route('siteDocs');
+  document.querySelectorAll('.docLineMini').forEach(b=>b.onclick=()=>{mode=b.dataset.doc; route('siteDocForm');});
+  const allVisits=document.getElementById('allVisitsBtn'); if(allVisits) allVisits.onclick=()=>route('visits');
+  document.querySelectorAll('.visitMiniButton').forEach(b=>b.onclick=()=>{mode=b.dataset.visit; route('visitDetail');});
 }
-
-
 
 function docTitle(d){ return [d.type,d.title].filter(Boolean).join(" • ") || "Document / Link"; }
 function docMeta(d){
@@ -2049,7 +2102,7 @@ function settingsTabs(){
     ["email","Email","Default recipients, subject template, signature template, and tag tools."],
     ["overlay","Photo Overlay","Photo stamp alignment, size, accent color, and logo visibility."],
     ["themes","Theme","Theme presets, accent color, 3D controls, text size, and haptics."],
-    ["visibility","Simple View","App mode and feature visibility for a cleaner default screen."],
+    ["visibility","Modules","Enable or disable FireVault modules for a cleaner field interface."],
     ["advanced","Advanced","Optional future modules marked with an asterisk when services are required."],
     ["backup","Backup","Export, import, data safety snapshot, restore tools, and danger zone."],
     ["about","About","Build information, storage key, and FireVault roadmap notes."]
@@ -2227,7 +2280,7 @@ function settingsPanel(){
   if(settingsTab==="overlay") return `<div class="settingsStack"><div class="card settingGroup compactPane"><div class="paneHead"><h2>Photo Overlay</h2><button class="primary saveMini" id="saveSettings">Save</button></div><p class="paneNote">Preview and format the field photo stamp.</p><div class="previewPanel compactPreview"><div class="previewOverlay ${o.alignment==="top"?"top":""}">FIREVAULT • Site • Date • Time</div></div><div class="settingsGrid">${fieldBlock("Alignment",`<select id="ovAlign"><option ${o.alignment==="bottom"?"selected":""}>bottom</option><option ${o.alignment==="top"?"selected":""}>top</option></select>`)}${fieldBlock("Font Size",`<select id="ovSize"><option ${o.fontSize==="small"?"selected":""}>small</option><option ${o.fontSize==="medium"?"selected":""}>medium</option><option ${o.fontSize==="large"?"selected":""}>large</option></select>`)}${fieldBlock("Accent Color",`<input id="ovAccent" type="color" value="${esc(o.accentColor)}">`)}</div><div class="settingsList">${checkBlock("ovLogo","Show FireVault logo on overlay",o.showLogo)}</div></div></div>`;
   if(settingsTab==="gps") return `<div class="settingsStack"><div class="card settingGroup compactPane gpsSettingsPane"><div class="paneHead"><h2>GPS / Maps</h2><button class="primary saveMini" id="saveSettings">Save</button></div><p class="paneNote">Restored GPS tools. Coordinates are saved locally inside each site record.</p><div class="settingsGrid">${fieldBlock("Default Map",`<select id="gpsMapProvider"><option value="apple" ${gps.mapProvider!=="google"?"selected":""}>Apple Maps</option><option value="google" ${gps.mapProvider==="google"?"selected":""}>Google Maps</option></select>`)}${fieldBlock("GPS Accuracy",`<select id="gpsHighAccuracy"><option value="true" ${gps.highAccuracy!==false?"selected":""}>High accuracy</option><option value="false" ${gps.highAccuracy===false?"selected":""}>Standard</option></select>`)}${fieldBlock("Nearby Radius",`<input id="gpsNearbyRadius" inputmode="decimal" value="${esc(gps.nearbyRadiusMiles||1)}">`,`Miles for Nearby Sites detection`)}</div><div class="settingsList">${checkBlock("gpsEnabled","Show GPS capture buttons on site pages",gps.enabled!==false)}${checkBlock("gpsReports","Include GPS coordinates in reports",gps.includeInReports!==false)}</div><p class="fieldNote">Browser GPS works only when allowed by the phone/browser and served from HTTPS.</p></div></div>`;
   if(settingsTab==="themes") return `<div class="settingsStack"><div class="card settingGroup compactPane"><div class="paneHead"><h2>Theme Engine</h2><button class="primary saveMini" id="saveSettings">Apply</button></div><p class="paneNote">Quick presets and live UI controls.</p><div class="presetGrid">${Object.entries(themePresets).map(([key,p])=>`<button class="ghost presetBtn" data-preset="${key}"><span class="themeSwatch" style="background:${p.accentColor}"></span><span>${p.label}</span></button>`).join("")}</div><div class="settingsGrid">${fieldBlock("Theme",`<select id="themeName">${Object.entries(themePresets).map(([key,p])=>`<option value="${key}" ${t.name===key?"selected":""}>${p.label}</option>`).join("")}</select>`)}${fieldBlock("Accent Color",`<input id="themeAccent" type="color" value="${esc(t.accentColor||"#ef4444")}">`)}${fieldBlock("Buttons",`<select id="buttonStyle"><option value="rounded" ${t.buttonStyle!=="squared"?"selected":""}>rounded</option><option value="squared" ${t.buttonStyle==="squared"?"selected":""}>squared</option></select>`)}${fieldBlock("Cards",`<select id="cardStyle"><option value="glass" ${t.cardStyle!=="solid"?"selected":""}>glass</option><option value="solid" ${t.cardStyle==="solid"?"selected":""}>solid</option></select>`)}</div><div class="settingsList">${checkBlock("themeHighContrast","High contrast support",t.highContrast)}${checkBlock("themeLargeText","Larger text",t.largeText)}${checkBlock("themeCompact","Compact layout",t.compactLayout)}${checkBlock("themeHaptics","Haptic button feedback",s.app?.haptics!==false)}</div></div></div>`;
-  if(settingsTab==="visibility") { const mode=appMode(); const v=visibility(); return `<div class="settingsStack simpleSettings472"><div class="card settingGroup compactPane simpleHero472"><div class="paneHead"><div><h2>Simple View / Feature Visibility</h2><p class="paneNote">Keep FireVault feature-rich, but only show the tools you need day-to-day.</p></div><button class="primary saveMini" id="saveSettings">Save</button></div><div class="settingsGrid">${fieldBlock("App Mode",`<select id="viewMode"><option value="simple" ${mode==="simple"?"selected":""}>Simple View</option><option value="advanced" ${mode==="advanced"?"selected":""}>Advanced View</option><option value="power" ${mode==="power"?"selected":""}>Technician Power Mode</option></select>`,`Simple hides nonessential tools. Advanced shows most modules. Power shows everything.`)}</div><div class="viewModeQuick472"><button class="ghost" data-view-mode="simple">Simple</button><button class="ghost" data-view-mode="advanced">Advanced</button><button class="ghost" data-view-mode="power">Power</button></div></div>${visibilityPresetCards474()}<div class="card settingGroup compactPane"><div class="paneHead"><h2>Visible Features</h2></div><p class="paneNote">These toggles mainly affect Simple View. Advanced View shows most modules unless switched off. Power Mode ignores these and shows everything.</p><div class="settingsList featureList472">${FEATURE_LABELS.map(([key,label,note])=>`<label class="checkRow featureCheck472"><input type="checkbox" id="vis_${key}" ${v[key]?"checked":""}><span><strong>${esc(label)}</strong><small>${esc(note)}</small></span></label>`).join("")}</div></div></div>`; }
+  if(settingsTab==="visibility") { const mode=appMode(); const v=visibility(); return `<div class="settingsStack simpleSettings472"><div class="card settingGroup compactPane simpleHero472"><div class="paneHead"><div><h2>Modules / Simple View</h2><p class="paneNote">Turn major FireVault modules on or off. Disabled modules disappear from the interface until you enable them again here.</p></div><button class="primary saveMini" id="saveSettings">Save</button></div><div class="settingsGrid">${fieldBlock("App Mode",`<select id="viewMode"><option value="simple" ${mode==="simple"?"selected":""}>Simple View</option><option value="advanced" ${mode==="advanced"?"selected":""}>Advanced View</option><option value="power" ${mode==="power"?"selected":""}>Technician Power Mode</option></select>`,`Simple keeps the field interface clean. Advanced shows enabled modules. Power shows everything.`)}</div><div class="viewModeQuick472"><button class="ghost" data-view-mode="simple">Simple</button><button class="ghost" data-view-mode="advanced">Advanced</button><button class="ghost" data-view-mode="power">Power</button></div></div>${visibilityPresetCards474()}<div class="card settingGroup compactPane"><div class="paneHead"><h2>Modules</h2></div><p class="paneNote">Turn off anything you do not need. Disabled modules are removed from the dashboard, site screens, bottom tabs, and tool menus until enabled again.</p><div class="settingsList featureList472">${FEATURE_LABELS.map(([key,label,note])=>`<label class="checkRow featureCheck472"><input type="checkbox" id="vis_${key}" ${v[key]?"checked":""}><span><strong>${esc(label)}</strong><small>${esc(note)}</small></span></label>`).join("")}</div></div></div>`; }
   if(settingsTab==="advanced") return `<div class="settingsStack"><div class="card settingGroup compactPane"><div class="paneHead"><h2>Advanced Features</h2><button class="primary saveMini" id="saveSettings">Save</button></div><p class="paneNote"><span class="featureStar">*</span> Requires outside services, permissions, APIs, or future backend modules.</p><div class="settingsList twoCol">${[["advAi","aiTechnician","AI Technician"],["advReverse","reverseAddressLookup","Reverse Address Lookup *"],["advCloud","cloudBackup","Cloud Backup *"],["advVoice","voiceTranscription","Voice Transcription *"],["advOcr","ocrReader","OCR Reader *"],["advEmail","emailGateway","Email Gateway *"],["advWeather","weather","Weather Context *"],["advTraffic","traffic","Traffic / Routing *"]].map(x=>checkBlock(x[0],x[2],a[x[1]])).join("")}</div></div></div>`;
   if(settingsTab==="backup") return backupSettingsPanel();
   return `<div class="settingsStack"><div class="card settingGroup compactPane"><div class="paneHead"><h2>About FireVault</h2></div><p class="paneNote">A modular field knowledge system for fire alarm technicians.</p><div class="aboutGrid"><div><strong>Build</strong><span>${BUILD}</span></div><div><strong>Storage key</strong><span>${KEY}</span></div><div><strong>Roadmap lane</strong><span>Modular foundation, settings polish, iPhone PWA, deeper service-call modules.</span></div></div></div></div>`;
@@ -2412,11 +2465,11 @@ function diagnostics(){
 }
 function showChangelog(){
   const notes = [
-    "Removed the dashboard Stability Checkpoint section for a cleaner Simple View.",
-    "Made the top Build revision button glow green as the app health indicator.",
-    "The Build button still opens release notes when tapped.",
-    "Kept App Health and repair details available inside Diagnostics.",
-    "Preserved Quick View Presets, Feature Visibility, and Daily Route tools."
+    "Redesigned the home screen around customer account search.",
+    "Added prominent Nearby Accounts on the dashboard for GPS-aware site work.",
+    "Added Recent Accounts for quick access to recently used customers.",
+    "Renamed Simple View settings to Settings → Modules with clearer enable/disable controls.",
+    "Simplified the customer screen so common field information is visible first and enabled modules appear only when turned on."
   ];
   const overlay=document.createElement("div");
   overlay.className="releaseOverlay";

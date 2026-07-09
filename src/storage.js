@@ -27,25 +27,9 @@ export function normalize(data){
   data.settings.app = data.settings.app || {defaultScreen:"home", distanceUnit:"feet", theme:"dark", confirmDeletes:true, autoBackupReminder:true, compactMode:false, largeText:false, haptics:true, viewMode:"simple"};
   data.settings.app.haptics = data.settings.app.haptics !== false;
   data.settings.app.viewMode = data.settings.app.viewMode || "simple";
-  const featureDefaults = {dailyRoute:true, library:false, reports:false, equipment:false, diagnostics:false, advancedGps:false, attention:false, routeReview:false, csvExports:false, backupRepair:false};
+  const featureDefaults = {dailyRoute:true, library:false, reports:false, equipment:false, diagnostics:false, advancedGps:true, attention:false, routeReview:false, csvExports:false, backupRepair:false};
   data.settings.visibility = {...featureDefaults, ...(data.settings.visibility || {})};
   data.settings.theme = data.settings.theme || {name:"firevault-dark", accentColor:"#ef4444", highContrast:false, largeText:false, compactLayout:false, buttonStyle:"rounded", cardStyle:"glass"};
-  data.settings.modules = data.settings.modules || {
-    visits:true,
-    photos:true,
-    notes:true,
-    tasks:true,
-    deficiencies:true,
-    reports:true,
-    library:true,
-    gpsNearby:true,
-    breadcrumbs:false,
-    jobMode:true,
-    aiTechnician:false,
-    importExport:true,
-    diagnostics:false
-  };
-
   data.settings.advanced = data.settings.advanced || {aiTechnician:false, reverseAddressLookup:false, cloudBackup:false, voiceTranscription:false, ocrReader:false, emailGateway:false, weather:false, traffic:false};
   data.settings.gps = {enabled:true, mapProvider:"apple", highAccuracy:true, includeInReports:true, nearbyRadiusMiles:1, ...(data.settings.gps || {})};
   data.sites.forEach(ensureSite);
