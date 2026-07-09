@@ -8,7 +8,7 @@
   "orientation": "any",
   "background_color": "#0b0d10",
   "theme_color": "#101216",
-  "description": "Field knowledge system for fire alarm technicians. Build 0.50.16 adds Photo Vault filter tabs and document/photo workflow polish while preserving splash timing and iPad autosizing.",
+  "description": "Field knowledge system for fire alarm technicians. Build 0.50.17 adds Photo Vault filter tabs and document/photo workflow polish while preserving splash timing and iPad autosizing.",
   "icons": [
     {
       "src": "assets/icon-192.png",

@@ -9,14 +9,14 @@
   <meta name="apple-mobile-web-app-title" content="FireVault" />
   <title>FireVault</title>
   <link rel="manifest" href="manifest.json" />
-  <link rel="apple-touch-icon" href="assets/apple-touch-icon.png?v=0.50.16" />
-  <link rel="icon" type="image/png" href="assets/favicon.png?v=0.50.16" />
-  <link rel="stylesheet" href="src/styles.css?v=0.50.16" />
+  <link rel="apple-touch-icon" href="assets/apple-touch-icon.png?v=0.50.17" />
+  <link rel="icon" type="image/png" href="assets/favicon.png?v=0.50.17" />
+  <link rel="stylesheet" href="src/styles.css?v=0.50.17" />
 </head>
 <body>
   <header>
-    <div class="brand"><img class="brandMark" src="assets/favicon.png?v=0.50.16" alt=""><div><div>FIREVAULT</div><small>Field Vault System</small></div></div>
-    <button class="build" id="buildButton">0.50.16</button>
+    <div class="brand"><img class="brandMark" src="assets/favicon.png?v=0.50.17" alt=""><div><div>FIREVAULT</div><small>Field Vault System</small></div></div>
+    <button class="build" id="buildButton">0.50.17</button>
   </header>
 
   <main id="app">
@@ -24,14 +24,14 @@
       <div class="splashAura492"></div>
       <div class="splashOrb457 splashOrb492">
         <span class="splashRing492"></span>
-        <img src="assets/favicon.png?v=0.50.16" alt="FireVault">
+        <img src="assets/favicon.png?v=0.50.17" alt="FireVault">
       </div>
       <div class="splashText457 splashText492">
         <h1>FireVault</h1>
         <p>Site notes ready</p>
       </div>
       <div class="splashMeter457 splashMeter492"><span></span></div>
-      <small class="splashBuild492">0.50.16</small>
+      <small class="splashBuild492">0.50.17</small>
     </div>
   </main>
 
@@ -46,7 +46,7 @@
   <script>
     window.__FIREVAULT_BOOTED = false;
     window.__FIREVAULT_SPLASH_STARTED = Date.now();
-    window.__FIREVAULT_MIN_SPLASH_MS = 1350;
+    window.__FIREVAULT_MIN_SPLASH_MS = 5000;
     window.addEventListener('error', function(e){ window.__FIREVAULT_LAST_ERROR = e.message || String(e.error || e); });
     window.addEventListener('unhandledrejection', function(e){ window.__FIREVAULT_LAST_ERROR = String(e.reason || e); });
     setTimeout(function(){
@@ -57,6 +57,6 @@
       }
     }, 3500);
   </script>
-  <script type="module" src="src/app.js?v=0.50.16"></script>
+  <script type="module" src="src/app.js?v=0.50.17"></script>
 </body>
 </html>

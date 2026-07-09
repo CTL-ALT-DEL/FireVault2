@@ -3535,10 +3535,10 @@ function diagnostics(){
 }
 function showChangelog(){
   const notes = [
-    "Advanced to Build 0.50.16 from the Build 0.50.15 splash timing baseline.",
+    "Advanced to Build 0.50.17 from the Build 0.50.16 baseline.",
     "Added Photo Vault filter tabs for All, Photos, Links, and Docs so large site vaults are easier to scan.",
     "Added a quick Original download action directly from saved photo records in the Documents / Photos list.",
-    "Preserved Preview Overlay, Download With Overlay, custom overlay logo support, and the controlled splash-screen timing.",
+    "Preserved custom overlay logo support and the startup watchdog.",
     "Kept Photo Overlay settings, Daily Report / Site Notes workflow, iPad autosizing, simple Home screen, Search Bar Concept #6, and excluded job-status workflow controls."
   ];  const overlay=document.createElement("div");
   overlay.className="releaseOverlay";
@@ -3557,6 +3557,6 @@ function bootFireVault515(){
   window.__FIREVAULT_BOOTED = true;
 }
 const splashStarted515 = Number(window.__FIREVAULT_SPLASH_STARTED || Date.now());
-const minSplashMs515 = Number(window.__FIREVAULT_MIN_SPLASH_MS || 1350);
+const minSplashMs515 = Number(window.__FIREVAULT_MIN_SPLASH_MS || 5000);
 const elapsedSplashMs515 = Date.now() - splashStarted515;
 setTimeout(bootFireVault515, Math.max(0, minSplashMs515 - elapsedSplashMs515));

@@ -1,6 +1,6 @@
-# Clean Install Notes — FireVault Build 0.50.16
+# Clean Install Notes — FireVault Build 0.50.17
 
-This ZIP is intended to be used as the new clean baseline for FireVault Build 0.50.16.
+This ZIP is intended to be used as the new clean baseline for FireVault Build 0.50.17.
 
 ## Install
 
@@ -12,7 +12,7 @@ This ZIP is intended to be used as the new clean baseline for FireVault Build 0.
 
 ## Build focus
 
-Build 0.50.16 keeps the 0.50.15 splash timing polish and improves the Documents / Photos workflow:
+Build 0.50.17 keeps the 0.50.15 splash timing polish and improves the Documents / Photos workflow:
 
 - Adds Photo Vault filter tabs for All, Photos, Links, and Docs.
 - Adds visible record counts to each filter.
