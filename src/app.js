@@ -1153,10 +1153,7 @@ function todayNoteRows500(){
   const rows=[];
   (data.sites||[]).forEach(s=>{
     ensureSite(s);
-    const notes=(s.notes||[]).filter(n=>{
-      const d=(n.at||n.createdAt||n.date||"").slice(0,10);
-      return d===today;
-    });
+    const notes=todaySiteNoteEntries506(s,today);
     if(notes.length) rows.push({s,notes});
   });
   return rows.sort((a,b)=>String(a.s.name||"").localeCompare(String(b.s.name||"")));
@@ -1186,6 +1183,62 @@ function todayAccountsMarkup500(){
   const rows=todayAccounts500();
   if(!rows.length) return `<div class="empty todayAccountsEmpty500">No account activity yet today.</div>`;
   return rows.map(({s,reason})=>`<button class="todayAccountRow500" data-home-site="${esc(s.id)}"><span>${esc((s.name||"?").slice(0,1).toUpperCase())}</span><div><strong>${esc(s.name||"Unnamed Account")}</strong><small>${esc(fullAddress(s)||"No address saved")}</small></div><em>${esc(reason)}</em></button>`).join("");
+}
+
+function legacyNoteBlocks506(s){
+  return String(s?.notes || "").split(/\n\s*\n/).map(n=>n.trim()).filter(Boolean);
+}
+function parseLegacyNoteBlock506(block, index=0, fallbackAt=""){
+  const match=String(block||"").match(/^\[([^\]]+)\]\s*([\s\S]*)$/);
+  return {
+    id:`legacy-${index}`,
+    at:index===0 ? fallbackAt : "",
+    label:match ? match[1] : (fallbackAt ? new Date(fallbackAt).toLocaleString([], {month:"short",day:"numeric",hour:"numeric",minute:"2-digit"}) : "Saved note"),
+    text:(match ? match[2] : block || "Note saved.").trim()
+  };
+}
+function siteNoteEntries506(s){
+  ensureSite(s);
+  const entries=Array.isArray(s.noteEntries) ? s.noteEntries.filter(n=>String(n?.text||"").trim()).map(n=>({
+    id:n.id || uid(),
+    at:n.at || n.createdAt || n.date || "",
+    label:n.at ? new Date(n.at).toLocaleString([], {month:"short",day:"numeric",hour:"numeric",minute:"2-digit"}) : "Saved note",
+    text:String(n.text||"").trim()
+  })) : [];
+  if(entries.length) return entries.sort((a,b)=>String(b.at||"").localeCompare(String(a.at||"")));
+  return legacyNoteBlocks506(s).map((block,i)=>parseLegacyNoteBlock506(block,i,s.lastNoteAt||""));
+}
+function todaySiteNoteEntries506(s, day=localDateString()){
+  ensureSite(s);
+  const entries=siteNoteEntries506(s).filter(n=>n.at && sameLocalDay499(n.at,day));
+  if(entries.length) return entries;
+  if(sameLocalDay499(s.lastNoteAt,day)) return siteNoteEntries506(s).slice(0,1);
+  return [];
+}
+function siteNotePreview506(s, day=localDateString()){
+  const notes=todaySiteNoteEntries506(s,day);
+  const entry=notes[0] || siteNoteEntries506(s)[0];
+  return entry ? entry.text.replaceAll("\n"," / ") : "Note saved.";
+}
+function noteEntryTimeLabel506(entry){
+  if(entry?.at){
+    try{return new Date(entry.at).toLocaleTimeString([], {hour:"numeric",minute:"2-digit"});}catch{}
+  }
+  return entry?.label || "Saved note";
+}
+function siteNotesCopyText506(s){
+  const notes=siteNoteEntries506(s);
+  const body=notes.length ? notes.map(n=>`[${n.label || noteEntryTimeLabel506(n)}] ${n.text}`).join("\n\n") : "No notes entered.";
+  return `${s.name||"Site"}\n${fullAddress(s)||""}\n\nSITE NOTES\n\n${body}`.trim();
+}
+function setSiteNoteDraft506(prefix=""){
+  const target=document.getElementById("siteNoteText");
+  if(!target) return;
+  const current=target.value.trim();
+  if(prefix && !current) target.value=prefix;
+  else if(prefix && current && !current.endsWith(prefix.trim())) target.value=`${current}\n${prefix}`;
+  target.focus({preventScroll:false});
+  try{ target.setSelectionRange(target.value.length,target.value.length); }catch{}
 }
 
 
@@ -1325,19 +1378,22 @@ function todayRouteLogs499(){
 }
 function dailySummaryStats499(){
   const day=localDateString();
-  const notesSites=(data.sites||[]).filter(s=>sameLocalDay499(s.lastNoteAt,day));
+  const noteRows=(data.sites||[]).map(s=>({s,notes:todaySiteNoteEntries506(s,day)})).filter(r=>r.notes.length);
+  const notesSites=noteRows.map(r=>r.s);
+  const noteCount=noteRows.reduce((n,r)=>n+r.notes.length,0);
   const openTasks=allTaskRows().filter(r=>!taskIsDone(r.t));
   const tasksToday=allTaskRows().filter(r=>sameLocalDay499(r.t.createdAt,day));
   const defsToday=(data.sites||[]).flatMap(s=>(s.deficiencies||[]).map(d=>({s,d}))).filter(r=>sameLocalDay499(r.d.createdAt,day));
   const routes=todayRouteLogs499();
   const routePoints=routes.reduce((n,r)=>n+(r.events||[]).length,0);
   const routeSites=[...new Set(routes.flatMap(r=>(r.events||[]).map(e=>e.siteName).filter(Boolean)))];
-  return {day,notesSites,openTasks,tasksToday,defsToday,routes,routePoints,routeSites};
+  return {day,noteRows,noteCount,notesSites,openTasks,tasksToday,defsToday,routes,routePoints,routeSites};
 }
 function dailySummaryLine499(){
   const st=dailySummaryStats499();
   const parts=[];
-  parts.push(`${st.notesSites.length} note site${st.notesSites.length===1?"":"s"}`);
+  parts.push(`${st.noteCount} site note${st.noteCount===1?"":"s"}`);
+  if(st.notesSites.length) parts.push(`${st.notesSites.length} site${st.notesSites.length===1?"":"s"}`);
   if(st.routePoints) parts.push(`${st.routePoints} route point${st.routePoints===1?"":"s"}`);
   if(st.tasksToday.length) parts.push(`${st.tasksToday.length} new task${st.tasksToday.length===1?"":"s"}`);
   if(st.defsToday.length) parts.push(`${st.defsToday.length} deficienc${st.defsToday.length===1?"y":"ies"}`);
@@ -1347,15 +1403,23 @@ function dailySummaryText499(){
   const st=dailySummaryStats499();
   const date=new Date().toLocaleDateString([], {weekday:"long",month:"long",day:"numeric",year:"numeric"});
   const lines=[
-    `FIREVAULT DAILY SUMMARY`,
+    `FIREVAULT DAILY REPORT`,
     `Date: ${date}`,
     ``,
-    `SITE NOTES TODAY (${st.notesSites.length})`
+    `DAY SNAPSHOT`,
+    `- Site notes: ${st.noteCount}`,
+    `- Sites with notes: ${st.notesSites.length}`,
+    `- Route points: ${st.routePoints}`,
+    `- New tasks: ${st.tasksToday.length}`,
+    `- Deficiencies added: ${st.defsToday.length}`,
+    ``,
+    `SITE NOTES TODAY (${st.noteCount})`
   ];
-  if(st.notesSites.length){
-    st.notesSites.forEach(s=>{
-      const first=(s.notes||"").split("\n\n").filter(Boolean)[0]||"Note saved.";
-      lines.push(`- ${s.name||"Unnamed Site"}: ${first.replaceAll("\n"," / ")}`);
+  if(st.noteRows.length){
+    st.noteRows.forEach(({s,notes})=>{
+      lines.push(`- ${s.name||"Unnamed Site"} (${notes.length} note${notes.length===1?"":"s"})`);
+      notes.slice(0,4).forEach(n=>lines.push(`  • ${noteEntryTimeLabel506(n)} - ${n.text.replaceAll("\n"," / ")}`));
+      if(notes.length>4) lines.push(`  • +${notes.length-4} more note${notes.length-4===1?"":"s"}`);
     });
   }else lines.push(`- No site notes saved today.`);
   lines.push(``, `ROUTE ACTIVITY`);
@@ -1386,14 +1450,15 @@ function dailyCustomerSummaryText505(){
     `Date: ${date}`,
     ``,
     `Sites with notes: ${st.notesSites.length}`,
+    `Site notes: ${st.noteCount}`,
     `Route points: ${st.routePoints}`,
     `New deficiencies: ${st.defsToday.length}`,
     ``
   ];
-  if(st.notesSites.length){
+  if(st.noteRows.length){
     lines.push(`SITE NOTES`);
-    st.notesSites.forEach(s=>{
-      const first=(s.notes||"").split("\n\n").filter(Boolean)[0]||"Note saved.";
+    st.noteRows.forEach(({s,notes})=>{
+      const first=notes[0]?.text || "Note saved.";
       lines.push(`- ${s.name||"Unnamed Site"}: ${first.replaceAll("\n"," / ")}`);
     });
     lines.push(``);
@@ -1415,11 +1480,11 @@ function downloadDailySummary505(){
   const blob=new Blob([dailySummaryText499()],{type:"text/plain;charset=utf-8"});
   const a=document.createElement("a");
   a.href=URL.createObjectURL(blob);
-  a.download=`firevault-daily-summary-${localDateString()}.txt`;
+  a.download=`firevault-daily-report-${localDateString()}.txt`;
   document.body.appendChild(a);
   a.click();
   setTimeout(()=>{ URL.revokeObjectURL(a.href); a.remove(); },500);
-  toast("Daily summary TXT downloaded.");
+  toast("Daily report TXT downloaded.");
 }
 function dailyReportPreview505(){
   const full=dailySummaryText499();
@@ -1428,32 +1493,35 @@ function dailyReportPreview505(){
 
 function copyDailySummary499(){
   const text=dailySummaryText499();
-  if(navigator.clipboard?.writeText){ navigator.clipboard.writeText(text).then(()=>toast("Daily summary copied."),()=>toast("Clipboard unavailable.")); }
+  if(navigator.clipboard?.writeText){ navigator.clipboard.writeText(text).then(()=>toast("Daily report copied."),()=>toast("Clipboard unavailable.")); }
   else toast("Clipboard unavailable.");
 }
 function dailySummary(){
   const st=dailySummaryStats499();
-  html(`<div class="screen dailySummaryScreen499 dailySummaryScreen505">
+  const followUps=st.tasksToday.length+st.defsToday.length;
+  html(`<div class="screen dailySummaryScreen499 dailySummaryScreen505 dailyReportScreen506">
     <div class="row dailySummaryTop499 dailySummaryTop505"><button class="back ghost" id="backBtn">←</button><div><h1>Daily Report</h1><p>${new Date().toLocaleDateString([], {weekday:"long",month:"long",day:"numeric"})}</p></div></div>
-    <div class="card dailySummaryHero499 dailyReportHero505"><div><strong>${esc(dailySummaryLine499())}</strong><span>End-of-day site notes report</span></div><p>Copy a full internal report, copy a shorter customer-facing summary, or download a TXT file.</p></div>
-    <div class="dailyReportActions505">
+    <div class="card dailySummaryHero499 dailyReportHero505 dailyReportHero506"><div><strong>${esc(dailySummaryLine499())}</strong><span>End-of-day site notes report</span></div><p>Review today’s notes first, then copy an internal report, copy a customer summary, or download TXT.</p></div>
+    <div class="dailyReportActions505 dailyReportActions506">
       <button class="primary" id="copyDailySummaryBtn499">Copy Full Report</button>
       <button class="ghost" id="copyCustomerSummaryBtn505">Customer Copy</button>
       <button class="ghost" id="downloadDailySummaryBtn505">TXT</button>
     </div>
-    <div class="dailySummaryGrid499 dailySummaryGrid505">
+    <div class="dailySummaryGrid499 dailySummaryGrid505 dailySummaryGrid506">
+      <div class="card"><strong>${st.noteCount}</strong><span>Site Notes</span></div>
       <div class="card"><strong>${st.notesSites.length}</strong><span>Note Sites</span></div>
       <div class="card"><strong>${st.routePoints}</strong><span>Route Points</span></div>
-      <div class="card"><strong>${st.openTasks.length}</strong><span>Open Tasks</span></div>
-      <div class="card"><strong>${st.defsToday.length}</strong><span>New Def.</span></div>
+      <div class="card"><strong>${followUps}</strong><span>Follow-Ups</span></div>
+    </div>
+    <div class="card dailyReportReview506">
+      <div class="routeSectionTitle462"><strong>Note Review Queue</strong><span>${st.noteCount}</span></div>
+      ${st.noteRows.length?st.noteRows.map(({s,notes})=>`<button class="dailyNoteReviewRow506" data-summary-site="${esc(s.id)}"><span class="accountInitial476">${esc((s.name||"?").slice(0,1).toUpperCase())}</span><div><strong>${esc(s.name||"Unnamed Site")}</strong><small>${notes.length} note${notes.length===1?"":"s"} today • ${esc(fullAddress(s)||"No address saved")}</small><p>${esc((notes[0]?.text||"Note saved.").replaceAll("\n"," / "))}</p></div><em>Open</em></button>`).join(""):`<div class="empty">No site notes saved today.</div>`}
     </div>
     <div class="card dailyReportPreview505"><div class="routeSectionTitle462"><strong>Report Preview</strong><span>TXT</span></div><pre>${esc(dailyReportPreview505())}</pre></div>
-    <div class="list grow dailySummaryList499 dailySummaryList505">
-      <div class="routeSectionTitle462"><strong>Site Notes Today</strong><span>${st.notesSites.length}</span></div>
-      ${st.notesSites.length?st.notesSites.map(s=>`<button class="card dailySummarySite499 dailySummarySite505" data-summary-site="${esc(s.id)}"><h2>${esc(s.name||"Unnamed Site")}</h2><p>${esc(((s.notes||"").split("\n\n").filter(Boolean)[0]||"Note saved.").replaceAll("\n"," / "))}</p></button>`).join(""):`<div class="empty">No site notes saved today.</div>`}
+    <div class="list grow dailySummaryList499 dailySummaryList505 dailySummaryList506">
       <div class="routeSectionTitle462"><strong>Route Activity</strong><span>${st.routes.length}</span></div>
       ${st.routes.length?st.routes.map(r=>`<div class="card dailySummaryRoute499 dailySummaryRoute505"><h2>${r.endedAt?"Saved Route":"Active Route"}</h2><p>${esc(routeSummaryLine(r))}</p></div>`).join(""):`<div class="empty">No route activity recorded today.</div>`}
-      <div class="routeSectionTitle462"><strong>Tasks / Deficiencies</strong><span>${st.tasksToday.length+st.defsToday.length}</span></div>
+      <div class="routeSectionTitle462"><strong>Tasks / Deficiencies</strong><span>${followUps}</span></div>
       <div class="card dailySummaryText499 dailySummaryText505"><p>Open tasks: ${st.openTasks.length}</p><p>New tasks today: ${st.tasksToday.length}</p><p>Deficiencies added today: ${st.defsToday.length}</p></div>
     </div>
   </div>`);
@@ -1461,7 +1529,7 @@ function dailySummary(){
   document.getElementById("copyDailySummaryBtn499").onclick=copyDailySummary499;
   document.getElementById("copyCustomerSummaryBtn505").onclick=copyCustomerDailySummary505;
   document.getElementById("downloadDailySummaryBtn505").onclick=downloadDailySummary505;
-  document.querySelectorAll("[data-summary-site]").forEach(b=>b.onclick=()=>{selectedSiteId=b.dataset.summarySite; route("siteDetail");});
+  document.querySelectorAll("[data-summary-site]").forEach(b=>b.onclick=()=>{selectedSiteId=b.dataset.summarySite; route("jobMode");});
 }
 
 function routeLog(){
@@ -2414,22 +2482,26 @@ function resourceForm(){
 
 
 function appendSiteNote491(s, text){
-  const stamp=new Date().toLocaleString([], {month:"short",day:"numeric",year:"numeric",hour:"numeric",minute:"2-digit"});
+  ensureSite(s);
+  const now=new Date();
+  const stamp=now.toLocaleString([], {month:"short",day:"numeric",year:"numeric",hour:"numeric",minute:"2-digit"});
   const clean=(text||"").trim();
   if(!clean) return false;
+  const entry={id:uid(), at:now.toISOString(), text:clean};
+  s.noteEntries = Array.isArray(s.noteEntries) ? s.noteEntries : [];
+  s.noteEntries.unshift(entry);
   const line=`[${stamp}] ${clean}`;
   s.notes = s.notes ? `${line}\n\n${s.notes}` : line;
-  s.lastNoteAt=new Date().toISOString();
+  s.lastNoteAt=entry.at;
   save();
   return true;
 }
 function addSiteNotePrompt(defaultText=""){
   const s=site();
   if(!s){ route("sites"); return; }
-  const note=prompt("Add site note", defaultText);
-  if(note===null) return;
-  if(appendSiteNote491(s,note)){ toast("Site note added."); route("siteDetail"); }
-  else toast("No note added.");
+  mode="siteNoteDraft";
+  route("jobMode");
+  setTimeout(()=>setSiteNoteDraft506(defaultText),0);
 }
 function startJob(){ addSiteNotePrompt(); }
 
@@ -2437,34 +2509,46 @@ function jobMode(){
   const s=site();
   if(!s){ route("sites"); return; }
   ensureSite(s);
-  const noteLines=(s.notes||"").split("\n\n").filter(Boolean);
+  const noteEntries=siteNoteEntries506(s);
   const lastNote=s.lastNoteAt ? new Date(s.lastNoteAt).toLocaleString([], {month:"short",day:"numeric",hour:"numeric",minute:"2-digit"}) : "No notes yet";
-  html(`<div class="screen siteNotesScreen491 siteNotesScreen494">
-    <div class="row jobTop490 siteNotesTop494"><button class="back ghost" id="backBtn">←</button><div><h1>Site Notes</h1><p>${esc(s.name||"Customer Account")}</p></div><button class="ghost smallBtn" id="copyNotesBtn494" ${noteLines.length?"":"disabled"}>Copy</button></div>
-    <div class="card jobHero490 idle siteNotesHero491 siteNotesHero494"><div class="jobHeroHead490"><div><strong>Site Notes Only</strong><span>${noteLines.length} note${noteLines.length===1?"":"s"} • Last: ${esc(lastNote)}</span></div></div><p>${esc(fullAddress(s)||"No address entered.")}</p></div>
-    <div class="grid2 jobQuickGrid490 siteNotesActions491 siteNotesActions494">
-      <button class="primary" id="quickNoteBtn">Add Note</button>
-      <button class="ghost" id="custUpdateBtn">Customer Update</button>
-      <button class="ghost" id="partsBtn">Parts Needed</button>
-      <button class="ghost" id="accessBtn494">Access Note</button>
-      <button class="ghost" id="testingBtn494">Testing Note</button>
-      <button class="ghost" id="defJobBtn">Add Deficiency</button>
+  html(`<div class="screen siteNotesScreen491 siteNotesScreen494 siteNotesScreen506">
+    <div class="row jobTop490 siteNotesTop494"><button class="back ghost" id="backBtn">←</button><div><h1>Site Notes</h1><p>${esc(s.name||"Customer Account")}</p></div><button class="ghost smallBtn" id="copyNotesBtn494" ${noteEntries.length?"":"disabled"}>Copy</button></div>
+    <div class="card jobHero490 idle siteNotesHero491 siteNotesHero494 siteNotesHero506"><div class="jobHeroHead490"><div><strong>Site Notes Only</strong><span>${noteEntries.length} note${noteEntries.length===1?"":"s"} • Last: ${esc(lastNote)}</span></div><button class="ghost smallBtn" id="openDailyReport506">Daily Report</button></div><p>${esc(fullAddress(s)||"No address entered.")}</p></div>
+    <div class="card siteNoteComposer506">
+      <div class="siteNoteComposerHead506"><div><h2>Quick Site Note</h2><p>Type once, use templates, then save it into today’s Daily Report.</p></div><button class="primary smallBtn" id="saveSiteNoteBtn506">Save Note</button></div>
+      <textarea id="siteNoteText" placeholder="Add what happened, what you found, customer update, parts needed, or follow-up..." rows="5"></textarea>
+      <div class="grid2 jobQuickGrid490 siteNotesActions491 siteNotesActions494 siteNotesActions506">
+        <button class="ghost" id="quickNoteBtn">New Blank Note</button>
+        <button class="ghost" id="custUpdateBtn">Customer Update</button>
+        <button class="ghost" id="partsBtn">Parts Needed</button>
+        <button class="ghost" id="accessBtn494">Access Note</button>
+        <button class="ghost" id="testingBtn494">Testing Note</button>
+        <button class="ghost" id="defJobBtn">Add Deficiency</button>
+      </div>
+      <div class="noteTemplatePanel503 noteTemplatePanel506"><h2>Templates</h2><p>Tap a template to add clean report wording to the note box.</p>${noteTemplatesMarkup503()}</div>
     </div>
-    <div class="list grow jobTimeline490 siteNotesList491 siteNotesList494">
+    <div class="list grow jobTimeline490 siteNotesList491 siteNotesList494 siteNotesList506">
       <div class="routeSectionTitle462"><strong>Saved Site Notes</strong><span>Newest first</span></div>
-      ${noteLines.length?noteLines.map((n,i)=>`<div class="card jobEvent490 siteNoteItem491 siteNoteItem494"><div class="siteNoteIndex494">${i+1}</div><p>${esc(n)}</p></div>`).join(""):`<div class="empty">No notes yet. Tap Add Note to save the first site note.</div>`}
+      ${noteEntries.length?noteEntries.map((n,i)=>`<div class="card jobEvent490 siteNoteItem491 siteNoteItem494 siteNoteItem506"><div class="siteNoteIndex494">${i+1}</div><div><strong>${esc(n.label || noteEntryTimeLabel506(n))}</strong><p>${esc(n.text)}</p></div></div>`).join(""):`<div class="empty">No notes yet. Type a quick note above and tap Save Note.</div>`}
     </div>
   </div>`);
   document.getElementById("backBtn").onclick=()=>route("siteDetail");
-  document.getElementById("quickNoteBtn").onclick=()=>addSiteNotePrompt();
-  document.getElementById("custUpdateBtn").onclick=()=>addSiteNotePrompt("Customer update: ");
-  document.getElementById("partsBtn").onclick=()=>addSiteNotePrompt("Parts needed: ");
-  document.getElementById("accessBtn494").onclick=()=>addSiteNotePrompt("Access note: ");
-  document.getElementById("testingBtn494").onclick=()=>addSiteNotePrompt("Testing note: ");
+  document.getElementById("openDailyReport506").onclick=()=>route("dailySummary");
+  document.getElementById("quickNoteBtn").onclick=()=>{ const target=document.getElementById("siteNoteText"); if(target) target.value=""; setSiteNoteDraft506(); };
+  document.getElementById("custUpdateBtn").onclick=()=>setSiteNoteDraft506("Customer update: ");
+  document.getElementById("partsBtn").onclick=()=>setSiteNoteDraft506("Parts needed: ");
+  document.getElementById("accessBtn494").onclick=()=>setSiteNoteDraft506("Access note: ");
+  document.getElementById("testingBtn494").onclick=()=>setSiteNoteDraft506("Testing note: ");
   document.getElementById("defJobBtn").onclick=()=>{ mode=null; route("deficiencyForm"); };
+  document.getElementById("saveSiteNoteBtn506").onclick=()=>{
+    const note=val("siteNoteText");
+    if(appendSiteNote491(s,note)){ toast("Site note saved to Daily Report."); route("jobMode"); }
+    else toast("Type a note before saving.");
+  };
+  wireNoteTemplates503("siteNoteText");
   const copy=document.getElementById("copyNotesBtn494");
   if(copy) copy.onclick=()=>{
-    const text=`${s.name||"Site"}\n${fullAddress(s)||""}\n\nSITE NOTES\n\n${s.notes||"No notes entered."}`.trim();
+    const text=siteNotesCopyText506(s);
     if(navigator.clipboard?.writeText){ navigator.clipboard.writeText(text).then(()=>toast("Site notes copied."),()=>toast("Clipboard unavailable.")); }
     else toast("Clipboard unavailable.");
   };
@@ -2842,17 +2926,17 @@ function diagnostics(){
 }
 function showChangelog(){
   const notes = [
-    "Polished Daily Summary into a cleaner Daily Report screen.",
-    "Added Copy Full Report, Customer Copy, and TXT download actions.",
-    "Added a report preview so the end-of-day summary can be checked before copying.",
-    "Kept the Home screen simple with the selected Search Bar Concept #6.",
-    "Preserved Site Notes Templates, Daily Route, Modules, and splash screen."
+    "Advanced to Build 0.50.6 from the uploaded 0.50.5 baseline.",
+    "Added an inline Site Notes composer with Save Note, quick prefixes, and template buttons.",
+    "Improved the Daily Report with a note review queue, note counts, and clearer report text.",
+    "Changed Daily Report TXT downloads to use daily-report filenames.",
+    "Kept the Home screen simple and preserved Search Bar Concept #6."
   ];
   const overlay=document.createElement("div");
   overlay.className="releaseOverlay";
   overlay.innerHTML=`<div class="releaseSheet" role="dialog" aria-modal="true" aria-label="FireVault release notes">
     <div class="releaseHead"><div><strong>FireVault</strong><span>Build ${BUILD}</span></div><button class="ghost iconBtn" id="closeRelease" aria-label="Close release notes">×</button></div>
-    <div class="releaseBody"><h2>Release Notes</h2><p class="releaseIntro">Daily Summary, site notes recap, and end-of-day copy tools.</p><ul>${notes.map(n=>`<li>${esc(n)}</li>`).join("")}</ul></div>
+    <div class="releaseBody"><h2>Release Notes</h2><p class="releaseIntro">Daily Report review queue, inline site-note composer, and end-of-day copy tools.</p><ul>${notes.map(n=>`<li>${esc(n)}</li>`).join("")}</ul></div>
   </div>`;
   document.body.appendChild(overlay);
   const close=()=>overlay.remove();

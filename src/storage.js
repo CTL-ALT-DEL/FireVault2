@@ -1,4 +1,4 @@
-export const BUILD = "0.50.5";
+export const BUILD = "0.50.6";
 export const KEY = "firevault_vault_build_030";
 export const ACTIVE_JOB_KEY = "firevault_active_job_modular";
 
@@ -46,6 +46,7 @@ export function ensureSite(s){
   s.deficiencies = Array.isArray(s.deficiencies) ? s.deficiencies : [];
   s.tasks = Array.isArray(s.tasks) ? s.tasks : [];
   s.reportDeliveries = Array.isArray(s.reportDeliveries) ? s.reportDeliveries : [];
+  s.noteEntries = Array.isArray(s.noteEntries) ? s.noteEntries : [];
   if(s.gps && (!Number.isFinite(Number(s.gps.lat)) || !Number.isFinite(Number(s.gps.lng)))) s.gps = null;
   return s;
 }

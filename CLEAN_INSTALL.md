@@ -1,4 +1,4 @@
-# Clean Install Notes — FireVault Build 0.45.1
+# Clean Install Notes — FireVault Build 0.50.6
 
 Use this ZIP as a clean root package. Do not copy the outer `firevault-build-*` folder into your repository.
 
