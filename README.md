@@ -1,18 +1,18 @@
-# FireVault Build 0.48.1
+# FireVault Build 0.48.2
 
-Build 0.48.1 is an Apple-inspired Home refinement build.
+Build 0.48.2 is an Apple-inspired Home screen fit and full-screen helper polish build.
 
 ## What changed
 
-- Visible app version advanced to 0.48.1.
-- Kept the Concept #2 Apple-inspired proportions instead of squishing the layout.
-- Replaced the awkward top-right Home icon with a small green glowing Build pill.
-- Improved phone-width Home screen centering and spacing.
-- Added safer bottom breathing room for Recent Accounts and the floating add button.
-- Preserved customer search, Nearby Accounts, Recent Accounts, Modules, Daily Route, and all 0.48.0 features.
+- Visible app version advanced to 0.48.2.
+- Added a small Safari/Home Screen helper so it is clearer why the browser bars appear on iPhone.
+- Added one-tap instructions for opening FireVault from the iPhone Home Screen for the clean full-screen view.
+- Improved Home screen safe-area spacing without squishing the Concept #2 layout.
+- Added more breathing room for Recent Accounts and the floating add button.
+- Preserved the Apple-inspired customer search, Nearby Accounts, Recent Accounts, Modules, Daily Route, and green Build revision indicator.
 
 Suggested commit message:
 
 ```text
-Build 0.48.1 apple home refinement green build pill
+Build 0.48.2 apple home full screen fit helper
 ```

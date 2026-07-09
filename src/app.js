@@ -17,6 +17,7 @@ let libraryFolder = "all";
 let routeReviewId = "";
 let routeHistorySearch = "";
 let simpleToolsOpen = false;
+let homeInstallTipHidden = localStorage.getItem("firevault_home_install_tip_hidden") === "1";
 let jobTimer = null;
 const QUICK_EVENTS = ["Arrived on site","Opened panel","Panel normal","Trouble active","Ground fault active","Device tested","Customer update","Parts needed"];
 const DEFAULT_CHECKLIST = [
@@ -1113,6 +1114,15 @@ function moduleStatus476(){
   const visible=FEATURE_LABELS.filter(([k])=>featureOn(k)).length;
   return `${visible} module${visible===1?'':'s'} visible`;
 }
+
+function isHomeScreenMode482(){
+  return window.matchMedia?.("(display-mode: standalone)")?.matches || window.navigator.standalone === true;
+}
+function homeInstallTip482(){
+  if(isHomeScreenMode482() || homeInstallTipHidden) return "";
+  return `<div class="homeInstallTip482"><div><strong>Full-screen mode</strong><span>Open FireVault from your iPhone Home Screen to remove Safari bars.</span></div><button class="ghost smallBtn" id="homeInstallHow482">How</button><button class="ghost smallBtn" id="homeInstallHide482">Hide</button></div>`;
+}
+
 function home(){
   const taskRows = allTaskRows();
   const taskCounts = taskFilterCounts(taskRows);
@@ -1130,6 +1140,8 @@ function home(){
       <div class="brand478"><img src="assets/favicon.png?v=${BUILD}" alt="FireVault"><strong>FIREVAULT</strong></div>
       <button class="homeBuildPill481" id="homeBell478" aria-label="Release notes"><span></span>Build ${BUILD}</button>
     </div>
+
+    ${homeInstallTip482()}
 
     <div class="todayBlock478">
       <div class="todayRouteWrap478">${activeRoute?`<span class="${activeRoute.paused?"routeLed470 routeLedPaused470":"routeLed463"}" aria-label="${activeRoute.paused?"Daily route paused":"Daily route recording"}"></span>`:""}<div><h1>Today</h1><p>${esc(dateLine)}</p></div></div>
@@ -1172,6 +1184,8 @@ function home(){
   const checkNearby=document.getElementById('checkNearbyHomeBtn476'); if(checkNearby) checkNearby.onclick=checkNearbyHome476;
   document.getElementById('modulesTopBtn476').onclick=()=>{settingsTab='visibility'; mode='settingsDetail'; route('settings');};
   const bell=document.getElementById('homeBell478'); if(bell) bell.onclick=showChangelog;
+  const installHow=document.getElementById('homeInstallHow482'); if(installHow) installHow.onclick=()=>alert('To get the clean full-screen FireVault view on iPhone: tap Share, choose Add to Home Screen, then open FireVault from the new Home Screen icon.');
+  const installHide=document.getElementById('homeInstallHide482'); if(installHide) installHide.onclick=()=>{homeInstallTipHidden=true; localStorage.setItem('firevault_home_install_tip_hidden','1'); home();};
   document.getElementById('manageModulesBtn476').onclick=()=>{settingsTab='visibility'; mode='settingsDetail'; route('settings');};
   const allAccounts=document.getElementById('allAccountsBtn478'); if(allAccounts) allAccounts.onclick=()=>route('sites');
   const visitsCard=document.getElementById('visitsCard478'); if(visitsCard) visitsCard.onclick=()=>{selectedSiteId=null; route('sites');};
@@ -2536,11 +2550,11 @@ function diagnostics(){
 }
 function showChangelog(){
   const notes = [
-    "Refined the Apple-inspired home screen without squishing the layout.",
-    "Replaced the awkward top-right icon with a small green glowing Build pill.",
-    "Improved phone-width home screen centering and spacing.",
-    "Added safer bottom breathing room so Recent Accounts and the floating add button do not fight each other.",
-    "Preserved customer search, Nearby Accounts, Recent Accounts, Modules, and Daily Route tools."
+    "Added a small full-screen Home Screen mode helper for Safari users.",
+    "Improved Apple-inspired Home spacing without squishing the layout.",
+    "Added extra safe-area breathing room for the floating add button and Recent Accounts.",
+    "Kept the Concept #2 style with customer search, Nearby Accounts, and Recent Accounts.",
+    "Preserved Modules, Daily Route, customer tools, and the green Build revision indicator."
   ];
   const overlay=document.createElement("div");
   overlay.className="releaseOverlay";
