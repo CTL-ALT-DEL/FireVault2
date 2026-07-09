@@ -1353,8 +1353,9 @@ function home(){
 
     ${homeInstallTip482()}
 
-    <div class="todayBlock478">
+    <div class="todayBlock478 todayBlock551">
       <div class="todayRouteWrap478">${activeRoute?`<span class="${activeRoute.paused?"routeLed470 routeLedPaused470":"routeLed463"}" aria-label="${activeRoute.paused?"Daily route paused":"Daily route recording"}"></span>`:""}<div><h1>Today</h1><p>${esc(dateLine)}</p></div></div>
+      <button class="todayAddSite551" id="addSiteBtn" aria-label="Add Site">＋</button>
     </div>
 
     <div class="appleSearchCard478">
@@ -1401,7 +1402,6 @@ function home(){
 
     <button class="card dailySummaryCard499" id="dailySummaryBtn499"><div><strong>Daily Summary</strong><span>${dailySummaryLine499()}</span></div><em>Open</em></button>
     <div class="homeModuleSummary476 homeModuleSummary478"><button class="ghost" id="manageModulesBtn476"><strong>Modules</strong><span>${esc(moduleStatus476())}</span></button><button class="ghost" id="defCard"><strong>${def}</strong><span>Deficiencies</span></button></div>
-    <button class="floatingAdd478" id="addSiteBtn" aria-label="Add Account">＋</button>
     <div class="buildRevisionSpacer475" aria-hidden="true"></div>
   </div>`);
 
@@ -4098,17 +4098,17 @@ function diagnostics(){
 }
 function showChangelog(){
   const notes = [
-    "Advanced to Build 0.50.50 from the stable 0.50.49 baseline.",
-    "Removed the splash-screen loading bar completely.",
-    "Removed the pulsing ember loader so there is no more unreliable splash animation.",
-    "Lifted the red Home add button above the bottom navigation so it is not blocked by the black bottom area.",
-    "Preserved fixed splash/header behavior, Startup Health diagnostics, the 5-second splash screen, Photo Vault tools, Customer Report Photo workflow, iPad autosizing, simple Home screen, Search Bar Concept #6, and excluded job-status workflow controls."
+    "Advanced to Build 0.50.51 from the stable 0.50.50 baseline.",
+    "Moved the red Add Site button to the top of the Home screen, across from Today and the current date.",
+    "Removed the bottom floating red Add Site button so it can no longer be blocked by the bottom navigation.",
+    "Kept the splash screen loader removed and preserved the clean 5-second splash screen.",
+    "Preserved fixed splash/header behavior, Startup Health diagnostics, Photo Vault tools, Customer Report Photo workflow, iPad autosizing, simple Home screen, Search Bar Concept #6, and excluded job-status workflow controls."
   ];
   const overlay=document.createElement("div");
   overlay.className="releaseOverlay";
   overlay.innerHTML=`<div class="releaseSheet" role="dialog" aria-modal="true" aria-label="FireVault release notes">
     <div class="releaseHead"><div><strong>FireVault</strong><span>Build ${BUILD}</span></div><button class="ghost iconBtn" id="closeRelease" aria-label="Close release notes">×</button></div>
-    <div class="releaseBody"><h2>Release Notes</h2><p class="releaseIntro">Removed the splash loader completely and repaired the Home bottom button clearance.</p><ul>${notes.map(n=>`<li>${esc(n)}</li>`).join("")}</ul></div>
+    <div class="releaseBody"><h2>Release Notes</h2><p class="releaseIntro">Moved the Add Site button to the Today/date row and removed the bottom floating button.</p><ul>${notes.map(n=>`<li>${esc(n)}</li>`).join("")}</ul></div>
   </div>`;
   document.body.appendChild(overlay);
   const close=()=>overlay.remove();
