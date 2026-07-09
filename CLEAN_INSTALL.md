@@ -1,6 +1,6 @@
-# Clean Install Notes — FireVault Build 0.50.46
+# Clean Install Notes — FireVault Build 0.50.47
 
-This ZIP is intended to be used as the new clean baseline for FireVault Build 0.50.46.
+This ZIP is intended to be used as the new clean baseline for FireVault Build 0.50.47.
 
 ## Install
 
@@ -11,7 +11,7 @@ This ZIP is intended to be used as the new clean baseline for FireVault Build 0.
 
 ## Build focus
 
-Build 0.50.46 rebuilds from the stable 0.50.44 baseline after the 0.50.45 EOF issue and fixes the Home layout.
+Build 0.50.47 continues from the stable 0.50.46 baseline and updates the splash loading animation.
 
 ## Notes
 
@@ -21,9 +21,9 @@ Build 0.50.46 rebuilds from the stable 0.50.44 baseline after the 0.50.45 EOF is
 - Keeps Home simple.
 - Does not reintroduce job-status workflow buttons.
 
-## Build 0.50.46 highlights
+## Build 0.50.47 highlights
 
-- Rebuilt from the last working 0.50.44 baseline because 0.50.45 had an EOF startup error.
-- Lifted the floating **Add Account** button above the bottom navigation so it no longer hides behind the black bottom bar.
-- Moved the **Today / current date** block closer to the top of the Home screen.
+- Built from the stable 0.50.46 baseline.
+- Replaced the splash loading bar with a small animated flame that moves right and left.
+- Preserved the 0.50.46 Home layout fixes.
 - Preserved fixed splash/header behavior and the 5-second splash screen.
