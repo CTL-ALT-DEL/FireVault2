@@ -1,23 +1,23 @@
-# Clean Install Notes — FireVault Build 0.50.7
+# Clean Install Notes — FireVault Build 0.50.8
 
-Use this ZIP as a clean root package. Do not copy the outer `firevault-build-*` folder into your repository.
+This ZIP is intended to be used as the new clean baseline for FireVault Build 0.50.8.
 
-## Expected root files
+## Install
 
-```text
-index.html
-manifest.json
-src/
-assets/
-README.md
-CLEAN_INSTALL.md
-.gitignore
-```
+1. Extract the ZIP.
+2. Copy the extracted files into the root of the `FireVault2` repository.
+3. Commit and push to GitHub.
+4. Let GitHub Pages redeploy.
+5. On iPhone or iPad, refresh the PWA. If the old build remains cached, remove the Home Screen icon and add it again.
 
-## Install reminder
+## Build notes
 
-Copy the contents of this ZIP into the GitHub Pages project root, replacing the old files. The app still uses the existing FireVault local storage key, so existing browser data should remain compatible.
+Build 0.50.8 keeps the 0.50.7 iPad autosizing work and adds a safer Daily Report / Site Notes workflow:
 
-## Tablet note
-
-Build 0.50.7 allows portrait and landscape orientation in the PWA manifest and adds responsive layout rules for iPad-sized screens.
+- Site Note drafts autosave per site while typing.
+- Saved Site Notes clear the matching draft automatically.
+- Daily Report shows a Report Ready Check.
+- Daily Report surfaces unsaved Site Note drafts before copying or downloading reports.
+- Home screen remains simple.
+- Search Bar Concept #6 remains unchanged.
+- Job-status workflow buttons remain excluded.
