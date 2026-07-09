@@ -2535,11 +2535,11 @@ function diagnostics(){
 }
 function showChangelog(){
   const notes = [
-    "Shifted the dashboard closer to Home Screen Concept #2 Apple-Inspired.",
-    "Added a dark iOS-style FireVault top bar with compact brand and action icons.",
-    "Made Today/date, search, Nearby Accounts, quick stats, and Recent Accounts follow the #2 card layout.",
-    "Added a floating Add Account button on the home screen.",
-    "Preserved Modules, Nearby Accounts, Recent Accounts, Daily Route, and customer screen simplification."
+    "Repaired the Apple-inspired home screen after 0.47.8 felt too bulky.",
+    "Removed duplicate in-page header clutter from the dashboard.",
+    "Reduced oversized text, cards, search field, stats, and spacing.",
+    "Moved the floating add button so it no longer collides with the bottom menu.",
+    "Added safer bottom spacing so Recent Accounts remains visible above the menu."
   ];
   const overlay=document.createElement("div");
   overlay.className="releaseOverlay";

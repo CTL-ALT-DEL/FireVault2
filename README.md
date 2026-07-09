@@ -1,23 +1,21 @@
-# FireVault Build 0.47.8
+# FireVault Build 0.47.9
 
-Build 0.47.8 applies the selected **Home Screen Concept #2 — Apple-Inspired** dashboard direction.
+Build 0.47.9 is a corrective Apple-inspired home screen cleanup build.
 
 ## What changed
 
-- Visible app version advanced to 0.47.8.
-- Redesigned the home screen closer to concept #2.
-- Added a dark iOS-style dashboard background.
-- Added compact top FireVault brand bar.
-- Made **Today** and the current date feel like the main start point.
-- Redesigned customer search into a rounded Apple-style search pill.
-- Redesigned **Nearby Accounts** as a prominent light card.
-- Added two clean quick-stat cards for recent visits and open tasks.
-- Redesigned **Recent Accounts** into a dark iOS-style list card.
-- Added a floating red **+** button for adding an account.
-- Preserved Modules, Nearby Accounts, Recent Accounts, customer screen simplification, Daily Route, and green Build revision glow.
+- Visible app version advanced to 0.47.9.
+- Cleaned up the 0.47.8 home screen after it became too bulky.
+- Removed the duplicate in-page FireVault header from the dashboard.
+- Reduced oversized text, cards, search field, stats, and spacing.
+- Made Nearby Accounts more compact and easier to read.
+- Made Recent Accounts fit better above the bottom menu.
+- Moved the floating Add button so it no longer sits on top of content or the bottom nav.
+- Added safer bottom scroll spacing for Safari/PWA display.
+- Preserved the Apple-inspired direction, Modules, customer search, Nearby Accounts, Recent Accounts, Daily Route, and green Build revision glow.
 
 Suggested commit message:
 
 ```text
-Build 0.47.8 apple inspired home screen concept two
+Build 0.47.9 apple home cleanup screen fit repair
 ```
