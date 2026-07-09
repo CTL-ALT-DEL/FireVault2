@@ -1,11 +1,11 @@
-# FireVault Build 0.50.48
+# FireVault Build 0.50.49
 
-Build 0.50.48 continues from the stable 0.50.47 baseline and repairs the splash-screen flame loader so the flame actually moves left and right.
+Build 0.50.49 continues from the stable 0.50.48 baseline and removes the unreliable scrolling splash loader, replacing it with a FireVault-style pulsing ember loader.
 
 ## Changes
 
-- Visible app version advanced to 0.50.48.
-- Cache-busting references updated to 0.50.48.
+- Visible app version advanced to 0.50.49.
+- Cache-busting references updated to 0.50.49.
 - Added **Site Quick Actions** card on the account/site screen.
 - Added direct quick actions for:
   - Add Site Note
@@ -31,11 +31,11 @@ Run from the project root:
 node --check src/storage.js
 node --check src/app.js
 python -m json.tool manifest.json > /dev/null
-zip -T firevault-build-0.50.48-modular-root.zip
+zip -T firevault-build-0.50.49-modular-root.zip
 ```
 
 ## Suggested commit message
 
 ```text
-Build 0.50.48 splash flame movement repair
+Build 0.50.49 pulsing ember splash loader
 ```

@@ -8,7 +8,7 @@
   "orientation": "any",
   "background_color": "#0b0d10",
   "theme_color": "#101216",
-  "description": "Field knowledge system for fire alarm technicians. Build 0.50.48 repairs the splash-screen flame loader so the flame actually moves left and right while preserving stable startup, header behavior, and Home layout fixes.",
+  "description": "Field knowledge system for fire alarm technicians. Build 0.50.49 removes the unreliable scrolling splash loader and replaces it with a stable FireVault-style pulsing ember loader while preserving startup, header, and Home layout fixes.",
   "icons": [
     {
       "src": "assets/icon-192.png",
