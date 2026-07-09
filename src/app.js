@@ -2550,17 +2550,17 @@ function diagnostics(){
 }
 function showChangelog(){
   const notes = [
-    "Advanced visible version and cache-busting references updated to 0.48.4.",
-    "Added Home search focus mode so customer search results get the full screen instead of competing with dashboard cards.",
-    "Nearby Accounts, stats, Recent Accounts, Modules, and the floating add button now step out of the way while searching.",
-    "Changed the active search control to Cancel for a clearer return to the dashboard.",
+    "Advanced visible version and cache-busting references updated to 0.48.5.",
+    "Polished Home Search Focus Mode so customer results have more room and cleaner spacing.",
+    "Improved search result cards with stronger tap targets and easier account scanning.",
+    "Added safer bottom spacing while searching so the last result stays above iPhone/Safari controls.",
     "Preserved the Apple-inspired Concept #2 proportions, Modules, Daily Route, and green Build revision indicator."
   ];
   const overlay=document.createElement("div");
   overlay.className="releaseOverlay";
   overlay.innerHTML=`<div class="releaseSheet" role="dialog" aria-modal="true" aria-label="FireVault release notes">
     <div class="releaseHead"><div><strong>FireVault</strong><span>Build ${BUILD}</span></div><button class="ghost iconBtn" id="closeRelease" aria-label="Close release notes">×</button></div>
-    <div class="releaseBody"><h2>Release Notes</h2><p class="releaseIntro">Apple-inspired Home polish, screen fit, and version housekeeping.</p><ul>${notes.map(n=>`<li>${esc(n)}</li>`).join("")}</ul></div>
+    <div class="releaseBody"><h2>Release Notes</h2><p class="releaseIntro">Home Search Focus polish, account result spacing, and version housekeeping.</p><ul>${notes.map(n=>`<li>${esc(n)}</li>`).join("")}</ul></div>
   </div>`;
   document.body.appendChild(overlay);
   const close=()=>overlay.remove();
