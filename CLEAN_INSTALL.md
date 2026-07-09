@@ -1,10 +1,10 @@
-# Clean Install Notes — FireVault Build 0.50.38
+# Clean Install Notes — FireVault Build 0.50.39
 
-This ZIP is intended to be the next clean baseline after the working FireVault Build 0.50.37.
+This ZIP is intended to be the next clean baseline after the working FireVault Build 0.50.38.
 
 ## Important
 
-Build 0.50.38 keeps the stable splash/header repair from 0.50.37 and adds a Report Center customer closeout email copy action.
+Build 0.50.39 keeps the stable splash/header repair and adds a Report Center **Copy Closeout Packet** action.
 
 ## Install
 
@@ -17,7 +17,8 @@ Build 0.50.38 keeps the stable splash/header repair from 0.50.37 and adds a Repo
 
 - Open a site.
 - Open Report Center.
-- Tap **Copy Customer Email** to copy a customer-facing closeout message using the current report/photo selection.
+- Tap **Copy Closeout Packet** to copy a customer-facing email, ready check, and selected photo summary together.
+- Use **Copy Customer Email** when you only want the shorter email text.
 
 ## Preserved startup behavior
 

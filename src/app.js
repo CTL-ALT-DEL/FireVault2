@@ -2059,6 +2059,29 @@ async function copyCustomerCloseoutEmail538(){
   catch{ toast("Clipboard unavailable."); }
 }
 
+function customerCloseoutPacket539(s={}){
+  const stats=reportPhotoSummary527(s);
+  const ready=customerReportPhotoReady530(s);
+  const blocks=[
+    customerCloseoutEmail538(s),
+    "",
+    "---",
+    "CUSTOMER PHOTO READY CHECK",
+    ready.issues.length ? ready.issues.map(x=>`- ${x}`).join("\n") : "- Ready: selected customer photos have captions.",
+    `- Selected photos: ${stats.selected.length}`,
+    `- Captioned photos: ${stats.captioned}`,
+    "",
+    "---",
+    customerPhotoSummary529(s)
+  ];
+  return blocks.join("\n");
+}
+async function copyCustomerCloseoutPacket539(){
+  const s=site(); if(!s) return;
+  try{ await navigator.clipboard.writeText(customerCloseoutPacket539(s)); toast("Customer closeout packet copied."); }
+  catch{ toast("Clipboard unavailable."); }
+}
+
 function defaultCustomerCaption530(d={}){
   const cat=photoCategory524(d)||"Photo";
   const title=d.title||d.imageName||"site photo";
@@ -3099,7 +3122,7 @@ function report(){
   const subject=renderTemplate(data.settings.email.defaultSubject,s);
   html(`<div class="screen reportScreen440 reportScreen447"><div class="row reportTopRow"><button class="back ghost" id="backBtn">←</button><div><h1>Report Center</h1><p>${esc(s.name||"Site")}</p></div></div>
     <div class="card reportHero440 ${stats.h.cls}"><div><strong>${stats.h.score}%</strong><span>Health</span></div><div><strong>${stats.openTasks.length}</strong><span>Open Tasks</span></div><div><strong>${stats.openDef.length}</strong><span>Deficiencies</span></div><div><strong>${stats.equipmentIssues.length}</strong><span>Equip Issues</span></div></div>
-    <div class="reportActionGrid440 reportActionGrid442 reportActionGrid447"><button class="primary" id="shareBtn">Share / Copy</button><button class="ghost" id="emailDraftBtn">Email Draft</button><button class="ghost" id="customerEmailBtn538">Copy Customer Email</button><button class="ghost" id="copyBtn">Copy TXT</button><button class="ghost" id="downloadBtn">Download</button><button class="ghost" id="subjectBtn">Copy Subject</button></div>
+    <div class="reportActionGrid440 reportActionGrid442 reportActionGrid447"><button class="primary" id="shareBtn">Share / Copy</button><button class="ghost" id="emailDraftBtn">Email Draft</button><button class="ghost" id="customerEmailBtn538">Copy Customer Email</button><button class="ghost" id="customerPacketBtn539">Copy Closeout Packet</button><button class="ghost" id="copyBtn">Copy TXT</button><button class="ghost" id="downloadBtn">Download</button><button class="ghost" id="subjectBtn">Copy Subject</button></div>
     <div class="card reportReadyCard reportReadyCard442 reportReadyCard447"><div><h2>Ready to Send</h2><p>${esc(subject || "FireVault Report")}</p><small>${esc((data.settings.email.defaultTo || "No default recipient") + (data.settings.email.cc ? ` • CC ${data.settings.email.cc}` : ""))}</small></div><span class="pill ${stats.h.cls}">${esc(stats.h.label)}</span></div>
     ${reportPhotoSelector526(s)}
     <div class="card reportDeliveryCard442 reportDeliveryCard444 reportDeliveryCard447"><div class="reportDeliveryHead"><div><h2>Delivery Log</h2><p>Tap a delivery item to copy a receipt. Add a follow-up task when a report needs customer confirmation.</p></div><div class="reportDeliveryHeadActions"><button class="ghost smallBtn" id="followReportBtn">Follow-Up</button><button class="ghost smallBtn" id="logSentBtn">Log Sent</button></div></div><div class="reportDeliveryList">${reportDeliveryHtml(s)}</div></div>
@@ -3118,6 +3141,7 @@ function report(){
   document.getElementById("shareBtn").onclick=async()=>{ if(await shareReportText(s,txt)){ logReportDelivery(s,"Share / Copy",subject); report(); } };
   document.getElementById("emailDraftBtn").onclick=()=>openReportEmailDraft(s,txt,subject);
   const customerEmailBtn538=document.getElementById("customerEmailBtn538"); if(customerEmailBtn538) customerEmailBtn538.onclick=copyCustomerCloseoutEmail538;
+  const customerPacketBtn539=document.getElementById("customerPacketBtn539"); if(customerPacketBtn539) customerPacketBtn539.onclick=copyCustomerCloseoutPacket539;
   document.getElementById("copyBtn").onclick=async()=>{await navigator.clipboard.writeText(txt); logReportDelivery(s,"Copied TXT",subject); toast("Report copied."); report();};
   document.getElementById("subjectBtn").onclick=async()=>{await navigator.clipboard.writeText(subject); logReportDelivery(s,"Subject Copied",subject); toast("Email subject copied."); report();};
   document.getElementById("downloadBtn").onclick=()=>{ downloadBlob(`firevault-report-${(s.name||"site").replace(/\W+/g,"-")}.txt`,txt); logReportDelivery(s,"Downloaded TXT",subject); report(); };
@@ -3957,16 +3981,16 @@ function diagnostics(){
 }
 function showChangelog(){
   const notes = [
-    "Advanced to Build 0.50.38 from the stable 0.50.37 baseline.",
-    "Added Copy Customer Email in Report Center for a clean customer-facing closeout message.",
-    "Customer email copy includes site/address, selected customer photo count, photo captions, technician signature, and build number.",
+    "Advanced to Build 0.50.39 from the stable 0.50.38 baseline.",
+    "Added Copy Closeout Packet in Report Center for a combined customer email, photo ready check, and customer photo summary.",
+    "Closeout packet keeps internal technician notes out of the customer-facing copy while preserving captions and selected photo counts.",
     "Kept the stable splash/header repair untouched after 0.50.37 fixed the top app chrome.",
-    "Preserved Customer Photo Ready Check, Customer Photo Captions, Customer Report Photo Selection, Deficiency Photo Workflow, Photo Vault tools, Startup Health diagnostics, the 5-second splash screen, iPad autosizing, simple Home screen, Search Bar Concept #6, and excluded job-status workflow controls."
+    "Preserved Copy Customer Email, Customer Photo Ready Check, Customer Photo Captions, Customer Report Photo Selection, Deficiency Photo Workflow, Photo Vault tools, Startup Health diagnostics, the 5-second splash screen, iPad autosizing, simple Home screen, Search Bar Concept #6, and excluded job-status workflow controls."
   ];  const overlay=document.createElement("div");
   overlay.className="releaseOverlay";
   overlay.innerHTML=`<div class="releaseSheet" role="dialog" aria-modal="true" aria-label="FireVault release notes">
     <div class="releaseHead"><div><strong>FireVault</strong><span>Build ${BUILD}</span></div><button class="ghost iconBtn" id="closeRelease" aria-label="Close release notes">×</button></div>
-    <div class="releaseBody"><h2>Release Notes</h2><p class="releaseIntro">Added customer closeout email copy for Report Center.</p><ul>${notes.map(n=>`<li>${esc(n)}</li>`).join("")}</ul></div>
+    <div class="releaseBody"><h2>Release Notes</h2><p class="releaseIntro">Added customer closeout packet copy for Report Center.</p><ul>${notes.map(n=>`<li>${esc(n)}</li>`).join("")}</ul></div>
   </div>`;
   document.body.appendChild(overlay);
   const close=()=>overlay.remove();
