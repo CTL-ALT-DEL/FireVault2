@@ -1032,7 +1032,7 @@ function render(){
     const routes = {home, routeLog, sites, nearbySites, attention:attentionQueue, siteDetail, visits, visitDetail, checklist, siteForm, contactsList, contactForm, siteDocs, siteDocForm, equipmentList, equipmentForm, tasks, taskForm, deficiencies, deficiencyForm, report, library, resourceForm, jobMode, settings, diagnostics};
     (routes[view] || home)();
     document.body.classList.toggle("homeFullscreen480", view === "home");
-    view === "jobMode" ? startJobTimer() : stopJobTimer();
+    stopJobTimer();
     applyFeatureVisibility();
     setActiveNav();
   }catch(err){ showError(err); }
@@ -1427,7 +1427,7 @@ function siteDetail(){
 
     <div class="card siteHero477 siteHero489"><div class="siteHeroMain477"><span class="accountInitialLarge477">${esc((s.name||'?').slice(0,1).toUpperCase())}</span><div><h1>${esc(s.name||'Unnamed Account')}</h1><p>${esc(fullAddress(s))}</p><em>${esc(nextAction)}</em></div></div><div class="siteHealthDot477 ${health.cls}">${health.score}%</div></div>
 
-    <div class="grid2 sitePrimaryActions477 sitePrimaryActions489"><button class="primary tile" id="jobBtn"><strong>Start Job</strong><span>Begin service call</span></button><button class="ghost tile" id="snapshotBtn"><strong>Snapshot</strong><span>Copy field summary</span></button>${featureOn('advancedGps')?`<button class="ghost tile" id="navigateBtn477"><strong>Navigate</strong><span>Open maps</span></button>`:''}<button class="ghost tile" id="addTaskQuick477"><strong>Add Task</strong><span>Follow-up item</span></button></div>
+    <div class="grid2 sitePrimaryActions477 sitePrimaryActions489"><button class="primary tile" id="jobBtn"><strong>Add Note</strong><span>Timestamped site note</span></button><button class="ghost tile" id="snapshotBtn"><strong>Snapshot</strong><span>Copy field summary</span></button>${featureOn('advancedGps')?`<button class="ghost tile" id="navigateBtn477"><strong>Navigate</strong><span>Open maps</span></button>`:''}<button class="ghost tile" id="addTaskQuick477"><strong>Add Task</strong><span>Follow-up item</span></button></div>
 
     <div class="card fieldCard477 fieldCard489"><div class="siteCardHead477"><div><h2>Field Card</h2><p>Most-used account information first.</p></div><button class="ghost smallBtn" id="contactsQuick477">Contacts</button></div><div class="fieldGrid477">
       ${fieldValue477('Panel', panel)}
@@ -1442,7 +1442,7 @@ function siteDetail(){
 
     <div class="card contactsMiniCard477 siteSimpleCard477"><div class="row"><div><h2>Contacts & Access</h2><p>${contacts.length ? `${contacts.length} saved contact${contacts.length===1?'':'s'}` : 'Customer, access, gate, and after-hours details.'}</p></div><button class="ghost smallBtn" id="manageContactsBtn">Manage</button></div>${contacts.length?contacts.slice(0,2).map(c=>`<button class="contactLine contactLine477" data-contact="${esc(c.id)}"><strong>${esc(contactTitle(c))}</strong><span>${esc(contactMeta(c))}</span>${c.accessNotes?`<em>${esc(c.accessNotes)}</em>`:''}</button>`).join(''):`<p class="fieldNote">Add customer contacts, access codes, lockbox notes, or monitoring center details here.</p>`}</div>
 
-    <div class="card recentVisitsCard477 siteSimpleCard477"><div class="row"><div><h2>Recent Visit</h2><p>${lastVisit ? `${visitDateLabel(lastVisit)} • ${durationText(lastVisit.startedAt,lastVisit.endedAt)}` : 'No completed visits yet.'}</p></div>${siteVisits.length?`<button class="ghost smallBtn" id="allVisitsBtn">All</button>`:''}</div>${lastVisit?`<button class="visitMini visitMiniButton" data-visit="${esc(lastVisit.id)}"><strong>${esc(visitNotesPreview(lastVisit,1))}</strong><span>Open visit detail</span></button>`:`<p class="fieldNote">Finish a Job Mode service call and it will appear here.</p>`}</div>
+    <div class="card recentVisitsCard477 siteSimpleCard477"><div class="row"><div><h2>Recent Visit</h2><p>${lastVisit ? `${visitDateLabel(lastVisit)} • ${durationText(lastVisit.startedAt,lastVisit.endedAt)}` : 'No completed visits yet.'}</p></div>${siteVisits.length?`<button class="ghost smallBtn" id="allVisitsBtn">All</button>`:''}</div>${lastVisit?`<button class="visitMini visitMiniButton" data-visit="${esc(lastVisit.id)}"><strong>${esc(visitNotesPreview(lastVisit,1))}</strong><span>Open visit detail</span></button>`:`<p class="fieldNote">Use Add Note to keep timestamped site notes for this account.</p>`}</div>
 
     ${toolCount?`<div class="card siteModulesCard477 siteModulesCard489"><div class="siteModulesHead477"><h2>More Site Tools</h2><p>Disabled modules are removed from this account screen.</p></div><div class="grid2 siteModuleGrid477">
       ${featureOn('reports')?`<button class="ghost tile" id="reportBtn"><strong>Report</strong><span>Copy / download</span></button>`:''}
@@ -1458,7 +1458,7 @@ function siteDetail(){
 
     ${featureOn('library') && docs.length?`<div class="card docsMiniCard477 siteSimpleCard477"><div class="row"><div><h2>Documents / Links</h2><p>${docs.length} saved document${docs.length===1?'':'s'}</p></div><button class="ghost smallBtn" id="manageDocsBtn2">Manage</button></div>${docs.slice(0,2).map(d=>`<button class="docLineMini" data-doc="${esc(d.id)}"><strong>${esc(docTitle(d))}</strong><span>${esc(docMeta(d))}</span></button>`).join('')}</div>`:''}
 
-    <div class="card grow siteNotes477"><h2>Site Notes</h2><p>${esc(s.notes || 'No notes entered.')}</p></div>
+    <div class="card grow siteNotes477 siteNotes491"><div class="row"><div><h2>Site Notes</h2><p>Timestamped notes for this account.</p></div><button class="primary smallBtn" id="addSiteNoteBtn491">＋ Note</button></div><pre>${esc(s.notes || 'No notes entered.')}</pre></div>
   </div>`);
   document.getElementById('backBtn').onclick=()=>route('sites');
   document.getElementById('editBtn').onclick=()=>{mode='edit'; route('siteForm');};
@@ -1468,7 +1468,8 @@ function siteDetail(){
   document.getElementById('openTasksMini476').onclick=()=>route('tasks');
   document.getElementById('openDefMini476').onclick=()=>route('deficiencies');
   document.getElementById('snapshotBtn').onclick=shareSiteSnapshot;
-  document.getElementById('jobBtn').onclick=startJob;
+  document.getElementById('jobBtn').onclick=()=>addSiteNotePrompt();
+  const siteNoteBtn491=document.getElementById('addSiteNoteBtn491'); if(siteNoteBtn491) siteNoteBtn491.onclick=()=>addSiteNotePrompt();
   const addTask=document.getElementById('addTaskQuick477'); if(addTask) addTask.onclick=()=>{mode=null; route('taskForm');};
   const addDef=document.getElementById('addDefQuick477'); if(addDef) addDef.onclick=()=>{mode=null; route('deficiencyForm');};
   const nav=document.getElementById('navigateBtn477'); if(nav) nav.onclick=()=>window.open(mapUrl(s,(data.settings.gps&&data.settings.gps.mapProvider)||'apple'),'_blank');
@@ -1689,7 +1690,7 @@ function visits(){
   const siteVisits=Array.isArray(s.visits) ? s.visits : [];
   html(`<div class="screen visitLogScreen"><div class="row"><button class="back ghost" id="backBtn">←</button><h1>Visit Log</h1></div>
     <div class="card visitLogHero"><h2>${esc(s.name)}</h2><p>${siteVisits.length ? `${siteVisits.length} saved visit${siteVisits.length===1?"":"s"}` : "No completed visits yet."}</p><button class="primary smallBtn" id="startVisitBtn">Start New Visit</button></div>
-    <div class="list grow">${siteVisits.length?siteVisits.map(v=>`<button class="card visitLogItem" data-visit="${esc(v.id)}"><div class="row"><div><h2>${esc(visitDateLabel(v))}</h2><p>${esc(visitTimeRange(v))} • ${esc(durationText(v.startedAt,v.endedAt))}</p></div><span class="pill">${esc(v.type||"Visit")}</span></div><p>${esc(visitNotesPreview(v,3))}</p></button>`).join(""):`<div class="empty">Use Job Mode to create the first visit log for this site.</div>`}</div>
+    <div class="list grow">${siteVisits.length?siteVisits.map(v=>`<button class="card visitLogItem" data-visit="${esc(v.id)}"><div class="row"><div><h2>${esc(visitDateLabel(v))}</h2><p>${esc(visitTimeRange(v))} • ${esc(durationText(v.startedAt,v.endedAt))}</p></div><span class="pill">${esc(v.type||"Visit")}</span></div><p>${esc(visitNotesPreview(v,3))}</p></button>`).join(""):`<div class="empty">Use Add Note on the customer screen to create site notes for this account.</div>`}</div>
   </div>`);
   document.getElementById("backBtn").onclick=()=>route("siteDetail");
   document.getElementById("startVisitBtn").onclick=startJob;
@@ -2159,37 +2160,50 @@ function resourceForm(){
   if(del) del.onclick=()=>{data.resources=data.resources.filter(x=>x.id!==mode); save(); route("library");};
 }
 
-function startJob(){
-  const s=site();
-  if(!s) return;
-  if(activeJob && activeJob.siteId !== s.id){
-    if(!confirm(`A service call is already active for ${activeJob.siteName}. Replace it with this site?`)) return;
-  }
-  if(activeJob && activeJob.siteId === s.id){ route("jobMode"); return; }
-  activeJob={siteId:s.id,siteName:s.name,startedAt:new Date().toISOString(),events:[{time:new Date().toISOString(),note:"Job started"}]};
-  saveActiveJob(); route("jobMode");
+
+function appendSiteNote491(s, text){
+  const stamp=new Date().toLocaleString([], {month:"short",day:"numeric",year:"numeric",hour:"numeric",minute:"2-digit"});
+  const clean=(text||"").trim();
+  if(!clean) return false;
+  const line=`[${stamp}] ${clean}`;
+  s.notes = s.notes ? `${line}\n\n${s.notes}` : line;
+  s.lastNoteAt=new Date().toISOString();
+  save();
+  return true;
 }
+function addSiteNotePrompt(defaultText=""){
+  const s=site();
+  if(!s){ route("sites"); return; }
+  const note=prompt("Add site note", defaultText);
+  if(note===null) return;
+  if(appendSiteNote491(s,note)){ toast("Site note added."); route("siteDetail"); }
+  else toast("No note added.");
+}
+function startJob(){ addSiteNotePrompt(); }
 function jobMode(){
   const s=site();
-  if(!s||!activeJob){route("siteDetail"); return;}
-  const events = Array.isArray(activeJob.events) ? activeJob.events : [];
-  html(`<div class="screen serviceCallScreen"><div class="row"><button class="back ghost" id="backBtn">←</button><h1>Job Mode</h1></div>
-    <div class="card serviceTimerCard"><h2>${esc(s.name)}</h2><div class="timer" id="jobElapsed">${elapsedText(activeJob.startedAt)}</div><p>Started ${esc(eventTime(activeJob.startedAt))}</p></div>
-    <div class="card quickEventCard"><div class="row"><h2>Quick Events</h2><span class="pill">${events.length} events</span></div><div class="quickEventGrid">${QUICK_EVENTS.map(q=>`<button class="ghost quickEventBtn" data-note="${esc(q)}">${esc(q)}</button>`).join("")}</div></div>
-    <div class="card jobFollowCard"><h2>Service Follow-Up</h2><p>Create action items while the job is still fresh. These save as open tasks for this site.</p><div class="jobActionGrid"><button class="ghost" id="noteBtn">Custom Event</button><button class="ghost" id="followBtn">Follow-Up Task</button><button class="ghost" id="partsBtn">Parts Needed</button><button class="primary" id="finishBtn">Finish Visit</button></div></div>
-    <div class="list grow serviceEventList">${events.length?events.map(e=>`<div class="card visit"><strong>${esc(eventTime(e.time))}</strong><p>${esc(e.note)}</p></div>`).join(""):`<div class="empty">No events yet.</div>`}</div>
+  if(!s){ route("sites"); return; }
+  ensureSite(s);
+  const noteLines=(s.notes||"").split("\n\n").filter(Boolean);
+  html(`<div class="screen siteNotesScreen491">
+    <div class="row jobTop490"><button class="back ghost" id="backBtn">←</button><div><h1>Site Notes</h1><p>${esc(s.name||"Customer Account")}</p></div></div>
+    <div class="card jobHero490 idle siteNotesHero491"><div class="jobHeroHead490"><div><strong>Notes Only</strong><span>No start/end job status</span></div></div><p>${esc(fullAddress(s)||"No address entered.")}</p></div>
+    <div class="grid2 jobQuickGrid490 siteNotesActions491">
+      <button class="primary" id="quickNoteBtn">Add Note</button>
+      <button class="ghost" id="custUpdateBtn">Customer Note</button>
+      <button class="ghost" id="partsBtn">Parts Note</button>
+      <button class="ghost" id="defJobBtn">Add Deficiency</button>
+    </div>
+    <div class="list grow jobTimeline490 siteNotesList491">
+      <div class="routeSectionTitle462"><strong>Saved Site Notes</strong><span>${noteLines.length} note${noteLines.length===1?"":"s"}</span></div>
+      ${noteLines.length?noteLines.map(n=>`<div class="card jobEvent490 siteNoteItem491"><p>${esc(n)}</p></div>`).join(""):`<div class="empty">No notes yet. Tap Add Note to save the first site note.</div>`}
+    </div>
   </div>`);
   document.getElementById("backBtn").onclick=()=>route("siteDetail");
-  document.querySelectorAll(".quickEventBtn").forEach(b=>b.onclick=()=>{ if(b.dataset.note === "Parts needed") addServiceFollowUp("Parts Needed"); else {addJobEvent(b.dataset.note); render();} });
-  document.getElementById("noteBtn").onclick=()=>{const note=prompt("Event note:","Checked panel"); if(note){addJobEvent(note); render();}};
-  document.getElementById("followBtn").onclick=()=>addServiceFollowUp("Follow-up");
-  document.getElementById("partsBtn").onclick=()=>addServiceFollowUp("Parts Needed");
-  document.getElementById("finishBtn").onclick=()=>{
-    s.visits=s.visits||[];
-    const endedAt=new Date().toISOString();
-    s.visits.unshift({id:uid(),date:todayIso(),startedAt:activeJob.startedAt,endedAt,notes:(activeJob.events||[]).map(e=>`${eventTime(e.time)} - ${e.note}`).join("\n")});
-    activeJob=null; saveActiveJob(); save(); toast("Visit saved."); route("siteDetail");
-  };
+  document.getElementById("quickNoteBtn").onclick=()=>addSiteNotePrompt();
+  document.getElementById("custUpdateBtn").onclick=()=>addSiteNotePrompt("Customer update: ");
+  document.getElementById("partsBtn").onclick=()=>addSiteNotePrompt("Parts needed: ");
+  document.getElementById("defJobBtn").onclick=()=>{ mode=null; route("deficiencyForm"); };
 }
 
 function settingsTabs(){
@@ -2435,7 +2449,7 @@ function stabilityReport(){
     if(r.id && resourceIds.has(r.id)) issues.push(`Duplicate library resource ID detected: ${r.id}`);
     if(r.id) resourceIds.add(r.id);
   });
-  if(activeJob && !data.sites.some(s=>s.id===activeJob.siteId)) issues.push("Active service call points to a site that no longer exists");
+  if(activeJob && !data.sites.some(s=>s.id===activeJob.siteId)) issues.push("Old active job record points to a site that no longer exists");
   if(!issues.length){
     pass.push("No duplicate site IDs found");
     pass.push("No invalid GPS coordinates found");
@@ -2462,7 +2476,7 @@ function diagnosticsText(){
     `Visits: ${totalVisits}`,
     `GPS Saved Sites: ${data.sites.filter(hasGps).length}`,
     `Route Days: ${(data.routeLogs||[]).length}`,
-    `Active Job: ${activeJob ? activeJob.siteName : "None"}`,
+    `Old Job Record: ${activeJob ? activeJob.siteName : "None"}`,
     `Storage Key: ${KEY}`,
     ``,
     `Stability Issues:`,
@@ -2555,7 +2569,7 @@ function diagnostics(){
     <div class="list grow diagnosticsList460">
       <div class="card"><h2>Stability Issues</h2>${stability.issues.length?`<ul>${stability.issues.map(i=>`<li>${esc(i)}</li>`).join("")}</ul>`:`<p>No issues found.</p>`}</div>
       <div class="card"><h2>Checks Passed</h2><ul>${stability.pass.map(p=>`<li>${esc(p)}</li>`).join("")}</ul></div>
-      <div class="card errorBox"><p>Build: ${BUILD}</p><p>Total Tasks: ${totalTasks}</p><p>Due Today: ${taskCounts.today}</p><p>Service Follow-Ups: ${serviceTasks}</p><p>Total Deficiencies: ${totalDef}</p><p>Closed Deficiencies: ${closedDefTotal}</p><p>Total Contacts: ${totalContacts}</p><p>Total Documents: ${totalDocs}</p><p>Report Deliveries: ${totalReportDeliveries}</p><p>Report Follow-Ups: ${reportFollowUps}</p><p>Checklist Items: ${totalChecklist}</p><p>Checklist Issues: ${checklistIssues}</p><p>Completed Inspections: ${completedInspections}</p><p>Attention Sites: ${healthWarn}</p><p>Watch Sites: ${healthWatch}</p><p>Active Job: ${activeJob ? esc(activeJob.siteName) : "None"}</p><p>Current Theme: ${esc(data.settings.theme.name)}</p><p>Accent: ${esc(data.settings.theme.accentColor)}</p><p>Route Days: ${(data.routeLogs||[]).length}</p><p>GPS Tools: ${data.settings.gps?.enabled !== false ? "Enabled" : "Hidden"}</p><p>Nearby Radius: ${nearbyRadiusMiles()} mi</p><p>Haptics: ${data.settings.app?.haptics !== false ? "Enabled" : "Off"}</p><p>Last Stability Check: ${esc(lastCheck)}</p><p>Storage key: ${KEY}</p><p>Modules loaded successfully.</p></div>
+      <div class="card errorBox"><p>Build: ${BUILD}</p><p>Total Tasks: ${totalTasks}</p><p>Due Today: ${taskCounts.today}</p><p>Site Follow-Ups: ${serviceTasks}</p><p>Total Deficiencies: ${totalDef}</p><p>Closed Deficiencies: ${closedDefTotal}</p><p>Total Contacts: ${totalContacts}</p><p>Total Documents: ${totalDocs}</p><p>Report Deliveries: ${totalReportDeliveries}</p><p>Report Follow-Ups: ${reportFollowUps}</p><p>Checklist Items: ${totalChecklist}</p><p>Checklist Issues: ${checklistIssues}</p><p>Completed Inspections: ${completedInspections}</p><p>Attention Sites: ${healthWarn}</p><p>Watch Sites: ${healthWatch}</p><p>Old Job Record: ${activeJob ? esc(activeJob.siteName) : "None"}</p><p>Current Theme: ${esc(data.settings.theme.name)}</p><p>Accent: ${esc(data.settings.theme.accentColor)}</p><p>Route Days: ${(data.routeLogs||[]).length}</p><p>GPS Tools: ${data.settings.gps?.enabled !== false ? "Enabled" : "Hidden"}</p><p>Nearby Radius: ${nearbyRadiusMiles()} mi</p><p>Haptics: ${data.settings.app?.haptics !== false ? "Enabled" : "Off"}</p><p>Last Stability Check: ${esc(lastCheck)}</p><p>Storage key: ${KEY}</p><p>Modules loaded successfully.</p></div>
     </div>
   </div>`);
   document.getElementById("backHome").onclick=()=>route("home");
@@ -2564,11 +2578,11 @@ function diagnostics(){
 }
 function showChangelog(){
   const notes = [
-    "Polished the customer/account screen to match the Apple-inspired Home direction.",
-    "Cleaned up the customer header, account card, Field Card, and Today’s Priority sections.",
-    "Improved quick-action button spacing for Start Job, Snapshot, Navigate, Add Task, and Add Deficiency.",
-    "Made More Site Tools feel like an optional module area instead of the main customer screen.",
-    "Preserved module-aware hiding, Home search repair, Daily Route tools, and the green Build indicator."
+    "Removed Start Job / End Job workflow language.",
+    "Re-centered the customer account screen around site notes only.",
+    "Replaced Start Job with Add Note on the customer screen.",
+    "Added timestamped site note entry without service-call status tracking.",
+    "Preserved Home search, Modules, Daily Route tools, Settings cleanup, and the green Build revision indicator."
   ];
   const overlay=document.createElement("div");
   overlay.className="releaseOverlay";

@@ -1,20 +1,22 @@
-# FireVault Build 0.48.9
+# FireVault Build 0.49.1
 
-Build 0.48.9 is a Customer Account Polish build.
+Build 0.49.1 corrects the app direction back to **Site Notes only**.
 
 ## What changed
 
-- Visible app version advanced to 0.48.9.
-- Updated cache-busting references in `index.html` to 0.48.9.
+- Visible app version advanced to 0.49.1.
+- Updated cache-busting references in `index.html` to 0.49.1.
 - Updated release notes to match this build.
-- Polished the customer/account screen to match the Apple-inspired Home direction.
-- Cleaned up the account header, account hero card, Field Card, and Today’s Priority section.
-- Improved quick-action spacing for Start Job, Snapshot, Navigate, Add Task, and Add Deficiency.
-- Made More Site Tools feel like an optional module area instead of the main customer screen.
-- Preserved module-aware hiding, Home search repair, Daily Route tools, Settings header cleanup, and the green Build revision indicator.
+- Removed the Start Job / End Job workflow from the main customer flow.
+- Replaced **Start Job** with **Add Note** on the customer/account screen.
+- Added timestamped site note entry directly into the account notes.
+- Changed the old job workflow screen into a simple **Site Notes** screen.
+- Removed job status wording like Arrived / Working / Complete from the working interface.
+- Hid old active-job dashboard cards so the app behaves as a site notes app.
+- Preserved customer account polish, Home search repair, Modules, Daily Route tools, Settings cleanup, and the green Build revision indicator.
 
 Suggested commit message:
 
 ```text
-Build 0.48.9 customer account polish field card cleanup
+Build 0.49.1 site notes only remove job workflow status
 ```
