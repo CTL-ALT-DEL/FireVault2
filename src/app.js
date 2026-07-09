@@ -2082,6 +2082,45 @@ async function copyCustomerCloseoutPacket539(){
   catch{ toast("Clipboard unavailable."); }
 }
 
+function technicianCloseoutPacket540(s={}){
+  const stats=reportPhotoSummary527(s);
+  const ready=customerReportPhotoReady530(s);
+  const openTasks=(s.tasks||[]).filter(t=>String(t.status||"Open").toLowerCase()!=="complete");
+  const openDef=(s.deficiencies||[]).filter(d=>String(d.status||"Open").toLowerCase()!=="complete");
+  const lines=[
+    `FireVault Technician Closeout Packet`,
+    `Site: ${s.name||"Unnamed Site"}`,
+    `Address: ${fullAddress(s)}`,
+    `Date: ${fmtDate()}`,
+    `Build: ${BUILD}`,
+    "",
+    "CUSTOMER REPORT PHOTOS",
+    `Selected: ${stats.selected.length} of ${stats.photos.length}`,
+    `Captioned: ${stats.captioned}`,
+    `Ready Check: ${ready.label}`
+  ];
+  if(ready.issues.length) ready.issues.forEach(x=>lines.push(`- ${x}`));
+  if(stats.selected.length){
+    lines.push("", "SELECTED PHOTOS");
+    stats.selected.forEach((d,i)=>{
+      lines.push(`${i+1}. ${reportPhotoLabel526(d)}`);
+      if(d.customerCaption) lines.push(`   Customer caption: ${String(d.customerCaption).replaceAll("\n","\n   ")}`);
+      if(d.notes) lines.push(`   Internal notes: ${String(d.notes).replaceAll("\n","\n   ")}`);
+      if(d.linkedDeficiencyTitle) lines.push(`   Linked deficiency: ${d.linkedDeficiencyTitle}`);
+    });
+  }
+  lines.push("", "OPEN TASKS");
+  if(openTasks.length) openTasks.slice(0,20).forEach((t,i)=>lines.push(`${i+1}. ${t.title||"Open task"}${t.due?` — Due ${t.due}`:""}`)); else lines.push("None listed.");
+  lines.push("", "OPEN DEFICIENCIES");
+  if(openDef.length) openDef.slice(0,20).forEach((d,i)=>lines.push(`${i+1}. ${d.title||"Open deficiency"}${d.priority?` — ${d.priority}`:""}`)); else lines.push("None listed.");
+  return lines.join("\n");
+}
+async function copyTechnicianCloseoutPacket540(){
+  const s=site(); if(!s) return;
+  try{ await navigator.clipboard.writeText(technicianCloseoutPacket540(s)); toast("Technician closeout packet copied."); }
+  catch{ toast("Clipboard unavailable."); }
+}
+
 function defaultCustomerCaption530(d={}){
   const cat=photoCategory524(d)||"Photo";
   const title=d.title||d.imageName||"site photo";
@@ -3122,7 +3161,7 @@ function report(){
   const subject=renderTemplate(data.settings.email.defaultSubject,s);
   html(`<div class="screen reportScreen440 reportScreen447"><div class="row reportTopRow"><button class="back ghost" id="backBtn">←</button><div><h1>Report Center</h1><p>${esc(s.name||"Site")}</p></div></div>
     <div class="card reportHero440 ${stats.h.cls}"><div><strong>${stats.h.score}%</strong><span>Health</span></div><div><strong>${stats.openTasks.length}</strong><span>Open Tasks</span></div><div><strong>${stats.openDef.length}</strong><span>Deficiencies</span></div><div><strong>${stats.equipmentIssues.length}</strong><span>Equip Issues</span></div></div>
-    <div class="reportActionGrid440 reportActionGrid442 reportActionGrid447"><button class="primary" id="shareBtn">Share / Copy</button><button class="ghost" id="emailDraftBtn">Email Draft</button><button class="ghost" id="customerEmailBtn538">Copy Customer Email</button><button class="ghost" id="customerPacketBtn539">Copy Closeout Packet</button><button class="ghost" id="copyBtn">Copy TXT</button><button class="ghost" id="downloadBtn">Download</button><button class="ghost" id="subjectBtn">Copy Subject</button></div>
+    <div class="reportActionGrid440 reportActionGrid442 reportActionGrid447"><button class="primary" id="shareBtn">Share / Copy</button><button class="ghost" id="emailDraftBtn">Email Draft</button><button class="ghost" id="customerEmailBtn538">Copy Customer Email</button><button class="ghost" id="customerPacketBtn539">Copy Closeout Packet</button><button class="ghost" id="techPacketBtn540">Copy Tech Packet</button><button class="ghost" id="copyBtn">Copy TXT</button><button class="ghost" id="downloadBtn">Download</button><button class="ghost" id="subjectBtn">Copy Subject</button></div>
     <div class="card reportReadyCard reportReadyCard442 reportReadyCard447"><div><h2>Ready to Send</h2><p>${esc(subject || "FireVault Report")}</p><small>${esc((data.settings.email.defaultTo || "No default recipient") + (data.settings.email.cc ? ` • CC ${data.settings.email.cc}` : ""))}</small></div><span class="pill ${stats.h.cls}">${esc(stats.h.label)}</span></div>
     ${reportPhotoSelector526(s)}
     <div class="card reportDeliveryCard442 reportDeliveryCard444 reportDeliveryCard447"><div class="reportDeliveryHead"><div><h2>Delivery Log</h2><p>Tap a delivery item to copy a receipt. Add a follow-up task when a report needs customer confirmation.</p></div><div class="reportDeliveryHeadActions"><button class="ghost smallBtn" id="followReportBtn">Follow-Up</button><button class="ghost smallBtn" id="logSentBtn">Log Sent</button></div></div><div class="reportDeliveryList">${reportDeliveryHtml(s)}</div></div>
@@ -3142,6 +3181,7 @@ function report(){
   document.getElementById("emailDraftBtn").onclick=()=>openReportEmailDraft(s,txt,subject);
   const customerEmailBtn538=document.getElementById("customerEmailBtn538"); if(customerEmailBtn538) customerEmailBtn538.onclick=copyCustomerCloseoutEmail538;
   const customerPacketBtn539=document.getElementById("customerPacketBtn539"); if(customerPacketBtn539) customerPacketBtn539.onclick=copyCustomerCloseoutPacket539;
+  const techPacketBtn540=document.getElementById("techPacketBtn540"); if(techPacketBtn540) techPacketBtn540.onclick=copyTechnicianCloseoutPacket540;
   document.getElementById("copyBtn").onclick=async()=>{await navigator.clipboard.writeText(txt); logReportDelivery(s,"Copied TXT",subject); toast("Report copied."); report();};
   document.getElementById("subjectBtn").onclick=async()=>{await navigator.clipboard.writeText(subject); logReportDelivery(s,"Subject Copied",subject); toast("Email subject copied."); report();};
   document.getElementById("downloadBtn").onclick=()=>{ downloadBlob(`firevault-report-${(s.name||"site").replace(/\W+/g,"-")}.txt`,txt); logReportDelivery(s,"Downloaded TXT",subject); report(); };
@@ -3981,16 +4021,16 @@ function diagnostics(){
 }
 function showChangelog(){
   const notes = [
-    "Advanced to Build 0.50.39 from the stable 0.50.38 baseline.",
-    "Added Copy Closeout Packet in Report Center for a combined customer email, photo ready check, and customer photo summary.",
-    "Closeout packet keeps internal technician notes out of the customer-facing copy while preserving captions and selected photo counts.",
-    "Kept the stable splash/header repair untouched after 0.50.37 fixed the top app chrome.",
-    "Preserved Copy Customer Email, Customer Photo Ready Check, Customer Photo Captions, Customer Report Photo Selection, Deficiency Photo Workflow, Photo Vault tools, Startup Health diagnostics, the 5-second splash screen, iPad autosizing, simple Home screen, Search Bar Concept #6, and excluded job-status workflow controls."
+    "Advanced to Build 0.50.41 from the stable 0.50.39 baseline.",
+    "Added Copy Tech Packet in Report Center for technician-facing closeout details.",
+    "Technician packet includes customer photo readiness, selected photo captions, internal photo notes, linked deficiencies, open tasks, and open deficiencies.",
+    "Kept Customer Closeout Packet and Customer Email copy available for customer-facing text.",
+    "Preserved fixed splash/header behavior, Startup Health diagnostics, the 5-second splash screen, Photo Vault tools, Customer Report Photo workflow, iPad autosizing, simple Home screen, Search Bar Concept #6, and excluded job-status workflow controls."
   ];  const overlay=document.createElement("div");
   overlay.className="releaseOverlay";
   overlay.innerHTML=`<div class="releaseSheet" role="dialog" aria-modal="true" aria-label="FireVault release notes">
     <div class="releaseHead"><div><strong>FireVault</strong><span>Build ${BUILD}</span></div><button class="ghost iconBtn" id="closeRelease" aria-label="Close release notes">×</button></div>
-    <div class="releaseBody"><h2>Release Notes</h2><p class="releaseIntro">Added customer closeout packet copy for Report Center.</p><ul>${notes.map(n=>`<li>${esc(n)}</li>`).join("")}</ul></div>
+    <div class="releaseBody"><h2>Release Notes</h2><p class="releaseIntro">Added technician closeout packet copy for Report Center.</p><ul>${notes.map(n=>`<li>${esc(n)}</li>`).join("")}</ul></div>
   </div>`;
   document.body.appendChild(overlay);
   const close=()=>overlay.remove();

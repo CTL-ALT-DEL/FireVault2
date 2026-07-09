@@ -1,10 +1,10 @@
-# Clean Install Notes — FireVault Build 0.50.39
+# Clean Install Notes — FireVault Build 0.50.41
 
-This ZIP is intended to be the next clean baseline after the working FireVault Build 0.50.38.
+This ZIP is intended to be the next clean baseline after the working FireVault Build 0.50.39.
 
 ## Important
 
-Build 0.50.39 keeps the stable splash/header repair and adds a Report Center **Copy Closeout Packet** action.
+Build 0.50.41 keeps the stable splash/header repair and adds a Report Center **Copy Tech Packet** action.
 
 ## Install
 
@@ -17,11 +17,14 @@ Build 0.50.39 keeps the stable splash/header repair and adds a Report Center **C
 
 - Open a site.
 - Open Report Center.
-- Tap **Copy Closeout Packet** to copy a customer-facing email, ready check, and selected photo summary together.
-- Use **Copy Customer Email** when you only want the shorter email text.
+- Tap **Copy Tech Packet** to copy a technician-facing closeout packet with internal notes, open tasks, open deficiencies, and selected photo readiness.
+- Use **Copy Closeout Packet** or **Copy Customer Email** for customer-facing text.
 
 ## Preserved startup behavior
 
 - Splash screen stays clean.
 - Fixed app header appears after the app opens.
 - Top app bar remains fixed and does not scroll away with the main page.
+
+
+Build 0.50.41 trims the Home screen spacing under the fixed header while preserving the clean splash screen and stable startup behavior.

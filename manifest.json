@@ -8,7 +8,7 @@
   "orientation": "any",
   "background_color": "#0b0d10",
   "theme_color": "#101216",
-  "description": "Field knowledge system for fire alarm technicians. Build 0.50.39 adds Report Center customer closeout packet copy while preserving the stable splash/header repair.",
+  "description": "Field knowledge system for fire alarm technicians. Build 0.50.41 trims Home screen top spacing while preserving the stable splash/header behavior and customer closeout workflow.",
   "icons": [
     {
       "src": "assets/icon-192.png",
