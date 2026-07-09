@@ -1134,7 +1134,7 @@ function home(){
   const recentVisits = visits.filter(v=>new Date(v.endedAt||v.startedAt||v.date||0).getTime() >= weekAgo).length;
   const now = new Date();
   const dateLine = now.toLocaleDateString([], {weekday:"long", month:"long", day:"numeric"});
-  html(`<div class="screen homeScreen476 homeScreen478">
+  html(`<div class="screen homeScreen476 homeScreen478 ${siteSearch?"homeSearchMode484":""}">
     <div class="homeChrome478">
       <button class="homeIcon478" id="modulesTopBtn476" aria-label="Modules">☰</button>
       <div class="brand478"><img src="assets/favicon.png?v=${BUILD}" alt="FireVault"><strong>FIREVAULT</strong></div>
@@ -1148,7 +1148,7 @@ function home(){
     </div>
 
     <div class="appleSearchCard478">
-      <div class="homeSearchBox476 homeSearchBox478"><span class="searchGlass478">⌕</span><input id="homeCustomerSearch476" type="search" value="${esc(siteSearch)}" placeholder="Search customers..." autocomplete="off"><button class="ghost smallBtn searchClear478" id="clearHomeSearch476" ${siteSearch?"":"disabled"}>${siteSearch?"Clear":"⌕"}</button></div>
+      <div class="homeSearchBox476 homeSearchBox478"><span class="searchGlass478">⌕</span><input id="homeCustomerSearch476" type="search" value="${esc(siteSearch)}" placeholder="Search customers..." autocomplete="off"><button class="ghost smallBtn searchClear478" id="clearHomeSearch476" ${siteSearch?"":"disabled"}>${siteSearch?"Cancel":"⌕"}</button></div>
     </div>
 
     ${siteSearch?`<div class="card searchResultsPanel478" id="homeSearchResults476">${homeAccountRowsMarkup476()}</div>`:`<div id="homeSearchResults476" class="searchResultsPanel478 hiddenSearchResults478"></div>`}
@@ -2550,11 +2550,11 @@ function diagnostics(){
 }
 function showChangelog(){
   const notes = [
-    "Advanced visible version and cache-busting references updated to 0.48.3.",
-    "Refined the Apple-inspired Home screen spacing without squishing the Concept #2 proportions.",
-    "Made the Safari/Home Screen helper smaller and less distracting.",
-    "Improved Recent Accounts bottom breathing room and floating add-button clearance.",
-    "Preserved Modules, Nearby Accounts, Daily Route tools, customer screen simplification, and green Build revision indicator."
+    "Advanced visible version and cache-busting references updated to 0.48.4.",
+    "Added Home search focus mode so customer search results get the full screen instead of competing with dashboard cards.",
+    "Nearby Accounts, stats, Recent Accounts, Modules, and the floating add button now step out of the way while searching.",
+    "Changed the active search control to Cancel for a clearer return to the dashboard.",
+    "Preserved the Apple-inspired Concept #2 proportions, Modules, Daily Route, and green Build revision indicator."
   ];
   const overlay=document.createElement("div");
   overlay.className="releaseOverlay";
