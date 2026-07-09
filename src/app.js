@@ -2212,29 +2212,30 @@ function settings(){
   const active=tabs.find(t=>t[0]===settingsTab)||tabs[0];
   const inDetail = mode === "settingsDetail";
   if(!inDetail){
-    html(`<div class="screen settingsHomeScreen settingsHomeScreen451">
-      <div class="settingsHomeHero451 card">
-        <div><h1>Settings</h1><p>Choose a settings area. Each option opens full screen with a Save button and a back arrow.</p></div>
-        <button class="ghost iconBtn settingsInfoBtn" id="diagBtn" title="Diagnostics" aria-label="Diagnostics">ⓘ</button>
+    html(`<div class="screen settingsHomeScreen settingsHomeScreen451 settingsHomeScreen488">
+      <div class="settingsHeader488">
+        <div><h1>Settings</h1><p>Modules, app setup, and maintenance.</p></div>
+        <button class="ghost settingsModulesQuick488" id="modulesQuickBtn">Modules</button>
       </div>
-      <div class="settingsChoiceGrid451 grow" aria-label="Settings choices">
+      <div class="settingsChoiceGrid451 grow settingsChoiceGrid488" aria-label="Settings choices">
         ${tabs.map((t,i)=>`<button class="settingsChoice451 settingsChoice455 settingsChoice456" data-tab="${t[0]}"><span class="settingsChoiceIcon451">${["👤","⌖","▤","✉","▧","◐","☰","⚡","⇅","ⓘ"][i]}</span><span class="settingsChoiceText456"><strong>${t[1]}</strong><small>${t[2]}</small></span><span class="settingsChoiceArrow455">›</span></button>`).join("")}
         <button class="settingsChoice451 settingsChoice455 settingsChoice456 settingsChoiceUtility451" id="diagnosticsChoice"><span class="settingsChoiceIcon451">⌁</span><span class="settingsChoiceText456"><strong>Diagnostics</strong><small>Build, storage, GPS, module, task, report, and vault health details.</small></span><span class="settingsChoiceArrow455">›</span></button>
       </div>
     </div>`);
     document.querySelectorAll(".settingsChoice451[data-tab]").forEach(b=>b.onclick=()=>{ settingsTab=b.dataset.tab; mode="settingsDetail"; settings(); });
-    document.getElementById("diagBtn").onclick=()=>route("diagnostics");
+    const mq=document.getElementById("modulesQuickBtn"); if(mq) mq.onclick=()=>{ settingsTab="visibility"; mode="settingsDetail"; settings(); };
     document.getElementById("diagnosticsChoice").onclick=()=>route("diagnostics");
     return;
   }
   const saveable=!['backup','about'].includes(settingsTab);
-  html(`<div class="screen settingsDetailScreen451 settingsScreen settingsScreen448 settingsScreen449">
-    <div class="settingsDetailTop451">
-      <button class="ghost settingsBack451" id="settingsBackBtn">← Settings</button>
-      <div class="settingsDetailTitle451"><h1>${active[1]}</h1><p>${active[2]}</p></div>
-      ${saveable?`<button class="primary settingsTopSave451" id="saveSettingsTop">Save</button>`:`<button class="ghost settingsTopSave451" id="settingsDoneBtn">Choices</button>`}
+  html(`<div class="screen settingsDetailScreen451 settingsScreen settingsScreen448 settingsScreen449 settingsDetailScreen488">
+    <div class="settingsDetailTop451 settingsDetailTop488">
+      <button class="ghost settingsBack451 settingsBack488" id="settingsBackBtn">←</button>
+      <div class="settingsDetailTitle451 settingsDetailTitle488"><h1>${active[1]}</h1></div>
+      ${saveable?`<button class="primary settingsTopSave451 settingsTopSave488" id="saveSettingsTop">Save</button>`:`<button class="ghost settingsTopSave451 settingsTopSave488" id="settingsDoneBtn">Done</button>`}
     </div>
-    <div class="settingsDetailBody451 grow settingsContent448 settingsContent449">${settingsPanel()}</div>
+    <p class="settingsDetailSub488">${active[2]}</p>
+    <div class="settingsDetailBody451 grow settingsContent448 settingsContent449 settingsDetailBody488">${settingsPanel()}</div>
   </div>`);
   document.getElementById("settingsBackBtn").onclick=()=>{ mode=null; settings(); };
   const done=document.getElementById("settingsDoneBtn"); if(done) done.onclick=()=>{ mode=null; settings(); };
@@ -2563,17 +2564,17 @@ function diagnostics(){
 }
 function showChangelog(){
   const notes = [
-    "Fixed the main Home screen customer search bar so typing no longer rebuilds the whole dashboard.",
-    "Search Focus Mode now opens smoothly and keeps the keyboard/input focus stable.",
-    "Removed the inactive right-side search button so the input has more room.",
-    "Improved Cancel behavior and search result spacing on iPhone screens.",
-    "Preserved Recent Accounts, Nearby Accounts, Modules, Daily Route, and the green Build revision indicator."
+    "Reworked the Settings page header into a cleaner compact Apple-style bar.",
+    "Added a direct Modules shortcut at the top of Settings.",
+    "Simplified Settings detail headers so the back button, title, and Save button are not cramped.",
+    "Moved long Settings descriptions below the header instead of stuffing them into the top bar.",
+    "Preserved the Home search bar repair, Apple-inspired dashboard, Modules, Daily Route tools, and green Build indicator."
   ];
   const overlay=document.createElement("div");
   overlay.className="releaseOverlay";
   overlay.innerHTML=`<div class="releaseSheet" role="dialog" aria-modal="true" aria-label="FireVault release notes">
     <div class="releaseHead"><div><strong>FireVault</strong><span>Build ${BUILD}</span></div><button class="ghost iconBtn" id="closeRelease" aria-label="Close release notes">×</button></div>
-    <div class="releaseBody"><h2>Release Notes</h2><p class="releaseIntro">Recent Accounts cleanup, Nearby Accounts status polish, and version housekeeping.</p><ul>${notes.map(n=>`<li>${esc(n)}</li>`).join("")}</ul></div>
+    <div class="releaseBody"><h2>Release Notes</h2><p class="releaseIntro">Settings header cleanup, Modules shortcut, and Home search polish.</p><ul>${notes.map(n=>`<li>${esc(n)}</li>`).join("")}</ul></div>
   </div>`;
   document.body.appendChild(overlay);
   const close=()=>overlay.remove();

@@ -1,22 +1,20 @@
-# FireVault Build 0.48.7
+# FireVault Build 0.48.8
 
-Build 0.48.7 is a Home screen search bar repair and polish build.
+Build 0.48.8 is a Settings header cleanup and Home search polish build.
 
 ## What changed
 
-- Visible app version advanced to 0.48.7.
-- Updated cache-busting references in `index.html` to 0.48.7.
+- Visible app version advanced to 0.48.8.
+- Updated cache-busting references in `index.html` to 0.48.8.
 - Updated release notes to match this build.
-- Fixed the main Home screen customer search bar.
-- Search typing no longer forces a full Home screen rebuild on the first character.
-- Search Focus Mode now keeps the keyboard/input focus stable.
-- Removed the inactive right-side search icon button so the search input has more room.
-- Improved Cancel behavior.
-- Improved search result spacing and bottom clearance for iPhone / Safari / PWA use.
-- Preserved Recent Accounts, Nearby Accounts, Modules, Daily Route tools, customer screen simplification, and the green Build revision indicator.
+- Reworked the **Settings** page header into a cleaner compact Apple-style bar.
+- Added a direct **Modules** shortcut at the top of Settings.
+- Simplified Settings detail headers so the back button, title, and Save button are not cramped.
+- Moved long Settings descriptions below the header instead of stuffing them into the top bar.
+- Preserved the Home search bar repair, Apple-inspired dashboard, Modules, Daily Route tools, and green Build revision indicator.
 
 Suggested commit message:
 
 ```text
-Build 0.48.7 home search bar repair
+Build 0.48.8 settings header cleanup
 ```
