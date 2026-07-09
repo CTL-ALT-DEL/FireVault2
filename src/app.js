@@ -1085,6 +1085,17 @@ function homeAccountRowsMarkup476(){
   const empty=q?'No matching accounts found.':'No recent accounts yet.';
   return `<div class="homeAccountSection476"><div class="homeSectionHead476"><strong>${title}</strong><span>${rows.length} account${rows.length===1?'':'s'}</span></div>${rows.length?rows.map(s=>`<button class="homeAccountCard476" data-home-site="${esc(s.id)}"><span class="accountInitial476">${esc((s.name||'?').slice(0,1).toUpperCase())}</span><span><strong>${esc(s.name||'Unnamed Site')}</strong><small>${esc(siteSubline476(s))}</small><em>${esc(siteActivityLine476(s))}</em></span></button>`).join(''):`<div class="empty homeEmpty476">${empty}</div>`}</div>`;
 }
+
+function homeRecentRowsOnly486(){
+  const rows=recentAccounts476(5);
+  return rows.length?rows.map(s=>`<button class="homeAccountCard476 homeRecentRow486" data-home-site="${esc(s.id)}"><span class="accountInitial476">${esc((s.name||'?').slice(0,1).toUpperCase())}</span><span><strong>${esc(s.name||'Unnamed Site')}</strong><small>${esc(siteSubline476(s))}</small><em>${esc(siteActivityLine476(s))}</em></span></button>`).join(''):`<div class="empty homeEmpty476">No recent accounts yet. Open a customer account and it will appear here.</div>`;
+}
+function homeNearbyTitle486(){
+  if(!featureOn('advancedGps')) return 'GPS module disabled';
+  if(!data.sites.some(hasGps)) return 'No GPS accounts saved';
+  if(nearbyState) return `Last check ${new Date(nearbyState.at).toLocaleTimeString([], {hour:"numeric",minute:"2-digit"})} • GPS ±${nearbyState.accuracy||0}m`;
+  return `${data.sites.filter(hasGps).length} GPS-ready account${data.sites.filter(hasGps).length===1?'':'s'}`;
+}
 function homeNearbyMarkup476(){
   if(!featureOn('advancedGps')) return '';
   if(!data.sites.some(hasGps)) return `<div class="homeNearbyEmpty476"><p>No GPS-saved accounts yet. Open a customer account and capture GPS first.</p></div>`;
@@ -1154,7 +1165,7 @@ function home(){
     ${siteSearch?`<div class="card searchResultsPanel478" id="homeSearchResults476">${homeAccountRowsMarkup476()}</div>`:`<div id="homeSearchResults476" class="searchResultsPanel478 hiddenSearchResults478"></div>`}
 
     <div class="card nearbyAccountsHero476 nearbyAccountsHero478 ${featureOn("advancedGps")?"":"featureHidden472"}">
-      <div class="nearbyHead476 nearbyHead478"><div><h2>Nearby Accounts</h2><p>${nearbyState?`Last check ${new Date(nearbyState.at).toLocaleTimeString([], {hour:"numeric",minute:"2-digit"})} • GPS ±${nearbyState.accuracy||0}m`:`${gpsSites} nearby-ready account${gpsSites===1?"":"s"}`}</p></div><button class="smallBtn nearbyCount478" id="checkNearbyHomeBtn476">${nearbyState?"Refresh":"Check"}</button></div>
+      <div class="nearbyHead476 nearbyHead478"><div><h2>Nearby Accounts</h2><p>${homeNearbyTitle486()}</p></div><button class="smallBtn nearbyCount478" id="checkNearbyHomeBtn476">${nearbyState?"Refresh":"Check"}</button></div>
       <div class="nearbyList476 nearbyList478">${homeNearbyMarkup476()}</div>
     </div>
 
@@ -1168,7 +1179,7 @@ function home(){
 
     <div class="recentAccountsPanel478">
       <div class="recentHead478"><div><strong>Recent Accounts</strong><span>${recentAccounts476(5).length} account${recentAccounts476(5).length===1?"":"s"}</span></div><button class="ghost smallBtn" id="allAccountsBtn478">See All</button></div>
-      <div class="recentList478">${homeAccountRowsMarkup476()}</div>
+      <div class="recentList478 recentList486">${homeRecentRowsOnly486()}</div>
     </div>
 
     <div class="homeModuleSummary476 homeModuleSummary478"><button class="ghost" id="manageModulesBtn476"><strong>Modules</strong><span>${esc(moduleStatus476())}</span></button><button class="ghost" id="defCard"><strong>${def}</strong><span>Deficiencies</span></button></div>
@@ -1179,7 +1190,7 @@ function home(){
   const homeRoot=document.querySelector('.homeScreen476');
   if(homeRoot) homeRoot.onclick=e=>{ const card=e.target.closest('[data-home-site]'); if(card){ selectedSiteId=card.dataset.homeSite; route('siteDetail'); } };
   const search=document.getElementById('homeCustomerSearch476');
-  if(search){ search.oninput=()=>{ siteSearch=search.value; renderHomeSearch476(); const clear=document.getElementById('clearHomeSearch476'); if(clear){ clear.disabled=!siteSearch; clear.textContent=siteSearch?'Clear':'⌕'; } }; setTimeout(()=>{ try{ search.setSelectionRange(search.value.length, search.value.length); }catch{} },0); }
+  if(search){ search.oninput=()=>{ siteSearch=search.value; renderHomeSearch476(); const clear=document.getElementById('clearHomeSearch476'); if(clear){ clear.disabled=!siteSearch; clear.textContent=siteSearch?'Cancel':'⌕'; } }; setTimeout(()=>{ try{ search.setSelectionRange(search.value.length, search.value.length); }catch{} },0); }
   const clear=document.getElementById('clearHomeSearch476'); if(clear) clear.onclick=()=>{ siteSearch=''; home(); };
   const checkNearby=document.getElementById('checkNearbyHomeBtn476'); if(checkNearby) checkNearby.onclick=checkNearbyHome476;
   document.getElementById('modulesTopBtn476').onclick=()=>{settingsTab='visibility'; mode='settingsDetail'; route('settings');};
@@ -2550,17 +2561,17 @@ function diagnostics(){
 }
 function showChangelog(){
   const notes = [
-    "Advanced visible version and cache-busting references updated to 0.48.5.",
-    "Polished Home Search Focus Mode so customer results have more room and cleaner spacing.",
-    "Improved search result cards with stronger tap targets and easier account scanning.",
-    "Added safer bottom spacing while searching so the last result stays above iPhone/Safari controls.",
-    "Preserved the Apple-inspired Concept #2 proportions, Modules, Daily Route, and green Build revision indicator."
+    "Advanced visible version and cache-busting references updated to 0.48.6.",
+    "Cleaned up the Apple-inspired Recent Accounts panel by removing the duplicate nested header.",
+    "Improved Nearby Accounts status text so the GPS state is clearer at a glance.",
+    "Kept search focus controls consistent by using Cancel while customer search is active.",
+    "Preserved the Concept #2 home proportions, Modules, Daily Route tools, and green Build revision indicator."
   ];
   const overlay=document.createElement("div");
   overlay.className="releaseOverlay";
   overlay.innerHTML=`<div class="releaseSheet" role="dialog" aria-modal="true" aria-label="FireVault release notes">
     <div class="releaseHead"><div><strong>FireVault</strong><span>Build ${BUILD}</span></div><button class="ghost iconBtn" id="closeRelease" aria-label="Close release notes">×</button></div>
-    <div class="releaseBody"><h2>Release Notes</h2><p class="releaseIntro">Home Search Focus polish, account result spacing, and version housekeeping.</p><ul>${notes.map(n=>`<li>${esc(n)}</li>`).join("")}</ul></div>
+    <div class="releaseBody"><h2>Release Notes</h2><p class="releaseIntro">Recent Accounts cleanup, Nearby Accounts status polish, and version housekeeping.</p><ul>${notes.map(n=>`<li>${esc(n)}</li>`).join("")}</ul></div>
   </div>`;
   document.body.appendChild(overlay);
   const close=()=>overlay.remove();
