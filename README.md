@@ -1,21 +1,20 @@
-# FireVault Build 0.50.1
+# FireVault Build 0.50.2
 
-Build 0.50.1 applies the selected Home search bar concept.
+Build 0.50.2 is a Home screen cleanup build.
 
 ## What changed
 
-- Visible app version advanced to 0.50.1.
-- Updated cache-busting references in `index.html` to 0.50.1.
+- Visible app version advanced to 0.50.2.
+- Updated cache-busting references in `index.html` to 0.50.2.
 - Updated release notes to match this build.
-- Applied selected **Search Bar Concept #6** to the Home screen.
-- Added the dark minimalist pill style.
-- Added a larger left search icon.
-- Added the right-side divider and red **Clear** control.
-- Kept the input area clean with no placeholder text.
-- Preserved Field Dashboard, Site Notes, Daily Summary, Daily Route, Modules, and splash screen.
+- Removed the extra **Field Dashboard** block that was added in 0.50.0.
+- Removed the extra **Today’s Accounts** block from the main menu.
+- Kept the selected **Search Bar Concept #6** design from 0.50.1.
+- Returned Home to a simpler customer-search-first layout.
+- Preserved Site Notes, Daily Summary screen, Daily Route, Modules, and splash screen.
 
 Suggested commit message:
 
 ```text
-Build 0.50.1 apply selected search bar concept six
+Build 0.50.2 clean up home menu remove extra dashboard blocks
 ```

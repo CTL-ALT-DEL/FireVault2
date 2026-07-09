@@ -2746,11 +2746,11 @@ function diagnostics(){
 }
 function showChangelog(){
   const notes = [
-    "Applied selected Search Bar Concept #6 to the Home screen.",
-    "Added the dark minimalist pill style with a larger left search icon.",
-    "Added the right-side divider and red Clear control.",
-    "Kept the search input clean with no placeholder text.",
-    "Preserved Field Dashboard, Site Notes, Daily Summary, Daily Route, Modules, and splash screen."
+    "Cleaned up the Home screen by removing the extra Field Dashboard block.",
+    "Removed the Today’s Accounts block from the main menu.",
+    "Kept the selected Concept #6 search bar design.",
+    "Returned the Home screen to a simpler customer-search-first layout.",
+    "Preserved Site Notes, Daily Summary screen, Daily Route, Modules, and splash screen."
   ];
   const overlay=document.createElement("div");
   overlay.className="releaseOverlay";
