@@ -3918,7 +3918,7 @@ function diagnostics(){
 }
 function showChangelog(){
   const notes = [
-    "Advanced to Build 0.50.34 from the working 0.50.33 baseline.",
+    "Advanced to Build 0.50.35 from the working 0.50.34 baseline.",
     "Re-applied the splash/top-bar fix without changing the stable JavaScript startup path.",
     "Hid the top logo/build/settings chrome while the splash screen is active.",
     "Pinned the Home logo/build/settings bar with a sticky header so it does not scroll away with the main page.",
@@ -3927,7 +3927,7 @@ function showChangelog(){
   overlay.className="releaseOverlay";
   overlay.innerHTML=`<div class="releaseSheet" role="dialog" aria-modal="true" aria-label="FireVault release notes">
     <div class="releaseHead"><div><strong>FireVault</strong><span>Build ${BUILD}</span></div><button class="ghost iconBtn" id="closeRelease" aria-label="Close release notes">×</button></div>
-    <div class="releaseBody"><h2>Release Notes</h2><p class="releaseIntro">Top bar splash visibility and sticky Home header repair.</p><ul>${notes.map(n=>`<li>${esc(n)}</li>`).join("")}</ul></div>
+    <div class="releaseBody"><h2>Release Notes</h2><p class="releaseIntro">Splash top-bar hide and Home safe-area backing repair.</p><ul>${notes.map(n=>`<li>${esc(n)}</li>`).join("")}</ul></div>
   </div>`;
   document.body.appendChild(overlay);
   const close=()=>overlay.remove();
@@ -3942,6 +3942,8 @@ function bootFireVault518(){
     render();
     document.body.classList.remove("app-loading533");
     document.body.classList.add("app-booted533");
+    document.getElementById("appHeader")?.removeAttribute("style");
+    document.getElementById("appNav")?.removeAttribute("style");
     window.__FIREVAULT_BOOTED = true;
     localStorage.setItem("firevault_last_boot_ok", new Date().toLocaleString());
     localStorage.setItem("firevault_last_boot_build", BUILD);
@@ -3956,6 +3958,8 @@ function bootFireVault518(){
     const app=document.getElementById("app");
     document.body.classList.remove("app-loading533");
     document.body.classList.add("app-boot-error533");
+    document.getElementById("appHeader")?.removeAttribute("style");
+    document.getElementById("appNav")?.removeAttribute("style");
     if(app){
       app.innerHTML=`<div class="screen"><div class="card errorBox"><h1>FireVault startup error</h1><p>The module loaded, but the app could not render.</p><p>${esc(window.__FIREVAULT_LAST_ERROR)}</p><button class="primary" onclick="location.reload()">Reload App</button></div></div>`;
     }
