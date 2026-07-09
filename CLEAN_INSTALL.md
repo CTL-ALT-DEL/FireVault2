@@ -1,27 +1,28 @@
-# Clean Install Notes — FireVault Build 0.50.25
+# Clean Install Notes — FireVault Build 0.50.26
 
-This ZIP is intended to be used as the clean baseline for FireVault Build 0.50.25.
+This ZIP is intended to be used as the clean baseline for FireVault Build 0.50.26.
 
 ## Install
 
 1. Extract the ZIP.
-2. Commit all files to the FireVault GitHub repository.
-3. Push to GitHub Pages.
-4. Clear browser/PWA cache if the previous build remains visible.
-5. Open the deployed PWA and confirm the visible build number shows `0.50.25`.
+2. Upload the extracted root contents to the FireVault GitHub Pages repository.
+3. Commit all files.
+4. Wait for GitHub Pages to deploy.
+5. Open the deployed PWA and confirm the visible build number shows `0.50.26`.
 
 ## Build focus
 
-Build 0.50.25 keeps the stable 0.50.24 photo workflow and adds Deficiency Photo Workflow:
+Build 0.50.26 keeps the stable 0.50.25 startup and photo workflow, then adds Customer Report Photo Selection:
 
-- `Save + Add Photo` from the Deficiency form.
-- `+ Photo` quick action from deficiency cards.
-- Linked deficiency photo thumbnails on deficiency cards and edit screens.
-- Deficiency-linked photo records saved in the Photo Vault.
-- Photo Vault search includes deficiency-linked metadata.
+- Customer-photo picker in Report Center.
+- Include in customer report checkbox on the photo form.
+- Selected customer photos appear in the generated TXT report.
+- Deficiency-linked photos include deficiency title when listed in the report.
+- Startup path, splash timing, and EOF repair were not changed.
 
-## Stability notes
+## Validation checklist
 
-- Startup path was intentionally left alone.
-- The 5-second splash timing and startup watchdog are preserved.
-- JavaScript validation and ZIP integrity checks were run before release.
+- JavaScript syntax check passes.
+- Manifest JSON validation passes.
+- ZIP integrity test passes.
+- Extracted ZIP contains expected root files.

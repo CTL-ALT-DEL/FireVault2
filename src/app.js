@@ -1940,6 +1940,30 @@ function siteDetail(){
 }
 
 function photoCategory524(d={}){ return d.photoCategory || (docHasPhoto512(d) ? "Panel" : ""); }
+function photoReportSelected526(d={}){ return !!(d && d.imageData && d.includeInCustomerReport === true); }
+function reportPhotos526(s={}){ return (s.docs||[]).filter(photoReportSelected526); }
+function reportPhotoLabel526(d={}){ return [photoCategory524(d)||"Photo", d.title||d.imageName||"Account Photo"].filter(Boolean).join(" • "); }
+function toggleReportPhoto526(docId){
+  const s=site(); if(!s) return;
+  const d=(s.docs||[]).find(x=>x.id===docId);
+  if(!d || !docHasPhoto512(d)){ toast("Photo not found."); return; }
+  d.includeInCustomerReport = !photoReportSelected526(d);
+  d.updatedAt = new Date().toISOString();
+  save();
+  toast(d.includeInCustomerReport ? "Photo selected for customer report." : "Photo removed from customer report.");
+  report();
+}
+function reportPhotoSelector526(s={}){
+  const photos=(s.docs||[]).filter(docHasPhoto512);
+  const selected=photos.filter(photoReportSelected526);
+  if(!photos.length) return `<div class="card reportPhotos526"><div class="reportPhotosHead526"><div><h2>Customer Report Photos</h2><p>No account photos saved yet. Add photos from the account screen or Photo Vault.</p></div><button class="ghost smallBtn" id="reportAddPhoto526">＋ Add Photo</button></div></div>`;
+  return `<div class="card reportPhotos526"><div class="reportPhotosHead526"><div><h2>Customer Report Photos</h2><p>${selected.length} of ${photos.length} photo${photos.length===1?"":"s"} selected for the customer package.</p></div><button class="ghost smallBtn" id="reportAddPhoto526">＋ Add Photo</button></div><div class="reportPhotoGrid526">${photos.slice(0,12).map(d=>`<button type="button" class="reportPhotoPick526 ${photoReportSelected526(d)?"selected":""}" data-doc="${esc(d.id)}">${docPhotoThumb512(d)}<span>${esc(reportPhotoLabel526(d))}</span><em>${photoReportSelected526(d)?"Included":"Tap to include"}</em></button>`).join("")}</div><p class="fieldNote">Selected photos are listed in the TXT customer report now. Image export can come later as PDF/report package support.</p></div>`;
+}
+function selectedReportPhotosText526(s={}){
+  const photos=reportPhotos526(s);
+  if(!photos.length) return "No photos selected for customer report";
+  return photos.map((d,i)=>`- Photo ${i+1}: ${reportPhotoLabel526(d)}${d.linkedDeficiencyTitle?` | Deficiency: ${d.linkedDeficiencyTitle}`:""}${d.notes?`\n  Notes: ${String(d.notes).replaceAll("\n","\n  ")}`:""}`).join("\n");
+}
 function photoCategoryHint524(cat){ return PHOTO_CATEGORY_HINTS_524[cat] || PHOTO_CATEGORY_HINTS_524.Other; }
 function photoCategoryChips524(active="Panel"){
   return `<div class="photoCategoryGrid524">${PHOTO_CATEGORIES_524.map(cat=>`<button type="button" class="photoCategoryChip524 ${active===cat?"active":""}" data-photo-category="${esc(cat)}"><strong>${esc(cat)}</strong><span>${esc(photoCategoryHint524(cat))}</span></button>`).join("")}</div>`;
@@ -2011,7 +2035,8 @@ function docPhotoPreviewMarkup512(d={}){
       <div class="photoNotesPanel524">
         <label>Photo Category</label><input type="hidden" id="docPhotoCategory524" value="${esc(currentCategory)}">${photoCategoryChips524(currentCategory)}
         <label class="checkRow inlineCheck photoOverlayToggle524"><input type="checkbox" id="docUseOverlay524" ${useOverlay?"checked":""}> Use overlay for this photo</label>
-        <p class="fieldNote">The overlay setting controls Download With Overlay and future report photo stamps.</p>
+        <label class="checkRow inlineCheck photoReportToggle526"><input type="checkbox" id="docIncludeReport526" ${d.includeInCustomerReport===true?"checked":""}> Include in customer report</label>
+        <p class="fieldNote">The overlay setting controls Download With Overlay. Customer report selection controls which photos are listed from Report Center.</p>
       </div>
     </div>
     <div id="docPhotoOverlayPreview513" class="docPhotoOverlayPreview513"></div>
@@ -2361,7 +2386,7 @@ function siteDocForm(){
   wireDocPhotoControls512(d||{});
   document.getElementById("saveDocBtn").onclick=()=>{
     const imageData=docPhotoClearRequested512 ? "" : (docPhotoDraftDataUrl512 || d?.imageData || "");
-    const obj={type:val("docType"),title:val("docTitle")||"Untitled Reference",ref:isDefPhoto525?"Deficiency":val("docRef"),url:val("docUrl"),date:val("docDate"),notes:raw("docNotes"),imageData,imageName:imageData?(docPhotoDraftName512||d?.imageName||"Site photo"):"",photoCategory:imageData?(isDefPhoto525?"Deficiency":selectedPhotoCategory524()):"",useOverlayOnSave:checked("docUseOverlay524"),imageUpdatedAt:imageData?new Date().toISOString():"",updatedAt:new Date().toISOString(),linkedDeficiencyId:isDefPhoto525?linkedDefId525:(d?.linkedDeficiencyId||""),linkedDeficiencyTitle:isDefPhoto525?(linkedDef525?.title||""):(d?.linkedDeficiencyTitle||"")};
+    const obj={type:val("docType"),title:val("docTitle")||"Untitled Reference",ref:isDefPhoto525?"Deficiency":val("docRef"),url:val("docUrl"),date:val("docDate"),notes:raw("docNotes"),imageData,imageName:imageData?(docPhotoDraftName512||d?.imageName||"Site photo"):"",photoCategory:imageData?(isDefPhoto525?"Deficiency":selectedPhotoCategory524()):"",useOverlayOnSave:checked("docUseOverlay524"),imageUpdatedAt:imageData?new Date().toISOString():"",updatedAt:new Date().toISOString(),linkedDeficiencyId:isDefPhoto525?linkedDefId525:(d?.linkedDeficiencyId||""),linkedDeficiencyTitle:isDefPhoto525?(linkedDef525?.title||""):(d?.linkedDeficiencyTitle||""),includeInCustomerReport:imageData?checked("docIncludeReport526"):false};
     if(mode && !isNewPhoto523 && d){ Object.assign(d,obj); }
     else s.docs.unshift({...obj,id:uid(),createdAt:new Date().toISOString()});
     save(); toast(isDefPhoto525?"Deficiency photo saved.":"Document saved."); if(isDefPhoto525){ mode=linkedDefId525; route("deficiencyForm"); } else route("siteDocs");
@@ -2764,6 +2789,7 @@ function defaultReportSections(){
     tasks:r.includeTasks !== false,
     deficiencies:r.includeDeficiencies !== false,
     notes:true,
+    photos:true,
     email:true
   };
 }
@@ -2774,7 +2800,7 @@ function reportSectionLabels(){
   return [
     ["site","Site"], ["tech","Tech"], ["visits","Visits"], ["contacts","Contacts"],
     ["equipment","Equipment"], ["docs","Docs"], ["checklist","Checklist"], ["tasks","Tasks"],
-    ["deficiencies","Deficiencies"], ["notes","Notes"], ["email","Email"]
+    ["deficiencies","Deficiencies"], ["notes","Notes"], ["photos","Photos"], ["email","Email"]
   ];
 }
 function reportSectionControls(opts){
@@ -2803,6 +2829,7 @@ function reportText(s, opts=reportSectionState()){
   if(opts.tasks) sections.push(["TASKS", (s.tasks||[]).map(t=>`- ${t.status||"Open"}: ${t.title}${t.source?` [${t.source}]`:""}${t.due?` due ${t.due}`:""}`).join("\n")||"No tasks"]);
   if(opts.deficiencies) sections.push(["DEFICIENCIES", (s.deficiencies||[]).map(d=>`- ${d.status||"Open"}: ${d.priority||"Normal"} - ${d.title}`).join("\n")||"No deficiencies"]);
   if(opts.notes) sections.push(["NOTES", s.notes||"No notes"]);
+  if(opts.photos) sections.push(["CUSTOMER REPORT PHOTOS", selectedReportPhotosText526(s)]);
   if(opts.email) sections.push(["EMAIL SUBJECT", renderTemplate(set.email.defaultSubject,s) || "FireVault Report"]), sections.push(["SIGNATURE", renderTemplate(set.email.signature,s) || "No signature template entered"]);
   return reportJoin(sections);
 }
@@ -2918,11 +2945,14 @@ function report(){
     <div class="card reportHero440 ${stats.h.cls}"><div><strong>${stats.h.score}%</strong><span>Health</span></div><div><strong>${stats.openTasks.length}</strong><span>Open Tasks</span></div><div><strong>${stats.openDef.length}</strong><span>Deficiencies</span></div><div><strong>${stats.equipmentIssues.length}</strong><span>Equip Issues</span></div></div>
     <div class="reportActionGrid440 reportActionGrid442 reportActionGrid447"><button class="primary" id="shareBtn">Share / Copy</button><button class="ghost" id="emailDraftBtn">Email Draft</button><button class="ghost" id="copyBtn">Copy TXT</button><button class="ghost" id="downloadBtn">Download</button><button class="ghost" id="subjectBtn">Copy Subject</button></div>
     <div class="card reportReadyCard reportReadyCard442 reportReadyCard447"><div><h2>Ready to Send</h2><p>${esc(subject || "FireVault Report")}</p><small>${esc((data.settings.email.defaultTo || "No default recipient") + (data.settings.email.cc ? ` • CC ${data.settings.email.cc}` : ""))}</small></div><span class="pill ${stats.h.cls}">${esc(stats.h.label)}</span></div>
+    ${reportPhotoSelector526(s)}
     <div class="card reportDeliveryCard442 reportDeliveryCard444 reportDeliveryCard447"><div class="reportDeliveryHead"><div><h2>Delivery Log</h2><p>Tap a delivery item to copy a receipt. Add a follow-up task when a report needs customer confirmation.</p></div><div class="reportDeliveryHeadActions"><button class="ghost smallBtn" id="followReportBtn">Follow-Up</button><button class="ghost smallBtn" id="logSentBtn">Log Sent</button></div></div><div class="reportDeliveryList">${reportDeliveryHtml(s)}</div></div>
     <div class="card reportOptions441 reportOptions447"><div class="reportOptionsHead"><div><h2>Report Package</h2><p>Tap sections on/off before sharing, copying, or downloading.</p></div><button class="ghost smallBtn" id="resetReportSections">Reset</button></div><div class="reportSectionGrid441">${reportSectionControls(opts)}</div></div>
     <div class="reportPreviewGrid440 reportPreviewGrid447">${reportPreviewCards(s).map(card=>`<div class="card reportPreviewCard440"><span>${esc(card[0])}</span><h2>${esc(card[1])}</h2>${card[2].map(x=>`<p>${esc(x)}</p>`).join("")}</div>`).join("")}</div>
     <div class="card reportBox reportBox440 reportBox447 grow">${esc(txt)}</div></div>`);
   document.getElementById("backBtn").onclick=()=>route("siteDetail");
+  const reportAddPhoto526=document.getElementById("reportAddPhoto526"); if(reportAddPhoto526) reportAddPhoto526.onclick=()=>{mode="newPhoto"; route("siteDocForm");};
+  document.querySelectorAll(".reportPhotoPick526").forEach(b=>b.onclick=()=>toggleReportPhoto526(b.dataset.doc));
   document.getElementById("shareBtn").onclick=async()=>{ if(await shareReportText(s,txt)){ logReportDelivery(s,"Share / Copy",subject); report(); } };
   document.getElementById("emailDraftBtn").onclick=()=>openReportEmailDraft(s,txt,subject);
   document.getElementById("copyBtn").onclick=async()=>{await navigator.clipboard.writeText(txt); logReportDelivery(s,"Copied TXT",subject); toast("Report copied."); report();};
@@ -3764,18 +3794,18 @@ function diagnostics(){
 }
 function showChangelog(){
   const notes = [
-    "Advanced to Build 0.50.25 from the stable Build 0.50.24 baseline.",
-    "Added Deficiency Photo Workflow so photos can be linked directly to deficiencies.",
-    "Added Save + Add Photo on the Deficiency form and + Photo on deficiency cards.",
-    "Added linked photo thumbnail strips on deficiency cards and deficiency edit screens.",
-    "Deficiency photos now save into the site Photo Vault with category Deficiency and linked deficiency metadata.",
-    "Preserved the stable Safari EOF startup repair, 5-second splash timing, Startup Health diagnostics, Account Photos, Photo Vault search/sort/filter tools, Photo Overlay tools, iPad autosizing, simple Home screen, Search Bar Concept #6, and excluded job-status workflow controls."
+    "Advanced to Build 0.50.26 from the stable Build 0.50.25 baseline.",
+    "Added Customer Report Photo Selection in Report Center.",
+    "Photos can now be marked Include in customer report from the photo form.",
+    "Report Center now shows a customer-photo picker with selected / included status.",
+    "Selected photos are listed in the generated TXT customer report with category, title, deficiency link, and notes.",
+    "Preserved the stable startup path, 5-second splash timing, Startup Health diagnostics, Deficiency Photo Workflow, Photo Vault search/sort/filter tools, Photo Overlay tools, iPad autosizing, simple Home screen, Search Bar Concept #6, and excluded job-status workflow controls."
   ];
   const overlay=document.createElement("div");
   overlay.className="releaseOverlay";
   overlay.innerHTML=`<div class="releaseSheet" role="dialog" aria-modal="true" aria-label="FireVault release notes">
     <div class="releaseHead"><div><strong>FireVault</strong><span>Build ${BUILD}</span></div><button class="ghost iconBtn" id="closeRelease" aria-label="Close release notes">×</button></div>
-    <div class="releaseBody"><h2>Release Notes</h2><p class="releaseIntro">Deficiency photo workflow.</p><ul>${notes.map(n=>`<li>${esc(n)}</li>`).join("")}</ul></div>
+    <div class="releaseBody"><h2>Release Notes</h2><p class="releaseIntro">Customer report photo selection.</p><ul>${notes.map(n=>`<li>${esc(n)}</li>`).join("")}</ul></div>
   </div>`;
   document.body.appendChild(overlay);
   const close=()=>overlay.remove();
