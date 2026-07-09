@@ -2020,11 +2020,51 @@ async function copyCustomerPhotoSummary529(){
   try{ await navigator.clipboard.writeText(customerPhotoSummary529(s)); toast("Customer photo summary copied."); }
   catch{ toast("Clipboard unavailable."); }
 }
+
+function defaultCustomerCaption530(d={}){
+  const cat=photoCategory524(d)||"Photo";
+  const title=d.title||d.imageName||"site photo";
+  if(d.linkedDeficiencyTitle) return `Photo documenting deficiency: ${d.linkedDeficiencyTitle}.`;
+  if(cat==="Before") return `Before photo: ${title}.`;
+  if(cat==="After") return `After photo: ${title}.`;
+  if(cat==="Deficiency") return `Deficiency photo: ${title}.`;
+  if(cat==="Battery") return `Battery condition photo: ${title}.`;
+  if(cat==="Communicator") return `Communicator photo: ${title}.`;
+  if(cat==="NAC") return `Notification circuit photo: ${title}.`;
+  if(cat==="Device") return `Device photo: ${title}.`;
+  if(cat==="Panel") return `Panel photo: ${title}.`;
+  return `${cat} photo: ${title}.`;
+}
+function fillMissingCustomerCaptions530(){
+  const s=site(); if(!s) return;
+  const selected=reportPhotos526(s);
+  let count=0;
+  selected.forEach(d=>{
+    if(!String(d.customerCaption||"").trim()){
+      d.customerCaption=defaultCustomerCaption530(d);
+      d.updatedAt=new Date().toISOString();
+      count++;
+    }
+  });
+  if(!count){ toast("All selected photos already have captions."); return; }
+  save();
+  toast(`${count} customer caption${count===1?"":"s"} added.`);
+  report();
+}
+function customerReportPhotoReady530(s={}){
+  const {photos,selected,captioned}=reportPhotoSummary527(s);
+  const missing=Math.max(0, selected.length-captioned);
+  const issues=[];
+  if(photos.length && !selected.length) issues.push("No customer photos selected");
+  if(missing) issues.push(`${missing} selected photo${missing===1?"":"s"} missing customer captions`);
+  return {missing, issues, label:issues.length?"Needs Review":"Ready"};
+}
 function reportPhotoSelector526(s={}){
   const {photos,selected,deficiency,beforeAfter,captioned}=reportPhotoSummary527(s);
+  const ready=customerReportPhotoReady530(s);
   if(!photos.length) return `<div class="card reportPhotos526 reportPhotos527"><div class="reportPhotosHead526"><div><h2>Customer Report Photos</h2><p>No account photos saved yet. Add photos from the account screen or Photo Vault.</p></div><button class="ghost smallBtn" id="reportAddPhoto526">＋ Add Photo</button></div></div>`;
   const selectedSet = selected.slice(0,6).map(d=>`<button type="button" class="reportIncludedThumb527" data-doc="${esc(d.id)}">${docPhotoThumb512(d)}<span>${esc(reportPhotoLabel526(d))}</span></button>`).join("");
-  return `<div class="card reportPhotos526 reportPhotos527"><div class="reportPhotosHead526"><div><h2>Customer Report Photos</h2><p>${selected.length} of ${photos.length} photo${photos.length===1?"":"s"} selected for the customer package.</p></div><button class="ghost smallBtn" id="reportAddPhoto526">＋ Add Photo</button></div><div class="reportPhotoStats527"><span><strong>${selected.length}</strong> Included</span><span><strong>${deficiency}</strong> Deficiency</span><span><strong>${beforeAfter}</strong> Before / After</span><span><strong>${captioned}</strong> Captioned</span></div><div class="reportPhotoActions527 reportPhotoActions529"><button type="button" class="ghost smallBtn" id="reportSelectAllPhotos527">Select All</button><button type="button" class="ghost smallBtn" id="reportClearPhotos527">Clear Selected</button><button type="button" class="ghost smallBtn" id="reportCopyPhotoList527">Copy Photo List</button><button type="button" class="ghost smallBtn" id="reportCopyCustomerSummary529">Copy Customer Summary</button></div>${selected.length?`<div class="reportIncludedStrip527">${selectedSet}${selected.length>6?`<em>+${selected.length-6} more selected</em>`:""}</div>`:`<p class="fieldNote">No photos selected yet. Tap photos below or use Select All.</p>`}<div class="reportPhotoGrid526 reportPhotoGrid527">${photos.map(d=>`<button type="button" class="reportPhotoPick526 ${photoReportSelected526(d)?"selected":""}" data-doc="${esc(d.id)}">${docPhotoThumb512(d)}<span>${esc(reportPhotoLabel526(d))}</span>${d.customerCaption?`<small class="photoCaptionReady528">Caption ready</small>`:""}<em>${photoReportSelected526(d)?"Included":"Tap to include"}</em></button>`).join("")}</div><p class="fieldNote">Copy Photo List is useful when sending a customer summary before PDF/photo package support is added.</p></div>`;
+  return `<div class="card reportPhotos526 reportPhotos527 reportPhotos530"><div class="reportPhotosHead526"><div><h2>Customer Report Photos</h2><p>${selected.length} of ${photos.length} photo${photos.length===1?"":"s"} selected for the customer package.</p></div><button class="ghost smallBtn" id="reportAddPhoto526">＋ Add Photo</button></div><div class="reportPhotoStats527 reportPhotoStats530"><span><strong>${selected.length}</strong> Included</span><span><strong>${deficiency}</strong> Deficiency</span><span><strong>${beforeAfter}</strong> Before / After</span><span><strong>${captioned}</strong> Captioned</span><span class="${ready.issues.length?"needsReview530":"ready530"}"><strong>${ready.issues.length?ready.missing:0}</strong> ${ready.label}</span></div>${ready.issues.length?`<div class="customerPhotoReady530"><strong>Customer photo check</strong><span>${esc(ready.issues.join(" • "))}</span></div>`:`<div class="customerPhotoReady530 good"><strong>Customer photo check</strong><span>Selected photos are ready for customer summary.</span></div>`}<div class="reportPhotoActions527 reportPhotoActions529"><button type="button" class="ghost smallBtn" id="reportSelectAllPhotos527">Select All</button><button type="button" class="ghost smallBtn" id="reportClearPhotos527">Clear Selected</button><button type="button" class="ghost smallBtn" id="reportFillCaptions530">Auto-Caption Missing</button><button type="button" class="ghost smallBtn" id="reportCopyPhotoList527">Copy Photo List</button><button type="button" class="ghost smallBtn" id="reportCopyCustomerSummary529">Copy Customer Summary</button></div>${selected.length?`<div class="reportIncludedStrip527">${selectedSet}${selected.length>6?`<em>+${selected.length-6} more selected</em>`:""}</div>`:`<p class="fieldNote">No photos selected yet. Tap photos below or use Select All.</p>`}<div class="reportPhotoGrid526 reportPhotoGrid527">${photos.map(d=>`<button type="button" class="reportPhotoPick526 ${photoReportSelected526(d)?"selected":""}" data-doc="${esc(d.id)}">${docPhotoThumb512(d)}<span>${esc(reportPhotoLabel526(d))}</span>${d.customerCaption?`<small class="photoCaptionReady528">Caption ready</small>`:photoReportSelected526(d)?`<small class="photoCaptionMissing530">Needs caption</small>`:""}<em>${photoReportSelected526(d)?"Included":"Tap to include"}</em></button>`).join("")}</div><p class="fieldNote">Auto-Caption Missing creates customer-facing captions from category, title, and linked deficiency info. You can edit them any time in the photo form.</p></div>`;
 }
 function selectedReportPhotosText526(s={}){
   const photos=reportPhotos526(s);
@@ -3036,6 +3076,7 @@ function report(){
   const clearPhotos527=document.getElementById("reportClearPhotos527"); if(clearPhotos527) clearPhotos527.onclick=()=>setAllReportPhotos527(false);
   const copyPhotoList527=document.getElementById("reportCopyPhotoList527"); if(copyPhotoList527) copyPhotoList527.onclick=copyReportPhotoList527;
   const copyCustomerSummary529=document.getElementById("reportCopyCustomerSummary529"); if(copyCustomerSummary529) copyCustomerSummary529.onclick=copyCustomerPhotoSummary529;
+  const fillCaptions530=document.getElementById("reportFillCaptions530"); if(fillCaptions530) fillCaptions530.onclick=fillMissingCustomerCaptions530;
   document.getElementById("shareBtn").onclick=async()=>{ if(await shareReportText(s,txt)){ logReportDelivery(s,"Share / Copy",subject); report(); } };
   document.getElementById("emailDraftBtn").onclick=()=>openReportEmailDraft(s,txt,subject);
   document.getElementById("copyBtn").onclick=async()=>{await navigator.clipboard.writeText(txt); logReportDelivery(s,"Copied TXT",subject); toast("Report copied."); report();};
@@ -3877,17 +3918,17 @@ function diagnostics(){
 }
 function showChangelog(){
   const notes = [
-    "Advanced to Build 0.50.29 from the stable Build 0.50.28 baseline.",
-    "Added Copy Customer Summary for selected customer-report photos.",
-    "Customer photo summary uses customer-facing captions and avoids internal technician notes.",
-    "Added a Captioned count to the Customer Report Photos stats.",
+    "Advanced to Build 0.50.30 from the stable 0.50.29 baseline.",
+    "Added Customer Photo Ready Check in Report Center.",
+    "Added Auto-Caption Missing for selected customer-report photos that do not have customer captions yet.",
+    "Added Needs Caption indicators on selected photos and a Ready / Needs Review status inside Customer Report Photos.",
     "Preserved Customer Photo Captions, Customer Report Photo Selection, Deficiency Photo Workflow, Photo Vault search/sort/filter tools, Photo Overlay tools, Startup Health diagnostics, the 5-second splash screen, iPad autosizing, simple Home screen, Search Bar Concept #6, and excluded job-status workflow controls."
   ];
   const overlay=document.createElement("div");
   overlay.className="releaseOverlay";
   overlay.innerHTML=`<div class="releaseSheet" role="dialog" aria-modal="true" aria-label="FireVault release notes">
     <div class="releaseHead"><div><strong>FireVault</strong><span>Build ${BUILD}</span></div><button class="ghost iconBtn" id="closeRelease" aria-label="Close release notes">×</button></div>
-    <div class="releaseBody"><h2>Release Notes</h2><p class="releaseIntro">Customer photo summary polish.</p><ul>${notes.map(n=>`<li>${esc(n)}</li>`).join("")}</ul></div>
+    <div class="releaseBody"><h2>Release Notes</h2><p class="releaseIntro">Customer photo ready-check and auto-caption polish.</p><ul>${notes.map(n=>`<li>${esc(n)}</li>`).join("")}</ul></div>
   </div>`;
   document.body.appendChild(overlay);
   const close=()=>overlay.remove();
