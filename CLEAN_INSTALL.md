@@ -1,6 +1,6 @@
-# Clean Install Notes — FireVault Build 0.50.8
+# Clean Install Notes — FireVault Build 0.50.9
 
-This ZIP is intended to be used as the new clean baseline for FireVault Build 0.50.8.
+This ZIP is intended to be used as the new clean baseline for FireVault Build 0.50.9.
 
 ## Install
 
@@ -12,12 +12,13 @@ This ZIP is intended to be used as the new clean baseline for FireVault Build 0.
 
 ## Build notes
 
-Build 0.50.8 keeps the 0.50.7 iPad autosizing work and adds a safer Daily Report / Site Notes workflow:
+Build 0.50.9 keeps the 0.50.8 Daily Report / Site Notes draft-safety work and adds faster closeout actions:
 
-- Site Note drafts autosave per site while typing.
-- Saved Site Notes clear the matching draft automatically.
-- Daily Report shows a Report Ready Check.
-- Daily Report surfaces unsaved Site Note drafts before copying or downloading reports.
+- Site Notes now has **Save + Report** to save the current note and jump straight to Daily Report.
+- Daily Report now has **Notes Only** copy for a clean saved-note-only closeout text.
+- Notes Only copy warns when unsaved Site Note drafts still exist.
+- Autosaved Site Note drafts, Clear Draft, Report Ready Check, Unsaved Drafts, Full Report, Customer Copy, and TXT download remain in place.
 - Home screen remains simple.
 - Search Bar Concept #6 remains unchanged.
+- iPad autosizing remains in place.
 - Job-status workflow buttons remain excluded.
