@@ -1030,6 +1030,7 @@ function render(){
   try{
     const routes = {home, routeLog, sites, nearbySites, attention:attentionQueue, siteDetail, visits, visitDetail, checklist, siteForm, contactsList, contactForm, siteDocs, siteDocForm, equipmentList, equipmentForm, tasks, taskForm, deficiencies, deficiencyForm, report, library, resourceForm, jobMode, settings, diagnostics};
     (routes[view] || home)();
+    document.body.classList.toggle("homeFullscreen480", view === "home");
     view === "jobMode" ? startJobTimer() : stopJobTimer();
     applyFeatureVisibility();
     setActiveNav();
@@ -2535,11 +2536,11 @@ function diagnostics(){
 }
 function showChangelog(){
   const notes = [
-    "Repaired the Apple-inspired home screen after 0.47.8 felt too bulky.",
-    "Removed duplicate in-page header clutter from the dashboard.",
-    "Reduced oversized text, cards, search field, stats, and spacing.",
-    "Moved the floating add button so it no longer collides with the bottom menu.",
-    "Added safer bottom spacing so Recent Accounts remains visible above the menu."
+    "Restored the Apple-inspired concept #2 proportions from 0.47.8.",
+    "Removed the extra global top header on the Home screen.",
+    "Removed the extra bottom app nav on the Home screen.",
+    "Kept the concept-style in-page menu, FireVault brand, search, Nearby Accounts, stats, and Recent Accounts.",
+    "Added full-screen Home layout mode so Safari/PWA chrome does not squeeze the design as badly."
   ];
   const overlay=document.createElement("div");
   overlay.className="releaseOverlay";
