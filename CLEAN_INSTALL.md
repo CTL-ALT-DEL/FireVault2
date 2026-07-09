@@ -1,21 +1,19 @@
-# Clean Install Notes — FireVault Build 0.50.31
+# Clean Install Notes — FireVault Build 0.50.32
 
-This ZIP is intended to be used as the new clean baseline for FireVault Build 0.50.31.
+This ZIP is intended to be used as the new clean baseline for FireVault Build 0.50.32.
 
 ## Install
 
 1. Extract the ZIP.
-2. Commit the extracted root files to the GitHub Pages branch.
-3. Wait for GitHub Pages deployment to complete.
-4. On iPhone/iPad, refresh Safari or remove/re-add the home screen app if cached files remain.
+2. Copy the extracted files to the root of the FireVault GitHub Pages repo.
+3. Commit and push to GitHub.
+4. On iPhone/iPad, reload the installed PWA or reinstall from Safari if cached files remain.
 
-## Build focus
+## Notes
 
-Build 0.50.31 keeps the stable startup path and improves customer-report photo review:
+Build 0.50.32 keeps the stable startup path and improves the splash/top bar layout:
 
-- Copy Caption Checklist.
-- READY / NEEDS CAPTION checklist output.
-- Suggested captions for selected photos missing customer captions.
-- Existing Customer Photo Ready Check and Auto-Caption Missing preserved.
-
-Startup path, 5-second splash screen, iPad autosizing, simple Home screen, and Search Bar Concept #6 were preserved.
+- Top static app bar is hidden during the splash screen.
+- Home logo / build / settings bar is pinned so it does not scroll away.
+- 5-second splash timing remains in place.
+- Startup Health and Safari EOF repair remain intact.

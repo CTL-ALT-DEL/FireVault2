@@ -3952,16 +3952,16 @@ function diagnostics(){
 }
 function showChangelog(){
   const notes = [
-    "Advanced to Build 0.50.31 from the stable 0.50.30 baseline.",
-    "Added Copy Caption Checklist for selected customer-report photos.",
-    "Caption Checklist marks each selected photo as READY or NEEDS CAPTION and includes suggested auto-captions for missing entries.",
+    "Advanced to Build 0.50.32 from the stable 0.50.31 baseline.",
+    "Hid the top static app bar during the splash screen so the splash appears clean by itself.",
+    "Pinned the Home logo/build/settings bar so it stays visible instead of scrolling away with the Home page.",
     "Preserved Customer Photo Ready Check, Auto-Caption Missing, Customer Photo Captions, Customer Report Photo Selection, Deficiency Photo Workflow, Photo Vault search/sort/filter tools, Photo Overlay tools, Startup Health diagnostics, the 5-second splash screen, iPad autosizing, simple Home screen, Search Bar Concept #6, and excluded job-status workflow controls."
   ];
   const overlay=document.createElement("div");
   overlay.className="releaseOverlay";
   overlay.innerHTML=`<div class="releaseSheet" role="dialog" aria-modal="true" aria-label="FireVault release notes">
     <div class="releaseHead"><div><strong>FireVault</strong><span>Build ${BUILD}</span></div><button class="ghost iconBtn" id="closeRelease" aria-label="Close release notes">×</button></div>
-    <div class="releaseBody"><h2>Release Notes</h2><p class="releaseIntro">Customer photo caption checklist polish.</p><ul>${notes.map(n=>`<li>${esc(n)}</li>`).join("")}</ul></div>
+    <div class="releaseBody"><h2>Release Notes</h2><p class="releaseIntro">Top chrome and splash screen layout polish.</p><ul>${notes.map(n=>`<li>${esc(n)}</li>`).join("")}</ul></div>
   </div>`;
   document.body.appendChild(overlay);
   const close=()=>overlay.remove();
@@ -3974,6 +3974,8 @@ function bootFireVault518(){
   try{
     window.__FIREVAULT_MODULE_READY = true;
     render();
+    document.body.classList.remove("preboot532");
+    document.body.classList.add("appReady532");
     window.__FIREVAULT_BOOTED = true;
     localStorage.setItem("firevault_last_boot_ok", new Date().toLocaleString());
     localStorage.setItem("firevault_last_boot_build", BUILD);
@@ -3985,6 +3987,8 @@ function bootFireVault518(){
       localStorage.setItem("firevault_last_boot_error", window.__FIREVAULT_LAST_ERROR);
       localStorage.setItem("firevault_last_boot_build", BUILD);
     }catch{}
+    document.body.classList.remove("preboot532");
+    document.body.classList.add("appReady532");
     const app=document.getElementById("app");
     if(app){
       app.innerHTML=`<div class="screen"><div class="card errorBox"><h1>FireVault startup error</h1><p>The module loaded, but the app could not render.</p><p>${esc(window.__FIREVAULT_LAST_ERROR)}</p><button class="primary" onclick="location.reload()">Reload App</button></div></div>`;
