@@ -1,6 +1,6 @@
-# Clean Install Notes — FireVault Build 0.50.49
+# Clean Install Notes — FireVault Build 0.50.50
 
-This ZIP is intended to be used as the new clean baseline for FireVault Build 0.50.49.
+This ZIP is intended to be used as the new clean baseline for FireVault Build 0.50.50.
 
 ## Install
 
@@ -11,7 +11,7 @@ This ZIP is intended to be used as the new clean baseline for FireVault Build 0.
 
 ## Build focus
 
-Build 0.50.49 continues from the stable 0.50.48 baseline and replaces the unreliable moving splash loader.
+Build 0.50.50 continues from the stable 0.50.49 baseline and removes the splash loader completely.
 
 ## Notes
 
@@ -21,17 +21,22 @@ Build 0.50.49 continues from the stable 0.50.48 baseline and replaces the unreli
 - Keeps Home simple.
 - Does not reintroduce job-status workflow buttons.
 
-## Build 0.50.49 highlights
+## Build 0.50.50 highlights
 
 - Built from the stable 0.50.46 baseline.
-- Removed the moving splash bar/flame behavior and replaced it with pulsing embers.
+- Removed the splash loading bar/ember entirely.
 - Preserved the 0.50.46 Home layout fixes.
 - Preserved fixed splash/header behavior and the 5-second splash screen.
 
-## Build 0.50.49 note
+## Build 0.50.50 note
 
 - Repairs the 0.50.47 splash flame animation by separating travel movement from flame flicker so Safari/PWA does not cancel the movement.
 
-## Build 0.50.49 note
+## Build 0.50.50 note
 
 - Replaces the unreliable left/right scrolling loader with a stable pulsing ember animation that should work better in iPhone PWA/Safari.
+
+## Build 0.50.50 note
+
+- Removes the splash-screen loading bar completely.
+- Lifts the red Home add button above the bottom navigation and removes the extra black Home safe-area slab that was covering it.
