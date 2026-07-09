@@ -1136,6 +1136,47 @@ function homeInstallTip482(){
   return `<div class="homeInstallTip482"><div><strong>Full-screen mode</strong><span>Open FireVault from your iPhone Home Screen to remove Safari bars.</span></div><button class="ghost smallBtn" id="homeInstallHow482">How</button><button class="ghost smallBtn" id="homeInstallHide482">Hide</button></div>`;
 }
 
+
+function todayNoteRows500(){
+  const today=localDateString();
+  const rows=[];
+  (data.sites||[]).forEach(s=>{
+    ensureSite(s);
+    const notes=(s.notes||[]).filter(n=>{
+      const d=(n.at||n.createdAt||n.date||"").slice(0,10);
+      return d===today;
+    });
+    if(notes.length) rows.push({s,notes});
+  });
+  return rows.sort((a,b)=>String(a.s.name||"").localeCompare(String(b.s.name||"")));
+}
+function todayAccounts500(){
+  const map=new Map();
+  todayNoteRows500().forEach(r=>map.set(r.s.id,{s:r.s,reason:`${r.notes.length} note${r.notes.length===1?"":"s"}`}));
+  const today=localDateString();
+  const routeEvents=[...(activeRoute?.events||[]), ...((data.routeLogs||[]).filter(l=>(l.date||"")===today || (l.startedAt||"").slice(0,10)===today).flatMap(l=>l.events||[]))];
+  routeEvents.forEach(e=>{
+    if(e.siteId){
+      const s=data.sites.find(x=>x.id===e.siteId);
+      if(s && !map.has(s.id)) map.set(s.id,{s,reason:"Route stop"});
+    }
+  });
+  return [...map.values()].slice(0,5);
+}
+function dashboardSummary500(){
+  const notes=todayNoteRows500();
+  const noteCount=notes.reduce((n,r)=>n+r.notes.length,0);
+  const routeCount=(activeRoute?.events||[]).length;
+  const openTasks=allTaskRows().filter(r=>!taskIsDone(r.t)).length;
+  const openDef=data.sites.reduce((n,s)=>n+(s.deficiencies||[]).filter(d=>(d.status||"Open")!=="Closed").length,0);
+  return {notes:noteCount,noteSites:notes.length,route:routeCount,tasks:openTasks,def:openDef};
+}
+function todayAccountsMarkup500(){
+  const rows=todayAccounts500();
+  if(!rows.length) return `<div class="empty todayAccountsEmpty500">No account activity yet today.</div>`;
+  return rows.map(({s,reason})=>`<button class="todayAccountRow500" data-home-site="${esc(s.id)}"><span>${esc((s.name||"?").slice(0,1).toUpperCase())}</span><div><strong>${esc(s.name||"Unnamed Account")}</strong><small>${esc(fullAddress(s)||"No address saved")}</small></div><em>${esc(reason)}</em></button>`).join("");
+}
+
 function home(){
   const taskRows = allTaskRows();
   const taskCounts = taskFilterCounts(taskRows);
@@ -1165,6 +1206,24 @@ function home(){
     </div>
 
     ${siteSearch?`<div class="card searchResultsPanel478" id="homeSearchResults476">${homeAccountRowsMarkup476()}</div>`:`<div id="homeSearchResults476" class="searchResultsPanel478 hiddenSearchResults478"></div>`}
+
+    ${!siteSearch?`<div class="fieldDashboard500">
+      <div class="fieldDashHead500"><div><strong>Field Dashboard</strong><span>Site notes, route, and daily summary</span></div><button class="ghost smallBtn" id="dailySummaryBtn500">Summary</button></div>
+      <div class="fieldDashStats500">
+        <button class="fieldStat500" id="dashNotes500"><strong>${dashboardSummary500().notes}</strong><span>Notes Today</span></button>
+        <button class="fieldStat500" id="dashAccounts500"><strong>${dashboardSummary500().noteSites}</strong><span>Note Sites</span></button>
+        <button class="fieldStat500" id="dashRoute500"><strong>${dashboardSummary500().route}</strong><span>Route Points</span></button>
+      </div>
+      <div class="fieldDashActions500">
+        <button class="primary" id="quickAccountNote500">＋ Site Note</button>
+        <button class="ghost" id="openRoute500">Daily Route</button>
+        <button class="ghost" id="copySummary500">Copy Summary</button>
+      </div>
+    </div>
+    <div class="todayAccountsPanel500">
+      <div class="recentHead478"><div><strong>Today’s Accounts</strong><span>Notes and route activity</span></div><button class="ghost smallBtn" id="allTodayAccounts500">All Sites</button></div>
+      <div class="todayAccountsList500">${todayAccountsMarkup500()}</div>
+    </div>`:""}
 
     <div class="card nearbyAccountsHero476 nearbyAccountsHero478 ${featureOn("advancedGps")?"":"featureHidden472"}">
       <div class="nearbyHead476 nearbyHead478"><div><h2>Nearby Accounts</h2><p>${homeNearbyTitle486()}</p></div><button class="smallBtn nearbyCount478" id="checkNearbyHomeBtn476">${nearbyState?"Refresh":"Check"}</button></div>
@@ -2687,11 +2746,11 @@ function diagnostics(){
 }
 function showChangelog(){
   const notes = [
-    "Added Daily Summary for the site-notes-only workflow.",
-    "Added a Home dashboard Daily Summary card.",
-    "Daily Summary includes today’s note sites, route activity, open tasks, new tasks, and deficiencies.",
-    "Added Copy Summary for quick end-of-day reporting.",
-    "Preserved Site Notes polish, clean Home search box, splash screen, Modules, and Daily Route tools."
+    "Marked FireVault 0.50.0 as the Field Dashboard Milestone.",
+    "Refined the Home dashboard around site notes, today's accounts, route, and daily summary.",
+    "Added stronger field-ready visual treatment for the daily dashboard sections.",
+    "Made note, route, and summary actions feel more like the main workflow.",
+    "Preserved Site Notes, Daily Summary, Daily Route, Modules, splash screen, and clean Home search."
   ];
   const overlay=document.createElement("div");
   overlay.className="releaseOverlay";
