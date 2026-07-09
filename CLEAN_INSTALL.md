@@ -1,10 +1,10 @@
-# Clean Install Notes — FireVault Build 0.50.35
+# Clean Install Notes — FireVault Build 0.50.36
 
 This ZIP is intended to replace the failed 0.50.31 / 0.50.32 branch.
 
 ## Important
 
-Build 0.50.35 continues from the working 0.50.34 baseline and directly fixes splash top-bar visibility plus the Home safe-area backing behind the fixed top bar without changing the stable startup path.
+Build 0.50.36 continues from the working 0.50.34 baseline and directly fixes splash top-bar visibility plus the Home safe-area backing behind the fixed top bar without changing the stable startup path.
 
 ## Install
 

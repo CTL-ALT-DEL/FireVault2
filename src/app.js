@@ -3918,16 +3918,16 @@ function diagnostics(){
 }
 function showChangelog(){
   const notes = [
-    "Advanced to Build 0.50.35 from the working 0.50.34 baseline.",
-    "Re-applied the splash/top-bar fix without changing the stable JavaScript startup path.",
-    "Hid the top logo/build/settings chrome while the splash screen is active.",
-    "Pinned the Home logo/build/settings bar with a sticky header so it does not scroll away with the main page.",
+    "Advanced to Build 0.50.36 from the working 0.50.35 baseline.",
+    "Restored the Home top bar after the clean splash-screen hide fix.",
+    "Kept the top logo/build/settings chrome hidden during splash, then explicitly reveals it after boot.",
+    "Pinned the Home logo/build/settings bar above the scroll area with a solid black safe-area backing.",
     "Preserved Customer Photo Ready Check, Customer Photo Captions, Customer Report Photo Selection, Deficiency Photo Workflow, Photo Vault tools, Startup Health diagnostics, the 5-second splash screen, iPad autosizing, simple Home screen, Search Bar Concept #6, and excluded job-status workflow controls."
   ];  const overlay=document.createElement("div");
   overlay.className="releaseOverlay";
   overlay.innerHTML=`<div class="releaseSheet" role="dialog" aria-modal="true" aria-label="FireVault release notes">
     <div class="releaseHead"><div><strong>FireVault</strong><span>Build ${BUILD}</span></div><button class="ghost iconBtn" id="closeRelease" aria-label="Close release notes">×</button></div>
-    <div class="releaseBody"><h2>Release Notes</h2><p class="releaseIntro">Splash top-bar hide and Home safe-area backing repair.</p><ul>${notes.map(n=>`<li>${esc(n)}</li>`).join("")}</ul></div>
+    <div class="releaseBody"><h2>Release Notes</h2><p class="releaseIntro">Home top-bar restore and splash chrome polish.</p><ul>${notes.map(n=>`<li>${esc(n)}</li>`).join("")}</ul></div>
   </div>`;
   document.body.appendChild(overlay);
   const close=()=>overlay.remove();
@@ -3939,9 +3939,10 @@ function showChangelog(){
 function bootFireVault518(){
   try{
     window.__FIREVAULT_MODULE_READY = true;
-    render();
     document.body.classList.remove("app-loading533");
     document.body.classList.add("app-booted533");
+    render();
+    document.body.classList.add("app-chrome-ready536");
     document.getElementById("appHeader")?.removeAttribute("style");
     document.getElementById("appNav")?.removeAttribute("style");
     window.__FIREVAULT_BOOTED = true;
