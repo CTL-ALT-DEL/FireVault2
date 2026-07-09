@@ -48,7 +48,7 @@ nav{min-height:var(--navH);position:fixed;bottom:0;left:0;right:0;display:grid;g
 
 
 /* Build 0.40.5 Settings small-space redesign + logo cache-bust */
-.settingsScreen{gap:6px;min-height:0}.settingsMicrobar{display:flex;align-items:center;justify-content:space-between;gap:8px;min-height:34px;padding:5px 7px;border:1px solid rgba(255,255,255,.07);border-radius:12px;background:rgba(255,255,255,.035)}.settingsCrumb{display:flex;align-items:center;gap:7px;min-width:0;font-size:12px;color:var(--muted);font-weight:850;text-transform:uppercase;letter-spacing:.055em}.settingsCrumb b{color:var(--text);font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-transform:none;letter-spacing:0}.settingsMicroLogo{width:24px;height:24px;border-radius:7px;flex:0 0 auto}.iconBtn{width:32px;height:32px;min-height:32px;padding:0;border-radius:10px;font-size:14px;display:grid;place-items:center}.settingsLayout{grid-template-columns:124px minmax(0,1fr);gap:7px}.settingsRail{gap:5px;padding:0 1px 8px}.settingsRail .tabBtn,.settingsRail .tabBtn.tabBtn{min-height:38px;padding:5px 7px;border-radius:11px;align-items:flex-start;text-align:left}.settingsRail .tabBtn strong{font-size:12px;line-height:1.05}.settingsRail .tabBtn span{font-size:9.5px;line-height:1.05;margin-top:1px;letter-spacing:0}.settingsContent{padding-bottom:12px}.settingsStack{gap:7px}.compactPane{padding:8px 9px;border-left-width:3px}.paneHead{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:2px}.paneHead h2{font-size:15px;line-height:1.1;margin:0}.paneNote{font-size:11px;line-height:1.25;margin:0 0 7px;color:var(--muted)}.saveMini{min-height:32px;padding:6px 10px;border-radius:10px;font-size:12px;flex:0 0 auto}.settingsGrid{grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}.settingField{gap:3px}.settingField label,label{font-size:9.5px;line-height:1.1;letter-spacing:.065em;text-align:left}.settingField input,.settingField textarea,.settingField select,input,textarea,select{min-height:38px;padding:8px 9px;border-radius:10px;font-size:13px;text-align:left}.settingField textarea,textarea{min-height:64px}.fieldNote{font-size:10.5px;line-height:1.2;margin:1px 0 0}.settingsList{gap:6px;margin-top:7px}.settingsList.twoCol{grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}.checkRow{min-height:36px;padding:7px 8px;border-radius:10px;font-size:12px;line-height:1.15;text-align:left;justify-content:flex-start}.checkRow input{width:17px;height:17px;min-height:17px}.presetGrid{grid-template-columns:repeat(2,minmax(0,1fr));gap:6px;margin-bottom:7px}.presetBtn{min-height:38px;padding:6px 8px;border-radius:10px;font-size:12px}.themeSwatch{width:22px;height:22px;border-radius:7px}.previewPanel.compactPreview{min-height:92px;margin:6px 0}.previewOverlay{font-size:11px;padding:7px 8px}.aboutGrid{gap:6px}.aboutGrid div{padding:8px;border-radius:10px}.aboutGrid strong{font-size:9.5px}.aboutGrid span{font-size:12px}.brandMark{content:url('../assets/icon-192.png?v=0.50.23')}
+.settingsScreen{gap:6px;min-height:0}.settingsMicrobar{display:flex;align-items:center;justify-content:space-between;gap:8px;min-height:34px;padding:5px 7px;border:1px solid rgba(255,255,255,.07);border-radius:12px;background:rgba(255,255,255,.035)}.settingsCrumb{display:flex;align-items:center;gap:7px;min-width:0;font-size:12px;color:var(--muted);font-weight:850;text-transform:uppercase;letter-spacing:.055em}.settingsCrumb b{color:var(--text);font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-transform:none;letter-spacing:0}.settingsMicroLogo{width:24px;height:24px;border-radius:7px;flex:0 0 auto}.iconBtn{width:32px;height:32px;min-height:32px;padding:0;border-radius:10px;font-size:14px;display:grid;place-items:center}.settingsLayout{grid-template-columns:124px minmax(0,1fr);gap:7px}.settingsRail{gap:5px;padding:0 1px 8px}.settingsRail .tabBtn,.settingsRail .tabBtn.tabBtn{min-height:38px;padding:5px 7px;border-radius:11px;align-items:flex-start;text-align:left}.settingsRail .tabBtn strong{font-size:12px;line-height:1.05}.settingsRail .tabBtn span{font-size:9.5px;line-height:1.05;margin-top:1px;letter-spacing:0}.settingsContent{padding-bottom:12px}.settingsStack{gap:7px}.compactPane{padding:8px 9px;border-left-width:3px}.paneHead{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:2px}.paneHead h2{font-size:15px;line-height:1.1;margin:0}.paneNote{font-size:11px;line-height:1.25;margin:0 0 7px;color:var(--muted)}.saveMini{min-height:32px;padding:6px 10px;border-radius:10px;font-size:12px;flex:0 0 auto}.settingsGrid{grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}.settingField{gap:3px}.settingField label,label{font-size:9.5px;line-height:1.1;letter-spacing:.065em;text-align:left}.settingField input,.settingField textarea,.settingField select,input,textarea,select{min-height:38px;padding:8px 9px;border-radius:10px;font-size:13px;text-align:left}.settingField textarea,textarea{min-height:64px}.fieldNote{font-size:10.5px;line-height:1.2;margin:1px 0 0}.settingsList{gap:6px;margin-top:7px}.settingsList.twoCol{grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}.checkRow{min-height:36px;padding:7px 8px;border-radius:10px;font-size:12px;line-height:1.15;text-align:left;justify-content:flex-start}.checkRow input{width:17px;height:17px;min-height:17px}.presetGrid{grid-template-columns:repeat(2,minmax(0,1fr));gap:6px;margin-bottom:7px}.presetBtn{min-height:38px;padding:6px 8px;border-radius:10px;font-size:12px}.themeSwatch{width:22px;height:22px;border-radius:7px}.previewPanel.compactPreview{min-height:92px;margin:6px 0}.previewOverlay{font-size:11px;padding:7px 8px}.aboutGrid{gap:6px}.aboutGrid div{padding:8px;border-radius:10px}.aboutGrid strong{font-size:9.5px}.aboutGrid span{font-size:12px}.brandMark{content:url('../assets/icon-192.png?v=0.50.24')}
 @media(max-width:720px){main{padding:7px 7px 14px}.settingsLayout{grid-template-columns:1fr;gap:6px}.settingsRail{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));grid-auto-flow:row;grid-auto-columns:auto;overflow:visible;gap:5px;padding:0}.settingsRail .tabBtn,.settingsRail .tabBtn.tabBtn{min-height:36px;padding:5px 4px;align-items:center;text-align:center}.settingsRail .tabBtn strong{font-size:11px}.settingsRail .tabBtn span{font-size:8.5px}.settingsGrid,.settingsList.twoCol,.presetGrid{grid-template-columns:1fr}.compactPane{padding:8px}.paneHead h2{font-size:14px}.settingsCrumb span{display:none}.settingsMicrobar{min-height:32px}.settingsContent{overflow:auto;padding-bottom:16px}.settingField input,.settingField textarea,.settingField select,input,textarea,select{font-size:13px;min-height:37px}.checkRow{font-size:11.5px}.presetGrid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:390px){.settingsRail{grid-template-columns:repeat(4,minmax(0,1fr));gap:4px}.settingsRail .tabBtn strong{font-size:10.5px}.settingsRail .tabBtn span{display:none}.presetGrid{grid-template-columns:1fr}.paneNote{display:none}.settingsGrid{gap:6px}.compactPane{padding:7px}}
 
@@ -7991,7 +7991,7 @@ button[id="quickNoteBtn"]{
 
 /* Build 0.50.15 Splash screen timing polish: startup is intentionally delayed briefly in app.js so the splash does not flash. */
 
-/* Build 0.50.23 Photo Vault filter polish */
+/* Build 0.50.24 Photo Vault filter polish */
 .docsHero516{
   overflow:hidden;
 }
@@ -8049,7 +8049,7 @@ button[id="quickNoteBtn"]{
   }
 }
 
-/* Build 0.50.23 Startup Health diagnostics */
+/* Build 0.50.24 Startup Health diagnostics */
 .startupHealth520{
   border-left:4px solid rgba(52,211,153,.9);
   background:linear-gradient(180deg,rgba(16,185,129,.08),rgba(15,23,42,.78));
@@ -8123,7 +8123,7 @@ button[id="quickNoteBtn"]{
   .startupHealthGrid520{grid-template-columns:repeat(2,minmax(0,1fr));}
 }
 
-/* Build 0.50.23 Photo Vault search polish */
+/* Build 0.50.24 Photo Vault search polish */
 .docsHero521{
   overflow:hidden;
 }
@@ -8170,7 +8170,7 @@ button[id="quickNoteBtn"]{
   }
 }
 
-/* Build 0.50.23 Photo Vault sort and copy-list polish */
+/* Build 0.50.24 Photo Vault sort and copy-list polish */
 .docSortBar522{
   display:grid;
   grid-template-columns:auto minmax(0,1fr) auto;
@@ -8207,7 +8207,7 @@ button[id="quickNoteBtn"]{
 }
 
 
-/* Build 0.50.23 Account Photos entry-point polish */
+/* Build 0.50.24 Account Photos entry-point polish */
 .accountPhotoCard523{
   border-left:4px solid rgba(56,189,248,.9);
 }
@@ -8279,5 +8279,184 @@ button[id="quickNoteBtn"]{
   }
   .accountPhotoThumb523 .docPhotoThumb512{
     height:120px;
+  }
+}
+
+/* Build 0.50.24 Account Photo polish */
+.docPhotoManager524{
+  border-left:4px solid rgba(56,189,248,.95);
+}
+.docPhotoHead524 span{
+  max-width:58ch;
+}
+.photoQuickLayout524{
+  display:grid;
+  grid-template-columns:minmax(0,1.1fr) minmax(260px,.9fr);
+  gap:10px;
+  align-items:start;
+}
+.photoPickerPanel524,.photoNotesPanel524{
+  display:grid;
+  gap:7px;
+  min-width:0;
+}
+.docPhotoPreview524{
+  min-height:220px;
+}
+.photoCategoryGrid524{
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:7px;
+}
+.photoCategoryChip524{
+  min-height:58px!important;
+  padding:8px!important;
+  display:grid!important;
+  gap:3px!important;
+  align-content:start!important;
+  text-align:left!important;
+  border-radius:13px!important;
+  border:1px solid rgba(255,255,255,.08)!important;
+  background:linear-gradient(180deg,rgba(255,255,255,.055),rgba(255,255,255,.022))!important;
+}
+.photoCategoryChip524 strong{
+  color:#fff;
+  font-size:12px;
+  line-height:1.05;
+  font-weight:950;
+}
+.photoCategoryChip524 span{
+  color:#9ca3af;
+  font-size:9.6px;
+  line-height:1.12;
+  font-weight:760;
+}
+.photoCategoryChip524.active{
+  border-color:color-mix(in srgb,var(--accent,#ef4444) 75%,rgba(255,255,255,.12))!important;
+  background:linear-gradient(180deg,color-mix(in srgb,var(--accent,#ef4444) 26%,rgba(255,255,255,.07)),rgba(255,255,255,.026))!important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.08),0 8px 16px rgba(0,0,0,.16);
+}
+.photoOverlayToggle524{
+  margin-top:4px!important;
+}
+.photoCategoryPill524{
+  display:inline-grid;
+  place-items:center;
+  min-height:20px;
+  padding:3px 7px;
+  margin-right:6px;
+  border-radius:999px;
+  color:#fff;
+  background:rgba(56,189,248,.2);
+  border:1px solid rgba(56,189,248,.35);
+  font-size:10px;
+  font-weight:950;
+  text-transform:uppercase;
+  letter-spacing:.045em;
+}
+.accountPhotoThumb524{
+  position:relative;
+}
+.accountPhotoThumb524 em{
+  position:absolute;
+  top:6px;
+  left:6px;
+  padding:3px 6px;
+  border-radius:999px;
+  background:rgba(0,0,0,.62);
+  border:1px solid rgba(255,255,255,.14);
+  color:#fff;
+  font-size:9.5px;
+  font-style:normal;
+  font-weight:950;
+  letter-spacing:.04em;
+  text-transform:uppercase;
+}
+.photoModalOverlay524{
+  position:fixed;
+  inset:0;
+  z-index:130;
+  display:grid;
+  place-items:center;
+  padding:14px;
+  background:rgba(0,0,0,.72);
+  backdrop-filter:blur(8px);
+}
+.photoModalSheet524{
+  width:min(860px,100%);
+  max-height:92vh;
+  overflow:auto;
+  display:grid;
+  gap:10px;
+  padding:12px;
+  border-radius:22px;
+  border:1px solid rgba(255,255,255,.12);
+  background:linear-gradient(180deg,#162033,#0b0f16);
+  box-shadow:0 24px 60px rgba(0,0,0,.5),inset 0 1px 0 rgba(255,255,255,.08);
+}
+.photoModalHead524{
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:10px;
+}
+.photoModalHead524 strong{
+  display:block;
+  font-size:18px;
+  line-height:1.15;
+}
+.photoModalHead524 span{
+  display:block;
+  color:var(--muted);
+  font-size:12px;
+  margin-top:2px;
+}
+.photoModalImage524{
+  min-height:240px;
+  border-radius:18px;
+  overflow:hidden;
+  background:#020617;
+  border:1px solid rgba(255,255,255,.08);
+  display:grid;
+  place-items:center;
+}
+.photoModalImage524 img{
+  width:100%;
+  max-height:62vh;
+  object-fit:contain;
+  display:block;
+}
+.photoModalNotes524{
+  margin:0;
+  padding:10px;
+  border-radius:14px;
+  color:#cbd5e1;
+  background:rgba(255,255,255,.045);
+  border:1px solid rgba(255,255,255,.07);
+  white-space:pre-wrap;
+}
+.photoModalActions524{
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:8px;
+}
+@media(max-width:760px){
+  .photoQuickLayout524{
+    grid-template-columns:1fr;
+  }
+  .photoCategoryGrid524{
+    grid-template-columns:repeat(2,minmax(0,1fr));
+  }
+}
+@media(max-width:520px){
+  .photoCategoryGrid524,
+  .photoModalActions524{
+    grid-template-columns:1fr;
+  }
+  .photoModalOverlay524{
+    padding:8px;
+  }
+  .photoModalSheet524{
+    border-radius:18px;
   }
 }

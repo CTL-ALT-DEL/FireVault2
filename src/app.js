@@ -70,6 +70,18 @@ const OVERLAY_TAGS_510 = [
   ["{gps}","GPS","Sample saved GPS coordinates"],
   ["{build}","Build","Current FireVault build number"]
 ];
+const PHOTO_CATEGORIES_524 = ["Panel","NAC","Device","Communicator","Battery","Deficiency","Before","After","Other"];
+const PHOTO_CATEGORY_HINTS_524 = {
+  Panel:"Panel cabinet, display, trouble state, or wiring overview.",
+  NAC:"Horn/strobe circuit, EOL, module, or notification appliance wiring.",
+  Device:"Smoke, pull station, duct detector, module, tamper, flow, or other field device.",
+  Communicator:"Cellular/IP communicator, antenna, signal screen, or wiring.",
+  Battery:"Batteries, date codes, charger readings, or cabinet condition.",
+  Deficiency:"Problem condition, damage, missing device, access issue, or failed test evidence.",
+  Before:"Before repair or before cleanup documentation.",
+  After:"After repair, restore, cleanup, or completion documentation.",
+  Other:"General site photo."
+};
 const REPORT_SECTION_KEY = "firevault_report_section_prefs";
 let reportSectionPrefs = loadReportSectionPrefs();
 const appEl = document.getElementById("app");
@@ -1866,7 +1878,7 @@ function siteDetail(){
 
     <div class="grid3 siteQuickStats477 siteQuickStats489"><button class="card tile" id="taskBtn"><strong>${open}</strong><span>Open Tasks</span></button><button class="card tile" id="defBtn"><strong>${def}</strong><span>Deficiencies</span></button><button class="card tile" id="visitsMini477"><strong>${siteVisits.length}</strong><span>Visits</span></button></div>
 
-    <div class="card accountPhotoCard523 siteSimpleCard477"><div class="row"><div><h2>Account Photos</h2><p>${photoDocs.length ? `${photoDocs.length} saved photo${photoDocs.length===1?'':'s'} for this account.` : 'Add panel, device, wiring, deficiency, and site condition photos here.'}</p></div><div class="photoCardActions523"><button class="ghost smallBtn" id="openPhotoVaultBtn523">Photo Vault</button><button class="primary smallBtn" id="addAccountPhotoBtn523">＋ Add Photo</button></div></div>${photoDocs.length?`<div class="accountPhotoStrip523">${photoDocs.slice(0,3).map(d=>`<button class="accountPhotoThumb523" data-doc="${esc(d.id)}">${docPhotoThumb512(d)}<span>${esc(d.title||d.imageName||'Photo')}</span></button>`).join('')}</div>`:`<p class="fieldNote">This is now visible directly on the account screen so photos are not hidden under Documents.</p>`}</div>
+    <div class="card accountPhotoCard523 siteSimpleCard477"><div class="row"><div><h2>Account Photos</h2><p>${photoDocs.length ? `${photoDocs.length} saved photo${photoDocs.length===1?'':'s'} for this account.` : 'Add panel, device, wiring, deficiency, and site condition photos here.'}</p></div><div class="photoCardActions523"><button class="ghost smallBtn" id="openPhotoVaultBtn523">Photo Vault</button><button class="primary smallBtn" id="addAccountPhotoBtn523">＋ Add Photo</button></div></div>${photoDocs.length?`<div class="accountPhotoStrip523 accountPhotoStrip524">${photoDocs.slice(0,3).map(d=>`<button class="accountPhotoThumb523 accountPhotoThumb524" data-doc="${esc(d.id)}">${docPhotoThumb512(d)}<span>${esc(d.title||d.imageName||'Photo')}</span><em>${esc(photoCategory524(d)||'Photo')}</em></button>`).join('')}</div>`:`<p class="fieldNote">This is now visible directly on the account screen so photos are not hidden under Documents.</p>`}</div>
 
     <div class="card siteNow477 siteNow489"><div class="siteNowHead477"><div><h2>Today’s Priority</h2><p>${esc(health.details.join(' • '))}</p></div><span>${health.score}%</span></div><div class="siteNowGrid477"><button id="openTasksMini476"><strong>${open}</strong><small>Open Tasks</small></button><button id="openDefMini476"><strong>${def}</strong><small>Deficiencies</small></button><button id="addDefQuick477"><strong>＋</strong><small>Add Deficiency</small></button></div></div>
 
@@ -1897,7 +1909,7 @@ function siteDetail(){
   document.getElementById('visitsMini477').onclick=()=>route('visits');
   const openPhotoVault523=document.getElementById('openPhotoVaultBtn523'); if(openPhotoVault523) openPhotoVault523.onclick=()=>{docVaultFilter516='photos'; route('siteDocs');};
   const addAccountPhoto523=document.getElementById('addAccountPhotoBtn523'); if(addAccountPhoto523) addAccountPhoto523.onclick=()=>{mode='newPhoto'; route('siteDocForm');};
-  document.querySelectorAll('.accountPhotoThumb523').forEach(b=>b.onclick=()=>{mode=b.dataset.doc; route('siteDocForm');});
+  document.querySelectorAll('.accountPhotoThumb523').forEach(b=>b.onclick=()=>{ const d=(site()?.docs||[]).find(x=>x.id===b.dataset.doc); if(d) photoPreviewModal524(d); });
   document.getElementById('openTasksMini476').onclick=()=>route('tasks');
   document.getElementById('openDefMini476').onclick=()=>route('deficiencies');
   document.getElementById('snapshotBtn').onclick=shareSiteSnapshot;
@@ -1927,9 +1939,40 @@ function siteDetail(){
   document.querySelectorAll('.visitMiniButton').forEach(b=>b.onclick=()=>{mode=b.dataset.visit; route('visitDetail');});
 }
 
+function photoCategory524(d={}){ return d.photoCategory || (docHasPhoto512(d) ? "Panel" : ""); }
+function photoCategoryHint524(cat){ return PHOTO_CATEGORY_HINTS_524[cat] || PHOTO_CATEGORY_HINTS_524.Other; }
+function photoCategoryChips524(active="Panel"){
+  return `<div class="photoCategoryGrid524">${PHOTO_CATEGORIES_524.map(cat=>`<button type="button" class="photoCategoryChip524 ${active===cat?"active":""}" data-photo-category="${esc(cat)}"><strong>${esc(cat)}</strong><span>${esc(photoCategoryHint524(cat))}</span></button>`).join("")}</div>`;
+}
+function selectedPhotoCategory524(){ return document.querySelector(".photoCategoryChip524.active")?.dataset.photoCategory || val("docPhotoCategory524") || "Panel"; }
+function setPhotoCategory524(cat){
+  const hidden=document.getElementById("docPhotoCategory524");
+  if(hidden) hidden.value=cat;
+  document.querySelectorAll(".photoCategoryChip524").forEach(b=>b.classList.toggle("active", b.dataset.photoCategory===cat));
+}
+function photoPreviewModal524(d){
+  if(!d || !d.imageData){ toast("No photo to preview."); return; }
+  const s=site()||{};
+  const overlay=document.createElement("div");
+  overlay.className="photoModalOverlay524";
+  overlay.innerHTML=`<div class="photoModalSheet524">
+    <div class="photoModalHead524"><div><strong>${esc(d.title||d.imageName||"Account Photo")}</strong><span>${esc(photoCategory524(d)||"Photo")} • ${esc(s.name||"Account")}</span></div><button class="ghost smallBtn" id="closePhotoPreview524">Close</button></div>
+    <div class="photoModalImage524"><img src="${esc(d.imageData)}" alt="Full account photo preview"></div>
+    ${d.notes?`<p class="photoModalNotes524">${esc(d.notes)}</p>`:""}
+    <div class="photoModalActions524"><button class="primary" id="modalOverlayPhoto524">Download With Overlay</button><button class="ghost" id="modalOriginalPhoto524">Download Original</button><button class="ghost" id="modalEditPhoto524">Edit Photo</button></div>
+  </div>`;
+  document.body.appendChild(overlay);
+  const close=()=>overlay.remove();
+  overlay.addEventListener("click", e=>{ if(e.target===overlay) close(); });
+  document.getElementById("closePhotoPreview524").onclick=close;
+  document.getElementById("modalOverlayPhoto524").onclick=()=>downloadPhotoWithOverlay512(d);
+  document.getElementById("modalOriginalPhoto524").onclick=()=>downloadOriginalPhoto513(d);
+  document.getElementById("modalEditPhoto524").onclick=()=>{ close(); mode=d.id; route("siteDocForm"); };
+}
 function docTitle(d){ return [d.type,d.title].filter(Boolean).join(" • ") || "Document / Link"; }
 function docMeta(d){
   const parts=[];
+  if(docHasPhoto512(d) && photoCategory524(d)) parts.push(photoCategory524(d));
   if(d.ref) parts.push(d.ref);
   if(d.url) parts.push("Link saved");
   if(d.date) parts.push(d.date);
@@ -1956,13 +1999,23 @@ function safePhotoFileBase512(s,d){
 }
 function docPhotoPreviewMarkup512(d={}){
   const src=docPhotoDraftDataUrl512 || d.imageData || "";
-  return `<div class="docPhotoManager512 docPhotoManager513">
-    <div class="docPhotoHead512"><div><strong>Photo Vault</strong><span>Upload a site photo, preview the actual overlay, then download either the stamped copy or the original photo.</span></div><button type="button" class="ghost smallBtn" id="openOverlaySettings512">Overlay Settings</button></div>
-    <label>Photo Image</label><input id="docPhotoFile512" type="file" accept="image/*" capture="environment">
-    <div id="docPhotoPreview512" class="docPhotoPreview512">${src?`<img src="${esc(src)}" alt="Photo preview">`:`<div><b>No photo selected</b><span>Choose an image from camera roll or take a photo on iPhone / iPad.</span></div>`}</div>
+  const currentCategory=photoCategory524(d)||"Panel";
+  const useOverlay = d.useOverlayOnSave !== false;
+  return `<div class="docPhotoManager512 docPhotoManager513 docPhotoManager524">
+    <div class="docPhotoHead512 docPhotoHead524"><div><strong>Account Photo</strong><span>Take Photo / Upload Photo, choose a category, add notes, then save it to this account.</span></div><button type="button" class="ghost smallBtn" id="openOverlaySettings512">Overlay Settings</button></div>
+    <div class="photoQuickLayout524">
+      <div class="photoPickerPanel524">
+        <label>Take Photo / Upload Photo</label><input id="docPhotoFile512" type="file" accept="image/*" capture="environment">
+        <div id="docPhotoPreview512" class="docPhotoPreview512 docPhotoPreview524">${src?`<img src="${esc(src)}" alt="Photo preview">`:`<div><b>No photo selected</b><span>On iPhone / iPad, choose Take Photo or Photo Library when prompted.</span></div>`}</div>
+      </div>
+      <div class="photoNotesPanel524">
+        <label>Photo Category</label><input type="hidden" id="docPhotoCategory524" value="${esc(currentCategory)}">${photoCategoryChips524(currentCategory)}
+        <label class="checkRow inlineCheck photoOverlayToggle524"><input type="checkbox" id="docUseOverlay524" ${useOverlay?"checked":""}> Use overlay for this photo</label>
+        <p class="fieldNote">The overlay setting controls Download With Overlay and future report photo stamps.</p>
+      </div>
+    </div>
     <div id="docPhotoOverlayPreview513" class="docPhotoOverlayPreview513"></div>
     <div class="docPhotoActions512 docPhotoActions513"><button type="button" class="primary" id="previewOverlayPhoto513">Preview Overlay</button><button type="button" class="primary" id="downloadOverlayPhoto512">Download With Overlay</button><button type="button" class="ghost" id="downloadOriginalPhoto513">Download Original</button><button type="button" class="ghost" id="clearDocPhoto512">Clear Photo</button></div>
-    <p class="fieldNote">Photos are stored locally in this browser with the site record. Very large photos can increase FireVault storage size.</p>
   </div>`;
 }
 function docPhotoOverlayPreviewMarkup513(d={}){
@@ -2183,6 +2236,7 @@ function wireDocPhotoControls512(d={}){
   if(down) down.onclick=()=>downloadPhotoWithOverlay512({...(d||{}),title:val("docTitle")||d.title||"Site Photo",imageData:docPhotoDraftDataUrl512||d.imageData});
   const original=document.getElementById("downloadOriginalPhoto513");
   if(original) original.onclick=()=>downloadOriginalPhoto513({...(d||{}),title:val("docTitle")||d.title||"Site Photo",imageData:docPhotoDraftDataUrl512||d.imageData});
+  document.querySelectorAll(".photoCategoryChip524").forEach(b=>b.onclick=()=>setPhotoCategory524(b.dataset.photoCategory||"Panel"));
   const settingsBtn=document.getElementById("openOverlaySettings512");
   if(settingsBtn) settingsBtn.onclick=()=>{ settingsTab="overlay"; mode="settingsDetail"; route("settings"); };
 }
@@ -2236,11 +2290,11 @@ function siteDocCard519(d){
   return `<div class="card docVaultItem docVaultItem512 docVaultItem516" data-doc="${esc(d.id)}">
     ${docPhotoThumb512(d)}
     <div class="docVaultText512">
-      <div class="row"><div><h2>${esc(docTitle(d))}</h2><p>${esc(docMeta(d))}</p>${docHasPhoto512(d)?`<p class="docPhotoMeta512">${esc(photoDocSummary512(d))}</p>`:""}</div><span class="pill">${esc(d.type||"Doc")}</span></div>
+      <div class="row"><div><h2>${esc(docTitle(d))}</h2><p>${esc(docMeta(d))}</p>${docHasPhoto512(d)?`<p class="docPhotoMeta512"><span class="photoCategoryPill524">${esc(photoCategory524(d)||"Photo")}</span> ${esc(photoDocSummary512(d))}</p>`:""}</div><span class="pill">${esc(d.type||"Doc")}</span></div>
       ${notesPreview?`<p class="docNotes">${notesPreview}</p>`:""}
       <div class="docQuickActions">
         ${d.url?`<button class="ghost smallBtn openDocLink" data-url="${esc(d.url)}">Open Link</button>`:""}
-        ${docHasPhoto512(d)?`<button class="primary smallBtn overlayDocPhotoBtn512" data-doc="${esc(d.id)}">Overlay Photo</button><button class="ghost smallBtn originalDocPhotoBtn516" data-doc="${esc(d.id)}">Original</button>`:""}
+        ${docHasPhoto512(d)?`<button class="primary smallBtn previewDocPhotoBtn524" data-doc="${esc(d.id)}">Preview</button><button class="primary smallBtn overlayDocPhotoBtn512" data-doc="${esc(d.id)}">Overlay Photo</button><button class="ghost smallBtn originalDocPhotoBtn516" data-doc="${esc(d.id)}">Original</button>`:""}
         <button class="ghost smallBtn copyDocRef" data-doc="${esc(d.id)}">Copy</button>
       </div>
     </div>
@@ -2272,6 +2326,7 @@ function siteDocs(){
   document.querySelectorAll(".copyDocRef").forEach(b=>b.onclick=async e=>{e.stopPropagation(); const d=docs.find(x=>x.id===b.dataset.doc); if(d){ await navigator.clipboard.writeText(`${docTitle(d)}
 ${d.url||""}
 ${d.notes||""}`.trim()); toast("Document reference copied."); }});
+  document.querySelectorAll(".previewDocPhotoBtn524").forEach(b=>b.onclick=e=>{e.stopPropagation(); const d=docs.find(x=>x.id===b.dataset.doc); if(d) photoPreviewModal524(d);});
   document.querySelectorAll(".overlayDocPhotoBtn512").forEach(b=>b.onclick=e=>{e.stopPropagation(); const d=docs.find(x=>x.id===b.dataset.doc); if(d) downloadPhotoWithOverlay512(d);});
   document.querySelectorAll(".originalDocPhotoBtn516").forEach(b=>b.onclick=e=>{e.stopPropagation(); const d=docs.find(x=>x.id===b.dataset.doc); if(d) downloadOriginalPhoto513(d);});
 }
@@ -2296,14 +2351,14 @@ function siteDocForm(){
     <label>Reference / Account / Permit #</label><input id="docRef" value="${esc(d.ref||"")}" placeholder="Account number, permit number, drawing ID...">
     <label>URL / Link</label><input id="docUrl" value="${esc(d.url||"")}" placeholder="https://...">
     ${docPhotoPreviewMarkup512(d)}
-    <label>Notes</label><textarea id="docNotes" placeholder="Where to find it, customer-specific instructions, page numbers, revision notes...">${esc(d.notes||"")}</textarea></div>
+    <label>Photo / Document Notes</label><textarea id="docNotes" class="photoNotesField524" placeholder="Photo location, device address, circuit, problem found, customer note, or report note...">${esc(d.notes||"")}</textarea></div>
     <button class="primary" id="saveDocBtn">Save Document</button>${mode && !isNewPhoto523?`<button class="danger" id="deleteDocBtn">Delete Document</button>`:""}
   </div></div>`);
   document.getElementById("backBtn").onclick=()=>route("siteDocs");
   wireDocPhotoControls512(d||{});
   document.getElementById("saveDocBtn").onclick=()=>{
     const imageData=docPhotoClearRequested512 ? "" : (docPhotoDraftDataUrl512 || d?.imageData || "");
-    const obj={type:val("docType"),title:val("docTitle")||"Untitled Reference",ref:val("docRef"),url:val("docUrl"),date:val("docDate"),notes:raw("docNotes"),imageData,imageName:imageData?(docPhotoDraftName512||d?.imageName||"Site photo"):"",imageUpdatedAt:imageData?new Date().toISOString():"",updatedAt:new Date().toISOString()};
+    const obj={type:val("docType"),title:val("docTitle")||"Untitled Reference",ref:val("docRef"),url:val("docUrl"),date:val("docDate"),notes:raw("docNotes"),imageData,imageName:imageData?(docPhotoDraftName512||d?.imageName||"Site photo"):"",photoCategory:imageData?selectedPhotoCategory524():"",useOverlayOnSave:checked("docUseOverlay524"),imageUpdatedAt:imageData?new Date().toISOString():"",updatedAt:new Date().toISOString()};
     if(mode && !isNewPhoto523 && d){ Object.assign(d,obj); }
     else s.docs.unshift({...obj,id:uid(),createdAt:new Date().toISOString()});
     save(); toast("Document saved."); route("siteDocs");
@@ -3649,18 +3704,18 @@ function diagnostics(){
 }
 function showChangelog(){
   const notes = [
-    "Advanced to Build 0.50.23 from the stable Build 0.50.22 baseline.",
-    "Added a clearly visible Account Photos card directly on each account / site screen.",
-    "Added a direct Add Photo button so account photos are no longer hidden under Documents.",
-    "Added Photo Vault and Add Photo buttons inside the Documents / Photos screen.",
-    "New Add Account Photo flow defaults to Photo Set and guides the user to choose a photo first.",
+    "Advanced to Build 0.50.24 from the stable Build 0.50.23 baseline.",
+    "Polished Account Photos with clearer Take Photo / Upload Photo wording.",
+    "Added photo category buttons for Panel, NAC, Device, Communicator, Battery, Deficiency, Before, After, and Other.",
+    "Added a Use Overlay toggle and improved field-photo notes labeling.",
+    "Added full-screen photo preview from account thumbnails and Photo Vault records, with overlay download, original download, and edit actions.",
     "Preserved the stable Safari EOF startup repair, 5-second splash timing, Startup Health diagnostics, Photo Vault search/sort/filter tools, Photo Overlay tools, iPad autosizing, simple Home screen, Search Bar Concept #6, and excluded job-status workflow controls."
   ];
   const overlay=document.createElement("div");
   overlay.className="releaseOverlay";
   overlay.innerHTML=`<div class="releaseSheet" role="dialog" aria-modal="true" aria-label="FireVault release notes">
     <div class="releaseHead"><div><strong>FireVault</strong><span>Build ${BUILD}</span></div><button class="ghost iconBtn" id="closeRelease" aria-label="Close release notes">×</button></div>
-    <div class="releaseBody"><h2>Release Notes</h2><p class="releaseIntro">Account photo entry-point polish.</p><ul>${notes.map(n=>`<li>${esc(n)}</li>`).join("")}</ul></div>
+    <div class="releaseBody"><h2>Release Notes</h2><p class="releaseIntro">Account photo category and preview polish.</p><ul>${notes.map(n=>`<li>${esc(n)}</li>`).join("")}</ul></div>
   </div>`;
   document.body.appendChild(overlay);
   const close=()=>overlay.remove();
