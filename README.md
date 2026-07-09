@@ -1,27 +1,24 @@
-# FireVault Build 0.50.3
+# FireVault Build 0.50.4
 
-Build 0.50.3 adds Site Notes Templates.
+Build 0.50.4 polishes Site Notes Templates.
 
 ## What changed
 
-- Visible app version advanced to 0.50.3.
-- Updated cache-busting references in `index.html` to 0.50.3.
+- Visible app version advanced to 0.50.4.
+- Updated cache-busting references in `index.html` to 0.50.4.
 - Updated release notes to match this build.
-- Added Site Notes Templates for faster field note entry.
-- Added common fire alarm note starters:
-  - Panel Normal
-  - Trouble Found
-  - Ground Fault
-  - Customer Notified
-  - Parts Needed
-  - Access Issue
-  - Device Tested
-  - Inspection Note
-- Templates insert into the note composer so they can be edited before saving.
-- Preserved the clean Home screen, selected Search Bar Concept #6, Site Notes, Daily Summary screen, Daily Route, Modules, and splash screen.
+- Grouped Site Notes Templates into clearer categories:
+  - System
+  - Customer
+  - Follow-Up
+  - Testing
+- Improved template buttons with cleaner add indicators.
+- Improved template insertion so it targets the active note composer more reliably.
+- Kept the Home screen simple.
+- Preserved Search Bar Concept #6, Site Notes, Daily Summary, Daily Route, Modules, and splash screen.
 
 Suggested commit message:
 
 ```text
-Build 0.50.3 site notes templates
+Build 0.50.4 site notes template category polish
 ```

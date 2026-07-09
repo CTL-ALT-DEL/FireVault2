@@ -31,14 +31,14 @@ const DEFAULT_CHECKLIST = [
   ["Wrap-Up", "Panel restored and left normal"]
 ];
 const NOTE_TEMPLATES_503 = [
-  ["Panel Normal","Panel checked and left normal. No active alarms, troubles, or supervisory conditions observed."],
-  ["Trouble Found","Trouble condition found on site. Further troubleshooting / follow-up required."],
-  ["Ground Fault","Ground fault indication present. Circuit isolation / wiring investigation required."],
-  ["Customer Notified","Customer was notified of current fire alarm system status and next steps."],
-  ["Parts Needed","Parts or material are needed for completion. Add item details and quantity."],
-  ["Access Issue","Access issue encountered. Add door, room, contact, key, or escort details."],
-  ["Device Tested","Device tested and verified. Add device type, location, and result."],
-  ["Inspection Note","Inspection-related note. Add test area, device sample, or documentation details."]
+  ["System","Panel Normal","Panel checked and left normal. No active alarms, troubles, or supervisory conditions observed."],
+  ["System","Trouble Found","Trouble condition found on site. Further troubleshooting / follow-up required."],
+  ["System","Ground Fault","Ground fault indication present. Circuit isolation / wiring investigation required."],
+  ["Customer","Customer Notified","Customer was notified of current fire alarm system status and next steps."],
+  ["Customer","Access Issue","Access issue encountered. Add door, room, contact, key, or escort details."],
+  ["Follow-Up","Parts Needed","Parts or material are needed for completion. Add item details and quantity."],
+  ["Testing","Device Tested","Device tested and verified. Add device type, location, and result."],
+  ["Testing","Inspection Note","Inspection-related note. Add test area, device sample, or documentation details."]
 ];
 
 const EMAIL_TAGS = [
@@ -1190,17 +1190,27 @@ function todayAccountsMarkup500(){
 
 
 function noteTemplatesMarkup503(){
-  return `<div class="noteTemplateGrid503">${NOTE_TEMPLATES_503.map(([name,text])=>`<button class="ghost noteTemplateBtn503" data-template="${esc(text)}"><strong>${esc(name)}</strong><span>Use</span></button>`).join("")}</div>`;
+  const groups={};
+  NOTE_TEMPLATES_503.forEach(t=>{
+    const cat=t.length===3?t[0]:"General";
+    const name=t.length===3?t[1]:t[0];
+    const text=t.length===3?t[2]:t[1];
+    groups[cat]=groups[cat]||[];
+    groups[cat].push({name,text});
+  });
+  return `<div class="noteTemplateGroups504">${Object.entries(groups).map(([cat,items])=>`<div class="noteTemplateGroup504"><div class="noteTemplateGroupTitle504">${esc(cat)}</div><div class="noteTemplateGrid503">${items.map(item=>`<button class="ghost noteTemplateBtn503 noteTemplateBtn504" data-template="${esc(item.text)}"><strong>${esc(item.name)}</strong><span>＋</span></button>`).join("")}</div></div>`).join("")}</div>`;
 }
 function wireNoteTemplates503(targetId="siteNoteText"){
   document.querySelectorAll(".noteTemplateBtn503").forEach(btn=>{
     btn.onclick=()=>{
-      const target=document.getElementById(targetId) || document.querySelector("textarea");
-      if(!target) return;
+      const target=document.getElementById(targetId) || document.querySelector("#noteText") || document.querySelector("#notes") || document.querySelector("textarea");
+      if(!target){ toast("Open the note composer first."); return; }
       const text=btn.dataset.template || "";
       const current=target.value.trim();
       target.value=current ? `${current}\n${text}` : text;
+      target.dispatchEvent(new Event("input", {bubbles:true}));
       target.focus({preventScroll:true});
+      try{ target.setSelectionRange(target.value.length, target.value.length); }catch{}
       toast("Template added.");
     };
   });
@@ -2775,11 +2785,11 @@ function diagnostics(){
 }
 function showChangelog(){
   const notes = [
-    "Added Site Notes Templates for faster field note entry.",
-    "Added common fire alarm note starters for panel normal, trouble found, ground fault, customer notified, parts needed, access issue, device tested, and inspection notes.",
-    "Templates insert into the note composer so they can be edited before saving.",
-    "Preserved the clean Home screen and selected Search Bar Concept #6.",
-    "Preserved Site Notes, Daily Summary screen, Daily Route, Modules, and splash screen."
+    "Polished Site Notes Templates with clearer categories.",
+    "Grouped templates into System, Customer, Follow-Up, and Testing.",
+    "Improved template buttons with cleaner add indicators and better spacing.",
+    "Improved template insertion so it targets the active note composer more reliably.",
+    "Preserved the clean Home screen, Search Bar Concept #6, Daily Summary, Daily Route, Modules, and splash screen."
   ];
   const overlay=document.createElement("div");
   overlay.className="releaseOverlay";
