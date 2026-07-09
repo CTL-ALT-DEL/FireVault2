@@ -1202,7 +1202,7 @@ function home(){
     </div>
 
     <div class="appleSearchCard478">
-      <div class="homeSearchBox476 homeSearchBox478"><span class="searchGlass478" aria-hidden="true">🔎</span><input id="homeCustomerSearch476" type="search" value="${esc(siteSearch)}" placeholder="" autocomplete="off"><button class="ghost smallBtn searchClear478 ${siteSearch?"activeSearchClear487":""}" id="clearHomeSearch476" ${siteSearch?"":"disabled"}>${siteSearch?"×":""}</button></div>
+      <div class="homeSearchBox476 homeSearchBox478 homeSearchConcept501"><span class="searchGlass478" aria-hidden="true">⌕</span><input id="homeCustomerSearch476" type="search" value="${esc(siteSearch)}" placeholder="" autocomplete="off"><span class="searchDivider501" aria-hidden="true"></span><button class="ghost smallBtn searchClear478 clearConcept501" id="clearHomeSearch476" type="button">Clear</button></div>
     </div>
 
     ${siteSearch?`<div class="card searchResultsPanel478" id="homeSearchResults476">${homeAccountRowsMarkup476()}</div>`:`<div id="homeSearchResults476" class="searchResultsPanel478 hiddenSearchResults478"></div>`}
@@ -1252,8 +1252,8 @@ function home(){
   const homeRoot=document.querySelector('.homeScreen476');
   if(homeRoot) homeRoot.onclick=e=>{ const card=e.target.closest('[data-home-site]'); if(card){ selectedSiteId=card.dataset.homeSite; route('siteDetail'); } };
   const search=document.getElementById('homeCustomerSearch476');
-  if(search){ search.oninput=()=>{ siteSearch=search.value; renderHomeSearch476(); const clear=document.getElementById('clearHomeSearch476'); if(clear){ clear.disabled=!siteSearch; clear.textContent=siteSearch?'×':''; clear.classList.toggle('activeSearchClear487', !!siteSearch); } }; setTimeout(()=>{ try{ search.focus({preventScroll:true}); search.setSelectionRange(search.value.length, search.value.length); }catch{} },0); }
-  const clear=document.getElementById('clearHomeSearch476'); if(clear) clear.onclick=()=>{ siteSearch=''; const search=document.getElementById('homeCustomerSearch476'); if(search){ search.value=''; search.focus({preventScroll:true}); } clear.disabled=true; clear.textContent=''; clear.classList.remove('activeSearchClear487'); renderHomeSearch476(); };
+  if(search){ search.oninput=()=>{ siteSearch=search.value; renderHomeSearch476(); }; setTimeout(()=>{ try{ search.focus({preventScroll:true}); search.setSelectionRange(search.value.length, search.value.length); }catch{} },0); }
+  const clear=document.getElementById('clearHomeSearch476'); if(clear) clear.onclick=()=>{ siteSearch=''; const search=document.getElementById('homeCustomerSearch476'); if(search){ search.value=''; search.focus({preventScroll:true}); } renderHomeSearch476(); };
   const checkNearby=document.getElementById('checkNearbyHomeBtn476'); if(checkNearby) checkNearby.onclick=checkNearbyHome476;
   document.getElementById('modulesTopBtn476').onclick=()=>{mode=null; route('settings');};
   const bell=document.getElementById('homeBell478'); if(bell) bell.onclick=showChangelog;
@@ -2746,11 +2746,11 @@ function diagnostics(){
 }
 function showChangelog(){
   const notes = [
-    "Marked FireVault 0.50.0 as the Field Dashboard Milestone.",
-    "Refined the Home dashboard around site notes, today's accounts, route, and daily summary.",
-    "Added stronger field-ready visual treatment for the daily dashboard sections.",
-    "Made note, route, and summary actions feel more like the main workflow.",
-    "Preserved Site Notes, Daily Summary, Daily Route, Modules, splash screen, and clean Home search."
+    "Applied selected Search Bar Concept #6 to the Home screen.",
+    "Added the dark minimalist pill style with a larger left search icon.",
+    "Added the right-side divider and red Clear control.",
+    "Kept the search input clean with no placeholder text.",
+    "Preserved Field Dashboard, Site Notes, Daily Summary, Daily Route, Modules, and splash screen."
   ];
   const overlay=document.createElement("div");
   overlay.className="releaseOverlay";

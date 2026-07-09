@@ -1,27 +1,21 @@
-# FireVault Build 0.50.0
+# FireVault Build 0.50.1
 
-Build 0.50.0 is the Field Dashboard Milestone build.
+Build 0.50.1 applies the selected Home search bar concept.
 
 ## What changed
 
-- Visible app version advanced to 0.50.0.
-- Updated cache-busting references in `index.html` to 0.50.0.
+- Visible app version advanced to 0.50.1.
+- Updated cache-busting references in `index.html` to 0.50.1.
 - Updated release notes to match this build.
-- Added a cleaner **Field Dashboard** section on Home.
-- Made Site Notes, Daily Route, and Daily Summary feel like the main daily workflow.
-- Added dashboard stat buttons for:
-  - Notes Today
-  - Note Sites
-  - Route Points
-- Added quick dashboard actions:
-  - Site Note
-  - Daily Route
-  - Copy Summary
-- Added **Today’s Accounts** for accounts with note or route activity today.
-- Preserved Site Notes polish, Daily Summary, clean Home search, splash screen, Modules, and Daily Route tools.
+- Applied selected **Search Bar Concept #6** to the Home screen.
+- Added the dark minimalist pill style.
+- Added a larger left search icon.
+- Added the right-side divider and red **Clear** control.
+- Kept the input area clean with no placeholder text.
+- Preserved Field Dashboard, Site Notes, Daily Summary, Daily Route, Modules, and splash screen.
 
 Suggested commit message:
 
 ```text
-Build 0.50.0 field dashboard milestone
+Build 0.50.1 apply selected search bar concept six
 ```
