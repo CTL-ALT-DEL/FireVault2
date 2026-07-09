@@ -1148,10 +1148,10 @@ function home(){
   const now = new Date();
   const dateLine = now.toLocaleDateString([], {weekday:"long", month:"long", day:"numeric"});
   html(`<div class="screen homeScreen476 homeScreen478 ${siteSearch?"homeSearchMode484":""}">
-    <div class="homeChrome478">
-      <button class="homeIcon478" id="modulesTopBtn476" aria-label="Modules">☰</button>
-      <div class="brand478"><img src="assets/favicon.png?v=${BUILD}" alt="FireVault"><strong>FIREVAULT</strong></div>
-      <button class="homeBuildPill481" id="homeBell478" aria-label="Release notes"><span></span>Build ${BUILD}</button>
+    <div class="homeChrome478 homeChrome493">
+      <div class="brand478 brand493"><img src="assets/favicon.png?v=${BUILD}" alt="FireVault"><strong>FIREVAULT</strong></div>
+      <button class="homeBuildPill481 homeBuildPill493" id="homeBell478" aria-label="Release notes"><span></span>${BUILD}</button>
+      <button class="homeIcon478 settingsIcon493" id="modulesTopBtn476" aria-label="Settings">⚙</button>
     </div>
 
     ${homeInstallTip482()}
@@ -1195,7 +1195,7 @@ function home(){
   if(search){ search.oninput=()=>{ siteSearch=search.value; renderHomeSearch476(); const clear=document.getElementById('clearHomeSearch476'); if(clear){ clear.disabled=!siteSearch; clear.textContent=siteSearch?'Cancel':''; clear.classList.toggle('activeSearchClear487', !!siteSearch); } }; setTimeout(()=>{ try{ search.focus({preventScroll:true}); search.setSelectionRange(search.value.length, search.value.length); }catch{} },0); }
   const clear=document.getElementById('clearHomeSearch476'); if(clear) clear.onclick=()=>{ siteSearch=''; const search=document.getElementById('homeCustomerSearch476'); if(search){ search.value=''; search.focus({preventScroll:true}); } clear.disabled=true; clear.textContent=''; clear.classList.remove('activeSearchClear487'); renderHomeSearch476(); };
   const checkNearby=document.getElementById('checkNearbyHomeBtn476'); if(checkNearby) checkNearby.onclick=checkNearbyHome476;
-  document.getElementById('modulesTopBtn476').onclick=()=>{settingsTab='visibility'; mode='settingsDetail'; route('settings');};
+  document.getElementById('modulesTopBtn476').onclick=()=>{mode=null; route('settings');};
   const bell=document.getElementById('homeBell478'); if(bell) bell.onclick=showChangelog;
   const installHow=document.getElementById('homeInstallHow482'); if(installHow) installHow.onclick=()=>alert('To get the clean full-screen FireVault view on iPhone: tap Share, choose Add to Home Screen, then open FireVault from the new Home Screen icon.');
   const installHide=document.getElementById('homeInstallHide482'); if(installHide) installHide.onclick=()=>{homeInstallTipHidden=true; localStorage.setItem('firevault_home_install_tip_hidden','1'); home();};
@@ -2578,11 +2578,11 @@ function diagnostics(){
 }
 function showChangelog(){
   const notes = [
-    "Added a more impressive FireVault startup splash screen.",
-    "Made the main Home screen FireVault logo larger and centered.",
-    "Improved the splash loading animation and build label.",
-    "Kept FireVault focused on site notes, not job start/end status.",
-    "Preserved Home search, customer account polish, Modules, Daily Route tools, Settings cleanup, and the green Build revision indicator."
+    "Moved the Home logo/brand to the far left.",
+    "Moved the Settings icon to the far right of the Home header.",
+    "Cleaned up the build info button so it shows only the version number.",
+    "Updated the startup splash build label to show only the version number.",
+    "Preserved the site-notes-only direction, Home search, Modules, Daily Route tools, and Settings cleanup."
   ];
   const overlay=document.createElement("div");
   overlay.className="releaseOverlay";
