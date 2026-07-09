@@ -1,36 +1,33 @@
-# FireVault Build 0.50.12
+# FireVault Build 0.50.13
 
-Build 0.50.12 continues from the uploaded 0.50.11 baseline and connects the improved Photo Overlay settings to the Site Documents / Photos workflow while preserving the simple Home screen, Search Bar Concept #6, Daily Report / Site Notes workflow, and iPad responsive sizing.
+Build 0.50.13 continues from the uploaded 0.50.12 baseline and polishes the Photo Vault / overlay export workflow while preserving the simple Home screen, Search Bar Concept #6, Daily Report / Site Notes workflow, and iPad responsive sizing.
 
-## What changed
+## Build updates
 
-- Visible app version advanced to 0.50.12.
-- Updated cache-busting references in `index.html` to 0.50.12.
-- Added **Photo Vault** support inside Site Documents / Photos.
-- Added photo upload on the Add/Edit Document screen.
-- Saved photo documents now show thumbnails in the Documents / Photos list.
-- Added **Download With Overlay** for saved or newly selected photos.
-- Overlay export uses the current Photo Overlay settings, including template text, position, font size, background style, opacity, colors, FireVault logo, custom logo, and tagline.
-- Added quick access from a photo document to Photo Overlay settings.
-- Preserved the improved Photo Overlay editor from Build 0.50.11.
-- Preserved autosaved Site Note drafts, Report Ready Check, Unsaved Drafts, Full Report, Customer Copy, Notes Only copy, and TXT download.
-- Preserved iPad autosizing / responsive layout work.
-- Preserved the clean Home screen and selected Search Bar Concept #6.
-- Did not bring back Start Job / End Job / Arrived / Working / Complete workflow controls.
+- Visible app version advanced to 0.50.13.
+- Updated cache-busting references in `index.html` to 0.50.13.
+- Updated `manifest.json`, README, clean install notes, and in-app release notes.
+- Added **Preview Overlay** on the Site Documents / Photos document screen.
+- Added **Download Original** next to **Download With Overlay**.
+- Overlay preview uses the current Photo Overlay settings, including template fields, logo source, position, size, background, opacity, colors, and tagline.
+- Changing or clearing the selected photo now clears the old overlay preview so the preview stays accurate.
+- Preserved the 0.50.12 Photo Vault upload, saved thumbnails, and overlay export workflow.
+- Preserved the simple Home screen, Search Bar Concept #6, iPad autosizing, and advanced-module visibility rules.
+- No Start Job / End Job / Arrived / Working / Complete workflow was added back.
 
 ## Validation
 
-Before release, validate:
+Run from the extracted ZIP root:
 
 ```bash
 node --check src/storage.js
 node --check src/app.js
-python3 -m json.tool manifest.json >/dev/null
-zip -T firevault-build-0.50.12-modular-root.zip
+python -m json.tool manifest.json >/dev/null
+zip -T firevault-build-0.50.13-modular-root.zip
 ```
 
 ## Suggested commit message
 
 ```text
-Build 0.50.12 photo vault overlay export workflow
+Build 0.50.13 photo vault overlay preview polish
 ```

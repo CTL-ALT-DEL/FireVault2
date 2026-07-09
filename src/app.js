@@ -1946,19 +1946,59 @@ function safePhotoFileBase512(s,d){
 }
 function docPhotoPreviewMarkup512(d={}){
   const src=docPhotoDraftDataUrl512 || d.imageData || "";
-  return `<div class="docPhotoManager512">
-    <div class="docPhotoHead512"><div><strong>Photo Vault</strong><span>Upload a site photo, preview it here, then download a stamped copy using current Photo Overlay settings.</span></div><button type="button" class="ghost smallBtn" id="openOverlaySettings512">Overlay Settings</button></div>
+  return `<div class="docPhotoManager512 docPhotoManager513">
+    <div class="docPhotoHead512"><div><strong>Photo Vault</strong><span>Upload a site photo, preview the actual overlay, then download either the stamped copy or the original photo.</span></div><button type="button" class="ghost smallBtn" id="openOverlaySettings512">Overlay Settings</button></div>
     <label>Photo Image</label><input id="docPhotoFile512" type="file" accept="image/*" capture="environment">
     <div id="docPhotoPreview512" class="docPhotoPreview512">${src?`<img src="${esc(src)}" alt="Photo preview">`:`<div><b>No photo selected</b><span>Choose an image from camera roll or take a photo on iPhone / iPad.</span></div>`}</div>
-    <div class="docPhotoActions512"><button type="button" class="primary" id="downloadOverlayPhoto512">Download With Overlay</button><button type="button" class="ghost" id="clearDocPhoto512">Clear Photo</button></div>
+    <div id="docPhotoOverlayPreview513" class="docPhotoOverlayPreview513"></div>
+    <div class="docPhotoActions512 docPhotoActions513"><button type="button" class="primary" id="previewOverlayPhoto513">Preview Overlay</button><button type="button" class="primary" id="downloadOverlayPhoto512">Download With Overlay</button><button type="button" class="ghost" id="downloadOriginalPhoto513">Download Original</button><button type="button" class="ghost" id="clearDocPhoto512">Clear Photo</button></div>
     <p class="fieldNote">Photos are stored locally in this browser with the site record. Very large photos can increase FireVault storage size.</p>
   </div>`;
+}
+function docPhotoOverlayPreviewMarkup513(d={}){
+  const src=docPhotoDraftDataUrl512 || d.imageData || "";
+  if(!src) return `<div class="empty overlayEmpty513">No photo selected for overlay preview.</div>`;
+  const set=overlayCleanSetting510(data.settings.overlay||{});
+  const lines=esc(renderTemplate(set.template, site()||{}) || "FireVault Field Photo").replaceAll("
+","<br>");
+  const style=`--ovAccent:${esc(set.accentColor)};--ovText:${esc(set.textColor)};--ovAlpha:${Math.max(20,Math.min(100,Number(set.opacity)||85))/100}`;
+  const logoSrc=overlayLogoSrc510(set);
+  return `<div class="docOverlayCard513" style="${style}">
+    <div class="docOverlayHead513"><strong>Overlay Preview</strong><span>This is the stamp layout that will be used for Download With Overlay.</span></div>
+    <div class="docPhotoOverlayScene513">
+      <img src="${esc(src)}" alt="Photo with overlay preview">
+      <div class="photoStamp510 align-${esc(set.alignment)} size-${esc(set.fontSize)} style-${esc(set.backgroundStyle)}">
+        ${set.showLogo?`<div class="photoStampLogo510">${logoSrc?`<img src="${esc(logoSrc)}" alt="Overlay logo">`:`<span class="photoStampLogoPlaceholder511">Logo</span>`}</div>`:""}
+        <div class="photoStampText510"><div>${lines}</div>${set.showTagline?`<small>FireVault Field Photo Overlay</small>`:""}</div>
+      </div>
+    </div>
+  </div>`;
+}
+function showDocOverlayPreview513(d={}){
+  const holder=document.getElementById("docPhotoOverlayPreview513");
+  if(!holder) return;
+  holder.innerHTML=docPhotoOverlayPreviewMarkup513(d);
+}
+function clearDocOverlayPreview513(){
+  const holder=document.getElementById("docPhotoOverlayPreview513");
+  if(holder) holder.innerHTML="";
+}
+function downloadOriginalPhoto513(doc={}){
+  const s=site();
+  const source=doc.imageData || docPhotoDraftDataUrl512;
+  if(!source){ toast("Choose or save a photo first."); return; }
+  const a=document.createElement("a");
+  a.href=source;
+  a.download=`${safePhotoFileBase512(s,doc)}-original-build-${BUILD}.jpg`;
+  document.body.appendChild(a); a.click(); a.remove();
+  toast("Original photo downloaded.");
 }
 function updateDocPhotoPreview512(){
   const holder=document.getElementById("docPhotoPreview512");
   if(!holder) return;
   const src=docPhotoDraftDataUrl512;
   holder.innerHTML = src ? `<img src="${esc(src)}" alt="Photo preview">` : `<div><b>No photo selected</b><span>Choose an image from camera roll or take a photo on iPhone / iPad.</span></div>`;
+  clearDocOverlayPreview513();
 }
 function loadImage512(src){
   return new Promise((resolve,reject)=>{
@@ -2128,8 +2168,12 @@ function wireDocPhotoControls512(d={}){
     if(file) file.value="";
     updateDocPhotoPreview512();
   };
+  const preview=document.getElementById("previewOverlayPhoto513");
+  if(preview) preview.onclick=()=>showDocOverlayPreview513({...(d||{}),title:val("docTitle")||d.title||"Site Photo",imageData:docPhotoDraftDataUrl512||d.imageData});
   const down=document.getElementById("downloadOverlayPhoto512");
   if(down) down.onclick=()=>downloadPhotoWithOverlay512({...(d||{}),title:val("docTitle")||d.title||"Site Photo",imageData:docPhotoDraftDataUrl512||d.imageData});
+  const original=document.getElementById("downloadOriginalPhoto513");
+  if(original) original.onclick=()=>downloadOriginalPhoto513({...(d||{}),title:val("docTitle")||d.title||"Site Photo",imageData:docPhotoDraftDataUrl512||d.imageData});
   const settingsBtn=document.getElementById("openOverlaySettings512");
   if(settingsBtn) settingsBtn.onclick=()=>{ settingsTab="overlay"; mode="settingsDetail"; route("settings"); };
 }
@@ -3466,18 +3510,18 @@ function diagnostics(){
 }
 function showChangelog(){
   const notes = [
-    "Advanced to Build 0.50.12 from the uploaded 0.50.11 baseline.",
-    "Added Photo Vault upload support inside Site Documents / Photos.",
-    "Saved site photos now show thumbnails in the Documents / Photos list.",
-    "Added Download With Overlay so a saved or newly selected photo can be exported with the current Photo Overlay settings applied.",
-    "Added quick access from a photo document back to Photo Overlay settings.",
-    "Kept the improved Photo Overlay editor, custom logo support, Daily Report / Site Notes workflow, iPad autosizing, simple Home screen, Search Bar Concept #6, and excluded job-status workflow controls."
+    "Advanced to Build 0.50.13 from the uploaded 0.50.12 baseline.",
+    "Added Preview Overlay on the Photo Vault document screen so you can see the stamp on the selected photo before downloading.",
+    "Added Download Original next to Download With Overlay for quick access to the untouched source image.",
+    "Overlay preview uses the current Photo Overlay settings, including template fields, logo source, position, size, background, opacity, colors, and tagline.",
+    "Photo changes now clear the old overlay preview so the preview always matches the current selected image.",
+    "Kept Photo Vault overlay export, custom logo support, Daily Report / Site Notes workflow, iPad autosizing, simple Home screen, Search Bar Concept #6, and excluded job-status workflow controls."
   ];
   const overlay=document.createElement("div");
   overlay.className="releaseOverlay";
   overlay.innerHTML=`<div class="releaseSheet" role="dialog" aria-modal="true" aria-label="FireVault release notes">
     <div class="releaseHead"><div><strong>FireVault</strong><span>Build ${BUILD}</span></div><button class="ghost iconBtn" id="closeRelease" aria-label="Close release notes">×</button></div>
-    <div class="releaseBody"><h2>Release Notes</h2><p class="releaseIntro">Photo vault upload, saved thumbnails, and overlay photo export for site documents.</p><ul>${notes.map(n=>`<li>${esc(n)}</li>`).join("")}</ul></div>
+    <div class="releaseBody"><h2>Release Notes</h2><p class="releaseIntro">Photo Vault overlay preview and original-photo download polish.</p><ul>${notes.map(n=>`<li>${esc(n)}</li>`).join("")}</ul></div>
   </div>`;
   document.body.appendChild(overlay);
   const close=()=>overlay.remove();
