@@ -1,6 +1,6 @@
-# Clean Install Notes — FireVault Build 0.50.10
+# Clean Install Notes — FireVault Build 0.50.11
 
-This ZIP is intended to be used as the new clean baseline for FireVault Build 0.50.10.
+This ZIP is intended to be used as the new clean baseline for FireVault Build 0.50.11.
 
 ## Install
 
@@ -12,7 +12,7 @@ This ZIP is intended to be used as the new clean baseline for FireVault Build 0.
 
 ## Build notes
 
-Build 0.50.10 keeps the 0.50.9 Daily Report / Site Notes closeout work and improves the Photo Overlay settings:
+Build 0.50.11 keeps the existing Daily Report / Site Notes work and further improves the Photo Overlay settings:
 
 - Photo Overlay now shows an actual sample-photo preview with the real overlay rendered on top.
 - Overlay text can be edited as a template.

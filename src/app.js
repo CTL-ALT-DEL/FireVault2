@@ -7,6 +7,7 @@ let mode = null;
 let settingsTab = "tech";
 let settingsRailScroll = 0;
 let lastEmailTemplateField = "emailSubject";
+let overlayLogoDraftDataUrl = "";
 let taskFilter = "open";
 let deficiencyFilter = "open";
 let activeJob = loadActiveJob();
@@ -2894,23 +2895,33 @@ function overlayCleanSetting510(o={}){
     backgroundStyle:o.backgroundStyle || "bar",
     opacity:String(o.opacity || "85"),
     showLogo:o.showLogo !== false,
-    showTagline:o.showTagline !== false
+    showTagline:o.showTagline !== false,
+    logoMode:o.logoMode || "firevault",
+    customLogoData:o.customLogoData || ""
   };
 }
 function overlayTagButtons510(){
   return OVERLAY_TAGS_510.map(([tag,label,note])=>`<button type="button" class="overlayFieldChip510" data-overlay-tag="${esc(tag)}"><strong>${esc(tag)}</strong><span>${esc(label)}</span><small>${esc(note)}</small></button>`).join("");
 }
+function overlayLogoSrc510(set){
+  if(set.logoMode === "custom") return set.customLogoData || "";
+  return `assets/firevault-logo-master.png?v=${BUILD}`;
+}
+function overlayLogoStatus510(set){
+  if(set.logoMode === "custom" && set.customLogoData) return "Using custom logo";
+  if(set.logoMode === "custom") return "Custom logo selected but no image uploaded yet";
+  return "Using FireVault logo";
+}
 function overlayPreviewMarkup510(o){
   const set=overlayCleanSetting510(o);
   const lines=esc(renderTemplate(set.template, overlaySampleSite510()) || "FireVault overlay preview").replaceAll("\n","<br>");
   const style=`--ovAccent:${esc(set.accentColor)};--ovText:${esc(set.textColor)};--ovAlpha:${Math.max(20,Math.min(100,Number(set.opacity)||85))/100}`;
+  const logoSrc=overlayLogoSrc510(set);
   return `<div class="photoOverlayPreview510" style="${style}">
-    <div class="photoSampleScene510" aria-label="Sample fire alarm panel photo preview">
-      <div class="sampleWall510"></div>
-      <div class="samplePanel510"><span>FACP</span><b>ALARM</b><i>NORMAL</i><em>TROUBLE</em></div>
-      <div class="sampleConduit510 one"></div><div class="sampleConduit510 two"></div>
+    <div class="photoSampleScene510" aria-label="Sample field photo preview with overlay">
+      <img class="photoSampleImg510" src="assets/overlay-sample-photo.jpg?v=${BUILD}" alt="Sample fire alarm field photo">
       <div id="overlayLivePreview510" class="photoStamp510 align-${esc(set.alignment)} size-${esc(set.fontSize)} style-${esc(set.backgroundStyle)}">
-        ${set.showLogo?`<div class="photoStampLogo510">FV</div>`:""}
+        ${set.showLogo?`<div class="photoStampLogo510">${logoSrc?`<img src="${esc(logoSrc)}" alt="Overlay logo">`:`<span class="photoStampLogoPlaceholder511">Logo</span>`}</div>`:""}
         <div class="photoStampText510"><div>${lines}</div>${set.showTagline?`<small>FireVault Field Photo Overlay</small>`:""}</div>
       </div>
     </div>
@@ -2920,7 +2931,7 @@ function overlaySettingsPanel510(o){
   const set=overlayCleanSetting510(o);
   return `<div class="settingsStack overlaySettings510">
     <div class="card settingGroup compactPane overlayEditor510">
-      <div class="paneHead"><div><h2>Photo Overlay</h2><p class="paneNote">Build the stamp that appears on field photos. Preview uses a sample panel image and actual overlay text.</p></div><button class="primary saveMini" id="saveSettings">Save</button></div>
+      <div class="paneHead"><div><h2>Photo Overlay</h2><p class="paneNote">Preview now uses a cleaner sample field photo and the real FireVault logo. You can also upload a custom logo for the overlay.</p></div><button class="primary saveMini" id="saveSettings">Save</button></div>
       ${overlayPreviewMarkup510(set)}
       <div class="overlayControlGrid510">
         ${fieldBlock("Overlay Text",`<textarea id="ovTemplate" class="overlayTemplate510" rows="4" placeholder="{site_name} • {date} • {time}">${esc(set.template)}</textarea>`,`Tap fields below to insert them into the overlay.`)}
@@ -2931,10 +2942,29 @@ function overlaySettingsPanel510(o){
           ${fieldBlock("Opacity",`<input id="ovOpacity" type="range" min="35" max="100" value="${esc(set.opacity)}">`,`Stamp background strength`)}
           ${fieldBlock("Accent Color",`<input id="ovAccent" type="color" value="${esc(set.accentColor)}">`)}
           ${fieldBlock("Text Color",`<input id="ovText" type="color" value="${esc(set.textColor)}">`)}
+          ${fieldBlock("Logo Source",`<select id="ovLogoMode"><option value="firevault" ${set.logoMode==="firevault"?"selected":""}>FireVault logo</option><option value="custom" ${set.logoMode==="custom"?"selected":""}>Custom logo</option></select>`,`Change which logo appears on the overlay.`)}
+        </div>
+      </div>
+      <div class="overlayLogoManager511">
+        <div class="overlayLogoCard511">
+          <div class="overlayLogoPreview511">${set.showLogo ? (overlayLogoSrc510(set)?`<img src="${esc(overlayLogoSrc510(set))}" alt="Current overlay logo preview">`:`<span>No logo image</span>`) : `<span>Logo hidden</span>`}</div>
+          <div class="overlayLogoMeta511">
+            <strong>Overlay Logo</strong>
+            <p id="ovLogoStatus">${esc(overlayLogoStatus510(set))}</p>
+            <label class="overlayUploadLabel511">
+              <span>Upload custom logo</span>
+              <input id="ovCustomLogo" type="file" accept="image/*">
+            </label>
+            <div class="overlayLogoActions511">
+              <button type="button" class="ghost" id="ovUseFireVault">Use FireVault Logo</button>
+              <button type="button" class="ghost" id="ovClearCustomLogo">Clear Custom Logo</button>
+            </div>
+            <small class="fieldNote">Custom logo is saved locally on this device/browser. Best results: square PNG with transparent background.</small>
+          </div>
         </div>
       </div>
       <div class="settingsList twoCol overlayToggles510">
-        ${checkBlock("ovLogo","Show FireVault logo badge",set.showLogo)}
+        ${checkBlock("ovLogo","Show overlay logo",set.showLogo)}
         ${checkBlock("ovTagline","Show FireVault tagline",set.showTagline)}
       </div>
     </div>
@@ -2954,16 +2984,26 @@ function collectOverlayFromInputs510(){
     backgroundStyle:val("ovBg") || "bar",
     opacity:val("ovOpacity") || "85",
     showLogo:checked("ovLogo"),
-    showTagline:checked("ovTagline")
+    showTagline:checked("ovTagline"),
+    logoMode:val("ovLogoMode") || "firevault",
+    customLogoData:overlayLogoDraftDataUrl || data.settings.overlay?.customLogoData || ""
   });
 }
 function updateOverlayPreview510(){
   const holder=document.querySelector(".photoOverlayPreview510");
   if(!holder) return;
-  const next=overlayPreviewMarkup510(collectOverlayFromInputs510());
+  const nextSet=collectOverlayFromInputs510();
+  const next=overlayPreviewMarkup510(nextSet);
   const wrap=document.createElement("div");
   wrap.innerHTML=next;
   holder.replaceWith(wrap.firstElementChild);
+  const miniPreview=document.querySelector('.overlayLogoPreview511');
+  if(miniPreview){
+    const logoSrc=overlayLogoSrc510(nextSet);
+    miniPreview.innerHTML = !nextSet.showLogo ? '<span>Logo hidden</span>' : (logoSrc ? `<img src="${esc(logoSrc)}" alt="Current overlay logo preview">` : '<span>No logo image</span>');
+  }
+  const stat=document.getElementById('ovLogoStatus');
+  if(stat) stat.textContent=overlayLogoStatus510(nextSet);
 }
 function insertOverlayTag510(tag){
   const target=document.getElementById("ovTemplate");
@@ -2975,13 +3015,48 @@ function insertOverlayTag510(tag){
   target.dispatchEvent(new Event("input",{bubbles:true}));
 }
 function wireOverlaySettings510(){
-  ["ovTemplate","ovAlign","ovSize","ovBg","ovOpacity","ovAccent","ovText","ovLogo","ovTagline"].forEach(id=>{
+  overlayLogoDraftDataUrl = data.settings.overlay?.customLogoData || "";
+  ["ovTemplate","ovAlign","ovSize","ovBg","ovOpacity","ovAccent","ovText","ovLogo","ovTagline","ovLogoMode"].forEach(id=>{
     const el=document.getElementById(id);
     if(el) el.addEventListener(el.type==="checkbox"?"change":"input", updateOverlayPreview510);
     if(el && el.tagName === "SELECT") el.addEventListener("change", updateOverlayPreview510);
   });
   document.querySelectorAll(".overlayFieldChip510").forEach(b=>b.onclick=()=>insertOverlayTag510(b.dataset.overlayTag||""));
+  const upload=document.getElementById('ovCustomLogo');
+  if(upload) upload.addEventListener('change', e=>{
+    const file=e.target.files && e.target.files[0];
+    if(!file) return;
+    if(!file.type.startsWith('image/')){ toast('Please choose an image file.'); return; }
+    const reader=new FileReader();
+    reader.onload=()=>{
+      overlayLogoDraftDataUrl=String(reader.result||'');
+      const select=document.getElementById('ovLogoMode');
+      if(select) select.value='custom';
+      const showLogo=document.getElementById('ovLogo');
+      if(showLogo) showLogo.checked=true;
+      updateOverlayPreview510();
+      toast('Custom overlay logo loaded. Save settings to keep it.');
+    };
+    reader.readAsDataURL(file);
+  });
+  const useFireVault=document.getElementById('ovUseFireVault');
+  if(useFireVault) useFireVault.onclick=()=>{
+    const select=document.getElementById('ovLogoMode');
+    if(select) select.value='firevault';
+    updateOverlayPreview510();
+  };
+  const clearCustom=document.getElementById('ovClearCustomLogo');
+  if(clearCustom) clearCustom.onclick=()=>{
+    overlayLogoDraftDataUrl='';
+    const upload=document.getElementById('ovCustomLogo');
+    if(upload) upload.value='';
+    const select=document.getElementById('ovLogoMode');
+    if(select && select.value==='custom') select.value='firevault';
+    updateOverlayPreview510();
+    toast('Custom overlay logo cleared.');
+  };
 }
+
 
 function settingsPanel(){
   const s=data.settings, t=s.theme, tech=s.technician, email=s.email, r=s.reports, o=s.overlay, a=s.advanced, gps=s.gps||{};
@@ -3177,10 +3252,10 @@ function diagnostics(){
 }
 function showChangelog(){
   const notes = [
-    "Advanced to Build 0.50.10 from the uploaded 0.50.9 baseline.",
-    "Rebuilt Photo Overlay settings into a more functional editor with a real sample-photo preview.",
-    "Added an editable overlay template with tap-to-insert field chips for every available {field}.",
-    "Added live preview support for alignment, font size, accent color, text color, background style, opacity, logo, and tagline settings.",
+    "Advanced to Build 0.50.11 from the uploaded 0.50.10 baseline.",
+    "Improved Photo Overlay settings again with a cleaner sample photo, the real FireVault logo, and custom logo support.",
+    "Added custom overlay logo upload / clear controls and a logo source selector.",
+    "Updated the live preview to render the overlay on a better sample image while preserving the available {field} insert chips and overlay controls.",
     "Added new overlay fields including address, city, state, ZIP, technician, company, phone, email, license, GPS, and build number.",
     "Kept Daily Report / Site Notes closeout features, iPad autosizing, the simple Home screen, Search Bar Concept #6, and excluded job-status workflow controls."
   ];
