@@ -1,10 +1,10 @@
-# Clean Install Notes — FireVault Build 0.50.36
+# Clean Install Notes — FireVault Build 0.50.37
 
 This ZIP is intended to replace the failed 0.50.31 / 0.50.32 branch.
 
 ## Important
 
-Build 0.50.36 continues from the working 0.50.34 baseline and directly fixes splash top-bar visibility plus the Home safe-area backing behind the fixed top bar without changing the stable startup path.
+Build 0.50.37 continues from the working 0.50.34 baseline and directly fixes splash top-bar visibility plus the Home safe-area backing behind the fixed top bar without changing the stable startup path.
 
 ## Install
 
@@ -18,3 +18,6 @@ Build 0.50.36 continues from the working 0.50.34 baseline and directly fixes spl
 - Splash screen stays clean without the top app bar.
 - Top app bar appears after the app opens.
 - Top app bar is fixed and should not scroll away with the main page.
+
+
+Build 0.50.37 repairs the post-splash top bar by showing the real fixed app header after boot while keeping splash clean.

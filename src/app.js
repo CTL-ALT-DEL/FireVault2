@@ -1073,6 +1073,8 @@ function addServiceFollowUp(kind="Follow-up"){
 function startJobTimer(){ stopJobTimer(); jobTimer=setInterval(()=>{ const el=document.getElementById("jobElapsed"); if(el && activeJob) el.textContent=elapsedText(activeJob.startedAt); },1000); }
 function stopJobTimer(){ if(jobTimer){ clearInterval(jobTimer); jobTimer=null; } }
 function setActiveNav(){ document.querySelectorAll("nav button").forEach(b=>b.classList.remove("active")); const section=["routeLog","dailySummary"].includes(view)?"home":(["siteDetail","visits","visitDetail","checklist","siteForm","contactsList","contactForm","siteDocs","siteDocForm","equipmentList","equipmentForm","tasks","taskForm","deficiencies","deficiencyForm","report","jobMode","nearbySites","attention"].includes(view)?"sites":view); document.getElementById("nav-"+section)?.classList.add("active"); }
+function wireGlobalHeader537(){ const b=document.getElementById("headerSettingsBtn537"); if(b) b.onclick=()=>route("settings"); }
+function showGlobalChrome537(){ const h=document.getElementById("appHeader"); const n=document.getElementById("appNav"); if(h){ h.style.display="flex"; h.style.visibility="visible"; h.style.opacity="1"; } if(n){ n.style.display="grid"; n.style.visibility="visible"; n.style.opacity="1"; } wireGlobalHeader537(); }
 
 function render(){
   try{
@@ -3918,7 +3920,7 @@ function diagnostics(){
 }
 function showChangelog(){
   const notes = [
-    "Advanced to Build 0.50.36 from the working 0.50.35 baseline.",
+    "Advanced to Build 0.50.37 from the working 0.50.35 baseline.",
     "Restored the Home top bar after the clean splash-screen hide fix.",
     "Kept the top logo/build/settings chrome hidden during splash, then explicitly reveals it after boot.",
     "Pinned the Home logo/build/settings bar above the scroll area with a solid black safe-area backing.",
@@ -3927,7 +3929,7 @@ function showChangelog(){
   overlay.className="releaseOverlay";
   overlay.innerHTML=`<div class="releaseSheet" role="dialog" aria-modal="true" aria-label="FireVault release notes">
     <div class="releaseHead"><div><strong>FireVault</strong><span>Build ${BUILD}</span></div><button class="ghost iconBtn" id="closeRelease" aria-label="Close release notes">×</button></div>
-    <div class="releaseBody"><h2>Release Notes</h2><p class="releaseIntro">Home top-bar restore and splash chrome polish.</p><ul>${notes.map(n=>`<li>${esc(n)}</li>`).join("")}</ul></div>
+    <div class="releaseBody"><h2>Release Notes</h2><p class="releaseIntro">Fixed app header logo/build/settings visibility after splash.</p><ul>${notes.map(n=>`<li>${esc(n)}</li>`).join("")}</ul></div>
   </div>`;
   document.body.appendChild(overlay);
   const close=()=>overlay.remove();
@@ -3943,6 +3945,7 @@ function bootFireVault518(){
     document.body.classList.add("app-booted533");
     render();
     document.body.classList.add("app-chrome-ready536");
+    showGlobalChrome537();
     document.getElementById("appHeader")?.removeAttribute("style");
     document.getElementById("appNav")?.removeAttribute("style");
     window.__FIREVAULT_BOOTED = true;
