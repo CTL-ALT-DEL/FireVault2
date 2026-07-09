@@ -1,32 +1,29 @@
-# FireVault Build 0.50.17
+# FireVault Build 0.50.18
 
-Build 0.50.17 continues from the Build 0.50.15 splash timing baseline and polishes the Documents / Photos workflow with Photo Vault filter tabs and faster photo download actions.
+Build 0.50.18 continues from the Build 0.50.17 baseline and repairs the startup/splash watchdog behavior. The 5-second splash screen is preserved, but the watchdog now waits long enough and separates actual module-load failures from the intentional splash delay.
 
 ## Changes
 
-- Visible app version advanced to 0.50.17.
-- Updated cache-busting references in `index.html` to 0.50.17.
-- Added Photo Vault filter tabs: All, Photos, Links, and Docs.
-- Added live counts on each Photo Vault filter tab.
-- Added a quick Original download action directly from saved photo records.
-- Preserved Preview Overlay, Download With Overlay, Download Original, and custom overlay logo support.
-- Preserved controlled splash-screen timing and the startup watchdog.
-- Preserved iPad autosizing, the simple Home screen, and Search Bar Concept #6.
-- Did not bring back job-status workflow buttons.
+- Visible app version advanced to 0.50.18.
+- Updated cache-busting references in `index.html` to 0.50.18.
+- Fixed the startup watchdog false-positive that could show an error before the 5-second splash completed.
+- Kept the splash screen minimum display time at about 5 seconds.
+- Added a module-ready flag so a delayed splash is not treated as a failed boot.
+- Added safer render error handling after the splash delay.
+- Preserved Photo Vault filters, Photo Overlay tools, custom overlay logo support, iPad autosizing, simple Home screen, and Search Bar Concept #6.
+- Did not bring back Start Job / End Job / Arrived / Working / Complete workflow.
 
 ## Validation
-
-Run these checks before deploying:
 
 ```bash
 node --check src/storage.js
 node --check src/app.js
 python -m json.tool manifest.json
-zip -T firevault-build-0.50.17-modular-root.zip
+zip -T firevault-build-0.50.18-modular-root.zip
 ```
 
-Suggested commit message:
+## Suggested commit message
 
 ```text
-Build 0.50.17 five second splash timing
+Build 0.50.18 startup watchdog and splash timing repair
 ```

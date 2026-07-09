@@ -9,14 +9,14 @@
   <meta name="apple-mobile-web-app-title" content="FireVault" />
   <title>FireVault</title>
   <link rel="manifest" href="manifest.json" />
-  <link rel="apple-touch-icon" href="assets/apple-touch-icon.png?v=0.50.17" />
-  <link rel="icon" type="image/png" href="assets/favicon.png?v=0.50.17" />
-  <link rel="stylesheet" href="src/styles.css?v=0.50.17" />
+  <link rel="apple-touch-icon" href="assets/apple-touch-icon.png?v=0.50.18" />
+  <link rel="icon" type="image/png" href="assets/favicon.png?v=0.50.18" />
+  <link rel="stylesheet" href="src/styles.css?v=0.50.18" />
 </head>
 <body>
   <header>
-    <div class="brand"><img class="brandMark" src="assets/favicon.png?v=0.50.17" alt=""><div><div>FIREVAULT</div><small>Field Vault System</small></div></div>
-    <button class="build" id="buildButton">0.50.17</button>
+    <div class="brand"><img class="brandMark" src="assets/favicon.png?v=0.50.18" alt=""><div><div>FIREVAULT</div><small>Field Vault System</small></div></div>
+    <button class="build" id="buildButton">0.50.18</button>
   </header>
 
   <main id="app">
@@ -24,14 +24,14 @@
       <div class="splashAura492"></div>
       <div class="splashOrb457 splashOrb492">
         <span class="splashRing492"></span>
-        <img src="assets/favicon.png?v=0.50.17" alt="FireVault">
+        <img src="assets/favicon.png?v=0.50.18" alt="FireVault">
       </div>
       <div class="splashText457 splashText492">
         <h1>FireVault</h1>
         <p>Site notes ready</p>
       </div>
       <div class="splashMeter457 splashMeter492"><span></span></div>
-      <small class="splashBuild492">0.50.17</small>
+      <small class="splashBuild492">0.50.18</small>
     </div>
   </main>
 
@@ -45,6 +45,7 @@
 
   <script>
     window.__FIREVAULT_BOOTED = false;
+    window.__FIREVAULT_MODULE_READY = false;
     window.__FIREVAULT_SPLASH_STARTED = Date.now();
     window.__FIREVAULT_MIN_SPLASH_MS = 5000;
     window.addEventListener('error', function(e){ window.__FIREVAULT_LAST_ERROR = e.message || String(e.error || e); });
@@ -52,11 +53,18 @@
     setTimeout(function(){
       var app = document.getElementById('app');
       var stillOnSplash = app && app.querySelector && app.querySelector('.splashScreen457, .splashScreen492');
-      if (!window.__FIREVAULT_BOOTED && app && (stillOnSplash || /Loading FireVault/i.test(app.textContent || ''))) {
-        app.innerHTML = '<div class="screen"><div class="card errorBox"><h1>FireVault did not finish loading</h1><p>The app module did not boot. This build includes a startup watchdog so the splash screen will not hide errors anymore.</p><p>' + (window.__FIREVAULT_LAST_ERROR || 'No browser error was reported.') + '</p><button class="primary" onclick="location.reload()">Reload App</button></div></div>';
+      if (!window.__FIREVAULT_MODULE_READY && app && (stillOnSplash || /Loading FireVault/i.test(app.textContent || ''))) {
+        app.innerHTML = '<div class="screen"><div class="card errorBox"><h1>FireVault did not finish loading</h1><p>The app JavaScript module did not load. Try Reload App. If it continues, clear the browser/PWA cache and reinstall this build.</p><p>' + (window.__FIREVAULT_LAST_ERROR || 'No browser error was reported.') + '</p><button class="primary" onclick="location.reload()">Reload App</button></div></div>';
       }
-    }, 3500);
+    }, 9000);
+    setTimeout(function(){
+      var app = document.getElementById('app');
+      var stillOnSplash = app && app.querySelector && app.querySelector('.splashScreen457, .splashScreen492');
+      if (window.__FIREVAULT_MODULE_READY && !window.__FIREVAULT_BOOTED && app && stillOnSplash) {
+        app.innerHTML = '<div class="screen"><div class="card errorBox"><h1>FireVault started but did not open</h1><p>The module loaded, but the app did not leave the splash screen. Try Reload App.</p><p>' + (window.__FIREVAULT_LAST_ERROR || 'No browser error was reported.') + '</p><button class="primary" onclick="location.reload()">Reload App</button></div></div>';
+      }
+    }, 11000);
   </script>
-  <script type="module" src="src/app.js?v=0.50.17"></script>
+  <script type="module" src="src/app.js?v=0.50.18"></script>
 </body>
 </html>

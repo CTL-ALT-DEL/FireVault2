@@ -1,4 +1,5 @@
 import { BUILD, KEY, ACTIVE_JOB_KEY, loadData, saveData, ensureSite, fullAddress, esc, uid, downloadBlob } from "./storage.js";
+window.__FIREVAULT_MODULE_READY = true;
 
 let data = loadData();
 let view = new URLSearchParams(location.search).get("route") || data.settings.app?.defaultScreen || "home";
@@ -3535,16 +3536,16 @@ function diagnostics(){
 }
 function showChangelog(){
   const notes = [
-    "Advanced to Build 0.50.17 from the Build 0.50.16 baseline.",
-    "Added Photo Vault filter tabs for All, Photos, Links, and Docs so large site vaults are easier to scan.",
-    "Added a quick Original download action directly from saved photo records in the Documents / Photos list.",
-    "Preserved custom overlay logo support and the startup watchdog.",
-    "Kept Photo Overlay settings, Daily Report / Site Notes workflow, iPad autosizing, simple Home screen, Search Bar Concept #6, and excluded job-status workflow controls."
+    "Advanced to Build 0.50.18 from the Build 0.50.17 baseline.",
+    "Fixed the splash watchdog false-positive that showed a loading error before the 5-second splash finished.",
+    "Kept the splash screen minimum display time at about 5 seconds.",
+    "Added a module-ready flag so startup errors are separated from intentional splash delay.",
+    "Preserved Photo Vault filters, Photo Overlay tools, custom overlay logo support, iPad autosizing, simple Home screen, Search Bar Concept #6, and excluded job-status workflow controls."
   ];  const overlay=document.createElement("div");
   overlay.className="releaseOverlay";
   overlay.innerHTML=`<div class="releaseSheet" role="dialog" aria-modal="true" aria-label="FireVault release notes">
     <div class="releaseHead"><div><strong>FireVault</strong><span>Build ${BUILD}</span></div><button class="ghost iconBtn" id="closeRelease" aria-label="Close release notes">×</button></div>
-    <div class="releaseBody"><h2>Release Notes</h2><p class="releaseIntro">Photo Vault filter and download workflow polish.</p><ul>${notes.map(n=>`<li>${esc(n)}</li>`).join("")}</ul></div>
+    <div class="releaseBody"><h2>Release Notes</h2><p class="releaseIntro">Startup watchdog and 5-second splash timing repair.</p><ul>${notes.map(n=>`<li>${esc(n)}</li>`).join("")}</ul></div>
   </div>`;
   document.body.appendChild(overlay);
   const close=()=>overlay.remove();
@@ -3552,11 +3553,19 @@ function showChangelog(){
   overlay.addEventListener("click",e=>{ if(e.target===overlay) close(); });
 }
 
-function bootFireVault515(){
-  render();
-  window.__FIREVAULT_BOOTED = true;
+function bootFireVault518(){
+  try{
+    render();
+    window.__FIREVAULT_BOOTED = true;
+  }catch(err){
+    window.__FIREVAULT_LAST_ERROR = err && err.message ? err.message : String(err);
+    const app=document.getElementById("app");
+    if(app){
+      app.innerHTML=`<div class="screen"><div class="card errorBox"><h1>FireVault startup error</h1><p>The module loaded, but the app could not render.</p><p>${esc(window.__FIREVAULT_LAST_ERROR)}</p><button class="primary" onclick="location.reload()">Reload App</button></div></div>`;
+    }
+  }
 }
-const splashStarted515 = Number(window.__FIREVAULT_SPLASH_STARTED || Date.now());
-const minSplashMs515 = Number(window.__FIREVAULT_MIN_SPLASH_MS || 5000);
-const elapsedSplashMs515 = Date.now() - splashStarted515;
-setTimeout(bootFireVault515, Math.max(0, minSplashMs515 - elapsedSplashMs515));
+const splashStarted518 = Number(window.__FIREVAULT_SPLASH_STARTED || Date.now());
+const minSplashMs518 = Number(window.__FIREVAULT_MIN_SPLASH_MS || 5000);
+const elapsedSplashMs518 = Date.now() - splashStarted518;
+setTimeout(bootFireVault518, Math.max(0, minSplashMs518 - elapsedSplashMs518));
