@@ -1,6 +1,6 @@
-# Clean Install Notes — FireVault Build 0.50.44
+# Clean Install Notes — FireVault Build 0.50.45
 
-This ZIP is intended to be used as the new clean baseline for FireVault Build 0.50.44.
+This ZIP is intended to be used as the new clean baseline for FireVault Build 0.50.45.
 
 ## Install
 
@@ -11,11 +11,11 @@ This ZIP is intended to be used as the new clean baseline for FireVault Build 0.
 
 ## Build focus
 
-Build 0.50.44 keeps the stable splash/header repair and Home spacing polish, then adds a visible **Site Quick Actions** card on each account screen.
+Build 0.50.45 keeps the stable splash/header repair, Home spacing polish, and Site Quick Actions, then adds **Deficiency Closeout Polish** for documenting issue resolution and customer-facing deficiency notes.
 
 ## Notes
 
-- Uses the stable 0.50.43 baseline.
+- Uses the stable 0.50.44 baseline.
 - Keeps the 5-second splash screen.
 - Keeps the fixed top header behavior.
 - Keeps Home simple.

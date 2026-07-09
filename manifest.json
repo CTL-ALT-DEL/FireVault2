@@ -8,7 +8,7 @@
   "orientation": "any",
   "background_color": "#0b0d10",
   "theme_color": "#101216",
-  "description": "Field knowledge system for fire alarm technicians. Build 0.50.44 adds a Report Center closeout action-items copy tool while preserving stable splash/header behavior and Home spacing polish.",
+  "description": "Field knowledge system for fire alarm technicians. Build 0.50.45 adds Deficiency Closeout Polish while preserving stable splash/header behavior, Site Quick Actions, and Home spacing polish.",
   "icons": [
     {
       "src": "assets/icon-192.png",
