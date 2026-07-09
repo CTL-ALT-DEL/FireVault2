@@ -14,7 +14,6 @@ let docPhotoClearRequested512 = false;
 let taskFilter = "open";
 let deficiencyFilter = "open";
 let activeJob = loadActiveJob();
-let activeRoute = loadActiveRoute();
 let nearbyState = null;
 let siteSearch = "";
 let libraryFolder = "all";
@@ -23,6 +22,8 @@ let routeHistorySearch = "";
 let simpleToolsOpen = false;
 let homeInstallTipHidden = localStorage.getItem("firevault_home_install_tip_hidden") === "1";
 let jobTimer = null;
+const ACTIVE_ROUTE_KEY = "firevault_active_route_day";
+let activeRoute = loadActiveRoute();
 const QUICK_EVENTS = ["Arrived on site","Opened panel","Panel normal","Trouble active","Ground fault active","Device tested","Customer update","Parts needed"];
 const DEFAULT_CHECKLIST = [
   ["Panel", "Panel normal / no active troubles"],
@@ -570,7 +571,6 @@ function applyTheme(){
 function loadActiveJob(){ try{ const raw = localStorage.getItem(ACTIVE_JOB_KEY); return raw ? JSON.parse(raw) : null; } catch{ return null; } }
 function saveActiveJob(){ activeJob ? localStorage.setItem(ACTIVE_JOB_KEY, JSON.stringify(activeJob)) : localStorage.removeItem(ACTIVE_JOB_KEY); }
 
-const ACTIVE_ROUTE_KEY = "firevault_active_route_day";
 function loadActiveRoute(){ try{ const raw = localStorage.getItem(ACTIVE_ROUTE_KEY); return raw ? JSON.parse(raw) : null; } catch{ return null; } }
 function saveActiveRoute(){ activeRoute ? localStorage.setItem(ACTIVE_ROUTE_KEY, JSON.stringify(activeRoute)) : localStorage.removeItem(ACTIVE_ROUTE_KEY); }
 function routeEventTime(iso){ try{return new Date(iso).toLocaleTimeString([], {hour:"numeric",minute:"2-digit"});}catch{return "";} }
@@ -1959,8 +1959,7 @@ function docPhotoOverlayPreviewMarkup513(d={}){
   const src=docPhotoDraftDataUrl512 || d.imageData || "";
   if(!src) return `<div class="empty overlayEmpty513">No photo selected for overlay preview.</div>`;
   const set=overlayCleanSetting510(data.settings.overlay||{});
-  const lines=esc(renderTemplate(set.template, site()||{}) || "FireVault Field Photo").replaceAll("
-","<br>");
+  const lines=esc(renderTemplate(set.template, site()||{}) || "FireVault Field Photo").replaceAll("\n","<br>");
   const style=`--ovAccent:${esc(set.accentColor)};--ovText:${esc(set.textColor)};--ovAlpha:${Math.max(20,Math.min(100,Number(set.opacity)||85))/100}`;
   const logoSrc=overlayLogoSrc510(set);
   return `<div class="docOverlayCard513" style="${style}">
@@ -3510,18 +3509,18 @@ function diagnostics(){
 }
 function showChangelog(){
   const notes = [
-    "Advanced to Build 0.50.13 from the uploaded 0.50.12 baseline.",
-    "Added Preview Overlay on the Photo Vault document screen so you can see the stamp on the selected photo before downloading.",
-    "Added Download Original next to Download With Overlay for quick access to the untouched source image.",
-    "Overlay preview uses the current Photo Overlay settings, including template fields, logo source, position, size, background, opacity, colors, and tagline.",
-    "Photo changes now clear the old overlay preview so the preview always matches the current selected image.",
+    "Advanced to Build 0.50.14 from the uploaded 0.50.13 baseline.",
+    "Fixed a startup bug that could leave Build 0.50.13 stuck on the splash screen.",
+    "Corrected the Photo Vault overlay preview line-break handling that was blocking the app module from booting.",
+    "Added a stronger splash-screen watchdog so startup errors are shown instead of silently staying on the splash screen.",
+    "Preserved the Photo Vault overlay preview and Download Original features from Build 0.50.13.",
     "Kept Photo Vault overlay export, custom logo support, Daily Report / Site Notes workflow, iPad autosizing, simple Home screen, Search Bar Concept #6, and excluded job-status workflow controls."
   ];
   const overlay=document.createElement("div");
   overlay.className="releaseOverlay";
   overlay.innerHTML=`<div class="releaseSheet" role="dialog" aria-modal="true" aria-label="FireVault release notes">
     <div class="releaseHead"><div><strong>FireVault</strong><span>Build ${BUILD}</span></div><button class="ghost iconBtn" id="closeRelease" aria-label="Close release notes">×</button></div>
-    <div class="releaseBody"><h2>Release Notes</h2><p class="releaseIntro">Photo Vault overlay preview and original-photo download polish.</p><ul>${notes.map(n=>`<li>${esc(n)}</li>`).join("")}</ul></div>
+    <div class="releaseBody"><h2>Release Notes</h2><p class="releaseIntro">Startup hotfix for the splash-screen hang in Build 0.50.13.</p><ul>${notes.map(n=>`<li>${esc(n)}</li>`).join("")}</ul></div>
   </div>`;
   document.body.appendChild(overlay);
   const close=()=>overlay.remove();

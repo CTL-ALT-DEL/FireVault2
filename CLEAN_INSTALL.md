@@ -1,24 +1,20 @@
-# Clean Install Notes — FireVault Build 0.50.13
+# Clean Install Notes — FireVault Build 0.50.14
 
-This ZIP is intended to be used as the new clean baseline for FireVault Build 0.50.13.
+This ZIP is intended to be used as the new clean baseline for FireVault Build 0.50.14.
 
-## Install
+Build 0.50.14 is a startup hotfix for Build 0.50.13. It fixes the issue where the app could remain stuck on the splash screen and never enter the app.
 
-1. Extract the ZIP.
-2. Upload the full extracted root to the GitHub Pages branch / repository root.
-3. Commit all files together.
-4. Wait for GitHub Pages deployment.
-5. On iPhone or iPad, refresh Safari and reinstall the PWA if the previous cached build remains visible.
+## Included
 
-## Important
+- Startup fix for the 0.50.13 splash-screen hang.
+- Stronger startup watchdog that displays errors instead of leaving the splash screen visible.
+- Photo Vault overlay preview preserved.
+- Download Original preserved.
+- Photo Overlay settings, custom logo support, and overlay export preserved.
+- Simple Home screen preserved.
+- Search Bar Concept #6 preserved.
+- iPad autosizing preserved.
 
-Build 0.50.13 keeps the existing Daily Report / Site Notes work and polishes the Photo Vault workflow:
+## Deploy
 
-- Preview Overlay button on the document photo screen.
-- Download Original button beside Download With Overlay.
-- Overlay preview uses current Photo Overlay settings and the selected photo.
-- Old overlay preview clears when the selected photo changes.
-- Home screen stays simple.
-- Search Bar Concept #6 remains intact.
-- iPad autosizing remains intact.
-- Job-status workflow controls were not restored.
+Upload the contents of this ZIP to the GitHub Pages branch/root as usual, replacing the previous build files.

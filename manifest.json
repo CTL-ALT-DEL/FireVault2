@@ -8,7 +8,7 @@
   "orientation": "any",
   "background_color": "#0b0d10",
   "theme_color": "#101216",
-  "description": "Field knowledge system for fire alarm technicians. Build 0.50.13 adds Photo Vault overlay preview and original-photo download polish while preserving the simple Home screen and iPad autosizing.",
+  "description": "Field knowledge system for fire alarm technicians. Build 0.50.14 adds Photo Vault overlay preview and original-photo download polish while preserving the simple Home screen and iPad autosizing.",
   "icons": [
     {
       "src": "assets/icon-192.png",
