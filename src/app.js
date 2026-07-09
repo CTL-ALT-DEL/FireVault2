@@ -2926,17 +2926,17 @@ function diagnostics(){
 }
 function showChangelog(){
   const notes = [
-    "Advanced to Build 0.50.6 from the uploaded 0.50.5 baseline.",
-    "Added an inline Site Notes composer with Save Note, quick prefixes, and template buttons.",
-    "Improved the Daily Report with a note review queue, note counts, and clearer report text.",
-    "Changed Daily Report TXT downloads to use daily-report filenames.",
-    "Kept the Home screen simple and preserved Search Bar Concept #6."
+    "Advanced to Build 0.50.7 from the uploaded 0.50.6 baseline.",
+    "Added iPad autosizing so FireVault no longer stays locked to a narrow phone-width Home layout on larger screens.",
+    "Improved tablet portrait and landscape spacing for Home, Daily Report, Site Notes, Settings, and bottom navigation.",
+    "Allowed the PWA manifest to support portrait or landscape orientation for iPad use.",
+    "Kept the Home screen simple, preserved Search Bar Concept #6, and did not bring back job-status workflow controls."
   ];
   const overlay=document.createElement("div");
   overlay.className="releaseOverlay";
   overlay.innerHTML=`<div class="releaseSheet" role="dialog" aria-modal="true" aria-label="FireVault release notes">
     <div class="releaseHead"><div><strong>FireVault</strong><span>Build ${BUILD}</span></div><button class="ghost iconBtn" id="closeRelease" aria-label="Close release notes">×</button></div>
-    <div class="releaseBody"><h2>Release Notes</h2><p class="releaseIntro">Daily Report review queue, inline site-note composer, and end-of-day copy tools.</p><ul>${notes.map(n=>`<li>${esc(n)}</li>`).join("")}</ul></div>
+    <div class="releaseBody"><h2>Release Notes</h2><p class="releaseIntro">iPad autosizing, responsive tablet spacing, and preserved simple Home workflow.</p><ul>${notes.map(n=>`<li>${esc(n)}</li>`).join("")}</ul></div>
   </div>`;
   document.body.appendChild(overlay);
   const close=()=>overlay.remove();
