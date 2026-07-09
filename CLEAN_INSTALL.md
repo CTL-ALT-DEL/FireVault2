@@ -1,10 +1,10 @@
-# Clean Install Notes — FireVault Build 0.50.33
+# Clean Install Notes — FireVault Build 0.50.34
 
 This ZIP is intended to replace the failed 0.50.31 / 0.50.32 branch.
 
 ## Important
 
-Build 0.50.33 was rebuilt from the last known stable 0.50.30 baseline because both 0.50.31 and 0.50.32 produced EOF errors at load.
+Build 0.50.34 continues from the working 0.50.33 baseline and repairs the splash/top-bar layout without changing the JavaScript startup path.
 
 ## Install
 

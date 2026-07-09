@@ -1,12 +1,12 @@
-# FireVault Build 0.50.33
+# FireVault Build 0.50.34
 
-Build 0.50.33 is a startup-safe repair build made from the last known stable Build 0.50.30 baseline. Builds 0.50.31 and 0.50.32 were treated as bad branches because they produced EOF errors at load.
+Build 0.50.34 continues from the working Build 0.50.33 baseline and repairs the splash/top-bar layout without changing the JavaScript startup path.
 
 ## Changes
 
-- Visible app version advanced to 0.50.33.
-- Cache-busting references updated to 0.50.33.
-- Rebuilt from stable 0.50.30 instead of continuing from the 0.50.31 / 0.50.32 EOF branch.
+- Visible app version advanced to 0.50.34.
+- Cache-busting references updated to 0.50.34.
+- Continued from the working 0.50.33 baseline and avoided risky JavaScript feature changes.
 - Hid the top logo / build / settings chrome while the splash screen is showing.
 - Top chrome appears only after FireVault boots.
 - Top chrome is pinned/fixed after app boot so it does not scroll away with the main page.
@@ -20,11 +20,11 @@ Build 0.50.33 is a startup-safe repair build made from the last known stable Bui
 node --check src/storage.js
 node --check src/app.js
 python -m json.tool manifest.json
-zip -T firevault-build-0.50.33-modular-root.zip
+zip -T firevault-build-0.50.34-modular-root.zip
 ```
 
 ## Suggested commit message
 
 ```text
-Build 0.50.33 stable startup rebuild and top chrome repair
+Build 0.50.34 top bar splash visibility and sticky Home header repair
 ```
