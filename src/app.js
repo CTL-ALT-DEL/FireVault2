@@ -8,6 +8,9 @@ let settingsTab = "tech";
 let settingsRailScroll = 0;
 let lastEmailTemplateField = "emailSubject";
 let overlayLogoDraftDataUrl = "";
+let docPhotoDraftDataUrl512 = "";
+let docPhotoDraftName512 = "";
+let docPhotoClearRequested512 = false;
 let taskFilter = "open";
 let deficiencyFilter = "open";
 let activeJob = loadActiveJob();
@@ -204,7 +207,7 @@ function route(v){
   if(["equipmentList","equipmentForm"].includes(v) && !featureOn("equipment")){ toast("Equipment Vault is hidden in Simple View."); v="siteDetail"; }
   if((v === "nearbySites") && !featureOn("advancedGps")){ toast("Advanced GPS is hidden in Simple View."); v="home"; }
   if((v === "routeLog") && !activeRoute && !featureOn("dailyRoute")){ toast("Daily Route is hidden in Simple View."); v="home"; }
-  view = v; mode = null; render();
+  view = v; render();
 }
 function html(content){ appEl.innerHTML = content; }
 function toast(msg){ const t=document.createElement("div"); t.className="toast"; t.textContent=msg; document.body.appendChild(t); setTimeout(()=>t.remove(),1800); }
@@ -1927,37 +1930,248 @@ function docReportLine(d){
   const notes=d.notes ? `\n  Notes: ${String(d.notes).replaceAll("\n","\n  ")}` : "";
   return main + notes;
 }
+
+function docHasPhoto512(d){ return !!(d && d.imageData); }
+function docPhotoThumb512(d){
+  return docHasPhoto512(d) ? `<div class="docPhotoThumb512"><img src="${esc(d.imageData)}" alt="Saved site photo thumbnail"></div>` : "";
+}
+function photoDocSummary512(d){
+  const bits=[];
+  if(d.imageName) bits.push(d.imageName);
+  if(d.imageStampedAt) bits.push("Overlay exported");
+  return bits.join(" • ") || "Saved photo available";
+}
+function safePhotoFileBase512(s,d){
+  return `${s?.name||"firevault-site"}-${d?.title||"photo"}`.toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/(^-|-$)/g,"").slice(0,70) || "firevault-photo";
+}
+function docPhotoPreviewMarkup512(d={}){
+  const src=docPhotoDraftDataUrl512 || d.imageData || "";
+  return `<div class="docPhotoManager512">
+    <div class="docPhotoHead512"><div><strong>Photo Vault</strong><span>Upload a site photo, preview it here, then download a stamped copy using current Photo Overlay settings.</span></div><button type="button" class="ghost smallBtn" id="openOverlaySettings512">Overlay Settings</button></div>
+    <label>Photo Image</label><input id="docPhotoFile512" type="file" accept="image/*" capture="environment">
+    <div id="docPhotoPreview512" class="docPhotoPreview512">${src?`<img src="${esc(src)}" alt="Photo preview">`:`<div><b>No photo selected</b><span>Choose an image from camera roll or take a photo on iPhone / iPad.</span></div>`}</div>
+    <div class="docPhotoActions512"><button type="button" class="primary" id="downloadOverlayPhoto512">Download With Overlay</button><button type="button" class="ghost" id="clearDocPhoto512">Clear Photo</button></div>
+    <p class="fieldNote">Photos are stored locally in this browser with the site record. Very large photos can increase FireVault storage size.</p>
+  </div>`;
+}
+function updateDocPhotoPreview512(){
+  const holder=document.getElementById("docPhotoPreview512");
+  if(!holder) return;
+  const src=docPhotoDraftDataUrl512;
+  holder.innerHTML = src ? `<img src="${esc(src)}" alt="Photo preview">` : `<div><b>No photo selected</b><span>Choose an image from camera roll or take a photo on iPhone / iPad.</span></div>`;
+}
+function loadImage512(src){
+  return new Promise((resolve,reject)=>{
+    const img=new Image();
+    img.onload=()=>resolve(img);
+    img.onerror=()=>reject(new Error("Image failed to load"));
+    img.src=src;
+  });
+}
+function hexToRgb512(hex){
+  const m=String(hex||"").replace("#","").match(/^([0-9a-f]{6})$/i);
+  if(!m) return {r:239,g:68,b:68};
+  const n=parseInt(m[1],16);
+  return {r:(n>>16)&255,g:(n>>8)&255,b:n&255};
+}
+function roundRect512(ctx,x,y,w,h,r){
+  const rr=Math.min(r,w/2,h/2);
+  ctx.beginPath();
+  ctx.moveTo(x+rr,y);
+  ctx.arcTo(x+w,y,x+w,y+h,rr);
+  ctx.arcTo(x+w,y+h,x,y+h,rr);
+  ctx.arcTo(x,y+h,x,y,rr);
+  ctx.arcTo(x,y,x+w,y,rr);
+  ctx.closePath();
+}
+function wrapCanvasText512(ctx,text,maxWidth){
+  const words=String(text||"").split(/\s+/).filter(Boolean);
+  const lines=[];
+  let line="";
+  words.forEach(word=>{
+    const test=line ? line+" "+word : word;
+    if(ctx.measureText(test).width > maxWidth && line){ lines.push(line); line=word; }
+    else line=test;
+  });
+  if(line) lines.push(line);
+  return lines.length ? lines : [""];
+}
+async function downloadPhotoWithOverlay512(doc={}){
+  const s=site();
+  const source=doc.imageData || docPhotoDraftDataUrl512;
+  if(!source){ toast("Choose or save a photo first."); return; }
+  try{
+    toast("Building overlay photo...");
+    const photo=await loadImage512(source);
+    const maxW=1800;
+    const scale=Math.min(1, maxW/(photo.naturalWidth||photo.width||maxW));
+    const w=Math.max(1,Math.round((photo.naturalWidth||photo.width)*scale));
+    const h=Math.max(1,Math.round((photo.naturalHeight||photo.height)*scale));
+    const canvas=document.createElement("canvas");
+    canvas.width=w; canvas.height=h;
+    const ctx=canvas.getContext("2d");
+    ctx.drawImage(photo,0,0,w,h);
+    const set=overlayCleanSetting510(data.settings.overlay||{});
+    const accent=hexToRgb512(set.accentColor);
+    const alpha=Math.max(.2,Math.min(1,(Number(set.opacity)||85)/100));
+    const baseFont=set.fontSize==="large"?Math.round(w*0.032):set.fontSize==="small"?Math.round(w*0.022):Math.round(w*0.027);
+    const fontSize=Math.max(18,Math.min(54,baseFont));
+    const pad=Math.max(18,Math.round(w*0.018));
+    const logoSize=set.showLogo?Math.max(48,Math.min(100,Math.round(w*0.065))):0;
+    const rawLines=String(renderTemplate(set.template,s||{})||"FireVault Field Photo").split(/\n/);
+    ctx.font=`800 ${fontSize}px Arial, sans-serif`;
+    const textMax=set.backgroundStyle==="card"?Math.round(w*.68):w-(pad*5)-logoSize;
+    const lines=rawLines.flatMap(line=>wrapCanvasText512(ctx,line,textMax));
+    const tagline=set.showTagline ? "FireVault Field Photo Overlay" : "";
+    const lineHeight=Math.round(fontSize*1.24);
+    const tagHeight=tagline?Math.round(fontSize*.86):0;
+    const textH=(lines.length*lineHeight)+tagHeight;
+    let stampW=set.backgroundStyle==="card"?Math.min(w-pad*2,Math.max(Math.round(w*.42), Math.max(...lines.map(l=>ctx.measureText(l).width),0)+logoSize+pad*4)):w-pad*2;
+    let stampH=Math.max(logoSize+pad*1.4, textH+pad*1.7);
+    let x=pad;
+    let y=set.alignment==="top"?pad:set.alignment==="middle"?Math.round((h-stampH)/2):h-stampH-pad;
+    ctx.save();
+    if(set.backgroundStyle==="minimal"){
+      ctx.fillStyle=`rgba(0,0,0,${Math.min(.76,alpha)})`;
+      ctx.fillRect(x,y,stampW,stampH);
+      ctx.fillStyle=`rgba(${accent.r},${accent.g},${accent.b},.95)`;
+      ctx.fillRect(x,y,Math.max(8,Math.round(w*.006)),stampH);
+    }else{
+      roundRect512(ctx,x,y,stampW,stampH,Math.max(18,Math.round(w*.012)));
+      ctx.fillStyle=`rgba(0,0,0,${alpha})`;
+      ctx.fill();
+      ctx.strokeStyle=`rgba(${accent.r},${accent.g},${accent.b},.95)`;
+      ctx.lineWidth=Math.max(3,Math.round(w*.003));
+      ctx.stroke();
+      if(set.backgroundStyle==="bar"){
+        const grd=ctx.createLinearGradient(x,y,x+stampW,y);
+        grd.addColorStop(0,`rgba(0,0,0,${alpha})`);
+        grd.addColorStop(1,`rgba(${accent.r},${accent.g},${accent.b},${Math.min(.82,alpha*.72)})`);
+        roundRect512(ctx,x,y,stampW,stampH,Math.max(18,Math.round(w*.012)));
+        ctx.fillStyle=grd; ctx.fill();
+      }else{
+        ctx.fillStyle=`rgba(${accent.r},${accent.g},${accent.b},.95)`;
+        ctx.fillRect(x,y,Math.max(8,Math.round(w*.006)),stampH);
+      }
+    }
+    let tx=x+pad;
+    if(set.showLogo){
+      const logoSrc=overlayLogoSrc510(set);
+      if(logoSrc){
+        try{
+          const logo=await loadImage512(logoSrc);
+          const lx=x+pad, ly=y+(stampH-logoSize)/2;
+          ctx.save();
+          roundRect512(ctx,lx,ly,logoSize,logoSize,Math.round(logoSize*.22));
+          ctx.clip();
+          ctx.drawImage(logo,lx,ly,logoSize,logoSize);
+          ctx.restore();
+        }catch{}
+      }
+      tx+=logoSize+pad;
+    }
+    ctx.fillStyle=set.textColor||"#ffffff";
+    ctx.textBaseline="top";
+    ctx.font=`900 ${fontSize}px Arial, sans-serif`;
+    let ty=y+Math.max(pad*.75,(stampH-textH)/2);
+    lines.forEach(line=>{
+      ctx.fillText(line,tx,ty);
+      ty+=lineHeight;
+    });
+    if(tagline){
+      ctx.font=`800 ${Math.max(12,Math.round(fontSize*.62))}px Arial, sans-serif`;
+      ctx.fillStyle="rgba(255,255,255,.78)";
+      ctx.fillText(tagline,tx,ty+Math.round(fontSize*.1));
+    }
+    ctx.restore();
+    canvas.toBlob(blob=>{
+      if(!blob){ toast("Could not create overlay photo."); return; }
+      const a=document.createElement("a");
+      a.href=URL.createObjectURL(blob);
+      a.download=`${safePhotoFileBase512(s,doc)}-overlay-build-${BUILD}.jpg`;
+      document.body.appendChild(a); a.click(); a.remove();
+      setTimeout(()=>URL.revokeObjectURL(a.href),1500);
+      if(doc && doc.id){ doc.imageStampedAt=new Date().toISOString(); save(); }
+      toast("Overlay photo downloaded.");
+    },"image/jpeg",0.92);
+  }catch(err){
+    console.error(err);
+    toast("Overlay photo failed.");
+  }
+}
+function wireDocPhotoControls512(d={}){
+  const file=document.getElementById("docPhotoFile512");
+  if(file) file.onchange=e=>{
+    const f=e.target.files && e.target.files[0];
+    if(!f) return;
+    if(!f.type.startsWith("image/")){ toast("Choose an image file."); return; }
+    const reader=new FileReader();
+    reader.onload=()=>{
+      docPhotoDraftDataUrl512=String(reader.result||"");
+      docPhotoDraftName512=f.name || "Site photo";
+      docPhotoClearRequested512=false;
+      const title=document.getElementById("docTitle");
+      if(title && !title.value.trim()) title.value=f.name.replace(/\.[^.]+$/,'');
+      const type=document.getElementById("docType");
+      if(type) type.value="Photo Set";
+      updateDocPhotoPreview512();
+      toast("Photo loaded. Save document to keep it.");
+    };
+    reader.readAsDataURL(f);
+  };
+  const clear=document.getElementById("clearDocPhoto512");
+  if(clear) clear.onclick=()=>{
+    docPhotoDraftDataUrl512="";
+    docPhotoDraftName512="";
+    docPhotoClearRequested512=true;
+    const file=document.getElementById("docPhotoFile512");
+    if(file) file.value="";
+    updateDocPhotoPreview512();
+  };
+  const down=document.getElementById("downloadOverlayPhoto512");
+  if(down) down.onclick=()=>downloadPhotoWithOverlay512({...(d||{}),title:val("docTitle")||d.title||"Site Photo",imageData:docPhotoDraftDataUrl512||d.imageData});
+  const settingsBtn=document.getElementById("openOverlaySettings512");
+  if(settingsBtn) settingsBtn.onclick=()=>{ settingsTab="overlay"; mode="settingsDetail"; route("settings"); };
+}
 function siteDocs(){
   const s=site(); if(!s){ route("sites"); return; }
   s.docs=Array.isArray(s.docs) ? s.docs : [];
   const docs=s.docs;
   const linked=docs.filter(d=>d.url).length;
-  html(`<div class="screen docsScreen"><div class="row"><button class="back ghost" id="backBtn">←</button><div><h1>Documents / Links</h1><p>${esc(s.name||"Site")}</p></div><button class="primary" id="addDocBtn">＋</button></div>
-    <div class="card docsHero"><h2>Site Documents Vault</h2><p>Keep the field references that are specific to this customer: manuals, permits, inspection forms, account numbers, and useful links.</p><div class="docStats"><span><strong>${docs.length}</strong>Total</span><span><strong>${linked}</strong>Links</span><span><strong>${docs.length-linked}</strong>Notes</span></div></div>
-    <div class="list grow docsList">${docs.length?docs.map(d=>`<div class="card docVaultItem" data-doc="${esc(d.id)}"><div class="row"><div><h2>${esc(docTitle(d))}</h2><p>${esc(docMeta(d))}</p></div><span class="pill">${esc(d.type||"Doc")}</span></div>${d.notes?`<p class="docNotes">${esc(String(d.notes).split("\n").slice(0,2).join(" • "))}</p>`:""}<div class="docQuickActions">${d.url?`<button class="ghost smallBtn openDocLink" data-url="${esc(d.url)}">Open Link</button>`:""}<button class="ghost smallBtn copyDocRef" data-doc="${esc(d.id)}">Copy</button></div></div>`).join(""):`<div class="empty">No documents or links saved yet. Add a panel manual, permit number, inspection form, or account reference.</div>`}</div>
+  const photos=docs.filter(docHasPhoto512).length;
+  html(`<div class="screen docsScreen docsScreen512"><div class="row"><button class="back ghost" id="backBtn">←</button><div><h1>Documents / Photos</h1><p>${esc(s.name||"Site")}</p></div><button class="primary" id="addDocBtn">＋</button></div>
+    <div class="card docsHero"><h2>Site Documents Vault</h2><p>Keep customer-specific references, links, and field photos. Photo records can now be downloaded with your current FireVault overlay applied.</p><div class="docStats"><span><strong>${docs.length}</strong>Total</span><span><strong>${photos}</strong>Photos</span><span><strong>${linked}</strong>Links</span></div></div>
+    <div class="list grow docsList">${docs.length?docs.map(d=>`<div class="card docVaultItem docVaultItem512" data-doc="${esc(d.id)}">${docPhotoThumb512(d)}<div class="docVaultText512"><div class="row"><div><h2>${esc(docTitle(d))}</h2><p>${esc(docMeta(d))}</p>${docHasPhoto512(d)?`<p class="docPhotoMeta512">${esc(photoDocSummary512(d))}</p>`:""}</div><span class="pill">${esc(d.type||"Doc")}</span></div>${d.notes?`<p class="docNotes">${esc(String(d.notes).split("\n").slice(0,2).join(" • "))}</p>`:""}<div class="docQuickActions">${d.url?`<button class="ghost smallBtn openDocLink" data-url="${esc(d.url)}">Open Link</button>`:""}${docHasPhoto512(d)?`<button class="primary smallBtn overlayDocPhotoBtn512" data-doc="${esc(d.id)}">Overlay Photo</button>`:""}<button class="ghost smallBtn copyDocRef" data-doc="${esc(d.id)}">Copy</button></div></div></div>`).join(""):`<div class="empty">No documents or photos saved yet. Add a panel manual, permit number, inspection form, account reference, or field photo.</div>`}</div>
   </div>`);
   document.getElementById("backBtn").onclick=()=>route("siteDetail");
   document.getElementById("addDocBtn").onclick=()=>{mode=null; route("siteDocForm");};
   document.querySelectorAll(".docVaultItem").forEach(b=>b.onclick=()=>{mode=b.dataset.doc; route("siteDocForm");});
   document.querySelectorAll(".openDocLink").forEach(b=>b.onclick=e=>{e.stopPropagation(); window.open(b.dataset.url,"_blank");});
   document.querySelectorAll(".copyDocRef").forEach(b=>b.onclick=async e=>{e.stopPropagation(); const d=docs.find(x=>x.id===b.dataset.doc); if(d){ await navigator.clipboard.writeText(`${docTitle(d)}\n${d.url||""}\n${d.notes||""}`.trim()); toast("Document reference copied."); }});
+  document.querySelectorAll(".overlayDocPhotoBtn512").forEach(b=>b.onclick=e=>{e.stopPropagation(); const d=docs.find(x=>x.id===b.dataset.doc); if(d) downloadPhotoWithOverlay512(d);});
 }
 function siteDocForm(){
   const s=site(); if(!s){ route("sites"); return; }
   s.docs=Array.isArray(s.docs) ? s.docs : [];
   const d=mode ? s.docs.find(x=>x.id===mode) : {};
+  docPhotoDraftDataUrl512 = d?.imageData || "";
+  docPhotoDraftName512 = d?.imageName || "";
+  docPhotoClearRequested512 = false;
   const types=["Panel Manual","Permit","Inspection Form","Monitoring Account","Contract","Photo Set","Map / Drawing","Code Reference","Other"];
   html(`<div class="screen"><div class="row"><button class="back ghost" id="backBtn">←</button><h1>${mode?"Edit":"Add"} Document</h1></div><div class="form grow">
-    <div class="card docFormCard"><div class="compactField"><div><label>Type</label><select id="docType">${types.map(x=>`<option value="${esc(x)}" ${((d.type||"Panel Manual")===x)?"selected":""}>${esc(x)}</option>`).join("")}</select></div><div><label>Date / Revision</label><input id="docDate" value="${esc(d.date||"")}" placeholder="Rev, date, or version"></div></div>
+    <div class="card docFormCard docFormCard512"><div class="compactField"><div><label>Type</label><select id="docType">${types.map(x=>`<option value="${esc(x)}" ${((d.type||"Panel Manual")===x)?"selected":""}>${esc(x)}</option>`).join("")}</select></div><div><label>Date / Revision</label><input id="docDate" value="${esc(d.date||"")}" placeholder="Rev, date, or version"></div></div>
     <label>Title</label><input id="docTitle" value="${esc(d.title||"")}" placeholder="Notifier NFS2-640 manual, annual inspection form...">
     <label>Reference / Account / Permit #</label><input id="docRef" value="${esc(d.ref||"")}" placeholder="Account number, permit number, drawing ID...">
     <label>URL / Link</label><input id="docUrl" value="${esc(d.url||"")}" placeholder="https://...">
+    ${docPhotoPreviewMarkup512(d)}
     <label>Notes</label><textarea id="docNotes" placeholder="Where to find it, customer-specific instructions, page numbers, revision notes...">${esc(d.notes||"")}</textarea></div>
     <button class="primary" id="saveDocBtn">Save Document</button>${mode?`<button class="danger" id="deleteDocBtn">Delete Document</button>`:""}
   </div></div>`);
   document.getElementById("backBtn").onclick=()=>route("siteDocs");
+  wireDocPhotoControls512(d||{});
   document.getElementById("saveDocBtn").onclick=()=>{
-    const obj={type:val("docType"),title:val("docTitle")||"Untitled Reference",ref:val("docRef"),url:val("docUrl"),date:val("docDate"),notes:raw("docNotes")};
+    const imageData=docPhotoClearRequested512 ? "" : (docPhotoDraftDataUrl512 || d?.imageData || "");
+    const obj={type:val("docType"),title:val("docTitle")||"Untitled Reference",ref:val("docRef"),url:val("docUrl"),date:val("docDate"),notes:raw("docNotes"),imageData,imageName:imageData?(docPhotoDraftName512||d?.imageName||"Site photo"):"",imageUpdatedAt:imageData?new Date().toISOString():""};
     if(mode && d){ Object.assign(d,obj); }
     else s.docs.unshift({...obj,id:uid(),createdAt:new Date().toISOString()});
     save(); toast("Document saved."); route("siteDocs");
@@ -3252,18 +3466,18 @@ function diagnostics(){
 }
 function showChangelog(){
   const notes = [
-    "Advanced to Build 0.50.11 from the uploaded 0.50.10 baseline.",
-    "Improved Photo Overlay settings again with a cleaner sample photo, the real FireVault logo, and custom logo support.",
-    "Added custom overlay logo upload / clear controls and a logo source selector.",
-    "Updated the live preview to render the overlay on a better sample image while preserving the available {field} insert chips and overlay controls.",
-    "Added new overlay fields including address, city, state, ZIP, technician, company, phone, email, license, GPS, and build number.",
-    "Kept Daily Report / Site Notes closeout features, iPad autosizing, the simple Home screen, Search Bar Concept #6, and excluded job-status workflow controls."
+    "Advanced to Build 0.50.12 from the uploaded 0.50.11 baseline.",
+    "Added Photo Vault upload support inside Site Documents / Photos.",
+    "Saved site photos now show thumbnails in the Documents / Photos list.",
+    "Added Download With Overlay so a saved or newly selected photo can be exported with the current Photo Overlay settings applied.",
+    "Added quick access from a photo document back to Photo Overlay settings.",
+    "Kept the improved Photo Overlay editor, custom logo support, Daily Report / Site Notes workflow, iPad autosizing, simple Home screen, Search Bar Concept #6, and excluded job-status workflow controls."
   ];
   const overlay=document.createElement("div");
   overlay.className="releaseOverlay";
   overlay.innerHTML=`<div class="releaseSheet" role="dialog" aria-modal="true" aria-label="FireVault release notes">
     <div class="releaseHead"><div><strong>FireVault</strong><span>Build ${BUILD}</span></div><button class="ghost iconBtn" id="closeRelease" aria-label="Close release notes">×</button></div>
-    <div class="releaseBody"><h2>Release Notes</h2><p class="releaseIntro">Daily Report closeout actions, Site Notes speed polish, and preserved simple Home workflow.</p><ul>${notes.map(n=>`<li>${esc(n)}</li>`).join("")}</ul></div>
+    <div class="releaseBody"><h2>Release Notes</h2><p class="releaseIntro">Photo vault upload, saved thumbnails, and overlay photo export for site documents.</p><ul>${notes.map(n=>`<li>${esc(n)}</li>`).join("")}</ul></div>
   </div>`;
   document.body.appendChild(overlay);
   const close=()=>overlay.remove();

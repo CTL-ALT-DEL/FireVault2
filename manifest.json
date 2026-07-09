@@ -8,7 +8,7 @@
   "orientation": "any",
   "background_color": "#0b0d10",
   "theme_color": "#101216",
-  "description": "Field knowledge system for fire alarm technicians. Build 0.50.11 improves the Photo Overlay settings with a better sample preview, real FireVault logo support, and custom overlay logo upload.",
+  "description": "Field knowledge system for fire alarm technicians. Build 0.50.12 adds photo vault upload, saved photo thumbnails, and download-with-overlay tools for site documents.",
   "icons": [
     {
       "src": "assets/icon-192.png",

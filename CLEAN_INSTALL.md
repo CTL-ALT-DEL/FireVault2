@@ -1,6 +1,6 @@
-# Clean Install Notes — FireVault Build 0.50.11
+# Clean Install Notes — FireVault Build 0.50.12
 
-This ZIP is intended to be used as the new clean baseline for FireVault Build 0.50.11.
+This ZIP is intended to be used as the new clean baseline for FireVault Build 0.50.12.
 
 ## Install
 
@@ -12,14 +12,14 @@ This ZIP is intended to be used as the new clean baseline for FireVault Build 0.
 
 ## Build notes
 
-Build 0.50.11 keeps the existing Daily Report / Site Notes work and further improves the Photo Overlay settings:
+Build 0.50.12 keeps the existing Daily Report / Site Notes work and connects Photo Overlay settings to the Site Documents / Photos workflow:
 
-- Photo Overlay now shows an actual sample-photo preview with the real overlay rendered on top.
-- Overlay text can be edited as a template.
-- All available `{fields}` are shown as insert buttons.
-- Live preview updates as controls are changed.
-- Overlay controls now include position, font size, background style, opacity, accent color, text color, FireVault logo badge, and tagline.
-- Available fields include site, address, city, state, ZIP, date, time, technician, company, phone, email, license, GPS, and build number.
+- Site Documents is now labeled Documents / Photos where appropriate.
+- Add/Edit Document now includes a Photo Vault upload area.
+- Uploaded photos can be saved locally with a site document record.
+- Saved photo documents show thumbnails in the list.
+- Saved or newly selected photos can be downloaded with the current overlay applied.
+- Overlay export uses the configured overlay text, fields, position, font size, colors, opacity, background style, FireVault/custom logo, and tagline.
 - Home screen remains simple.
 - Search Bar Concept #6 remains unchanged.
 - iPad autosizing remains in place.
