@@ -1,20 +1,20 @@
-# FireVault Build 0.49.6
+# FireVault Build 0.49.7
 
-Build 0.49.6 is a Home search box cleanup build.
+Build 0.49.7 is a faster Site Notes workflow polish build.
 
 ## What changed
 
-- Visible app version advanced to 0.49.6.
-- Updated cache-busting references in `index.html` to 0.49.6.
+- Visible app version advanced to 0.49.7.
+- Updated cache-busting references in `index.html` to 0.49.7.
 - Updated release notes to match this build.
-- Removed all placeholder text from the main Home search box.
-- Changed the active search cancel control from text to a compact × clear button.
-- Improved search bar spacing after removing unnecessary text.
-- Preserved the larger search icon and polished search bar style.
-- Preserved Site Notes workflow, splash screen, Home header polish, Modules, and Daily Route tools.
+- Improved Site Notes visual priority.
+- Added stronger Notes styling on customer/search cards.
+- Improved quick-note button styling.
+- Improved note card spacing and note timeline breathing room.
+- Preserved the clean Home search box, splash screen, Home header polish, Modules, and Daily Route tools.
 
 Suggested commit message:
 
 ```text
-Build 0.49.6 remove home search placeholder text
+Build 0.49.7 faster site notes workflow polish
 ```
