@@ -938,7 +938,7 @@ nav button:active{transform:translateY(1px) scale(.992)}
 .reportDeliveryEmpty{font-size:12px;color:var(--muted);padding:9px 10px;border:1px dashed rgba(255,255,255,.13);border-radius:13px;background:rgba(255,255,255,.025);}
 @media(max-width:560px){.reportActionGrid442{grid-template-columns:repeat(2,minmax(0,1fr));}.reportActionGrid442 #shareBtn{grid-column:1 / -1}.reportDeliveryHead{align-items:center}.reportDeliveryRow{grid-template-columns:1fr}.reportDeliveryRow time{justify-self:start}.reportReadyCard442 small{white-space:normal}}
 
-/* Build 0.47.6 Report delivery receipts and follow-up tasks */
+/* Build 0.47.7 Report delivery receipts and follow-up tasks */
 .reportDeliveryCard444 .reportDeliveryHead{align-items:flex-start;}
 .reportDeliveryHeadActions{display:flex;gap:7px;align-items:center;flex:0 0 auto;}
 .reportDeliveryReceiptBtn{width:100%;text-align:left;color:var(--text);font:inherit;cursor:pointer;}
@@ -946,7 +946,7 @@ nav button:active{transform:translateY(1px) scale(.992)}
 .reportDeliveryReceiptBtn:active{transform:translateY(1px);}
 @media(max-width:560px){.reportDeliveryCard444 .reportDeliveryHead{display:grid;grid-template-columns:1fr;gap:9px}.reportDeliveryHeadActions{display:grid;grid-template-columns:1fr 1fr;width:100%}.reportDeliveryHeadActions .smallBtn{width:100%}}
 
-/* Build 0.47.6 Visual Consistency Pass - professional field-tool surface system */
+/* Build 0.47.7 Visual Consistency Pass - professional field-tool surface system */
 :root{
   --fv445Top:#242d3d;
   --fv445Bottom:#121923;
@@ -1111,7 +1111,7 @@ nav button span:last-child{font-size:11.2px!important;font-weight:850;}
 }
 
 
-/* Build 0.47.6 Site Detail polish - professional customer vault command page */
+/* Build 0.47.7 Site Detail polish - professional customer vault command page */
 .siteDetailScreen446{gap:10px;}
 .siteTopBar{align-items:center;justify-content:space-between;margin-bottom:-2px;}
 .siteTopBar .back,.siteTopBar #editBtn{min-height:38px;border-radius:14px;padding:8px 13px;font-size:13px;font-weight:900;}
@@ -1165,7 +1165,7 @@ nav button span:last-child{font-size:11.2px!important;font-weight:850;}
   .siteDetailScreen446 .mapActions{grid-template-columns:1fr;}
 }
 
-/* Build 0.47.6 Report Center polish and readability pass */
+/* Build 0.47.7 Report Center polish and readability pass */
 .reportScreen447{gap:10px;}
 .reportScreen447 .reportTopRow{min-height:40px;gap:10px;}
 .reportScreen447 .reportTopRow .back{min-width:40px;min-height:40px;border-radius:14px;}
@@ -1212,7 +1212,7 @@ nav button span:last-child{font-size:11.2px!important;font-weight:850;}
   .reportBox447{font-size:11.5px!important;}
 }
 
-/* Build 0.47.6 Settings final readability and layout consistency pass */
+/* Build 0.47.7 Settings final readability and layout consistency pass */
 .settingsScreen448{
   gap:10px!important;
   text-align:left!important;
@@ -1474,7 +1474,7 @@ nav button span:last-child{font-size:11.2px!important;font-weight:850;}
   .settingsContent448 .checkRow{font-size:13.2px!important;}
 }
 
-/* Build 0.47.6 Backup Center polish + data safety snapshot */
+/* Build 0.47.7 Backup Center polish + data safety snapshot */
 .settingsScreen449 .settingsMiniTitle p{max-width:56vw}
 .backupCenter449{gap:12px!important}
 .backupCenter449 .compactPane{border-radius:18px!important;border-left:0!important}
@@ -1493,7 +1493,7 @@ nav button span:last-child{font-size:11.2px!important;font-weight:850;}
 @media(max-width:620px){.backupStats449{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.backupActionGrid449{grid-template-columns:1fr}.backupStats449 div{min-height:58px}.backupStats449 strong{font-size:20px}}
 
 
-/* Build 0.47.6 Stability Checkpoint - dashboard status polish */
+/* Build 0.47.7 Stability Checkpoint - dashboard status polish */
 .homeScreen450{gap:11px!important;}
 .homeHero450{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;}
 .homeHero450 p{font-size:13px;font-weight:800;color:#aeb9cc;margin-top:4px;}
@@ -1511,7 +1511,7 @@ nav button span:last-child{font-size:11.2px!important;font-weight:850;}
 @media(max-width:390px){.homeHero450{display:block}.homeBuildPill450{margin-top:8px}.homeStatusGrid450{gap:7px}.homeStatusGrid450 div{min-height:48px;padding:7px}.homeStatusGrid450 strong{font-size:18px}.homeStatusHead450{align-items:flex-start}.homeStatusHead450 span{font-size:10.8px}}
 
 
-/* Build 0.47.6 Settings full-screen redesign - main choices + detail pages */
+/* Build 0.47.7 Settings full-screen redesign - main choices + detail pages */
 .settingsHomeScreen451{
   gap:12px!important;
   padding-top:2px!important;
@@ -1755,7 +1755,7 @@ nav button span:last-child{font-size:11.2px!important;font-weight:850;}
 }
 
 
-/* Build 0.47.6 dashboard duplicate build pill removal + bottom visibility fix */
+/* Build 0.47.7 dashboard duplicate build pill removal + bottom visibility fix */
 .homeHero450{justify-content:flex-start!important;}
 .homeScreen450{overflow:auto!important; padding-bottom:calc(var(--navH) + 18px)!important; -webkit-overflow-scrolling:touch;}
 .homeScreen450 .homeStatus450{margin-bottom:4px!important;}
@@ -1768,7 +1768,7 @@ main{padding-bottom:8px!important;}
 }
 
 
-/* Build 0.47.6 Settings menu repair - horizontal icon/title and no OPEN labels */
+/* Build 0.47.7 Settings menu repair - horizontal icon/title and no OPEN labels */
 .settingsChoiceGrid451{
   grid-template-columns:repeat(2,minmax(0,1fr))!important;
   gap:10px!important;
@@ -1897,7 +1897,7 @@ main{padding-bottom:8px!important;}
 }
 
 
-/* Build 0.47.6 Settings tab vertical alignment polish */
+/* Build 0.47.7 Settings tab vertical alignment polish */
 .settingsChoice451.settingsChoice456{
   min-height:82px!important;
   padding:12px 42px 12px 12px!important;
@@ -1995,7 +1995,7 @@ main{padding-bottom:8px!important;}
 }
 
 
-/* Build 0.47.6 dashboard date, startup splash, and Library folders */
+/* Build 0.47.7 dashboard date, startup splash, and Library folders */
 .splashScreen457{
   min-height:100%;
   display:flex;
@@ -2265,7 +2265,7 @@ main{padding-bottom:8px!important;}
 }
 
 
-/* Build 0.47.6 Center-justified day/date block */
+/* Build 0.47.7 Center-justified day/date block */
 .homeHero457{
   display:flex!important;
   justify-content:center!important;
@@ -2299,7 +2299,7 @@ main{padding-bottom:8px!important;}
 }
 
 
-/* Build 0.47.6 Navigation & Screen Fit Polish */
+/* Build 0.47.7 Navigation & Screen Fit Polish */
 :root{
   --contentBottomPad459:calc(var(--navH) + 22px);
   --screenGap459:10px;
@@ -2463,7 +2463,7 @@ nav button{
 }
 
 
-/* Build 0.47.6 Stability Checkpoint / Diagnostics polish */
+/* Build 0.47.7 Stability Checkpoint / Diagnostics polish */
 .diagnosticsScreen460{
   gap:10px!important;
   overflow:hidden!important;
@@ -2574,7 +2574,7 @@ nav button{
 }
 
 
-/* Build 0.47.6 Diagnostics bottom menu visibility fix */
+/* Build 0.47.7 Diagnostics bottom menu visibility fix */
 .diagnosticsScreen460{
   overflow-y:auto!important;
   overflow-x:hidden!important;
@@ -2610,7 +2610,7 @@ nav button{
 }
 
 
-/* Build 0.47.6 Daily Route Log Starter */
+/* Build 0.47.7 Daily Route Log Starter */
 .routeHomeTile462{
   border-color:color-mix(in srgb,var(--blue) 36%, rgba(255,255,255,.09))!important;
 }
@@ -2747,7 +2747,7 @@ nav button{
 }
 
 
-/* Build 0.47.6 Daily Route recording LED */
+/* Build 0.47.7 Daily Route recording LED */
 .homeHero463{
   justify-content:center!important;
 }
@@ -2802,7 +2802,7 @@ nav button{
 }
 
 
-/* Build 0.47.6 Daily Route report polish */
+/* Build 0.47.7 Daily Route report polish */
 .routeControls462{
   grid-template-columns:1fr 1fr 1fr!important;
 }
@@ -2862,7 +2862,7 @@ nav button{
 }
 
 
-/* Build 0.47.6 Daily Route waypoint edit/delete polish */
+/* Build 0.47.7 Daily Route waypoint edit/delete polish */
 .routeControls462{
   grid-template-columns:1fr 1fr!important;
 }
@@ -2905,7 +2905,7 @@ nav button{
 }
 
 
-/* Build 0.47.6 Daily Route smart nearest-site suggestions */
+/* Build 0.47.7 Daily Route smart nearest-site suggestions */
 .routeNearestBtn466{
   grid-column:1 / -1;
   border-color:color-mix(in srgb,var(--green) 32%, rgba(255,255,255,.1))!important;
@@ -2954,7 +2954,7 @@ nav button{
 }
 
 
-/* Build 0.47.6 Daily Route export polish */
+/* Build 0.47.7 Daily Route export polish */
 .routeReportPreview467{
   border-left:0!important;
   background:linear-gradient(180deg,color-mix(in srgb,var(--blue) 12%, #202838),#101720)!important;
@@ -2988,7 +2988,7 @@ nav button{
 }
 
 
-/* Build 0.47.6 Active Daily Route dashboard card */
+/* Build 0.47.7 Active Daily Route dashboard card */
 .activeRouteMini468{
   display:grid;
   gap:10px;
@@ -3082,7 +3082,7 @@ nav button{
 }
 
 
-/* Build 0.47.6 Daily Route vehicle / mileage details */
+/* Build 0.47.7 Daily Route vehicle / mileage details */
 .routeDetails469{
   display:grid;
   gap:10px;
@@ -3136,7 +3136,7 @@ nav button{
 }
 
 
-/* Build 0.47.6 Daily Route pause / resume status */
+/* Build 0.47.7 Daily Route pause / resume status */
 .routeLed470{
   flex:0 0 auto;
   width:13px;
@@ -3181,7 +3181,7 @@ nav button{
 }
 
 
-/* Build 0.47.6 Saved Daily Route review/search polish */
+/* Build 0.47.7 Saved Daily Route review/search polish */
 .routeHistoryTools471{
   display:grid;
   grid-template-columns:minmax(0,1fr) auto;
@@ -3319,7 +3319,7 @@ nav button{
 }
 
 
-/* Build 0.47.6 Simple View / Feature Visibility */
+/* Build 0.47.7 Simple View / Feature Visibility */
 .featureHidden472{display:none!important;}
 .simpleViewNotice472{
   display:flex;
@@ -3355,7 +3355,7 @@ body.view-simple472 nav:has(#nav-library[style*="none"]) {grid-template-columns:
 }
 
 
-/* Build 0.47.6 Simple View dashboard drawer and hidden tools polish */
+/* Build 0.47.7 Simple View dashboard drawer and hidden tools polish */
 .view-simple472 .homeScreen450{
   gap:9px!important;
 }
@@ -3509,7 +3509,7 @@ body.view-simple472 nav:has(#nav-library[style*="none"]) {grid-template-columns:
 }
 
 
-/* Build 0.47.6 Quick View Presets / Simple View setup polish */
+/* Build 0.47.7 Quick View Presets / Simple View setup polish */
 .featurePresets474{
   display:grid;
   gap:10px;
@@ -3575,7 +3575,7 @@ body.view-simple472 nav:has(#nav-library[style*="none"]) {grid-template-columns:
 }
 
 
-/* Build 0.47.6 Green build revision status + remove dashboard Stability Checkpoint */
+/* Build 0.47.7 Green build revision status + remove dashboard Stability Checkpoint */
 .build{
   color:#dcfce7!important;
   border-color:rgba(34,197,94,.58)!important;
@@ -3617,7 +3617,7 @@ body.view-simple472 nav:has(#nav-library[style*="none"]) {grid-template-columns:
 }
 
 
-/* Build 0.47.6 Apple-inspired home search, Nearby Accounts, Modules, and customer screen cleanup */
+/* Build 0.47.7 Apple-inspired home search, Nearby Accounts, Modules, and customer screen cleanup */
 .homeScreen476{
   gap:12px!important;
   overflow:auto!important;
@@ -3705,4 +3705,301 @@ body.view-simple472 nav:has(#nav-library[style*="none"]) {grid-template-columns:
   .nearbyHead476{align-items:stretch;flex-direction:column;}
   .siteHero476 h1{font-size:24px!important;}
   .siteQuickStats476{grid-template-columns:repeat(3,minmax(0,1fr))!important;}
+}
+
+
+/* Build 0.47.7 Customer Account simplification */
+.siteDetailScreen477{
+  gap:10px!important;
+  overflow:auto!important;
+  padding-bottom:calc(var(--navH) + 34px)!important;
+  -webkit-overflow-scrolling:touch!important;
+}
+.siteTopBar477{
+  display:grid!important;
+  grid-template-columns:auto minmax(0,1fr) auto!important;
+  align-items:center!important;
+  gap:10px!important;
+}
+.siteTopTitle477{
+  min-width:0;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  text-align:center;
+  gap:2px;
+}
+.siteTopTitle477 strong{
+  color:#fff;
+  font-size:14px;
+  line-height:1;
+  font-weight:1000;
+}
+.siteTopTitle477 span{
+  color:#9aa8bb;
+  font-size:10.5px;
+  line-height:1;
+  font-weight:850;
+  text-transform:uppercase;
+  letter-spacing:.06em;
+}
+.siteHero477{
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:12px;
+  padding:14px!important;
+  border-left:0!important;
+  background:linear-gradient(180deg,#232d40,#101720)!important;
+}
+.siteHeroMain477{
+  display:flex;
+  align-items:flex-start;
+  gap:12px;
+  min-width:0;
+}
+.accountInitialLarge477{
+  flex:0 0 auto;
+  width:44px;
+  height:44px;
+  border-radius:16px;
+  display:grid;
+  place-items:center;
+  color:#fff;
+  font-size:21px;
+  font-weight:1000;
+  background:linear-gradient(180deg,color-mix(in srgb,var(--accent) 48%, #263044),#111720);
+  border:1px solid rgba(255,255,255,.12);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.16),0 2px 0 #05070b,0 10px 18px rgba(0,0,0,.24);
+}
+.siteHero477 h1{
+  margin:0 0 5px!important;
+  font-size:24px!important;
+  line-height:.98!important;
+  letter-spacing:-.055em!important;
+  font-weight:1000!important;
+  color:#fff!important;
+}
+.siteHero477 p{
+  margin:0!important;
+  color:#c3ccda!important;
+  font-weight:750!important;
+  font-size:13px!important;
+  line-height:1.25!important;
+}
+.siteHero477 em{
+  display:inline-block;
+  margin-top:7px;
+  font-style:normal;
+  color:#e8eef8;
+  font-size:12px;
+  font-weight:900;
+  padding:6px 8px;
+  border-radius:999px;
+  background:rgba(255,255,255,.07);
+  border:1px solid rgba(255,255,255,.09);
+}
+.siteHealthDot477{
+  flex:0 0 auto;
+  min-width:46px;
+  height:46px;
+  display:grid;
+  place-items:center;
+  border-radius:16px;
+  color:#fff;
+  font-size:15px;
+  font-weight:1000;
+  background:linear-gradient(180deg,#263044,#111720);
+  border:1px solid rgba(255,255,255,.12);
+}
+.sitePrimaryActions477{
+  gap:8px!important;
+}
+.sitePrimaryActions477 .tile{
+  min-height:58px!important;
+  align-items:flex-start!important;
+  text-align:left!important;
+}
+.fieldCard477{
+  display:grid;
+  gap:10px;
+  padding:12px!important;
+  border-left:0!important;
+}
+.siteCardHead477{
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:10px;
+}
+.siteCardHead477 h2,
+.siteNow477 h2,
+.siteModulesCard477 h2,
+.contactsMiniCard477 h2,
+.recentVisitsCard477 h2,
+.siteNotes477 h2{
+  margin:0 0 4px!important;
+  font-size:16px!important;
+  line-height:1!important;
+  font-weight:1000!important;
+  color:#fff!important;
+}
+.siteCardHead477 p,
+.siteNow477 p,
+.siteModulesCard477 p,
+.contactsMiniCard477 p,
+.recentVisitsCard477 p{
+  font-size:12.5px!important;
+  line-height:1.25!important;
+}
+.fieldGrid477{
+  display:grid;
+  grid-template-columns:1fr;
+  gap:8px;
+}
+.fieldValue477{
+  display:grid;
+  grid-template-columns:minmax(84px,.35fr) minmax(0,1fr) auto;
+  align-items:center;
+  gap:8px;
+  padding:9px 10px;
+  border-radius:14px;
+  background:linear-gradient(180deg,#1d2532,#101720);
+  border:1px solid rgba(255,255,255,.08);
+}
+.fieldValue477 span{
+  color:#8f9cae;
+  font-size:11px;
+  line-height:1;
+  font-weight:950;
+  text-transform:uppercase;
+  letter-spacing:.05em;
+}
+.fieldValue477 strong{
+  min-width:0;
+  color:#f8fafc;
+  font-size:13px;
+  line-height:1.18;
+  font-weight:850;
+  overflow-wrap:anywhere;
+}
+.microBtn477{
+  min-height:30px!important;
+  padding:6px 9px!important;
+  font-size:11px!important;
+  border-radius:10px!important;
+}
+.siteQuickStats477{
+  gap:8px!important;
+}
+.siteQuickStats477 .tile{
+  min-height:58px!important;
+  padding:10px!important;
+}
+.siteNow477{
+  padding:12px!important;
+  border-left:0!important;
+}
+.siteNowHead477{
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:10px;
+  margin-bottom:10px;
+}
+.siteNowHead477 span{
+  flex:0 0 auto;
+  color:#fff;
+  font-size:13px;
+  font-weight:1000;
+  padding:6px 8px;
+  border-radius:999px;
+  background:rgba(255,255,255,.08);
+  border:1px solid rgba(255,255,255,.1);
+}
+.siteNowGrid477{
+  display:grid;
+  grid-template-columns:1fr 1fr 1fr;
+  gap:8px;
+}
+.siteNowGrid477 button{
+  min-height:52px;
+  padding:8px;
+  border-radius:14px;
+  text-align:left;
+  background:linear-gradient(180deg,#202838,#111720);
+  border:1px solid rgba(255,255,255,.09);
+}
+.siteNowGrid477 strong{
+  display:block;
+  color:#fff;
+  font-size:18px;
+  line-height:1;
+  font-weight:1000;
+}
+.siteNowGrid477 small{
+  display:block;
+  margin-top:5px;
+  color:#aeb9cc;
+  font-size:10.5px;
+  font-weight:900;
+  text-transform:uppercase;
+  letter-spacing:.04em;
+}
+.siteSimpleCard477{
+  padding:12px!important;
+  border-left:0!important;
+}
+.contactLine477{
+  width:100%;
+  margin-top:8px;
+  display:grid;
+  gap:3px;
+  text-align:left;
+  padding:10px!important;
+  border-radius:14px!important;
+  background:linear-gradient(180deg,#1d2532,#101720)!important;
+  border:1px solid rgba(255,255,255,.08)!important;
+}
+.contactLine477 strong{color:#fff;font-size:13px;line-height:1.1}
+.contactLine477 span{color:#aeb9cc;font-size:12px;line-height:1.2}
+.contactLine477 em{color:#e2e8f0;font-size:12px;line-height:1.25;font-style:normal;opacity:.95}
+.siteModulesCard477{
+  display:grid;
+  gap:10px;
+  padding:12px!important;
+  border-left:0!important;
+}
+.siteModulesHead477{
+  display:grid;
+  gap:4px;
+}
+.siteModuleGrid477{
+  gap:8px!important;
+}
+.siteModuleGrid477 .tile{
+  min-height:56px!important;
+  text-align:left!important;
+  align-items:flex-start!important;
+}
+.siteGpsCard477,
+.equipmentMiniCard477,
+.docsMiniCard477,
+.siteNotes477{
+  padding:12px!important;
+  border-left:0!important;
+}
+.siteNotes477 p{
+  color:#cbd5e1!important;
+  font-size:13px!important;
+  line-height:1.35!important;
+  overflow-wrap:anywhere;
+}
+@media(max-width:430px){
+  .siteHero477 h1{font-size:22px!important;}
+  .accountInitialLarge477{width:40px;height:40px;border-radius:14px;font-size:19px;}
+  .sitePrimaryActions477{grid-template-columns:1fr 1fr!important;}
+  .fieldValue477{grid-template-columns:1fr;align-items:start;gap:5px;}
+  .fieldValue477 .microBtn477{justify-self:start;}
+  .siteNowGrid477{grid-template-columns:1fr 1fr 1fr;gap:7px;}
 }

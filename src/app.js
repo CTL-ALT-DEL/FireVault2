@@ -169,8 +169,8 @@ function val(id){ return document.getElementById(id)?.value?.trim() || ""; }
 function raw(id){ return document.getElementById(id)?.value || ""; }
 function checked(id){ return !!document.getElementById(id)?.checked; }
 function route(v){
-  if(v === "library" && !featureOn("library")){ toast("Library is hidden in Simple View. Turn it on in Settings → Simple View."); v="home"; }
-  if(v === "diagnostics" && !featureOn("diagnostics")){ toast("Diagnostics is hidden in Simple View. Turn it on in Settings → Simple View."); v="settings"; }
+  if(v === "library" && !featureOn("library")){ toast("Library is hidden in Simple View. Turn it on in Settings → Modules."); v="home"; }
+  if(v === "diagnostics" && !featureOn("diagnostics")){ toast("Diagnostics is hidden in Simple View. Turn it on in Settings → Modules."); v="settings"; }
   if((v === "report") && !featureOn("reports")){ toast("Reports are hidden in Simple View."); v="siteDetail"; }
   if(["equipmentList","equipmentForm"].includes(v) && !featureOn("equipment")){ toast("Equipment Vault is hidden in Simple View."); v="siteDetail"; }
   if((v === "nearbySites") && !featureOn("advancedGps")){ toast("Advanced GPS is hidden in Simple View."); v="home"; }
@@ -1047,7 +1047,7 @@ function recentAccounts476(limit=5){
 }
 function recentSiteTime476(s){
   const visits=Array.isArray(s.visits)?s.visits:[];
-  const times=visits.flatMap(v=>[v.endedAt,v.startedAt,v.date]).filter(Boolean).map(x=>new Date(x).getTime()).filter(Number.isFinite);
+  const times=[s.lastOpenedAt,s.updatedAt,s.createdAt].concat(visits.flatMap(v=>[v.endedAt,v.startedAt,v.date])).filter(Boolean).map(x=>new Date(x).getTime()).filter(Number.isFinite);
   return times.length ? Math.max(...times) : 0;
 }
 function siteSearchText476(s){
@@ -1329,8 +1329,35 @@ function nearbySites(){
   document.querySelectorAll(".nearbyItem").forEach(el=>el.onclick=()=>{selectedSiteId=el.dataset.id; route("siteDetail");});
 }
 
+
+function primaryContact477(s){
+  const contacts=Array.isArray(s.contacts)?s.contacts:[];
+  return contacts.find(c=>c.afterHours) || contacts.find(c=>c.phone) || contacts.find(c=>c.email) || contacts[0] || null;
+}
+function accessSummary477(s){
+  const contacts=Array.isArray(s.contacts)?s.contacts:[];
+  const access=contacts.find(c=>c.accessNotes || String(c.type||'').toLowerCase().includes('access'));
+  if(access?.accessNotes) return access.accessNotes;
+  if(s.notes) return String(s.notes).split('\n').slice(0,2).join(' ');
+  return 'No access notes entered.';
+}
+function fieldValue477(label,value,extra=''){
+  return `<div class="fieldValue477"><span>${esc(label)}</span><strong>${esc(value||'Not entered')}</strong>${extra}</div>`;
+}
+function siteToolCount477(){
+  const mode=appMode();
+  let n=0;
+  if(featureOn('reports')) n++;
+  if(mode!=='simple' || featureOn('reports')) n++;
+  if(featureOn('library')) n++;
+  if(featureOn('equipment')) n++;
+  if(featureOn('advancedGps')) n++;
+  return n;
+}
 function siteDetail(){
   const s=site(); if(!s){ route('sites'); return; }
+  s.lastOpenedAt=new Date().toISOString();
+  saveData(data);
   const open=(s.tasks||[]).filter(t=>(t.status||'Open')!=='Done').length;
   const def=(s.deficiencies||[]).filter(d=>(d.status||'Open')!=='Closed').length;
   const siteVisits=Array.isArray(s.visits) ? s.visits : [];
@@ -1342,45 +1369,66 @@ function siteDetail(){
   const health=siteHealth(s);
   const lastVisit=siteVisits[0];
   const panel=[s.panelManufacturer,s.panelModel].filter(Boolean).join(' ')||'Panel not entered';
-  const showAdvancedTools=appMode()!=='simple' || featureOn('reports') || featureOn('equipment') || featureOn('advancedGps');
-  html(`<div class="screen siteDetailScreen476"><div class="row siteTopBar siteTopBar476"><button class="back ghost" id="backBtn">←</button><button class="ghost" id="editBtn">Edit</button></div>
-    <div class="card siteHero476"><div><h1>${esc(s.name)}</h1><p>${esc(fullAddress(s))}</p><span>${esc(panel)}</span></div><div class="siteHealthDot476 ${health.cls}">${health.score}%</div></div>
-    <div class="grid3 siteQuickStats476"><button class="card tile" id="taskBtn"><strong>${open}</strong><span>Open Tasks</span></button><button class="card tile" id="defBtn"><strong>${def}</strong><span>Deficiencies</span></button><button class="card tile" id="contactsBtn"><strong>${contacts.length}</strong><span>Contacts</span></button></div>
-    <div class="grid2 sitePrimaryActions476"><button class="primary tile" id="jobBtn"><strong>Start Job</strong><span>Live service call</span></button><button class="ghost tile" id="snapshotBtn"><strong>Snapshot</strong><span>Copy field summary</span></button></div>
+  const primary=primaryContact477(s);
+  const access=accessSummary477(s);
+  const showChecklistTool=appMode()!=='simple' || featureOn('reports');
+  const toolCount=siteToolCount477();
+  const nextAction = def ? `${def} deficiency${def===1?'':'ies'} need review` : open ? `${open} open task${open===1?'':'s'}` : 'Ready for service';
+  html(`<div class="screen siteDetailScreen477"><div class="row siteTopBar siteTopBar477"><button class="back ghost" id="backBtn">←</button><div class="siteTopTitle477"><strong>Customer Account</strong><span>${esc(appMode()==='simple'?'Simple View':'Modules enabled')}</span></div><button class="ghost" id="editBtn">Edit</button></div>
 
-    <div class="card siteNow476"><div class="siteNowHead476"><div><h2>Important Now</h2><p>${esc(health.details.join(' • '))}</p></div><span>${health.score}%</span></div><div class="siteNowGrid476"><button id="openTasksMini476"><strong>${open}</strong><small>Open Tasks</small></button><button id="openDefMini476"><strong>${def}</strong><small>Deficiencies</small></button><button id="visitsMini476"><strong>${siteVisits.length}</strong><small>Visits</small></button></div></div>
+    <div class="card siteHero477"><div class="siteHeroMain477"><span class="accountInitialLarge477">${esc((s.name||'?').slice(0,1).toUpperCase())}</span><div><h1>${esc(s.name||'Unnamed Account')}</h1><p>${esc(fullAddress(s))}</p><em>${esc(nextAction)}</em></div></div><div class="siteHealthDot477 ${health.cls}">${health.score}%</div></div>
 
-    <div class="card contactsMiniCard siteSimpleCard476"><div class="row"><div><h2>Contacts & Access</h2><p>${contacts.length ? `${contacts.length} saved contact${contacts.length===1?'':'s'}` : 'Customer, access, gate, and after-hours details.'}</p></div><button class="ghost smallBtn" id="manageContactsBtn">Manage</button></div>${contacts.length?contacts.slice(0,3).map(c=>`<button class="contactLine" data-contact="${esc(c.id)}"><strong>${esc(contactTitle(c))}</strong><span>${esc(contactMeta(c))}</span></button>`).join(''):`<p class="fieldNote">Add customer contacts, access codes, lockbox notes, or monitoring center details here.</p>`}</div>
+    <div class="grid2 sitePrimaryActions477"><button class="primary tile" id="jobBtn"><strong>Start Job</strong><span>Begin service call</span></button><button class="ghost tile" id="snapshotBtn"><strong>Snapshot</strong><span>Copy field summary</span></button>${featureOn('advancedGps')?`<button class="ghost tile" id="navigateBtn477"><strong>Navigate</strong><span>Open maps</span></button>`:''}<button class="ghost tile" id="addTaskQuick477"><strong>Add Task</strong><span>Follow-up item</span></button></div>
 
-    <div class="card recentVisitsCard visitLogCard siteSimpleCard476"><div class="row"><div><h2>Recent Visit</h2><p>${lastVisit ? `${visitDateLabel(lastVisit)} • ${durationText(lastVisit.startedAt,lastVisit.endedAt)}` : 'No completed visits yet.'}</p></div>${siteVisits.length?`<button class="ghost smallBtn" id="allVisitsBtn">All</button>`:''}</div>${lastVisit?`<button class="visitMini visitMiniButton" data-visit="${esc(lastVisit.id)}"><strong>${esc(visitNotesPreview(lastVisit,1))}</strong><span>Open visit detail</span></button>`:`<p class="fieldNote">Finish a Job Mode service call and it will appear here.</p>`}</div>
+    <div class="card fieldCard477"><div class="siteCardHead477"><div><h2>Field Card</h2><p>Most-used account information first.</p></div><button class="ghost smallBtn" id="contactsQuick477">Contacts</button></div><div class="fieldGrid477">
+      ${fieldValue477('Panel', panel)}
+      ${fieldValue477('Primary Contact', primary ? contactTitle(primary) : 'No contact saved', primary?.phone?`<button class="ghost microBtn477" id="callPrimary477">Call</button>`:'')}
+      ${fieldValue477('Access', access)}
+      ${fieldValue477('Last Visit', lastVisit ? `${visitDateLabel(lastVisit)} • ${durationText(lastVisit.startedAt,lastVisit.endedAt)}` : 'No completed visits')}
+    </div></div>
 
-    <div class="card docsMiniCard siteSimpleCard476"><div class="row"><div><h2>Documents / Links</h2><p>${docs.length ? `${docs.length} saved document${docs.length===1?'':'s'}` : 'Manuals, permits, forms, and site reference links.'}</p></div><button class="ghost smallBtn" id="manageDocsBtn">Manage</button></div>${docs.length?docs.slice(0,2).map(d=>`<button class="docLineMini" data-doc="${esc(d.id)}"><strong>${esc(docTitle(d))}</strong><span>${esc(docMeta(d))}</span></button>`).join(''):`<p class="fieldNote">Add panel manuals, permits, or site-specific references.</p>`}</div>
+    <div class="grid3 siteQuickStats477"><button class="card tile" id="taskBtn"><strong>${open}</strong><span>Open Tasks</span></button><button class="card tile" id="defBtn"><strong>${def}</strong><span>Deficiencies</span></button><button class="card tile" id="visitsMini477"><strong>${siteVisits.length}</strong><span>Visits</span></button></div>
 
-    ${showAdvancedTools?`<div class="card siteModulesCard476"><div class="siteModulesHead476"><h2>Enabled Site Tools</h2><p>Only modules enabled in Settings → Modules appear here.</p></div><div class="grid2 siteModuleGrid476">
-      ${featureOn('reports')?`<button class="ghost tile" id="reportBtn"><strong>Report</strong><span>Copy/download</span></button>`:''}
-      <button class="ghost tile" id="checklistBtn"><strong>${checklistItems.length ? checkStats.progress + '%' : 'New'}</strong><span>Checklist</span></button>
+    <div class="card siteNow477"><div class="siteNowHead477"><div><h2>Today’s Priority</h2><p>${esc(health.details.join(' • '))}</p></div><span>${health.score}%</span></div><div class="siteNowGrid477"><button id="openTasksMini476"><strong>${open}</strong><small>Open Tasks</small></button><button id="openDefMini476"><strong>${def}</strong><small>Deficiencies</small></button><button id="addDefQuick477"><strong>＋</strong><small>Add Deficiency</small></button></div></div>
+
+    <div class="card contactsMiniCard477 siteSimpleCard477"><div class="row"><div><h2>Contacts & Access</h2><p>${contacts.length ? `${contacts.length} saved contact${contacts.length===1?'':'s'}` : 'Customer, access, gate, and after-hours details.'}</p></div><button class="ghost smallBtn" id="manageContactsBtn">Manage</button></div>${contacts.length?contacts.slice(0,2).map(c=>`<button class="contactLine contactLine477" data-contact="${esc(c.id)}"><strong>${esc(contactTitle(c))}</strong><span>${esc(contactMeta(c))}</span>${c.accessNotes?`<em>${esc(c.accessNotes)}</em>`:''}</button>`).join(''):`<p class="fieldNote">Add customer contacts, access codes, lockbox notes, or monitoring center details here.</p>`}</div>
+
+    <div class="card recentVisitsCard477 siteSimpleCard477"><div class="row"><div><h2>Recent Visit</h2><p>${lastVisit ? `${visitDateLabel(lastVisit)} • ${durationText(lastVisit.startedAt,lastVisit.endedAt)}` : 'No completed visits yet.'}</p></div>${siteVisits.length?`<button class="ghost smallBtn" id="allVisitsBtn">All</button>`:''}</div>${lastVisit?`<button class="visitMini visitMiniButton" data-visit="${esc(lastVisit.id)}"><strong>${esc(visitNotesPreview(lastVisit,1))}</strong><span>Open visit detail</span></button>`:`<p class="fieldNote">Finish a Job Mode service call and it will appear here.</p>`}</div>
+
+    ${toolCount?`<div class="card siteModulesCard477"><div class="siteModulesHead477"><h2>More Site Tools</h2><p>Disabled modules are removed from this account screen.</p></div><div class="grid2 siteModuleGrid477">
+      ${featureOn('reports')?`<button class="ghost tile" id="reportBtn"><strong>Report</strong><span>Copy / download</span></button>`:''}
+      ${showChecklistTool?`<button class="ghost tile" id="checklistBtn"><strong>${checklistItems.length ? checkStats.progress + '%' : 'New'}</strong><span>Checklist</span></button>`:''}
+      ${featureOn('library')?`<button class="ghost tile" id="manageDocsBtn"><strong>${docs.length}</strong><span>Documents</span></button>`:''}
       ${featureOn('equipment')?`<button class="ghost tile" id="equipmentBtn"><strong>${equipment.length}</strong><span>Equipment</span></button>`:''}
-      ${featureOn('advancedGps')?`<button class="ghost tile" id="gpsToolsBtn"><strong>GPS</strong><span>${hasGps(s)?'Saved':'Capture / maps'}</span></button>`:''}
+      ${featureOn('advancedGps')?`<button class="ghost tile" id="gpsToolsBtn"><strong>GPS</strong><span>${hasGps(s)?'Saved':'Capture'}</span></button>`:''}
     </div></div>`:''}
 
-    ${featureOn('advancedGps')?`<div class="card gpsCard siteGpsCard476"><div class="row"><div><h2>GPS / Maps</h2><p>${esc(gpsLine(s))}</p></div>${data.settings.gps?.enabled===false?'':`<button id="captureGpsBtn" class="primary smallBtn">Capture GPS</button>`}</div><div class="mapActions"><button id="appleBtn" class="ghost">Apple Maps</button><button id="googleBtn" class="ghost">Google Maps</button></div></div>`:''}
-    ${featureOn('equipment')?`<div class="card equipmentMiniCard siteSimpleCard476"><div class="row"><div><h2>Equipment Vault</h2><p>${equipment.length ? `${equipment.length} saved equipment item${equipment.length===1?'':'s'}` : 'Panel, communicator, power supply, and device notes.'}</p></div><button class="ghost smallBtn" id="manageEquipmentBtn">Manage</button></div>${equipment.length?equipment.slice(0,2).map(e=>`<button class="equipmentLine" data-eq="${esc(e.id)}"><strong>${esc(equipmentTitle(e))}</strong><span>${esc(e.location||e.type||'No location entered')}</span></button>`).join(''):`<p class="fieldNote">Add the panel, communicator, power supplies, and important equipment here.</p>`}</div>`:''}
-    <div class="card grow siteNotes476"><h2>Site Notes</h2><p>${esc(s.notes || 'No notes entered.')}</p></div>
+    ${featureOn('advancedGps')?`<div class="card gpsCard siteGpsCard477"><div class="row"><div><h2>GPS / Maps</h2><p>${esc(gpsLine(s))}</p></div>${data.settings.gps?.enabled===false?'':`<button id="captureGpsBtn" class="primary smallBtn">Capture GPS</button>`}</div><div class="mapActions"><button id="appleBtn" class="ghost">Apple Maps</button><button id="googleBtn" class="ghost">Google Maps</button></div></div>`:''}
+
+    ${featureOn('equipment') && equipment.length?`<div class="card equipmentMiniCard477 siteSimpleCard477"><div class="row"><div><h2>Equipment Snapshot</h2><p>${equipment.length} saved equipment item${equipment.length===1?'':'s'}</p></div><button class="ghost smallBtn" id="manageEquipmentBtn">Manage</button></div>${equipment.slice(0,2).map(e=>`<button class="equipmentLine" data-eq="${esc(e.id)}"><strong>${esc(equipmentTitle(e))}</strong><span>${esc(e.location||e.type||'No location entered')}</span></button>`).join('')}</div>`:''}
+
+    ${featureOn('library') && docs.length?`<div class="card docsMiniCard477 siteSimpleCard477"><div class="row"><div><h2>Documents / Links</h2><p>${docs.length} saved document${docs.length===1?'':'s'}</p></div><button class="ghost smallBtn" id="manageDocsBtn2">Manage</button></div>${docs.slice(0,2).map(d=>`<button class="docLineMini" data-doc="${esc(d.id)}"><strong>${esc(docTitle(d))}</strong><span>${esc(docMeta(d))}</span></button>`).join('')}</div>`:''}
+
+    <div class="card grow siteNotes477"><h2>Site Notes</h2><p>${esc(s.notes || 'No notes entered.')}</p></div>
   </div>`);
   document.getElementById('backBtn').onclick=()=>route('sites');
   document.getElementById('editBtn').onclick=()=>{mode='edit'; route('siteForm');};
   document.getElementById('taskBtn').onclick=()=>route('tasks');
   document.getElementById('defBtn').onclick=()=>route('deficiencies');
-  document.getElementById('contactsBtn').onclick=()=>route('contactsList');
+  document.getElementById('visitsMini477').onclick=()=>route('visits');
   document.getElementById('openTasksMini476').onclick=()=>route('tasks');
   document.getElementById('openDefMini476').onclick=()=>route('deficiencies');
-  document.getElementById('visitsMini476').onclick=()=>route('visits');
   document.getElementById('snapshotBtn').onclick=shareSiteSnapshot;
   document.getElementById('jobBtn').onclick=startJob;
+  const addTask=document.getElementById('addTaskQuick477'); if(addTask) addTask.onclick=()=>{mode=null; route('taskForm');};
+  const addDef=document.getElementById('addDefQuick477'); if(addDef) addDef.onclick=()=>{mode=null; route('deficiencyForm');};
+  const nav=document.getElementById('navigateBtn477'); if(nav) nav.onclick=()=>window.open(mapUrl(s,(data.settings.gps&&data.settings.gps.mapProvider)||'apple'),'_blank');
+  const call=document.getElementById('callPrimary477'); if(call && primary?.phone) call.onclick=()=>{location.href=`tel:${primary.phone}`;};
+  const contactQuick=document.getElementById('contactsQuick477'); if(contactQuick) contactQuick.onclick=()=>route('contactsList');
   const report=document.getElementById('reportBtn'); if(report) report.onclick=()=>route('report');
   const checklist=document.getElementById('checklistBtn'); if(checklist) checklist.onclick=()=>route('checklist');
   const equipmentBtn=document.getElementById('equipmentBtn'); if(equipmentBtn) equipmentBtn.onclick=()=>route('equipmentList');
-  const gpsTools=document.getElementById('gpsToolsBtn'); if(gpsTools) gpsTools.onclick=()=>{ const gps=document.querySelector('.siteGpsCard476'); if(gps) gps.scrollIntoView({behavior:'smooth',block:'center'}); };
+  const gpsTools=document.getElementById('gpsToolsBtn'); if(gpsTools) gpsTools.onclick=()=>{ const gps=document.querySelector('.siteGpsCard477'); if(gps) gps.scrollIntoView({behavior:'smooth',block:'center'}); };
   const gpsBtn=document.getElementById('captureGpsBtn'); if(gpsBtn) gpsBtn.onclick=captureGpsForSite;
   const apple=document.getElementById('appleBtn'); if(apple) apple.onclick=()=>window.open(mapUrl(s,'apple'),'_blank');
   const google=document.getElementById('googleBtn'); if(google) google.onclick=()=>window.open(mapUrl(s,'google'),'_blank');
@@ -1389,6 +1437,7 @@ function siteDetail(){
   const manageEq=document.getElementById('manageEquipmentBtn'); if(manageEq) manageEq.onclick=()=>route('equipmentList');
   document.querySelectorAll('.equipmentLine').forEach(b=>b.onclick=()=>{mode=b.dataset.eq; route('equipmentForm');});
   const manageDocs=document.getElementById('manageDocsBtn'); if(manageDocs) manageDocs.onclick=()=>route('siteDocs');
+  const manageDocs2=document.getElementById('manageDocsBtn2'); if(manageDocs2) manageDocs2.onclick=()=>route('siteDocs');
   document.querySelectorAll('.docLineMini').forEach(b=>b.onclick=()=>{mode=b.dataset.doc; route('siteDocForm');});
   const allVisits=document.getElementById('allVisitsBtn'); if(allVisits) allVisits.onclick=()=>route('visits');
   document.querySelectorAll('.visitMiniButton').forEach(b=>b.onclick=()=>{mode=b.dataset.visit; route('visitDetail');});
@@ -2465,11 +2514,11 @@ function diagnostics(){
 }
 function showChangelog(){
   const notes = [
-    "Redesigned the home screen around customer account search.",
-    "Added prominent Nearby Accounts on the dashboard for GPS-aware site work.",
-    "Added Recent Accounts for quick access to recently used customers.",
-    "Renamed Simple View settings to Settings → Modules with clearer enable/disable controls.",
-    "Simplified the customer screen so common field information is visible first and enabled modules appear only when turned on."
+    "Simplified the customer account screen around a field card layout.",
+    "Most-used information now appears first: address, panel, primary contact, access notes, last visit, tasks, and deficiencies.",
+    "Added faster customer actions for Start Job, Snapshot, Navigate, Add Task, and Add Deficiency.",
+    "Moved optional customer tools into a More Site Tools module area.",
+    "Disabled modules now disappear from the customer screen more completely."
   ];
   const overlay=document.createElement("div");
   overlay.className="releaseOverlay";
