@@ -2578,11 +2578,11 @@ function diagnostics(){
 }
 function showChangelog(){
   const notes = [
-    "Removed Start Job / End Job workflow language.",
-    "Re-centered the customer account screen around site notes only.",
-    "Replaced Start Job with Add Note on the customer screen.",
-    "Added timestamped site note entry without service-call status tracking.",
-    "Preserved Home search, Modules, Daily Route tools, Settings cleanup, and the green Build revision indicator."
+    "Added a more impressive FireVault startup splash screen.",
+    "Made the main Home screen FireVault logo larger and centered.",
+    "Improved the splash loading animation and build label.",
+    "Kept FireVault focused on site notes, not job start/end status.",
+    "Preserved Home search, customer account polish, Modules, Daily Route tools, Settings cleanup, and the green Build revision indicator."
   ];
   const overlay=document.createElement("div");
   overlay.className="releaseOverlay";
