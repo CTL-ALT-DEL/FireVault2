@@ -4098,17 +4098,17 @@ function diagnostics(){
 }
 function showChangelog(){
   const notes = [
-    "Advanced to Build 0.50.47 from the stable 0.50.46 baseline.",
-    "Replaced the splash-screen moving bar with a small animated flame that moves right and left.",
-    "Styled the splash loader as a glowing flame traveling along a subtle guide track.",
-    "Preserved the Home layout fixes from 0.50.46, including the lifted Add Account button and tighter Today / date spacing.",
+    "Advanced to Build 0.50.48 from the stable 0.50.47 baseline.",
+    "Fixed the splash-screen flame loader so the flame actually moves right and left.",
+    "Reworked the CSS animation so travel movement and flame flicker no longer cancel each other.",
+    "Preserved the Home layout fixes from 0.50.46 and the flame-loader styling from 0.50.47.",
     "Preserved fixed splash/header behavior, Startup Health diagnostics, the 5-second splash screen, Photo Vault tools, Customer Report Photo workflow, iPad autosizing, simple Home screen, Search Bar Concept #6, and excluded job-status workflow controls."
   ];
   const overlay=document.createElement("div");
   overlay.className="releaseOverlay";
   overlay.innerHTML=`<div class="releaseSheet" role="dialog" aria-modal="true" aria-label="FireVault release notes">
     <div class="releaseHead"><div><strong>FireVault</strong><span>Build ${BUILD}</span></div><button class="ghost iconBtn" id="closeRelease" aria-label="Close release notes">×</button></div>
-    <div class="releaseBody"><h2>Release Notes</h2><p class="releaseIntro">Updated the splash loader to a moving flame while preserving the stable layout fixes.</p><ul>${notes.map(n=>`<li>${esc(n)}</li>`).join("")}</ul></div>
+    <div class="releaseBody"><h2>Release Notes</h2><p class="releaseIntro">Fixed the splash flame loader movement while preserving the stable layout fixes.</p><ul>${notes.map(n=>`<li>${esc(n)}</li>`).join("")}</ul></div>
   </div>`;
   document.body.appendChild(overlay);
   const close=()=>overlay.remove();

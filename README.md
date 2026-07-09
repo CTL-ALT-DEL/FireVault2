@@ -1,11 +1,11 @@
-# FireVault Build 0.50.47
+# FireVault Build 0.50.48
 
-Build 0.50.47 continues from the stable 0.50.46 baseline and updates the splash-screen loading animation to a moving flame while preserving the fixed splash/header behavior and stable startup path.
+Build 0.50.48 continues from the stable 0.50.47 baseline and repairs the splash-screen flame loader so the flame actually moves left and right.
 
 ## Changes
 
-- Visible app version advanced to 0.50.47.
-- Cache-busting references updated to 0.50.47.
+- Visible app version advanced to 0.50.48.
+- Cache-busting references updated to 0.50.48.
 - Added **Site Quick Actions** card on the account/site screen.
 - Added direct quick actions for:
   - Add Site Note
@@ -31,11 +31,11 @@ Run from the project root:
 node --check src/storage.js
 node --check src/app.js
 python -m json.tool manifest.json > /dev/null
-zip -T firevault-build-0.50.47-modular-root.zip
+zip -T firevault-build-0.50.48-modular-root.zip
 ```
 
 ## Suggested commit message
 
 ```text
-Build 0.50.47 splash flame loader polish
+Build 0.50.48 splash flame movement repair
 ```

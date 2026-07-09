@@ -1,6 +1,6 @@
-# Clean Install Notes — FireVault Build 0.50.47
+# Clean Install Notes — FireVault Build 0.50.48
 
-This ZIP is intended to be used as the new clean baseline for FireVault Build 0.50.47.
+This ZIP is intended to be used as the new clean baseline for FireVault Build 0.50.48.
 
 ## Install
 
@@ -11,7 +11,7 @@ This ZIP is intended to be used as the new clean baseline for FireVault Build 0.
 
 ## Build focus
 
-Build 0.50.47 continues from the stable 0.50.46 baseline and updates the splash loading animation.
+Build 0.50.48 continues from the stable 0.50.47 baseline and repairs the splash flame animation.
 
 ## Notes
 
@@ -21,9 +21,13 @@ Build 0.50.47 continues from the stable 0.50.46 baseline and updates the splash 
 - Keeps Home simple.
 - Does not reintroduce job-status workflow buttons.
 
-## Build 0.50.47 highlights
+## Build 0.50.48 highlights
 
 - Built from the stable 0.50.46 baseline.
-- Replaced the splash loading bar with a small animated flame that moves right and left.
+- Fixed the splash flame loader so the flame actually moves right and left.
 - Preserved the 0.50.46 Home layout fixes.
 - Preserved fixed splash/header behavior and the 5-second splash screen.
+
+## Build 0.50.48 note
+
+- Repairs the 0.50.47 splash flame animation by separating travel movement from flame flicker so Safari/PWA does not cancel the movement.
