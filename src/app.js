@@ -2196,6 +2196,21 @@ function docVaultFilterBar516(docs){
   };
   return `<div class="docFilterBar516">${["all","photos","links","docs"].map(key=>`<button type="button" class="docFilterBtn516 ${docVaultFilter516===key?"active":""}" data-doc-filter="${key}"><strong>${docVaultFilterLabel516(key)}</strong><span>${counts[key]}</span></button>`).join("")}</div>`;
 }
+function siteDocCard519(d){
+  const notesPreview = d.notes ? esc(String(d.notes).split(/\r?\n/).slice(0,2).join(" • ")) : "";
+  return `<div class="card docVaultItem docVaultItem512 docVaultItem516" data-doc="${esc(d.id)}">
+    ${docPhotoThumb512(d)}
+    <div class="docVaultText512">
+      <div class="row"><div><h2>${esc(docTitle(d))}</h2><p>${esc(docMeta(d))}</p>${docHasPhoto512(d)?`<p class="docPhotoMeta512">${esc(photoDocSummary512(d))}</p>`:""}</div><span class="pill">${esc(d.type||"Doc")}</span></div>
+      ${notesPreview?`<p class="docNotes">${notesPreview}</p>`:""}
+      <div class="docQuickActions">
+        ${d.url?`<button class="ghost smallBtn openDocLink" data-url="${esc(d.url)}">Open Link</button>`:""}
+        ${docHasPhoto512(d)?`<button class="primary smallBtn overlayDocPhotoBtn512" data-doc="${esc(d.id)}">Overlay Photo</button><button class="ghost smallBtn originalDocPhotoBtn516" data-doc="${esc(d.id)}">Original</button>`:""}
+        <button class="ghost smallBtn copyDocRef" data-doc="${esc(d.id)}">Copy</button>
+      </div>
+    </div>
+  </div>`;
+}
 function siteDocs(){
   const s=site(); if(!s){ route("sites"); return; }
   s.docs=Array.isArray(s.docs) ? s.docs : [];
@@ -2203,10 +2218,10 @@ function siteDocs(){
   const linked=docs.filter(d=>d.url).length;
   const photos=docs.filter(docHasPhoto512).length;
   const filteredDocs=docs.filter(docMatchesVaultFilter516);
+  const docListHtml = filteredDocs.length ? filteredDocs.map(siteDocCard519).join("") : `<div class="empty">No ${esc(docVaultFilterLabel516(docVaultFilter516).toLowerCase())} records found. Tap + to add a document, link, or field photo.</div>`;
   html(`<div class="screen docsScreen docsScreen512 docsScreen516"><div class="row"><button class="back ghost" id="backBtn">←</button><div><h1>Documents / Photos</h1><p>${esc(s.name||"Site")}</p></div><button class="primary" id="addDocBtn">＋</button></div>
     <div class="card docsHero docsHero516"><h2>Site Documents Vault</h2><p>Keep customer-specific references, links, and field photos. Use filters to quickly find photos, links, or regular documents.</p><div class="docStats"><span><strong>${docs.length}</strong>Total</span><span><strong>${photos}</strong>Photos</span><span><strong>${linked}</strong>Links</span></div>${docVaultFilterBar516(docs)}</div>
-    <div class="list grow docsList">${filteredDocs.length?filteredDocs.map(d=>`<div class="card docVaultItem docVaultItem512 docVaultItem516" data-doc="${esc(d.id)}">${docPhotoThumb512(d)}<div class="docVaultText512"><div class="row"><div><h2>${esc(docTitle(d))}</h2><p>${esc(docMeta(d))}</p>${docHasPhoto512(d)?`<p class="docPhotoMeta512">${esc(photoDocSummary512(d))}</p>`:""}</div><span class="pill">${esc(d.type||"Doc")}</span></div>${d.notes?`<p class="docNotes">${esc(String(d.notes).split("
-").slice(0,2).join(" • "))}</p>`:""}<div class="docQuickActions">${d.url?`<button class="ghost smallBtn openDocLink" data-url="${esc(d.url)}">Open Link</button>`:""}${docHasPhoto512(d)?`<button class="primary smallBtn overlayDocPhotoBtn512" data-doc="${esc(d.id)}">Overlay Photo</button><button class="ghost smallBtn originalDocPhotoBtn516" data-doc="${esc(d.id)}">Original</button>`:""}<button class="ghost smallBtn copyDocRef" data-doc="${esc(d.id)}">Copy</button></div></div></div>`).join(""):`<div class="empty">No ${esc(docVaultFilterLabel516(docVaultFilter516).toLowerCase())} records found. Tap + to add a document, link, or field photo.</div>`}</div>
+    <div class="list grow docsList">${docListHtml}</div>
   </div>`);
   document.getElementById("backBtn").onclick=()=>route("siteDetail");
   document.getElementById("addDocBtn").onclick=()=>{mode=null; route("siteDocForm");};
@@ -2219,6 +2234,7 @@ ${d.notes||""}`.trim()); toast("Document reference copied."); }});
   document.querySelectorAll(".overlayDocPhotoBtn512").forEach(b=>b.onclick=e=>{e.stopPropagation(); const d=docs.find(x=>x.id===b.dataset.doc); if(d) downloadPhotoWithOverlay512(d);});
   document.querySelectorAll(".originalDocPhotoBtn516").forEach(b=>b.onclick=e=>{e.stopPropagation(); const d=docs.find(x=>x.id===b.dataset.doc); if(d) downloadOriginalPhoto513(d);});
 }
+
 
 function siteDocForm(){
   const s=site(); if(!s){ route("sites"); return; }
@@ -3536,22 +3552,24 @@ function diagnostics(){
 }
 function showChangelog(){
   const notes = [
-    "Advanced to Build 0.50.18 from the Build 0.50.17 baseline.",
-    "Fixed the splash watchdog false-positive that showed a loading error before the 5-second splash finished.",
+    "Advanced to Build 0.50.19 from the Build 0.50.18 baseline.",
+    "Fixed the Photo Vault document-list newline syntax pattern that caused Safari/PWA SyntaxError: Unexpected EOF on app load.",
+    "Moved document card rendering into a safer helper so note previews no longer create broken JavaScript strings.",
     "Kept the splash screen minimum display time at about 5 seconds.",
-    "Added a module-ready flag so startup errors are separated from intentional splash delay.",
     "Preserved Photo Vault filters, Photo Overlay tools, custom overlay logo support, iPad autosizing, simple Home screen, Search Bar Concept #6, and excluded job-status workflow controls."
-  ];  const overlay=document.createElement("div");
+  ];
+  const overlay=document.createElement("div");
   overlay.className="releaseOverlay";
   overlay.innerHTML=`<div class="releaseSheet" role="dialog" aria-modal="true" aria-label="FireVault release notes">
     <div class="releaseHead"><div><strong>FireVault</strong><span>Build ${BUILD}</span></div><button class="ghost iconBtn" id="closeRelease" aria-label="Close release notes">×</button></div>
-    <div class="releaseBody"><h2>Release Notes</h2><p class="releaseIntro">Startup watchdog and 5-second splash timing repair.</p><ul>${notes.map(n=>`<li>${esc(n)}</li>`).join("")}</ul></div>
+    <div class="releaseBody"><h2>Release Notes</h2><p class="releaseIntro">Safari EOF startup repair and 5-second splash preserved.</p><ul>${notes.map(n=>`<li>${esc(n)}</li>`).join("")}</ul></div>
   </div>`;
   document.body.appendChild(overlay);
   const close=()=>overlay.remove();
   document.getElementById("closeRelease").onclick=close;
   overlay.addEventListener("click",e=>{ if(e.target===overlay) close(); });
 }
+
 
 function bootFireVault518(){
   try{
