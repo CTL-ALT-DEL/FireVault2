@@ -1025,11 +1025,11 @@ function addServiceFollowUp(kind="Follow-up"){
 }
 function startJobTimer(){ stopJobTimer(); jobTimer=setInterval(()=>{ const el=document.getElementById("jobElapsed"); if(el && activeJob) el.textContent=elapsedText(activeJob.startedAt); },1000); }
 function stopJobTimer(){ if(jobTimer){ clearInterval(jobTimer); jobTimer=null; } }
-function setActiveNav(){ document.querySelectorAll("nav button").forEach(b=>b.classList.remove("active")); const section=view==="routeLog"?"home":(["siteDetail","visits","visitDetail","checklist","siteForm","contactsList","contactForm","siteDocs","siteDocForm","equipmentList","equipmentForm","tasks","taskForm","deficiencies","deficiencyForm","report","jobMode","nearbySites","attention"].includes(view)?"sites":view); document.getElementById("nav-"+section)?.classList.add("active"); }
+function setActiveNav(){ document.querySelectorAll("nav button").forEach(b=>b.classList.remove("active")); const section=["routeLog","dailySummary"].includes(view)?"home":(["siteDetail","visits","visitDetail","checklist","siteForm","contactsList","contactForm","siteDocs","siteDocForm","equipmentList","equipmentForm","tasks","taskForm","deficiencies","deficiencyForm","report","jobMode","nearbySites","attention"].includes(view)?"sites":view); document.getElementById("nav-"+section)?.classList.add("active"); }
 
 function render(){
   try{
-    const routes = {home, routeLog, sites, nearbySites, attention:attentionQueue, siteDetail, visits, visitDetail, checklist, siteForm, contactsList, contactForm, siteDocs, siteDocForm, equipmentList, equipmentForm, tasks, taskForm, deficiencies, deficiencyForm, report, library, resourceForm, jobMode, settings, diagnostics};
+    const routes = {home, dailySummary, routeLog, sites, nearbySites, attention:attentionQueue, siteDetail, visits, visitDetail, checklist, siteForm, contactsList, contactForm, siteDocs, siteDocForm, equipmentList, equipmentForm, tasks, taskForm, deficiencies, deficiencyForm, report, library, resourceForm, jobMode, settings, diagnostics};
     (routes[view] || home)();
     document.body.classList.toggle("homeFullscreen480", view === "home");
     stopJobTimer();
@@ -1184,6 +1184,7 @@ function home(){
       <div class="recentList478 recentList486">${homeRecentRowsOnly486()}</div>
     </div>
 
+    <button class="card dailySummaryCard499" id="dailySummaryBtn499"><div><strong>Daily Summary</strong><span>${dailySummaryLine499()}</span></div><em>Open</em></button>
     <div class="homeModuleSummary476 homeModuleSummary478"><button class="ghost" id="manageModulesBtn476"><strong>Modules</strong><span>${esc(moduleStatus476())}</span></button><button class="ghost" id="defCard"><strong>${def}</strong><span>Deficiencies</span></button></div>
     <button class="floatingAdd478" id="addSiteBtn" aria-label="Add Account">＋</button>
     <div class="buildRevisionSpacer475" aria-hidden="true"></div>
@@ -1199,6 +1200,7 @@ function home(){
   const bell=document.getElementById('homeBell478'); if(bell) bell.onclick=showChangelog;
   const installHow=document.getElementById('homeInstallHow482'); if(installHow) installHow.onclick=()=>alert('To get the clean full-screen FireVault view on iPhone: tap Share, choose Add to Home Screen, then open FireVault from the new Home Screen icon.');
   const installHide=document.getElementById('homeInstallHide482'); if(installHide) installHide.onclick=()=>{homeInstallTipHidden=true; localStorage.setItem('firevault_home_install_tip_hidden','1'); home();};
+  const dailySummaryBtn499=document.getElementById('dailySummaryBtn499'); if(dailySummaryBtn499) dailySummaryBtn499.onclick=()=>route('dailySummary');
   document.getElementById('manageModulesBtn476').onclick=()=>{settingsTab='visibility'; mode='settingsDetail'; route('settings');};
   const allAccounts=document.getElementById('allAccountsBtn478'); if(allAccounts) allAccounts.onclick=()=>route('sites');
   const visitsCard=document.getElementById('visitsCard478'); if(visitsCard) visitsCard.onclick=()=>{selectedSiteId=null; route('sites');};
@@ -1211,6 +1213,100 @@ function home(){
   const homeRoutePause=document.getElementById('homeRoutePauseBtn'); if(homeRoutePause) homeRoutePause.onclick=()=> activeRoute?.paused ? resumeRouteDay() : pauseRouteDay();
   const homeRouteEnd=document.getElementById('homeRouteEndBtn'); if(homeRouteEnd) homeRouteEnd.onclick=()=>{ if(confirm('End and save today’s route?')) endRouteDay(); };
   const rb=document.getElementById('resumeJobBtn'); if(rb) rb.onclick=()=>{selectedSiteId=activeJob.siteId; route('jobMode');};
+}
+
+
+function sameLocalDay499(iso, day=localDateString()){
+  if(!iso) return false;
+  try{return localDateString(new Date(iso))===day;}catch{return false;}
+}
+function todayRouteLogs499(){
+  const day=localDateString();
+  const saved=(data.routeLogs||[]).filter(log=>(log.date===day)||sameLocalDay499(log.startedAt,day));
+  return activeRoute ? [activeRoute, ...saved.filter(log=>log.id!==activeRoute.id)] : saved;
+}
+function dailySummaryStats499(){
+  const day=localDateString();
+  const notesSites=(data.sites||[]).filter(s=>sameLocalDay499(s.lastNoteAt,day));
+  const openTasks=allTaskRows().filter(r=>!taskIsDone(r.t));
+  const tasksToday=allTaskRows().filter(r=>sameLocalDay499(r.t.createdAt,day));
+  const defsToday=(data.sites||[]).flatMap(s=>(s.deficiencies||[]).map(d=>({s,d}))).filter(r=>sameLocalDay499(r.d.createdAt,day));
+  const routes=todayRouteLogs499();
+  const routePoints=routes.reduce((n,r)=>n+(r.events||[]).length,0);
+  const routeSites=[...new Set(routes.flatMap(r=>(r.events||[]).map(e=>e.siteName).filter(Boolean)))];
+  return {day,notesSites,openTasks,tasksToday,defsToday,routes,routePoints,routeSites};
+}
+function dailySummaryLine499(){
+  const st=dailySummaryStats499();
+  const parts=[];
+  parts.push(`${st.notesSites.length} note site${st.notesSites.length===1?"":"s"}`);
+  if(st.routePoints) parts.push(`${st.routePoints} route point${st.routePoints===1?"":"s"}`);
+  if(st.tasksToday.length) parts.push(`${st.tasksToday.length} new task${st.tasksToday.length===1?"":"s"}`);
+  if(st.defsToday.length) parts.push(`${st.defsToday.length} deficienc${st.defsToday.length===1?"y":"ies"}`);
+  return parts.join(" • ") || "No site notes yet today";
+}
+function dailySummaryText499(){
+  const st=dailySummaryStats499();
+  const date=new Date().toLocaleDateString([], {weekday:"long",month:"long",day:"numeric",year:"numeric"});
+  const lines=[
+    `FIREVAULT DAILY SUMMARY`,
+    `Date: ${date}`,
+    ``,
+    `SITE NOTES TODAY (${st.notesSites.length})`
+  ];
+  if(st.notesSites.length){
+    st.notesSites.forEach(s=>{
+      const first=(s.notes||"").split("\n\n").filter(Boolean)[0]||"Note saved.";
+      lines.push(`- ${s.name||"Unnamed Site"}: ${first.replaceAll("\n"," / ")}`);
+    });
+  }else lines.push(`- No site notes saved today.`);
+  lines.push(``, `ROUTE ACTIVITY`);
+  if(st.routes.length){
+    st.routes.forEach(r=>lines.push(`- ${r.endedAt?"Saved":"Active"}: ${routeSummaryLine(r)}${routeOdometerMiles(r)?` • Odometer ${routeOdometerMiles(r).toFixed(1)} mi`:""}`));
+  }else lines.push(`- No route activity recorded today.`);
+  lines.push(``, `TASKS / DEFICIENCIES`);
+  lines.push(`- Open tasks: ${st.openTasks.length}`);
+  lines.push(`- New tasks today: ${st.tasksToday.length}`);
+  lines.push(`- Deficiencies added today: ${st.defsToday.length}`);
+  if(st.tasksToday.length){
+    lines.push(``, `NEW TASKS TODAY`);
+    st.tasksToday.slice(0,12).forEach(r=>lines.push(`- ${r.s.name||"Site"}: ${r.t.title||"Task"}`));
+  }
+  if(st.defsToday.length){
+    lines.push(``, `DEFICIENCIES ADDED TODAY`);
+    st.defsToday.slice(0,12).forEach(r=>lines.push(`- ${r.s.name||"Site"}: ${r.d.title||"Deficiency"}${r.d.priority?` (${r.d.priority})`:""}`));
+  }
+  lines.push(``, `Generated by FireVault ${BUILD} on ${new Date().toLocaleString()}`);
+  return lines.join("\n");
+}
+function copyDailySummary499(){
+  const text=dailySummaryText499();
+  if(navigator.clipboard?.writeText){ navigator.clipboard.writeText(text).then(()=>toast("Daily summary copied."),()=>toast("Clipboard unavailable.")); }
+  else toast("Clipboard unavailable.");
+}
+function dailySummary(){
+  const st=dailySummaryStats499();
+  html(`<div class="screen dailySummaryScreen499">
+    <div class="row dailySummaryTop499"><button class="back ghost" id="backBtn">←</button><div><h1>Daily Summary</h1><p>${new Date().toLocaleDateString([], {weekday:"long",month:"long",day:"numeric"})}</p></div><button class="primary smallBtn" id="copyDailySummaryBtn499">Copy</button></div>
+    <div class="card dailySummaryHero499"><div><strong>${esc(dailySummaryLine499())}</strong><span>Site notes only summary</span></div><p>Quick recap of notes, route points, open tasks, and deficiencies for today.</p></div>
+    <div class="dailySummaryGrid499">
+      <div class="card"><strong>${st.notesSites.length}</strong><span>Note Sites</span></div>
+      <div class="card"><strong>${st.routePoints}</strong><span>Route Points</span></div>
+      <div class="card"><strong>${st.openTasks.length}</strong><span>Open Tasks</span></div>
+      <div class="card"><strong>${st.defsToday.length}</strong><span>New Def.</span></div>
+    </div>
+    <div class="list grow dailySummaryList499">
+      <div class="routeSectionTitle462"><strong>Site Notes Today</strong><span>${st.notesSites.length}</span></div>
+      ${st.notesSites.length?st.notesSites.map(s=>`<button class="card dailySummarySite499" data-summary-site="${esc(s.id)}"><h2>${esc(s.name||"Unnamed Site")}</h2><p>${esc(((s.notes||"").split("\n\n").filter(Boolean)[0]||"Note saved.").replaceAll("\n"," / "))}</p></button>`).join(""):`<div class="empty">No site notes saved today.</div>`}
+      <div class="routeSectionTitle462"><strong>Route Activity</strong><span>${st.routes.length}</span></div>
+      ${st.routes.length?st.routes.map(r=>`<div class="card dailySummaryRoute499"><h2>${r.endedAt?"Saved Route":"Active Route"}</h2><p>${esc(routeSummaryLine(r))}</p></div>`).join(""):`<div class="empty">No route activity recorded today.</div>`}
+      <div class="routeSectionTitle462"><strong>Tasks / Deficiencies</strong><span>${st.tasksToday.length+st.defsToday.length}</span></div>
+      <div class="card dailySummaryText499"><p>Open tasks: ${st.openTasks.length}</p><p>New tasks today: ${st.tasksToday.length}</p><p>Deficiencies added today: ${st.defsToday.length}</p></div>
+    </div>
+  </div>`);
+  document.getElementById("backBtn").onclick=()=>route("home");
+  document.getElementById("copyDailySummaryBtn499").onclick=copyDailySummary499;
+  document.querySelectorAll("[data-summary-site]").forEach(b=>b.onclick=()=>{selectedSiteId=b.dataset.summarySite; route("siteDetail");});
 }
 
 function routeLog(){
@@ -2591,17 +2687,17 @@ function diagnostics(){
 }
 function showChangelog(){
   const notes = [
-    "Removed placeholder text from the Home search box for a cleaner look.",
-    "Changed the active search cancel control to a compact × clear button.",
-    "Improved search bar spacing after removing unnecessary text.",
-    "Kept the larger search icon and polished search bar styling.",
-    "Preserved Site Notes workflow, splash screen, Home header polish, Modules, and Daily Route tools."
+    "Added Daily Summary for the site-notes-only workflow.",
+    "Added a Home dashboard Daily Summary card.",
+    "Daily Summary includes today’s note sites, route activity, open tasks, new tasks, and deficiencies.",
+    "Added Copy Summary for quick end-of-day reporting.",
+    "Preserved Site Notes polish, clean Home search box, splash screen, Modules, and Daily Route tools."
   ];
   const overlay=document.createElement("div");
   overlay.className="releaseOverlay";
   overlay.innerHTML=`<div class="releaseSheet" role="dialog" aria-modal="true" aria-label="FireVault release notes">
     <div class="releaseHead"><div><strong>FireVault</strong><span>Build ${BUILD}</span></div><button class="ghost iconBtn" id="closeRelease" aria-label="Close release notes">×</button></div>
-    <div class="releaseBody"><h2>Release Notes</h2><p class="releaseIntro">Customer account polish, cleaner field card, and module-aware site tools.</p><ul>${notes.map(n=>`<li>${esc(n)}</li>`).join("")}</ul></div>
+    <div class="releaseBody"><h2>Release Notes</h2><p class="releaseIntro">Daily Summary, site notes recap, and end-of-day copy tools.</p><ul>${notes.map(n=>`<li>${esc(n)}</li>`).join("")}</ul></div>
   </div>`;
   document.body.appendChild(overlay);
   const close=()=>overlay.remove();
