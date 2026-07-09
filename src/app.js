@@ -1161,7 +1161,7 @@ function home(){
     </div>
 
     <div class="appleSearchCard478">
-      <div class="homeSearchBox476 homeSearchBox478"><span class="searchGlass478" aria-hidden="true">🔎</span><input id="homeCustomerSearch476" type="search" value="${esc(siteSearch)}" placeholder="Search accounts, panel, address, contact..." autocomplete="off"><button class="ghost smallBtn searchClear478 ${siteSearch?"activeSearchClear487":""}" id="clearHomeSearch476" ${siteSearch?"":"disabled"}>${siteSearch?"Cancel":""}</button></div>
+      <div class="homeSearchBox476 homeSearchBox478"><span class="searchGlass478" aria-hidden="true">🔎</span><input id="homeCustomerSearch476" type="search" value="${esc(siteSearch)}" placeholder="" autocomplete="off"><button class="ghost smallBtn searchClear478 ${siteSearch?"activeSearchClear487":""}" id="clearHomeSearch476" ${siteSearch?"":"disabled"}>${siteSearch?"×":""}</button></div>
     </div>
 
     ${siteSearch?`<div class="card searchResultsPanel478" id="homeSearchResults476">${homeAccountRowsMarkup476()}</div>`:`<div id="homeSearchResults476" class="searchResultsPanel478 hiddenSearchResults478"></div>`}
@@ -1192,7 +1192,7 @@ function home(){
   const homeRoot=document.querySelector('.homeScreen476');
   if(homeRoot) homeRoot.onclick=e=>{ const card=e.target.closest('[data-home-site]'); if(card){ selectedSiteId=card.dataset.homeSite; route('siteDetail'); } };
   const search=document.getElementById('homeCustomerSearch476');
-  if(search){ search.oninput=()=>{ siteSearch=search.value; renderHomeSearch476(); const clear=document.getElementById('clearHomeSearch476'); if(clear){ clear.disabled=!siteSearch; clear.textContent=siteSearch?'Cancel':''; clear.classList.toggle('activeSearchClear487', !!siteSearch); } }; setTimeout(()=>{ try{ search.focus({preventScroll:true}); search.setSelectionRange(search.value.length, search.value.length); }catch{} },0); }
+  if(search){ search.oninput=()=>{ siteSearch=search.value; renderHomeSearch476(); const clear=document.getElementById('clearHomeSearch476'); if(clear){ clear.disabled=!siteSearch; clear.textContent=siteSearch?'×':''; clear.classList.toggle('activeSearchClear487', !!siteSearch); } }; setTimeout(()=>{ try{ search.focus({preventScroll:true}); search.setSelectionRange(search.value.length, search.value.length); }catch{} },0); }
   const clear=document.getElementById('clearHomeSearch476'); if(clear) clear.onclick=()=>{ siteSearch=''; const search=document.getElementById('homeCustomerSearch476'); if(search){ search.value=''; search.focus({preventScroll:true}); } clear.disabled=true; clear.textContent=''; clear.classList.remove('activeSearchClear487'); renderHomeSearch476(); };
   const checkNearby=document.getElementById('checkNearbyHomeBtn476'); if(checkNearby) checkNearby.onclick=checkNearbyHome476;
   document.getElementById('modulesTopBtn476').onclick=()=>{mode=null; route('settings');};
@@ -2591,10 +2591,10 @@ function diagnostics(){
 }
 function showChangelog(){
   const notes = [
-    "Redesigned the Home screen search bar with a more polished Apple-style look.",
-    "Made the search icon larger and more prominent.",
-    "Improved search field spacing, contrast, and tap comfort.",
-    "Improved the Cancel button styling so it feels more intentional and easier to tap.",
+    "Removed placeholder text from the Home search box for a cleaner look.",
+    "Changed the active search cancel control to a compact × clear button.",
+    "Improved search bar spacing after removing unnecessary text.",
+    "Kept the larger search icon and polished search bar styling.",
     "Preserved Site Notes workflow, splash screen, Home header polish, Modules, and Daily Route tools."
   ];
   const overlay=document.createElement("div");
