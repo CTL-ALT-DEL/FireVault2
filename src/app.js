@@ -30,6 +30,17 @@ const DEFAULT_CHECKLIST = [
   ["Documentation", "Customer notified of status"],
   ["Wrap-Up", "Panel restored and left normal"]
 ];
+const NOTE_TEMPLATES_503 = [
+  ["Panel Normal","Panel checked and left normal. No active alarms, troubles, or supervisory conditions observed."],
+  ["Trouble Found","Trouble condition found on site. Further troubleshooting / follow-up required."],
+  ["Ground Fault","Ground fault indication present. Circuit isolation / wiring investigation required."],
+  ["Customer Notified","Customer was notified of current fire alarm system status and next steps."],
+  ["Parts Needed","Parts or material are needed for completion. Add item details and quantity."],
+  ["Access Issue","Access issue encountered. Add door, room, contact, key, or escort details."],
+  ["Device Tested","Device tested and verified. Add device type, location, and result."],
+  ["Inspection Note","Inspection-related note. Add test area, device sample, or documentation details."]
+];
+
 const EMAIL_TAGS = [
   ["{site_name}","Site"], ["{date}","Date"], ["{technician}","Tech"],
   ["{company}","Company"], ["{phone}","Phone"], ["{email}","Email"]
@@ -471,7 +482,7 @@ function checklist(){
     <div class="card checklistTools"><p>Tap OK, Issue, or N/A as you work. Issue automatically creates an open deficiency so it shows in Site Health, Attention Queue, and reports.</p><p class="fieldNote">${esc(checklistLastSavedLine(s))}</p><div class="checkToolButtons"><button class="primary smallBtn completeInspectionBtn" id="completeChecklistBtn">Complete Inspection</button><button class="ghost smallBtn" id="newChecklistRoundBtn">New Round</button><button class="ghost smallBtn" id="copyChecklistBtn">Copy Summary</button><button class="ghost smallBtn" id="resetChecklistBtn">Reset Defaults</button></div></div>
     <div class="list grow checklistList">${s.checklist.length?s.checklist.map(item=>`<div class="card checkItem ${checklistItemClass(item)}"><div class="checkItemTop"><div><span class="checkCategory">${esc(item.category||"General")}</span><h2>${esc(item.label||"Checklist item")}</h2>${item.notes?`<p>${esc(item.notes)}</p>`:""}</div><span class="pill checkStatus">${esc(item.status||"Pending")}</span></div><div class="checkButtons"><button class="ghost smallBtn checkStatusBtn" data-id="${esc(item.id)}" data-status="OK">OK</button><button class="ghost smallBtn checkStatusBtn" data-id="${esc(item.id)}" data-status="Issue">Issue</button><button class="ghost smallBtn checkStatusBtn" data-id="${esc(item.id)}" data-status="N/A">N/A</button><button class="ghost smallBtn checkNoteBtn" data-id="${esc(item.id)}">Note</button></div></div>`).join(""):`<div class="empty">No checklist items saved.</div>`}</div>
   </div>`);
-  document.getElementById("backBtn").onclick=()=>route("siteDetail");
+  document.getElementById("backBtn").onclick=()=>route("siteDetail"); wireNoteTemplates503();
   document.getElementById("addCheckItemBtn").onclick=()=>{
     const label=prompt("Checklist item:", "");
     if(!label) return;
@@ -1175,6 +1186,24 @@ function todayAccountsMarkup500(){
   const rows=todayAccounts500();
   if(!rows.length) return `<div class="empty todayAccountsEmpty500">No account activity yet today.</div>`;
   return rows.map(({s,reason})=>`<button class="todayAccountRow500" data-home-site="${esc(s.id)}"><span>${esc((s.name||"?").slice(0,1).toUpperCase())}</span><div><strong>${esc(s.name||"Unnamed Account")}</strong><small>${esc(fullAddress(s)||"No address saved")}</small></div><em>${esc(reason)}</em></button>`).join("");
+}
+
+
+function noteTemplatesMarkup503(){
+  return `<div class="noteTemplateGrid503">${NOTE_TEMPLATES_503.map(([name,text])=>`<button class="ghost noteTemplateBtn503" data-template="${esc(text)}"><strong>${esc(name)}</strong><span>Use</span></button>`).join("")}</div>`;
+}
+function wireNoteTemplates503(targetId="siteNoteText"){
+  document.querySelectorAll(".noteTemplateBtn503").forEach(btn=>{
+    btn.onclick=()=>{
+      const target=document.getElementById(targetId) || document.querySelector("textarea");
+      if(!target) return;
+      const text=btn.dataset.template || "";
+      const current=target.value.trim();
+      target.value=current ? `${current}\n${text}` : text;
+      target.focus({preventScroll:true});
+      toast("Template added.");
+    };
+  });
 }
 
 function home(){
@@ -2746,10 +2775,10 @@ function diagnostics(){
 }
 function showChangelog(){
   const notes = [
-    "Cleaned up the Home screen by removing the extra Field Dashboard block.",
-    "Removed the Today’s Accounts block from the main menu.",
-    "Kept the selected Concept #6 search bar design.",
-    "Returned the Home screen to a simpler customer-search-first layout.",
+    "Added Site Notes Templates for faster field note entry.",
+    "Added common fire alarm note starters for panel normal, trouble found, ground fault, customer notified, parts needed, access issue, device tested, and inspection notes.",
+    "Templates insert into the note composer so they can be edited before saving.",
+    "Preserved the clean Home screen and selected Search Bar Concept #6.",
     "Preserved Site Notes, Daily Summary screen, Daily Route, Modules, and splash screen."
   ];
   const overlay=document.createElement("div");

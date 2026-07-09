@@ -1,20 +1,27 @@
-# FireVault Build 0.50.2
+# FireVault Build 0.50.3
 
-Build 0.50.2 is a Home screen cleanup build.
+Build 0.50.3 adds Site Notes Templates.
 
 ## What changed
 
-- Visible app version advanced to 0.50.2.
-- Updated cache-busting references in `index.html` to 0.50.2.
+- Visible app version advanced to 0.50.3.
+- Updated cache-busting references in `index.html` to 0.50.3.
 - Updated release notes to match this build.
-- Removed the extra **Field Dashboard** block that was added in 0.50.0.
-- Removed the extra **Today’s Accounts** block from the main menu.
-- Kept the selected **Search Bar Concept #6** design from 0.50.1.
-- Returned Home to a simpler customer-search-first layout.
-- Preserved Site Notes, Daily Summary screen, Daily Route, Modules, and splash screen.
+- Added Site Notes Templates for faster field note entry.
+- Added common fire alarm note starters:
+  - Panel Normal
+  - Trouble Found
+  - Ground Fault
+  - Customer Notified
+  - Parts Needed
+  - Access Issue
+  - Device Tested
+  - Inspection Note
+- Templates insert into the note composer so they can be edited before saving.
+- Preserved the clean Home screen, selected Search Bar Concept #6, Site Notes, Daily Summary screen, Daily Route, Modules, and splash screen.
 
 Suggested commit message:
 
 ```text
-Build 0.50.2 clean up home menu remove extra dashboard blocks
+Build 0.50.3 site notes templates
 ```
