@@ -2,7 +2,7 @@
 
 Build 0.50.13 continues from the uploaded 0.50.12 baseline and polishes the Photo Vault / overlay export workflow while preserving the simple Home screen, Search Bar Concept #6, Daily Report / Site Notes workflow, and iPad responsive sizing.
 
-## Build updates
+## Build updates 
 
 - Visible app version advanced to 0.50.13.
 - Updated cache-busting references in `index.html` to 0.50.13.
