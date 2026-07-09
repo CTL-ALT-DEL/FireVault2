@@ -1,20 +1,26 @@
-# Clean Install Notes — FireVault Build 0.50.14
+# Clean Install Notes — FireVault Build 0.50.15
 
-This ZIP is intended to be used as the new clean baseline for FireVault Build 0.50.14.
+This ZIP is intended to be used as the new clean baseline for FireVault Build 0.50.15.
 
-Build 0.50.14 is a startup hotfix for Build 0.50.13. It fixes the issue where the app could remain stuck on the splash screen and never enter the app.
+## Install
 
-## Included
+1. Extract the ZIP.
+2. Upload the contents to the GitHub Pages root for the FireVault repository.
+3. Commit all changed files together.
+4. Wait for GitHub Pages to finish deploying.
+5. On iPhone/iPad, fully close and reopen the PWA if the previous build is cached.
 
-- Startup fix for the 0.50.13 splash-screen hang.
-- Stronger startup watchdog that displays errors instead of leaving the splash screen visible.
-- Photo Vault overlay preview preserved.
-- Download Original preserved.
-- Photo Overlay settings, custom logo support, and overlay export preserved.
-- Simple Home screen preserved.
-- Search Bar Concept #6 preserved.
-- iPad autosizing preserved.
+## Build focus
 
-## Deploy
+Build 0.50.15 keeps the 0.50.14 startup hotfix and improves splash-screen timing:
 
-Upload the contents of this ZIP to the GitHub Pages branch/root as usual, replacing the previous build files.
+- Adds a controlled minimum splash display time so the splash screen does not flash for only a microsecond.
+- Keeps the startup watchdog from 0.50.14.
+- Preserves Photo Vault overlay workflow, Photo Overlay settings, iPad autosizing, simple Home screen, and Search Bar Concept #6.
+
+## Validation performed
+
+- JavaScript syntax validation.
+- Manifest JSON validation.
+- ZIP integrity validation.
+- Extracted ZIP validation.

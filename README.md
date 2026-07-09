@@ -1,28 +1,30 @@
-# FireVault Build 0.50.14
+# FireVault Build 0.50.15
 
-Build 0.50.14 continues from the uploaded 0.50.13 baseline and fixes a blocking startup issue that could leave the app stuck on the splash screen. It preserves the Photo Vault overlay preview, Download Original, Photo Overlay settings, simple Home screen, Search Bar Concept #6, and iPad autosizing.
+Build 0.50.15 continues from the Build 0.50.14 startup hotfix baseline and adjusts the splash screen timing so the splash screen stays visible long enough to feel intentional instead of flashing for a microsecond.
 
 ## Changes
 
-- Visible app version advanced to 0.50.14.
-- Updated cache-busting references in `index.html` to 0.50.14.
-- Fixed the Photo Vault overlay preview line-break handling that prevented the app module from booting.
-- Added a stronger splash-screen watchdog so startup errors are displayed instead of silently leaving the splash screen visible.
-- Preserved Build 0.50.13 Photo Vault overlay preview and Download Original features.
-- Preserved the simple Home screen, Search Bar Concept #6, iPad autosizing, and hidden advanced modules behavior.
-- Did not add Start Job / End Job / Arrived / Working / Complete workflow controls.
+- Visible app version advanced to 0.50.15.
+- Updated cache-busting references in `index.html` to 0.50.15.
+- Added a controlled minimum splash-screen display time.
+- Preserved the 0.50.14 startup watchdog so boot errors still surface instead of silently hanging.
+- Preserved Photo Vault overlay preview, Download Original, Download With Overlay, custom logo support, and Photo Overlay settings.
+- Preserved iPad autosizing, the simple Home screen, and Search Bar Concept #6.
+- Did not bring back job-status workflow buttons.
 
 ## Validation
+
+Run these checks before deploying:
 
 ```bash
 node --check src/storage.js
 node --check src/app.js
-python -m json.tool manifest.json >/dev/null
-zip -T firevault-build-0.50.14-modular-root.zip
+python -m json.tool manifest.json
+zip -T firevault-build-0.50.15-modular-root.zip
 ```
 
-## Suggested commit message
+Suggested commit message:
 
 ```text
-Build 0.50.14 splash screen startup hotfix
+Build 0.50.15 splash screen timing polish
 ```

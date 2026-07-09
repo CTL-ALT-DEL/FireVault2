@@ -3509,18 +3509,16 @@ function diagnostics(){
 }
 function showChangelog(){
   const notes = [
-    "Advanced to Build 0.50.14 from the uploaded 0.50.13 baseline.",
-    "Fixed a startup bug that could leave Build 0.50.13 stuck on the splash screen.",
-    "Corrected the Photo Vault overlay preview line-break handling that was blocking the app module from booting.",
-    "Added a stronger splash-screen watchdog so startup errors are shown instead of silently staying on the splash screen.",
-    "Preserved the Photo Vault overlay preview and Download Original features from Build 0.50.13.",
-    "Kept Photo Vault overlay export, custom logo support, Daily Report / Site Notes workflow, iPad autosizing, simple Home screen, Search Bar Concept #6, and excluded job-status workflow controls."
-  ];
-  const overlay=document.createElement("div");
+    "Advanced to Build 0.50.15 from the Build 0.50.14 startup hotfix baseline.",
+    "Added a controlled minimum splash-screen display time so the splash feels intentional instead of flashing for a microsecond.",
+    "Kept the startup watchdog from Build 0.50.14 so boot errors still surface instead of silently hanging.",
+    "Preserved the 0.50.13 / 0.50.14 Photo Vault overlay preview, Download Original, Download With Overlay, and custom logo support.",
+    "Kept Photo Overlay settings, Daily Report / Site Notes workflow, iPad autosizing, simple Home screen, Search Bar Concept #6, and excluded job-status workflow controls."
+  ];  const overlay=document.createElement("div");
   overlay.className="releaseOverlay";
   overlay.innerHTML=`<div class="releaseSheet" role="dialog" aria-modal="true" aria-label="FireVault release notes">
     <div class="releaseHead"><div><strong>FireVault</strong><span>Build ${BUILD}</span></div><button class="ghost iconBtn" id="closeRelease" aria-label="Close release notes">×</button></div>
-    <div class="releaseBody"><h2>Release Notes</h2><p class="releaseIntro">Startup hotfix for the splash-screen hang in Build 0.50.13.</p><ul>${notes.map(n=>`<li>${esc(n)}</li>`).join("")}</ul></div>
+    <div class="releaseBody"><h2>Release Notes</h2><p class="releaseIntro">Splash-screen timing polish after the 0.50.14 startup hotfix.</p><ul>${notes.map(n=>`<li>${esc(n)}</li>`).join("")}</ul></div>
   </div>`;
   document.body.appendChild(overlay);
   const close=()=>overlay.remove();
@@ -3528,5 +3526,11 @@ function showChangelog(){
   overlay.addEventListener("click",e=>{ if(e.target===overlay) close(); });
 }
 
-render();
-window.__FIREVAULT_BOOTED = true;
+function bootFireVault515(){
+  render();
+  window.__FIREVAULT_BOOTED = true;
+}
+const splashStarted515 = Number(window.__FIREVAULT_SPLASH_STARTED || Date.now());
+const minSplashMs515 = Number(window.__FIREVAULT_MIN_SPLASH_MS || 1350);
+const elapsedSplashMs515 = Date.now() - splashStarted515;
+setTimeout(bootFireVault515, Math.max(0, minSplashMs515 - elapsedSplashMs515));
