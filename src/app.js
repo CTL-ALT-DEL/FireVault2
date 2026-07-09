@@ -1105,10 +1105,12 @@ function homeNearbyMarkup476(){
 }
 function renderHomeSearch476(){
   const box=document.getElementById('homeSearchResults476');
-  if(!box) return;
+  const root=document.querySelector('.homeScreen476');
   const q=(siteSearch||'').trim();
-  if(q && box.classList.contains('hiddenSearchResults478')){ home(); return; }
-  if(!q && !box.classList.contains('hiddenSearchResults478')){ home(); return; }
+  if(root) root.classList.toggle('homeSearchMode484', !!q);
+  if(!box) return;
+  box.classList.toggle('hiddenSearchResults478', !q);
+  box.classList.toggle('card', !!q);
   box.innerHTML=q?homeAccountRowsMarkup476():'';
 }
 function checkNearbyHome476(){
@@ -1159,7 +1161,7 @@ function home(){
     </div>
 
     <div class="appleSearchCard478">
-      <div class="homeSearchBox476 homeSearchBox478"><span class="searchGlass478">⌕</span><input id="homeCustomerSearch476" type="search" value="${esc(siteSearch)}" placeholder="Search customers..." autocomplete="off"><button class="ghost smallBtn searchClear478" id="clearHomeSearch476" ${siteSearch?"":"disabled"}>${siteSearch?"Cancel":"⌕"}</button></div>
+      <div class="homeSearchBox476 homeSearchBox478"><span class="searchGlass478">⌕</span><input id="homeCustomerSearch476" type="search" value="${esc(siteSearch)}" placeholder="Search customers..." autocomplete="off"><button class="ghost smallBtn searchClear478 ${siteSearch?"activeSearchClear487":""}" id="clearHomeSearch476" ${siteSearch?"":"disabled"}>${siteSearch?"Cancel":""}</button></div>
     </div>
 
     ${siteSearch?`<div class="card searchResultsPanel478" id="homeSearchResults476">${homeAccountRowsMarkup476()}</div>`:`<div id="homeSearchResults476" class="searchResultsPanel478 hiddenSearchResults478"></div>`}
@@ -1190,8 +1192,8 @@ function home(){
   const homeRoot=document.querySelector('.homeScreen476');
   if(homeRoot) homeRoot.onclick=e=>{ const card=e.target.closest('[data-home-site]'); if(card){ selectedSiteId=card.dataset.homeSite; route('siteDetail'); } };
   const search=document.getElementById('homeCustomerSearch476');
-  if(search){ search.oninput=()=>{ siteSearch=search.value; renderHomeSearch476(); const clear=document.getElementById('clearHomeSearch476'); if(clear){ clear.disabled=!siteSearch; clear.textContent=siteSearch?'Cancel':'⌕'; } }; setTimeout(()=>{ try{ search.setSelectionRange(search.value.length, search.value.length); }catch{} },0); }
-  const clear=document.getElementById('clearHomeSearch476'); if(clear) clear.onclick=()=>{ siteSearch=''; home(); };
+  if(search){ search.oninput=()=>{ siteSearch=search.value; renderHomeSearch476(); const clear=document.getElementById('clearHomeSearch476'); if(clear){ clear.disabled=!siteSearch; clear.textContent=siteSearch?'Cancel':''; clear.classList.toggle('activeSearchClear487', !!siteSearch); } }; setTimeout(()=>{ try{ search.focus({preventScroll:true}); search.setSelectionRange(search.value.length, search.value.length); }catch{} },0); }
+  const clear=document.getElementById('clearHomeSearch476'); if(clear) clear.onclick=()=>{ siteSearch=''; const search=document.getElementById('homeCustomerSearch476'); if(search){ search.value=''; search.focus({preventScroll:true}); } clear.disabled=true; clear.textContent=''; clear.classList.remove('activeSearchClear487'); renderHomeSearch476(); };
   const checkNearby=document.getElementById('checkNearbyHomeBtn476'); if(checkNearby) checkNearby.onclick=checkNearbyHome476;
   document.getElementById('modulesTopBtn476').onclick=()=>{settingsTab='visibility'; mode='settingsDetail'; route('settings');};
   const bell=document.getElementById('homeBell478'); if(bell) bell.onclick=showChangelog;
@@ -2561,11 +2563,11 @@ function diagnostics(){
 }
 function showChangelog(){
   const notes = [
-    "Advanced visible version and cache-busting references updated to 0.48.6.",
-    "Cleaned up the Apple-inspired Recent Accounts panel by removing the duplicate nested header.",
-    "Improved Nearby Accounts status text so the GPS state is clearer at a glance.",
-    "Kept search focus controls consistent by using Cancel while customer search is active.",
-    "Preserved the Concept #2 home proportions, Modules, Daily Route tools, and green Build revision indicator."
+    "Fixed the main Home screen customer search bar so typing no longer rebuilds the whole dashboard.",
+    "Search Focus Mode now opens smoothly and keeps the keyboard/input focus stable.",
+    "Removed the inactive right-side search button so the input has more room.",
+    "Improved Cancel behavior and search result spacing on iPhone screens.",
+    "Preserved Recent Accounts, Nearby Accounts, Modules, Daily Route, and the green Build revision indicator."
   ];
   const overlay=document.createElement("div");
   overlay.className="releaseOverlay";
