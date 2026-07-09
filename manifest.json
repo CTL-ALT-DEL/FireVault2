@@ -8,7 +8,7 @@
   "orientation": "any",
   "background_color": "#0b0d10",
   "theme_color": "#101216",
-  "description": "Field knowledge system for fire alarm technicians. Build 0.50.22 adds Photo Vault sorting and copy-list tools while preserving startup health diagnostics, the 5-second splash, and the stable Safari boot repair.",
+  "description": "Field knowledge system for fire alarm technicians. Build 0.50.23 adds visible account photo entry points and direct Add Photo access while preserving Photo Vault tools and stable startup.",
   "icons": [
     {
       "src": "assets/icon-192.png",

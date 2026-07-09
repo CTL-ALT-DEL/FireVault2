@@ -1,20 +1,18 @@
-# FireVault Build 0.50.22
+# FireVault Build 0.50.23
 
-Build 0.50.22 continues from the stable Build 0.50.21 baseline and adds Photo Vault sorting plus a copyable document/photo index while preserving the stable boot repair, 5-second splash screen, Startup Health diagnostics, Photo Vault search/filter workflow, simple Home screen, Search Bar Concept #6, and iPad autosizing.
+Build 0.50.23 continues from the stable Build 0.50.22 baseline and makes adding photos to an account obvious. The Photo Vault tools are now surfaced directly on the account/site screen instead of being hidden under Documents.
 
 ## Changes
 
-- Visible app version advanced to 0.50.22.
-- Updated cache-busting references in `index.html` to 0.50.22.
-- Added Photo Vault sorting:
-  - Newest first
-  - Photos first
-  - Title A-Z
-  - Type
-- Added **Copy List** on the Document / Photo Vault screen.
-- Copy List respects the current search, filter, and sort view.
-- Saved document records now store an updated timestamp for cleaner recent sorting.
-- Preserved Photo Vault search and filter tabs.
+- Visible app version advanced to 0.50.23.
+- Updated cache-busting references in `index.html` to 0.50.23.
+- Added a visible **Account Photos** card directly on each account/site screen.
+- Added direct **Add Photo** button from the account screen.
+- Added direct **Photo Vault** button from the account screen.
+- Added photo thumbnail strip for the latest saved account photos.
+- Updated the Documents / Photos screen with clear **Add Photo** and **Add Document / Link** buttons.
+- New photo records now default to **Photo Set** and use an **Add Account Photo** form title.
+- Preserved Photo Vault search, filters, sorting, Copy List, overlay preview, Download With Overlay, and Download Original.
 - Preserved Startup Health diagnostics and the 5-second splash screen.
 - Preserved the stable Safari EOF boot repair.
 - Preserved Photo Overlay tools and custom overlay logo support.
@@ -29,11 +27,11 @@ Build 0.50.22 continues from the stable Build 0.50.21 baseline and adds Photo Va
 - ZIP integrity test:
 
 ```bash
-zip -T firevault-build-0.50.22-modular-root.zip
+zip -T firevault-build-0.50.23-modular-root.zip
 ```
 
 ## Suggested commit message
 
 ```text
-Build 0.50.22 photo vault sort and copy-list polish
+Build 0.50.23 account photo entry point polish
 ```

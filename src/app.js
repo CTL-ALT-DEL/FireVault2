@@ -1840,6 +1840,7 @@ function siteDetail(){
   const equipment=Array.isArray(s.equipment) ? s.equipment : [];
   const contacts=Array.isArray(s.contacts) ? s.contacts : [];
   const docs=Array.isArray(s.docs) ? s.docs : [];
+  const photoDocs=docs.filter(docHasPhoto512);
   const checklistItems=Array.isArray(s.checklist) ? s.checklist : [];
   const checkStats=checklistStats(s);
   const health=siteHealth(s);
@@ -1864,6 +1865,8 @@ function siteDetail(){
     </div></div>
 
     <div class="grid3 siteQuickStats477 siteQuickStats489"><button class="card tile" id="taskBtn"><strong>${open}</strong><span>Open Tasks</span></button><button class="card tile" id="defBtn"><strong>${def}</strong><span>Deficiencies</span></button><button class="card tile" id="visitsMini477"><strong>${siteVisits.length}</strong><span>Visits</span></button></div>
+
+    <div class="card accountPhotoCard523 siteSimpleCard477"><div class="row"><div><h2>Account Photos</h2><p>${photoDocs.length ? `${photoDocs.length} saved photo${photoDocs.length===1?'':'s'} for this account.` : 'Add panel, device, wiring, deficiency, and site condition photos here.'}</p></div><div class="photoCardActions523"><button class="ghost smallBtn" id="openPhotoVaultBtn523">Photo Vault</button><button class="primary smallBtn" id="addAccountPhotoBtn523">＋ Add Photo</button></div></div>${photoDocs.length?`<div class="accountPhotoStrip523">${photoDocs.slice(0,3).map(d=>`<button class="accountPhotoThumb523" data-doc="${esc(d.id)}">${docPhotoThumb512(d)}<span>${esc(d.title||d.imageName||'Photo')}</span></button>`).join('')}</div>`:`<p class="fieldNote">This is now visible directly on the account screen so photos are not hidden under Documents.</p>`}</div>
 
     <div class="card siteNow477 siteNow489"><div class="siteNowHead477"><div><h2>Today’s Priority</h2><p>${esc(health.details.join(' • '))}</p></div><span>${health.score}%</span></div><div class="siteNowGrid477"><button id="openTasksMini476"><strong>${open}</strong><small>Open Tasks</small></button><button id="openDefMini476"><strong>${def}</strong><small>Deficiencies</small></button><button id="addDefQuick477"><strong>＋</strong><small>Add Deficiency</small></button></div></div>
 
@@ -1892,6 +1895,9 @@ function siteDetail(){
   document.getElementById('taskBtn').onclick=()=>route('tasks');
   document.getElementById('defBtn').onclick=()=>route('deficiencies');
   document.getElementById('visitsMini477').onclick=()=>route('visits');
+  const openPhotoVault523=document.getElementById('openPhotoVaultBtn523'); if(openPhotoVault523) openPhotoVault523.onclick=()=>{docVaultFilter516='photos'; route('siteDocs');};
+  const addAccountPhoto523=document.getElementById('addAccountPhotoBtn523'); if(addAccountPhoto523) addAccountPhoto523.onclick=()=>{mode='newPhoto'; route('siteDocForm');};
+  document.querySelectorAll('.accountPhotoThumb523').forEach(b=>b.onclick=()=>{mode=b.dataset.doc; route('siteDocForm');});
   document.getElementById('openTasksMini476').onclick=()=>route('tasks');
   document.getElementById('openDefMini476').onclick=()=>route('deficiencies');
   document.getElementById('snapshotBtn').onclick=shareSiteSnapshot;
@@ -2249,11 +2255,13 @@ function siteDocs(){
   const filteredDocs=sortedDocs522(docs.filter(docMatchesVaultFilter516).filter(docMatchesSearch521));
   const docListHtml = filteredDocs.length ? filteredDocs.map(siteDocCard519).join("") : `<div class="empty">No ${esc(docVaultFilterLabel516(docVaultFilter516).toLowerCase())} records found${docVaultSearch521?` for “${esc(docVaultSearch521)}”`:""}. Tap + to add a document, link, or field photo.</div>`;
   html(`<div class="screen docsScreen docsScreen512 docsScreen516"><div class="row"><button class="back ghost" id="backBtn">←</button><div><h1>Documents / Photos</h1><p>${esc(s.name||"Site")}</p></div><button class="primary" id="addDocBtn">＋</button></div>
-    <div class="card docsHero docsHero516 docsHero521"><h2>Site Documents Vault</h2><p>Keep customer-specific references, links, and field photos. Use filters and search to quickly find photos, links, or regular documents.</p><div class="docStats"><span><strong>${docs.length}</strong>Total</span><span><strong>${photos}</strong>Photos</span><span><strong>${linked}</strong>Links</span></div>${docVaultSearchBar521()}${docVaultSortControls522()}${docVaultFilterBar516(docs)}</div>
+    <div class="card docsHero docsHero516 docsHero521"><h2>Site Documents / Photo Vault</h2><p>Keep customer-specific references, links, and field photos. Use the buttons below for the common actions.</p><div class="docHeroActions523"><button class="primary" id="addPhotoBtn523">＋ Add Photo</button><button class="ghost" id="addRegularDocBtn523">＋ Add Document / Link</button></div><div class="docStats"><span><strong>${docs.length}</strong>Total</span><span><strong>${photos}</strong>Photos</span><span><strong>${linked}</strong>Links</span></div>${docVaultSearchBar521()}${docVaultSortControls522()}${docVaultFilterBar516(docs)}</div>
     <div class="list grow docsList">${docListHtml}</div>
   </div>`);
   document.getElementById("backBtn").onclick=()=>route("siteDetail");
-  document.getElementById("addDocBtn").onclick=()=>{mode=null; route("siteDocForm");};
+  document.getElementById("addDocBtn").onclick=()=>{mode="newPhoto"; route("siteDocForm");};
+  const addPhotoBtn523=document.getElementById("addPhotoBtn523"); if(addPhotoBtn523) addPhotoBtn523.onclick=()=>{mode="newPhoto"; route("siteDocForm");};
+  const addRegularDocBtn523=document.getElementById("addRegularDocBtn523"); if(addRegularDocBtn523) addRegularDocBtn523.onclick=()=>{mode=null; route("siteDocForm");};
   const docSearch=document.getElementById("docVaultSearch521"); if(docSearch) docSearch.oninput=()=>{docVaultSearch521=docSearch.value; siteDocs();};
   const clearDocSearch=document.getElementById("clearDocSearch521"); if(clearDocSearch) clearDocSearch.onclick=()=>{docVaultSearch521=""; siteDocs();};
   const docSort=document.getElementById("docVaultSort522"); if(docSort) docSort.onchange=()=>{docVaultSort522=docSort.value||"recent"; siteDocs();};
@@ -2272,26 +2280,31 @@ ${d.notes||""}`.trim()); toast("Document reference copied."); }});
 function siteDocForm(){
   const s=site(); if(!s){ route("sites"); return; }
   s.docs=Array.isArray(s.docs) ? s.docs : [];
-  const d=mode ? s.docs.find(x=>x.id===mode) : {};
+  const isNewPhoto523 = mode === "newPhoto";
+  const d=(mode && !isNewPhoto523) ? s.docs.find(x=>x.id===mode) : {};
   docPhotoDraftDataUrl512 = d?.imageData || "";
   docPhotoDraftName512 = d?.imageName || "";
   docPhotoClearRequested512 = false;
   const types=["Panel Manual","Permit","Inspection Form","Monitoring Account","Contract","Photo Set","Map / Drawing","Code Reference","Other"];
-  html(`<div class="screen"><div class="row"><button class="back ghost" id="backBtn">←</button><h1>${mode?"Edit":"Add"} Document</h1></div><div class="form grow">
-    <div class="card docFormCard docFormCard512"><div class="compactField"><div><label>Type</label><select id="docType">${types.map(x=>`<option value="${esc(x)}" ${((d.type||"Panel Manual")===x)?"selected":""}>${esc(x)}</option>`).join("")}</select></div><div><label>Date / Revision</label><input id="docDate" value="${esc(d.date||"")}" placeholder="Rev, date, or version"></div></div>
-    <label>Title</label><input id="docTitle" value="${esc(d.title||"")}" placeholder="Notifier NFS2-640 manual, annual inspection form...">
+  const formTitle523 = mode && !isNewPhoto523 ? "Edit Document / Photo" : isNewPhoto523 ? "Add Account Photo" : "Add Document / Link";
+  const defaultType523 = isNewPhoto523 ? "Photo Set" : "Panel Manual";
+  const defaultTitle523 = isNewPhoto523 ? "Site Photo" : "";
+  html(`<div class="screen"><div class="row"><button class="back ghost" id="backBtn">←</button><h1>${formTitle523}</h1></div><div class="form grow">
+    ${isNewPhoto523?`<div class="card addPhotoHint523"><strong>Add Photo to Account</strong><span>Choose a photo, add a title or notes, then save it to this account’s Photo Vault.</span></div>`:""}
+    <div class="card docFormCard docFormCard512"><div class="compactField"><div><label>Type</label><select id="docType">${types.map(x=>`<option value="${esc(x)}" ${((d.type||defaultType523)===x)?"selected":""}>${esc(x)}</option>`).join("")}</select></div><div><label>Date / Revision</label><input id="docDate" value="${esc(d.date||"")}" placeholder="Rev, date, or version"></div></div>
+    <label>Title</label><input id="docTitle" value="${esc(d.title||defaultTitle523)}" placeholder="Panel cabinet photo, SLC module, NAC wiring, deficiency photo...">
     <label>Reference / Account / Permit #</label><input id="docRef" value="${esc(d.ref||"")}" placeholder="Account number, permit number, drawing ID...">
     <label>URL / Link</label><input id="docUrl" value="${esc(d.url||"")}" placeholder="https://...">
     ${docPhotoPreviewMarkup512(d)}
     <label>Notes</label><textarea id="docNotes" placeholder="Where to find it, customer-specific instructions, page numbers, revision notes...">${esc(d.notes||"")}</textarea></div>
-    <button class="primary" id="saveDocBtn">Save Document</button>${mode?`<button class="danger" id="deleteDocBtn">Delete Document</button>`:""}
+    <button class="primary" id="saveDocBtn">Save Document</button>${mode && !isNewPhoto523?`<button class="danger" id="deleteDocBtn">Delete Document</button>`:""}
   </div></div>`);
   document.getElementById("backBtn").onclick=()=>route("siteDocs");
   wireDocPhotoControls512(d||{});
   document.getElementById("saveDocBtn").onclick=()=>{
     const imageData=docPhotoClearRequested512 ? "" : (docPhotoDraftDataUrl512 || d?.imageData || "");
     const obj={type:val("docType"),title:val("docTitle")||"Untitled Reference",ref:val("docRef"),url:val("docUrl"),date:val("docDate"),notes:raw("docNotes"),imageData,imageName:imageData?(docPhotoDraftName512||d?.imageName||"Site photo"):"",imageUpdatedAt:imageData?new Date().toISOString():"",updatedAt:new Date().toISOString()};
-    if(mode && d){ Object.assign(d,obj); }
+    if(mode && !isNewPhoto523 && d){ Object.assign(d,obj); }
     else s.docs.unshift({...obj,id:uid(),createdAt:new Date().toISOString()});
     save(); toast("Document saved."); route("siteDocs");
   };
@@ -3636,18 +3649,18 @@ function diagnostics(){
 }
 function showChangelog(){
   const notes = [
-    "Advanced to Build 0.50.22 from the stable Build 0.50.21 baseline.",
-    "Added Photo Vault sorting for newest first, photos first, title A-Z, and type.",
-    "Added Copy List on the Document / Photo Vault screen so filtered search results can be copied as a quick site reference index.",
-    "Updated saved document records with an updated timestamp for cleaner recent sorting.",
-    "Preserved the stable Safari EOF startup repair, 5-second splash screen timing, and Startup Health diagnostics.",
-    "Preserved Photo Vault search, filters, Photo Overlay tools, custom overlay logo support, iPad autosizing, simple Home screen, Search Bar Concept #6, and excluded job-status workflow controls."
+    "Advanced to Build 0.50.23 from the stable Build 0.50.22 baseline.",
+    "Added a clearly visible Account Photos card directly on each account / site screen.",
+    "Added a direct Add Photo button so account photos are no longer hidden under Documents.",
+    "Added Photo Vault and Add Photo buttons inside the Documents / Photos screen.",
+    "New Add Account Photo flow defaults to Photo Set and guides the user to choose a photo first.",
+    "Preserved the stable Safari EOF startup repair, 5-second splash timing, Startup Health diagnostics, Photo Vault search/sort/filter tools, Photo Overlay tools, iPad autosizing, simple Home screen, Search Bar Concept #6, and excluded job-status workflow controls."
   ];
   const overlay=document.createElement("div");
   overlay.className="releaseOverlay";
   overlay.innerHTML=`<div class="releaseSheet" role="dialog" aria-modal="true" aria-label="FireVault release notes">
     <div class="releaseHead"><div><strong>FireVault</strong><span>Build ${BUILD}</span></div><button class="ghost iconBtn" id="closeRelease" aria-label="Close release notes">×</button></div>
-    <div class="releaseBody"><h2>Release Notes</h2><p class="releaseIntro">Photo Vault sort and copy-list polish.</p><ul>${notes.map(n=>`<li>${esc(n)}</li>`).join("")}</ul></div>
+    <div class="releaseBody"><h2>Release Notes</h2><p class="releaseIntro">Account photo entry-point polish.</p><ul>${notes.map(n=>`<li>${esc(n)}</li>`).join("")}</ul></div>
   </div>`;
   document.body.appendChild(overlay);
   const close=()=>overlay.remove();
