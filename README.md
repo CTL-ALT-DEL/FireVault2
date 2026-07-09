@@ -1,21 +1,25 @@
-# FireVault Build 0.49.3
+# FireVault Build 0.49.4
 
-Build 0.49.3 is a Home header layout cleanup build.
+Build 0.49.4 is a Site Notes polish build.
 
 ## What changed
 
-- Visible app version advanced to 0.49.3.
-- Updated cache-busting references in `index.html` to 0.49.3.
+- Visible app version advanced to 0.49.4.
+- Updated cache-busting references in `index.html` to 0.49.4.
 - Updated release notes to match this build.
-- Moved the Home logo/brand to the far left.
-- Moved the Settings icon to the far right.
-- Changed the Home build info button so it shows only `0.49.3` instead of `Build 0.49.3`.
-- Changed the global build button and splash build label to show only the version number.
-- Settings icon now opens the Settings page directly.
-- Preserved the site-notes-only direction, Home search, customer account polish, Modules, Daily Route tools, and green build indicator.
+- Polished the notes-only site workflow.
+- Added **Open** and **＋ Note** controls directly on the customer Site Notes card.
+- Added **Copy All Notes** from the Site Notes screen.
+- Added quick note types:
+  - Customer Update
+  - Parts Needed
+  - Access Note
+  - Testing Note
+- Improved saved note cards with better spacing and numbered note markers.
+- Preserved splash screen, left-logo/right-settings header, Home search, Modules, Daily Route tools, and the green version indicator.
 
 Suggested commit message:
 
 ```text
-Build 0.49.3 home header logo settings and build number cleanup
+Build 0.49.4 site notes polish quick note types
 ```

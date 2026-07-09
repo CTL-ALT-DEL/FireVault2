@@ -1458,7 +1458,7 @@ function siteDetail(){
 
     ${featureOn('library') && docs.length?`<div class="card docsMiniCard477 siteSimpleCard477"><div class="row"><div><h2>Documents / Links</h2><p>${docs.length} saved document${docs.length===1?'':'s'}</p></div><button class="ghost smallBtn" id="manageDocsBtn2">Manage</button></div>${docs.slice(0,2).map(d=>`<button class="docLineMini" data-doc="${esc(d.id)}"><strong>${esc(docTitle(d))}</strong><span>${esc(docMeta(d))}</span></button>`).join('')}</div>`:''}
 
-    <div class="card grow siteNotes477 siteNotes491"><div class="row"><div><h2>Site Notes</h2><p>Timestamped notes for this account.</p></div><button class="primary smallBtn" id="addSiteNoteBtn491">＋ Note</button></div><pre>${esc(s.notes || 'No notes entered.')}</pre></div>
+    <div class="card grow siteNotes477 siteNotes491 siteNotes494"><div class="row"><div><h2>Site Notes</h2><p>Timestamped notes for this account.</p></div><div class="noteCardActions494"><button class="ghost smallBtn" id="openSiteNotesBtn494">Open</button><button class="primary smallBtn" id="addSiteNoteBtn491">＋ Note</button></div></div><pre>${esc(s.notes || 'No notes entered.')}</pre></div>
   </div>`);
   document.getElementById('backBtn').onclick=()=>route('sites');
   document.getElementById('editBtn').onclick=()=>{mode='edit'; route('siteForm');};
@@ -1470,6 +1470,7 @@ function siteDetail(){
   document.getElementById('snapshotBtn').onclick=shareSiteSnapshot;
   document.getElementById('jobBtn').onclick=()=>addSiteNotePrompt();
   const siteNoteBtn491=document.getElementById('addSiteNoteBtn491'); if(siteNoteBtn491) siteNoteBtn491.onclick=()=>addSiteNotePrompt();
+  const openNotes494=document.getElementById('openSiteNotesBtn494'); if(openNotes494) openNotes494.onclick=()=>route('jobMode');
   const addTask=document.getElementById('addTaskQuick477'); if(addTask) addTask.onclick=()=>{mode=null; route('taskForm');};
   const addDef=document.getElementById('addDefQuick477'); if(addDef) addDef.onclick=()=>{mode=null; route('deficiencyForm');};
   const nav=document.getElementById('navigateBtn477'); if(nav) nav.onclick=()=>window.open(mapUrl(s,(data.settings.gps&&data.settings.gps.mapProvider)||'apple'),'_blank');
@@ -2180,30 +2181,42 @@ function addSiteNotePrompt(defaultText=""){
   else toast("No note added.");
 }
 function startJob(){ addSiteNotePrompt(); }
+
 function jobMode(){
   const s=site();
   if(!s){ route("sites"); return; }
   ensureSite(s);
   const noteLines=(s.notes||"").split("\n\n").filter(Boolean);
-  html(`<div class="screen siteNotesScreen491">
-    <div class="row jobTop490"><button class="back ghost" id="backBtn">←</button><div><h1>Site Notes</h1><p>${esc(s.name||"Customer Account")}</p></div></div>
-    <div class="card jobHero490 idle siteNotesHero491"><div class="jobHeroHead490"><div><strong>Notes Only</strong><span>No start/end job status</span></div></div><p>${esc(fullAddress(s)||"No address entered.")}</p></div>
-    <div class="grid2 jobQuickGrid490 siteNotesActions491">
+  const lastNote=s.lastNoteAt ? new Date(s.lastNoteAt).toLocaleString([], {month:"short",day:"numeric",hour:"numeric",minute:"2-digit"}) : "No notes yet";
+  html(`<div class="screen siteNotesScreen491 siteNotesScreen494">
+    <div class="row jobTop490 siteNotesTop494"><button class="back ghost" id="backBtn">←</button><div><h1>Site Notes</h1><p>${esc(s.name||"Customer Account")}</p></div><button class="ghost smallBtn" id="copyNotesBtn494" ${noteLines.length?"":"disabled"}>Copy</button></div>
+    <div class="card jobHero490 idle siteNotesHero491 siteNotesHero494"><div class="jobHeroHead490"><div><strong>Site Notes Only</strong><span>${noteLines.length} note${noteLines.length===1?"":"s"} • Last: ${esc(lastNote)}</span></div></div><p>${esc(fullAddress(s)||"No address entered.")}</p></div>
+    <div class="grid2 jobQuickGrid490 siteNotesActions491 siteNotesActions494">
       <button class="primary" id="quickNoteBtn">Add Note</button>
-      <button class="ghost" id="custUpdateBtn">Customer Note</button>
-      <button class="ghost" id="partsBtn">Parts Note</button>
+      <button class="ghost" id="custUpdateBtn">Customer Update</button>
+      <button class="ghost" id="partsBtn">Parts Needed</button>
+      <button class="ghost" id="accessBtn494">Access Note</button>
+      <button class="ghost" id="testingBtn494">Testing Note</button>
       <button class="ghost" id="defJobBtn">Add Deficiency</button>
     </div>
-    <div class="list grow jobTimeline490 siteNotesList491">
-      <div class="routeSectionTitle462"><strong>Saved Site Notes</strong><span>${noteLines.length} note${noteLines.length===1?"":"s"}</span></div>
-      ${noteLines.length?noteLines.map(n=>`<div class="card jobEvent490 siteNoteItem491"><p>${esc(n)}</p></div>`).join(""):`<div class="empty">No notes yet. Tap Add Note to save the first site note.</div>`}
+    <div class="list grow jobTimeline490 siteNotesList491 siteNotesList494">
+      <div class="routeSectionTitle462"><strong>Saved Site Notes</strong><span>Newest first</span></div>
+      ${noteLines.length?noteLines.map((n,i)=>`<div class="card jobEvent490 siteNoteItem491 siteNoteItem494"><div class="siteNoteIndex494">${i+1}</div><p>${esc(n)}</p></div>`).join(""):`<div class="empty">No notes yet. Tap Add Note to save the first site note.</div>`}
     </div>
   </div>`);
   document.getElementById("backBtn").onclick=()=>route("siteDetail");
   document.getElementById("quickNoteBtn").onclick=()=>addSiteNotePrompt();
   document.getElementById("custUpdateBtn").onclick=()=>addSiteNotePrompt("Customer update: ");
   document.getElementById("partsBtn").onclick=()=>addSiteNotePrompt("Parts needed: ");
+  document.getElementById("accessBtn494").onclick=()=>addSiteNotePrompt("Access note: ");
+  document.getElementById("testingBtn494").onclick=()=>addSiteNotePrompt("Testing note: ");
   document.getElementById("defJobBtn").onclick=()=>{ mode=null; route("deficiencyForm"); };
+  const copy=document.getElementById("copyNotesBtn494");
+  if(copy) copy.onclick=()=>{
+    const text=`${s.name||"Site"}\n${fullAddress(s)||""}\n\nSITE NOTES\n\n${s.notes||"No notes entered."}`.trim();
+    if(navigator.clipboard?.writeText){ navigator.clipboard.writeText(text).then(()=>toast("Site notes copied."),()=>toast("Clipboard unavailable.")); }
+    else toast("Clipboard unavailable.");
+  };
 }
 
 function settingsTabs(){
@@ -2578,11 +2591,11 @@ function diagnostics(){
 }
 function showChangelog(){
   const notes = [
-    "Moved the Home logo/brand to the far left.",
-    "Moved the Settings icon to the far right of the Home header.",
-    "Cleaned up the build info button so it shows only the version number.",
-    "Updated the startup splash build label to show only the version number.",
-    "Preserved the site-notes-only direction, Home search, Modules, Daily Route tools, and Settings cleanup."
+    "Polished the Site Notes workflow for notes-only field use.",
+    "Added Copy All Notes on the Site Notes screen.",
+    "Added quick note types for customer update, parts needed, access note, and testing note.",
+    "Added an Open Notes shortcut from the customer account note card.",
+    "Preserved the splash screen, left-logo/right-settings header, Home search, Modules, Daily Route tools, and green version indicator."
   ];
   const overlay=document.createElement("div");
   overlay.className="releaseOverlay";
