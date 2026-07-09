@@ -1869,7 +1869,17 @@ function siteDetail(){
 
     <div class="card siteHero477 siteHero489"><div class="siteHeroMain477"><span class="accountInitialLarge477">${esc((s.name||'?').slice(0,1).toUpperCase())}</span><div><h1>${esc(s.name||'Unnamed Account')}</h1><p>${esc(fullAddress(s))}</p><em>${esc(nextAction)}</em></div></div><div class="siteHealthDot477 ${health.cls}">${health.score}%</div></div>
 
-    <div class="grid2 sitePrimaryActions477 sitePrimaryActions489"><button class="primary tile" id="jobBtn"><strong>Add Note</strong><span>Timestamped site note</span></button><button class="ghost tile" id="snapshotBtn"><strong>Snapshot</strong><span>Copy field summary</span></button>${featureOn('advancedGps')?`<button class="ghost tile" id="navigateBtn477"><strong>Navigate</strong><span>Open maps</span></button>`:''}<button class="ghost tile" id="addTaskQuick477"><strong>Add Task</strong><span>Follow-up item</span></button></div>
+    <div class="card siteQuickActions544"><div class="siteCardHead477"><div><h2>Site Quick Actions</h2><p>Fast access to the field tasks used most on this account.</p></div><span class="quickActionBadge544">${open+def+photoDocs.length}</span></div><div class="quickActionGrid544">
+      <button class="primary quickAction544" id="qaAddNote544"><strong>＋ Site Note</strong><span>Timestamped note</span></button>
+      <button class="ghost quickAction544" id="qaAddPhoto544"><strong>＋ Photo</strong><span>Panel, device, deficiency</span></button>
+      <button class="ghost quickAction544" id="qaAddDef544"><strong>＋ Deficiency</strong><span>Document a problem</span></button>
+      <button class="ghost quickAction544" id="qaAddTask544"><strong>＋ Task</strong><span>Follow-up item</span></button>
+      <button class="ghost quickAction544" id="qaPhotoVault544"><strong>Photo Vault</strong><span>${photoDocs.length} saved photo${photoDocs.length===1?'':'s'}</span></button>
+      <button class="ghost quickAction544" id="qaReport544"><strong>Report Center</strong><span>Customer closeout</span></button>
+      <button class="ghost quickAction544 wideAction544" id="qaCloseout544"><strong>Copy Closeout Packet</strong><span>Customer-facing summary</span></button>
+    </div></div>
+
+    <div class="grid2 sitePrimaryActions477 sitePrimaryActions489 compactPrimaryActions544"><button class="ghost tile" id="snapshotBtn"><strong>Snapshot</strong><span>Copy field summary</span></button>${featureOn('advancedGps')?`<button class="ghost tile" id="navigateBtn477"><strong>Navigate</strong><span>Open maps</span></button>`:''}</div>
 
     <div class="card fieldCard477 fieldCard489"><div class="siteCardHead477"><div><h2>Field Card</h2><p>Most-used account information first.</p></div><button class="ghost smallBtn" id="contactsQuick477">Contacts</button></div><div class="fieldGrid477">
       ${fieldValue477('Panel', panel)}
@@ -1915,7 +1925,13 @@ function siteDetail(){
   document.getElementById('openTasksMini476').onclick=()=>route('tasks');
   document.getElementById('openDefMini476').onclick=()=>route('deficiencies');
   document.getElementById('snapshotBtn').onclick=shareSiteSnapshot;
-  document.getElementById('jobBtn').onclick=()=>addSiteNotePrompt();
+  const qaNote544=document.getElementById('qaAddNote544'); if(qaNote544) qaNote544.onclick=()=>addSiteNotePrompt();
+  const qaPhoto544=document.getElementById('qaAddPhoto544'); if(qaPhoto544) qaPhoto544.onclick=()=>{mode='newPhoto'; route('siteDocForm');};
+  const qaDef544=document.getElementById('qaAddDef544'); if(qaDef544) qaDef544.onclick=()=>{mode=null; route('deficiencyForm');};
+  const qaTask544=document.getElementById('qaAddTask544'); if(qaTask544) qaTask544.onclick=()=>{mode=null; route('taskForm');};
+  const qaVault544=document.getElementById('qaPhotoVault544'); if(qaVault544) qaVault544.onclick=()=>{docVaultFilter516='photos'; route('siteDocs');};
+  const qaReport544=document.getElementById('qaReport544'); if(qaReport544) qaReport544.onclick=()=>route('report');
+  const qaCloseout544=document.getElementById('qaCloseout544'); if(qaCloseout544) qaCloseout544.onclick=copyCustomerCloseoutPacket539;
   const siteNoteBtn491=document.getElementById('addSiteNoteBtn491'); if(siteNoteBtn491) siteNoteBtn491.onclick=()=>addSiteNotePrompt();
   const openNotes494=document.getElementById('openSiteNotesBtn494'); if(openNotes494) openNotes494.onclick=()=>route('jobMode');
   const addTask=document.getElementById('addTaskQuick477'); if(addTask) addTask.onclick=()=>{mode=null; route('taskForm');};
@@ -4082,17 +4098,17 @@ function diagnostics(){
 }
 function showChangelog(){
   const notes = [
-    "Advanced to Build 0.50.43 from the stable 0.50.42 baseline.",
-    "Added Copy Action Items in Report Center for quick closeout follow-up review.",
-    "Action Items includes customer photo readiness, missing captions, open tasks, open deficiencies, and the next suggested closeout step.",
-    "Preserved Copy Customer Email, Copy Closeout Packet, Copy Tech Packet, and Copy Full Bundle.",
-    "Preserved fixed splash/header behavior, Startup Health diagnostics, the 5-second splash screen, Photo Vault tools, Customer Report Photo workflow, iPad autosizing, simple Home screen, Search Bar Concept #6, and excluded job-status workflow controls."
+    "Advanced to Build 0.50.44 from the stable 0.50.43 baseline.",
+    "Added a Site Quick Actions card directly on each account screen.",
+    "Quick Actions now provide one-tap access to Add Site Note, Add Photo, Add Deficiency, Add Task, Photo Vault, Report Center, and Copy Closeout Packet.",
+    "Kept Snapshot and Navigate available while making the most-used field actions easier to find.",
+    "Preserved fixed splash/header behavior, Home spacing polish, Startup Health diagnostics, the 5-second splash screen, Photo Vault tools, Customer Report Photo workflow, iPad autosizing, simple Home screen, Search Bar Concept #6, and excluded job-status workflow controls."
   ];
   const overlay=document.createElement("div");
   overlay.className="releaseOverlay";
   overlay.innerHTML=`<div class="releaseSheet" role="dialog" aria-modal="true" aria-label="FireVault release notes">
     <div class="releaseHead"><div><strong>FireVault</strong><span>Build ${BUILD}</span></div><button class="ghost iconBtn" id="closeRelease" aria-label="Close release notes">×</button></div>
-    <div class="releaseBody"><h2>Release Notes</h2><p class="releaseIntro">Added closeout action-items copy for Report Center.</p><ul>${notes.map(n=>`<li>${esc(n)}</li>`).join("")}</ul></div>
+    <div class="releaseBody"><h2>Release Notes</h2><p class="releaseIntro">Added Site Quick Actions for faster account workflow access.</p><ul>${notes.map(n=>`<li>${esc(n)}</li>`).join("")}</ul></div>
   </div>`;
   document.body.appendChild(overlay);
   const close=()=>overlay.remove();
