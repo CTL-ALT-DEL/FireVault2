@@ -1,6 +1,6 @@
-# Clean Install Notes — FireVault Build 0.50.15
+# Clean Install Notes — FireVault Build 0.50.16
 
-This ZIP is intended to be used as the new clean baseline for FireVault Build 0.50.15.
+This ZIP is intended to be used as the new clean baseline for FireVault Build 0.50.16.
 
 ## Install
 
@@ -12,11 +12,12 @@ This ZIP is intended to be used as the new clean baseline for FireVault Build 0.
 
 ## Build focus
 
-Build 0.50.15 keeps the 0.50.14 startup hotfix and improves splash-screen timing:
+Build 0.50.16 keeps the 0.50.15 splash timing polish and improves the Documents / Photos workflow:
 
-- Adds a controlled minimum splash display time so the splash screen does not flash for only a microsecond.
-- Keeps the startup watchdog from 0.50.14.
-- Preserves Photo Vault overlay workflow, Photo Overlay settings, iPad autosizing, simple Home screen, and Search Bar Concept #6.
+- Adds Photo Vault filter tabs for All, Photos, Links, and Docs.
+- Adds visible record counts to each filter.
+- Adds quick Original download from saved photo records.
+- Preserves Photo Overlay settings, custom logo support, overlay export, iPad autosizing, simple Home screen, and Search Bar Concept #6.
 
 ## Validation performed
 
