@@ -938,7 +938,7 @@ nav button:active{transform:translateY(1px) scale(.992)}
 .reportDeliveryEmpty{font-size:12px;color:var(--muted);padding:9px 10px;border:1px dashed rgba(255,255,255,.13);border-radius:13px;background:rgba(255,255,255,.025);}
 @media(max-width:560px){.reportActionGrid442{grid-template-columns:repeat(2,minmax(0,1fr));}.reportActionGrid442 #shareBtn{grid-column:1 / -1}.reportDeliveryHead{align-items:center}.reportDeliveryRow{grid-template-columns:1fr}.reportDeliveryRow time{justify-self:start}.reportReadyCard442 small{white-space:normal}}
 
-/* Build 0.47.7 Report delivery receipts and follow-up tasks */
+/* Build 0.47.8 Report delivery receipts and follow-up tasks */
 .reportDeliveryCard444 .reportDeliveryHead{align-items:flex-start;}
 .reportDeliveryHeadActions{display:flex;gap:7px;align-items:center;flex:0 0 auto;}
 .reportDeliveryReceiptBtn{width:100%;text-align:left;color:var(--text);font:inherit;cursor:pointer;}
@@ -946,7 +946,7 @@ nav button:active{transform:translateY(1px) scale(.992)}
 .reportDeliveryReceiptBtn:active{transform:translateY(1px);}
 @media(max-width:560px){.reportDeliveryCard444 .reportDeliveryHead{display:grid;grid-template-columns:1fr;gap:9px}.reportDeliveryHeadActions{display:grid;grid-template-columns:1fr 1fr;width:100%}.reportDeliveryHeadActions .smallBtn{width:100%}}
 
-/* Build 0.47.7 Visual Consistency Pass - professional field-tool surface system */
+/* Build 0.47.8 Visual Consistency Pass - professional field-tool surface system */
 :root{
   --fv445Top:#242d3d;
   --fv445Bottom:#121923;
@@ -1111,7 +1111,7 @@ nav button span:last-child{font-size:11.2px!important;font-weight:850;}
 }
 
 
-/* Build 0.47.7 Site Detail polish - professional customer vault command page */
+/* Build 0.47.8 Site Detail polish - professional customer vault command page */
 .siteDetailScreen446{gap:10px;}
 .siteTopBar{align-items:center;justify-content:space-between;margin-bottom:-2px;}
 .siteTopBar .back,.siteTopBar #editBtn{min-height:38px;border-radius:14px;padding:8px 13px;font-size:13px;font-weight:900;}
@@ -1165,7 +1165,7 @@ nav button span:last-child{font-size:11.2px!important;font-weight:850;}
   .siteDetailScreen446 .mapActions{grid-template-columns:1fr;}
 }
 
-/* Build 0.47.7 Report Center polish and readability pass */
+/* Build 0.47.8 Report Center polish and readability pass */
 .reportScreen447{gap:10px;}
 .reportScreen447 .reportTopRow{min-height:40px;gap:10px;}
 .reportScreen447 .reportTopRow .back{min-width:40px;min-height:40px;border-radius:14px;}
@@ -1212,7 +1212,7 @@ nav button span:last-child{font-size:11.2px!important;font-weight:850;}
   .reportBox447{font-size:11.5px!important;}
 }
 
-/* Build 0.47.7 Settings final readability and layout consistency pass */
+/* Build 0.47.8 Settings final readability and layout consistency pass */
 .settingsScreen448{
   gap:10px!important;
   text-align:left!important;
@@ -1474,7 +1474,7 @@ nav button span:last-child{font-size:11.2px!important;font-weight:850;}
   .settingsContent448 .checkRow{font-size:13.2px!important;}
 }
 
-/* Build 0.47.7 Backup Center polish + data safety snapshot */
+/* Build 0.47.8 Backup Center polish + data safety snapshot */
 .settingsScreen449 .settingsMiniTitle p{max-width:56vw}
 .backupCenter449{gap:12px!important}
 .backupCenter449 .compactPane{border-radius:18px!important;border-left:0!important}
@@ -1493,7 +1493,7 @@ nav button span:last-child{font-size:11.2px!important;font-weight:850;}
 @media(max-width:620px){.backupStats449{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.backupActionGrid449{grid-template-columns:1fr}.backupStats449 div{min-height:58px}.backupStats449 strong{font-size:20px}}
 
 
-/* Build 0.47.7 Stability Checkpoint - dashboard status polish */
+/* Build 0.47.8 Stability Checkpoint - dashboard status polish */
 .homeScreen450{gap:11px!important;}
 .homeHero450{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;}
 .homeHero450 p{font-size:13px;font-weight:800;color:#aeb9cc;margin-top:4px;}
@@ -1511,7 +1511,7 @@ nav button span:last-child{font-size:11.2px!important;font-weight:850;}
 @media(max-width:390px){.homeHero450{display:block}.homeBuildPill450{margin-top:8px}.homeStatusGrid450{gap:7px}.homeStatusGrid450 div{min-height:48px;padding:7px}.homeStatusGrid450 strong{font-size:18px}.homeStatusHead450{align-items:flex-start}.homeStatusHead450 span{font-size:10.8px}}
 
 
-/* Build 0.47.7 Settings full-screen redesign - main choices + detail pages */
+/* Build 0.47.8 Settings full-screen redesign - main choices + detail pages */
 .settingsHomeScreen451{
   gap:12px!important;
   padding-top:2px!important;
@@ -1755,7 +1755,7 @@ nav button span:last-child{font-size:11.2px!important;font-weight:850;}
 }
 
 
-/* Build 0.47.7 dashboard duplicate build pill removal + bottom visibility fix */
+/* Build 0.47.8 dashboard duplicate build pill removal + bottom visibility fix */
 .homeHero450{justify-content:flex-start!important;}
 .homeScreen450{overflow:auto!important; padding-bottom:calc(var(--navH) + 18px)!important; -webkit-overflow-scrolling:touch;}
 .homeScreen450 .homeStatus450{margin-bottom:4px!important;}
@@ -1768,7 +1768,7 @@ main{padding-bottom:8px!important;}
 }
 
 
-/* Build 0.47.7 Settings menu repair - horizontal icon/title and no OPEN labels */
+/* Build 0.47.8 Settings menu repair - horizontal icon/title and no OPEN labels */
 .settingsChoiceGrid451{
   grid-template-columns:repeat(2,minmax(0,1fr))!important;
   gap:10px!important;
@@ -1897,7 +1897,7 @@ main{padding-bottom:8px!important;}
 }
 
 
-/* Build 0.47.7 Settings tab vertical alignment polish */
+/* Build 0.47.8 Settings tab vertical alignment polish */
 .settingsChoice451.settingsChoice456{
   min-height:82px!important;
   padding:12px 42px 12px 12px!important;
@@ -1995,7 +1995,7 @@ main{padding-bottom:8px!important;}
 }
 
 
-/* Build 0.47.7 dashboard date, startup splash, and Library folders */
+/* Build 0.47.8 dashboard date, startup splash, and Library folders */
 .splashScreen457{
   min-height:100%;
   display:flex;
@@ -2265,7 +2265,7 @@ main{padding-bottom:8px!important;}
 }
 
 
-/* Build 0.47.7 Center-justified day/date block */
+/* Build 0.47.8 Center-justified day/date block */
 .homeHero457{
   display:flex!important;
   justify-content:center!important;
@@ -2299,7 +2299,7 @@ main{padding-bottom:8px!important;}
 }
 
 
-/* Build 0.47.7 Navigation & Screen Fit Polish */
+/* Build 0.47.8 Navigation & Screen Fit Polish */
 :root{
   --contentBottomPad459:calc(var(--navH) + 22px);
   --screenGap459:10px;
@@ -2463,7 +2463,7 @@ nav button{
 }
 
 
-/* Build 0.47.7 Stability Checkpoint / Diagnostics polish */
+/* Build 0.47.8 Stability Checkpoint / Diagnostics polish */
 .diagnosticsScreen460{
   gap:10px!important;
   overflow:hidden!important;
@@ -2574,7 +2574,7 @@ nav button{
 }
 
 
-/* Build 0.47.7 Diagnostics bottom menu visibility fix */
+/* Build 0.47.8 Diagnostics bottom menu visibility fix */
 .diagnosticsScreen460{
   overflow-y:auto!important;
   overflow-x:hidden!important;
@@ -2610,7 +2610,7 @@ nav button{
 }
 
 
-/* Build 0.47.7 Daily Route Log Starter */
+/* Build 0.47.8 Daily Route Log Starter */
 .routeHomeTile462{
   border-color:color-mix(in srgb,var(--blue) 36%, rgba(255,255,255,.09))!important;
 }
@@ -2747,7 +2747,7 @@ nav button{
 }
 
 
-/* Build 0.47.7 Daily Route recording LED */
+/* Build 0.47.8 Daily Route recording LED */
 .homeHero463{
   justify-content:center!important;
 }
@@ -2802,7 +2802,7 @@ nav button{
 }
 
 
-/* Build 0.47.7 Daily Route report polish */
+/* Build 0.47.8 Daily Route report polish */
 .routeControls462{
   grid-template-columns:1fr 1fr 1fr!important;
 }
@@ -2862,7 +2862,7 @@ nav button{
 }
 
 
-/* Build 0.47.7 Daily Route waypoint edit/delete polish */
+/* Build 0.47.8 Daily Route waypoint edit/delete polish */
 .routeControls462{
   grid-template-columns:1fr 1fr!important;
 }
@@ -2905,7 +2905,7 @@ nav button{
 }
 
 
-/* Build 0.47.7 Daily Route smart nearest-site suggestions */
+/* Build 0.47.8 Daily Route smart nearest-site suggestions */
 .routeNearestBtn466{
   grid-column:1 / -1;
   border-color:color-mix(in srgb,var(--green) 32%, rgba(255,255,255,.1))!important;
@@ -2954,7 +2954,7 @@ nav button{
 }
 
 
-/* Build 0.47.7 Daily Route export polish */
+/* Build 0.47.8 Daily Route export polish */
 .routeReportPreview467{
   border-left:0!important;
   background:linear-gradient(180deg,color-mix(in srgb,var(--blue) 12%, #202838),#101720)!important;
@@ -2988,7 +2988,7 @@ nav button{
 }
 
 
-/* Build 0.47.7 Active Daily Route dashboard card */
+/* Build 0.47.8 Active Daily Route dashboard card */
 .activeRouteMini468{
   display:grid;
   gap:10px;
@@ -3082,7 +3082,7 @@ nav button{
 }
 
 
-/* Build 0.47.7 Daily Route vehicle / mileage details */
+/* Build 0.47.8 Daily Route vehicle / mileage details */
 .routeDetails469{
   display:grid;
   gap:10px;
@@ -3136,7 +3136,7 @@ nav button{
 }
 
 
-/* Build 0.47.7 Daily Route pause / resume status */
+/* Build 0.47.8 Daily Route pause / resume status */
 .routeLed470{
   flex:0 0 auto;
   width:13px;
@@ -3181,7 +3181,7 @@ nav button{
 }
 
 
-/* Build 0.47.7 Saved Daily Route review/search polish */
+/* Build 0.47.8 Saved Daily Route review/search polish */
 .routeHistoryTools471{
   display:grid;
   grid-template-columns:minmax(0,1fr) auto;
@@ -3319,7 +3319,7 @@ nav button{
 }
 
 
-/* Build 0.47.7 Simple View / Feature Visibility */
+/* Build 0.47.8 Simple View / Feature Visibility */
 .featureHidden472{display:none!important;}
 .simpleViewNotice472{
   display:flex;
@@ -3355,7 +3355,7 @@ body.view-simple472 nav:has(#nav-library[style*="none"]) {grid-template-columns:
 }
 
 
-/* Build 0.47.7 Simple View dashboard drawer and hidden tools polish */
+/* Build 0.47.8 Simple View dashboard drawer and hidden tools polish */
 .view-simple472 .homeScreen450{
   gap:9px!important;
 }
@@ -3509,7 +3509,7 @@ body.view-simple472 nav:has(#nav-library[style*="none"]) {grid-template-columns:
 }
 
 
-/* Build 0.47.7 Quick View Presets / Simple View setup polish */
+/* Build 0.47.8 Quick View Presets / Simple View setup polish */
 .featurePresets474{
   display:grid;
   gap:10px;
@@ -3575,7 +3575,7 @@ body.view-simple472 nav:has(#nav-library[style*="none"]) {grid-template-columns:
 }
 
 
-/* Build 0.47.7 Green build revision status + remove dashboard Stability Checkpoint */
+/* Build 0.47.8 Green build revision status + remove dashboard Stability Checkpoint */
 .build{
   color:#dcfce7!important;
   border-color:rgba(34,197,94,.58)!important;
@@ -3617,7 +3617,7 @@ body.view-simple472 nav:has(#nav-library[style*="none"]) {grid-template-columns:
 }
 
 
-/* Build 0.47.7 Apple-inspired home search, Nearby Accounts, Modules, and customer screen cleanup */
+/* Build 0.47.8 Apple-inspired home search, Nearby Accounts, Modules, and customer screen cleanup */
 .homeScreen476{
   gap:12px!important;
   overflow:auto!important;
@@ -3708,7 +3708,7 @@ body.view-simple472 nav:has(#nav-library[style*="none"]) {grid-template-columns:
 }
 
 
-/* Build 0.47.7 Customer Account simplification */
+/* Build 0.47.8 Customer Account simplification */
 .siteDetailScreen477{
   gap:10px!important;
   overflow:auto!important;
@@ -4002,4 +4002,307 @@ body.view-simple472 nav:has(#nav-library[style*="none"]) {grid-template-columns:
   .fieldValue477{grid-template-columns:1fr;align-items:start;gap:5px;}
   .fieldValue477 .microBtn477{justify-self:start;}
   .siteNowGrid477{grid-template-columns:1fr 1fr 1fr;gap:7px;}
+}
+
+
+/* Build 0.47.8 Home Screen Concept #2 — Apple-inspired dark dashboard */
+.homeScreen478{
+  position:relative;
+  gap:11px!important;
+  padding:10px 12px calc(var(--navH) + 34px)!important;
+  background:
+    radial-gradient(circle at 54% 0%, rgba(255,255,255,.08), transparent 30%),
+    radial-gradient(circle at 0% 12%, color-mix(in srgb,var(--accent) 16%, transparent), transparent 28%),
+    linear-gradient(180deg,#11161d 0%,#080b0f 48%,#08090d 100%)!important;
+}
+.homeChrome478{
+  min-height:38px;
+  display:grid;
+  grid-template-columns:38px minmax(0,1fr) 38px;
+  align-items:center;
+  gap:8px;
+  flex:0 0 auto;
+}
+.homeIcon478{
+  width:36px!important;
+  height:36px!important;
+  min-height:36px!important;
+  padding:0!important;
+  display:grid!important;
+  place-items:center!important;
+  border-radius:14px!important;
+  background:transparent!important;
+  border:0!important;
+  box-shadow:none!important;
+  color:#e5e7eb!important;
+  font-size:19px!important;
+}
+.brand478{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:7px;
+  min-width:0;
+}
+.brand478 img{width:21px;height:21px;border-radius:6px;filter:drop-shadow(0 0 10px rgba(239,68,68,.28));}
+.brand478 strong{font-size:17px;line-height:1;font-weight:1000;letter-spacing:.045em;color:#f8fafc;}
+.homeBell478{font-size:18px!important;}
+.todayBlock478{
+  display:flex;
+  align-items:flex-start;
+  justify-content:flex-start;
+  padding:8px 2px 3px;
+  flex:0 0 auto;
+}
+.todayRouteWrap478{
+  display:flex;
+  align-items:center;
+  justify-content:flex-start;
+  gap:10px;
+  min-width:0;
+}
+.todayBlock478 h1{
+  margin:0;
+  font-size:25px;
+  line-height:1;
+  font-weight:1000;
+  letter-spacing:-.045em;
+  color:#f8fafc;
+}
+.todayBlock478 p{
+  margin:5px 0 0!important;
+  font-size:14px!important;
+  line-height:1!important;
+  color:#d1d5db!important;
+  font-weight:780!important;
+}
+.appleSearchCard478{
+  flex:0 0 auto;
+  padding:0!important;
+  border:0!important;
+  background:transparent!important;
+  box-shadow:none!important;
+}
+.homeSearchBox478{
+  height:48px;
+  display:grid!important;
+  grid-template-columns:30px minmax(0,1fr) auto!important;
+  gap:2px!important;
+  align-items:center!important;
+  padding:0 6px 0 12px;
+  border-radius:22px!important;
+  background:linear-gradient(180deg,rgba(255,255,255,.12),rgba(255,255,255,.07))!important;
+  border:1px solid rgba(255,255,255,.12)!important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.12),0 10px 26px rgba(0,0,0,.24)!important;
+}
+.searchGlass478{
+  color:#f8fafc;
+  font-size:20px;
+  line-height:1;
+  opacity:.95;
+}
+.homeSearchBox478 input{
+  height:44px!important;
+  padding:0 8px!important;
+  border:0!important;
+  border-radius:18px!important;
+  background:transparent!important;
+  box-shadow:none!important;
+  color:#fff!important;
+  font-size:15px!important;
+  font-weight:800!important;
+}
+.homeSearchBox478 input::placeholder{color:#cbd5e1!important;font-weight:750;}
+.searchClear478{
+  min-height:34px!important;
+  height:34px!important;
+  padding:0 10px!important;
+  border-radius:999px!important;
+  background:rgba(255,255,255,.08)!important;
+  border:0!important;
+  box-shadow:none!important;
+  color:#e5e7eb!important;
+}
+.searchClear478:disabled{opacity:.76!important;}
+.searchResultsPanel478{
+  display:grid;
+  gap:8px;
+  padding:10px!important;
+  border-radius:20px!important;
+  border-left:0!important;
+  background:linear-gradient(180deg,#171d26,#10151d)!important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.10),0 12px 28px rgba(0,0,0,.28)!important;
+}
+.hiddenSearchResults478{display:none!important;}
+.nearbyAccountsHero478{
+  padding:13px!important;
+  border-radius:22px!important;
+  background:linear-gradient(180deg,#f8fafc,#e8edf3)!important;
+  color:#111827!important;
+  border:1px solid rgba(255,255,255,.48)!important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.82),0 12px 30px rgba(0,0,0,.32)!important;
+}
+.nearbyHead478 h2{color:#111827!important;font-size:13px!important;letter-spacing:.04em!important;text-transform:uppercase!important;}
+.nearbyHead478 p{color:#4b5563!important;font-size:11.8px!important;}
+.nearbyCount478{
+  background:transparent!important;
+  border:0!important;
+  box-shadow:none!important;
+  color:#ef4444!important;
+  font-size:12px!important;
+  font-weight:1000!important;
+  min-height:30px!important;
+  padding:4px 6px!important;
+}
+.nearbyList478{gap:2px!important;}
+.nearbyAccountsHero478 .homeNearbyEmpty476 p{color:#4b5563!important;}
+.nearbyAccountsHero478 .nearbyAccountCard476{
+  grid-template-columns:28px minmax(0,1fr) 18px!important;
+  position:relative;
+  padding:10px 4px!important;
+  border-radius:0!important;
+  background:transparent!important;
+  border:0!important;
+  border-top:1px solid rgba(15,23,42,.10)!important;
+  box-shadow:none!important;
+}
+.nearbyAccountsHero478 .nearbyAccountCard476::after{
+  content:'›';
+  grid-column:3;
+  grid-row:1/3;
+  align-self:center;
+  justify-self:center;
+  color:#64748b;
+  font-size:24px;
+  line-height:1;
+}
+.nearbyAccountsHero478 .nearbyAccountCard476 span{
+  background:transparent!important;
+  color:#ef4444!important;
+  width:24px!important;
+  height:24px!important;
+  font-size:16px!important;
+}
+.nearbyAccountsHero478 .nearbyAccountCard476 strong{color:#111827!important;font-size:14px!important;}
+.nearbyAccountsHero478 .nearbyAccountCard476 small{color:#475569!important;font-size:11.5px!important;}
+.appleStats478{gap:10px!important;flex:0 0 auto;}
+.statTile478{
+  min-height:92px!important;
+  padding:13px!important;
+  text-align:left!important;
+  border-radius:22px!important;
+  border-left:0!important;
+  background:linear-gradient(180deg,#f8fafc,#e9eef4)!important;
+  color:#0f172a!important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.85),0 12px 26px rgba(0,0,0,.26)!important;
+}
+.statTile478 strong{
+  display:block;
+  color:#ef4444!important;
+  font-size:38px!important;
+  line-height:.9!important;
+  font-weight:1000!important;
+  letter-spacing:-.06em!important;
+}
+.statTile478 span{
+  display:block;
+  margin-top:7px;
+  color:#111827!important;
+  font-size:13px!important;
+  line-height:1!important;
+  font-weight:950!important;
+}
+.statTile478 em{
+  display:block;
+  margin-top:5px;
+  color:#6b7280!important;
+  font-size:11px!important;
+  font-style:normal;
+  font-weight:780!important;
+}
+.recentAccountsPanel478{
+  display:grid;
+  gap:9px;
+  padding:13px!important;
+  border-radius:22px!important;
+  background:linear-gradient(180deg,#171d26,#10151d)!important;
+  border:1px solid rgba(255,255,255,.10)!important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.10),0 12px 28px rgba(0,0,0,.28)!important;
+}
+.recentHead478{display:flex;align-items:center;justify-content:space-between;gap:10px;}
+.recentHead478 strong{display:block;color:#f8fafc;font-size:13px;font-weight:1000;letter-spacing:.03em;text-transform:uppercase;}
+.recentHead478 span{display:block;color:#9ca3af;font-size:11.5px;font-weight:780;margin-top:2px;}
+.recentHead478 button{min-height:30px!important;border-radius:999px!important;padding:4px 8px!important;color:#ef4444!important;background:transparent!important;border:0!important;box-shadow:none!important;}
+.recentList478 .homeAccountSection476{gap:3px!important;}
+.recentList478 .homeSectionHead476{display:none!important;}
+.recentList478 .homeAccountCard476,
+.searchResultsPanel478 .homeAccountCard476{
+  grid-template-columns:minmax(0,1fr) 18px!important;
+  position:relative;
+  padding:10px 2px!important;
+  border-radius:0!important;
+  background:transparent!important;
+  border:0!important;
+  border-top:1px solid rgba(255,255,255,.08)!important;
+  box-shadow:none!important;
+}
+.recentList478 .homeAccountCard476::after,
+.searchResultsPanel478 .homeAccountCard476::after{
+  content:'›';
+  grid-column:2;
+  grid-row:1;
+  align-self:center;
+  justify-self:center;
+  color:#94a3b8;
+  font-size:23px;
+}
+.recentList478 .accountInitial476,
+.searchResultsPanel478 .accountInitial476{display:none!important;}
+.recentList478 .homeAccountCard476 strong,
+.searchResultsPanel478 .homeAccountCard476 strong{font-size:14px!important;}
+.recentList478 .homeAccountCard476 small,
+.recentList478 .homeAccountCard476 em,
+.searchResultsPanel478 .homeAccountCard476 small,
+.searchResultsPanel478 .homeAccountCard476 em{font-size:11.4px!important;}
+.homeModuleSummary478{
+  grid-template-columns:1fr 92px!important;
+  opacity:.88;
+}
+.homeModuleSummary478 button{
+  min-height:42px!important;
+  border-radius:18px!important;
+  background:rgba(255,255,255,.06)!important;
+  box-shadow:none!important;
+}
+.homeModuleSummary478 .ghost{padding:8px 10px!important;}
+.floatingAdd478{
+  position:fixed;
+  left:50%;
+  bottom:calc(env(safe-area-inset-bottom) + 24px);
+  transform:translateX(-50%);
+  z-index:60;
+  width:58px!important;
+  height:58px!important;
+  min-height:58px!important;
+  border-radius:999px!important;
+  padding:0!important;
+  display:grid!important;
+  place-items:center!important;
+  font-size:31px!important;
+  line-height:1!important;
+  font-weight:500!important;
+  color:#fff!important;
+  background:linear-gradient(180deg,#fb3b28,#dc2626)!important;
+  border:1px solid rgba(255,255,255,.18)!important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.25),0 4px 0 #7f1d1d,0 16px 32px rgba(220,38,38,.28),0 18px 34px rgba(0,0,0,.38)!important;
+}
+.activeRouteMini478,
+.activeJobMini478{border-radius:22px!important;border-left:0!important;}
+@media(max-width:430px){
+  .homeScreen478{padding-left:12px!important;padding-right:12px!important;gap:10px!important;}
+  .todayBlock478 h1{font-size:24px;}
+  .todayBlock478 p{font-size:13.5px!important;}
+  .statTile478{min-height:86px!important;}
+  .statTile478 strong{font-size:34px!important;}
+  .floatingAdd478{width:56px!important;height:56px!important;min-height:56px!important;bottom:calc(env(safe-area-inset-bottom) + 22px);}
 }

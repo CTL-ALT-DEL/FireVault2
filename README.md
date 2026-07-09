@@ -1,33 +1,23 @@
-# FireVault Build 0.47.7
+# FireVault Build 0.47.8
 
-Build 0.47.7 is the Customer Account simplification build.
+Build 0.47.8 applies the selected **Home Screen Concept #2 — Apple-Inspired** dashboard direction.
 
 ## What changed
 
-- Visible app version advanced to 0.47.7.
-- Simplified the customer/site detail page around a new **Field Card** layout.
-- Most-used field information now appears first:
-  - Address
-  - Panel
-  - Primary contact
-  - Access notes
-  - Last visit
-  - Open tasks
-  - Deficiencies
-- Added faster account actions:
-  - Start Job
-  - Snapshot
-  - Navigate
-  - Add Task
-  - Add Deficiency
-- Moved optional customer tools into a **More Site Tools** area.
-- Disabled modules now disappear from the customer screen more completely.
-- Opening a customer account now updates Recent Accounts on the home screen.
-- Renamed remaining Simple View prompts to **Settings → Modules**.
-- Preserved the Apple-style home screen, Nearby Accounts, Recent Accounts, green Build glow, and all 0.47.6 features.
+- Visible app version advanced to 0.47.8.
+- Redesigned the home screen closer to concept #2.
+- Added a dark iOS-style dashboard background.
+- Added compact top FireVault brand bar.
+- Made **Today** and the current date feel like the main start point.
+- Redesigned customer search into a rounded Apple-style search pill.
+- Redesigned **Nearby Accounts** as a prominent light card.
+- Added two clean quick-stat cards for recent visits and open tasks.
+- Redesigned **Recent Accounts** into a dark iOS-style list card.
+- Added a floating red **+** button for adding an account.
+- Preserved Modules, Nearby Accounts, Recent Accounts, customer screen simplification, Daily Route, and green Build revision glow.
 
 Suggested commit message:
 
 ```text
-Build 0.47.7 customer field card and module aware site screen
+Build 0.47.8 apple inspired home screen concept two
 ```

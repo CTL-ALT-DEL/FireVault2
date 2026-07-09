@@ -1092,7 +1092,11 @@ function homeNearbyMarkup476(){
 }
 function renderHomeSearch476(){
   const box=document.getElementById('homeSearchResults476');
-  if(box) box.innerHTML=homeAccountRowsMarkup476();
+  if(!box) return;
+  const q=(siteSearch||'').trim();
+  if(q && box.classList.contains('hiddenSearchResults478')){ home(); return; }
+  if(!q && !box.classList.contains('hiddenSearchResults478')){ home(); return; }
+  box.innerHTML=q?homeAccountRowsMarkup476():'';
 }
 function checkNearbyHome476(){
   if(data.settings.gps?.enabled===false){ toast('GPS tools are hidden in Settings.'); return; }
@@ -1114,45 +1118,62 @@ function home(){
   const openTasks = taskCounts.open;
   const def = data.sites.reduce((n,s)=>n+(s.deficiencies||[]).filter(d => (d.status||"Open") !== "Closed").length,0);
   const gpsSites = data.sites.filter(hasGps).length;
+  const visits = data.sites.flatMap(s => (s.visits||[]).map(v => ({...v, site:s.name})));
+  const weekAgo = Date.now() - 7*24*60*60*1000;
+  const recentVisits = visits.filter(v=>new Date(v.endedAt||v.startedAt||v.date||0).getTime() >= weekAgo).length;
   const now = new Date();
-  html(`<div class="screen homeScreen476">
-    <div class="homeTop476">
-      <button class="ghost smallBtn modulesTopBtn476" id="modulesTopBtn476">Modules</button>
-      <div class="homeHero450 homeHero457 homeHero463 homeHero476"><div class="homeDateWrap463 homeDateWrap476">${activeRoute?`<span class="${activeRoute.paused?"routeLed470 routeLedPaused470":"routeLed463"}" aria-label="${activeRoute.paused?"Daily route paused":"Daily route recording"}"></span>`:""}<div class="homeDateBlock457"><div class="todayDay"><h1>${now.toLocaleDateString([], {weekday:"long"})}</h1></div><p class="homeDateLine457">${fmtDate(now)}</p></div></div></div>
+  const dateLine = now.toLocaleDateString([], {weekday:"long", month:"long", day:"numeric"});
+  html(`<div class="screen homeScreen476 homeScreen478">
+    <div class="homeChrome478">
+      <button class="homeIcon478" id="modulesTopBtn476" aria-label="Modules">☰</button>
+      <div class="brand478"><img src="assets/favicon.png?v=${BUILD}" alt="FireVault"><strong>FIREVAULT</strong></div>
+      <button class="homeIcon478 homeBell478" id="homeBell478" aria-label="Release notes">♧</button>
     </div>
 
-    <div class="card customerSearchHero476">
-      <div class="searchTitle476"><span>🔍</span><div><h1>Find Account</h1><p>Search customers, addresses, panels, contacts, access notes, or equipment.</p></div></div>
-      <div class="homeSearchBox476"><input id="homeCustomerSearch476" type="search" value="${esc(siteSearch)}" placeholder="Search customer accounts..." autocomplete="off"><button class="ghost smallBtn" id="clearHomeSearch476" ${siteSearch?"":"disabled"}>Clear</button></div>
-      <div id="homeSearchResults476">${homeAccountRowsMarkup476()}</div>
+    <div class="todayBlock478">
+      <div class="todayRouteWrap478">${activeRoute?`<span class="${activeRoute.paused?"routeLed470 routeLedPaused470":"routeLed463"}" aria-label="${activeRoute.paused?"Daily route paused":"Daily route recording"}"></span>`:""}<div><h1>Today</h1><p>${esc(dateLine)}</p></div></div>
     </div>
 
-    <div class="card nearbyAccountsHero476 ${featureOn("advancedGps")?"":"featureHidden472"}">
-      <div class="nearbyHead476"><div><h2>Nearby Accounts</h2><p>${nearbyState?`Last check ${new Date(nearbyState.at).toLocaleTimeString([], {hour:"numeric",minute:"2-digit"})} • GPS ±${nearbyState.accuracy||0}m`:`${gpsSites} account${gpsSites===1?"":"s"} with saved GPS`}</p></div><button class="primary smallBtn" id="checkNearbyHomeBtn476">Check Nearby</button></div>
-      <div class="nearbyList476">${homeNearbyMarkup476()}</div>
+    <div class="appleSearchCard478">
+      <div class="homeSearchBox476 homeSearchBox478"><span class="searchGlass478">⌕</span><input id="homeCustomerSearch476" type="search" value="${esc(siteSearch)}" placeholder="Search customers..." autocomplete="off"><button class="ghost smallBtn searchClear478" id="clearHomeSearch476" ${siteSearch?"":"disabled"}>${siteSearch?"Clear":"⌕"}</button></div>
     </div>
 
-    ${activeRoute ? `<div class="card activeRouteMini468 activeRouteMini476 ${activeRoute.paused?"activeRoutePaused470":""}"><div class="activeRouteHead468"><div><h2><span class="${activeRoute.paused?"routeLed470 routeLedPaused470":"routeLed463"} miniLed468"></span>${activeRoute.paused?"Daily Route Paused":"Daily Route Recording"}</h2><p>${esc(routeSummaryLine(activeRoute))}</p></div><button class="primary smallBtn" id="openRouteMiniBtn">Open</button></div><div class="activeRouteStats468"><div><strong>${(activeRoute.events||[]).length}</strong><span>Waypoints</span></div><div><strong>${routeDuration(activeRoute.startedAt)}</strong><span>Time</span></div><div><strong>${esc(routeDistanceLabel(activeRoute))}</strong><span>Distance</span></div></div><div class="activeRouteActions468"><button class="ghost smallBtn" id="homeRoutePointBtn" ${activeRoute.paused?"disabled":""}>Waypoint</button><button class="ghost smallBtn" id="homeRouteNearestBtn" ${activeRoute.paused?"disabled":""}>Nearest</button><button class="${activeRoute.paused?"primary":"ghost"} smallBtn" id="homeRoutePauseBtn">${activeRoute.paused?"Resume":"Pause"}</button><button class="danger smallBtn" id="homeRouteEndBtn">End / Save</button></div></div>` : ""}
-    ${activeJob ? `<div class="card activeJobMini"><div class="row"><div><h2>Service Call Active</h2><p>${esc(activeJob.siteName)} • <span id="jobElapsed">${elapsedText(activeJob.startedAt)}</span></p></div><button class="primary" id="resumeJobBtn">Open</button></div></div>` : ""}
+    ${siteSearch?`<div class="card searchResultsPanel478" id="homeSearchResults476">${homeAccountRowsMarkup476()}</div>`:`<div id="homeSearchResults476" class="searchResultsPanel478 hiddenSearchResults478"></div>`}
 
-    <div class="grid3 homeStats476">
-      <button class="card tile metricCard" id="sitesCard"><strong>${data.sites.length}</strong><span>Accounts</span></button>
-      <button class="card tile metricCard taskMetricCard" id="tasksCard"><strong>${openTasks}</strong><span>${taskCounts.overdue ? `${taskCounts.overdue} overdue` : taskCounts.today ? `${taskCounts.today} due today` : "Open Tasks"}</span></button>
-      <button class="card tile metricCard" id="defCard"><strong>${def}</strong><span>Deficiencies</span></button>
+    <div class="card nearbyAccountsHero476 nearbyAccountsHero478 ${featureOn("advancedGps")?"":"featureHidden472"}">
+      <div class="nearbyHead476 nearbyHead478"><div><h2>Nearby Accounts</h2><p>${nearbyState?`Last check ${new Date(nearbyState.at).toLocaleTimeString([], {hour:"numeric",minute:"2-digit"})} • GPS ±${nearbyState.accuracy||0}m`:`${gpsSites} nearby-ready account${gpsSites===1?"":"s"}`}</p></div><button class="smallBtn nearbyCount478" id="checkNearbyHomeBtn476">${nearbyState?"Refresh":"Check"}</button></div>
+      <div class="nearbyList476 nearbyList478">${homeNearbyMarkup476()}</div>
     </div>
-    <div class="homeModuleSummary476"><button class="ghost" id="manageModulesBtn476"><strong>Modules</strong><span>${esc(moduleStatus476())} • disabled modules disappear from the interface</span></button><button class="primary" id="addSiteBtn">＋ Add Account</button></div>
+
+    <div class="grid2 appleStats478">
+      <button class="card tile statTile478" id="visitsCard478"><strong>${recentVisits}</strong><span>Recent Visits</span><em>This Week</em></button>
+      <button class="card tile statTile478" id="tasksCard"><strong>${openTasks}</strong><span>Open Tasks</span><em>${taskCounts.overdue ? `${taskCounts.overdue} overdue` : taskCounts.today ? `${taskCounts.today} due soon` : "Due Soon"}</em></button>
+    </div>
+
+    ${activeRoute ? `<div class="card activeRouteMini468 activeRouteMini476 activeRouteMini478 ${activeRoute.paused?"activeRoutePaused470":""}"><div class="activeRouteHead468"><div><h2><span class="${activeRoute.paused?"routeLed470 routeLedPaused470":"routeLed463"} miniLed468"></span>${activeRoute.paused?"Daily Route Paused":"Daily Route Recording"}</h2><p>${esc(routeSummaryLine(activeRoute))}</p></div><button class="primary smallBtn" id="openRouteMiniBtn">Open</button></div><div class="activeRouteStats468"><div><strong>${(activeRoute.events||[]).length}</strong><span>Waypoints</span></div><div><strong>${routeDuration(activeRoute.startedAt)}</strong><span>Time</span></div><div><strong>${esc(routeDistanceLabel(activeRoute))}</strong><span>Distance</span></div></div><div class="activeRouteActions468"><button class="ghost smallBtn" id="homeRoutePointBtn" ${activeRoute.paused?"disabled":""}>Waypoint</button><button class="ghost smallBtn" id="homeRouteNearestBtn" ${activeRoute.paused?"disabled":""}>Nearest</button><button class="${activeRoute.paused?"primary":"ghost"} smallBtn" id="homeRoutePauseBtn">${activeRoute.paused?"Resume":"Pause"}</button><button class="danger smallBtn" id="homeRouteEndBtn">End / Save</button></div></div>` : ""}
+    ${activeJob ? `<div class="card activeJobMini activeJobMini478"><div class="row"><div><h2>Service Call Active</h2><p>${esc(activeJob.siteName)} • <span id="jobElapsed">${elapsedText(activeJob.startedAt)}</span></p></div><button class="primary" id="resumeJobBtn">Open</button></div></div>` : ""}
+
+    <div class="recentAccountsPanel478">
+      <div class="recentHead478"><div><strong>Recent Accounts</strong><span>${recentAccounts476(5).length} account${recentAccounts476(5).length===1?"":"s"}</span></div><button class="ghost smallBtn" id="allAccountsBtn478">See All</button></div>
+      <div class="recentList478">${homeAccountRowsMarkup476()}</div>
+    </div>
+
+    <div class="homeModuleSummary476 homeModuleSummary478"><button class="ghost" id="manageModulesBtn476"><strong>Modules</strong><span>${esc(moduleStatus476())}</span></button><button class="ghost" id="defCard"><strong>${def}</strong><span>Deficiencies</span></button></div>
+    <button class="floatingAdd478" id="addSiteBtn" aria-label="Add Account">＋</button>
     <div class="buildRevisionSpacer475" aria-hidden="true"></div>
   </div>`);
 
   const homeRoot=document.querySelector('.homeScreen476');
   if(homeRoot) homeRoot.onclick=e=>{ const card=e.target.closest('[data-home-site]'); if(card){ selectedSiteId=card.dataset.homeSite; route('siteDetail'); } };
   const search=document.getElementById('homeCustomerSearch476');
-  if(search){ search.oninput=()=>{ siteSearch=search.value; renderHomeSearch476(); const clear=document.getElementById('clearHomeSearch476'); if(clear) clear.disabled=!siteSearch; }; setTimeout(()=>{ try{ search.setSelectionRange(search.value.length, search.value.length); }catch{} },0); }
+  if(search){ search.oninput=()=>{ siteSearch=search.value; renderHomeSearch476(); const clear=document.getElementById('clearHomeSearch476'); if(clear){ clear.disabled=!siteSearch; clear.textContent=siteSearch?'Clear':'⌕'; } }; setTimeout(()=>{ try{ search.setSelectionRange(search.value.length, search.value.length); }catch{} },0); }
   const clear=document.getElementById('clearHomeSearch476'); if(clear) clear.onclick=()=>{ siteSearch=''; home(); };
   const checkNearby=document.getElementById('checkNearbyHomeBtn476'); if(checkNearby) checkNearby.onclick=checkNearbyHome476;
   document.getElementById('modulesTopBtn476').onclick=()=>{settingsTab='visibility'; mode='settingsDetail'; route('settings');};
+  const bell=document.getElementById('homeBell478'); if(bell) bell.onclick=showChangelog;
   document.getElementById('manageModulesBtn476').onclick=()=>{settingsTab='visibility'; mode='settingsDetail'; route('settings');};
-  document.getElementById('sitesCard').onclick=()=>route('sites');
+  const allAccounts=document.getElementById('allAccountsBtn478'); if(allAccounts) allAccounts.onclick=()=>route('sites');
+  const visitsCard=document.getElementById('visitsCard478'); if(visitsCard) visitsCard.onclick=()=>{selectedSiteId=null; route('sites');};
   document.getElementById('tasksCard').onclick=()=>{selectedSiteId=null; route('tasks');};
   document.getElementById('defCard').onclick=()=>{selectedSiteId=null; route('deficiencies');};
   document.getElementById('addSiteBtn').onclick=()=>{selectedSiteId=null; mode=null; route('siteForm');};
@@ -2514,11 +2535,11 @@ function diagnostics(){
 }
 function showChangelog(){
   const notes = [
-    "Simplified the customer account screen around a field card layout.",
-    "Most-used information now appears first: address, panel, primary contact, access notes, last visit, tasks, and deficiencies.",
-    "Added faster customer actions for Start Job, Snapshot, Navigate, Add Task, and Add Deficiency.",
-    "Moved optional customer tools into a More Site Tools module area.",
-    "Disabled modules now disappear from the customer screen more completely."
+    "Shifted the dashboard closer to Home Screen Concept #2 Apple-Inspired.",
+    "Added a dark iOS-style FireVault top bar with compact brand and action icons.",
+    "Made Today/date, search, Nearby Accounts, quick stats, and Recent Accounts follow the #2 card layout.",
+    "Added a floating Add Account button on the home screen.",
+    "Preserved Modules, Nearby Accounts, Recent Accounts, Daily Route, and customer screen simplification."
   ];
   const overlay=document.createElement("div");
   overlay.className="releaseOverlay";
