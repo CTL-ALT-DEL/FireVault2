@@ -1348,7 +1348,7 @@ function home(){
     <div class="homeChrome478 homeChrome493">
       <div class="brand478 brand493"><img src="assets/favicon.png?v=${BUILD}" alt="FireVault"><strong>FIREVAULT</strong></div>
       <button class="homeBuildPill481 homeBuildPill493" id="homeBell478" aria-label="Release notes"><span></span>${BUILD}</button>
-      <button class="homeIcon478 settingsIcon493" id="modulesTopBtn476" aria-label="Settings">⚙</button>
+      <button class="homeIcon478 settingsIcon493 stackedMenu553" id="modulesTopBtn476" aria-label="Settings">☰</button>
     </div>
 
     ${homeInstallTip482()}
@@ -4046,7 +4046,7 @@ function repairVaultState(){
 }
 
 
-/* Build 0.50.52 Backup Safety helpers */
+/* Build 0.50.53 Backup Safety helpers */
 function backupSafetyStats552(){
   const sites = (data.sites || []).length;
   const visits = (data.sites || []).reduce((n,s)=>n+((s.visits||[]).length),0);
@@ -4124,14 +4124,51 @@ function backupSafetyMarkup552(){
     <div class="backupActions552">
       <button class="primary" id="downloadBackup552">Download Backup</button>
       <button class="ghost" id="copyBackupSummary552">Copy Summary</button>
+      <button class="ghost" id="copyUpdateChecklist553">Copy Checklist</button>
+    </div>
+    <div class="backupChecklist553">
+      <strong>Before updating:</strong>
+      <span>Download Backup → commit/upload new build → verify app opens → keep the backup file.</span>
     </div>
   </div>`;
 }
+
+async function copyUpdateChecklist553(){
+  const s=backupSafetyStats552();
+  const lines=[
+    "FireVault Update Checklist",
+    `Current Build: ${BUILD}`,
+    `Backup Size: ${s.bytes ? Math.max(1,Math.round(s.bytes/1024))+" KB" : "Unknown"}`,
+    "",
+    "1. Tap Download Backup and save the JSON file.",
+    "2. Upload / commit the new FireVault build ZIP contents.",
+    "3. Open the app and confirm the splash screen clears.",
+    "4. Check Home, Add Site, Backup Safety, and one saved account.",
+    "5. Keep the backup file until the new build is confirmed working.",
+    "",
+    "Data counts:",
+    `Sites: ${s.sites}`,
+    `Visits: ${s.visits}`,
+    `Documents: ${s.docs}`,
+    `Photos: ${s.photoDocs}`,
+    `Tasks: ${s.tasks}`,
+    `Deficiencies: ${s.deficiencies}`
+  ].join("\n");
+  try{
+    await navigator.clipboard.writeText(lines);
+    toast("Update checklist copied.");
+  }catch{
+    toast("Clipboard unavailable.");
+  }
+}
+
 function wireBackupSafety552(){
   const dl=document.getElementById("downloadBackup552");
   if(dl) dl.onclick=downloadVaultBackup552;
   const copy=document.getElementById("copyBackupSummary552");
   if(copy) copy.onclick=copyBackupSummary552;
+  const checklist=document.getElementById("copyUpdateChecklist553");
+  if(checklist) checklist.onclick=copyUpdateChecklist553;
 }
 
 function diagnostics(){
@@ -4192,17 +4229,17 @@ function diagnostics(){
 }
 function showChangelog(){
   const notes = [
-    "Advanced to Build 0.50.52 from the stable 0.50.51 baseline.",
-    "Added a Backup Safety card so you can download a FireVault JSON backup before installing new builds.",
-    "Backup Safety shows counts for sites, visits, documents, photos, tasks, deficiencies, and estimated backup size.",
-    "Added Copy Backup Summary for quick troubleshooting and record keeping.",
-    "Preserved the top-right Add Site button placement, clean splash screen with no loader, fixed splash/header behavior, Startup Health diagnostics, Photo Vault tools, Customer Report Photo workflow, iPad autosizing, simple Home screen, Search Bar Concept #6, and excluded job-status workflow controls."
+    "Advanced to Build 0.50.53 from the stable 0.50.52 baseline.",
+    "Changed the main-page Settings button from the gear icon back to a stacked-lines menu icon.",
+    "Added Copy Update Checklist to Backup Safety so build updates have a repeatable safety checklist.",
+    "Added a short Backup Safety reminder showing the recommended update order.",
+    "Preserved the top-right Add Site button placement, Backup Safety download tools, clean splash screen with no loader, fixed splash/header behavior, Startup Health diagnostics, Photo Vault tools, Customer Report Photo workflow, iPad autosizing, simple Home screen, Search Bar Concept #6, and excluded job-status workflow controls."
   ];
   const overlay=document.createElement("div");
   overlay.className="releaseOverlay";
   overlay.innerHTML=`<div class="releaseSheet" role="dialog" aria-modal="true" aria-label="FireVault release notes">
     <div class="releaseHead"><div><strong>FireVault</strong><span>Build ${BUILD}</span></div><button class="ghost iconBtn" id="closeRelease" aria-label="Close release notes">×</button></div>
-    <div class="releaseBody"><h2>Release Notes</h2><p class="releaseIntro">Added Backup Safety download and summary tools.</p><ul>${notes.map(n=>`<li>${esc(n)}</li>`).join("")}</ul></div>
+    <div class="releaseBody"><h2>Release Notes</h2><p class="releaseIntro">Added Backup Safety update checklist and restored the stacked-lines main Settings icon.</p><ul>${notes.map(n=>`<li>${esc(n)}</li>`).join("")}</ul></div>
   </div>`;
   document.body.appendChild(overlay);
   const close=()=>overlay.remove();

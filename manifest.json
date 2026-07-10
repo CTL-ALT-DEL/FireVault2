@@ -8,7 +8,7 @@
   "orientation": "any",
   "background_color": "#0b0d10",
   "theme_color": "#101216",
-  "description": "Field knowledge system for fire alarm technicians. Build 0.50.52 adds Backup Safety tools for downloading a FireVault JSON backup and copying a backup summary before installing new builds.",
+  "description": "Field knowledge system for fire alarm technicians. Build 0.50.53 restores the stacked-lines main Settings icon and adds a Backup Safety update checklist while preserving backup download tools.",
   "icons": [
     {
       "src": "assets/icon-192.png",
