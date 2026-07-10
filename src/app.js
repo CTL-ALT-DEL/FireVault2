@@ -3231,6 +3231,67 @@ function openReportEmailDraft(s, txt, subject){
   toast("Opening email draft.");
   window.location.href = reportMailtoUrl(s, txt, subject);
 }
+
+
+/* Build 0.50.55 Customer Report Preview helpers */
+function customerReportPreviewStats555(s={}){
+  const selected=reportPhotos526(s);
+  const ready=customerReportPhotoReady530(s);
+  const stats=reportPhotoSummary527(s);
+  return {
+    selected:selected.length,
+    captioned:stats.captioned || 0,
+    issues:ready.issues || [],
+    ready:(ready.issues || []).length===0
+  };
+}
+function customerReportPreviewHtml555(s={}){
+  const preview=customerCloseoutPacket539(s);
+  const p=customerReportPreviewStats555(s);
+  return `<div class="card customerPreview555">
+    <div class="customerPreviewHead555">
+      <div><h2>Customer Report Preview</h2><p>Review the customer-facing closeout before copying or sending it.</p></div>
+      <span class="${p.ready?"previewReady555":"previewReview555"}">${p.ready?"Ready":"Review"}</span>
+    </div>
+    <div class="customerPreviewStats555">
+      <div><strong>${p.selected}</strong><span>Selected Photos</span></div>
+      <div><strong>${p.captioned}</strong><span>Captioned</span></div>
+      <div><strong>${p.issues.length}</strong><span>Issues</span></div>
+    </div>
+    ${p.issues.length?`<div class="customerPreviewIssues555">${p.issues.map(x=>`<p>• ${esc(x)}</p>`).join("")}</div>`:`<div class="customerPreviewIssues555 ready"><p>• Customer report photos are ready.</p></div>`}
+    <div class="customerPreviewText555">${esc(preview)}</div>
+    <div class="customerPreviewActions555">
+      <button class="primary" id="copyCustomerPreview555">Copy Preview</button>
+      <button class="ghost" id="downloadCustomerPreview555">Download Preview</button>
+      <button class="ghost" id="copyCustomerPacketFromPreview555">Copy Packet</button>
+    </div>
+  </div>`;
+}
+async function copyCustomerPreview555(){
+  const s=site(); if(!s) return;
+  try{
+    await navigator.clipboard.writeText(customerCloseoutPacket539(s));
+    toast("Customer preview copied.");
+  }catch{
+    toast("Clipboard unavailable.");
+  }
+}
+function downloadCustomerPreview555(){
+  const s=site(); if(!s) return;
+  const name=(s.name||"site").replace(/\W+/g,"-").replace(/^-|-$/g,"") || "site";
+  downloadBlob(`firevault-customer-preview-${name}.txt`, customerCloseoutPacket539(s));
+  logReportDelivery(s,"Downloaded Customer Preview", renderTemplate(data.settings.email.defaultSubject,s));
+  toast("Customer preview downloaded.");
+}
+function wireCustomerPreview555(){
+  const copy=document.getElementById("copyCustomerPreview555");
+  if(copy) copy.onclick=copyCustomerPreview555;
+  const download=document.getElementById("downloadCustomerPreview555");
+  if(download) download.onclick=downloadCustomerPreview555;
+  const packet=document.getElementById("copyCustomerPacketFromPreview555");
+  if(packet) packet.onclick=copyCustomerCloseoutPacket539;
+}
+
 function report(){
   const s=site(); if(!s){route("sites"); return;}
   const opts=reportSectionState();
@@ -3239,12 +3300,13 @@ function report(){
   const subject=renderTemplate(data.settings.email.defaultSubject,s);
   html(`<div class="screen reportScreen440 reportScreen447"><div class="row reportTopRow"><button class="back ghost" id="backBtn">←</button><div><h1>Report Center</h1><p>${esc(s.name||"Site")}</p></div></div>
     <div class="card reportHero440 ${stats.h.cls}"><div><strong>${stats.h.score}%</strong><span>Health</span></div><div><strong>${stats.openTasks.length}</strong><span>Open Tasks</span></div><div><strong>${stats.openDef.length}</strong><span>Deficiencies</span></div><div><strong>${stats.equipmentIssues.length}</strong><span>Equip Issues</span></div></div>
-    <div class="reportActionGrid440 reportActionGrid442 reportActionGrid447"><button class="primary" id="shareBtn">Share / Copy</button><button class="ghost" id="emailDraftBtn">Email Draft</button><button class="ghost" id="customerEmailBtn538">Copy Customer Email</button><button class="ghost" id="customerPacketBtn539">Copy Closeout Packet</button><button class="ghost" id="techPacketBtn540">Copy Tech Packet</button><button class="ghost" id="fullBundleBtn542">Copy Full Bundle</button><button class="ghost" id="actionItemsBtn543">Copy Action Items</button><button class="ghost" id="copyBtn">Copy TXT</button><button class="ghost" id="downloadBtn">Download</button><button class="ghost" id="subjectBtn">Copy Subject</button></div>
+    <div class="reportActionGrid440 reportActionGrid442 reportActionGrid447"><button class="primary" id="shareBtn">Share / Copy</button><button class="ghost" id="emailDraftBtn">Email Draft</button><button class="ghost" id="customerEmailBtn538">Copy Customer Email</button><button class="ghost" id="customerPreviewBtn555">Copy Customer Preview</button><button class="ghost" id="customerPacketBtn539">Copy Closeout Packet</button><button class="ghost" id="techPacketBtn540">Copy Tech Packet</button><button class="ghost" id="fullBundleBtn542">Copy Full Bundle</button><button class="ghost" id="actionItemsBtn543">Copy Action Items</button><button class="ghost" id="copyBtn">Copy TXT</button><button class="ghost" id="downloadBtn">Download</button><button class="ghost" id="subjectBtn">Copy Subject</button></div>
     <div class="card reportReadyCard reportReadyCard442 reportReadyCard447"><div><h2>Ready to Send</h2><p>${esc(subject || "FireVault Report")}</p><small>${esc((data.settings.email.defaultTo || "No default recipient") + (data.settings.email.cc ? ` • CC ${data.settings.email.cc}` : ""))}</small></div><span class="pill ${stats.h.cls}">${esc(stats.h.label)}</span></div>
     ${reportPhotoSelector526(s)}
     <div class="card reportDeliveryCard442 reportDeliveryCard444 reportDeliveryCard447"><div class="reportDeliveryHead"><div><h2>Delivery Log</h2><p>Tap a delivery item to copy a receipt. Add a follow-up task when a report needs customer confirmation.</p></div><div class="reportDeliveryHeadActions"><button class="ghost smallBtn" id="followReportBtn">Follow-Up</button><button class="ghost smallBtn" id="logSentBtn">Log Sent</button></div></div><div class="reportDeliveryList">${reportDeliveryHtml(s)}</div></div>
     <div class="card reportOptions441 reportOptions447"><div class="reportOptionsHead"><div><h2>Report Package</h2><p>Tap sections on/off before sharing, copying, or downloading.</p></div><button class="ghost smallBtn" id="resetReportSections">Reset</button></div><div class="reportSectionGrid441">${reportSectionControls(opts)}</div></div>
     <div class="reportPreviewGrid440 reportPreviewGrid447">${reportPreviewCards(s).map(card=>`<div class="card reportPreviewCard440"><span>${esc(card[0])}</span><h2>${esc(card[1])}</h2>${card[2].map(x=>`<p>${esc(x)}</p>`).join("")}</div>`).join("")}</div>
+    ${customerReportPreviewHtml555(s)}
     <div class="card reportBox reportBox440 reportBox447 grow">${esc(txt)}</div></div>`);
   document.getElementById("backBtn").onclick=()=>route("siteDetail");
   const reportAddPhoto526=document.getElementById("reportAddPhoto526"); if(reportAddPhoto526) reportAddPhoto526.onclick=()=>{mode="newPhoto"; route("siteDocForm");};
@@ -3258,6 +3320,8 @@ function report(){
   document.getElementById("shareBtn").onclick=async()=>{ if(await shareReportText(s,txt)){ logReportDelivery(s,"Share / Copy",subject); report(); } };
   document.getElementById("emailDraftBtn").onclick=()=>openReportEmailDraft(s,txt,subject);
   const customerEmailBtn538=document.getElementById("customerEmailBtn538"); if(customerEmailBtn538) customerEmailBtn538.onclick=copyCustomerCloseoutEmail538;
+  const customerPreviewBtn555=document.getElementById("customerPreviewBtn555"); if(customerPreviewBtn555) customerPreviewBtn555.onclick=copyCustomerPreview555;
+  wireCustomerPreview555();
   const customerPacketBtn539=document.getElementById("customerPacketBtn539"); if(customerPacketBtn539) customerPacketBtn539.onclick=copyCustomerCloseoutPacket539;
   const techPacketBtn540=document.getElementById("techPacketBtn540"); if(techPacketBtn540) techPacketBtn540.onclick=copyTechnicianCloseoutPacket540;
   const fullBundleBtn542=document.getElementById("fullBundleBtn542"); if(fullBundleBtn542) fullBundleBtn542.onclick=copyFullCloseoutBundle542;
@@ -4047,7 +4111,7 @@ function repairVaultState(){
 }
 
 
-/* Build 0.50.54 Backup Safety helpers */
+/* Build 0.50.55 Backup Safety helpers */
 function backupSafetyStats552(){
   const sites = (data.sites || []).length;
   const visits = (data.sites || []).reduce((n,s)=>n+((s.visits||[]).length),0);
@@ -4164,7 +4228,7 @@ async function copyUpdateChecklist553(){
 }
 
 
-/* Build 0.50.54 Backup Restore Center */
+/* Build 0.50.55 Backup Restore Center */
 let pendingRestoreBackup554 = null;
 
 function normalizeBackupPayload554(raw){
@@ -4373,17 +4437,17 @@ function diagnostics(){
 }
 function showChangelog(){
   const notes = [
-    "Advanced to Build 0.50.54 from the stable 0.50.53 baseline.",
-    "Added Restore Center for importing a FireVault JSON backup.",
-    "Restore Center previews backup build, backup date, sites, visits, docs, photos, tasks, and deficiencies before restoring.",
-    "Restore Backup now requires confirmation before overwriting current local FireVault data.",
-    "Preserved the stacked-lines main Settings icon, top-right Add Site button placement, Backup Safety download tools, clean splash screen with no loader, fixed splash/header behavior, Startup Health diagnostics, Photo Vault tools, Customer Report Photo workflow, iPad autosizing, simple Home screen, Search Bar Concept #6, and excluded job-status workflow controls."
+    "Advanced to Build 0.50.55 from the stable 0.50.54 baseline.",
+    "Added Customer Report Preview inside Report Center.",
+    "Preview shows the customer-facing closeout packet before copying, downloading, or sending.",
+    "Added ready/review status with selected photo, caption, and issue counts.",
+    "Preserved Backup Restore Center, stacked-lines main Settings icon, top-right Add Site button placement, Backup Safety download tools, clean splash screen with no loader, fixed splash/header behavior, Startup Health diagnostics, Photo Vault tools, Customer Report Photo workflow, iPad autosizing, simple Home screen, Search Bar Concept #6, and excluded job-status workflow controls."
   ];
   const overlay=document.createElement("div");
   overlay.className="releaseOverlay";
   overlay.innerHTML=`<div class="releaseSheet" role="dialog" aria-modal="true" aria-label="FireVault release notes">
     <div class="releaseHead"><div><strong>FireVault</strong><span>Build ${BUILD}</span></div><button class="ghost iconBtn" id="closeRelease" aria-label="Close release notes">×</button></div>
-    <div class="releaseBody"><h2>Release Notes</h2><p class="releaseIntro">Added Backup Restore Center with preview and confirmation.</p><ul>${notes.map(n=>`<li>${esc(n)}</li>`).join("")}</ul></div>
+    <div class="releaseBody"><h2>Release Notes</h2><p class="releaseIntro">Added Customer Report Preview in Report Center.</p><ul>${notes.map(n=>`<li>${esc(n)}</li>`).join("")}</ul></div>
   </div>`;
   document.body.appendChild(overlay);
   const close=()=>overlay.remove();

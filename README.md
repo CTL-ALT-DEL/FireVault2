@@ -1,11 +1,11 @@
-# FireVault Build 0.50.54
+# FireVault Build 0.50.55
 
-Build 0.50.54 continues from the stable 0.50.53 baseline and adds a Backup Restore Center with import, preview, and restore confirmation.
+Build 0.50.55 continues from the stable 0.50.54 baseline and adds Customer Report Preview inside Report Center.
 
 ## Changes
 
-- Visible app version advanced to 0.50.54.
-- Cache-busting references updated to 0.50.54.
+- Visible app version advanced to 0.50.55.
+- Cache-busting references updated to 0.50.55.
 - Added **Site Quick Actions** card on the account/site screen.
 - Added direct quick actions for:
   - Add Site Note
@@ -31,13 +31,13 @@ Run from the project root:
 node --check src/storage.js
 node --check src/app.js
 python -m json.tool manifest.json > /dev/null
-zip -T firevault-build-0.50.54-modular-root.zip
+zip -T firevault-build-0.50.55-modular-root.zip
 ```
 
 ## Suggested commit message
 
 ```text
-Build 0.50.54 backup restore center
+Build 0.50.55 customer report preview
 ```
 
 - Lifted the red Home add button above the bottom nav so it should not be blocked by the black bottom area.
@@ -55,3 +55,7 @@ Build 0.50.54 backup restore center
 - Restore Center previews backup build, export date, sites, visits, docs, photos, tasks, and deficiencies.
 - Restore requires confirmation before overwriting current local data.
 - Preserved stacked-lines Settings icon and top-right Add Site placement.
+
+- Added ready/review status with selected photo, caption, and issue counts.
+- Added Copy Preview and Download Preview actions.
+- Preserved Backup Restore Center from 0.50.54.
