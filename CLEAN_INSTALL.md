@@ -1,17 +1,11 @@
-# Clean Install Notes — FireVault Build 0.53.1
+# Clean Install Notes — FireVault Build 0.54.0
 
-This ZIP is the clean milestone baseline for FireVault Build 0.53.1.
+This build should replace the previous GitHub Pages files as a complete set.
 
-## Installation
+1. Export a FireVault backup from Settings → Backup.
+2. Replace the repository files with the contents of this ZIP.
+3. Commit and push the changes.
+4. Wait for GitHub Pages deployment to complete.
+5. On iPhone/iPad, reload Safari. If an older build remains cached, remove the Home Screen app, clear the website data for the FireVault site, and reinstall it.
 
-1. Replace the repository contents with the contents of this ZIP.
-2. Commit the files to the main branch.
-3. Allow GitHub Pages to redeploy.
-4. On iPhone or iPad, fully close FireVault and reopen it.
-5. If an older build remains cached, remove the Home Screen app, clear the site data/cache, and reinstall from Safari.
-
-## Data safety
-
-The existing FireVault storage key is unchanged. Updating from Build 0.50.76 does not intentionally erase saved sites, visits, photos, tasks, route logs, settings, or reports.
-
-Home card open/closed preferences are stored separately in local browser storage and can be changed at any time by tapping the round arrow control in each supported card header.
+Build 0.54.0 preserves existing local data and settings.

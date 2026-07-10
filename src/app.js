@@ -97,7 +97,7 @@ function fireVaultBrand575(extraClass=""){
   return `<span class="fireVaultWordmark575 ${esc(extraClass)}"><span>FIRE</span><b>VAULT</b></span>`;
 }
 
-/* Build 0.53.1 Home card collapse memory */
+/* Build 0.54.0 Home card collapse memory */
 function loadHomeCardState5100(){
   try{
     const parsed=JSON.parse(localStorage.getItem(HOME_CARD_STATE_KEY_5100)||"{}");
@@ -4431,8 +4431,8 @@ function settings(){
         <button class="ghost settingsModulesQuick488" id="modulesQuickBtn">Modules</button>
       </div>
       <div class="settingsChoiceGrid451 grow settingsChoiceGrid488" aria-label="Settings choices">
-        ${tabs.map((t,i)=>`<button class="settingsChoice451 settingsChoice455 settingsChoice456" data-tab="${t[0]}"><span class="settingsChoiceIcon451">${["👤","⌖","▤","✉","▧","◐","☰","⚡","⇅","ⓘ"][i]}</span><span class="settingsChoiceText456"><strong>${t[1]}</strong><small>${t[2]}</small></span><span class="settingsChoiceArrow455">›</span></button>`).join("")}
-        <button class="settingsChoice451 settingsChoice455 settingsChoice456 settingsChoiceUtility451" id="diagnosticsChoice"><span class="settingsChoiceIcon451">⌁</span><span class="settingsChoiceText456"><strong>Diagnostics</strong><small>Build, storage, GPS, module, task, report, and vault health details.</small></span><span class="settingsChoiceArrow455">›</span></button>
+        ${tabs.map((t,i)=>`<button class="settingsChoice451 settingsChoice455 settingsChoice456 settingsChoice-${t[0]}" data-tab="${t[0]}"><span class="settingsChoiceIcon451">${["👤","⌖","▤","✉","▧","◐","☰","⚡","⇅","ⓘ"][i]}</span><span class="settingsChoiceText456"><strong>${t[1]}</strong><small>${t[2]}</small></span><span class="settingsChoiceArrow455">›</span></button>`).join("")}
+        <button class="settingsChoice451 settingsChoice455 settingsChoice456 settingsChoiceUtility451 settingsChoice-diagnostics" id="diagnosticsChoice"><span class="settingsChoiceIcon451">⌁</span><span class="settingsChoiceText456"><strong>Diagnostics</strong><small>Build, storage, GPS, module, task, report, and vault health details.</small></span><span class="settingsChoiceArrow455">›</span></button>
       </div>
     </div>`);
     const homeBtn572=document.getElementById("settingsHomeBtn572"); if(homeBtn572) homeBtn572.onclick=leaveSettingsHome572;
@@ -4444,7 +4444,7 @@ function settings(){
     return;
   }
   const saveable=!['backup','about'].includes(settingsTab);
-  html(`<div class="screen settingsDetailScreen451 settingsScreen settingsScreen448 settingsScreen449 settingsDetailScreen488 settingsStable573">
+  html(`<div class="screen settingsDetailScreen451 settingsScreen settingsScreen448 settingsScreen449 settingsDetailScreen488 settingsStable573 settingsTab-${settingsTab}" data-settings-tab="${settingsTab}">
     <div class="settingsDetailTop451 settingsDetailTop488 settingsDetailTop572">
       <button class="ghost settingsBack451 settingsBack488" id="settingsBackBtn" aria-label="Back to Settings">←</button>
       <div class="settingsDetailTitle451 settingsDetailTitle488"><h1>${active[1]}</h1></div>
@@ -4540,40 +4540,51 @@ function emailTagButtons(){
 function emailSampleSite(){ return {name:"Acme Fire Panel", street:"123 Main St", city:"Casper", state:"WY", zip:"82601"}; }
 function emailPreviewHtml(subject, signature){
   const sample=emailSampleSite();
-  const renderedSubject=renderTemplate(subject || "", sample) || "FireVault Report - Acme Fire Panel - Today";
-  const renderedSig=renderTemplate(signature || "", sample) || "Technician\nCompany\nPhone\nEmail";
+  const renderedSubject=renderTemplate(subject || "", sample).trim() || "FireVault Report - Acme Fire Panel - Today";
+  const signatureValue=renderTemplate(signature || "", sample);
+  const renderedSig=signatureValue.trim() ? signatureValue : "FireVault Technician\nExample Fire Protection\n(307) 555-0100\ntech@example.com";
   return `<div class="emailPreviewLine"><strong>Subject</strong><span id="emailPreviewSubject">${esc(renderedSubject)}</span></div><div class="emailPreviewSignature" id="emailPreviewSignature">${esc(renderedSig).replaceAll("\n","<br>")}</div>`;
 }
 function emailSettingsPanel(email){
-  return `<div class="settingsStack emailSettingsPro">
-    <div class="card settingGroup compactPane emailComposerPane">
-      <div class="paneHead emailPaneHead"><div><h2>Email Defaults</h2><p class="paneNote">Clean templates for outgoing FireVault reports.</p></div><button class="primary saveMini" id="saveSettings">Save</button></div>
-      <div class="emailCardStack">
-        <section class="emailModule">
-          <div class="emailModuleTitle"><span>Recipients</span><small>Optional</small></div>
-          <div class="emailRowGrid">
-            <div class="emailControl"><label for="emailTo">Default To</label><input id="emailTo" autocomplete="email" inputmode="email" placeholder="customer@example.com" value="${esc(email.defaultTo)}"></div>
-            <div class="emailControl"><label for="emailCc">CC</label><input id="emailCc" autocomplete="email" inputmode="email" placeholder="office@example.com" value="${esc(email.cc)}"></div>
-          </div>
-        </section>
-        <section class="emailModule emailTemplateModule">
-          <div class="emailModuleTitle"><span>Subject Template</span><small>Tap tags below</small></div>
-          <div class="emailControl full"><input id="emailSubject" class="templateInput" value="${esc(email.defaultSubject)}" placeholder="FireVault Report - {site_name} - {date}"></div>
-        </section>
-        <section class="emailModule emailTemplateModule">
-          <div class="emailModuleTitle"><span>Signature Template</span><small>Report footer</small></div>
-          <div class="emailControl full"><textarea id="emailSig" class="emailSignatureTextarea" placeholder="{technician}\n{company}\n{phone}\n{email}">${esc(email.signature)}</textarea></div>
-        </section>
-        <section class="emailModule tagModule">
-          <div class="emailModuleTitle"><span>Insert Tags</span><small>Use in subject or signature</small></div>
-          <div class="emailTagGrid">${emailTagButtons()}</div>
-        </section>
-        <section class="emailModule emailPreviewCard">
-          <div class="emailModuleTitle"><span>Live Example</span><small>Sample site</small></div>
-          ${emailPreviewHtml(email.defaultSubject, email.signature)}
-        </section>
+  return `<div class="settingsStack emailSettingsRedesign530 emailSettings540">
+    <section class="card compactPane settingsSection530 emailEditor530 settingsSection540 tone-email">
+      <div class="settingsSectionHead530">
+        <div><span class="settingsEyebrow530">Outgoing reports</span><h2>Email Setup</h2><p>Set the defaults FireVault uses when you prepare a customer report email.</p></div>
+        <button class="primary saveMini" id="saveSettings">Save Changes</button>
       </div>
-    </div>
+
+      <div class="emailBlock530">
+        <div class="emailBlockHead530"><span class="emailStep530">1</span><div><h3>Recipients</h3><p>Leave these blank when recipients change from job to job.</p></div></div>
+        <div class="emailRowGrid530">
+          <div class="emailControl530"><label for="emailTo">Default recipient</label><input id="emailTo" autocomplete="email" inputmode="email" placeholder="customer@example.com" value="${esc(email.defaultTo)}"></div>
+          <div class="emailControl530"><label for="emailCc">Default CC</label><input id="emailCc" autocomplete="email" inputmode="email" placeholder="office@example.com" value="${esc(email.cc)}"></div>
+        </div>
+      </div>
+
+      <div class="emailBlock530">
+        <div class="emailBlockHead530"><span class="emailStep530">2</span><div><h3>Subject line</h3><p>Tap the subject field, then insert tags where you want account information to appear.</p></div></div>
+        <div class="emailControl530"><label for="emailSubject">Subject template</label><input id="emailSubject" class="templateInput" value="${esc(email.defaultSubject)}" placeholder="FireVault Report - {site_name} - {date}"></div>
+      </div>
+
+      <div class="emailBlock530">
+        <div class="emailBlockHead530"><span class="emailStep530">3</span><div><h3>Signature</h3><p>This appears at the bottom of the prepared email.</p></div></div>
+        <div class="emailControl530"><label for="emailSig">Signature template</label><textarea id="emailSig" class="emailSignatureTextarea" placeholder="{technician}\n{company}\n{phone}\n{email}">${esc(email.signature)}</textarea></div>
+      </div>
+
+      <div class="emailBlock530 emailTagsBlock530">
+        <div class="emailBlockHead530"><span class="emailStep530">+</span><div><h3>Insert information</h3><p>Choose a tag to insert it into the active subject or signature field.</p></div></div>
+        <div class="emailTagGrid530">${emailTagButtons()}</div>
+      </div>
+    </section>
+
+    <aside class="card compactPane settingsSection530 emailPreviewPanel530 settingsSection540 tone-preview">
+      <div class="settingsSectionHead530 emailPreviewHead530"><div><span class="settingsEyebrow530">Live preview</span><h2>Example Email</h2><p>Sample account information shows how your saved templates will read.</p></div></div>
+      <div class="emailMock530">
+        <div class="emailMockRow530"><strong>To</strong><span id="emailPreviewTo530">${esc(email.defaultTo || 'Customer email added when sending')}</span></div>
+        <div class="emailMockRow530"><strong>CC</strong><span id="emailPreviewCc530">${esc(email.cc || 'None')}</span></div>
+        ${emailPreviewHtml(email.defaultSubject, email.signature)}
+      </div>
+    </aside>
   </div>`;
 }
 function insertAtCursor(el, text){
@@ -4589,8 +4600,15 @@ function updateEmailPreview(){
   const sig=document.getElementById("emailSig");
   const subjectPreview=document.getElementById("emailPreviewSubject");
   const sigPreview=document.getElementById("emailPreviewSignature");
-  if(subjectPreview && subject) subjectPreview.textContent=renderTemplate(subject.value, emailSampleSite()) || "FireVault Report";
-  if(sigPreview && sig) sigPreview.innerHTML=esc(renderTemplate(sig.value, emailSampleSite())).replaceAll("\n","<br>") || "Signature preview";
+  if(subjectPreview && subject){
+    const renderedSubject=renderTemplate(subject.value, emailSampleSite()).trim();
+    subjectPreview.textContent=renderedSubject || "FireVault Report";
+  }
+  if(sigPreview && sig){
+    const renderedSignature=renderTemplate(sig.value, emailSampleSite());
+    const previewSignature=renderedSignature.trim() ? renderedSignature : "FireVault Technician\nExample Fire Protection\n(307) 555-0100\ntech@example.com";
+    sigPreview.innerHTML=esc(previewSignature).replaceAll("\n","<br>");
+  }
 }
 function overlayDefaultTemplate510(){ return "{site_name} • {date} • {time}\n{technician} • {company}"; }
 function overlaySampleSite510(){
@@ -4776,23 +4794,68 @@ function wireOverlaySettings510(){
 }
 
 
+
+function settingsSection540(kicker,title,note,content,tone="blue",action=""){
+  return `<section class="card settingGroup compactPane settingsSection540 tone-${tone}">
+    <div class="paneHead settingsPaneHead540"><div><span class="settingsKicker540">${esc(kicker)}</span><h2>${esc(title)}</h2><p class="paneNote">${esc(note)}</p></div>${action}</div>
+    <div class="settingsSectionBody540">${content}</div>
+  </section>`;
+}
+
 function settingsPanel(){
   const s=data.settings, t=s.theme, tech=s.technician, email=s.email, r=s.reports, o=s.overlay, a=s.advanced, gps=s.gps||{};
-  if(settingsTab==="tech") return `<div class="settingsStack"><div class="card settingGroup compactPane"><div class="paneHead"><h2>Technician Profile</h2><button class="primary saveMini" id="saveSettings">Save</button></div><p class="paneNote">Used on reports, email tags, and future photo stamps.</p><div class="settingsGrid">${fieldBlock("Name",`<input id="techName" value="${esc(tech.name)}">`)}${fieldBlock("Company",`<input id="techCompany" value="${esc(tech.company)}">`)}${fieldBlock("Phone",`<input id="techPhone" value="${esc(tech.phone)}">`)}${fieldBlock("Email",`<input id="techEmail" value="${esc(tech.email)}">`)}${fieldBlock("License / ID",`<input id="techLicense" value="${esc(tech.license)}">`)}</div></div></div>`;
-  if(settingsTab==="reports") return `<div class="settingsStack"><div class="card settingGroup compactPane"><div class="paneHead"><h2>Report Defaults</h2><button class="primary saveMini" id="saveSettings">Save</button></div><p class="paneNote">Controls generated site reports.</p><div class="settingsGrid">${fieldBlock("Report Title",`<input id="reportTitle" value="${esc(r.title)}">`)}${fieldBlock("Format",`<select id="reportFormat"><option ${r.format==="detailed"?"selected":""}>detailed</option><option ${r.format==="compact"?"selected":""}>compact</option></select>`)}</div><div class="settingsList">${checkBlock("repTech","Include technician profile",r.includeTechnician)}${checkBlock("repTasks","Include open and completed tasks",r.includeTasks)}${checkBlock("repDef","Include deficiencies",r.includeDeficiencies)}</div></div></div>`;
+  const saveButton=(label="Save")=>`<button class="primary saveMini" id="saveSettings">${esc(label)}</button>`;
+
+  if(settingsTab==="tech") return `<div class="settingsStack settingsStack540">
+    ${settingsSection540("Identity","Technician Profile","This information is reused throughout reports, email templates, and photo stamps.",`<div class="settingsGrid settingsGrid540">${fieldBlock("Technician name",`<input id="techName" autocomplete="name" value="${esc(tech.name)}">`)}${fieldBlock("Company",`<input id="techCompany" autocomplete="organization" value="${esc(tech.company)}">`)}</div>`,"blue",saveButton())}
+    ${settingsSection540("Contact","Contact & Credentials","Keep customer-facing contact details and your license or employee identifier together.",`<div class="settingsGrid settingsGrid540">${fieldBlock("Phone",`<input id="techPhone" autocomplete="tel" inputmode="tel" value="${esc(tech.phone)}">`)}${fieldBlock("Email",`<input id="techEmail" autocomplete="email" inputmode="email" value="${esc(tech.email)}">`)}${fieldBlock("License / ID",`<input id="techLicense" value="${esc(tech.license)}">`,`Optional identifier shown on reports`)}</div>`,"cyan")}
+  </div>`;
+
+  if(settingsTab==="reports") return `<div class="settingsStack settingsStack540">
+    ${settingsSection540("Document setup","Report Defaults","Choose the title and level of detail FireVault uses for new service reports.",`<div class="settingsGrid settingsGrid540">${fieldBlock("Report title",`<input id="reportTitle" value="${esc(r.title)}">`)}${fieldBlock("Report format",`<select id="reportFormat"><option value="detailed" ${r.format==="detailed"?"selected":""}>Detailed</option><option value="compact" ${r.format==="compact"?"selected":""}>Compact</option></select>`,`Detailed includes more site history; Compact is faster to review.`)}</div>`,"violet",saveButton())}
+    ${settingsSection540("Included content","Report Sections","Control which information is added automatically when a report is generated.",`<div class="settingsList settingsToggleList540">${checkBlock("repTech","Include technician profile",r.includeTechnician)}${checkBlock("repTasks","Include open and completed tasks",r.includeTasks)}${checkBlock("repDef","Include deficiencies",r.includeDeficiencies)}</div>`,"purple")}
+  </div>`;
+
   if(settingsTab==="email") return emailSettingsPanel(email);
   if(settingsTab==="overlay") return overlaySettingsPanel510(o);
-  if(settingsTab==="gps") return `<div class="settingsStack"><div class="card settingGroup compactPane gpsSettingsPane"><div class="paneHead"><h2>GPS / Maps</h2><button class="primary saveMini" id="saveSettings">Save</button></div><p class="paneNote">Restored GPS tools. Coordinates are saved locally inside each site record.</p><div class="settingsGrid">${fieldBlock("Default Map",`<select id="gpsMapProvider"><option value="apple" ${gps.mapProvider!=="google"?"selected":""}>Apple Maps</option><option value="google" ${gps.mapProvider==="google"?"selected":""}>Google Maps</option></select>`)}${fieldBlock("GPS Accuracy",`<select id="gpsHighAccuracy"><option value="true" ${gps.highAccuracy!==false?"selected":""}>High accuracy</option><option value="false" ${gps.highAccuracy===false?"selected":""}>Standard</option></select>`)}${fieldBlock("Nearby Radius",`<input id="gpsNearbyRadius" inputmode="decimal" value="${esc(gps.nearbyRadiusMiles||1)}">`,`Miles for Nearby Sites detection`)}</div><div class="settingsList">${checkBlock("gpsEnabled","Show GPS capture buttons on site pages",gps.enabled!==false)}${checkBlock("gpsReports","Include GPS coordinates in reports",gps.includeInReports!==false)}</div><p class="fieldNote">Browser GPS works only when allowed by the phone/browser and served from HTTPS.</p></div></div>`;
-  if(settingsTab==="themes") return `<div class="settingsStack"><div class="card settingGroup compactPane"><div class="paneHead"><h2>Theme Engine</h2><button class="primary saveMini" id="saveSettings">Apply</button></div><p class="paneNote">Quick presets and live UI controls.</p><div class="presetGrid">${Object.entries(themePresets).map(([key,p])=>`<button class="ghost presetBtn" data-preset="${key}"><span class="themeSwatch" style="background:${p.accentColor}"></span><span>${p.label}</span></button>`).join("")}</div><div class="settingsGrid">${fieldBlock("Theme",`<select id="themeName">${Object.entries(themePresets).map(([key,p])=>`<option value="${key}" ${t.name===key?"selected":""}>${p.label}</option>`).join("")}</select>`)}${fieldBlock("Accent Color",`<input id="themeAccent" type="color" value="${esc(t.accentColor||"#ef4444")}">`)}${fieldBlock("Buttons",`<select id="buttonStyle"><option value="rounded" ${t.buttonStyle!=="squared"?"selected":""}>rounded</option><option value="squared" ${t.buttonStyle==="squared"?"selected":""}>squared</option></select>`)}${fieldBlock("Cards",`<select id="cardStyle"><option value="glass" ${t.cardStyle!=="solid"?"selected":""}>glass</option><option value="solid" ${t.cardStyle==="solid"?"selected":""}>solid</option></select>`)}</div><div class="settingsList">${checkBlock("themeHighContrast","High contrast support",t.highContrast)}${checkBlock("themeLargeText","Larger text",t.largeText)}${checkBlock("themeCompact","Compact layout",t.compactLayout)}${checkBlock("themeHaptics","Haptic button feedback",s.app?.haptics!==false)}</div></div></div>`;
-  if(settingsTab==="visibility") { const mode=appMode(); const v=visibility(); return `<div class="settingsStack simpleSettings472"><div class="card settingGroup compactPane simpleHero472"><div class="paneHead"><div><h2>Modules / Simple View</h2><p class="paneNote">Turn major FireVault modules on or off. Disabled modules disappear from the interface until you enable them again here.</p></div><button class="primary saveMini" id="saveSettings">Save</button></div><div class="settingsGrid">${fieldBlock("App Mode",`<select id="viewMode"><option value="simple" ${mode==="simple"?"selected":""}>Simple View</option><option value="advanced" ${mode==="advanced"?"selected":""}>Advanced View</option><option value="power" ${mode==="power"?"selected":""}>Technician Power Mode</option></select>`,`Simple keeps the field interface clean. Advanced shows enabled modules. Power shows everything.`)}</div><div class="viewModeQuick472"><button class="ghost" data-view-mode="simple">Simple</button><button class="ghost" data-view-mode="advanced">Advanced</button><button class="ghost" data-view-mode="power">Power</button></div></div>${visibilityPresetCards474()}${layoutPresetCards565()}<div class="card settingGroup compactPane"><div class="paneHead"><h2>Modules</h2></div><p class="paneNote">Turn off anything you do not need. Disabled modules are removed from the dashboard, site screens, bottom tabs, and tool menus until enabled again. Field Focus, Pinned Sites, Data Safe Home Card, Important Site Info, Site Brief, and Site Activity Timeline are layout controls; their underlying tools remain available from their full screens.</p><div class="settingsList featureList472">${FEATURE_LABELS.map(([key,label,note])=>`<label class="checkRow featureCheck472"><input type="checkbox" id="vis_${key}" ${v[key]?"checked":""}><span><strong>${esc(label)}</strong><small>${esc(note)}</small></span></label>`).join("")}</div></div></div>`; }
-  if(settingsTab==="advanced") return `<div class="settingsStack"><div class="card settingGroup compactPane"><div class="paneHead"><h2>Advanced Features</h2><button class="primary saveMini" id="saveSettings">Save</button></div><p class="paneNote"><span class="featureStar">*</span> Requires outside services, permissions, APIs, or future backend modules.</p><div class="settingsList twoCol">${[["advAi","aiTechnician","AI Technician"],["advReverse","reverseAddressLookup","Reverse Address Lookup *"],["advCloud","cloudBackup","Cloud Backup *"],["advVoice","voiceTranscription","Voice Transcription *"],["advOcr","ocrReader","OCR Reader *"],["advEmail","emailGateway","Email Gateway *"],["advWeather","weather","Weather Context *"],["advTraffic","traffic","Traffic / Routing *"]].map(x=>checkBlock(x[0],x[2],a[x[1]])).join("")}</div></div></div>`;
+
+  if(settingsTab==="gps") return `<div class="settingsStack settingsStack540">
+    ${settingsSection540("Navigation","Map Preferences","Set the map service, GPS accuracy, and distance used for nearby-account detection.",`<div class="settingsGrid settingsGrid540">${fieldBlock("Default map",`<select id="gpsMapProvider"><option value="apple" ${gps.mapProvider!=="google"?"selected":""}>Apple Maps</option><option value="google" ${gps.mapProvider==="google"?"selected":""}>Google Maps</option></select>`)}${fieldBlock("GPS accuracy",`<select id="gpsHighAccuracy"><option value="true" ${gps.highAccuracy!==false?"selected":""}>High accuracy</option><option value="false" ${gps.highAccuracy===false?"selected":""}>Standard</option></select>`)}${fieldBlock("Nearby radius",`<input id="gpsNearbyRadius" inputmode="decimal" value="${esc(gps.nearbyRadiusMiles||1)}">`,`Distance in miles used by Nearby Sites`)}</div>`,"green",saveButton())}
+    ${settingsSection540("Availability","GPS Tools","Choose where location controls and saved coordinates are available.",`<div class="settingsList settingsToggleList540">${checkBlock("gpsEnabled","Show GPS capture buttons on site pages",gps.enabled!==false)}${checkBlock("gpsReports","Include GPS coordinates in reports",gps.includeInReports!==false)}</div><div class="settingsInfo540"><strong>Location permission required</strong><span>Browser GPS works only when FireVault is served over HTTPS and location access is allowed on the device.</span></div>`,"teal")}
+  </div>`;
+
+  if(settingsTab==="themes") return `<div class="settingsStack settingsStack540">
+    ${settingsSection540("One-tap styles","Quick Themes","Apply a coordinated accent and contrast preset without changing your stored field data.",`<div class="presetGrid settingsPresetGrid540">${Object.entries(themePresets).map(([key,p])=>`<button class="ghost presetBtn" data-preset="${key}"><span class="themeSwatch" style="background:${p.accentColor}"></span><span>${p.label}</span></button>`).join("")}</div>`,"violet",saveButton("Apply"))}
+    ${settingsSection540("Appearance","Interface Style","Fine-tune the color and shape of FireVault controls.",`<div class="settingsGrid settingsGrid540">${fieldBlock("Theme",`<select id="themeName">${Object.entries(themePresets).map(([key,p])=>`<option value="${key}" ${t.name===key?"selected":""}>${p.label}</option>`).join("")}</select>`)}${fieldBlock("Accent color",`<input id="themeAccent" type="color" value="${esc(t.accentColor||"#ef4444")}">`)}${fieldBlock("Button shape",`<select id="buttonStyle"><option value="rounded" ${t.buttonStyle!=="squared"?"selected":""}>Rounded</option><option value="squared" ${t.buttonStyle==="squared"?"selected":""}>Squared</option></select>`)}${fieldBlock("Card style",`<select id="cardStyle"><option value="glass" ${t.cardStyle!=="solid"?"selected":""}>Glass</option><option value="solid" ${t.cardStyle==="solid"?"selected":""}>Solid</option></select>`)}</div>`,"pink")}
+    ${settingsSection540("Comfort","Readability & Feedback","Adjust contrast, text density, and tactile feedback for field use.",`<div class="settingsList settingsToggleList540 twoCol">${checkBlock("themeHighContrast","High contrast support",t.highContrast)}${checkBlock("themeLargeText","Larger text",t.largeText)}${checkBlock("themeCompact","Compact layout",t.compactLayout)}${checkBlock("themeHaptics","Haptic button feedback",s.app?.haptics!==false)}</div>`,"blue")}
+  </div>`;
+
+  if(settingsTab==="visibility") {
+    const mode=appMode(); const v=visibility();
+    return `<div class="settingsStack simpleSettings472 settingsStack540">
+      <div class="card settingGroup compactPane simpleHero472 settingsSection540 tone-red"><div class="paneHead settingsPaneHead540"><div><span class="settingsKicker540">Workspace</span><h2>Modules / Simple View</h2><p class="paneNote">Choose how much of FireVault appears during everyday field work.</p></div>${saveButton()}</div><div class="settingsSectionBody540"><div class="settingsGrid settingsGrid540">${fieldBlock("App mode",`<select id="viewMode"><option value="simple" ${mode==="simple"?"selected":""}>Simple View</option><option value="advanced" ${mode==="advanced"?"selected":""}>Advanced View</option><option value="power" ${mode==="power"?"selected":""}>Technician Power Mode</option></select>`,`Simple keeps the interface clean. Advanced shows enabled modules. Power shows everything.`)}</div><div class="viewModeQuick472"><button class="ghost" data-view-mode="simple">Simple</button><button class="ghost" data-view-mode="advanced">Advanced</button><button class="ghost" data-view-mode="power">Power</button></div></div></div>
+      ${visibilityPresetCards474()}
+      ${layoutPresetCards565()}
+      <div class="card settingGroup compactPane settingsSection540 tone-amber modulesList540"><div class="paneHead settingsPaneHead540"><div><span class="settingsKicker540">Individual controls</span><h2>Module Visibility</h2><p class="paneNote">Turn off anything you do not use. Hidden modules remain available to enable again here.</p></div></div><div class="settingsSectionBody540"><div class="settingsList featureList472">${FEATURE_LABELS.map(([key,label,note])=>`<label class="checkRow featureCheck472"><input type="checkbox" id="vis_${key}" ${v[key]?"checked":""}><span><strong>${esc(label)}</strong><small>${esc(note)}</small></span></label>`).join("")}</div></div></div>
+    </div>`;
+  }
+
+  if(settingsTab==="advanced") return `<div class="settingsStack settingsStack540">
+    ${settingsSection540("Optional services","Advanced Features","These controls prepare FireVault for features that may require permissions, APIs, cloud services, or future backend modules.",`<div class="settingsInfo540 warning"><strong><span class="featureStar">*</span> External service required</strong><span>Turning on a future module does not automatically connect or purchase an outside service.</span></div><div class="settingsList twoCol advancedGrid540">${[["advAi","aiTechnician","AI Technician"],["advReverse","reverseAddressLookup","Reverse Address Lookup *"],["advCloud","cloudBackup","Cloud Backup *"],["advVoice","voiceTranscription","Voice Transcription *"],["advOcr","ocrReader","OCR Reader *"],["advEmail","emailGateway","Email Gateway *"],["advWeather","weather","Weather Context *"],["advTraffic","traffic","Traffic / Routing *"]].map(x=>checkBlock(x[0],x[2],a[x[1]])).join("")}</div>`,"amber",saveButton())}
+  </div>`;
+
   if(settingsTab==="backup") return backupSettingsPanel();
-  return `<div class="settingsStack"><div class="card settingGroup compactPane"><div class="paneHead"><h2>About ${fireVaultBrand575()}</h2></div><p class="paneNote">A modular field knowledge system for fire alarm technicians.</p><div class="aboutGrid"><div><strong>Build</strong><span>${BUILD}</span></div><div><strong>Storage key</strong><span>${KEY}</span></div><div><strong>Roadmap lane</strong><span>Modular foundation, settings polish, iPhone PWA, deeper service-call modules.</span></div></div></div></div>`;
+
+  return `<div class="settingsStack settingsStack540">
+    ${settingsSection540("Fire alarm field system",`About FireVault`,`A modular field knowledge system built to keep account history, service notes, and technician tools together.`,`<div class="aboutBrand540">${fireVaultBrand575()}<span>Field Vault System</span></div><p class="aboutCopy540">FireVault is designed for fast field reference, local-first reliability, and a simple interface that can reveal advanced tools only when they are needed.</p>`,"red")}
+    ${settingsSection540("Application details","Build Information","Use these details when reporting a problem or confirming which release is installed.",`<div class="aboutGrid aboutGrid540"><div><strong>Build</strong><span>${BUILD}</span></div><div><strong>Storage key</strong><span>${KEY}</span></div><div class="wide"><strong>Roadmap lane</strong><span>Stable modular foundation, refined settings, responsive iPhone and iPad layouts, and deeper service-call tools.</span></div></div>`,"slate")}
+  </div>`;
 }
 function wireSettingsPanel(){
   const saveBtn=document.getElementById("saveSettings"); if(saveBtn) saveBtn.onclick=saveSettings;
   if(settingsTab==="overlay") wireOverlaySettings510();
   ["emailSubject","emailSig"].forEach(id=>{ const el=document.getElementById(id); if(el){ el.addEventListener("focus",()=>lastEmailTemplateField=id); el.addEventListener("input",updateEmailPreview); } });
+  [["emailTo","emailPreviewTo530","Customer email added when sending"],["emailCc","emailPreviewCc530","None"]].forEach(([inputId,previewId,fallback])=>{ const input=document.getElementById(inputId); const preview=document.getElementById(previewId); if(input&&preview) input.addEventListener("input",()=>preview.textContent=input.value.trim()||fallback); });
   document.querySelectorAll(".emailTagChip").forEach(b=>b.onclick=()=>{ const target=document.getElementById(lastEmailTemplateField) || document.getElementById("emailSubject"); insertAtCursor(target, b.dataset.emailTag || ""); });
   document.querySelectorAll(".presetBtn").forEach(b=>b.onclick=()=>{ const p=themePresets[b.dataset.preset]; data.settings.theme.name=b.dataset.preset; data.settings.theme.accentColor=p.accentColor; if(p.highContrast) data.settings.theme.highContrast=true; save(); settings(); toast("Theme applied."); });
   document.querySelectorAll("[data-view-mode]").forEach(b=>b.onclick=()=>setViewMode(b.dataset.viewMode));
@@ -5686,7 +5749,7 @@ function diagnostics(){
 }
 function showChangelog(){
   const notes = [
-    "Advanced to milestone Build 0.53.1 from the stable 0.50.76 baseline.",
+    "Build 0.54.0 restores the preferred Email composer and introduces a fully scoped Settings redesign.",
     "Added collapsible Home cards for Pinned Sites, Field Focus, Nearby Accounts, and Recent Accounts.",
     "Each Home card remembers its open or closed state between app sessions while remaining open by default for existing users.",
     "Improved iPad portrait and landscape reflow so Home modules use available width without stretching phone layouts or hiding controls.",

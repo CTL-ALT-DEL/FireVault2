@@ -48,7 +48,7 @@ nav{min-height:var(--navH);position:fixed;bottom:0;left:0;right:0;display:grid;g
 
 
 /* Build 0.40.5 Settings small-space redesign + logo cache-bust */
-.settingsScreen{gap:6px;min-height:0}.settingsMicrobar{display:flex;align-items:center;justify-content:space-between;gap:8px;min-height:34px;padding:5px 7px;border:1px solid rgba(255,255,255,.07);border-radius:12px;background:rgba(255,255,255,.035)}.settingsCrumb{display:flex;align-items:center;gap:7px;min-width:0;font-size:12px;color:var(--muted);font-weight:850;text-transform:uppercase;letter-spacing:.055em}.settingsCrumb b{color:var(--text);font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-transform:none;letter-spacing:0}.settingsMicroLogo{width:24px;height:24px;border-radius:7px;flex:0 0 auto}.iconBtn{width:32px;height:32px;min-height:32px;padding:0;border-radius:10px;font-size:14px;display:grid;place-items:center}.settingsLayout{grid-template-columns:124px minmax(0,1fr);gap:7px}.settingsRail{gap:5px;padding:0 1px 8px}.settingsRail .tabBtn,.settingsRail .tabBtn.tabBtn{min-height:38px;padding:5px 7px;border-radius:11px;align-items:flex-start;text-align:left}.settingsRail .tabBtn strong{font-size:12px;line-height:1.05}.settingsRail .tabBtn span{font-size:9.5px;line-height:1.05;margin-top:1px;letter-spacing:0}.settingsContent{padding-bottom:12px}.settingsStack{gap:7px}.compactPane{padding:8px 9px;border-left-width:3px}.paneHead{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:2px}.paneHead h2{font-size:15px;line-height:1.1;margin:0}.paneNote{font-size:11px;line-height:1.25;margin:0 0 7px;color:var(--muted)}.saveMini{min-height:32px;padding:6px 10px;border-radius:10px;font-size:12px;flex:0 0 auto}.settingsGrid{grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}.settingField{gap:3px}.settingField label,label{font-size:9.5px;line-height:1.1;letter-spacing:.065em;text-align:left}.settingField input,.settingField textarea,.settingField select,input,textarea,select{min-height:38px;padding:8px 9px;border-radius:10px;font-size:13px;text-align:left}.settingField textarea,textarea{min-height:64px}.fieldNote{font-size:10.5px;line-height:1.2;margin:1px 0 0}.settingsList{gap:6px;margin-top:7px}.settingsList.twoCol{grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}.checkRow{min-height:36px;padding:7px 8px;border-radius:10px;font-size:12px;line-height:1.15;text-align:left;justify-content:flex-start}.checkRow input{width:17px;height:17px;min-height:17px}.presetGrid{grid-template-columns:repeat(2,minmax(0,1fr));gap:6px;margin-bottom:7px}.presetBtn{min-height:38px;padding:6px 8px;border-radius:10px;font-size:12px}.themeSwatch{width:22px;height:22px;border-radius:7px}.previewPanel.compactPreview{min-height:92px;margin:6px 0}.previewOverlay{font-size:11px;padding:7px 8px}.aboutGrid{gap:6px}.aboutGrid div{padding:8px;border-radius:10px}.aboutGrid strong{font-size:9.5px}.aboutGrid span{font-size:12px}.brandMark{content:url('../assets/icon-192.png?v=0.53.1')}
+.settingsScreen{gap:6px;min-height:0}.settingsMicrobar{display:flex;align-items:center;justify-content:space-between;gap:8px;min-height:34px;padding:5px 7px;border:1px solid rgba(255,255,255,.07);border-radius:12px;background:rgba(255,255,255,.035)}.settingsCrumb{display:flex;align-items:center;gap:7px;min-width:0;font-size:12px;color:var(--muted);font-weight:850;text-transform:uppercase;letter-spacing:.055em}.settingsCrumb b{color:var(--text);font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-transform:none;letter-spacing:0}.settingsMicroLogo{width:24px;height:24px;border-radius:7px;flex:0 0 auto}.iconBtn{width:32px;height:32px;min-height:32px;padding:0;border-radius:10px;font-size:14px;display:grid;place-items:center}.settingsLayout{grid-template-columns:124px minmax(0,1fr);gap:7px}.settingsRail{gap:5px;padding:0 1px 8px}.settingsRail .tabBtn,.settingsRail .tabBtn.tabBtn{min-height:38px;padding:5px 7px;border-radius:11px;align-items:flex-start;text-align:left}.settingsRail .tabBtn strong{font-size:12px;line-height:1.05}.settingsRail .tabBtn span{font-size:9.5px;line-height:1.05;margin-top:1px;letter-spacing:0}.settingsContent{padding-bottom:12px}.settingsStack{gap:7px}.compactPane{padding:8px 9px;border-left-width:3px}.paneHead{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:2px}.paneHead h2{font-size:15px;line-height:1.1;margin:0}.paneNote{font-size:11px;line-height:1.25;margin:0 0 7px;color:var(--muted)}.saveMini{min-height:32px;padding:6px 10px;border-radius:10px;font-size:12px;flex:0 0 auto}.settingsGrid{grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}.settingField{gap:3px}.settingField label,label{font-size:9.5px;line-height:1.1;letter-spacing:.065em;text-align:left}.settingField input,.settingField textarea,.settingField select,input,textarea,select{min-height:38px;padding:8px 9px;border-radius:10px;font-size:13px;text-align:left}.settingField textarea,textarea{min-height:64px}.fieldNote{font-size:10.5px;line-height:1.2;margin:1px 0 0}.settingsList{gap:6px;margin-top:7px}.settingsList.twoCol{grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}.checkRow{min-height:36px;padding:7px 8px;border-radius:10px;font-size:12px;line-height:1.15;text-align:left;justify-content:flex-start}.checkRow input{width:17px;height:17px;min-height:17px}.presetGrid{grid-template-columns:repeat(2,minmax(0,1fr));gap:6px;margin-bottom:7px}.presetBtn{min-height:38px;padding:6px 8px;border-radius:10px;font-size:12px}.themeSwatch{width:22px;height:22px;border-radius:7px}.previewPanel.compactPreview{min-height:92px;margin:6px 0}.previewOverlay{font-size:11px;padding:7px 8px}.aboutGrid{gap:6px}.aboutGrid div{padding:8px;border-radius:10px}.aboutGrid strong{font-size:9.5px}.aboutGrid span{font-size:12px}.brandMark{content:url('../assets/icon-192.png?v=0.54.0')}
 @media(max-width:720px){main{padding:7px 7px 14px}.settingsLayout{grid-template-columns:1fr;gap:6px}.settingsRail{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));grid-auto-flow:row;grid-auto-columns:auto;overflow:visible;gap:5px;padding:0}.settingsRail .tabBtn,.settingsRail .tabBtn.tabBtn{min-height:36px;padding:5px 4px;align-items:center;text-align:center}.settingsRail .tabBtn strong{font-size:11px}.settingsRail .tabBtn span{font-size:8.5px}.settingsGrid,.settingsList.twoCol,.presetGrid{grid-template-columns:1fr}.compactPane{padding:8px}.paneHead h2{font-size:14px}.settingsCrumb span{display:none}.settingsMicrobar{min-height:32px}.settingsContent{overflow:auto;padding-bottom:16px}.settingField input,.settingField textarea,.settingField select,input,textarea,select{font-size:13px;min-height:37px}.checkRow{font-size:11.5px}.presetGrid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:390px){.settingsRail{grid-template-columns:repeat(4,minmax(0,1fr));gap:4px}.settingsRail .tabBtn strong{font-size:10.5px}.settingsRail .tabBtn span{display:none}.presetGrid{grid-template-columns:1fr}.paneNote{display:none}.settingsGrid{gap:6px}.compactPane{padding:7px}}
 
@@ -11948,14 +11948,14 @@ body.app-booted533.settingsChrome572 > #appNav{
 }
 
 
-/* Build 0.53.1 Settings scroll-position recovery */
+/* Build 0.54.0 Settings scroll-position recovery */
 .settingsDetailBody488,
 .settingsHomeScreen488.settingsStable573{
   overflow-anchor:none;
   scroll-behavior:auto!important;
 }
 
-/* Build 0.53.1 responsive Home milestone */
+/* Build 0.54.0 responsive Home milestone */
 .homeUtilityGrid5100{
   display:grid;
   grid-template-columns:minmax(0,1fr);
@@ -12101,9 +12101,256 @@ body.app-booted533.settingsChrome572 > #appNav{
   width:100%!important;
 }
 
-/* Build 0.53.1 light-card collapse control contrast */
+/* Build 0.54.0 light-card collapse control contrast */
 .nearbyAccountsHero478 .homeCollapseBtn5100{
   color:#475569!important;
   background:rgba(15,23,42,.06)!important;
   border-color:rgba(15,23,42,.12)!important;
+}
+
+
+/* Build 0.54.0 — Settings redesign, strictly scoped to Settings routes */
+.settingsHomeScreen488.settingsStable573,
+.settingsDetailScreen488.settingsStable573{
+  --settingsAccent540:#ef4444;
+  --settingsTint540:rgba(239,68,68,.14);
+  --settingsPanel540:#151c27;
+  --settingsPanelSoft540:#1a2330;
+  --settingsLine540:rgba(164,181,207,.20);
+  --settingsText540:#f7f9fc;
+  --settingsMuted540:#acb9cb;
+}
+
+/* Settings home */
+.settingsHomeScreen488.settingsStable573 .settingsHeader488{
+  position:relative;
+  padding:13px 14px!important;
+  border:1px solid rgba(239,68,68,.30)!important;
+  border-radius:17px!important;
+  background:linear-gradient(125deg,rgba(239,68,68,.14),rgba(18,24,34,.98) 38%,rgba(18,24,34,.98))!important;
+  box-shadow:0 12px 28px rgba(0,0,0,.24)!important;
+  overflow:hidden;
+}
+.settingsHomeScreen488.settingsStable573 .settingsHeader488:after{
+  content:"";position:absolute;left:0;right:0;bottom:0;height:2px;
+  background:linear-gradient(90deg,#ef4444,rgba(239,68,68,.08));
+}
+.settingsHomeScreen488.settingsStable573 .settingsHeaderTitle572 h1{font-size:24px!important;line-height:1.05!important;letter-spacing:-.02em!important}
+.settingsHomeScreen488.settingsStable573 .settingsHeaderTitle572 p{margin-top:4px!important;font-size:12.5px!important;line-height:1.4!important;color:#b9c4d4!important}
+.settingsHomeScreen488.settingsStable573 .settingsChoiceGrid488{gap:10px!important;padding-bottom:18px!important}
+.settingsHomeScreen488.settingsStable573 .settingsChoice456{
+  --choice540:#64748b;--choiceTint540:rgba(100,116,139,.15);
+  position:relative;min-height:78px!important;padding:12px 13px!important;
+  border:1px solid color-mix(in srgb,var(--choice540) 36%,rgba(255,255,255,.10))!important;
+  border-radius:16px!important;
+  background:linear-gradient(110deg,var(--choiceTint540),rgba(18,25,36,.98) 38%,rgba(15,21,30,.98))!important;
+  box-shadow:0 8px 22px rgba(0,0,0,.22),inset 0 1px 0 rgba(255,255,255,.035)!important;
+  overflow:hidden;
+}
+.settingsHomeScreen488.settingsStable573 .settingsChoice456:before{
+  content:"";position:absolute;left:0;top:12px;bottom:12px;width:3px;border-radius:0 4px 4px 0;background:var(--choice540);opacity:.95;
+}
+.settingsHomeScreen488.settingsStable573 .settingsChoice456:hover,
+.settingsHomeScreen488.settingsStable573 .settingsChoice456:focus-visible{transform:translateY(-1px);border-color:color-mix(in srgb,var(--choice540) 62%,white 5%)!important;background:linear-gradient(110deg,color-mix(in srgb,var(--choice540) 21%,transparent),rgba(24,33,46,.99) 42%)!important}
+.settingsHomeScreen488.settingsStable573 .settingsChoiceIcon451{
+  width:44px!important;height:44px!important;border-radius:13px!important;
+  color:#fff!important;background:color-mix(in srgb,var(--choice540) 23%,#121923)!important;
+  border:1px solid color-mix(in srgb,var(--choice540) 50%,transparent)!important;
+  box-shadow:0 0 18px color-mix(in srgb,var(--choice540) 18%,transparent)!important;
+  font-size:20px!important;
+}
+.settingsHomeScreen488.settingsStable573 .settingsChoiceText456 strong{font-size:15.5px!important;line-height:1.15!important;color:#fff!important}
+.settingsHomeScreen488.settingsStable573 .settingsChoiceText456 small{margin-top:4px!important;font-size:11.8px!important;line-height:1.38!important;color:#b9c4d4!important}
+.settingsHomeScreen488.settingsStable573 .settingsChoiceArrow455{display:grid;place-items:center;width:28px;height:28px;border-radius:9px;background:color-mix(in srgb,var(--choice540) 15%,rgba(255,255,255,.04));color:color-mix(in srgb,var(--choice540) 74%,white 20%)!important;font-size:22px!important}
+.settingsHomeScreen488.settingsStable573 .settingsChoice-tech{--choice540:#38bdf8;--choiceTint540:rgba(56,189,248,.13)}
+.settingsHomeScreen488.settingsStable573 .settingsChoice-gps{--choice540:#22c55e;--choiceTint540:rgba(34,197,94,.13)}
+.settingsHomeScreen488.settingsStable573 .settingsChoice-reports{--choice540:#a78bfa;--choiceTint540:rgba(167,139,250,.14)}
+.settingsHomeScreen488.settingsStable573 .settingsChoice-email{--choice540:#fb923c;--choiceTint540:rgba(251,146,60,.15)}
+.settingsHomeScreen488.settingsStable573 .settingsChoice-overlay{--choice540:#22d3ee;--choiceTint540:rgba(34,211,238,.13)}
+.settingsHomeScreen488.settingsStable573 .settingsChoice-themes{--choice540:#e879f9;--choiceTint540:rgba(232,121,249,.13)}
+.settingsHomeScreen488.settingsStable573 .settingsChoice-visibility{--choice540:#ef4444;--choiceTint540:rgba(239,68,68,.14)}
+.settingsHomeScreen488.settingsStable573 .settingsChoice-advanced{--choice540:#fbbf24;--choiceTint540:rgba(251,191,36,.13)}
+.settingsHomeScreen488.settingsStable573 .settingsChoice-backup{--choice540:#60a5fa;--choiceTint540:rgba(96,165,250,.13)}
+.settingsHomeScreen488.settingsStable573 .settingsChoice-about{--choice540:#94a3b8;--choiceTint540:rgba(148,163,184,.13)}
+.settingsHomeScreen488.settingsStable573 .settingsChoice-diagnostics{--choice540:#34d399;--choiceTint540:rgba(52,211,153,.12)}
+
+/* Per-submenu identity */
+.settingsDetailScreen488.settingsStable573.settingsTab-tech{--settingsAccent540:#38bdf8;--settingsTint540:rgba(56,189,248,.14)}
+.settingsDetailScreen488.settingsStable573.settingsTab-gps{--settingsAccent540:#22c55e;--settingsTint540:rgba(34,197,94,.14)}
+.settingsDetailScreen488.settingsStable573.settingsTab-reports{--settingsAccent540:#a78bfa;--settingsTint540:rgba(167,139,250,.15)}
+.settingsDetailScreen488.settingsStable573.settingsTab-email{--settingsAccent540:#fb923c;--settingsTint540:rgba(251,146,60,.15)}
+.settingsDetailScreen488.settingsStable573.settingsTab-overlay{--settingsAccent540:#22d3ee;--settingsTint540:rgba(34,211,238,.14)}
+.settingsDetailScreen488.settingsStable573.settingsTab-themes{--settingsAccent540:#e879f9;--settingsTint540:rgba(232,121,249,.14)}
+.settingsDetailScreen488.settingsStable573.settingsTab-visibility{--settingsAccent540:#ef4444;--settingsTint540:rgba(239,68,68,.15)}
+.settingsDetailScreen488.settingsStable573.settingsTab-advanced{--settingsAccent540:#fbbf24;--settingsTint540:rgba(251,191,36,.14)}
+.settingsDetailScreen488.settingsStable573.settingsTab-backup{--settingsAccent540:#60a5fa;--settingsTint540:rgba(96,165,250,.14)}
+.settingsDetailScreen488.settingsStable573.settingsTab-about{--settingsAccent540:#94a3b8;--settingsTint540:rgba(148,163,184,.14)}
+
+.settingsDetailScreen488.settingsStable573 .settingsDetailTop488{
+  position:relative;padding:10px!important;border-radius:16px!important;
+  border:1px solid color-mix(in srgb,var(--settingsAccent540) 38%,rgba(255,255,255,.10))!important;
+  background:linear-gradient(118deg,var(--settingsTint540),rgba(18,25,35,.98) 42%)!important;
+  box-shadow:0 10px 25px rgba(0,0,0,.22)!important;overflow:hidden;
+}
+.settingsDetailScreen488.settingsStable573 .settingsDetailTop488:after{content:"";position:absolute;left:48px;right:48px;bottom:0;height:2px;background:linear-gradient(90deg,transparent,var(--settingsAccent540),transparent);opacity:.8}
+.settingsDetailScreen488.settingsStable573 .settingsDetailTitle488 h1{font-size:21px!important;line-height:1.1!important;letter-spacing:-.02em!important;color:#fff!important}
+.settingsDetailScreen488.settingsStable573 .settingsDetailSub488{margin:2px 6px 8px!important;font-size:12.3px!important;line-height:1.42!important;color:#b8c3d3!important}
+.settingsDetailScreen488.settingsStable573 .settingsDetailBody488{padding:2px 0 22px!important}
+.settingsDetailScreen488.settingsStable573 .settingsStack{gap:12px!important}
+
+/* Settings-only card language */
+.settingsDetailScreen488.settingsStable573 .compactPane,
+.settingsDetailScreen488.settingsStable573 .settingsSection540{
+  --section540:var(--settingsAccent540);
+  position:relative;padding:15px!important;border-radius:17px!important;
+  border:1px solid color-mix(in srgb,var(--section540) 30%,rgba(255,255,255,.11))!important;
+  border-left:4px solid var(--section540)!important;
+  background:linear-gradient(125deg,color-mix(in srgb,var(--section540) 10%,transparent),rgba(22,29,41,.98) 33%,rgba(16,22,31,.99))!important;
+  box-shadow:0 10px 24px rgba(0,0,0,.22),inset 0 1px 0 rgba(255,255,255,.035)!important;
+  overflow:hidden;
+}
+.settingsDetailScreen488.settingsStable573 .compactPane:before,
+.settingsDetailScreen488.settingsStable573 .settingsSection540:before{content:"";position:absolute;right:-34px;top:-44px;width:130px;height:130px;border-radius:50%;background:radial-gradient(circle,color-mix(in srgb,var(--section540) 13%,transparent),transparent 68%);pointer-events:none}
+.settingsDetailScreen488.settingsStable573 .tone-blue{--section540:#38bdf8}.settingsDetailScreen488.settingsStable573 .tone-cyan{--section540:#22d3ee}
+.settingsDetailScreen488.settingsStable573 .tone-green{--section540:#22c55e}.settingsDetailScreen488.settingsStable573 .tone-teal{--section540:#2dd4bf}
+.settingsDetailScreen488.settingsStable573 .tone-violet{--section540:#a78bfa}.settingsDetailScreen488.settingsStable573 .tone-purple{--section540:#c084fc}
+.settingsDetailScreen488.settingsStable573 .tone-pink{--section540:#e879f9}.settingsDetailScreen488.settingsStable573 .tone-red{--section540:#ef4444}
+.settingsDetailScreen488.settingsStable573 .tone-amber{--section540:#fbbf24}.settingsDetailScreen488.settingsStable573 .tone-email{--section540:#fb923c}
+.settingsDetailScreen488.settingsStable573 .tone-preview{--section540:#38bdf8}.settingsDetailScreen488.settingsStable573 .tone-slate{--section540:#94a3b8}
+.settingsDetailScreen488.settingsStable573 .settingsPaneHead540{align-items:flex-start!important;margin:0 0 13px!important;padding:0 0 12px!important;border-bottom:1px solid color-mix(in srgb,var(--section540) 20%,rgba(255,255,255,.08))!important}
+.settingsDetailScreen488.settingsStable573 .settingsPaneHead540>div{min-width:0}
+.settingsDetailScreen488.settingsStable573 .settingsKicker540{display:block;margin-bottom:4px;font-size:10px;font-weight:950;letter-spacing:.13em;text-transform:uppercase;color:var(--section540)}
+.settingsDetailScreen488.settingsStable573 .paneHead h2{margin:0!important;font-size:18px!important;line-height:1.17!important;letter-spacing:-.01em!important;color:#fff!important}
+.settingsDetailScreen488.settingsStable573 .paneNote{margin:5px 0 0!important;font-size:12.3px!important;line-height:1.42!important;color:#b4c0d1!important}
+.settingsDetailScreen488.settingsStable573 .settingsSectionBody540{position:relative;z-index:1}
+
+/* Proper form typography */
+.settingsDetailScreen488.settingsStable573 .settingsGrid{gap:11px!important}
+.settingsDetailScreen488.settingsStable573 .settingField{gap:6px!important}
+.settingsDetailScreen488.settingsStable573 .settingField>label,
+.settingsDetailScreen488.settingsStable573 .emailControl530>label{font-size:12.2px!important;font-weight:850!important;letter-spacing:.01em!important;text-transform:none!important;color:#e5ebf4!important;line-height:1.25!important}
+.settingsDetailScreen488.settingsStable573 input:not([type="checkbox"]):not([type="range"]),
+.settingsDetailScreen488.settingsStable573 textarea,
+.settingsDetailScreen488.settingsStable573 select{
+  min-height:46px!important;padding:11px 12px!important;border:1px solid rgba(162,180,207,.29)!important;border-radius:11px!important;
+  background:rgba(7,12,19,.88)!important;color:#f8fafc!important;font-size:14px!important;line-height:1.35!important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.025)!important;text-align:left!important;
+}
+.settingsDetailScreen488.settingsStable573 input:focus,
+.settingsDetailScreen488.settingsStable573 textarea:focus,
+.settingsDetailScreen488.settingsStable573 select:focus{outline:2px solid color-mix(in srgb,var(--settingsAccent540) 65%,white 5%)!important;outline-offset:1px!important;border-color:transparent!important}
+.settingsDetailScreen488.settingsStable573 textarea{min-height:112px!important;resize:vertical}
+.settingsDetailScreen488.settingsStable573 .fieldNote{margin-top:4px!important;font-size:11.3px!important;line-height:1.38!important;color:#9eacbf!important}
+.settingsDetailScreen488.settingsStable573 .saveMini,
+.settingsDetailScreen488.settingsStable573 .settingsTopSave488{min-height:39px!important;padding:8px 14px!important;border-radius:11px!important;font-size:12.8px!important;font-weight:950!important;white-space:nowrap}
+.settingsDetailScreen488.settingsStable573 .saveMini{background:linear-gradient(180deg,color-mix(in srgb,var(--section540) 88%,white 5%),color-mix(in srgb,var(--section540) 72%,black 12%))!important;border-color:color-mix(in srgb,var(--section540) 72%,white 5%)!important}
+
+/* Switch rows are visually separate, not identical dark boxes */
+.settingsDetailScreen488.settingsStable573 .settingsList{gap:8px!important}
+.settingsDetailScreen488.settingsStable573 .checkRow{
+  min-height:48px!important;padding:10px 11px!important;border-radius:12px!important;
+  border:1px solid rgba(158,176,204,.19)!important;background:rgba(255,255,255,.035)!important;
+  color:#e8edf5!important;font-size:12.8px!important;line-height:1.3!important;box-shadow:none!important;
+}
+.settingsDetailScreen488.settingsStable573 .checkRow:nth-child(even){background:color-mix(in srgb,var(--section540) 5%,rgba(255,255,255,.032))!important}
+.settingsDetailScreen488.settingsStable573 .checkRow:has(input:checked){border-color:color-mix(in srgb,var(--section540) 48%,rgba(255,255,255,.12))!important;background:color-mix(in srgb,var(--section540) 12%,rgba(255,255,255,.028))!important}
+.settingsDetailScreen488.settingsStable573 .checkRow input{width:20px!important;height:20px!important;min-height:20px!important;accent-color:var(--section540)!important;flex:0 0 auto}
+.settingsDetailScreen488.settingsStable573 .featureCheck472 span strong{font-size:13px!important;line-height:1.2!important;color:#f5f7fb!important}
+.settingsDetailScreen488.settingsStable573 .featureCheck472 span small{display:block;margin-top:3px!important;font-size:11.3px!important;line-height:1.38!important;color:#aebace!important}
+.settingsDetailScreen488.settingsStable573 .settingsInfo540{display:grid;gap:4px;margin-top:11px;padding:11px 12px;border-radius:12px;border:1px solid color-mix(in srgb,var(--section540) 28%,rgba(255,255,255,.08));background:color-mix(in srgb,var(--section540) 9%,rgba(0,0,0,.12))}
+.settingsDetailScreen488.settingsStable573 .settingsInfo540 strong{font-size:12.5px;color:#f5f7fb}.settingsDetailScreen488.settingsStable573 .settingsInfo540 span{font-size:11.4px;line-height:1.4;color:#afbbcc}
+.settingsDetailScreen488.settingsStable573 .settingsInfo540.warning{--section540:#fbbf24}
+
+/* Existing multi-card submenus */
+.settingsDetailScreen488.settingsStable573.settingsTab-visibility .simpleHero472{--section540:#ef4444}
+.settingsDetailScreen488.settingsStable573.settingsTab-visibility .featurePresets474{--section540:#a78bfa}
+.settingsDetailScreen488.settingsStable573.settingsTab-visibility .layoutPresets565{--section540:#22d3ee}
+.settingsDetailScreen488.settingsStable573.settingsTab-visibility .modulesList540{--section540:#fbbf24}
+.settingsDetailScreen488.settingsStable573 .presetGrid474,
+.settingsDetailScreen488.settingsStable573 .layoutPresetGrid565{gap:9px!important}
+.settingsDetailScreen488.settingsStable573 .presetFeatureBtn474,
+.settingsDetailScreen488.settingsStable573 .layoutPresetBtn565,
+.settingsDetailScreen488.settingsStable573 .presetBtn{
+  border:1px solid rgba(159,177,205,.22)!important;background:rgba(255,255,255,.04)!important;box-shadow:none!important;border-radius:13px!important;
+}
+.settingsDetailScreen488.settingsStable573 .presetFeatureBtn474:hover,
+.settingsDetailScreen488.settingsStable573 .layoutPresetBtn565:hover,
+.settingsDetailScreen488.settingsStable573 .presetBtn:hover{background:color-mix(in srgb,var(--section540) 12%,rgba(255,255,255,.045))!important;border-color:color-mix(in srgb,var(--section540) 44%,rgba(255,255,255,.10))!important}
+.settingsDetailScreen488.settingsStable573 .presetActive575{border-color:color-mix(in srgb,var(--section540) 65%,white 4%)!important;background:color-mix(in srgb,var(--section540) 17%,rgba(255,255,255,.04))!important}
+.settingsDetailScreen488.settingsStable573 .viewModeQuick472{gap:8px!important;margin-top:10px!important}.settingsDetailScreen488.settingsStable573 .viewModeQuick472 button{min-height:42px!important}
+
+/* Restored 0.53 email composer — scoped so it cannot alter Account cards */
+.settingsDetailScreen488.settingsStable573.settingsTab-email .emailSettingsRedesign530{display:grid!important;grid-template-columns:minmax(0,1fr)!important;gap:12px!important}
+.settingsDetailScreen488.settingsStable573.settingsTab-email .settingsSection530{padding:0!important;overflow:hidden}
+.settingsDetailScreen488.settingsStable573.settingsTab-email .settingsSectionHead530{display:flex;justify-content:space-between;align-items:flex-start;gap:14px;padding:16px;border-bottom:1px solid color-mix(in srgb,var(--section540) 24%,rgba(255,255,255,.08));position:relative;z-index:1}
+.settingsDetailScreen488.settingsStable573.settingsTab-email .settingsSectionHead530 h2{margin:3px 0 4px!important;font-size:20px!important;line-height:1.15!important;color:#fff!important}
+.settingsDetailScreen488.settingsStable573.settingsTab-email .settingsSectionHead530 p{margin:0!important;max-width:620px;font-size:12.3px!important;line-height:1.45!important;color:#b4c0d1!important}
+.settingsDetailScreen488.settingsStable573.settingsTab-email .settingsEyebrow530{display:block;font-size:10px;font-weight:950;letter-spacing:.13em;text-transform:uppercase;color:var(--section540)}
+.settingsDetailScreen488.settingsStable573.settingsTab-email .emailBlock530{padding:16px;border-bottom:1px solid rgba(158,176,204,.14);position:relative;z-index:1}
+.settingsDetailScreen488.settingsStable573.settingsTab-email .emailBlock530:nth-child(odd){background:rgba(255,255,255,.017)}
+.settingsDetailScreen488.settingsStable573.settingsTab-email .emailBlock530:last-child{border-bottom:0}
+.settingsDetailScreen488.settingsStable573.settingsTab-email .emailBlockHead530{display:flex;align-items:flex-start;gap:10px;margin-bottom:12px}
+.settingsDetailScreen488.settingsStable573.settingsTab-email .emailStep530{display:grid;place-items:center;flex:0 0 28px;width:28px;height:28px;border-radius:9px;background:linear-gradient(180deg,var(--section540),color-mix(in srgb,var(--section540) 72%,black 15%));color:#fff;font-size:12px;font-weight:950;box-shadow:0 4px 12px color-mix(in srgb,var(--section540) 24%,transparent)}
+.settingsDetailScreen488.settingsStable573.settingsTab-email .emailBlockHead530 h3{margin:0 0 3px!important;font-size:15px!important;line-height:1.2!important;color:#fff!important}
+.settingsDetailScreen488.settingsStable573.settingsTab-email .emailBlockHead530 p{margin:0!important;font-size:11.6px!important;line-height:1.38!important;color:#aebacd!important}
+.settingsDetailScreen488.settingsStable573.settingsTab-email .emailRowGrid530{display:grid;grid-template-columns:1fr;gap:10px}
+.settingsDetailScreen488.settingsStable573.settingsTab-email .emailControl530{display:grid;gap:6px}
+.settingsDetailScreen488.settingsStable573.settingsTab-email .emailControl530 textarea{min-height:138px!important;line-height:1.5!important;white-space:pre-wrap!important}
+.settingsDetailScreen488.settingsStable573.settingsTab-email .emailTagGrid530{display:flex;flex-wrap:wrap;gap:8px}
+.settingsDetailScreen488.settingsStable573.settingsTab-email .emailTagChip{display:inline-flex;align-items:center;gap:8px;width:auto;min-height:38px;padding:8px 10px;border:1px solid rgba(165,183,210,.23);border-radius:10px;background:rgba(255,255,255,.045);color:#fff;box-shadow:none}
+.settingsDetailScreen488.settingsStable573.settingsTab-email .emailTagChip:hover{background:rgba(251,146,60,.12);border-color:rgba(251,146,60,.43)}
+.settingsDetailScreen488.settingsStable573.settingsTab-email .emailTagChip strong{font-size:12px}.settingsDetailScreen488.settingsStable573.settingsTab-email .emailTagChip span{font-size:10px;color:#9eacc0}
+.settingsDetailScreen488.settingsStable573.settingsTab-email .emailPreviewPanel530{--section540:#38bdf8;align-self:start;padding:0!important}
+.settingsDetailScreen488.settingsStable573.settingsTab-email .emailMock530{padding:16px;background:#f5f7fa;color:#17202c;position:relative;z-index:1}
+.settingsDetailScreen488.settingsStable573.settingsTab-email .emailMockRow530,
+.settingsDetailScreen488.settingsStable573.settingsTab-email .emailPreviewLine{display:grid!important;grid-template-columns:64px minmax(0,1fr)!important;gap:8px;padding:9px 0;border-bottom:1px solid #dce2e9}
+.settingsDetailScreen488.settingsStable573.settingsTab-email .emailMockRow530 strong,
+.settingsDetailScreen488.settingsStable573.settingsTab-email .emailPreviewLine strong{font-size:10.5px!important;text-transform:uppercase!important;letter-spacing:.06em!important;color:#667386!important}
+.settingsDetailScreen488.settingsStable573.settingsTab-email .emailMockRow530 span,
+.settingsDetailScreen488.settingsStable573.settingsTab-email .emailPreviewLine span{font-size:13px!important;line-height:1.42!important;color:#17202c!important;overflow-wrap:anywhere}
+.settingsDetailScreen488.settingsStable573.settingsTab-email .emailPreviewSignature{padding:17px 0 4px!important;font-size:13px!important;line-height:1.55!important;color:#17202c!important}
+
+/* Overlay, Backup, About */
+.settingsDetailScreen488.settingsStable573.settingsTab-overlay .overlayPreviewCard510{--section540:#22d3ee}
+.settingsDetailScreen488.settingsStable573.settingsTab-overlay .overlayOptionsCard510{--section540:#60a5fa}
+.settingsDetailScreen488.settingsStable573.settingsTab-overlay .overlayFieldsCard510{--section540:#a78bfa}
+.settingsDetailScreen488.settingsStable573.settingsTab-overlay .overlayFieldChip510{border-color:rgba(155,177,207,.23)!important;background:rgba(255,255,255,.04)!important;box-shadow:none!important}
+.settingsDetailScreen488.settingsStable573.settingsTab-overlay .overlayFieldChip510:hover{border-color:rgba(34,211,238,.46)!important;background:rgba(34,211,238,.09)!important}
+.settingsDetailScreen488.settingsStable573.settingsTab-backup .backupHero449{--section540:#22c55e}
+.settingsDetailScreen488.settingsStable573.settingsTab-backup .backupImport449{--section540:#60a5fa}
+.settingsDetailScreen488.settingsStable573.settingsTab-backup .backupDanger449{--section540:#ef4444}
+.settingsDetailScreen488.settingsStable573.settingsTab-backup .backupStats449>div{border:1px solid rgba(157,176,205,.18)!important;background:rgba(255,255,255,.04)!important}
+.settingsDetailScreen488.settingsStable573 .aboutBrand540{display:flex;align-items:center;gap:10px;flex-wrap:wrap;font-size:24px;font-weight:950}.settingsDetailScreen488.settingsStable573 .aboutBrand540>span{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:#aebacd}
+.settingsDetailScreen488.settingsStable573 .aboutCopy540{margin:13px 0 0;font-size:13px;line-height:1.55;color:#c2ccda}
+.settingsDetailScreen488.settingsStable573 .aboutGrid540 .wide{grid-column:1/-1}
+.settingsDetailScreen488.settingsStable573 .aboutGrid540 div{border-color:rgba(157,176,205,.20)!important;background:rgba(255,255,255,.04)!important}
+
+@media(min-width:720px){
+  .settingsHomeScreen488.settingsStable573 .settingsChoiceGrid488{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+  .settingsDetailScreen488.settingsStable573 .settingsGrid540{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+  .settingsDetailScreen488.settingsStable573.settingsTab-email .emailSettingsRedesign530{grid-template-columns:minmax(0,1.35fr) minmax(285px,.65fr)!important;align-items:start}
+  .settingsDetailScreen488.settingsStable573.settingsTab-email .emailRowGrid530{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .settingsDetailScreen488.settingsStable573.settingsTab-email .emailPreviewPanel530{position:sticky;top:0}
+}
+@media(max-width:520px){
+  .settingsHomeScreen488.settingsStable573 .settingsHeader488{padding:11px!important}
+  .settingsHomeScreen488.settingsStable573 .settingsChoice456{min-height:76px!important;padding:11px 10px!important}
+  .settingsHomeScreen488.settingsStable573 .settingsChoiceText456 small{font-size:11.2px!important}
+  .settingsDetailScreen488.settingsStable573 .compactPane,.settingsDetailScreen488.settingsStable573 .settingsSection540{padding:13px!important;border-radius:15px!important}
+  .settingsDetailScreen488.settingsStable573 .settingsPaneHead540{display:block!important}
+  .settingsDetailScreen488.settingsStable573 .settingsPaneHead540 .saveMini{width:100%;margin-top:11px}
+  .settingsDetailScreen488.settingsStable573 .settingsGrid540{grid-template-columns:1fr!important}
+  .settingsDetailScreen488.settingsStable573 .settingsList.twoCol{grid-template-columns:1fr!important}
+  .settingsDetailScreen488.settingsStable573.settingsTab-email .settingsSection530{padding:0!important}
+  .settingsDetailScreen488.settingsStable573.settingsTab-email .settingsSectionHead530{padding:14px;display:block}
+  .settingsDetailScreen488.settingsStable573.settingsTab-email .settingsSectionHead530 .saveMini{width:100%;margin-top:12px}
+  .settingsDetailScreen488.settingsStable573.settingsTab-email .emailBlock530{padding:14px}
+  .settingsDetailScreen488.settingsStable573.settingsTab-email .emailMockRow530,
+  .settingsDetailScreen488.settingsStable573.settingsTab-email .emailPreviewLine{grid-template-columns:1fr!important;gap:3px}
+  .settingsDetailScreen488.settingsStable573.settingsTab-email .emailTagGrid530{display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}
+  .settingsDetailScreen488.settingsStable573.settingsTab-email .emailTagChip{width:100%;justify-content:space-between}
+}
+@media(max-width:380px){
+  .settingsHomeScreen488.settingsStable573 .settingsChoiceIcon451{width:40px!important;height:40px!important}
+  .settingsDetailScreen488.settingsStable573.settingsTab-email .emailTagGrid530{grid-template-columns:1fr}
 }

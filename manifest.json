@@ -8,7 +8,7 @@
   "orientation": "any",
   "background_color": "#0b0d10",
   "theme_color": "#101216",
-  "description": "Field knowledge system for fire alarm technicians. Build 0.53.1 adds responsive iPhone and iPad Home layouts with collapsible cards while preserving Settings scroll recovery and FIRE-red / VAULT-white branding.",
+  "description": "Field knowledge system for fire alarm technicians. Build 0.54.0 restores the Email composer and introduces a fully scoped, color-organized Settings redesign for iPhone and iPad.",
   "icons": [
     {
       "src": "assets/icon-192.png",
