@@ -88,6 +88,9 @@ const PHOTO_CATEGORY_HINTS_524 = {
 const REPORT_SECTION_KEY = "firevault_report_section_prefs";
 let reportSectionPrefs = loadReportSectionPrefs();
 const appEl = document.getElementById("app");
+function fireVaultBrand575(extraClass=""){
+  return `<span class="fireVaultWordmark575 ${esc(extraClass)}"><span>FIRE</span><b>VAULT</b></span>`;
+}
 const themePresets = {
   "firevault-dark": {label:"FireVault Dark", accentColor:"#ef4444"},
   "fire-red": {label:"Fire Red", accentColor:"#ef4444"},
@@ -181,13 +184,20 @@ const FEATURE_PRESETS_474 = {
   inspection:{label:"Inspector", mode:"advanced", icon:"▤", note:"Reports, equipment, route review, library, and export tools.", features:{dailyRoute:true, fieldFocus:true, dataSafeHome:true, siteBrief:true, siteTimeline:true, pinnedSites:true, importantSiteInfo:true, advancedGps:true, attention:true, library:true, reports:true, equipment:true, routeReview:true, csvExports:true, diagnostics:false, backupRepair:false}},
   power:{label:"Power Mode", mode:"power", icon:"⚡", note:"Show every FireVault module and advanced control.", features:{dailyRoute:true, fieldFocus:true, dataSafeHome:true, siteBrief:true, siteTimeline:true, pinnedSites:true, importantSiteInfo:true, advancedGps:true, attention:true, library:true, reports:true, equipment:true, routeReview:true, csvExports:true, diagnostics:true, backupRepair:true}}
 };
+function activeFeaturePresetKey575(){
+  const mode=appMode();
+  const v=visibility();
+  const keys=Object.keys(FEATURE_DEFAULTS);
+  return Object.entries(FEATURE_PRESETS_474).find(([,p])=>p.mode===mode && keys.every(k=>(p.features[k]===true)===(v[k]===true)))?.[0] || "";
+}
 function visibilityPresetCards474(){
-  return `<div class="card settingGroup compactPane featurePresets474"><div class="paneHead"><div><h2>Quick View Presets</h2><p class="paneNote">One tap changes the app mode and visible features. You can still fine-tune each toggle below.</p></div></div><div class="presetGrid474">${Object.entries(FEATURE_PRESETS_474).map(([key,p])=>`<button class="ghost presetFeatureBtn474" data-feature-preset="${esc(key)}"><span>${esc(p.icon)}</span><strong>${esc(p.label)}</strong><small>${esc(p.note)}</small></button>`).join("")}</div></div>`;
+  const active=activeFeaturePresetKey575();
+  return `<div class="card settingGroup compactPane featurePresets474"><div class="paneHead"><div><h2>Quick View Presets</h2><p class="paneNote">One tap changes the app mode and visible features. The active preset stays highlighted.</p></div></div><div class="presetGrid474">${Object.entries(FEATURE_PRESETS_474).map(([key,p])=>`<button class="ghost presetFeatureBtn474 ${active===key?"presetActive575":""}" data-feature-preset="${esc(key)}" aria-pressed="${active===key?"true":"false"}"><span>${esc(p.icon)}</span><strong>${esc(p.label)}</strong><small>${esc(p.note)}</small>${active===key?`<em class="presetActiveBadge575">✓ Active</em>`:""}</button>`).join("")}</div></div>`;
 }
 function applyFeaturePreset474(name){
   const p=FEATURE_PRESETS_474[name];
   if(!p){ toast("Preset unavailable."); return; }
-  data.settings.app={...(data.settings.app||{}),viewMode:p.mode};
+  data.settings.app={...(data.settings.app||{}),viewMode:p.mode,activeFeaturePreset575:name};
   data.settings.visibility={...FEATURE_DEFAULTS,...p.features};
   save();
   toast(`${p.label} preset applied.`);
@@ -207,15 +217,19 @@ const LAYOUT_PRESETS_565 = {
   site:{label:"Site Detail", icon:"▤", note:"Home stays clean while account screens show brief and timeline.", values:{fieldFocus:false,dataSafeHome:false,siteBrief:true,siteTimeline:true,pinnedSites:true,importantSiteInfo:true}},
   minimal:{label:"Minimal", icon:"—", note:"Hide optional Home and site-detail cards for the simplest view.", values:{fieldFocus:false,dataSafeHome:false,siteBrief:false,siteTimeline:false,pinnedSites:false,importantSiteInfo:false}}
 };
-function layoutPresetName565(){
+function activeLayoutPresetKey575(){
   const v=visibility();
-  const found=Object.values(LAYOUT_PRESETS_565).find(p=>Object.keys(p.values).every(k=>(v[k]!==false)===(p.values[k]!==false)));
-  return found?.label || "Custom Layout";
+  return Object.entries(LAYOUT_PRESETS_565).find(([,p])=>Object.keys(p.values).every(k=>(v[k]!==false)===(p.values[k]!==false)))?.[0] || "";
+}
+function layoutPresetName565(){
+  const key=activeLayoutPresetKey575();
+  return key ? LAYOUT_PRESETS_565[key].label : "Custom Layout";
 }
 function layoutPresetCards565(){
+  const active=activeLayoutPresetKey575();
   return `<div class="card settingGroup compactPane layoutPresets565">
-    <div class="paneHead"><div><h2>Quick Layout Presets</h2><p class="paneNote">One tap changes only the Home and account-screen layout cards. Your full modules and saved data stay intact.</p></div><span class="layoutPresetBadge565">${esc(layoutPresetName565())}</span></div>
-    <div class="layoutPresetGrid565">${Object.entries(LAYOUT_PRESETS_565).map(([key,p])=>`<button class="ghost layoutPresetBtn565" data-layout-preset="${esc(key)}"><span>${esc(p.icon)}</span><strong>${esc(p.label)}</strong><small>${esc(p.note)}</small></button>`).join("")}</div>
+    <div class="paneHead"><div><h2>Quick Layout Presets</h2><p class="paneNote">One tap changes only the Home and account-screen layout cards. The active preset stays highlighted.</p></div><span class="layoutPresetBadge565">${esc(layoutPresetName565())}</span></div>
+    <div class="layoutPresetGrid565">${Object.entries(LAYOUT_PRESETS_565).map(([key,p])=>`<button class="ghost layoutPresetBtn565 ${active===key?"presetActive575":""}" data-layout-preset="${esc(key)}" aria-pressed="${active===key?"true":"false"}"><span>${esc(p.icon)}</span><strong>${esc(p.label)}</strong><small>${esc(p.note)}</small>${active===key?`<em class="presetActiveBadge575">✓ Active</em>`:""}</button>`).join("")}</div>
   </div>`;
 }
 function applyLayoutPreset565(name){
@@ -223,6 +237,7 @@ function applyLayoutPreset565(name){
   if(!p){ toast("Layout preset unavailable."); return; }
   const v=visibility();
   data.settings.visibility={...v,...p.values};
+  data.settings.app={...(data.settings.app||{}),activeLayoutPreset575:name};
   save();
   toast(`${p.label} layout applied.`);
   settings();
@@ -1263,7 +1278,7 @@ function render(){
 
 function showError(err){
   console.error(err);
-  html(`<div class="screen"><div class="card errorBox"><h1>FireVault Diagnostics</h1><p>The app caught an error instead of going black.</p><p>${esc(err?.stack || err?.message || err)}</p><button class="primary" onclick="location.reload()">Reload App</button></div></div>`);
+  html(`<div class="screen"><div class="card errorBox"><h1>${fireVaultBrand575()} Diagnostics</h1><p>The app caught an error instead of going black.</p><p>${esc(err?.stack || err?.message || err)}</p><button class="primary" onclick="location.reload()">Reload App</button></div></div>`);
 }
 
 
@@ -1508,7 +1523,7 @@ function wireNoteTemplates503(targetId="siteNoteText"){
 }
 
 
-/* Build 0.50.74 Pinned Sites helpers */
+/* Build 0.50.75 Pinned Sites helpers */
 function isPinnedSite566(s){ return !!s?.pinnedAt; }
 function pinnedSites566(limit=5){
   return [...(data.sites||[])].filter(isPinnedSite566).sort((a,b)=>{
@@ -1566,7 +1581,7 @@ function toggleSitePinned566(){
   siteDetail();
 }
 
-/* Build 0.50.74 Pinned Sites Manager */
+/* Build 0.50.75 Pinned Sites Manager */
 function unpinSiteById567(id){
   const s=(data.sites||[]).find(x=>x.id===id);
   if(!s) return;
@@ -1643,7 +1658,7 @@ function home(){
   const dateLine = now.toLocaleDateString([], {weekday:"long", month:"long", day:"numeric"});
   html(`<div class="screen homeScreen476 homeScreen478 ${siteSearch?"homeSearchMode484":""}">
     <div class="homeChrome478 homeChrome493">
-      <div class="brand478 brand493"><img src="assets/favicon.png?v=${BUILD}" alt="FireVault"><strong>FIREVAULT</strong></div>
+      <div class="brand478 brand493"><img src="assets/favicon.png?v=${BUILD}" alt="FireVault"><strong>${fireVaultBrand575("homeWordmark575")}</strong></div>
       <button class="homeBuildPill481 homeBuildPill493" id="homeBell478" aria-label="Release notes"><span></span>${BUILD}</button>
       <button class="homeIcon478 settingsIcon493 stackedMenu553" id="modulesTopBtn476" aria-label="Settings">☰</button>
     </div>
@@ -2168,7 +2183,7 @@ function siteToolCount477(){
 }
 
 
-/* Build 0.50.74 Site Screen Cleanup helpers */
+/* Build 0.50.75 Site Screen Cleanup helpers */
 function siteOpenTasks556(s={}){
   return (s.tasks||[]).filter(t=>String(t.status||"Open").toLowerCase()!=="done" && String(t.status||"Open").toLowerCase()!=="complete");
 }
@@ -2261,7 +2276,7 @@ function wireSiteBrief556(){
 
 
 
-/* Build 0.50.74 Site Activity Timeline filters */
+/* Build 0.50.75 Site Activity Timeline filters */
 let siteTimelineFilter558 = "all";
 let siteTimelineExpanded559 = false;
 function siteTimelineFilterCounts558(s={}){
@@ -2305,7 +2320,7 @@ function wireSiteTimelineFilters558(){
   });
 }
 
-/* Build 0.50.74 Site Activity Timeline helpers */
+/* Build 0.50.75 Site Activity Timeline helpers */
 function activityDateMs557(value){
   const t=new Date(value || 0).getTime();
   return Number.isFinite(t) ? t : 0;
@@ -2475,7 +2490,7 @@ function wireSiteActivity557(){
 }
 
 
-/* Build 0.50.74 Important Site Info helpers */
+/* Build 0.50.75 Important Site Info helpers */
 function primaryContact568(s={}){
   const contacts=s.contacts||[];
   return contacts.find(c=>/primary|main|manager|owner|contact/i.test([c.role,c.notes,c.accessNotes].filter(Boolean).join(" "))) || contacts[0] || {};
@@ -3933,7 +3948,7 @@ function openReportEmailDraft(s, txt, subject){
 }
 
 
-/* Build 0.50.74 Customer Report Preview helpers */
+/* Build 0.50.75 Customer Report Preview helpers */
 function customerReportPreviewStats555(s={}){
   const selected=reportPhotos526(s);
   const ready=customerReportPhotoReady530(s);
@@ -4273,7 +4288,7 @@ function settingsTabs(){
 }
 
 
-/* Build 0.50.74 Settings navigation recovery */
+/* Build 0.50.75 Settings navigation recovery */
 function restoreAppChrome572(){
   document.body.classList.remove("homeFullscreen480","homeLayoutFixed570");
   const header=document.getElementById("appHeader");
@@ -4672,7 +4687,7 @@ function settingsPanel(){
   if(settingsTab==="visibility") { const mode=appMode(); const v=visibility(); return `<div class="settingsStack simpleSettings472"><div class="card settingGroup compactPane simpleHero472"><div class="paneHead"><div><h2>Modules / Simple View</h2><p class="paneNote">Turn major FireVault modules on or off. Disabled modules disappear from the interface until you enable them again here.</p></div><button class="primary saveMini" id="saveSettings">Save</button></div><div class="settingsGrid">${fieldBlock("App Mode",`<select id="viewMode"><option value="simple" ${mode==="simple"?"selected":""}>Simple View</option><option value="advanced" ${mode==="advanced"?"selected":""}>Advanced View</option><option value="power" ${mode==="power"?"selected":""}>Technician Power Mode</option></select>`,`Simple keeps the field interface clean. Advanced shows enabled modules. Power shows everything.`)}</div><div class="viewModeQuick472"><button class="ghost" data-view-mode="simple">Simple</button><button class="ghost" data-view-mode="advanced">Advanced</button><button class="ghost" data-view-mode="power">Power</button></div></div>${visibilityPresetCards474()}${layoutPresetCards565()}<div class="card settingGroup compactPane"><div class="paneHead"><h2>Modules</h2></div><p class="paneNote">Turn off anything you do not need. Disabled modules are removed from the dashboard, site screens, bottom tabs, and tool menus until enabled again. Field Focus, Pinned Sites, Data Safe Home Card, Important Site Info, Site Brief, and Site Activity Timeline are layout controls; their underlying tools remain available from their full screens.</p><div class="settingsList featureList472">${FEATURE_LABELS.map(([key,label,note])=>`<label class="checkRow featureCheck472"><input type="checkbox" id="vis_${key}" ${v[key]?"checked":""}><span><strong>${esc(label)}</strong><small>${esc(note)}</small></span></label>`).join("")}</div></div></div>`; }
   if(settingsTab==="advanced") return `<div class="settingsStack"><div class="card settingGroup compactPane"><div class="paneHead"><h2>Advanced Features</h2><button class="primary saveMini" id="saveSettings">Save</button></div><p class="paneNote"><span class="featureStar">*</span> Requires outside services, permissions, APIs, or future backend modules.</p><div class="settingsList twoCol">${[["advAi","aiTechnician","AI Technician"],["advReverse","reverseAddressLookup","Reverse Address Lookup *"],["advCloud","cloudBackup","Cloud Backup *"],["advVoice","voiceTranscription","Voice Transcription *"],["advOcr","ocrReader","OCR Reader *"],["advEmail","emailGateway","Email Gateway *"],["advWeather","weather","Weather Context *"],["advTraffic","traffic","Traffic / Routing *"]].map(x=>checkBlock(x[0],x[2],a[x[1]])).join("")}</div></div></div>`;
   if(settingsTab==="backup") return backupSettingsPanel();
-  return `<div class="settingsStack"><div class="card settingGroup compactPane"><div class="paneHead"><h2>About FireVault</h2></div><p class="paneNote">A modular field knowledge system for fire alarm technicians.</p><div class="aboutGrid"><div><strong>Build</strong><span>${BUILD}</span></div><div><strong>Storage key</strong><span>${KEY}</span></div><div><strong>Roadmap lane</strong><span>Modular foundation, settings polish, iPhone PWA, deeper service-call modules.</span></div></div></div></div>`;
+  return `<div class="settingsStack"><div class="card settingGroup compactPane"><div class="paneHead"><h2>About ${fireVaultBrand575()}</h2></div><p class="paneNote">A modular field knowledge system for fire alarm technicians.</p><div class="aboutGrid"><div><strong>Build</strong><span>${BUILD}</span></div><div><strong>Storage key</strong><span>${KEY}</span></div><div><strong>Roadmap lane</strong><span>Modular foundation, settings polish, iPhone PWA, deeper service-call modules.</span></div></div></div></div>`;
 }
 function wireSettingsPanel(){
   const saveBtn=document.getElementById("saveSettings"); if(saveBtn) saveBtn.onclick=saveSettings;
@@ -4696,7 +4711,7 @@ function saveSettings(){
   if(settingsTab==="overlay") s.overlay={...s.overlay,...collectOverlayFromInputs510()};
   if(settingsTab==="gps") s.gps={enabled:checked("gpsEnabled"),mapProvider:val("gpsMapProvider")||"apple",highAccuracy:val("gpsHighAccuracy")!=="false",includeInReports:checked("gpsReports"),nearbyRadiusMiles:Number(val("gpsNearbyRadius"))||1};
   if(settingsTab==="themes") { s.theme={name:val("themeName"),accentColor:val("themeAccent"),highContrast:checked("themeHighContrast"),largeText:checked("themeLargeText"),compactLayout:checked("themeCompact"),buttonStyle:val("buttonStyle"),cardStyle:val("cardStyle")}; s.app={...(s.app||{}),haptics:checked("themeHaptics"),viewMode:s.app?.viewMode||"simple"}; }
-  if(settingsTab==="visibility") { s.app={...(s.app||{}),viewMode:val("viewMode")||"simple"}; const next={...visibility()}; FEATURE_LABELS.forEach(([key])=>next[key]=checked("vis_"+key)); s.visibility=next; }
+  if(settingsTab==="visibility") { s.app={...(s.app||{}),viewMode:val("viewMode")||"simple",activeFeaturePreset575:"",activeLayoutPreset575:""}; const next={...visibility()}; FEATURE_LABELS.forEach(([key])=>next[key]=checked("vis_"+key)); s.visibility=next; }
   if(settingsTab==="advanced") s.advanced={aiTechnician:checked("advAi"),reverseAddressLookup:checked("advReverse"),cloudBackup:checked("advCloud"),voiceTranscription:checked("advVoice"),ocrReader:checked("advOcr"),emailGateway:checked("advEmail"),weather:checked("advWeather"),traffic:checked("advTraffic")};
   save(); toast("Settings saved."); view="settings"; mode="settingsDetail"; render();
 }
@@ -4856,7 +4871,7 @@ function repairVaultState(){
 
 
 
-/* Build 0.50.74 Action Center helpers */
+/* Build 0.50.75 Action Center helpers */
 function actionPriorityClass562(rank){
   if(rank<=1) return "critical";
   if(rank===2) return "today";
@@ -5031,7 +5046,7 @@ function actionCenter(){
 }
 
 
-/* Build 0.50.74 Field Focus dashboard helpers */
+/* Build 0.50.75 Field Focus dashboard helpers */
 function fieldFocusStats561(){
   const sites=data.sites||[];
   const openTasks=allTaskRows().filter(r=>!taskIsDone(r.t));
@@ -5116,7 +5131,7 @@ function wireFieldFocus561(){
 }
 
 
-/* Build 0.50.74 Data Tools / Home cleanup helpers */
+/* Build 0.50.75 Data Tools / Home cleanup helpers */
 function dataSafeSummary560(){
   const s=backupSafetyStats552();
   const lastRestore=localStorage.getItem("firevault_last_restore_time");
@@ -5239,7 +5254,7 @@ function dataTools(){
 }
 
 
-/* Build 0.50.74 Backup Safety helpers */
+/* Build 0.50.75 Backup Safety helpers */
 function backupSafetyStats552(){
   const sites = (data.sites || []).length;
   const visits = (data.sites || []).reduce((n,s)=>n+((s.visits||[]).length),0);
@@ -5356,7 +5371,7 @@ async function copyUpdateChecklist553(){
 }
 
 
-/* Build 0.50.74 Backup Restore Center */
+/* Build 0.50.75 Backup Restore Center */
 let pendingRestoreBackup554 = null;
 
 function normalizeBackupPayload554(raw){
@@ -5565,16 +5580,16 @@ function diagnostics(){
 }
 function showChangelog(){
   const notes = [
-    "Advanced to Build 0.50.74 from the stable 0.50.73 baseline.",
-    "Corrected account screen horizontal overflow and restored consistent left/right margins.",
-    "Made the account header, Important Site Info, Site Brief, and Timeline fit properly on iPhone widths.",
-    "Added distinct color identities for Contact, Access, Panel, GPS, Site Brief statistics, and account information sections.",
-    "Preserved Settings UI stability fixes, Daily Summary calendar, Home layout correction, Pinned Sites Manager, Quick Layout Presets, Action Center, Data Tools, Field Focus, clean splash screen with no loader, and excluded job-status workflow controls."
+    "Advanced to Build 0.50.75 from the stable 0.50.74 baseline.",
+    "Added persistent visual highlighting for selected Quick View and Quick Layout presets.",
+    "Active presets now show a red accent border, glow, brighter background, and a ✓ Active badge.",
+    "Applied the new branding standard: FIRE in red and VAULT in white across the header, Home, splash screen, About, diagnostics, and release notes.",
+    "Preserved account screen formatting, Settings UI stability, Daily Summary calendar, Home layout correction, Pinned Sites Manager, Action Center, Data Tools, Field Focus, and excluded job-status workflow controls."
   ];
   const overlay=document.createElement("div");
   overlay.className="releaseOverlay";
   overlay.innerHTML=`<div class="releaseSheet" role="dialog" aria-modal="true" aria-label="FireVault release notes">
-    <div class="releaseHead"><div><strong>FireVault</strong><span>Build ${BUILD}</span></div><button class="ghost iconBtn" id="closeRelease" aria-label="Close release notes">×</button></div>
+    <div class="releaseHead"><div><strong>${fireVaultBrand575()}</strong><span>Build ${BUILD}</span></div><button class="ghost iconBtn" id="closeRelease" aria-label="Close release notes">×</button></div>
     <div class="releaseBody"><h2>Release Notes</h2><p class="releaseIntro">Rebuilt Settings full-height layout and navigation stability.</p><ul>${notes.map(n=>`<li>${esc(n)}</li>`).join("")}</ul></div>
   </div>`;
   document.body.appendChild(overlay);

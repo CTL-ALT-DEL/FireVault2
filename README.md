@@ -1,11 +1,11 @@
-# FireVault Build 0.50.74
+# FireVault Build 0.50.75
 
-Build 0.50.74 continues from the stable 0.50.71 baseline and fixes Settings submenu navigation.
+Build 0.50.75 continues from the stable 0.50.71 baseline and fixes Settings submenu navigation.
 
 ## Changes
 
-- Visible app version advanced to 0.50.74.
-- Cache-busting references updated to 0.50.74.
+- Visible app version advanced to 0.50.75.
+- Cache-busting references updated to 0.50.75.
 - Added **Site Quick Actions** card on the account/site screen.
 - Added direct quick actions for:
   - Add Site Note
@@ -31,13 +31,13 @@ Run from the project root:
 node --check src/storage.js
 node --check src/app.js
 python -m json.tool manifest.json > /dev/null
-zip -T firevault-build-0.50.74-modular-root.zip
+zip -T firevault-build-0.50.75-modular-root.zip
 ```
 
 ## Suggested commit message
 
 ```text
-Build 0.50.74 settings navigation recovery
+Build 0.50.75 settings navigation recovery
 ```
 
 - Lifted the red Home add button above the bottom nav so it should not be blocked by the black bottom area.
@@ -111,15 +111,21 @@ Build 0.50.74 settings navigation recovery
 
 - Settings now forcibly restores the app header and bottom navigation whenever it renders.
 
-## Build 0.50.74
+## Build 0.50.75
 
 - Rebuilt Settings full-height scrolling.
 - Removed the large empty black lower area.
 - Stabilized Settings submenu and bottom-navigation recovery.
 
-## Build 0.50.74
+## Build 0.50.75
 
 - Corrected account screen horizontal overflow and side clipping.
 - Restored consistent iPhone margins and responsive account header sizing.
 - Added distinct colors for Contact, Access, Panel, GPS, Site Brief statistics, Timeline, and Quick Actions.
 - Improved wrapping for long customer names, addresses, GPS coordinates, notes, and panel information.
+
+## Build 0.50.75
+
+- Selected Quick View and Quick Layout presets now remain visibly highlighted.
+- Active preset styling includes a red glow, red border, brighter background, and ✓ Active badge.
+- Standardized visible FireVault wordmarks so FIRE is red and VAULT is white.

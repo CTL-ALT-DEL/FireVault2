@@ -8,7 +8,7 @@
   "orientation": "any",
   "background_color": "#0b0d10",
   "theme_color": "#101216",
-  "description": "Field knowledge system for fire alarm technicians. Build 0.50.74 corrects account screen overflow and adds clearer color separation for Important Site Info, Site Brief, Timeline, and quick actions.",
+  "description": "Field knowledge system for fire alarm technicians. Build 0.50.75 adds persistent active-preset highlighting and standardizes FIRE in red with VAULT in white across visible app branding.",
   "icons": [
     {
       "src": "assets/icon-192.png",
