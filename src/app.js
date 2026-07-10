@@ -1847,6 +1847,98 @@ function siteToolCount477(){
   if(featureOn('advancedGps')) n++;
   return n;
 }
+
+
+/* Build 0.50.56 Site Screen Cleanup helpers */
+function siteOpenTasks556(s={}){
+  return (s.tasks||[]).filter(t=>String(t.status||"Open").toLowerCase()!=="done" && String(t.status||"Open").toLowerCase()!=="complete");
+}
+function siteOpenDeficiencies556(s={}){
+  return (s.deficiencies||[]).filter(d=>String(d.status||"Open").toLowerCase()!=="closed");
+}
+function siteBriefText556(s={}){
+  const openTasks=siteOpenTasks556(s);
+  const openDef=siteOpenDeficiencies556(s);
+  const docs=Array.isArray(s.docs)?s.docs:[];
+  const photos=docs.filter(docHasPhoto512);
+  const visits=Array.isArray(s.visits)?s.visits:[];
+  const primary=primaryContact477(s);
+  const panel=[s.panelManufacturer,s.panelModel].filter(Boolean).join(" ") || "Panel not entered";
+  const last=visits[0];
+  const health=siteHealth(s);
+  const lines=[
+    "FireVault Site Brief",
+    `Build: ${BUILD}`,
+    "",
+    `Site: ${s.name || "Unnamed Account"}`,
+    `Address: ${fullAddress(s) || "No address saved"}`,
+    `Panel: ${panel}`,
+    `Primary Contact: ${primary ? contactTitle(primary) : "No contact saved"}`,
+    `Access: ${accessSummary477(s)}`,
+    "",
+    `Health: ${health.score}% - ${health.label}`,
+    `Open Tasks: ${openTasks.length}`,
+    `Open Deficiencies: ${openDef.length}`,
+    `Photos: ${photos.length}`,
+    `Visits: ${visits.length}`,
+    `Last Visit: ${last ? `${visitDateLabel(last)} • ${durationText(last.startedAt,last.endedAt)}` : "No completed visits"}`,
+    "",
+    `Priority: ${health.details.length ? health.details.join(" • ") : "Ready for service"}`
+  ];
+  return lines.join("\n");
+}
+async function copySiteBrief556(){
+  const s=site(); if(!s) return;
+  try{
+    await navigator.clipboard.writeText(siteBriefText556(s));
+    toast("Site brief copied.");
+  }catch{
+    toast("Clipboard unavailable.");
+  }
+}
+function siteBriefMarkup556(s={}){
+  const openTasks=siteOpenTasks556(s);
+  const openDef=siteOpenDeficiencies556(s);
+  const docs=Array.isArray(s.docs)?s.docs:[];
+  const photos=docs.filter(docHasPhoto512);
+  const visits=Array.isArray(s.visits)?s.visits:[];
+  const health=siteHealth(s);
+  const primary=primaryContact477(s);
+  const panel=[s.panelManufacturer,s.panelModel].filter(Boolean).join(" ") || "Panel not entered";
+  const last=visits[0];
+  const priority=health.details.length ? health.details.join(" • ") : "Ready for service";
+  return `<div class="card siteBrief556">
+    <div class="siteBriefHead556">
+      <div><h2>Site Brief</h2><p>${esc(priority)}</p></div>
+      <button class="ghost smallBtn" id="copySiteBrief556">Copy Brief</button>
+    </div>
+    <div class="siteBriefStats556">
+      <button id="briefTasks556"><strong>${openTasks.length}</strong><span>Open Tasks</span></button>
+      <button id="briefDef556"><strong>${openDef.length}</strong><span>Deficiencies</span></button>
+      <button id="briefPhotos556"><strong>${photos.length}</strong><span>Photos</span></button>
+      <button id="briefVisits556"><strong>${visits.length}</strong><span>Visits</span></button>
+    </div>
+    <div class="siteBriefGrid556">
+      <div><strong>Panel</strong><span>${esc(panel)}</span></div>
+      <div><strong>Contact</strong><span>${esc(primary ? contactTitle(primary) : "No contact saved")}</span></div>
+      <div><strong>Access</strong><span>${esc(accessSummary477(s))}</span></div>
+      <div><strong>Last Visit</strong><span>${esc(last ? `${visitDateLabel(last)} • ${durationText(last.startedAt,last.endedAt)}` : "No completed visits")}</span></div>
+    </div>
+  </div>`;
+}
+function wireSiteBrief556(){
+  const copy=document.getElementById("copySiteBrief556");
+  if(copy) copy.onclick=copySiteBrief556;
+  const tasks=document.getElementById("briefTasks556");
+  if(tasks) tasks.onclick=()=>route("tasks");
+  const defs=document.getElementById("briefDef556");
+  if(defs) defs.onclick=()=>route("deficiencies");
+  const photos=document.getElementById("briefPhotos556");
+  if(photos) photos.onclick=()=>{docVaultFilter516="photos"; route("siteDocs");};
+  const visits=document.getElementById("briefVisits556");
+  if(visits) visits.onclick=()=>route("visits");
+}
+
 function siteDetail(){
   const s=site(); if(!s){ route('sites'); return; }
   s.lastOpenedAt=new Date().toISOString();
@@ -1871,6 +1963,8 @@ function siteDetail(){
   html(`<div class="screen siteDetailScreen477 siteDetailScreen489"><div class="row siteTopBar siteTopBar477 siteTopBar489"><button class="back ghost" id="backBtn">←</button><div class="siteTopTitle477"><strong>Account</strong><span>${esc(appMode()==='simple'?'Simple tools':'Modules on')}</span></div><button class="ghost" id="editBtn">Edit</button></div>
 
     <div class="card siteHero477 siteHero489"><div class="siteHeroMain477"><span class="accountInitialLarge477">${esc((s.name||'?').slice(0,1).toUpperCase())}</span><div><h1>${esc(s.name||'Unnamed Account')}</h1><p>${esc(fullAddress(s))}</p><em>${esc(nextAction)}</em></div></div><div class="siteHealthDot477 ${health.cls}">${health.score}%</div></div>
+
+    ${siteBriefMarkup556(s)}
 
     <div class="card siteQuickActions544"><div class="siteCardHead477"><div><h2>Site Quick Actions</h2><p>Fast access to the field tasks used most on this account.</p></div><span class="quickActionBadge544">${open+def+photoDocs.length}</span></div><div class="quickActionGrid544">
       <button class="primary quickAction544" id="qaAddNote544"><strong>＋ Site Note</strong><span>Timestamped note</span></button>
@@ -1928,6 +2022,7 @@ function siteDetail(){
   document.getElementById('openTasksMini476').onclick=()=>route('tasks');
   document.getElementById('openDefMini476').onclick=()=>route('deficiencies');
   document.getElementById('snapshotBtn').onclick=shareSiteSnapshot;
+  wireSiteBrief556();
   const qaNote544=document.getElementById('qaAddNote544'); if(qaNote544) qaNote544.onclick=()=>addSiteNotePrompt();
   const qaPhoto544=document.getElementById('qaAddPhoto544'); if(qaPhoto544) qaPhoto544.onclick=()=>{mode='newPhoto'; route('siteDocForm');};
   const qaDef544=document.getElementById('qaAddDef544'); if(qaDef544) qaDef544.onclick=()=>{mode=null; route('deficiencyForm');};
@@ -3233,7 +3328,7 @@ function openReportEmailDraft(s, txt, subject){
 }
 
 
-/* Build 0.50.55 Customer Report Preview helpers */
+/* Build 0.50.56 Customer Report Preview helpers */
 function customerReportPreviewStats555(s={}){
   const selected=reportPhotos526(s);
   const ready=customerReportPhotoReady530(s);
@@ -4111,7 +4206,7 @@ function repairVaultState(){
 }
 
 
-/* Build 0.50.55 Backup Safety helpers */
+/* Build 0.50.56 Backup Safety helpers */
 function backupSafetyStats552(){
   const sites = (data.sites || []).length;
   const visits = (data.sites || []).reduce((n,s)=>n+((s.visits||[]).length),0);
@@ -4228,7 +4323,7 @@ async function copyUpdateChecklist553(){
 }
 
 
-/* Build 0.50.55 Backup Restore Center */
+/* Build 0.50.56 Backup Restore Center */
 let pendingRestoreBackup554 = null;
 
 function normalizeBackupPayload554(raw){
@@ -4437,17 +4532,17 @@ function diagnostics(){
 }
 function showChangelog(){
   const notes = [
-    "Advanced to Build 0.50.55 from the stable 0.50.54 baseline.",
-    "Added Customer Report Preview inside Report Center.",
-    "Preview shows the customer-facing closeout packet before copying, downloading, or sending.",
-    "Added ready/review status with selected photo, caption, and issue counts.",
-    "Preserved Backup Restore Center, stacked-lines main Settings icon, top-right Add Site button placement, Backup Safety download tools, clean splash screen with no loader, fixed splash/header behavior, Startup Health diagnostics, Photo Vault tools, Customer Report Photo workflow, iPad autosizing, simple Home screen, Search Bar Concept #6, and excluded job-status workflow controls."
+    "Advanced to Build 0.50.56 from the stable 0.50.55 baseline.",
+    "Added a Site Brief card near the top of each account screen.",
+    "Site Brief summarizes open tasks, deficiencies, photos, visits, panel, contact, access, and last visit.",
+    "Added Copy Brief for a clean technician-facing site summary.",
+    "Preserved Customer Report Preview, Backup Restore Center, stacked-lines main Settings icon, top-right Add Site button placement, Backup Safety download tools, clean splash screen with no loader, fixed splash/header behavior, Startup Health diagnostics, Photo Vault tools, Customer Report Photo workflow, iPad autosizing, simple Home screen, Search Bar Concept #6, and excluded job-status workflow controls."
   ];
   const overlay=document.createElement("div");
   overlay.className="releaseOverlay";
   overlay.innerHTML=`<div class="releaseSheet" role="dialog" aria-modal="true" aria-label="FireVault release notes">
     <div class="releaseHead"><div><strong>FireVault</strong><span>Build ${BUILD}</span></div><button class="ghost iconBtn" id="closeRelease" aria-label="Close release notes">×</button></div>
-    <div class="releaseBody"><h2>Release Notes</h2><p class="releaseIntro">Added Customer Report Preview in Report Center.</p><ul>${notes.map(n=>`<li>${esc(n)}</li>`).join("")}</ul></div>
+    <div class="releaseBody"><h2>Release Notes</h2><p class="releaseIntro">Added Site Brief card and Copy Brief on account screens.</p><ul>${notes.map(n=>`<li>${esc(n)}</li>`).join("")}</ul></div>
   </div>`;
   document.body.appendChild(overlay);
   const close=()=>overlay.remove();

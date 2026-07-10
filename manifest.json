@@ -8,7 +8,7 @@
   "orientation": "any",
   "background_color": "#0b0d10",
   "theme_color": "#101216",
-  "description": "Field knowledge system for fire alarm technicians. Build 0.50.55 adds Customer Report Preview inside Report Center with ready/review status, selected photo counts, and copy/download preview actions.",
+  "description": "Field knowledge system for fire alarm technicians. Build 0.50.56 adds a Site Brief card to account screens with quick stats and Copy Brief for technician-facing summaries.",
   "icons": [
     {
       "src": "assets/icon-192.png",

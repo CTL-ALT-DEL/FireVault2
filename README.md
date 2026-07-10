@@ -1,11 +1,11 @@
-# FireVault Build 0.50.55
+# FireVault Build 0.50.56
 
-Build 0.50.55 continues from the stable 0.50.54 baseline and adds Customer Report Preview inside Report Center.
+Build 0.50.56 continues from the stable 0.50.55 baseline and adds a Site Brief card to clean up the account/site detail screen.
 
 ## Changes
 
-- Visible app version advanced to 0.50.55.
-- Cache-busting references updated to 0.50.55.
+- Visible app version advanced to 0.50.56.
+- Cache-busting references updated to 0.50.56.
 - Added **Site Quick Actions** card on the account/site screen.
 - Added direct quick actions for:
   - Add Site Note
@@ -31,13 +31,13 @@ Run from the project root:
 node --check src/storage.js
 node --check src/app.js
 python -m json.tool manifest.json > /dev/null
-zip -T firevault-build-0.50.55-modular-root.zip
+zip -T firevault-build-0.50.56-modular-root.zip
 ```
 
 ## Suggested commit message
 
 ```text
-Build 0.50.55 customer report preview
+Build 0.50.56 site screen cleanup and brief
 ```
 
 - Lifted the red Home add button above the bottom nav so it should not be blocked by the black bottom area.
@@ -59,3 +59,6 @@ Build 0.50.55 customer report preview
 - Added ready/review status with selected photo, caption, and issue counts.
 - Added Copy Preview and Download Preview actions.
 - Preserved Backup Restore Center from 0.50.54.
+
+- Added Copy Brief for a technician-facing site summary.
+- Preserved Customer Report Preview from 0.50.55.
