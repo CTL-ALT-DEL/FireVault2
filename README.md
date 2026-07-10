@@ -1,11 +1,11 @@
-# FireVault Build 0.50.53
+# FireVault Build 0.50.54
 
-Build 0.50.53 continues from the stable 0.50.52 baseline, restores the stacked-lines main Settings icon, and adds a Backup Safety update checklist.
+Build 0.50.54 continues from the stable 0.50.53 baseline and adds a Backup Restore Center with import, preview, and restore confirmation.
 
 ## Changes
 
-- Visible app version advanced to 0.50.53.
-- Cache-busting references updated to 0.50.53.
+- Visible app version advanced to 0.50.54.
+- Cache-busting references updated to 0.50.54.
 - Added **Site Quick Actions** card on the account/site screen.
 - Added direct quick actions for:
   - Add Site Note
@@ -31,13 +31,13 @@ Run from the project root:
 node --check src/storage.js
 node --check src/app.js
 python -m json.tool manifest.json > /dev/null
-zip -T firevault-build-0.50.53-modular-root.zip
+zip -T firevault-build-0.50.54-modular-root.zip
 ```
 
 ## Suggested commit message
 
 ```text
-Build 0.50.53 backup checklist and stacked menu icon
+Build 0.50.54 backup restore center
 ```
 
 - Lifted the red Home add button above the bottom nav so it should not be blocked by the black bottom area.
@@ -51,3 +51,7 @@ Build 0.50.53 backup checklist and stacked menu icon
 
 - Added a short Backup Safety reminder for the recommended update order.
 - Preserved Download Backup and Copy Backup Summary.
+
+- Restore Center previews backup build, export date, sites, visits, docs, photos, tasks, and deficiencies.
+- Restore requires confirmation before overwriting current local data.
+- Preserved stacked-lines Settings icon and top-right Add Site placement.

@@ -8,7 +8,7 @@
   "orientation": "any",
   "background_color": "#0b0d10",
   "theme_color": "#101216",
-  "description": "Field knowledge system for fire alarm technicians. Build 0.50.53 restores the stacked-lines main Settings icon and adds a Backup Safety update checklist while preserving backup download tools.",
+  "description": "Field knowledge system for fire alarm technicians. Build 0.50.54 adds Backup Restore Center with JSON import, preview, and confirmation before overwriting local data.",
   "icons": [
     {
       "src": "assets/icon-192.png",

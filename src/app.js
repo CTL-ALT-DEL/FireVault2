@@ -1402,6 +1402,7 @@ function home(){
 
     <button class="card dailySummaryCard499" id="dailySummaryBtn499"><div><strong>Daily Summary</strong><span>${dailySummaryLine499()}</span></div><em>Open</em></button>
     ${backupSafetyMarkup552()}
+    ${backupRestoreCenterMarkup554()}
     <div class="homeModuleSummary476 homeModuleSummary478"><button class="ghost" id="manageModulesBtn476"><strong>Modules</strong><span>${esc(moduleStatus476())}</span></button><button class="ghost" id="defCard"><strong>${def}</strong><span>Deficiencies</span></button></div>
     <div class="buildRevisionSpacer475" aria-hidden="true"></div>
   </div>`);
@@ -4046,7 +4047,7 @@ function repairVaultState(){
 }
 
 
-/* Build 0.50.53 Backup Safety helpers */
+/* Build 0.50.54 Backup Safety helpers */
 function backupSafetyStats552(){
   const sites = (data.sites || []).length;
   const visits = (data.sites || []).reduce((n,s)=>n+((s.visits||[]).length),0);
@@ -4162,6 +4163,147 @@ async function copyUpdateChecklist553(){
   }
 }
 
+
+/* Build 0.50.54 Backup Restore Center */
+let pendingRestoreBackup554 = null;
+
+function normalizeBackupPayload554(raw){
+  const payload = raw && typeof raw === "object" ? raw : null;
+  if(!payload) return null;
+  const restoredData = payload.data && typeof payload.data === "object" ? payload.data : payload;
+  if(!restoredData || typeof restoredData !== "object") return null;
+  if(!Array.isArray(restoredData.sites)) return null;
+  if(!restoredData.settings || typeof restoredData.settings !== "object") restoredData.settings = data.settings || {};
+  if(!Array.isArray(restoredData.resources)) restoredData.resources = [];
+  if(!Array.isArray(restoredData.routeLogs)) restoredData.routeLogs = [];
+  return {
+    app: payload.app || "FireVault",
+    build: payload.build || restoredData.build || "Unknown",
+    exportedAt: payload.exportedAt || payload.date || payload.createdAt || "Unknown",
+    data: restoredData
+  };
+}
+function backupPreviewStats554(restoredData){
+  const sites = (restoredData.sites || []).length;
+  const visits = (restoredData.sites || []).reduce((n,s)=>n+((s.visits||[]).length),0);
+  const docs = (restoredData.sites || []).reduce((n,s)=>n+((s.docs||[]).length),0);
+  const photos = (restoredData.sites || []).reduce((n,s)=>n+((s.docs||[]).filter(d=>{
+    const kind=String(d.kind||d.type||"").toLowerCase();
+    return kind==="photo" || !!d.photoData || !!d.imageData || /^image\//.test(String(d.mime||d.mimeType||""));
+  }).length),0);
+  const tasks = (restoredData.sites || []).reduce((n,s)=>n+((s.tasks||[]).length),0);
+  const deficiencies = (restoredData.sites || []).reduce((n,s)=>n+((s.deficiencies||[]).length),0);
+  const routes = (restoredData.routeLogs || []).length;
+  return {sites,visits,docs,photos,tasks,deficiencies,routes};
+}
+function restoreStatusMarkup554(){
+  if(!pendingRestoreBackup554){
+    return `<div class="restoreStatus554 empty"><strong>No backup loaded</strong><span>Choose a FireVault backup JSON file to preview it before restoring.</span></div>`;
+  }
+  const p=pendingRestoreBackup554;
+  const s=backupPreviewStats554(p.data);
+  return `<div class="restoreStatus554 ready">
+    <div><strong>Backup Loaded / Ready to Restore</strong><span>Build ${esc(p.build)} • ${esc(p.exportedAt)}</span></div>
+    <div class="restorePreviewGrid554">
+      <div><b>${s.sites}</b><span>Sites</span></div>
+      <div><b>${s.visits}</b><span>Visits</span></div>
+      <div><b>${s.docs}</b><span>Docs</span></div>
+      <div><b>${s.photos}</b><span>Photos</span></div>
+      <div><b>${s.tasks}</b><span>Tasks</span></div>
+      <div><b>${s.deficiencies}</b><span>Def.</span></div>
+    </div>
+    <p>This will overwrite the current FireVault local data only after you confirm restore.</p>
+  </div>`;
+}
+function openBackupFilePicker554(){
+  const input=document.getElementById("backupImportFile554");
+  if(input) input.click();
+}
+function handleBackupFile554(file){
+  if(!file){ toast("No backup selected."); return; }
+  const reader=new FileReader();
+  reader.onload=()=>{
+    try{
+      const raw=JSON.parse(String(reader.result || ""));
+      const normalized=normalizeBackupPayload554(raw);
+      if(!normalized){
+        pendingRestoreBackup554=null;
+        toast("Backup file not recognized.");
+        render();
+        return;
+      }
+      pendingRestoreBackup554=normalized;
+      toast("Backup loaded for preview.");
+      render();
+    }catch(err){
+      console.error(err);
+      pendingRestoreBackup554=null;
+      toast("Could not read backup JSON.");
+      render();
+    }
+  };
+  reader.onerror=()=>toast("Could not read file.");
+  reader.readAsText(file);
+}
+function clearPendingRestore554(){
+  pendingRestoreBackup554=null;
+  toast("Restore preview cleared.");
+  render();
+}
+function restorePendingBackup554(){
+  if(!pendingRestoreBackup554){ toast("Load a backup first."); return; }
+  const p=pendingRestoreBackup554;
+  const s=backupPreviewStats554(p.data);
+  const msg=[
+    "Restore this FireVault backup?",
+    "",
+    `Backup build: ${p.build}`,
+    `Backup date: ${p.exportedAt}`,
+    `Sites: ${s.sites}`,
+    `Visits: ${s.visits}`,
+    `Docs/photos: ${s.docs}/${s.photos}`,
+    "",
+    "This will overwrite the current FireVault data on this device."
+  ].join("\n");
+  if(!confirm(msg)) return;
+  try{
+    Object.keys(data).forEach(k=>delete data[k]);
+    Object.assign(data, p.data);
+    save();
+    localStorage.setItem("firevault_last_restore_build", String(p.build || "Unknown"));
+    localStorage.setItem("firevault_last_restore_time", new Date().toISOString());
+    pendingRestoreBackup554=null;
+    toast("Backup restored.");
+    route("home");
+  }catch(err){
+    console.error(err);
+    toast("Restore failed.");
+  }
+}
+function backupRestoreCenterMarkup554(){
+  return `<div class="card restoreCenter554">
+    <div class="restoreHead554"><div><h2>Restore Center</h2><p>Import a FireVault backup JSON, preview it, then restore only after confirmation.</p></div></div>
+    <input id="backupImportFile554" type="file" accept=".json,application/json" hidden>
+    ${restoreStatusMarkup554()}
+    <div class="restoreActions554">
+      <button class="ghost" id="chooseBackup554">Import Backup</button>
+      <button class="primary" id="restoreBackup554" ${pendingRestoreBackup554?"":"disabled"}>Restore Backup</button>
+      <button class="ghost" id="clearRestore554" ${pendingRestoreBackup554?"":"disabled"}>Clear Preview</button>
+    </div>
+    <p class="fieldNote">Restore keeps your current data untouched until you press Restore Backup and confirm the warning.</p>
+  </div>`;
+}
+function wireRestoreCenter554(){
+  const choose=document.getElementById("chooseBackup554");
+  if(choose) choose.onclick=openBackupFilePicker554;
+  const file=document.getElementById("backupImportFile554");
+  if(file) file.onchange=e=>handleBackupFile554(e.target.files && e.target.files[0]);
+  const restore=document.getElementById("restoreBackup554");
+  if(restore) restore.onclick=restorePendingBackup554;
+  const clear=document.getElementById("clearRestore554");
+  if(clear) clear.onclick=clearPendingRestore554;
+}
+
 function wireBackupSafety552(){
   const dl=document.getElementById("downloadBackup552");
   if(dl) dl.onclick=downloadVaultBackup552;
@@ -4169,6 +4311,7 @@ function wireBackupSafety552(){
   if(copy) copy.onclick=copyBackupSummary552;
   const checklist=document.getElementById("copyUpdateChecklist553");
   if(checklist) checklist.onclick=copyUpdateChecklist553;
+  wireRestoreCenter554();
 }
 
 function diagnostics(){
@@ -4200,6 +4343,7 @@ function diagnostics(){
     </div>
     ${startupHealthCard520()}
     ${backupSafetyMarkup552()}
+    ${backupRestoreCenterMarkup554()}
     <div class="grid2 diagnosticsActions460">
       <button class="primary" id="repairVaultBtn">Repair Vault</button>
       <button class="ghost" id="copyDiagBtn">Copy Diagnostics</button>
@@ -4229,17 +4373,17 @@ function diagnostics(){
 }
 function showChangelog(){
   const notes = [
-    "Advanced to Build 0.50.53 from the stable 0.50.52 baseline.",
-    "Changed the main-page Settings button from the gear icon back to a stacked-lines menu icon.",
-    "Added Copy Update Checklist to Backup Safety so build updates have a repeatable safety checklist.",
-    "Added a short Backup Safety reminder showing the recommended update order.",
-    "Preserved the top-right Add Site button placement, Backup Safety download tools, clean splash screen with no loader, fixed splash/header behavior, Startup Health diagnostics, Photo Vault tools, Customer Report Photo workflow, iPad autosizing, simple Home screen, Search Bar Concept #6, and excluded job-status workflow controls."
+    "Advanced to Build 0.50.54 from the stable 0.50.53 baseline.",
+    "Added Restore Center for importing a FireVault JSON backup.",
+    "Restore Center previews backup build, backup date, sites, visits, docs, photos, tasks, and deficiencies before restoring.",
+    "Restore Backup now requires confirmation before overwriting current local FireVault data.",
+    "Preserved the stacked-lines main Settings icon, top-right Add Site button placement, Backup Safety download tools, clean splash screen with no loader, fixed splash/header behavior, Startup Health diagnostics, Photo Vault tools, Customer Report Photo workflow, iPad autosizing, simple Home screen, Search Bar Concept #6, and excluded job-status workflow controls."
   ];
   const overlay=document.createElement("div");
   overlay.className="releaseOverlay";
   overlay.innerHTML=`<div class="releaseSheet" role="dialog" aria-modal="true" aria-label="FireVault release notes">
     <div class="releaseHead"><div><strong>FireVault</strong><span>Build ${BUILD}</span></div><button class="ghost iconBtn" id="closeRelease" aria-label="Close release notes">×</button></div>
-    <div class="releaseBody"><h2>Release Notes</h2><p class="releaseIntro">Added Backup Safety update checklist and restored the stacked-lines main Settings icon.</p><ul>${notes.map(n=>`<li>${esc(n)}</li>`).join("")}</ul></div>
+    <div class="releaseBody"><h2>Release Notes</h2><p class="releaseIntro">Added Backup Restore Center with preview and confirmation.</p><ul>${notes.map(n=>`<li>${esc(n)}</li>`).join("")}</ul></div>
   </div>`;
   document.body.appendChild(overlay);
   const close=()=>overlay.remove();
