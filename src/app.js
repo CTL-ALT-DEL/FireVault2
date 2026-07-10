@@ -1364,6 +1364,8 @@ function home(){
 
     ${siteSearch?`<div class="card searchResultsPanel478" id="homeSearchResults476">${homeAccountRowsMarkup476()}</div>`:`<div id="homeSearchResults476" class="searchResultsPanel478 hiddenSearchResults478"></div>`}
 
+    ${!siteSearch?fieldFocusMarkup561():""}
+
     ${!siteSearch?`<div class="fieldDashboard500">
       <div class="fieldDashHead500"><div><strong>Field Dashboard</strong><span>Site notes, route, and daily summary</span></div><button class="ghost smallBtn" id="dailySummaryBtn500">Summary</button></div>
       <div class="fieldDashStats500">
@@ -1424,6 +1426,7 @@ function home(){
   document.getElementById('defCard').onclick=()=>{selectedSiteId=null; route('deficiencies');};
   document.getElementById('addSiteBtn').onclick=()=>{selectedSiteId=null; mode=null; route('siteForm');};
   const dataToolsHome560=document.getElementById('dataToolsHome560'); if(dataToolsHome560) dataToolsHome560.onclick=()=>route('dataTools');
+  wireFieldFocus561();
   const openRouteMini=document.getElementById('openRouteMiniBtn'); if(openRouteMini) openRouteMini.onclick=()=>route('routeLog');
   const homeRoutePoint=document.getElementById('homeRoutePointBtn'); if(homeRoutePoint) homeRoutePoint.onclick=()=>{ const note=prompt('Waypoint note', 'Manual waypoint')||'Manual waypoint'; addRouteEvent('Waypoint', note); };
   const homeRouteNearest=document.getElementById('homeRouteNearestBtn'); if(homeRouteNearest) homeRouteNearest.onclick=checkRouteNearestSite;
@@ -1848,7 +1851,7 @@ function siteToolCount477(){
 }
 
 
-/* Build 0.50.60 Site Screen Cleanup helpers */
+/* Build 0.50.61 Site Screen Cleanup helpers */
 function siteOpenTasks556(s={}){
   return (s.tasks||[]).filter(t=>String(t.status||"Open").toLowerCase()!=="done" && String(t.status||"Open").toLowerCase()!=="complete");
 }
@@ -1941,7 +1944,7 @@ function wireSiteBrief556(){
 
 
 
-/* Build 0.50.60 Site Activity Timeline filters */
+/* Build 0.50.61 Site Activity Timeline filters */
 let siteTimelineFilter558 = "all";
 let siteTimelineExpanded559 = false;
 function siteTimelineFilterCounts558(s={}){
@@ -1985,7 +1988,7 @@ function wireSiteTimelineFilters558(){
   });
 }
 
-/* Build 0.50.60 Site Activity Timeline helpers */
+/* Build 0.50.61 Site Activity Timeline helpers */
 function activityDateMs557(value){
   const t=new Date(value || 0).getTime();
   return Number.isFinite(t) ? t : 0;
@@ -3545,7 +3548,7 @@ function openReportEmailDraft(s, txt, subject){
 }
 
 
-/* Build 0.50.60 Customer Report Preview helpers */
+/* Build 0.50.61 Customer Report Preview helpers */
 function customerReportPreviewStats555(s={}){
   const selected=reportPhotos526(s);
   const ready=customerReportPhotoReady530(s);
@@ -4425,7 +4428,92 @@ function repairVaultState(){
 
 
 
-/* Build 0.50.60 Data Tools / Home cleanup helpers */
+
+/* Build 0.50.61 Field Focus dashboard helpers */
+function fieldFocusStats561(){
+  const sites=data.sites||[];
+  const openTasks=allTaskRows().filter(r=>!taskIsDone(r.t));
+  const overdue=openTasks.filter(r=>taskDueState(r.t).cls==="overdue");
+  const dueToday=openTasks.filter(r=>taskDueState(r.t).cls==="today");
+  const openDef=sites.reduce((arr,s)=>arr.concat((s.deficiencies||[]).filter(d=>String(d.status||"Open").toLowerCase()!=="closed").map(d=>({s,d}))),[]);
+  const attention=attentionRows();
+  const photos=sites.reduce((n,s)=>n+(s.docs||[]).filter(docHasPhoto512).length,0);
+  const selectedPhotos=sites.reduce((n,s)=>n+reportPhotos526(s).length,0);
+  const routeDays=(data.routeLogs||[]).length;
+  return {sites,openTasks,overdue,dueToday,openDef,attention,photos,selectedPhotos,routeDays};
+}
+function fieldFocusStatus561(){
+  const f=fieldFocusStats561();
+  if(f.overdue.length) return {label:"Overdue", cls:"warn", detail:`${f.overdue.length} overdue task${f.overdue.length===1?"":"s"}`};
+  if(f.openDef.length) return {label:"Deficiencies", cls:"danger", detail:`${f.openDef.length} open deficienc${f.openDef.length===1?"y":"ies"}`};
+  if(f.dueToday.length) return {label:"Due Today", cls:"today", detail:`${f.dueToday.length} task${f.dueToday.length===1?"":"s"} due today`};
+  if(f.attention.length) return {label:"Attention", cls:"watch", detail:`${f.attention.length} site${f.attention.length===1?"":"s"} need review`};
+  return {label:"Ready", cls:"ready", detail:"No urgent field items"};
+}
+function fieldFocusMarkup561(){
+  const f=fieldFocusStats561();
+  const status=fieldFocusStatus561();
+  return `<div class="card fieldFocus561 ${status.cls}">
+    <div class="fieldFocusHead561">
+      <div><h2>Field Focus</h2><p>${esc(status.detail)}</p></div>
+      <span>${esc(status.label)}</span>
+    </div>
+    <div class="fieldFocusGrid561">
+      <button id="focusAttention561"><strong>${f.attention.length}</strong><span>Attention</span></button>
+      <button id="focusTasks561"><strong>${f.openTasks.length}</strong><span>Open Tasks</span></button>
+      <button id="focusDef561"><strong>${f.openDef.length}</strong><span>Deficiencies</span></button>
+      <button id="focusPhotos561"><strong>${f.photos}</strong><span>Photos</span></button>
+    </div>
+    <div class="fieldFocusMini561">
+      <button id="focusToday561"><strong>${f.dueToday.length}</strong><span>Due Today</span></button>
+      <button id="focusOverdue561"><strong>${f.overdue.length}</strong><span>Overdue</span></button>
+      <button id="focusReports561"><strong>${f.selectedPhotos}</strong><span>Report Photos</span></button>
+      <button id="focusRoutes561"><strong>${f.routeDays}</strong><span>Route Days</span></button>
+    </div>
+  </div>`;
+}
+function fieldFocusText561(){
+  const f=fieldFocusStats561();
+  const status=fieldFocusStatus561();
+  const lines=[
+    "FireVault Field Focus",
+    `Build: ${BUILD}`,
+    `Date: ${new Date().toLocaleString()}`,
+    "",
+    `Status: ${status.label} - ${status.detail}`,
+    `Sites: ${f.sites.length}`,
+    `Attention Sites: ${f.attention.length}`,
+    `Open Tasks: ${f.openTasks.length}`,
+    `Due Today: ${f.dueToday.length}`,
+    `Overdue Tasks: ${f.overdue.length}`,
+    `Open Deficiencies: ${f.openDef.length}`,
+    `Photos: ${f.photos}`,
+    `Selected Report Photos: ${f.selectedPhotos}`,
+    `Route Days: ${f.routeDays}`
+  ];
+  return lines.join("\n");
+}
+async function copyFieldFocus561(){
+  try{
+    await navigator.clipboard.writeText(fieldFocusText561());
+    toast("Field Focus copied.");
+  }catch{
+    toast("Clipboard unavailable.");
+  }
+}
+function wireFieldFocus561(){
+  const attention=document.getElementById("focusAttention561"); if(attention) attention.onclick=()=>route("attention");
+  const tasks=document.getElementById("focusTasks561"); if(tasks) tasks.onclick=()=>route("tasks");
+  const def=document.getElementById("focusDef561"); if(def) def.onclick=()=>{selectedSiteId=null; route("deficiencies");};
+  const photos=document.getElementById("focusPhotos561"); if(photos) photos.onclick=()=>route("sites");
+  const today=document.getElementById("focusToday561"); if(today) today.onclick=()=>route("tasks");
+  const overdue=document.getElementById("focusOverdue561"); if(overdue) overdue.onclick=()=>route("tasks");
+  const reports=document.getElementById("focusReports561"); if(reports) reports.onclick=()=>route("sites");
+  const routes=document.getElementById("focusRoutes561"); if(routes) routes.onclick=()=>route("routeLog");
+}
+
+
+/* Build 0.50.61 Data Tools / Home cleanup helpers */
 function dataSafeSummary560(){
   const s=backupSafetyStats552();
   const lastRestore=localStorage.getItem("firevault_last_restore_time");
@@ -4470,6 +4558,7 @@ function dataTools(){
     <div class="card dataToolsMaintenance560">
       <div class="dataToolsMaintenanceHead560"><div><h2>Maintenance</h2><p>Use these when troubleshooting, checking startup health, or preparing a support note.</p></div></div>
       <div class="dataToolsActions560">
+        <button class="ghost" id="copyFieldFocus561">Copy Field Focus</button>
         <button class="ghost" id="copyDiagnostics560">Copy Diagnostics</button>
         <button class="ghost" id="copyStartupHealth560">Copy Startup Health</button>
         <button class="ghost" id="openDiagnostics560">Open Diagnostics</button>
@@ -4483,6 +4572,7 @@ function dataTools(){
   </div>`);
   document.getElementById("backHome560").onclick=()=>route("home");
   wireBackupSafety552();
+  const focus=document.getElementById("copyFieldFocus561"); if(focus) focus.onclick=copyFieldFocus561;
   const diag=document.getElementById("copyDiagnostics560"); if(diag) diag.onclick=copyDiagnostics;
   const startup=document.getElementById("copyStartupHealth560"); if(startup) startup.onclick=copyStartupHealth520;
   const openDiag=document.getElementById("openDiagnostics560"); if(openDiag) openDiag.onclick=()=>route("diagnostics");
@@ -4490,7 +4580,7 @@ function dataTools(){
 }
 
 
-/* Build 0.50.60 Backup Safety helpers */
+/* Build 0.50.61 Backup Safety helpers */
 function backupSafetyStats552(){
   const sites = (data.sites || []).length;
   const visits = (data.sites || []).reduce((n,s)=>n+((s.visits||[]).length),0);
@@ -4607,7 +4697,7 @@ async function copyUpdateChecklist553(){
 }
 
 
-/* Build 0.50.60 Backup Restore Center */
+/* Build 0.50.61 Backup Restore Center */
 let pendingRestoreBackup554 = null;
 
 function normalizeBackupPayload554(raw){
@@ -4816,17 +4906,17 @@ function diagnostics(){
 }
 function showChangelog(){
   const notes = [
-    "Advanced to Build 0.50.60 from the stable 0.50.59 baseline.",
-    "Cleaned up the Home screen by moving Backup Safety and Restore Center into a dedicated Data Tools screen.",
-    "Added Data Tools with backup, restore, diagnostics, startup health, repair vault, and update safety guidance.",
-    "Added a compact Data Safe card on Home so data tools remain easy to reach without crowding daily field workflow.",
-    "Preserved expandable Site Activity Timeline, timeline filters, Site Brief, Customer Report Preview, Backup Restore Center, stacked-lines main Settings icon, top-right Add Site button placement, clean splash screen with no loader, fixed splash/header behavior, Startup Health diagnostics, Photo Vault tools, Customer Report Photo workflow, iPad autosizing, simple Home screen, Search Bar Concept #6, and excluded job-status workflow controls."
+    "Advanced to Build 0.50.61 from the stable 0.50.60 baseline.",
+    "Added a Field Focus dashboard to the Home screen for daily technician priorities.",
+    "Field Focus summarizes attention sites, open tasks, deficiencies, photos, due-today tasks, overdue tasks, selected report photos, and route days.",
+    "Added Copy Field Focus inside Data Tools for quick status sharing or troubleshooting.",
+    "Preserved Home cleanup, Data Tools, expandable Site Activity Timeline, timeline filters, Site Brief, Customer Report Preview, Backup Restore Center, stacked-lines main Settings icon, top-right Add Site button placement, clean splash screen with no loader, fixed splash/header behavior, Startup Health diagnostics, Photo Vault tools, Customer Report Photo workflow, iPad autosizing, simple Home screen, Search Bar Concept #6, and excluded job-status workflow controls."
   ];
   const overlay=document.createElement("div");
   overlay.className="releaseOverlay";
   overlay.innerHTML=`<div class="releaseSheet" role="dialog" aria-modal="true" aria-label="FireVault release notes">
     <div class="releaseHead"><div><strong>FireVault</strong><span>Build ${BUILD}</span></div><button class="ghost iconBtn" id="closeRelease" aria-label="Close release notes">×</button></div>
-    <div class="releaseBody"><h2>Release Notes</h2><p class="releaseIntro">Moved Backup and Restore to Data Tools and cleaned up Home screen.</p><ul>${notes.map(n=>`<li>${esc(n)}</li>`).join("")}</ul></div>
+    <div class="releaseBody"><h2>Release Notes</h2><p class="releaseIntro">Added Field Focus Home dashboard and Copy Field Focus.</p><ul>${notes.map(n=>`<li>${esc(n)}</li>`).join("")}</ul></div>
   </div>`;
   document.body.appendChild(overlay);
   const close=()=>overlay.remove();

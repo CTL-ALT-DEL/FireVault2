@@ -1,11 +1,11 @@
-# FireVault Build 0.50.60
+# FireVault Build 0.50.61
 
-Build 0.50.60 continues from the stable 0.50.59 baseline and performs a larger Home Cleanup / Data Tools organization pass.
+Build 0.50.61 continues from the stable 0.50.60 baseline and adds a Field Focus dashboard to the Home screen.
 
 ## Changes
 
-- Visible app version advanced to 0.50.60.
-- Cache-busting references updated to 0.50.60.
+- Visible app version advanced to 0.50.61.
+- Cache-busting references updated to 0.50.61.
 - Added **Site Quick Actions** card on the account/site screen.
 - Added direct quick actions for:
   - Add Site Note
@@ -31,13 +31,13 @@ Run from the project root:
 node --check src/storage.js
 node --check src/app.js
 python -m json.tool manifest.json > /dev/null
-zip -T firevault-build-0.50.60-modular-root.zip
+zip -T firevault-build-0.50.61-modular-root.zip
 ```
 
 ## Suggested commit message
 
 ```text
-Build 0.50.60 home cleanup and data tools
+Build 0.50.61 field focus home dashboard
 ```
 
 - Lifted the red Home add button above the bottom nav so it should not be blocked by the black bottom area.
@@ -75,3 +75,6 @@ Build 0.50.60 home cleanup and data tools
 - Added a compact Data Safe card on Home.
 - Kept Home focused on Today/date, Add Site, Search, field dashboard, nearby accounts, recent accounts, and daily summary.
 - Preserved expandable Site Activity Timeline from 0.50.59.
+
+- Added Copy Field Focus in Data Tools.
+- Preserved Home cleanup and Data Tools from 0.50.60.
