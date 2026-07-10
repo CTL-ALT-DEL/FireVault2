@@ -1,11 +1,11 @@
-# FireVault Build 0.50.57
+# FireVault Build 0.50.58
 
-Build 0.50.57 continues from the stable 0.50.56 baseline and adds a Site Activity Timeline to each account screen.
+Build 0.50.58 continues from the stable 0.50.57 baseline and adds filters to the Site Activity Timeline.
 
 ## Changes
 
-- Visible app version advanced to 0.50.57.
-- Cache-busting references updated to 0.50.57.
+- Visible app version advanced to 0.50.58.
+- Cache-busting references updated to 0.50.58.
 - Added **Site Quick Actions** card on the account/site screen.
 - Added direct quick actions for:
   - Add Site Note
@@ -31,13 +31,13 @@ Run from the project root:
 node --check src/storage.js
 node --check src/app.js
 python -m json.tool manifest.json > /dev/null
-zip -T firevault-build-0.50.57-modular-root.zip
+zip -T firevault-build-0.50.58-modular-root.zip
 ```
 
 ## Suggested commit message
 
 ```text
-Build 0.50.57 site activity timeline
+Build 0.50.58 site activity timeline filters
 ```
 
 - Lifted the red Home add button above the bottom nav so it should not be blocked by the black bottom area.
@@ -65,3 +65,6 @@ Build 0.50.57 site activity timeline
 
 - Added Copy Timeline for a technician-facing activity summary.
 - Preserved Site Brief from 0.50.56.
+
+- Copy Timeline now respects the selected filter.
+- Preserved the Site Activity Timeline from 0.50.57.

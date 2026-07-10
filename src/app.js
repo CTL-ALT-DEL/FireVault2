@@ -1849,7 +1849,7 @@ function siteToolCount477(){
 }
 
 
-/* Build 0.50.57 Site Screen Cleanup helpers */
+/* Build 0.50.58 Site Screen Cleanup helpers */
 function siteOpenTasks556(s={}){
   return (s.tasks||[]).filter(t=>String(t.status||"Open").toLowerCase()!=="done" && String(t.status||"Open").toLowerCase()!=="complete");
 }
@@ -1941,7 +1941,50 @@ function wireSiteBrief556(){
 
 
 
-/* Build 0.50.57 Site Activity Timeline helpers */
+
+/* Build 0.50.58 Site Activity Timeline filters */
+let siteTimelineFilter558 = "all";
+function siteTimelineFilterCounts558(s={}){
+  const rows=siteActivityRows557(s);
+  return {
+    all: rows.length,
+    visits: rows.filter(r=>r.type==="Visit").length,
+    media: rows.filter(r=>r.type==="Photo" || r.type==="Doc").length,
+    tasks: rows.filter(r=>r.type==="Task").length,
+    deficiencies: rows.filter(r=>r.type==="Deficiency").length
+  };
+}
+function filteredSiteActivityRows558(s={}){
+  const rows=siteActivityRows557(s);
+  if(siteTimelineFilter558==="visits") return rows.filter(r=>r.type==="Visit");
+  if(siteTimelineFilter558==="media") return rows.filter(r=>r.type==="Photo" || r.type==="Doc");
+  if(siteTimelineFilter558==="tasks") return rows.filter(r=>r.type==="Task");
+  if(siteTimelineFilter558==="deficiencies") return rows.filter(r=>r.type==="Deficiency");
+  return rows;
+}
+function siteTimelineFilterButton558(key,label,count){
+  return `<button class="timelineFilter558 ${siteTimelineFilter558===key?"active":""}" data-filter="${esc(key)}"><strong>${esc(label)}</strong><span>${count}</span></button>`;
+}
+function siteTimelineFiltersMarkup558(s={}){
+  const c=siteTimelineFilterCounts558(s);
+  return `<div class="timelineFilters558">
+    ${siteTimelineFilterButton558("all","All",c.all)}
+    ${siteTimelineFilterButton558("visits","Visits",c.visits)}
+    ${siteTimelineFilterButton558("media","Photos / Docs",c.media)}
+    ${siteTimelineFilterButton558("tasks","Tasks",c.tasks)}
+    ${siteTimelineFilterButton558("deficiencies","Def.",c.deficiencies)}
+  </div>`;
+}
+function wireSiteTimelineFilters558(){
+  document.querySelectorAll(".timelineFilter558").forEach(b=>{
+    b.onclick=()=>{
+      siteTimelineFilter558=b.dataset.filter || "all";
+      siteDetail();
+    };
+  });
+}
+
+/* Build 0.50.58 Site Activity Timeline helpers */
 function activityDateMs557(value){
   const t=new Date(value || 0).getTime();
   return Number.isFinite(t) ? t : 0;
@@ -2013,7 +2056,7 @@ function siteActivityRows557(s={}){
   return rows.sort((a,b)=>b.sort-a.sort);
 }
 function siteActivityText557(s={}){
-  const rows=siteActivityRows557(s).slice(0,12);
+  const rows=filteredSiteActivityRows558(s).slice(0,12);
   const lines=[
     "FireVault Site Activity Timeline",
     `Build: ${BUILD}`,
@@ -2021,7 +2064,7 @@ function siteActivityText557(s={}){
     `Site: ${s.name||"Unnamed Account"}`,
     `Address: ${fullAddress(s)||"No address saved"}`,
     "",
-    rows.length ? "Recent Activity:" : "No recent activity saved yet."
+    rows.length ? `Recent Activity (${siteTimelineFilter558}):` : "No recent activity saved yet."
   ];
   rows.forEach((r,i)=>{
     lines.push(`${i+1}. ${activityDateLabel557(r.date)} ${activityTimeLabel557(r.date)} - ${r.type}: ${r.title}`);
@@ -2039,22 +2082,25 @@ async function copySiteActivity557(){
   }
 }
 function siteActivityTimelineMarkup557(s={}){
-  const rows=siteActivityRows557(s);
+  const rows=filteredSiteActivityRows558(s);
   const shown=rows.slice(0,6);
-  return `<div class="card siteTimeline557">
+  const labelMap={all:"all activity",visits:"visits",media:"photos / docs",tasks:"tasks",deficiencies:"deficiencies"};
+  return `<div class="card siteTimeline557 siteTimeline558">
     <div class="siteTimelineHead557">
-      <div><h2>Activity Timeline</h2><p>${shown.length ? `${shown.length} most recent item${shown.length===1?"":"s"}` : "No activity saved yet"}</p></div>
+      <div><h2>Activity Timeline</h2><p>${shown.length ? `${shown.length} recent ${labelMap[siteTimelineFilter558]||"items"}` : `No ${labelMap[siteTimelineFilter558]||"activity"} saved yet`}</p></div>
       <button class="ghost smallBtn" id="copySiteActivity557">Copy Timeline</button>
     </div>
+    ${siteTimelineFiltersMarkup558(s)}
     <div class="siteTimelineList557">
       ${shown.length ? shown.map((r,i)=>`<button class="siteActivityRow557" data-route="${esc(r.route)}">
         <span class="siteActivityIcon557">${esc(r.icon)}</span>
         <div><strong>${esc(r.title)}</strong><small>${esc(r.type)} • ${esc(activityDateLabel557(r.date))}${activityTimeLabel557(r.date)?` • ${esc(activityTimeLabel557(r.date))}`:""}</small>${r.detail?`<em>${esc(r.detail)}</em>`:""}</div>
-      </button>`).join("") : `<div class="empty">No visits, photos, documents, tasks, or deficiencies recorded yet.</div>`}
+      </button>`).join("") : `<div class="empty">No ${esc(labelMap[siteTimelineFilter558]||"activity")} saved yet.</div>`}
     </div>
   </div>`;
 }
 function wireSiteActivity557(){
+  wireSiteTimelineFilters558();
   const copy=document.getElementById("copySiteActivity557");
   if(copy) copy.onclick=copySiteActivity557;
   document.querySelectorAll(".siteActivityRow557").forEach(b=>{
@@ -3457,7 +3503,7 @@ function openReportEmailDraft(s, txt, subject){
 }
 
 
-/* Build 0.50.57 Customer Report Preview helpers */
+/* Build 0.50.58 Customer Report Preview helpers */
 function customerReportPreviewStats555(s={}){
   const selected=reportPhotos526(s);
   const ready=customerReportPhotoReady530(s);
@@ -4335,7 +4381,7 @@ function repairVaultState(){
 }
 
 
-/* Build 0.50.57 Backup Safety helpers */
+/* Build 0.50.58 Backup Safety helpers */
 function backupSafetyStats552(){
   const sites = (data.sites || []).length;
   const visits = (data.sites || []).reduce((n,s)=>n+((s.visits||[]).length),0);
@@ -4452,7 +4498,7 @@ async function copyUpdateChecklist553(){
 }
 
 
-/* Build 0.50.57 Backup Restore Center */
+/* Build 0.50.58 Backup Restore Center */
 let pendingRestoreBackup554 = null;
 
 function normalizeBackupPayload554(raw){
@@ -4661,17 +4707,17 @@ function diagnostics(){
 }
 function showChangelog(){
   const notes = [
-    "Advanced to Build 0.50.57 from the stable 0.50.56 baseline.",
-    "Added an Activity Timeline card to each account screen.",
-    "Timeline shows recent visits, photos/documents, tasks, and deficiencies in one compact list.",
-    "Added Copy Timeline for a quick technician-facing activity summary.",
-    "Preserved Site Brief, Customer Report Preview, Backup Restore Center, stacked-lines main Settings icon, top-right Add Site button placement, Backup Safety download tools, clean splash screen with no loader, fixed splash/header behavior, Startup Health diagnostics, Photo Vault tools, Customer Report Photo workflow, iPad autosizing, simple Home screen, Search Bar Concept #6, and excluded job-status workflow controls."
+    "Advanced to Build 0.50.58 from the stable 0.50.57 baseline.",
+    "Added filters to the Site Activity Timeline.",
+    "Timeline can now switch between All, Visits, Photos / Docs, Tasks, and Deficiencies.",
+    "Copy Timeline now respects the selected timeline filter.",
+    "Preserved Site Activity Timeline, Site Brief, Customer Report Preview, Backup Restore Center, stacked-lines main Settings icon, top-right Add Site button placement, Backup Safety download tools, clean splash screen with no loader, fixed splash/header behavior, Startup Health diagnostics, Photo Vault tools, Customer Report Photo workflow, iPad autosizing, simple Home screen, Search Bar Concept #6, and excluded job-status workflow controls."
   ];
   const overlay=document.createElement("div");
   overlay.className="releaseOverlay";
   overlay.innerHTML=`<div class="releaseSheet" role="dialog" aria-modal="true" aria-label="FireVault release notes">
     <div class="releaseHead"><div><strong>FireVault</strong><span>Build ${BUILD}</span></div><button class="ghost iconBtn" id="closeRelease" aria-label="Close release notes">×</button></div>
-    <div class="releaseBody"><h2>Release Notes</h2><p class="releaseIntro">Added Site Activity Timeline and Copy Timeline on account screens.</p><ul>${notes.map(n=>`<li>${esc(n)}</li>`).join("")}</ul></div>
+    <div class="releaseBody"><h2>Release Notes</h2><p class="releaseIntro">Added Site Activity Timeline filters and filtered Copy Timeline.</p><ul>${notes.map(n=>`<li>${esc(n)}</li>`).join("")}</ul></div>
   </div>`;
   document.body.appendChild(overlay);
   const close=()=>overlay.remove();

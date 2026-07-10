@@ -8,7 +8,7 @@
   "orientation": "any",
   "background_color": "#0b0d10",
   "theme_color": "#101216",
-  "description": "Field knowledge system for fire alarm technicians. Build 0.50.57 adds a Site Activity Timeline to account screens with recent visits, photos/documents, tasks, deficiencies, and Copy Timeline.",
+  "description": "Field knowledge system for fire alarm technicians. Build 0.50.58 adds filters to the Site Activity Timeline: All, Visits, Photos / Docs, Tasks, and Deficiencies.",
   "icons": [
     {
       "src": "assets/icon-192.png",
