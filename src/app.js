@@ -4545,35 +4545,45 @@ function emailPreviewHtml(subject, signature){
   return `<div class="emailPreviewLine"><strong>Subject</strong><span id="emailPreviewSubject">${esc(renderedSubject)}</span></div><div class="emailPreviewSignature" id="emailPreviewSignature">${esc(renderedSig).replaceAll("\n","<br>")}</div>`;
 }
 function emailSettingsPanel(email){
-  return `<div class="settingsStack emailSettingsPro">
-    <div class="card settingGroup compactPane emailComposerPane">
-      <div class="paneHead emailPaneHead"><div><h2>Email Defaults</h2><p class="paneNote">Clean templates for outgoing FireVault reports.</p></div><button class="primary saveMini" id="saveSettings">Save</button></div>
-      <div class="emailCardStack">
-        <section class="emailModule">
-          <div class="emailModuleTitle"><span>Recipients</span><small>Optional</small></div>
-          <div class="emailRowGrid">
-            <div class="emailControl"><label for="emailTo">Default To</label><input id="emailTo" autocomplete="email" inputmode="email" placeholder="customer@example.com" value="${esc(email.defaultTo)}"></div>
-            <div class="emailControl"><label for="emailCc">CC</label><input id="emailCc" autocomplete="email" inputmode="email" placeholder="office@example.com" value="${esc(email.cc)}"></div>
-          </div>
-        </section>
-        <section class="emailModule emailTemplateModule">
-          <div class="emailModuleTitle"><span>Subject Template</span><small>Tap tags below</small></div>
-          <div class="emailControl full"><input id="emailSubject" class="templateInput" value="${esc(email.defaultSubject)}" placeholder="FireVault Report - {site_name} - {date}"></div>
-        </section>
-        <section class="emailModule emailTemplateModule">
-          <div class="emailModuleTitle"><span>Signature Template</span><small>Report footer</small></div>
-          <div class="emailControl full"><textarea id="emailSig" class="emailSignatureTextarea" placeholder="{technician}\n{company}\n{phone}\n{email}">${esc(email.signature)}</textarea></div>
-        </section>
-        <section class="emailModule tagModule">
-          <div class="emailModuleTitle"><span>Insert Tags</span><small>Use in subject or signature</small></div>
-          <div class="emailTagGrid">${emailTagButtons()}</div>
-        </section>
-        <section class="emailModule emailPreviewCard">
-          <div class="emailModuleTitle"><span>Live Example</span><small>Sample site</small></div>
-          ${emailPreviewHtml(email.defaultSubject, email.signature)}
-        </section>
+  return `<div class="settingsStack emailSettingsRedesign530">
+    <section class="card compactPane settingsSection530 emailEditor530">
+      <div class="settingsSectionHead530">
+        <div><span class="settingsEyebrow530">Outgoing reports</span><h2>Email Setup</h2><p>Set the defaults FireVault uses when you prepare a customer report email.</p></div>
+        <button class="primary saveMini" id="saveSettings">Save Changes</button>
       </div>
-    </div>
+
+      <div class="emailBlock530">
+        <div class="emailBlockHead530"><span class="emailStep530">1</span><div><h3>Recipients</h3><p>Leave these blank when recipients change from job to job.</p></div></div>
+        <div class="emailRowGrid530">
+          <div class="emailControl530"><label for="emailTo">Default recipient</label><input id="emailTo" autocomplete="email" inputmode="email" placeholder="customer@example.com" value="${esc(email.defaultTo)}"></div>
+          <div class="emailControl530"><label for="emailCc">Default CC</label><input id="emailCc" autocomplete="email" inputmode="email" placeholder="office@example.com" value="${esc(email.cc)}"></div>
+        </div>
+      </div>
+
+      <div class="emailBlock530">
+        <div class="emailBlockHead530"><span class="emailStep530">2</span><div><h3>Subject line</h3><p>Tap a field below, then insert a tag where you want it.</p></div></div>
+        <div class="emailControl530"><label for="emailSubject">Subject template</label><input id="emailSubject" class="templateInput" value="${esc(email.defaultSubject)}" placeholder="FireVault Report - {site_name} - {date}"></div>
+      </div>
+
+      <div class="emailBlock530">
+        <div class="emailBlockHead530"><span class="emailStep530">3</span><div><h3>Signature</h3><p>This appears at the bottom of the prepared email.</p></div></div>
+        <div class="emailControl530"><label for="emailSig">Signature template</label><textarea id="emailSig" class="emailSignatureTextarea" placeholder="{technician}\n{company}\n{phone}\n{email}">${esc(email.signature)}</textarea></div>
+      </div>
+
+      <div class="emailBlock530 emailTagsBlock530">
+        <div class="emailBlockHead530"><span class="emailStep530">+</span><div><h3>Insert information</h3><p>Choose a tag to add it to the active subject or signature field.</p></div></div>
+        <div class="emailTagGrid530">${emailTagButtons()}</div>
+      </div>
+    </section>
+
+    <aside class="card compactPane settingsSection530 emailPreviewPanel530">
+      <div class="settingsSectionHead530 emailPreviewHead530"><div><span class="settingsEyebrow530">Preview</span><h2>Example Email</h2><p>Sample account information shows how your templates will read.</p></div></div>
+      <div class="emailMock530">
+        <div class="emailMockRow530"><strong>To</strong><span id="emailPreviewTo530">${esc(email.defaultTo || 'Customer email added when sending')}</span></div>
+        <div class="emailMockRow530"><strong>CC</strong><span id="emailPreviewCc530">${esc(email.cc || 'None')}</span></div>
+        ${emailPreviewHtml(email.defaultSubject, email.signature)}
+      </div>
+    </aside>
   </div>`;
 }
 function insertAtCursor(el, text){
@@ -4793,6 +4803,7 @@ function wireSettingsPanel(){
   const saveBtn=document.getElementById("saveSettings"); if(saveBtn) saveBtn.onclick=saveSettings;
   if(settingsTab==="overlay") wireOverlaySettings510();
   ["emailSubject","emailSig"].forEach(id=>{ const el=document.getElementById(id); if(el){ el.addEventListener("focus",()=>lastEmailTemplateField=id); el.addEventListener("input",updateEmailPreview); } });
+  [["emailTo","emailPreviewTo530","Customer email added when sending"],["emailCc","emailPreviewCc530","None"]].forEach(([inputId,previewId,fallback])=>{ const input=document.getElementById(inputId); const preview=document.getElementById(previewId); if(input&&preview) input.addEventListener("input",()=>preview.textContent=input.value.trim()||fallback); });
   document.querySelectorAll(".emailTagChip").forEach(b=>b.onclick=()=>{ const target=document.getElementById(lastEmailTemplateField) || document.getElementById("emailSubject"); insertAtCursor(target, b.dataset.emailTag || ""); });
   document.querySelectorAll(".presetBtn").forEach(b=>b.onclick=()=>{ const p=themePresets[b.dataset.preset]; data.settings.theme.name=b.dataset.preset; data.settings.theme.accentColor=p.accentColor; if(p.highContrast) data.settings.theme.highContrast=true; save(); settings(); toast("Theme applied."); });
   document.querySelectorAll("[data-view-mode]").forEach(b=>b.onclick=()=>setViewMode(b.dataset.viewMode));

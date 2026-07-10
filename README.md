@@ -1,19 +1,13 @@
-# FireVault Build 0.52.0
+# FireVault Build 0.53.0
 
-Build 0.52.0 is a Settings and submenu visual-polish milestone based on stable Build 0.51.0. Existing settings, data storage, routes, and Home behavior are preserved.
+Build 0.53.0 replaces the Build 0.52.0 Settings visual treatment with a cleaner, flatter interface. Existing settings, routes, storage, Home behavior, and scroll-position recovery are preserved.
 
-## Improvements
+## Changes
+- Redesigned every Settings menu card with a simpler visual hierarchy.
+- Removed excessive gradients, nested boxes, alternating surfaces, and decorative borders.
+- Standardized headings, field labels, controls, check rows, spacing, and contrast.
+- Completely rebuilt Email Settings as a step-by-step composer with a separate live preview.
+- Added live recipient and CC preview updates.
+- Preserved FIRE red / VAULT white branding and responsive phone/iPad behavior.
 
-- Cleaned up the main Settings menu and all Settings detail screens.
-- Increased label, note, input, and submenu heading readability.
-- Added stronger contrast and separation between individual cards and controls.
-- Standardized padding, borders, section headings, checkboxes, inputs, and Save buttons.
-- Reworked Email Settings into clearer recipient, subject, signature, tag, and live-preview sections.
-- Improved phone and iPad responsive layouts.
-- Preserved Settings scroll-position recovery from Build 0.50.76.
-- Preserved responsive collapsible Home cards from Build 0.51.0.
-- Preserved FIRE-red / VAULT-white branding.
-
-## Suggested commit message
-
-`Build 0.52.0 polish Settings menus and Email workspace`
+Suggested commit: `Build 0.53.0 redesign Settings and Email composer`

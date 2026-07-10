@@ -8,7 +8,7 @@
   "orientation": "any",
   "background_color": "#0b0d10",
   "theme_color": "#101216",
-  "description": "Field knowledge system for fire alarm technicians. Build 0.52.0 refreshes the complete Settings experience with cleaner menus, stronger card contrast, improved text formatting, and a redesigned Email Settings workspace.",
+  "description": "Field knowledge system for fire alarm technicians. Build 0.53.0 refreshes the complete Settings experience with cleaner menus, stronger card contrast, improved text formatting, and a redesigned Email Settings workspace.",
   "icons": [
     {
       "src": "assets/icon-192.png",
