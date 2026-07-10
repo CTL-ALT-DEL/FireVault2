@@ -251,8 +251,14 @@ ensureModuleBaseline476();
 applyTheme();
 document.getElementById("buildButton").addEventListener("click", showChangelog);
 document.querySelectorAll("nav button").forEach(btn => btn.addEventListener("click", () => {
-  if(view==="settings") mode=null;
-  route(btn.dataset.route);
+  const target=btn.dataset.route;
+  if(target==="settings"){
+    openSettingsHome572();
+    return;
+  }
+  mode=null;
+  restoreAppChrome572();
+  route(target);
 }));
 window.addEventListener("error", e => showError(e.error || e.message));
 window.addEventListener("unhandledrejection", e => showError(e.reason || e));
@@ -1237,11 +1243,12 @@ function addServiceFollowUp(kind="Follow-up"){
 function startJobTimer(){ stopJobTimer(); jobTimer=setInterval(()=>{ const el=document.getElementById("jobElapsed"); if(el && activeJob) el.textContent=elapsedText(activeJob.startedAt); },1000); }
 function stopJobTimer(){ if(jobTimer){ clearInterval(jobTimer); jobTimer=null; } }
 function setActiveNav(){ document.querySelectorAll("nav button").forEach(b=>b.classList.remove("active")); const section=["routeLog","dailySummary","actionCenter","pinnedSites"].includes(view)?"home":(["siteDetail","visits","visitDetail","checklist","siteForm","contactsList","contactForm","siteDocs","siteDocForm","equipmentList","equipmentForm","tasks","taskForm","deficiencies","deficiencyForm","report","jobMode","nearbySites","attention"].includes(view)?"sites":view); document.getElementById("nav-"+section)?.classList.add("active"); }
-function wireGlobalHeader537(){ const b=document.getElementById("headerSettingsBtn537"); if(b) b.onclick=()=>route("settings"); }
+function wireGlobalHeader537(){ const b=document.getElementById("headerSettingsBtn537"); if(b) b.onclick=openSettingsHome572; }
 function showGlobalChrome537(){ const h=document.getElementById("appHeader"); const n=document.getElementById("appNav"); if(h){ h.style.display="flex"; h.style.visibility="visible"; h.style.opacity="1"; } if(n){ n.style.display="grid"; n.style.visibility="visible"; n.style.opacity="1"; } wireGlobalHeader537(); }
 
 function render(){
   try{
+    if(view!=="home") restoreAppChrome572();
     const routes = {home, dailySummary, routeLog, actionCenter, pinnedSites:pinnedSitesManager567, sites, nearbySites, attention:attentionQueue, siteDetail, visits, visitDetail, checklist, siteForm, contactsList, contactForm, siteDocs, siteDocForm, equipmentList, equipmentForm, tasks, taskForm, deficiencies, deficiencyForm, report, library, resourceForm, jobMode, settings, diagnostics, dataTools};
     (routes[view] || home)();
     document.body.classList.toggle("homeFullscreen480", view === "home");
@@ -1501,7 +1508,7 @@ function wireNoteTemplates503(targetId="siteNoteText"){
 }
 
 
-/* Build 0.50.72 Pinned Sites helpers */
+/* Build 0.50.73 Pinned Sites helpers */
 function isPinnedSite566(s){ return !!s?.pinnedAt; }
 function pinnedSites566(limit=5){
   return [...(data.sites||[])].filter(isPinnedSite566).sort((a,b)=>{
@@ -1559,7 +1566,7 @@ function toggleSitePinned566(){
   siteDetail();
 }
 
-/* Build 0.50.72 Pinned Sites Manager */
+/* Build 0.50.73 Pinned Sites Manager */
 function unpinSiteById567(id){
   const s=(data.sites||[]).find(x=>x.id===id);
   if(!s) return;
@@ -2161,7 +2168,7 @@ function siteToolCount477(){
 }
 
 
-/* Build 0.50.72 Site Screen Cleanup helpers */
+/* Build 0.50.73 Site Screen Cleanup helpers */
 function siteOpenTasks556(s={}){
   return (s.tasks||[]).filter(t=>String(t.status||"Open").toLowerCase()!=="done" && String(t.status||"Open").toLowerCase()!=="complete");
 }
@@ -2254,7 +2261,7 @@ function wireSiteBrief556(){
 
 
 
-/* Build 0.50.72 Site Activity Timeline filters */
+/* Build 0.50.73 Site Activity Timeline filters */
 let siteTimelineFilter558 = "all";
 let siteTimelineExpanded559 = false;
 function siteTimelineFilterCounts558(s={}){
@@ -2298,7 +2305,7 @@ function wireSiteTimelineFilters558(){
   });
 }
 
-/* Build 0.50.72 Site Activity Timeline helpers */
+/* Build 0.50.73 Site Activity Timeline helpers */
 function activityDateMs557(value){
   const t=new Date(value || 0).getTime();
   return Number.isFinite(t) ? t : 0;
@@ -2468,7 +2475,7 @@ function wireSiteActivity557(){
 }
 
 
-/* Build 0.50.72 Important Site Info helpers */
+/* Build 0.50.73 Important Site Info helpers */
 function primaryContact568(s={}){
   const contacts=s.contacts||[];
   return contacts.find(c=>/primary|main|manager|owner|contact/i.test([c.role,c.notes,c.accessNotes].filter(Boolean).join(" "))) || contacts[0] || {};
@@ -3926,7 +3933,7 @@ function openReportEmailDraft(s, txt, subject){
 }
 
 
-/* Build 0.50.72 Customer Report Preview helpers */
+/* Build 0.50.73 Customer Report Preview helpers */
 function customerReportPreviewStats555(s={}){
   const selected=reportPhotos526(s);
   const ready=customerReportPhotoReady530(s);
@@ -4266,7 +4273,7 @@ function settingsTabs(){
 }
 
 
-/* Build 0.50.72 Settings navigation recovery */
+/* Build 0.50.73 Settings navigation recovery */
 function restoreAppChrome572(){
   document.body.classList.remove("homeFullscreen480","homeLayoutFixed570");
   const header=document.getElementById("appHeader");
@@ -4304,7 +4311,7 @@ function settings(){
   const active=tabs.find(t=>t[0]===settingsTab)||tabs[0];
   const inDetail = mode === "settingsDetail";
   if(!inDetail){
-    html(`<div class="screen settingsHomeScreen settingsHomeScreen451 settingsHomeScreen488">
+    html(`<div class="screen settingsHomeScreen settingsHomeScreen451 settingsHomeScreen488 settingsStable573">
       <div class="settingsHeader488 settingsHeader572">
         <button class="ghost settingsHomeBtn572" id="settingsHomeBtn572" aria-label="Return to Home">⌂</button>
         <div class="settingsHeaderTitle572"><h1>Settings</h1><p>Modules, app setup, and maintenance.</p></div>
@@ -4323,7 +4330,7 @@ function settings(){
     return;
   }
   const saveable=!['backup','about'].includes(settingsTab);
-  html(`<div class="screen settingsDetailScreen451 settingsScreen settingsScreen448 settingsScreen449 settingsDetailScreen488">
+  html(`<div class="screen settingsDetailScreen451 settingsScreen settingsScreen448 settingsScreen449 settingsDetailScreen488 settingsStable573">
     <div class="settingsDetailTop451 settingsDetailTop488 settingsDetailTop572">
       <button class="ghost settingsBack451 settingsBack488" id="settingsBackBtn" aria-label="Back to Settings">←</button>
       <div class="settingsDetailTitle451 settingsDetailTitle488"><h1>${active[1]}</h1></div>
@@ -4849,7 +4856,7 @@ function repairVaultState(){
 
 
 
-/* Build 0.50.72 Action Center helpers */
+/* Build 0.50.73 Action Center helpers */
 function actionPriorityClass562(rank){
   if(rank<=1) return "critical";
   if(rank===2) return "today";
@@ -5024,7 +5031,7 @@ function actionCenter(){
 }
 
 
-/* Build 0.50.72 Field Focus dashboard helpers */
+/* Build 0.50.73 Field Focus dashboard helpers */
 function fieldFocusStats561(){
   const sites=data.sites||[];
   const openTasks=allTaskRows().filter(r=>!taskIsDone(r.t));
@@ -5109,7 +5116,7 @@ function wireFieldFocus561(){
 }
 
 
-/* Build 0.50.72 Data Tools / Home cleanup helpers */
+/* Build 0.50.73 Data Tools / Home cleanup helpers */
 function dataSafeSummary560(){
   const s=backupSafetyStats552();
   const lastRestore=localStorage.getItem("firevault_last_restore_time");
@@ -5232,7 +5239,7 @@ function dataTools(){
 }
 
 
-/* Build 0.50.72 Backup Safety helpers */
+/* Build 0.50.73 Backup Safety helpers */
 function backupSafetyStats552(){
   const sites = (data.sites || []).length;
   const visits = (data.sites || []).reduce((n,s)=>n+((s.visits||[]).length),0);
@@ -5349,7 +5356,7 @@ async function copyUpdateChecklist553(){
 }
 
 
-/* Build 0.50.72 Backup Restore Center */
+/* Build 0.50.73 Backup Restore Center */
 let pendingRestoreBackup554 = null;
 
 function normalizeBackupPayload554(raw){
@@ -5558,17 +5565,17 @@ function diagnostics(){
 }
 function showChangelog(){
   const notes = [
-    "Advanced to Build 0.50.72 from the stable 0.50.71 baseline.",
-    "Fixed Settings submenu navigation so returning from a submenu restores the main Settings screen and bottom navigation.",
-    "Added explicit Home buttons to both the Settings main screen and every Settings submenu.",
-    "Settings navigation now uses the normal FireVault render path and forcibly restores app header/navigation chrome.",
+    "Advanced to Build 0.50.73 from the 0.50.72 Settings navigation baseline.",
+    "Rebuilt the Settings page height and scrolling behavior so the menu fills the usable screen instead of leaving a large black lower section.",
+    "Settings Home now uses one full-page scroll area, while detail pages use a stable internal content scroller above the bottom navigation.",
+    "Bottom navigation and header Settings actions now reset submenu state and always provide a reliable path back to Today.",
     "Preserved the FireVault Daily Summary calendar, bold activity dates, Home layout correction, Important Site Info, Pinned Sites Manager, Quick Layout Presets, Action Center, Data Tools, Field Focus, Site Brief, Site Activity Timeline, clean splash screen with no loader, and excluded job-status workflow controls."
   ];
   const overlay=document.createElement("div");
   overlay.className="releaseOverlay";
   overlay.innerHTML=`<div class="releaseSheet" role="dialog" aria-modal="true" aria-label="FireVault release notes">
     <div class="releaseHead"><div><strong>FireVault</strong><span>Build ${BUILD}</span></div><button class="ghost iconBtn" id="closeRelease" aria-label="Close release notes">×</button></div>
-    <div class="releaseBody"><h2>Release Notes</h2><p class="releaseIntro">Fixed Settings navigation and added reliable Home escape buttons.</p><ul>${notes.map(n=>`<li>${esc(n)}</li>`).join("")}</ul></div>
+    <div class="releaseBody"><h2>Release Notes</h2><p class="releaseIntro">Rebuilt Settings full-height layout and navigation stability.</p><ul>${notes.map(n=>`<li>${esc(n)}</li>`).join("")}</ul></div>
   </div>`;
   document.body.appendChild(overlay);
   const close=()=>overlay.remove();

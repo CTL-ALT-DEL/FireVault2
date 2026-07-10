@@ -1,11 +1,11 @@
-# FireVault Build 0.50.72
+# FireVault Build 0.50.73
 
-Build 0.50.72 continues from the stable 0.50.71 baseline and fixes Settings submenu navigation.
+Build 0.50.73 continues from the stable 0.50.71 baseline and fixes Settings submenu navigation.
 
 ## Changes
 
-- Visible app version advanced to 0.50.72.
-- Cache-busting references updated to 0.50.72.
+- Visible app version advanced to 0.50.73.
+- Cache-busting references updated to 0.50.73.
 - Added **Site Quick Actions** card on the account/site screen.
 - Added direct quick actions for:
   - Add Site Note
@@ -31,13 +31,13 @@ Run from the project root:
 node --check src/storage.js
 node --check src/app.js
 python -m json.tool manifest.json > /dev/null
-zip -T firevault-build-0.50.72-modular-root.zip
+zip -T firevault-build-0.50.73-modular-root.zip
 ```
 
 ## Suggested commit message
 
 ```text
-Build 0.50.72 settings navigation recovery
+Build 0.50.73 settings navigation recovery
 ```
 
 - Lifted the red Home add button above the bottom nav so it should not be blocked by the black bottom area.
@@ -110,3 +110,9 @@ Build 0.50.72 settings navigation recovery
 - Calendar opens even if no past daily summaries exist, and any date can be selected.
 
 - Settings now forcibly restores the app header and bottom navigation whenever it renders.
+
+## Build 0.50.73
+
+- Rebuilt Settings full-height scrolling.
+- Removed the large empty black lower area.
+- Stabilized Settings submenu and bottom-navigation recovery.
