@@ -1110,13 +1110,13 @@ function addServiceFollowUp(kind="Follow-up"){
 }
 function startJobTimer(){ stopJobTimer(); jobTimer=setInterval(()=>{ const el=document.getElementById("jobElapsed"); if(el && activeJob) el.textContent=elapsedText(activeJob.startedAt); },1000); }
 function stopJobTimer(){ if(jobTimer){ clearInterval(jobTimer); jobTimer=null; } }
-function setActiveNav(){ document.querySelectorAll("nav button").forEach(b=>b.classList.remove("active")); const section=["routeLog","dailySummary","actionCenter"].includes(view)?"home":(["siteDetail","visits","visitDetail","checklist","siteForm","contactsList","contactForm","siteDocs","siteDocForm","equipmentList","equipmentForm","tasks","taskForm","deficiencies","deficiencyForm","report","jobMode","nearbySites","attention"].includes(view)?"sites":view); document.getElementById("nav-"+section)?.classList.add("active"); }
+function setActiveNav(){ document.querySelectorAll("nav button").forEach(b=>b.classList.remove("active")); const section=["routeLog","dailySummary","actionCenter","pinnedSites"].includes(view)?"home":(["siteDetail","visits","visitDetail","checklist","siteForm","contactsList","contactForm","siteDocs","siteDocForm","equipmentList","equipmentForm","tasks","taskForm","deficiencies","deficiencyForm","report","jobMode","nearbySites","attention"].includes(view)?"sites":view); document.getElementById("nav-"+section)?.classList.add("active"); }
 function wireGlobalHeader537(){ const b=document.getElementById("headerSettingsBtn537"); if(b) b.onclick=()=>route("settings"); }
 function showGlobalChrome537(){ const h=document.getElementById("appHeader"); const n=document.getElementById("appNav"); if(h){ h.style.display="flex"; h.style.visibility="visible"; h.style.opacity="1"; } if(n){ n.style.display="grid"; n.style.visibility="visible"; n.style.opacity="1"; } wireGlobalHeader537(); }
 
 function render(){
   try{
-    const routes = {home, dailySummary, routeLog, actionCenter, sites, nearbySites, attention:attentionQueue, siteDetail, visits, visitDetail, checklist, siteForm, contactsList, contactForm, siteDocs, siteDocForm, equipmentList, equipmentForm, tasks, taskForm, deficiencies, deficiencyForm, report, library, resourceForm, jobMode, settings, diagnostics, dataTools};
+    const routes = {home, dailySummary, routeLog, actionCenter, pinnedSites:pinnedSitesManager567, sites, nearbySites, attention:attentionQueue, siteDetail, visits, visitDetail, checklist, siteForm, contactsList, contactForm, siteDocs, siteDocForm, equipmentList, equipmentForm, tasks, taskForm, deficiencies, deficiencyForm, report, library, resourceForm, jobMode, settings, diagnostics, dataTools};
     (routes[view] || home)();
     document.body.classList.toggle("homeFullscreen480", view === "home");
     stopJobTimer();
@@ -1372,7 +1372,7 @@ function wireNoteTemplates503(targetId="siteNoteText"){
 }
 
 
-/* Build 0.50.66 Pinned Sites helpers */
+/* Build 0.50.67 Pinned Sites helpers */
 function isPinnedSite566(s){ return !!s?.pinnedAt; }
 function pinnedSites566(limit=5){
   return [...(data.sites||[])].filter(isPinnedSite566).sort((a,b)=>{
@@ -1408,10 +1408,11 @@ async function copyPinnedSites566(){
   }
 }
 function pinnedSitesMarkup566(){
+  const all=[...(data.sites||[])].filter(isPinnedSite566);
   const rows=pinnedSites566(5);
   if(!rows.length) return "";
   return `<div class="card pinnedSites566">
-    <div class="pinnedSitesHead566"><div><strong>Pinned Sites</strong><span>${rows.length} quick account${rows.length===1?"":"s"}</span></div><button class="ghost smallBtn" id="copyPinnedSites566">Copy</button></div>
+    <div class="pinnedSitesHead566"><div><strong>Pinned Sites</strong><span>${all.length} pinned • ${rows.length} shown</span></div><div class="pinnedHeadActions567"><button class="ghost smallBtn" id="openPinnedSites567">All</button><button class="ghost smallBtn" id="copyPinnedSites566">Copy</button></div></div>
     <div class="pinnedSitesList566">${rows.map(s=>`<button class="pinnedSite566" data-home-site="${esc(s.id)}"><span>★</span><div><strong>${esc(s.name||"Unnamed Account")}</strong><small>${esc(siteSubline476(s))}</small><em>${esc(siteActivityLine476(s))}</em></div></button>`).join("")}</div>
   </div>`;
 }
@@ -1427,6 +1428,69 @@ function toggleSitePinned566(){
   s.updatedAt=new Date().toISOString();
   save();
   siteDetail();
+}
+
+/* Build 0.50.67 Pinned Sites Manager */
+function unpinSiteById567(id){
+  const s=(data.sites||[]).find(x=>x.id===id);
+  if(!s) return;
+  delete s.pinnedAt;
+  s.updatedAt=new Date().toISOString();
+  save();
+  toast("Site unpinned.");
+  pinnedSitesManager567();
+}
+function unpinAllSites567(){
+  const rows=(data.sites||[]).filter(isPinnedSite566);
+  if(!rows.length){ toast("No pinned sites."); return; }
+  if(!confirm(`Unpin ${rows.length} site${rows.length===1?"":"s"} from Home?`)) return;
+  rows.forEach(s=>{ delete s.pinnedAt; s.updatedAt=new Date().toISOString(); });
+  save();
+  toast("Pinned sites cleared.");
+  pinnedSitesManager567();
+}
+function pinnedSiteManagerRow567(s){
+  const health=siteHealth(s);
+  return `<div class="card pinnedManagerRow567">
+    <button class="pinnedManagerOpen567" data-pinned-open="${esc(s.id)}">
+      <span>★</span>
+      <div><strong>${esc(s.name||"Unnamed Account")}</strong><small>${esc(siteSubline476(s))}</small><em>${esc(siteActivityLine476(s))}</em></div>
+    </button>
+    <div class="pinnedManagerMeta567">
+      <span class="${esc(health.cls)}">${health.score}%</span>
+      <small>${s.pinnedAt?`Pinned ${new Date(s.pinnedAt).toLocaleDateString([], {month:"short",day:"numeric"})}`:"Pinned"}</small>
+    </div>
+    <div class="pinnedManagerActions567">
+      <button class="ghost smallBtn" data-pinned-open="${esc(s.id)}">Open</button>
+      <button class="ghost smallBtn" data-pinned-navigate="${esc(s.id)}">Map</button>
+      <button class="danger smallBtn" data-pinned-unpin="${esc(s.id)}">Unpin</button>
+    </div>
+  </div>`;
+}
+function pinnedSitesManager567(){
+  const rows=pinnedSites566(100);
+  const withGps=rows.filter(hasGps).length;
+  const openTasks=rows.reduce((n,s)=>n+(s.tasks||[]).filter(t=>!taskIsDone(t)).length,0);
+  const openDef=rows.reduce((n,s)=>n+(s.deficiencies||[]).filter(d=>(d.status||"Open")!=="Closed").length,0);
+  html(`<div class="screen pinnedManagerScreen567">
+    <div class="row pinnedManagerTop567"><button class="back ghost" id="backHome567">←</button><div><h1>Pinned Sites</h1><p>High-use customer account shortcuts.</p></div><button class="ghost smallBtn" id="copyPinsManager567">Copy</button></div>
+    <div class="card pinnedManagerHero567">
+      <div><h2>${rows.length} pinned account${rows.length===1?"":"s"}</h2><p>${withGps} GPS-ready • ${openTasks} open task${openTasks===1?"":"s"} • ${openDef} open deficienc${openDef===1?"y":"ies"}</p></div>
+      <span>★</span>
+    </div>
+    ${rows.length?`<div class="pinnedManagerList567">${rows.map(pinnedSiteManagerRow567).join("")}</div><button class="danger pinnedClear567" id="clearPinnedSites567">Unpin All</button>`:`<div class="card empty pinnedEmpty567"><h2>No pinned sites yet</h2><p>Open any account and tap the star in the account header to pin it to Home.</p><button class="primary" id="openSitesFromPins567">Open Accounts</button></div>`}
+  </div>`);
+  document.getElementById("backHome567").onclick=()=>route("home");
+  const copy=document.getElementById("copyPinsManager567"); if(copy) copy.onclick=copyPinnedSites566;
+  const clear=document.getElementById("clearPinnedSites567"); if(clear) clear.onclick=unpinAllSites567;
+  const openSites=document.getElementById("openSitesFromPins567"); if(openSites) openSites.onclick=()=>route("sites");
+  document.querySelectorAll("[data-pinned-open]").forEach(b=>b.onclick=()=>{ selectedSiteId=b.dataset.pinnedOpen; route("siteDetail"); });
+  document.querySelectorAll("[data-pinned-unpin]").forEach(b=>b.onclick=()=>unpinSiteById567(b.dataset.pinnedUnpin));
+  document.querySelectorAll("[data-pinned-navigate]").forEach(b=>b.onclick=()=>{
+    const s=(data.sites||[]).find(x=>x.id===b.dataset.pinnedNavigate);
+    if(!s) return;
+    window.open(mapUrl(s, data.settings.gps?.mapProvider || "apple"), "_blank");
+  });
 }
 
 
@@ -1525,6 +1589,7 @@ function home(){
   document.getElementById('addSiteBtn').onclick=()=>{selectedSiteId=null; mode=null; route('siteForm');};
   const dataToolsHome560=document.getElementById('dataToolsHome560'); if(dataToolsHome560) dataToolsHome560.onclick=()=>route('dataTools');
   const copyPins566=document.getElementById('copyPinnedSites566'); if(copyPins566) copyPins566.onclick=copyPinnedSites566;
+  const openPins567=document.getElementById('openPinnedSites567'); if(openPins567) openPins567.onclick=()=>route('pinnedSites');
   wireFieldFocus561();
   const openRouteMini=document.getElementById('openRouteMiniBtn'); if(openRouteMini) openRouteMini.onclick=()=>route('routeLog');
   const homeRoutePoint=document.getElementById('homeRoutePointBtn'); if(homeRoutePoint) homeRoutePoint.onclick=()=>{ const note=prompt('Waypoint note', 'Manual waypoint')||'Manual waypoint'; addRouteEvent('Waypoint', note); };
@@ -1950,7 +2015,7 @@ function siteToolCount477(){
 }
 
 
-/* Build 0.50.66 Site Screen Cleanup helpers */
+/* Build 0.50.67 Site Screen Cleanup helpers */
 function siteOpenTasks556(s={}){
   return (s.tasks||[]).filter(t=>String(t.status||"Open").toLowerCase()!=="done" && String(t.status||"Open").toLowerCase()!=="complete");
 }
@@ -2043,7 +2108,7 @@ function wireSiteBrief556(){
 
 
 
-/* Build 0.50.66 Site Activity Timeline filters */
+/* Build 0.50.67 Site Activity Timeline filters */
 let siteTimelineFilter558 = "all";
 let siteTimelineExpanded559 = false;
 function siteTimelineFilterCounts558(s={}){
@@ -2087,7 +2152,7 @@ function wireSiteTimelineFilters558(){
   });
 }
 
-/* Build 0.50.66 Site Activity Timeline helpers */
+/* Build 0.50.67 Site Activity Timeline helpers */
 function activityDateMs557(value){
   const t=new Date(value || 0).getTime();
   return Number.isFinite(t) ? t : 0;
@@ -3648,7 +3713,7 @@ function openReportEmailDraft(s, txt, subject){
 }
 
 
-/* Build 0.50.66 Customer Report Preview helpers */
+/* Build 0.50.67 Customer Report Preview helpers */
 function customerReportPreviewStats555(s={}){
   const selected=reportPhotos526(s);
   const ready=customerReportPhotoReady530(s);
@@ -4380,7 +4445,7 @@ function saveSettings(){
 function stabilityReport(){
   const issues=[];
   const pass=[];
-  const routeNames=["home","dailySummary","routeLog","actionCenter","sites","nearbySites","attention","siteDetail","visits","visitDetail","checklist","siteForm","contactsList","contactForm","siteDocs","siteDocForm","equipmentList","equipmentForm","tasks","taskForm","deficiencies","deficiencyForm","report","library","resourceForm","jobMode","settings","diagnostics","dataTools"];
+  const routeNames=["home","dailySummary","routeLog","actionCenter","pinnedSites","sites","nearbySites","attention","siteDetail","visits","visitDetail","checklist","siteForm","contactsList","contactForm","siteDocs","siteDocForm","equipmentList","equipmentForm","tasks","taskForm","deficiencies","deficiencyForm","report","library","resourceForm","jobMode","settings","diagnostics","dataTools"];
   pass.push(`${routeNames.length} app routes registered`);
   if(Array.isArray(data.sites)) pass.push("Sites database is an array"); else issues.push("Sites database is not an array");
   if(Array.isArray(data.resources)) pass.push("Library resources database is an array"); else issues.push("Library resources database is not an array");
@@ -4531,7 +4596,7 @@ function repairVaultState(){
 
 
 
-/* Build 0.50.66 Action Center helpers */
+/* Build 0.50.67 Action Center helpers */
 function actionPriorityClass562(rank){
   if(rank<=1) return "critical";
   if(rank===2) return "today";
@@ -4706,7 +4771,7 @@ function actionCenter(){
 }
 
 
-/* Build 0.50.66 Field Focus dashboard helpers */
+/* Build 0.50.67 Field Focus dashboard helpers */
 function fieldFocusStats561(){
   const sites=data.sites||[];
   const openTasks=allTaskRows().filter(r=>!taskIsDone(r.t));
@@ -4791,7 +4856,7 @@ function wireFieldFocus561(){
 }
 
 
-/* Build 0.50.66 Data Tools / Home cleanup helpers */
+/* Build 0.50.67 Data Tools / Home cleanup helpers */
 function dataSafeSummary560(){
   const s=backupSafetyStats552();
   const lastRestore=localStorage.getItem("firevault_last_restore_time");
@@ -4883,6 +4948,7 @@ function dataTools(){
       <div class="dataToolsMaintenanceHead560"><div><h2>Maintenance</h2><p>Use these when troubleshooting, checking startup health, or preparing a support note.</p></div></div>
       <div class="dataToolsActions560">
         <button class="ghost" id="copyFieldFocus561">Copy Field Focus</button>
+        <button class="ghost" id="openPinnedSitesData567">Open Pinned Sites</button>
         <button class="ghost" id="copyPinnedSitesData566">Copy Pinned Sites</button>
         <button class="ghost" id="copyActionCenterData562">Copy Action Center</button>
         <button class="ghost" id="copyDiagnostics560">Copy Diagnostics</button>
@@ -4902,6 +4968,7 @@ function dataTools(){
   const openLayout=document.getElementById("openLayoutSettings565"); if(openLayout) openLayout.onclick=()=>{settingsTab="visibility"; mode="settingsDetail"; route("settings");};
   const focus=document.getElementById("copyFieldFocus561"); if(focus) focus.onclick=copyFieldFocus561;
   const actionCopy=document.getElementById("copyActionCenterData562"); if(actionCopy) actionCopy.onclick=copyActionCenter562;
+  const pinnedOpen=document.getElementById("openPinnedSitesData567"); if(pinnedOpen) pinnedOpen.onclick=()=>route("pinnedSites");
   const pinnedCopy=document.getElementById("copyPinnedSitesData566"); if(pinnedCopy) pinnedCopy.onclick=copyPinnedSites566;
   const diag=document.getElementById("copyDiagnostics560"); if(diag) diag.onclick=copyDiagnostics;
   const startup=document.getElementById("copyStartupHealth560"); if(startup) startup.onclick=copyStartupHealth520;
@@ -4910,7 +4977,7 @@ function dataTools(){
 }
 
 
-/* Build 0.50.66 Backup Safety helpers */
+/* Build 0.50.67 Backup Safety helpers */
 function backupSafetyStats552(){
   const sites = (data.sites || []).length;
   const visits = (data.sites || []).reduce((n,s)=>n+((s.visits||[]).length),0);
@@ -5027,7 +5094,7 @@ async function copyUpdateChecklist553(){
 }
 
 
-/* Build 0.50.66 Backup Restore Center */
+/* Build 0.50.67 Backup Restore Center */
 let pendingRestoreBackup554 = null;
 
 function normalizeBackupPayload554(raw){
@@ -5236,17 +5303,17 @@ function diagnostics(){
 }
 function showChangelog(){
   const notes = [
-    "Advanced to Build 0.50.66 from the stable 0.50.65 baseline.",
-    "Added Pinned Sites for high-use or important customer accounts.",
-    "Sites can now be pinned or unpinned from the account screen.",
-    "Pinned Sites appear on Home and can be hidden from Settings → Modules.",
-    "Added Copy Pinned Sites and included Pinned Sites in Layout Controls, while preserving Quick Layout Presets, Action Center, Home cleanup, Data Tools, Field Focus, Site Brief, Site Activity Timeline, Customer Report Preview, top-right Add Site placement, clean splash screen with no loader, and excluded job-status workflow controls."
+    "Advanced to Build 0.50.67 from the stable 0.50.66 baseline.",
+    "Added Pinned Sites Manager for viewing and managing all pinned accounts.",
+    "Home Pinned Sites now has an All button that opens the full manager.",
+    "Pinned Sites Manager supports Open, Map, Copy, individual Unpin, and Unpin All.",
+    "Preserved Pinned Sites, Quick Layout Presets, Action Center, Home cleanup, Data Tools, Field Focus, Site Brief, Site Activity Timeline, Customer Report Preview, top-right Add Site placement, clean splash screen with no loader, and excluded job-status workflow controls."
   ];
   const overlay=document.createElement("div");
   overlay.className="releaseOverlay";
   overlay.innerHTML=`<div class="releaseSheet" role="dialog" aria-modal="true" aria-label="FireVault release notes">
     <div class="releaseHead"><div><strong>FireVault</strong><span>Build ${BUILD}</span></div><button class="ghost iconBtn" id="closeRelease" aria-label="Close release notes">×</button></div>
-    <div class="releaseBody"><h2>Release Notes</h2><p class="releaseIntro">Added Pinned Sites with Home shortcuts and layout toggle.</p><ul>${notes.map(n=>`<li>${esc(n)}</li>`).join("")}</ul></div>
+    <div class="releaseBody"><h2>Release Notes</h2><p class="releaseIntro">Added Pinned Sites Manager with open, map, copy, and unpin controls.</p><ul>${notes.map(n=>`<li>${esc(n)}</li>`).join("")}</ul></div>
   </div>`;
   document.body.appendChild(overlay);
   const close=()=>overlay.remove();

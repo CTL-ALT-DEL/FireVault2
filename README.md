@@ -1,11 +1,11 @@
-# FireVault Build 0.50.66
+# FireVault Build 0.50.67
 
-Build 0.50.66 continues from the stable 0.50.65 baseline and adds Pinned Sites for high-use customer accounts.
+Build 0.50.67 continues from the stable 0.50.66 baseline and adds Pinned Sites Manager.
 
 ## Changes
 
-- Visible app version advanced to 0.50.66.
-- Cache-busting references updated to 0.50.66.
+- Visible app version advanced to 0.50.67.
+- Cache-busting references updated to 0.50.67.
 - Added **Site Quick Actions** card on the account/site screen.
 - Added direct quick actions for:
   - Add Site Note
@@ -31,13 +31,13 @@ Run from the project root:
 node --check src/storage.js
 node --check src/app.js
 python -m json.tool manifest.json > /dev/null
-zip -T firevault-build-0.50.66-modular-root.zip
+zip -T firevault-build-0.50.67-modular-root.zip
 ```
 
 ## Suggested commit message
 
 ```text
-Build 0.50.66 pinned sites
+Build 0.50.67 pinned sites manager
 ```
 
 - Lifted the red Home add button above the bottom nav so it should not be blocked by the black bottom area.
@@ -95,3 +95,6 @@ Build 0.50.66 pinned sites
 - Added Settings → Modules toggle for Pinned Sites.
 - Added Copy Pinned Sites on Home and in Data Tools.
 - Pinned Sites are included in Layout Controls and Quick Layout Presets.
+
+- Pinned Sites Manager supports Open, Map, Copy, Unpin, and Unpin All.
+- Added Open Pinned Sites shortcut in Data Tools.

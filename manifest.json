@@ -8,7 +8,7 @@
   "orientation": "any",
   "background_color": "#0b0d10",
   "theme_color": "#101216",
-  "description": "Field knowledge system for fire alarm technicians. Build 0.50.66 adds Pinned Sites for high-use accounts, a Home shortcut card, account-screen pin/unpin, Copy Pinned Sites, and a Settings \u2192 Modules toggle.",
+  "description": "Field knowledge system for fire alarm technicians. Build 0.50.67 adds Pinned Sites Manager with All, Open, Map, Copy, Unpin, and Unpin All controls for pinned customer accounts.",
   "icons": [
     {
       "src": "assets/icon-192.png",
