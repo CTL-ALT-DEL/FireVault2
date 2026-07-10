@@ -95,7 +95,7 @@ const themePresets = {
   "amoled-black": {label:"AMOLED Black", accentColor:"#ef4444"}
 };
 
-const FEATURE_DEFAULTS = {dailyRoute:true, fieldFocus:true, dataSafeHome:true, siteBrief:true, siteTimeline:true, pinnedSites:true, library:false, reports:false, equipment:false, diagnostics:false, advancedGps:true, attention:false, routeReview:false, csvExports:false, backupRepair:false};
+const FEATURE_DEFAULTS = {dailyRoute:true, fieldFocus:true, dataSafeHome:true, siteBrief:true, siteTimeline:true, pinnedSites:true, importantSiteInfo:true, library:false, reports:false, equipment:false, diagnostics:false, advancedGps:true, attention:false, routeReview:false, csvExports:false, backupRepair:false};
 const FEATURE_LABELS = [
   ["dailyRoute","Daily Route","Route day logging, active route card, waypoint tools, and saved route days."],
   ["fieldFocus","Field Focus","Home dashboard for attention sites, open tasks, deficiencies, photos, due-today items, overdue items, and Action Center shortcuts."],
@@ -103,6 +103,7 @@ const FEATURE_LABELS = [
   ["siteBrief","Site Brief","Compact account summary with tasks, deficiencies, photos, visits, panel, contact, access, and last visit."],
   ["siteTimeline","Site Activity Timeline","Recent account activity list with filters for visits, photos/documents, tasks, and deficiencies."],
   ["pinnedSites","Pinned Sites","Home shortcut row for high-use or important customer accounts."],
+  ["importantSiteInfo","Important Site Info","Account-screen strip for contact, access notes, panel info, GPS status, and quick copy."],
   ["advancedGps","Advanced GPS","GPS / Maps dashboard tools, nearby site detection, and GPS capture cards."],
   ["attention","Attention Queue","Priority review shortcut for open tasks, deficiencies, and site health warnings."],
   ["library","Library","Global library tab for manuals, links, forms, codes, and folders."],
@@ -172,11 +173,11 @@ function featureLabel473(feature){ return (FEATURE_LABELS.find(([k])=>k===featur
 
 
 const FEATURE_PRESETS_474 = {
-  minimal:{label:"Minimal Daily", mode:"simple", icon:"◯", note:"Clean dashboard for basic sites and today’s route.", features:{dailyRoute:true, fieldFocus:true, dataSafeHome:true, siteBrief:true, siteTimeline:true, pinnedSites:true, advancedGps:false, attention:false, library:false, reports:false, equipment:false, routeReview:false, csvExports:false, diagnostics:false, backupRepair:false}},
-  route:{label:"Route Logger", mode:"simple", icon:"◇", note:"Daily Route plus GPS / nearby tools.", features:{dailyRoute:true, fieldFocus:true, dataSafeHome:true, siteBrief:true, siteTimeline:true, pinnedSites:true, advancedGps:true, attention:false, library:false, reports:false, equipment:false, routeReview:true, csvExports:false, diagnostics:false, backupRepair:false}},
-  service:{label:"Service Tech", mode:"advanced", icon:"▣", note:"Sites, reports, equipment, GPS, and attention tools.", features:{dailyRoute:true, fieldFocus:true, dataSafeHome:true, siteBrief:true, siteTimeline:true, pinnedSites:true, advancedGps:true, attention:true, library:false, reports:true, equipment:true, routeReview:false, csvExports:false, diagnostics:false, backupRepair:false}},
-  inspection:{label:"Inspector", mode:"advanced", icon:"▤", note:"Reports, equipment, route review, library, and export tools.", features:{dailyRoute:true, fieldFocus:true, dataSafeHome:true, siteBrief:true, siteTimeline:true, pinnedSites:true, advancedGps:true, attention:true, library:true, reports:true, equipment:true, routeReview:true, csvExports:true, diagnostics:false, backupRepair:false}},
-  power:{label:"Power Mode", mode:"power", icon:"⚡", note:"Show every FireVault module and advanced control.", features:{dailyRoute:true, fieldFocus:true, dataSafeHome:true, siteBrief:true, siteTimeline:true, pinnedSites:true, advancedGps:true, attention:true, library:true, reports:true, equipment:true, routeReview:true, csvExports:true, diagnostics:true, backupRepair:true}}
+  minimal:{label:"Minimal Daily", mode:"simple", icon:"◯", note:"Clean dashboard for basic sites and today’s route.", features:{dailyRoute:true, fieldFocus:true, dataSafeHome:true, siteBrief:true, siteTimeline:true, pinnedSites:true, importantSiteInfo:true, advancedGps:false, attention:false, library:false, reports:false, equipment:false, routeReview:false, csvExports:false, diagnostics:false, backupRepair:false}},
+  route:{label:"Route Logger", mode:"simple", icon:"◇", note:"Daily Route plus GPS / nearby tools.", features:{dailyRoute:true, fieldFocus:true, dataSafeHome:true, siteBrief:true, siteTimeline:true, pinnedSites:true, importantSiteInfo:true, advancedGps:true, attention:false, library:false, reports:false, equipment:false, routeReview:true, csvExports:false, diagnostics:false, backupRepair:false}},
+  service:{label:"Service Tech", mode:"advanced", icon:"▣", note:"Sites, reports, equipment, GPS, and attention tools.", features:{dailyRoute:true, fieldFocus:true, dataSafeHome:true, siteBrief:true, siteTimeline:true, pinnedSites:true, importantSiteInfo:true, advancedGps:true, attention:true, library:false, reports:true, equipment:true, routeReview:false, csvExports:false, diagnostics:false, backupRepair:false}},
+  inspection:{label:"Inspector", mode:"advanced", icon:"▤", note:"Reports, equipment, route review, library, and export tools.", features:{dailyRoute:true, fieldFocus:true, dataSafeHome:true, siteBrief:true, siteTimeline:true, pinnedSites:true, importantSiteInfo:true, advancedGps:true, attention:true, library:true, reports:true, equipment:true, routeReview:true, csvExports:true, diagnostics:false, backupRepair:false}},
+  power:{label:"Power Mode", mode:"power", icon:"⚡", note:"Show every FireVault module and advanced control.", features:{dailyRoute:true, fieldFocus:true, dataSafeHome:true, siteBrief:true, siteTimeline:true, pinnedSites:true, importantSiteInfo:true, advancedGps:true, attention:true, library:true, reports:true, equipment:true, routeReview:true, csvExports:true, diagnostics:true, backupRepair:true}}
 };
 function visibilityPresetCards474(){
   return `<div class="card settingGroup compactPane featurePresets474"><div class="paneHead"><div><h2>Quick View Presets</h2><p class="paneNote">One tap changes the app mode and visible features. You can still fine-tune each toggle below.</p></div></div><div class="presetGrid474">${Object.entries(FEATURE_PRESETS_474).map(([key,p])=>`<button class="ghost presetFeatureBtn474" data-feature-preset="${esc(key)}"><span>${esc(p.icon)}</span><strong>${esc(p.label)}</strong><small>${esc(p.note)}</small></button>`).join("")}</div></div>`;
@@ -199,10 +200,10 @@ function currentPresetName474(){
 }
 
 const LAYOUT_PRESETS_565 = {
-  clean:{label:"Clean Home", icon:"◯", note:"Hide priority and backup cards; keep account screens compact.", values:{fieldFocus:false,dataSafeHome:false,siteBrief:true,siteTimeline:false,pinnedSites:true}},
-  field:{label:"Field Focused", icon:"▣", note:"Show field priorities and data safety, keep site screens useful.", values:{fieldFocus:true,dataSafeHome:true,siteBrief:true,siteTimeline:true,pinnedSites:true}},
-  site:{label:"Site Detail", icon:"▤", note:"Home stays clean while account screens show brief and timeline.", values:{fieldFocus:false,dataSafeHome:false,siteBrief:true,siteTimeline:true,pinnedSites:true}},
-  minimal:{label:"Minimal", icon:"—", note:"Hide optional Home and site-detail cards for the simplest view.", values:{fieldFocus:false,dataSafeHome:false,siteBrief:false,siteTimeline:false,pinnedSites:false}}
+  clean:{label:"Clean Home", icon:"◯", note:"Hide priority and backup cards; keep account screens compact.", values:{fieldFocus:false,dataSafeHome:false,siteBrief:true,siteTimeline:false,pinnedSites:true,importantSiteInfo:true}},
+  field:{label:"Field Focused", icon:"▣", note:"Show field priorities and data safety, keep site screens useful.", values:{fieldFocus:true,dataSafeHome:true,siteBrief:true,siteTimeline:true,pinnedSites:true,importantSiteInfo:true}},
+  site:{label:"Site Detail", icon:"▤", note:"Home stays clean while account screens show brief and timeline.", values:{fieldFocus:false,dataSafeHome:false,siteBrief:true,siteTimeline:true,pinnedSites:true,importantSiteInfo:true}},
+  minimal:{label:"Minimal", icon:"—", note:"Hide optional Home and site-detail cards for the simplest view.", values:{fieldFocus:false,dataSafeHome:false,siteBrief:false,siteTimeline:false,pinnedSites:false,importantSiteInfo:false}}
 };
 function layoutPresetName565(){
   const v=visibility();
@@ -237,6 +238,7 @@ function ensureModuleBaseline476(){
   if(v.siteBrief !== false) v.siteBrief=true;
   if(v.siteTimeline !== false) v.siteTimeline=true;
   if(v.pinnedSites !== false) v.pinnedSites=true;
+  if(v.importantSiteInfo !== false) v.importantSiteInfo=true;
   data.settings.visibility=v;
   data.settings.app.modulesBaseline476=true;
   saveData(data);
@@ -1372,7 +1374,7 @@ function wireNoteTemplates503(targetId="siteNoteText"){
 }
 
 
-/* Build 0.50.67 Pinned Sites helpers */
+/* Build 0.50.68 Pinned Sites helpers */
 function isPinnedSite566(s){ return !!s?.pinnedAt; }
 function pinnedSites566(limit=5){
   return [...(data.sites||[])].filter(isPinnedSite566).sort((a,b)=>{
@@ -1430,7 +1432,7 @@ function toggleSitePinned566(){
   siteDetail();
 }
 
-/* Build 0.50.67 Pinned Sites Manager */
+/* Build 0.50.68 Pinned Sites Manager */
 function unpinSiteById567(id){
   const s=(data.sites||[]).find(x=>x.id===id);
   if(!s) return;
@@ -2015,7 +2017,7 @@ function siteToolCount477(){
 }
 
 
-/* Build 0.50.67 Site Screen Cleanup helpers */
+/* Build 0.50.68 Site Screen Cleanup helpers */
 function siteOpenTasks556(s={}){
   return (s.tasks||[]).filter(t=>String(t.status||"Open").toLowerCase()!=="done" && String(t.status||"Open").toLowerCase()!=="complete");
 }
@@ -2108,7 +2110,7 @@ function wireSiteBrief556(){
 
 
 
-/* Build 0.50.67 Site Activity Timeline filters */
+/* Build 0.50.68 Site Activity Timeline filters */
 let siteTimelineFilter558 = "all";
 let siteTimelineExpanded559 = false;
 function siteTimelineFilterCounts558(s={}){
@@ -2152,7 +2154,7 @@ function wireSiteTimelineFilters558(){
   });
 }
 
-/* Build 0.50.67 Site Activity Timeline helpers */
+/* Build 0.50.68 Site Activity Timeline helpers */
 function activityDateMs557(value){
   const t=new Date(value || 0).getTime();
   return Number.isFinite(t) ? t : 0;
@@ -2321,6 +2323,71 @@ function wireSiteActivity557(){
   });
 }
 
+
+/* Build 0.50.68 Important Site Info helpers */
+function primaryContact568(s={}){
+  const contacts=s.contacts||[];
+  return contacts.find(c=>/primary|main|manager|owner|contact/i.test([c.role,c.notes,c.accessNotes].filter(Boolean).join(" "))) || contacts[0] || {};
+}
+function accessLine568(s={}){
+  const c=primaryContact568(s);
+  return s.accessNotes || c.accessNotes || c.notes || s.notes || "";
+}
+function panelLine568(s={}){
+  return [s.panelManufacturer,s.panelModel].filter(Boolean).join(" ") || s.panel || s.panelLocation || "";
+}
+function importantSiteInfoText568(s={}){
+  const c=primaryContact568(s);
+  const lines=[
+    "FireVault Important Site Info",
+    `Build: ${BUILD}`,
+    "",
+    `Site: ${s.name||"Unnamed Account"}`,
+    `Address: ${fullAddress(s)||"No address saved"}`,
+    `Contact: ${[c.name,c.role].filter(Boolean).join(" - ") || "No contact saved"}`,
+    `Phone: ${c.phone||"No phone saved"}`,
+    `Email: ${c.email||"No email saved"}`,
+    `Access: ${accessLine568(s)||"No access notes saved"}`,
+    `Panel: ${panelLine568(s)||"No panel info saved"}`,
+    `GPS: ${gpsLine(s)}`
+  ];
+  return lines.join("\n");
+}
+async function copyImportantSiteInfo568(){
+  const s=site(); if(!s) return;
+  try{
+    await navigator.clipboard.writeText(importantSiteInfoText568(s));
+    toast("Important site info copied.");
+  }catch{
+    toast("Clipboard unavailable.");
+  }
+}
+function importantSiteInfoMarkup568(s={}){
+  const c=primaryContact568(s);
+  const contact=[c.name,c.role].filter(Boolean).join(" • ") || "No contact saved";
+  const phone=c.phone || c.email || "No phone/email";
+  const access=accessLine568(s) || "No access notes";
+  const panel=panelLine568(s) || "No panel info";
+  const gps=hasGps(s) ? "GPS saved" : "No GPS";
+  return `<div class="card importantInfo568">
+    <div class="importantInfoHead568">
+      <div><h2>Important Site Info</h2><p>Fast contact, access, panel, and GPS reference.</p></div>
+      <button class="ghost smallBtn" id="copyImportantInfo568">Copy</button>
+    </div>
+    <div class="importantInfoGrid568">
+      <div><strong>Contact</strong><span>${esc(contact)}</span><em>${esc(phone)}</em></div>
+      <div><strong>Access</strong><span>${esc(access)}</span></div>
+      <div><strong>Panel</strong><span>${esc(panel)}</span></div>
+      <div><strong>GPS</strong><span>${esc(gps)}</span><em>${esc(hasGps(s)?gpsLine(s):"Capture GPS when on site")}</em></div>
+    </div>
+  </div>`;
+}
+function wireImportantSiteInfo568(){
+  const copy=document.getElementById("copyImportantInfo568");
+  if(copy) copy.onclick=copyImportantSiteInfo568;
+}
+
+
 function siteDetail(){
   const s=site(); if(!s){ route('sites'); return; }
   s.lastOpenedAt=new Date().toISOString();
@@ -2346,6 +2413,7 @@ function siteDetail(){
 
     <div class="card siteHero477 siteHero489 siteHero566"><div class="siteHeroMain477"><span class="accountInitialLarge477">${esc((s.name||'?').slice(0,1).toUpperCase())}</span><div><h1>${esc(s.name||'Unnamed Account')}</h1><p>${esc(fullAddress(s))}</p><em>${esc(nextAction)}</em></div></div><div class="siteHeroActions566"><button class="pinSiteBtn566 ${isPinnedSite566(s)?"pinned":""}" id="pinSiteBtn566">${isPinnedSite566(s)?"★":"☆"}</button><div class="siteHealthDot477 ${health.cls}">${health.score}%</div></div></div>
 
+    ${featureOn("importantSiteInfo")?importantSiteInfoMarkup568(s):""}
     ${featureOn("siteBrief")?siteBriefMarkup556(s):""}
     ${featureOn("siteTimeline")?siteActivityTimelineMarkup557(s):""}
 
@@ -2406,6 +2474,7 @@ function siteDetail(){
   document.getElementById('openTasksMini476').onclick=()=>route('tasks');
   document.getElementById('openDefMini476').onclick=()=>route('deficiencies');
   document.getElementById('snapshotBtn').onclick=shareSiteSnapshot;
+  wireImportantSiteInfo568();
   wireSiteBrief556();
   wireSiteActivity557();
   const qaNote544=document.getElementById('qaAddNote544'); if(qaNote544) qaNote544.onclick=()=>addSiteNotePrompt();
@@ -3713,7 +3782,7 @@ function openReportEmailDraft(s, txt, subject){
 }
 
 
-/* Build 0.50.67 Customer Report Preview helpers */
+/* Build 0.50.68 Customer Report Preview helpers */
 function customerReportPreviewStats555(s={}){
   const selected=reportPhotos526(s);
   const ready=customerReportPhotoReady530(s);
@@ -4409,7 +4478,7 @@ function settingsPanel(){
   if(settingsTab==="overlay") return overlaySettingsPanel510(o);
   if(settingsTab==="gps") return `<div class="settingsStack"><div class="card settingGroup compactPane gpsSettingsPane"><div class="paneHead"><h2>GPS / Maps</h2><button class="primary saveMini" id="saveSettings">Save</button></div><p class="paneNote">Restored GPS tools. Coordinates are saved locally inside each site record.</p><div class="settingsGrid">${fieldBlock("Default Map",`<select id="gpsMapProvider"><option value="apple" ${gps.mapProvider!=="google"?"selected":""}>Apple Maps</option><option value="google" ${gps.mapProvider==="google"?"selected":""}>Google Maps</option></select>`)}${fieldBlock("GPS Accuracy",`<select id="gpsHighAccuracy"><option value="true" ${gps.highAccuracy!==false?"selected":""}>High accuracy</option><option value="false" ${gps.highAccuracy===false?"selected":""}>Standard</option></select>`)}${fieldBlock("Nearby Radius",`<input id="gpsNearbyRadius" inputmode="decimal" value="${esc(gps.nearbyRadiusMiles||1)}">`,`Miles for Nearby Sites detection`)}</div><div class="settingsList">${checkBlock("gpsEnabled","Show GPS capture buttons on site pages",gps.enabled!==false)}${checkBlock("gpsReports","Include GPS coordinates in reports",gps.includeInReports!==false)}</div><p class="fieldNote">Browser GPS works only when allowed by the phone/browser and served from HTTPS.</p></div></div>`;
   if(settingsTab==="themes") return `<div class="settingsStack"><div class="card settingGroup compactPane"><div class="paneHead"><h2>Theme Engine</h2><button class="primary saveMini" id="saveSettings">Apply</button></div><p class="paneNote">Quick presets and live UI controls.</p><div class="presetGrid">${Object.entries(themePresets).map(([key,p])=>`<button class="ghost presetBtn" data-preset="${key}"><span class="themeSwatch" style="background:${p.accentColor}"></span><span>${p.label}</span></button>`).join("")}</div><div class="settingsGrid">${fieldBlock("Theme",`<select id="themeName">${Object.entries(themePresets).map(([key,p])=>`<option value="${key}" ${t.name===key?"selected":""}>${p.label}</option>`).join("")}</select>`)}${fieldBlock("Accent Color",`<input id="themeAccent" type="color" value="${esc(t.accentColor||"#ef4444")}">`)}${fieldBlock("Buttons",`<select id="buttonStyle"><option value="rounded" ${t.buttonStyle!=="squared"?"selected":""}>rounded</option><option value="squared" ${t.buttonStyle==="squared"?"selected":""}>squared</option></select>`)}${fieldBlock("Cards",`<select id="cardStyle"><option value="glass" ${t.cardStyle!=="solid"?"selected":""}>glass</option><option value="solid" ${t.cardStyle==="solid"?"selected":""}>solid</option></select>`)}</div><div class="settingsList">${checkBlock("themeHighContrast","High contrast support",t.highContrast)}${checkBlock("themeLargeText","Larger text",t.largeText)}${checkBlock("themeCompact","Compact layout",t.compactLayout)}${checkBlock("themeHaptics","Haptic button feedback",s.app?.haptics!==false)}</div></div></div>`;
-  if(settingsTab==="visibility") { const mode=appMode(); const v=visibility(); return `<div class="settingsStack simpleSettings472"><div class="card settingGroup compactPane simpleHero472"><div class="paneHead"><div><h2>Modules / Simple View</h2><p class="paneNote">Turn major FireVault modules on or off. Disabled modules disappear from the interface until you enable them again here.</p></div><button class="primary saveMini" id="saveSettings">Save</button></div><div class="settingsGrid">${fieldBlock("App Mode",`<select id="viewMode"><option value="simple" ${mode==="simple"?"selected":""}>Simple View</option><option value="advanced" ${mode==="advanced"?"selected":""}>Advanced View</option><option value="power" ${mode==="power"?"selected":""}>Technician Power Mode</option></select>`,`Simple keeps the field interface clean. Advanced shows enabled modules. Power shows everything.`)}</div><div class="viewModeQuick472"><button class="ghost" data-view-mode="simple">Simple</button><button class="ghost" data-view-mode="advanced">Advanced</button><button class="ghost" data-view-mode="power">Power</button></div></div>${visibilityPresetCards474()}${layoutPresetCards565()}<div class="card settingGroup compactPane"><div class="paneHead"><h2>Modules</h2></div><p class="paneNote">Turn off anything you do not need. Disabled modules are removed from the dashboard, site screens, bottom tabs, and tool menus until enabled again. Field Focus, Pinned Sites, Data Safe Home Card, Site Brief, and Site Activity Timeline are layout controls; their underlying tools remain available from their full screens.</p><div class="settingsList featureList472">${FEATURE_LABELS.map(([key,label,note])=>`<label class="checkRow featureCheck472"><input type="checkbox" id="vis_${key}" ${v[key]?"checked":""}><span><strong>${esc(label)}</strong><small>${esc(note)}</small></span></label>`).join("")}</div></div></div>`; }
+  if(settingsTab==="visibility") { const mode=appMode(); const v=visibility(); return `<div class="settingsStack simpleSettings472"><div class="card settingGroup compactPane simpleHero472"><div class="paneHead"><div><h2>Modules / Simple View</h2><p class="paneNote">Turn major FireVault modules on or off. Disabled modules disappear from the interface until you enable them again here.</p></div><button class="primary saveMini" id="saveSettings">Save</button></div><div class="settingsGrid">${fieldBlock("App Mode",`<select id="viewMode"><option value="simple" ${mode==="simple"?"selected":""}>Simple View</option><option value="advanced" ${mode==="advanced"?"selected":""}>Advanced View</option><option value="power" ${mode==="power"?"selected":""}>Technician Power Mode</option></select>`,`Simple keeps the field interface clean. Advanced shows enabled modules. Power shows everything.`)}</div><div class="viewModeQuick472"><button class="ghost" data-view-mode="simple">Simple</button><button class="ghost" data-view-mode="advanced">Advanced</button><button class="ghost" data-view-mode="power">Power</button></div></div>${visibilityPresetCards474()}${layoutPresetCards565()}<div class="card settingGroup compactPane"><div class="paneHead"><h2>Modules</h2></div><p class="paneNote">Turn off anything you do not need. Disabled modules are removed from the dashboard, site screens, bottom tabs, and tool menus until enabled again. Field Focus, Pinned Sites, Data Safe Home Card, Important Site Info, Site Brief, and Site Activity Timeline are layout controls; their underlying tools remain available from their full screens.</p><div class="settingsList featureList472">${FEATURE_LABELS.map(([key,label,note])=>`<label class="checkRow featureCheck472"><input type="checkbox" id="vis_${key}" ${v[key]?"checked":""}><span><strong>${esc(label)}</strong><small>${esc(note)}</small></span></label>`).join("")}</div></div></div>`; }
   if(settingsTab==="advanced") return `<div class="settingsStack"><div class="card settingGroup compactPane"><div class="paneHead"><h2>Advanced Features</h2><button class="primary saveMini" id="saveSettings">Save</button></div><p class="paneNote"><span class="featureStar">*</span> Requires outside services, permissions, APIs, or future backend modules.</p><div class="settingsList twoCol">${[["advAi","aiTechnician","AI Technician"],["advReverse","reverseAddressLookup","Reverse Address Lookup *"],["advCloud","cloudBackup","Cloud Backup *"],["advVoice","voiceTranscription","Voice Transcription *"],["advOcr","ocrReader","OCR Reader *"],["advEmail","emailGateway","Email Gateway *"],["advWeather","weather","Weather Context *"],["advTraffic","traffic","Traffic / Routing *"]].map(x=>checkBlock(x[0],x[2],a[x[1]])).join("")}</div></div></div>`;
   if(settingsTab==="backup") return backupSettingsPanel();
   return `<div class="settingsStack"><div class="card settingGroup compactPane"><div class="paneHead"><h2>About FireVault</h2></div><p class="paneNote">A modular field knowledge system for fire alarm technicians.</p><div class="aboutGrid"><div><strong>Build</strong><span>${BUILD}</span></div><div><strong>Storage key</strong><span>${KEY}</span></div><div><strong>Roadmap lane</strong><span>Modular foundation, settings polish, iPhone PWA, deeper service-call modules.</span></div></div></div></div>`;
@@ -4596,7 +4665,7 @@ function repairVaultState(){
 
 
 
-/* Build 0.50.67 Action Center helpers */
+/* Build 0.50.68 Action Center helpers */
 function actionPriorityClass562(rank){
   if(rank<=1) return "critical";
   if(rank===2) return "today";
@@ -4771,7 +4840,7 @@ function actionCenter(){
 }
 
 
-/* Build 0.50.67 Field Focus dashboard helpers */
+/* Build 0.50.68 Field Focus dashboard helpers */
 function fieldFocusStats561(){
   const sites=data.sites||[];
   const openTasks=allTaskRows().filter(r=>!taskIsDone(r.t));
@@ -4856,7 +4925,7 @@ function wireFieldFocus561(){
 }
 
 
-/* Build 0.50.67 Data Tools / Home cleanup helpers */
+/* Build 0.50.68 Data Tools / Home cleanup helpers */
 function dataSafeSummary560(){
   const s=backupSafetyStats552();
   const lastRestore=localStorage.getItem("firevault_last_restore_time");
@@ -4882,6 +4951,7 @@ function layoutControlSummary564(){
     `Field Focus: ${on("fieldFocus")?"On":"Off"}`,
     `Pinned Sites: ${on("pinnedSites")?"On":"Off"} (${pinnedSites566(99).length} pinned)`,
     `Data Safe Home Card: ${on("dataSafeHome")?"On":"Off"}`,
+    `Important Site Info: ${on("importantSiteInfo")?"On":"Off"}`,
     `Site Brief: ${on("siteBrief")?"On":"Off"}`,
     `Site Activity Timeline: ${on("siteTimeline")?"On":"Off"}`
   ].join("\n");
@@ -4911,6 +4981,7 @@ function layoutControlsCard564(){
       <div><strong>${esc(state("fieldFocus"))}</strong><span>Field Focus</span></div>
       <div><strong>${esc(state("pinnedSites"))}</strong><span>Pinned Sites</span></div>
       <div><strong>${esc(state("dataSafeHome"))}</strong><span>Data Safe Home</span></div>
+      <div><strong>${esc(state("importantSiteInfo"))}</strong><span>Important Info</span></div>
       <div><strong>${esc(state("siteBrief"))}</strong><span>Site Brief</span></div>
       <div><strong>${esc(state("siteTimeline"))}</strong><span>Site Timeline</span></div>
     </div>
@@ -4977,7 +5048,7 @@ function dataTools(){
 }
 
 
-/* Build 0.50.67 Backup Safety helpers */
+/* Build 0.50.68 Backup Safety helpers */
 function backupSafetyStats552(){
   const sites = (data.sites || []).length;
   const visits = (data.sites || []).reduce((n,s)=>n+((s.visits||[]).length),0);
@@ -5094,7 +5165,7 @@ async function copyUpdateChecklist553(){
 }
 
 
-/* Build 0.50.67 Backup Restore Center */
+/* Build 0.50.68 Backup Restore Center */
 let pendingRestoreBackup554 = null;
 
 function normalizeBackupPayload554(raw){
@@ -5303,17 +5374,17 @@ function diagnostics(){
 }
 function showChangelog(){
   const notes = [
-    "Advanced to Build 0.50.67 from the stable 0.50.66 baseline.",
-    "Added Pinned Sites Manager for viewing and managing all pinned accounts.",
-    "Home Pinned Sites now has an All button that opens the full manager.",
-    "Pinned Sites Manager supports Open, Map, Copy, individual Unpin, and Unpin All.",
-    "Preserved Pinned Sites, Quick Layout Presets, Action Center, Home cleanup, Data Tools, Field Focus, Site Brief, Site Activity Timeline, Customer Report Preview, top-right Add Site placement, clean splash screen with no loader, and excluded job-status workflow controls."
+    "Advanced to Build 0.50.68 from the stable 0.50.67 baseline.",
+    "Added Important Site Info strip to account screens.",
+    "Important Site Info summarizes primary contact, phone/email, access notes, panel info, and GPS status.",
+    "Added Copy Important Site Info and a Settings → Modules toggle for Important Site Info.",
+    "Preserved Pinned Sites Manager, Pinned Sites, Quick Layout Presets, Action Center, Home cleanup, Data Tools, Field Focus, Site Brief, Site Activity Timeline, Customer Report Preview, top-right Add Site placement, clean splash screen with no loader, and excluded job-status workflow controls."
   ];
   const overlay=document.createElement("div");
   overlay.className="releaseOverlay";
   overlay.innerHTML=`<div class="releaseSheet" role="dialog" aria-modal="true" aria-label="FireVault release notes">
     <div class="releaseHead"><div><strong>FireVault</strong><span>Build ${BUILD}</span></div><button class="ghost iconBtn" id="closeRelease" aria-label="Close release notes">×</button></div>
-    <div class="releaseBody"><h2>Release Notes</h2><p class="releaseIntro">Added Pinned Sites Manager with open, map, copy, and unpin controls.</p><ul>${notes.map(n=>`<li>${esc(n)}</li>`).join("")}</ul></div>
+    <div class="releaseBody"><h2>Release Notes</h2><p class="releaseIntro">Added Important Site Info strip and Copy Important Site Info.</p><ul>${notes.map(n=>`<li>${esc(n)}</li>`).join("")}</ul></div>
   </div>`;
   document.body.appendChild(overlay);
   const close=()=>overlay.remove();

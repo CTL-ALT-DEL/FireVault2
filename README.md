@@ -1,11 +1,11 @@
-# FireVault Build 0.50.67
+# FireVault Build 0.50.68
 
-Build 0.50.67 continues from the stable 0.50.66 baseline and adds Pinned Sites Manager.
+Build 0.50.68 continues from the stable 0.50.67 baseline and adds Important Site Info on account screens.
 
 ## Changes
 
-- Visible app version advanced to 0.50.67.
-- Cache-busting references updated to 0.50.67.
+- Visible app version advanced to 0.50.68.
+- Cache-busting references updated to 0.50.68.
 - Added **Site Quick Actions** card on the account/site screen.
 - Added direct quick actions for:
   - Add Site Note
@@ -31,13 +31,13 @@ Run from the project root:
 node --check src/storage.js
 node --check src/app.js
 python -m json.tool manifest.json > /dev/null
-zip -T firevault-build-0.50.67-modular-root.zip
+zip -T firevault-build-0.50.68-modular-root.zip
 ```
 
 ## Suggested commit message
 
 ```text
-Build 0.50.67 pinned sites manager
+Build 0.50.68 important site info
 ```
 
 - Lifted the red Home add button above the bottom nav so it should not be blocked by the black bottom area.
@@ -98,3 +98,6 @@ Build 0.50.67 pinned sites manager
 
 - Pinned Sites Manager supports Open, Map, Copy, Unpin, and Unpin All.
 - Added Open Pinned Sites shortcut in Data Tools.
+
+- Added Copy Important Site Info.
+- Added Important Site Info toggle in Settings → Modules and Layout Controls.
