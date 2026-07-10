@@ -8,7 +8,7 @@
   "orientation": "any",
   "background_color": "#0b0d10",
   "theme_color": "#101216",
-  "description": "Field knowledge system for fire alarm technicians. Build 0.50.65 adds Quick Layout Presets for Home and account screen layout, with current preset status in Data Tools.",
+  "description": "Field knowledge system for fire alarm technicians. Build 0.50.66 adds Pinned Sites for high-use accounts, a Home shortcut card, account-screen pin/unpin, Copy Pinned Sites, and a Settings \u2192 Modules toggle.",
   "icons": [
     {
       "src": "assets/icon-192.png",

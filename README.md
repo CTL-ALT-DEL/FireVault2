@@ -1,11 +1,11 @@
-# FireVault Build 0.50.65
+# FireVault Build 0.50.66
 
-Build 0.50.65 continues from the stable 0.50.64 baseline and adds Quick Layout Presets for Home and account screen layout.
+Build 0.50.66 continues from the stable 0.50.65 baseline and adds Pinned Sites for high-use customer accounts.
 
 ## Changes
 
-- Visible app version advanced to 0.50.65.
-- Cache-busting references updated to 0.50.65.
+- Visible app version advanced to 0.50.66.
+- Cache-busting references updated to 0.50.66.
 - Added **Site Quick Actions** card on the account/site screen.
 - Added direct quick actions for:
   - Add Site Note
@@ -31,13 +31,13 @@ Run from the project root:
 node --check src/storage.js
 node --check src/app.js
 python -m json.tool manifest.json > /dev/null
-zip -T firevault-build-0.50.65-modular-root.zip
+zip -T firevault-build-0.50.66-modular-root.zip
 ```
 
 ## Suggested commit message
 
 ```text
-Build 0.50.65 quick layout presets
+Build 0.50.66 pinned sites
 ```
 
 - Lifted the red Home add button above the bottom nav so it should not be blocked by the black bottom area.
@@ -91,3 +91,7 @@ Build 0.50.65 quick layout presets
 
 - Data Tools now shows the current layout preset and includes Open Layout Settings.
 - Copy Layout Controls now includes the current layout preset.
+
+- Added Settings → Modules toggle for Pinned Sites.
+- Added Copy Pinned Sites on Home and in Data Tools.
+- Pinned Sites are included in Layout Controls and Quick Layout Presets.
