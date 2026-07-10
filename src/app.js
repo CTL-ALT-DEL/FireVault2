@@ -1849,7 +1849,7 @@ function siteToolCount477(){
 }
 
 
-/* Build 0.50.58 Site Screen Cleanup helpers */
+/* Build 0.50.59 Site Screen Cleanup helpers */
 function siteOpenTasks556(s={}){
   return (s.tasks||[]).filter(t=>String(t.status||"Open").toLowerCase()!=="done" && String(t.status||"Open").toLowerCase()!=="complete");
 }
@@ -1942,8 +1942,9 @@ function wireSiteBrief556(){
 
 
 
-/* Build 0.50.58 Site Activity Timeline filters */
+/* Build 0.50.59 Site Activity Timeline filters */
 let siteTimelineFilter558 = "all";
+let siteTimelineExpanded559 = false;
 function siteTimelineFilterCounts558(s={}){
   const rows=siteActivityRows557(s);
   return {
@@ -1979,12 +1980,13 @@ function wireSiteTimelineFilters558(){
   document.querySelectorAll(".timelineFilter558").forEach(b=>{
     b.onclick=()=>{
       siteTimelineFilter558=b.dataset.filter || "all";
+      siteTimelineExpanded559=false;
       siteDetail();
     };
   });
 }
 
-/* Build 0.50.58 Site Activity Timeline helpers */
+/* Build 0.50.59 Site Activity Timeline helpers */
 function activityDateMs557(value){
   const t=new Date(value || 0).getTime();
   return Number.isFinite(t) ? t : 0;
@@ -2081,16 +2083,53 @@ async function copySiteActivity557(){
     toast("Clipboard unavailable.");
   }
 }
+async function copyFullSiteActivity559(){
+  const s=site(); if(!s) return;
+  const current=siteTimelineFilter558;
+  const rows=filteredSiteActivityRows558(s);
+  const lines=[
+    "FireVault Full Site Activity Timeline",
+    `Build: ${BUILD}`,
+    "",
+    `Site: ${s.name||"Unnamed Account"}`,
+    `Address: ${fullAddress(s)||"No address saved"}`,
+    `Filter: ${current}`,
+    `Items: ${rows.length}`,
+    ""
+  ];
+  rows.forEach((r,i)=>{
+    lines.push(`${i+1}. ${activityDateLabel557(r.date)} ${activityTimeLabel557(r.date)} - ${r.type}: ${r.title}`);
+    if(r.detail) lines.push(`   ${r.detail}`);
+  });
+  try{
+    await navigator.clipboard.writeText(lines.join("\n"));
+    toast("Full timeline copied.");
+  }catch{
+    toast("Clipboard unavailable.");
+  }
+}
+function toggleSiteTimelineExpanded559(){
+  siteTimelineExpanded559=!siteTimelineExpanded559;
+  siteDetail();
+}
+
 function siteActivityTimelineMarkup557(s={}){
   const rows=filteredSiteActivityRows558(s);
-  const shown=rows.slice(0,6);
+  const limit=siteTimelineExpanded559 ? 20 : 6;
+  const shown=rows.slice(0,limit);
+  const remaining=Math.max(0, rows.length-shown.length);
   const labelMap={all:"all activity",visits:"visits",media:"photos / docs",tasks:"tasks",deficiencies:"deficiencies"};
-  return `<div class="card siteTimeline557 siteTimeline558">
+  return `<div class="card siteTimeline557 siteTimeline558 siteTimeline559">
     <div class="siteTimelineHead557">
-      <div><h2>Activity Timeline</h2><p>${shown.length ? `${shown.length} recent ${labelMap[siteTimelineFilter558]||"items"}` : `No ${labelMap[siteTimelineFilter558]||"activity"} saved yet`}</p></div>
+      <div><h2>Activity Timeline</h2><p>${shown.length ? `${shown.length} of ${rows.length} ${labelMap[siteTimelineFilter558]||"items"}` : `No ${labelMap[siteTimelineFilter558]||"activity"} saved yet`}</p></div>
       <button class="ghost smallBtn" id="copySiteActivity557">Copy Timeline</button>
     </div>
     ${siteTimelineFiltersMarkup558(s)}
+    <div class="timelineTools559">
+      <button class="ghost smallBtn" id="toggleTimeline559">${siteTimelineExpanded559?"Collapse":"Show More"}</button>
+      <button class="ghost smallBtn" id="copyFullTimeline559">Copy Full</button>
+      <span>${remaining ? `${remaining} more` : "All shown"}</span>
+    </div>
     <div class="siteTimelineList557">
       ${shown.length ? shown.map((r,i)=>`<button class="siteActivityRow557" data-route="${esc(r.route)}">
         <span class="siteActivityIcon557">${esc(r.icon)}</span>
@@ -2103,6 +2142,10 @@ function wireSiteActivity557(){
   wireSiteTimelineFilters558();
   const copy=document.getElementById("copySiteActivity557");
   if(copy) copy.onclick=copySiteActivity557;
+  const full=document.getElementById("copyFullTimeline559");
+  if(full) full.onclick=copyFullSiteActivity559;
+  const toggle=document.getElementById("toggleTimeline559");
+  if(toggle) toggle.onclick=toggleSiteTimelineExpanded559;
   document.querySelectorAll(".siteActivityRow557").forEach(b=>{
     b.onclick=()=>{
       const r=b.dataset.route;
@@ -3503,7 +3546,7 @@ function openReportEmailDraft(s, txt, subject){
 }
 
 
-/* Build 0.50.58 Customer Report Preview helpers */
+/* Build 0.50.59 Customer Report Preview helpers */
 function customerReportPreviewStats555(s={}){
   const selected=reportPhotos526(s);
   const ready=customerReportPhotoReady530(s);
@@ -4381,7 +4424,7 @@ function repairVaultState(){
 }
 
 
-/* Build 0.50.58 Backup Safety helpers */
+/* Build 0.50.59 Backup Safety helpers */
 function backupSafetyStats552(){
   const sites = (data.sites || []).length;
   const visits = (data.sites || []).reduce((n,s)=>n+((s.visits||[]).length),0);
@@ -4498,7 +4541,7 @@ async function copyUpdateChecklist553(){
 }
 
 
-/* Build 0.50.58 Backup Restore Center */
+/* Build 0.50.59 Backup Restore Center */
 let pendingRestoreBackup554 = null;
 
 function normalizeBackupPayload554(raw){
@@ -4707,17 +4750,17 @@ function diagnostics(){
 }
 function showChangelog(){
   const notes = [
-    "Advanced to Build 0.50.58 from the stable 0.50.57 baseline.",
-    "Added filters to the Site Activity Timeline.",
-    "Timeline can now switch between All, Visits, Photos / Docs, Tasks, and Deficiencies.",
-    "Copy Timeline now respects the selected timeline filter.",
-    "Preserved Site Activity Timeline, Site Brief, Customer Report Preview, Backup Restore Center, stacked-lines main Settings icon, top-right Add Site button placement, Backup Safety download tools, clean splash screen with no loader, fixed splash/header behavior, Startup Health diagnostics, Photo Vault tools, Customer Report Photo workflow, iPad autosizing, simple Home screen, Search Bar Concept #6, and excluded job-status workflow controls."
+    "Advanced to Build 0.50.59 from the stable 0.50.58 baseline.",
+    "Added Show More / Collapse controls to the Site Activity Timeline.",
+    "Timeline now shows 6 items by default and up to 20 items when expanded.",
+    "Added Copy Full for copying the full filtered timeline list.",
+    "Preserved Site Activity Timeline filters, Site Brief, Customer Report Preview, Backup Restore Center, stacked-lines main Settings icon, top-right Add Site button placement, Backup Safety download tools, clean splash screen with no loader, fixed splash/header behavior, Startup Health diagnostics, Photo Vault tools, Customer Report Photo workflow, iPad autosizing, simple Home screen, Search Bar Concept #6, and excluded job-status workflow controls."
   ];
   const overlay=document.createElement("div");
   overlay.className="releaseOverlay";
   overlay.innerHTML=`<div class="releaseSheet" role="dialog" aria-modal="true" aria-label="FireVault release notes">
     <div class="releaseHead"><div><strong>FireVault</strong><span>Build ${BUILD}</span></div><button class="ghost iconBtn" id="closeRelease" aria-label="Close release notes">×</button></div>
-    <div class="releaseBody"><h2>Release Notes</h2><p class="releaseIntro">Added Site Activity Timeline filters and filtered Copy Timeline.</p><ul>${notes.map(n=>`<li>${esc(n)}</li>`).join("")}</ul></div>
+    <div class="releaseBody"><h2>Release Notes</h2><p class="releaseIntro">Added expandable Site Activity Timeline controls and Copy Full Timeline.</p><ul>${notes.map(n=>`<li>${esc(n)}</li>`).join("")}</ul></div>
   </div>`;
   document.body.appendChild(overlay);
   const close=()=>overlay.remove();
