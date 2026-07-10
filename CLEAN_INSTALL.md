@@ -1,22 +1,17 @@
-# Clean Install Notes — FireVault Build 0.50.76
+# Clean Install Notes — FireVault Build 0.51.0
 
-This ZIP is the clean baseline for FireVault Build 0.50.76.
+This ZIP is the clean milestone baseline for FireVault Build 0.51.0.
 
-## Install
+## Installation
 
-1. Extract the ZIP.
-2. Upload the extracted root contents to the GitHub Pages branch/root.
-3. Confirm `index.html`, `manifest.json`, `src/`, and `assets/` are at the web root.
-4. Commit and push the replacement files.
-5. After GitHub Pages deploys, hard refresh the browser or clear the installed PWA cache if the old build number remains visible.
+1. Replace the repository contents with the contents of this ZIP.
+2. Commit the files to the main branch.
+3. Allow GitHub Pages to redeploy.
+4. On iPhone or iPad, fully close FireVault and reopen it.
+5. If an older build remains cached, remove the Home Screen app, clear the site data/cache, and reinstall from Safari.
 
-## Build focus
+## Data safety
 
-- Fixes Settings returning to the top after presets, saves, and submenu navigation.
-- Keeps separate remembered positions for the Settings menu and individual detail pages.
-- Preserves Build 0.50.75 functionality and visual design.
-- Keeps the Home screen simple and keeps FIRE red with VAULT white.
+The existing FireVault storage key is unchanged. Updating from Build 0.50.76 does not intentionally erase saved sites, visits, photos, tasks, route logs, settings, or reports.
 
-## Recommended check
-
-Open **Settings → Modules**, scroll down, change a module or preset, and press Save. The page should remain at the same location. Then return to the Settings menu and reopen Modules; both screens should restore their previous positions.
+Home card open/closed preferences are stored separately in local browser storage and can be changed at any time by tapping the round arrow control in each supported card header.

@@ -10,6 +10,8 @@ let settingsRailScroll = 0;
 const SETTINGS_SCROLL_KEY_576 = "firevault_settings_scroll_05076";
 let settingsSubmenuReturn576 = false;
 let settingsScrollState576 = loadSettingsScrollState576();
+const HOME_CARD_STATE_KEY_5100 = "firevault_home_card_state_05100";
+let homeCardState5100 = loadHomeCardState5100();
 let lastEmailTemplateField = "emailSubject";
 let overlayLogoDraftDataUrl = "";
 let docPhotoDraftDataUrl512 = "";
@@ -93,6 +95,45 @@ let reportSectionPrefs = loadReportSectionPrefs();
 const appEl = document.getElementById("app");
 function fireVaultBrand575(extraClass=""){
   return `<span class="fireVaultWordmark575 ${esc(extraClass)}"><span>FIRE</span><b>VAULT</b></span>`;
+}
+
+/* Build 0.51.0 Home card collapse memory */
+function loadHomeCardState5100(){
+  try{
+    const parsed=JSON.parse(localStorage.getItem(HOME_CARD_STATE_KEY_5100)||"{}");
+    return parsed && typeof parsed==="object" ? parsed : {};
+  }catch{
+    return {};
+  }
+}
+function persistHomeCardState5100(){
+  try{ localStorage.setItem(HOME_CARD_STATE_KEY_5100, JSON.stringify(homeCardState5100)); }catch{}
+}
+function homeCardCollapsed5100(key){ return homeCardState5100[key]===true; }
+function homeCollapseButton5100(key,label){
+  const collapsed=homeCardCollapsed5100(key);
+  return `<button class="ghost smallBtn homeCollapseBtn5100" type="button" data-home-collapse="${esc(key)}" data-home-label="${esc(label)}" aria-expanded="${collapsed?"false":"true"}" aria-label="${collapsed?"Expand":"Collapse"} ${esc(label)}"><span aria-hidden="true">${collapsed?"⌄":"⌃"}</span></button>`;
+}
+function wireHomeCollapsibles5100(){
+  document.querySelectorAll("[data-home-collapse]").forEach(btn=>{
+    btn.onclick=e=>{
+      e.preventDefault();
+      e.stopPropagation();
+      const key=btn.dataset.homeCollapse||"";
+      if(!key) return;
+      const collapsed=!homeCardCollapsed5100(key);
+      homeCardState5100[key]=collapsed;
+      persistHomeCardState5100();
+      const card=btn.closest("[data-home-collapsible]");
+      const body=card?.querySelector("[data-home-collapse-body]");
+      if(card) card.classList.toggle("homeCollapsed5100",collapsed);
+      if(body) body.hidden=collapsed;
+      btn.setAttribute("aria-expanded",collapsed?"false":"true");
+      btn.setAttribute("aria-label",`${collapsed?"Expand":"Collapse"} ${btn.dataset.homeLabel||"Home card"}`);
+      const icon=btn.querySelector("span");
+      if(icon) icon.textContent=collapsed?"⌄":"⌃";
+    };
+  });
 }
 
 /* Build 0.50.76 Settings scroll-position recovery */
@@ -1614,9 +1655,10 @@ function pinnedSitesMarkup566(){
   const all=[...(data.sites||[])].filter(isPinnedSite566);
   const rows=pinnedSites566(5);
   if(!rows.length) return "";
-  return `<div class="card pinnedSites566">
-    <div class="pinnedSitesHead566"><div><strong>Pinned Sites</strong><span>${all.length} pinned • ${rows.length} shown</span></div><div class="pinnedHeadActions567"><button class="ghost smallBtn" id="openPinnedSites567">All</button><button class="ghost smallBtn" id="copyPinnedSites566">Copy</button></div></div>
-    <div class="pinnedSitesList566">${rows.map(s=>`<button class="pinnedSite566" data-home-site="${esc(s.id)}"><span>★</span><div><strong>${esc(s.name||"Unnamed Account")}</strong><small>${esc(siteSubline476(s))}</small><em>${esc(siteActivityLine476(s))}</em></div></button>`).join("")}</div>
+  const collapsed=homeCardCollapsed5100("pinnedSites");
+  return `<div class="card pinnedSites566 homeCollapsible5100 ${collapsed?"homeCollapsed5100":""}" data-home-collapsible="pinnedSites">
+    <div class="pinnedSitesHead566"><div><strong>Pinned Sites</strong><span>${all.length} pinned • ${rows.length} shown</span></div><div class="pinnedHeadActions567 homeHeaderActions5100"><button class="ghost smallBtn" id="openPinnedSites567">All</button><button class="ghost smallBtn" id="copyPinnedSites566">Copy</button>${homeCollapseButton5100("pinnedSites","Pinned Sites")}</div></div>
+    <div class="pinnedSitesList566 homeCollapseBody5100" data-home-collapse-body ${collapsed?"hidden":""}>${rows.map(s=>`<button class="pinnedSite566" data-home-site="${esc(s.id)}"><span>★</span><div><strong>${esc(s.name||"Unnamed Account")}</strong><small>${esc(siteSubline476(s))}</small><em>${esc(siteActivityLine476(s))}</em></div></button>`).join("")}</div>
   </div>`;
 }
 function toggleSitePinned566(){
@@ -1708,7 +1750,7 @@ function home(){
   const recentVisits = visits.filter(v=>new Date(v.endedAt||v.startedAt||v.date||0).getTime() >= weekAgo).length;
   const now = new Date();
   const dateLine = now.toLocaleDateString([], {weekday:"long", month:"long", day:"numeric"});
-  html(`<div class="screen homeScreen476 homeScreen478 ${siteSearch?"homeSearchMode484":""}">
+  html(`<div class="screen homeScreen476 homeScreen478 homeMilestone5100 ${siteSearch?"homeSearchMode484":""}">
     <div class="homeChrome478 homeChrome493">
       <div class="brand478 brand493"><img src="assets/favicon.png?v=${BUILD}" alt="FireVault"><strong>${fireVaultBrand575("homeWordmark575")}</strong></div>
       <button class="homeBuildPill481 homeBuildPill493" id="homeBell478" aria-label="Release notes"><span></span>${BUILD}</button>
@@ -1749,22 +1791,24 @@ function home(){
       <div class="todayAccountsList500">${todayAccountsMarkup500()}</div>
     </div>`:""}
 
-    <div class="card nearbyAccountsHero476 nearbyAccountsHero478 ${featureOn("advancedGps")?"":"featureHidden472"}">
-      <div class="nearbyHead476 nearbyHead478"><div><h2>Nearby Accounts</h2><p>${homeNearbyTitle486()}</p></div><button class="smallBtn nearbyCount478" id="checkNearbyHomeBtn476">${nearbyState?"Refresh":"Check"}</button></div>
-      <div class="nearbyList476 nearbyList478">${homeNearbyMarkup476()}</div>
-    </div>
+    <div class="homeUtilityGrid5100 ${featureOn("advancedGps")?"":"homeUtilityNoGps5100"}">
+      <div class="card nearbyAccountsHero476 nearbyAccountsHero478 homeCollapsible5100 ${homeCardCollapsed5100("nearbyAccounts")?"homeCollapsed5100":""} ${featureOn("advancedGps")?"":"featureHidden472"}" data-home-collapsible="nearbyAccounts">
+        <div class="nearbyHead476 nearbyHead478"><div><h2>Nearby Accounts</h2><p>${homeNearbyTitle486()}</p></div><div class="homeHeaderActions5100"><button class="smallBtn nearbyCount478" id="checkNearbyHomeBtn476">${nearbyState?"Refresh":"Check"}</button>${homeCollapseButton5100("nearbyAccounts","Nearby Accounts")}</div></div>
+        <div class="nearbyList476 nearbyList478 homeCollapseBody5100" data-home-collapse-body ${homeCardCollapsed5100("nearbyAccounts")?"hidden":""}>${homeNearbyMarkup476()}</div>
+      </div>
 
-    <div class="grid2 appleStats478">
-      <button class="card tile statTile478" id="visitsCard478"><strong>${recentVisits}</strong><span>Recent Visits</span><em>This Week</em></button>
-      <button class="card tile statTile478" id="tasksCard"><strong>${openTasks}</strong><span>Open Tasks</span><em>${taskCounts.overdue ? `${taskCounts.overdue} overdue` : taskCounts.today ? `${taskCounts.today} due soon` : "Due Soon"}</em></button>
+      <div class="grid2 appleStats478">
+        <button class="card tile statTile478" id="visitsCard478"><strong>${recentVisits}</strong><span>Recent Visits</span><em>This Week</em></button>
+        <button class="card tile statTile478" id="tasksCard"><strong>${openTasks}</strong><span>Open Tasks</span><em>${taskCounts.overdue ? `${taskCounts.overdue} overdue` : taskCounts.today ? `${taskCounts.today} due soon` : "Due Soon"}</em></button>
+      </div>
     </div>
 
     ${activeRoute ? `<div class="card activeRouteMini468 activeRouteMini476 activeRouteMini478 ${activeRoute.paused?"activeRoutePaused470":""}"><div class="activeRouteHead468"><div><h2><span class="${activeRoute.paused?"routeLed470 routeLedPaused470":"routeLed463"} miniLed468"></span>${activeRoute.paused?"Daily Route Paused":"Daily Route Recording"}</h2><p>${esc(routeSummaryLine(activeRoute))}</p></div><button class="primary smallBtn" id="openRouteMiniBtn">Open</button></div><div class="activeRouteStats468"><div><strong>${(activeRoute.events||[]).length}</strong><span>Waypoints</span></div><div><strong>${routeDuration(activeRoute.startedAt)}</strong><span>Time</span></div><div><strong>${esc(routeDistanceLabel(activeRoute))}</strong><span>Distance</span></div></div><div class="activeRouteActions468"><button class="ghost smallBtn" id="homeRoutePointBtn" ${activeRoute.paused?"disabled":""}>Waypoint</button><button class="ghost smallBtn" id="homeRouteNearestBtn" ${activeRoute.paused?"disabled":""}>Nearest</button><button class="${activeRoute.paused?"primary":"ghost"} smallBtn" id="homeRoutePauseBtn">${activeRoute.paused?"Resume":"Pause"}</button><button class="danger smallBtn" id="homeRouteEndBtn">End / Save</button></div></div>` : ""}
     ${activeJob ? `<div class="card activeJobMini activeJobMini478"><div class="row"><div><h2>Service Call Active</h2><p>${esc(activeJob.siteName)} • <span id="jobElapsed">${elapsedText(activeJob.startedAt)}</span></p></div><button class="primary" id="resumeJobBtn">Open</button></div></div>` : ""}
 
-    <div class="recentAccountsPanel478">
-      <div class="recentHead478"><div><strong>Recent Accounts</strong><span>${recentAccounts476(5).length} account${recentAccounts476(5).length===1?"":"s"}</span></div><button class="ghost smallBtn" id="allAccountsBtn478">See All</button></div>
-      <div class="recentList478 recentList486">${homeRecentRowsOnly486()}</div>
+    <div class="recentAccountsPanel478 homeCollapsible5100 ${homeCardCollapsed5100("recentAccounts")?"homeCollapsed5100":""}" data-home-collapsible="recentAccounts">
+      <div class="recentHead478"><div><strong>Recent Accounts</strong><span>${recentAccounts476(5).length} account${recentAccounts476(5).length===1?"":"s"}</span></div><div class="homeHeaderActions5100"><button class="ghost smallBtn" id="allAccountsBtn478">See All</button>${homeCollapseButton5100("recentAccounts","Recent Accounts")}</div></div>
+      <div class="recentList478 recentList486 homeCollapseBody5100" data-home-collapse-body ${homeCardCollapsed5100("recentAccounts")?"hidden":""}>${homeRecentRowsOnly486()}</div>
     </div>
 
     <button class="card dailySummaryCard499" id="dailySummaryBtn499"><div><strong>Daily Summary</strong><span>${dailySummaryLine499()}</span></div><em>Open</em></button>
@@ -1775,6 +1819,7 @@ function home(){
 
   const homeRoot=document.querySelector('.homeScreen476');
   if(homeRoot) homeRoot.onclick=e=>{ const card=e.target.closest('[data-home-site]'); if(card){ selectedSiteId=card.dataset.homeSite; route('siteDetail'); } };
+  wireHomeCollapsibles5100();
   const search=document.getElementById('homeCustomerSearch476');
   if(search){ search.oninput=()=>{ siteSearch=search.value; renderHomeSearch476(); }; }
   const clear=document.getElementById('clearHomeSearch476'); if(clear) clear.onclick=()=>{ siteSearch=''; const search=document.getElementById('homeCustomerSearch476'); if(search){ search.value=''; search.focus({preventScroll:true}); } renderHomeSearch476(); };
@@ -5128,22 +5173,25 @@ function fieldFocusStatus561(){
 function fieldFocusMarkup561(){
   const f=fieldFocusStats561();
   const status=fieldFocusStatus561();
-  return `<div class="card fieldFocus561 ${status.cls}">
+  const collapsed=homeCardCollapsed5100("fieldFocus");
+  return `<div class="card fieldFocus561 homeCollapsible5100 ${status.cls} ${collapsed?"homeCollapsed5100":""}" data-home-collapsible="fieldFocus">
     <div class="fieldFocusHead561">
       <div><h2>Field Focus</h2><p>${esc(status.detail)}</p></div>
-      <button class="fieldFocusOpen562" id="openActionCenter562">${esc(status.label)} →</button>
+      <div class="homeHeaderActions5100"><button class="fieldFocusOpen562" id="openActionCenter562">${esc(status.label)} →</button>${homeCollapseButton5100("fieldFocus","Field Focus")}</div>
     </div>
-    <div class="fieldFocusGrid561">
-      <button id="focusAttention561"><strong>${f.attention.length}</strong><span>Attention</span></button>
-      <button id="focusTasks561"><strong>${f.openTasks.length}</strong><span>Open Tasks</span></button>
-      <button id="focusDef561"><strong>${f.openDef.length}</strong><span>Deficiencies</span></button>
-      <button id="focusPhotos561"><strong>${f.photos}</strong><span>Photos</span></button>
-    </div>
-    <div class="fieldFocusMini561">
-      <button id="focusToday561"><strong>${f.dueToday.length}</strong><span>Due Today</span></button>
-      <button id="focusOverdue561"><strong>${f.overdue.length}</strong><span>Overdue</span></button>
-      <button id="focusReports561"><strong>${f.selectedPhotos}</strong><span>Report Photos</span></button>
-      <button id="focusRoutes561"><strong>${f.routeDays}</strong><span>Route Days</span></button>
+    <div class="homeCollapseBody5100" data-home-collapse-body ${collapsed?"hidden":""}>
+      <div class="fieldFocusGrid561">
+        <button id="focusAttention561"><strong>${f.attention.length}</strong><span>Attention</span></button>
+        <button id="focusTasks561"><strong>${f.openTasks.length}</strong><span>Open Tasks</span></button>
+        <button id="focusDef561"><strong>${f.openDef.length}</strong><span>Deficiencies</span></button>
+        <button id="focusPhotos561"><strong>${f.photos}</strong><span>Photos</span></button>
+      </div>
+      <div class="fieldFocusMini561">
+        <button id="focusToday561"><strong>${f.dueToday.length}</strong><span>Due Today</span></button>
+        <button id="focusOverdue561"><strong>${f.overdue.length}</strong><span>Overdue</span></button>
+        <button id="focusReports561"><strong>${f.selectedPhotos}</strong><span>Report Photos</span></button>
+        <button id="focusRoutes561"><strong>${f.routeDays}</strong><span>Route Days</span></button>
+      </div>
     </div>
   </div>`;
 }
@@ -5638,17 +5686,17 @@ function diagnostics(){
 }
 function showChangelog(){
   const notes = [
-    "Advanced to Build 0.50.76 from the stable 0.50.75 baseline.",
-    "Settings now restores the exact scroll position after Quick View presets, Quick Layout presets, Save, theme changes, and other Settings rerenders.",
-    "Module toggles and App Mode changes retain the current Settings location while editing.",
-    "Returning from Settings detail pages, Diagnostics, or Data Tools restores the previous Settings menu position.",
-    "Preserved active-preset highlighting, account screen formatting, Daily Summary calendar, Home layout, Pinned Sites Manager, Action Center, Data Tools, Field Focus, and FIRE-red / VAULT-white branding."
+    "Advanced to milestone Build 0.51.0 from the stable 0.50.76 baseline.",
+    "Added collapsible Home cards for Pinned Sites, Field Focus, Nearby Accounts, and Recent Accounts.",
+    "Each Home card remembers its open or closed state between app sessions while remaining open by default for existing users.",
+    "Improved iPad portrait and landscape reflow so Home modules use available width without stretching phone layouts or hiding controls.",
+    "Preserved Settings scroll recovery, active presets, all existing workflows, and FIRE-red / VAULT-white branding."
   ];
   const overlay=document.createElement("div");
   overlay.className="releaseOverlay";
   overlay.innerHTML=`<div class="releaseSheet" role="dialog" aria-modal="true" aria-label="FireVault release notes">
     <div class="releaseHead"><div><strong>${fireVaultBrand575()}</strong><span>Build ${BUILD}</span></div><button class="ghost iconBtn" id="closeRelease" aria-label="Close release notes">×</button></div>
-    <div class="releaseBody"><h2>Release Notes</h2><p class="releaseIntro">Settings now stays exactly where you were working.</p><ul>${notes.map(n=>`<li>${esc(n)}</li>`).join("")}</ul></div>
+    <div class="releaseBody"><h2>Release Notes</h2><p class="releaseIntro">A cleaner Home that adapts to phones and iPads.</p><ul>${notes.map(n=>`<li>${esc(n)}</li>`).join("")}</ul></div>
   </div>`;
   document.body.appendChild(overlay);
   const close=()=>overlay.remove();

@@ -8,7 +8,7 @@
   "orientation": "any",
   "background_color": "#0b0d10",
   "theme_color": "#101216",
-  "description": "Field knowledge system for fire alarm technicians. Build 0.50.76 preserves the current Settings scroll position after module changes, presets, saves, and submenu navigation while keeping FIRE red and VAULT white.",
+  "description": "Field knowledge system for fire alarm technicians. Build 0.51.0 adds responsive iPhone and iPad Home layouts with collapsible cards while preserving Settings scroll recovery and FIRE-red / VAULT-white branding.",
   "icons": [
     {
       "src": "assets/icon-192.png",
