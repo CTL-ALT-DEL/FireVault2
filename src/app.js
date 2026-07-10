@@ -1078,7 +1078,7 @@ function showGlobalChrome537(){ const h=document.getElementById("appHeader"); co
 
 function render(){
   try{
-    const routes = {home, dailySummary, routeLog, sites, nearbySites, attention:attentionQueue, siteDetail, visits, visitDetail, checklist, siteForm, contactsList, contactForm, siteDocs, siteDocForm, equipmentList, equipmentForm, tasks, taskForm, deficiencies, deficiencyForm, report, library, resourceForm, jobMode, settings, diagnostics};
+    const routes = {home, dailySummary, routeLog, sites, nearbySites, attention:attentionQueue, siteDetail, visits, visitDetail, checklist, siteForm, contactsList, contactForm, siteDocs, siteDocForm, equipmentList, equipmentForm, tasks, taskForm, deficiencies, deficiencyForm, report, library, resourceForm, jobMode, settings, diagnostics, dataTools};
     (routes[view] || home)();
     document.body.classList.toggle("homeFullscreen480", view === "home");
     stopJobTimer();
@@ -1401,8 +1401,7 @@ function home(){
     </div>
 
     <button class="card dailySummaryCard499" id="dailySummaryBtn499"><div><strong>Daily Summary</strong><span>${dailySummaryLine499()}</span></div><em>Open</em></button>
-    ${backupSafetyMarkup552()}
-    ${backupRestoreCenterMarkup554()}
+    ${dataSafeCard560()}
     <div class="homeModuleSummary476 homeModuleSummary478"><button class="ghost" id="manageModulesBtn476"><strong>Modules</strong><span>${esc(moduleStatus476())}</span></button><button class="ghost" id="defCard"><strong>${def}</strong><span>Deficiencies</span></button></div>
     <div class="buildRevisionSpacer475" aria-hidden="true"></div>
   </div>`);
@@ -1424,7 +1423,7 @@ function home(){
   document.getElementById('tasksCard').onclick=()=>{selectedSiteId=null; route('tasks');};
   document.getElementById('defCard').onclick=()=>{selectedSiteId=null; route('deficiencies');};
   document.getElementById('addSiteBtn').onclick=()=>{selectedSiteId=null; mode=null; route('siteForm');};
-  wireBackupSafety552();
+  const dataToolsHome560=document.getElementById('dataToolsHome560'); if(dataToolsHome560) dataToolsHome560.onclick=()=>route('dataTools');
   const openRouteMini=document.getElementById('openRouteMiniBtn'); if(openRouteMini) openRouteMini.onclick=()=>route('routeLog');
   const homeRoutePoint=document.getElementById('homeRoutePointBtn'); if(homeRoutePoint) homeRoutePoint.onclick=()=>{ const note=prompt('Waypoint note', 'Manual waypoint')||'Manual waypoint'; addRouteEvent('Waypoint', note); };
   const homeRouteNearest=document.getElementById('homeRouteNearestBtn'); if(homeRouteNearest) homeRouteNearest.onclick=checkRouteNearestSite;
@@ -1849,7 +1848,7 @@ function siteToolCount477(){
 }
 
 
-/* Build 0.50.59 Site Screen Cleanup helpers */
+/* Build 0.50.60 Site Screen Cleanup helpers */
 function siteOpenTasks556(s={}){
   return (s.tasks||[]).filter(t=>String(t.status||"Open").toLowerCase()!=="done" && String(t.status||"Open").toLowerCase()!=="complete");
 }
@@ -1942,7 +1941,7 @@ function wireSiteBrief556(){
 
 
 
-/* Build 0.50.59 Site Activity Timeline filters */
+/* Build 0.50.60 Site Activity Timeline filters */
 let siteTimelineFilter558 = "all";
 let siteTimelineExpanded559 = false;
 function siteTimelineFilterCounts558(s={}){
@@ -1986,7 +1985,7 @@ function wireSiteTimelineFilters558(){
   });
 }
 
-/* Build 0.50.59 Site Activity Timeline helpers */
+/* Build 0.50.60 Site Activity Timeline helpers */
 function activityDateMs557(value){
   const t=new Date(value || 0).getTime();
   return Number.isFinite(t) ? t : 0;
@@ -3546,7 +3545,7 @@ function openReportEmailDraft(s, txt, subject){
 }
 
 
-/* Build 0.50.59 Customer Report Preview helpers */
+/* Build 0.50.60 Customer Report Preview helpers */
 function customerReportPreviewStats555(s={}){
   const selected=reportPhotos526(s);
   const ready=customerReportPhotoReady530(s);
@@ -3903,6 +3902,7 @@ function settings(){
     document.querySelectorAll(".settingsChoice451[data-tab]").forEach(b=>b.onclick=()=>{ settingsTab=b.dataset.tab; mode="settingsDetail"; settings(); });
     const mq=document.getElementById("modulesQuickBtn"); if(mq) mq.onclick=()=>{ settingsTab="visibility"; mode="settingsDetail"; settings(); };
     document.getElementById("diagnosticsChoice").onclick=()=>route("diagnostics");
+    const dataToolsChoice560=document.getElementById("dataToolsChoice560"); if(dataToolsChoice560) dataToolsChoice560.onclick=()=>route("dataTools");
     return;
   }
   const saveable=!['backup','about'].includes(settingsTab);
@@ -4424,7 +4424,73 @@ function repairVaultState(){
 }
 
 
-/* Build 0.50.59 Backup Safety helpers */
+
+/* Build 0.50.60 Data Tools / Home cleanup helpers */
+function dataSafeSummary560(){
+  const s=backupSafetyStats552();
+  const lastRestore=localStorage.getItem("firevault_last_restore_time");
+  const lastRestoreBuild=localStorage.getItem("firevault_last_restore_build") || "";
+  const kb=s.bytes ? `${Math.max(1,Math.round(s.bytes/1024))} KB` : "Size unknown";
+  const restoreLine=lastRestore ? `Last restore: ${new Date(lastRestore).toLocaleDateString()}${lastRestoreBuild?` • ${lastRestoreBuild}`:""}` : "No restore recorded";
+  return {stats:s,kb,restoreLine};
+}
+function dataSafeCard560(){
+  const d=dataSafeSummary560();
+  return `<button class="card dataSafeCard560" id="dataToolsHome560">
+    <div class="dataSafeIcon560">↧</div>
+    <div><strong>Data Safe</strong><span>${esc(d.stats.sites)} sites • ${esc(d.stats.docs)} docs • ${esc(d.kb)}</span><em>Backup, Restore, Diagnostics</em></div>
+    <b>Open</b>
+  </button>`;
+}
+function dataToolsStatusGrid560(){
+  const d=dataSafeSummary560();
+  const s=d.stats;
+  return `<div class="dataToolsGrid560">
+    <div><strong>${s.sites}</strong><span>Sites</span></div>
+    <div><strong>${s.visits}</strong><span>Visits</span></div>
+    <div><strong>${s.docs}</strong><span>Docs</span></div>
+    <div><strong>${s.photoDocs}</strong><span>Photos</span></div>
+    <div><strong>${s.tasks}</strong><span>Tasks</span></div>
+    <div><strong>${s.deficiencies}</strong><span>Def.</span></div>
+    <div><strong>${s.routes}</strong><span>Route Days</span></div>
+    <div><strong>${esc(d.kb)}</strong><span>Local Data</span></div>
+  </div>`;
+}
+function dataTools(){
+  const d=dataSafeSummary560();
+  html(`<div class="screen dataToolsScreen560">
+    <div class="row dataToolsTop560"><button class="back ghost" id="backHome560">←</button><div><h1>Data Tools</h1><p>Backup, restore, diagnostics, and build safety.</p></div></div>
+    <div class="card dataToolsHero560">
+      <div><h2>FireVault Data Safety</h2><p>${esc(d.restoreLine)}</p></div>
+      <span>${esc(BUILD)}</span>
+    </div>
+    ${dataToolsStatusGrid560()}
+    ${backupSafetyMarkup552()}
+    ${backupRestoreCenterMarkup554()}
+    <div class="card dataToolsMaintenance560">
+      <div class="dataToolsMaintenanceHead560"><div><h2>Maintenance</h2><p>Use these when troubleshooting, checking startup health, or preparing a support note.</p></div></div>
+      <div class="dataToolsActions560">
+        <button class="ghost" id="copyDiagnostics560">Copy Diagnostics</button>
+        <button class="ghost" id="copyStartupHealth560">Copy Startup Health</button>
+        <button class="ghost" id="openDiagnostics560">Open Diagnostics</button>
+        <button class="danger" id="repairVault560">Repair Vault</button>
+      </div>
+    </div>
+    <div class="card dataToolsInfo560">
+      <h2>Recommended update order</h2>
+      <p>Download Backup → install / commit the new build → confirm FireVault opens → check one saved account → keep the backup file until the build is confirmed stable.</p>
+    </div>
+  </div>`);
+  document.getElementById("backHome560").onclick=()=>route("home");
+  wireBackupSafety552();
+  const diag=document.getElementById("copyDiagnostics560"); if(diag) diag.onclick=copyDiagnostics;
+  const startup=document.getElementById("copyStartupHealth560"); if(startup) startup.onclick=copyStartupHealth520;
+  const openDiag=document.getElementById("openDiagnostics560"); if(openDiag) openDiag.onclick=()=>route("diagnostics");
+  const repair=document.getElementById("repairVault560"); if(repair) repair.onclick=()=>{ if(confirm("Run Repair Vault? This checks and repairs FireVault's local data structure.")) repairVaultState(); };
+}
+
+
+/* Build 0.50.60 Backup Safety helpers */
 function backupSafetyStats552(){
   const sites = (data.sites || []).length;
   const visits = (data.sites || []).reduce((n,s)=>n+((s.visits||[]).length),0);
@@ -4541,7 +4607,7 @@ async function copyUpdateChecklist553(){
 }
 
 
-/* Build 0.50.59 Backup Restore Center */
+/* Build 0.50.60 Backup Restore Center */
 let pendingRestoreBackup554 = null;
 
 function normalizeBackupPayload554(raw){
@@ -4750,17 +4816,17 @@ function diagnostics(){
 }
 function showChangelog(){
   const notes = [
-    "Advanced to Build 0.50.59 from the stable 0.50.58 baseline.",
-    "Added Show More / Collapse controls to the Site Activity Timeline.",
-    "Timeline now shows 6 items by default and up to 20 items when expanded.",
-    "Added Copy Full for copying the full filtered timeline list.",
-    "Preserved Site Activity Timeline filters, Site Brief, Customer Report Preview, Backup Restore Center, stacked-lines main Settings icon, top-right Add Site button placement, Backup Safety download tools, clean splash screen with no loader, fixed splash/header behavior, Startup Health diagnostics, Photo Vault tools, Customer Report Photo workflow, iPad autosizing, simple Home screen, Search Bar Concept #6, and excluded job-status workflow controls."
+    "Advanced to Build 0.50.60 from the stable 0.50.59 baseline.",
+    "Cleaned up the Home screen by moving Backup Safety and Restore Center into a dedicated Data Tools screen.",
+    "Added Data Tools with backup, restore, diagnostics, startup health, repair vault, and update safety guidance.",
+    "Added a compact Data Safe card on Home so data tools remain easy to reach without crowding daily field workflow.",
+    "Preserved expandable Site Activity Timeline, timeline filters, Site Brief, Customer Report Preview, Backup Restore Center, stacked-lines main Settings icon, top-right Add Site button placement, clean splash screen with no loader, fixed splash/header behavior, Startup Health diagnostics, Photo Vault tools, Customer Report Photo workflow, iPad autosizing, simple Home screen, Search Bar Concept #6, and excluded job-status workflow controls."
   ];
   const overlay=document.createElement("div");
   overlay.className="releaseOverlay";
   overlay.innerHTML=`<div class="releaseSheet" role="dialog" aria-modal="true" aria-label="FireVault release notes">
     <div class="releaseHead"><div><strong>FireVault</strong><span>Build ${BUILD}</span></div><button class="ghost iconBtn" id="closeRelease" aria-label="Close release notes">×</button></div>
-    <div class="releaseBody"><h2>Release Notes</h2><p class="releaseIntro">Added expandable Site Activity Timeline controls and Copy Full Timeline.</p><ul>${notes.map(n=>`<li>${esc(n)}</li>`).join("")}</ul></div>
+    <div class="releaseBody"><h2>Release Notes</h2><p class="releaseIntro">Moved Backup and Restore to Data Tools and cleaned up Home screen.</p><ul>${notes.map(n=>`<li>${esc(n)}</li>`).join("")}</ul></div>
   </div>`;
   document.body.appendChild(overlay);
   const close=()=>overlay.remove();

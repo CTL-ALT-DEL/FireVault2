@@ -1,11 +1,11 @@
-# FireVault Build 0.50.59
+# FireVault Build 0.50.60
 
-Build 0.50.59 continues from the stable 0.50.58 baseline and adds expandable controls to the Site Activity Timeline.
+Build 0.50.60 continues from the stable 0.50.59 baseline and performs a larger Home Cleanup / Data Tools organization pass.
 
 ## Changes
 
-- Visible app version advanced to 0.50.59.
-- Cache-busting references updated to 0.50.59.
+- Visible app version advanced to 0.50.60.
+- Cache-busting references updated to 0.50.60.
 - Added **Site Quick Actions** card on the account/site screen.
 - Added direct quick actions for:
   - Add Site Note
@@ -31,13 +31,13 @@ Run from the project root:
 node --check src/storage.js
 node --check src/app.js
 python -m json.tool manifest.json > /dev/null
-zip -T firevault-build-0.50.59-modular-root.zip
+zip -T firevault-build-0.50.60-modular-root.zip
 ```
 
 ## Suggested commit message
 
 ```text
-Build 0.50.59 expandable site activity timeline
+Build 0.50.60 home cleanup and data tools
 ```
 
 - Lifted the red Home add button above the bottom nav so it should not be blocked by the black bottom area.
@@ -71,3 +71,7 @@ Build 0.50.59 expandable site activity timeline
 
 - Added Copy Full for the full filtered timeline.
 - Preserved timeline filters from 0.50.58.
+
+- Added a compact Data Safe card on Home.
+- Kept Home focused on Today/date, Add Site, Search, field dashboard, nearby accounts, recent accounts, and daily summary.
+- Preserved expandable Site Activity Timeline from 0.50.59.
