@@ -1,19 +1,20 @@
-# FireVault Build 0.55.0
+# FireVault Build 0.56.0
 
-Build 0.55.0 adds a dedicated Home Layout workspace while preserving the stable 0.54.0 Settings and Email design.
+Build 0.56.0 turns the existing Home Field Dashboard into a complete working field workflow while preserving the stable 0.55.0 visual foundation.
 
 ## Highlights
 
-- Added Settings → Home Layout as a dedicated customization area.
-- Added Clean Home, Field Ready, Compact Cards, and Full Home presets.
-- Added individual visibility controls for Pinned Sites, Field Focus, Nearby Accounts, and Recent Accounts.
-- Added per-card open behavior: remember the last choice, always start open, or always start collapsed.
-- Added a live Home card preview inside Settings.
-- Added Expand All Now, Collapse All Now, and Reset Home Layout controls.
-- Home-card settings remain separate from module availability, so disabled modules are clearly identified without losing preferences.
-- Preserved the 0.54.0 Email composer, Settings formatting, Settings scroll recovery, responsive iPhone/iPad layout, and all existing account data.
+- Added a Quick Capture sheet launched from Home → Site Note.
+- Quick Capture can save a timestamped site note, create an open follow-up task, or record an open deficiency.
+- Deficiency capture can automatically create a matching follow-up task.
+- Quick Capture defaults to the active service-call account, today’s account, or the most recently opened account.
+- Activated the Field Dashboard Notes Today, Note Sites, Route Points, Daily Route, Copy Summary, and All Sites controls.
+- Daily dashboard counters now open the correct Daily Report or Daily Route workspace.
+- Saved notes, tasks, and deficiencies immediately update Home counters and Daily Reports.
+- Preserved all 0.55.0 Home Layout presets and per-card settings.
+- Preserved the scoped Settings redesign, Email composer, scroll-position recovery, responsive phone/iPad layouts, and all existing stored data.
 - Preserved FIRE in red and VAULT in white throughout the app.
 
 ## Commit message
 
-`Build 0.55.0 add Home Layout presets and card controls`
+`Build 0.56.0 add Field Dashboard Quick Capture workflow`
