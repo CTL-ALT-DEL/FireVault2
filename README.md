@@ -1,35 +1,19 @@
-# FireVault Build 0.51.0
+# FireVault Build 0.52.0
 
-Build 0.51.0 is the first larger milestone release after the stable 0.50.76 baseline. It improves Home-screen organization and responsive iPad sizing without redesigning existing workflows.
+Build 0.52.0 is a Settings and submenu visual-polish milestone based on stable Build 0.51.0. Existing settings, data storage, routes, and Home behavior are preserved.
 
-## Changes
+## Improvements
 
-- Advanced the visible build and cache-busting references to **0.51.0**.
-- Added collapsible Home cards for:
-  - Pinned Sites
-  - Field Focus
-  - Nearby Accounts
-  - Recent Accounts
-- Home cards remain open by default and remember their open/closed state between app sessions.
-- Collapse controls update in place without rerendering the Home screen or changing the current scroll position.
-- Added responsive Home grouping for phone, iPad portrait, and iPad landscape layouts.
-- iPad landscape now uses available width for paired dashboard sections while portrait layouts remain single-column and touch-friendly.
-- Preserved the Build 0.50.76 Settings scroll-position recovery.
-- Preserved all existing data, routes, sites, reports, settings, module presets, and FIRE-red / VAULT-white branding.
-
-## Validation
-
-Run from the project root:
-
-```bash
-node --check src/storage.js
-node --check src/app.js
-python -m json.tool manifest.json > /dev/null
-zip -T firevault-build-0.51.0-modular-root.zip
-```
+- Cleaned up the main Settings menu and all Settings detail screens.
+- Increased label, note, input, and submenu heading readability.
+- Added stronger contrast and separation between individual cards and controls.
+- Standardized padding, borders, section headings, checkboxes, inputs, and Save buttons.
+- Reworked Email Settings into clearer recipient, subject, signature, tag, and live-preview sections.
+- Improved phone and iPad responsive layouts.
+- Preserved Settings scroll-position recovery from Build 0.50.76.
+- Preserved responsive collapsible Home cards from Build 0.51.0.
+- Preserved FIRE-red / VAULT-white branding.
 
 ## Suggested commit message
 
-```text
-Build 0.51.0 add responsive collapsible Home cards
-```
+`Build 0.52.0 polish Settings menus and Email workspace`
