@@ -1,11 +1,11 @@
-# FireVault Build 0.50.62
+# FireVault Build 0.50.63
 
-Build 0.50.62 continues from the stable 0.50.61 baseline and adds Action Center for priority field work across every site.
+Build 0.50.63 continues from the stable 0.50.62 baseline and adds a Settings → Modules toggle for Field Focus.
 
 ## Changes
 
-- Visible app version advanced to 0.50.62.
-- Cache-busting references updated to 0.50.62.
+- Visible app version advanced to 0.50.63.
+- Cache-busting references updated to 0.50.63.
 - Added **Site Quick Actions** card on the account/site screen.
 - Added direct quick actions for:
   - Add Site Note
@@ -31,13 +31,13 @@ Run from the project root:
 node --check src/storage.js
 node --check src/app.js
 python -m json.tool manifest.json > /dev/null
-zip -T firevault-build-0.50.62-modular-root.zip
+zip -T firevault-build-0.50.63-modular-root.zip
 ```
 
 ## Suggested commit message
 
 ```text
-Build 0.50.62 action center field priorities
+Build 0.50.63 field focus module toggle
 ```
 
 - Lifted the red Home add button above the bottom nav so it should not be blocked by the black bottom area.
@@ -82,3 +82,6 @@ Build 0.50.62 action center field priorities
 - Field Focus now opens filtered Action Center views.
 - Corrected Field Focus due-today and overdue task counts.
 - Added Copy Action Center from Data Tools.
+
+- Updated visibility presets so Field Focus is tracked as a normal FireVault module.
+- Updated Diagnostics route registration to include Action Center and Data Tools.
