@@ -1,11 +1,11 @@
-# FireVault Build 0.50.61
+# FireVault Build 0.50.62
 
-Build 0.50.61 continues from the stable 0.50.60 baseline and adds a Field Focus dashboard to the Home screen.
+Build 0.50.62 continues from the stable 0.50.61 baseline and adds Action Center for priority field work across every site.
 
 ## Changes
 
-- Visible app version advanced to 0.50.61.
-- Cache-busting references updated to 0.50.61.
+- Visible app version advanced to 0.50.62.
+- Cache-busting references updated to 0.50.62.
 - Added **Site Quick Actions** card on the account/site screen.
 - Added direct quick actions for:
   - Add Site Note
@@ -31,13 +31,13 @@ Run from the project root:
 node --check src/storage.js
 node --check src/app.js
 python -m json.tool manifest.json > /dev/null
-zip -T firevault-build-0.50.61-modular-root.zip
+zip -T firevault-build-0.50.62-modular-root.zip
 ```
 
 ## Suggested commit message
 
 ```text
-Build 0.50.61 field focus home dashboard
+Build 0.50.62 action center field priorities
 ```
 
 - Lifted the red Home add button above the bottom nav so it should not be blocked by the black bottom area.
@@ -78,3 +78,7 @@ Build 0.50.61 field focus home dashboard
 
 - Added Copy Field Focus in Data Tools.
 - Preserved Home cleanup and Data Tools from 0.50.60.
+
+- Field Focus now opens filtered Action Center views.
+- Corrected Field Focus due-today and overdue task counts.
+- Added Copy Action Center from Data Tools.

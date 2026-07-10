@@ -14,6 +14,7 @@ let docPhotoDraftName512 = "";
 let docPhotoClearRequested512 = false;
 let taskFilter = "open";
 let deficiencyFilter = "open";
+let actionCenterFilter562 = "all";
 let activeJob = loadActiveJob();
 let nearbyState = null;
 let siteSearch = "";
@@ -1072,13 +1073,13 @@ function addServiceFollowUp(kind="Follow-up"){
 }
 function startJobTimer(){ stopJobTimer(); jobTimer=setInterval(()=>{ const el=document.getElementById("jobElapsed"); if(el && activeJob) el.textContent=elapsedText(activeJob.startedAt); },1000); }
 function stopJobTimer(){ if(jobTimer){ clearInterval(jobTimer); jobTimer=null; } }
-function setActiveNav(){ document.querySelectorAll("nav button").forEach(b=>b.classList.remove("active")); const section=["routeLog","dailySummary"].includes(view)?"home":(["siteDetail","visits","visitDetail","checklist","siteForm","contactsList","contactForm","siteDocs","siteDocForm","equipmentList","equipmentForm","tasks","taskForm","deficiencies","deficiencyForm","report","jobMode","nearbySites","attention"].includes(view)?"sites":view); document.getElementById("nav-"+section)?.classList.add("active"); }
+function setActiveNav(){ document.querySelectorAll("nav button").forEach(b=>b.classList.remove("active")); const section=["routeLog","dailySummary","actionCenter"].includes(view)?"home":(["siteDetail","visits","visitDetail","checklist","siteForm","contactsList","contactForm","siteDocs","siteDocForm","equipmentList","equipmentForm","tasks","taskForm","deficiencies","deficiencyForm","report","jobMode","nearbySites","attention"].includes(view)?"sites":view); document.getElementById("nav-"+section)?.classList.add("active"); }
 function wireGlobalHeader537(){ const b=document.getElementById("headerSettingsBtn537"); if(b) b.onclick=()=>route("settings"); }
 function showGlobalChrome537(){ const h=document.getElementById("appHeader"); const n=document.getElementById("appNav"); if(h){ h.style.display="flex"; h.style.visibility="visible"; h.style.opacity="1"; } if(n){ n.style.display="grid"; n.style.visibility="visible"; n.style.opacity="1"; } wireGlobalHeader537(); }
 
 function render(){
   try{
-    const routes = {home, dailySummary, routeLog, sites, nearbySites, attention:attentionQueue, siteDetail, visits, visitDetail, checklist, siteForm, contactsList, contactForm, siteDocs, siteDocForm, equipmentList, equipmentForm, tasks, taskForm, deficiencies, deficiencyForm, report, library, resourceForm, jobMode, settings, diagnostics, dataTools};
+    const routes = {home, dailySummary, routeLog, actionCenter, sites, nearbySites, attention:attentionQueue, siteDetail, visits, visitDetail, checklist, siteForm, contactsList, contactForm, siteDocs, siteDocForm, equipmentList, equipmentForm, tasks, taskForm, deficiencies, deficiencyForm, report, library, resourceForm, jobMode, settings, diagnostics, dataTools};
     (routes[view] || home)();
     document.body.classList.toggle("homeFullscreen480", view === "home");
     stopJobTimer();
@@ -1851,7 +1852,7 @@ function siteToolCount477(){
 }
 
 
-/* Build 0.50.61 Site Screen Cleanup helpers */
+/* Build 0.50.62 Site Screen Cleanup helpers */
 function siteOpenTasks556(s={}){
   return (s.tasks||[]).filter(t=>String(t.status||"Open").toLowerCase()!=="done" && String(t.status||"Open").toLowerCase()!=="complete");
 }
@@ -1944,7 +1945,7 @@ function wireSiteBrief556(){
 
 
 
-/* Build 0.50.61 Site Activity Timeline filters */
+/* Build 0.50.62 Site Activity Timeline filters */
 let siteTimelineFilter558 = "all";
 let siteTimelineExpanded559 = false;
 function siteTimelineFilterCounts558(s={}){
@@ -1988,7 +1989,7 @@ function wireSiteTimelineFilters558(){
   });
 }
 
-/* Build 0.50.61 Site Activity Timeline helpers */
+/* Build 0.50.62 Site Activity Timeline helpers */
 function activityDateMs557(value){
   const t=new Date(value || 0).getTime();
   return Number.isFinite(t) ? t : 0;
@@ -3548,7 +3549,7 @@ function openReportEmailDraft(s, txt, subject){
 }
 
 
-/* Build 0.50.61 Customer Report Preview helpers */
+/* Build 0.50.62 Customer Report Preview helpers */
 function customerReportPreviewStats555(s={}){
   const selected=reportPhotos526(s);
   const ready=customerReportPhotoReady530(s);
@@ -4429,12 +4430,188 @@ function repairVaultState(){
 
 
 
-/* Build 0.50.61 Field Focus dashboard helpers */
+
+/* Build 0.50.62 Action Center helpers */
+function actionPriorityClass562(rank){
+  if(rank<=1) return "critical";
+  if(rank===2) return "today";
+  if(rank===3) return "review";
+  return "normal";
+}
+function actionCenterRows562(){
+  const rows=[];
+  allTaskRows().forEach(r=>{
+    if(taskIsDone(r.t)) return;
+    if(r.state==="overdue" || r.state==="today"){
+      rows.push({
+        kind:r.state==="overdue"?"Overdue Task":"Due Today",
+        filter:r.state,
+        rank:r.state==="overdue"?1:2,
+        siteId:r.s.id,
+        siteName:r.s.name||"Unnamed Site",
+        title:r.t.title||"Task",
+        detail:[taskDueLabel(r.t), r.t.source||"", r.t.notes||""].filter(Boolean).join(" • "),
+        target:"tasks"
+      });
+    }
+  });
+  allDeficiencyRows().forEach(r=>{
+    if(deficiencyClosed(r.d)) return;
+    const sev=String(r.d.priority||"Normal");
+    rows.push({
+      kind:"Deficiency",
+      filter:"deficiencies",
+      rank:sev==="Critical"?1:(sev==="High"?2:3),
+      siteId:r.s.id,
+      siteName:r.s.name||"Unnamed Site",
+      title:r.d.title||r.d.name||"Open deficiency",
+      detail:[sev, deficiencyAgeLine(r.d), r.d.notes||r.d.customerNote||""].filter(Boolean).join(" • "),
+      target:"deficiencies"
+    });
+  });
+  (data.sites||[]).forEach(s=>{
+    const selected=reportPhotos526(s);
+    if(selected.length){
+      const ready=customerReportPhotoReady530(s);
+      if(ready.issues && ready.issues.length){
+        rows.push({
+          kind:"Report Review",
+          filter:"reports",
+          rank:3,
+          siteId:s.id,
+          siteName:s.name||"Unnamed Site",
+          title:`${selected.length} selected customer photo${selected.length===1?"":"s"}`,
+          detail:ready.issues.join(" • "),
+          target:"report"
+        });
+      }
+    }
+  });
+  attentionRows().forEach(r=>{
+    const already=rows.some(x=>x.siteId===r.s.id && x.rank<=2);
+    if(already) return;
+    rows.push({
+      kind:"Attention Site",
+      filter:"attention",
+      rank:r.h.cls==="healthWarn"?2:4,
+      siteId:r.s.id,
+      siteName:r.s.name||"Unnamed Site",
+      title:r.h.label||"Site needs review",
+      detail:attentionActionLine(r)||fullAddress(r.s)||"Review site details",
+      target:"site"
+    });
+  });
+  return rows.sort((a,b)=>a.rank-b.rank || String(a.siteName).localeCompare(String(b.siteName)) || String(a.title).localeCompare(String(b.title)));
+}
+function actionCenterCounts562(rows=actionCenterRows562()){
+  return {
+    all:rows.length,
+    overdue:rows.filter(r=>r.filter==="overdue").length,
+    today:rows.filter(r=>r.filter==="today").length,
+    deficiencies:rows.filter(r=>r.filter==="deficiencies").length,
+    reports:rows.filter(r=>r.filter==="reports").length,
+    attention:rows.filter(r=>r.filter==="attention").length
+  };
+}
+function filteredActionCenterRows562(){
+  const rows=actionCenterRows562();
+  if(actionCenterFilter562==="all") return rows;
+  return rows.filter(r=>r.filter===actionCenterFilter562);
+}
+function actionCenterFilterButton562(key,label,count){
+  return `<button class="actionFilter562 ${actionCenterFilter562===key?"active":""}" data-filter="${esc(key)}"><strong>${esc(label)}</strong><span>${count}</span></button>`;
+}
+function actionCenterStatus562(){
+  const c=actionCenterCounts562();
+  if(c.overdue) return {label:"Overdue", cls:"critical", detail:`${c.overdue} overdue task${c.overdue===1?"":"s"} need attention`};
+  if(c.deficiencies) return {label:"Deficiencies", cls:"review", detail:`${c.deficiencies} open deficienc${c.deficiencies===1?"y":"ies"}`};
+  if(c.today) return {label:"Due Today", cls:"today", detail:`${c.today} task${c.today===1?"":"s"} due today`};
+  if(c.reports) return {label:"Reports", cls:"review", detail:`${c.reports} report photo item${c.reports===1?"":"s"} need review`};
+  if(c.attention) return {label:"Attention", cls:"review", detail:`${c.attention} site${c.attention===1?"":"s"} need review`};
+  return {label:"Clear", cls:"ready", detail:"No priority action items"};
+}
+function actionCenterText562(){
+  const rows=filteredActionCenterRows562();
+  const status=actionCenterStatus562();
+  const lines=[
+    "FireVault Action Center",
+    `Build: ${BUILD}`,
+    `Date: ${new Date().toLocaleString()}`,
+    `Filter: ${actionCenterFilter562}`,
+    "",
+    `Status: ${status.label} - ${status.detail}`,
+    "",
+    rows.length ? "Action Items:" : "No action items in this filter."
+  ];
+  rows.slice(0,50).forEach((r,i)=>{
+    lines.push(`${i+1}. [${r.kind}] ${r.siteName} - ${r.title}`);
+    if(r.detail) lines.push(`   ${r.detail}`);
+  });
+  return lines.join("\n");
+}
+async function copyActionCenter562(){
+  try{
+    await navigator.clipboard.writeText(actionCenterText562());
+    toast("Action Center copied.");
+  }catch{
+    toast("Clipboard unavailable.");
+  }
+}
+function openActionRow562(btn){
+  const siteId=btn.dataset.site;
+  const target=btn.dataset.target;
+  if(siteId) selectedSiteId=siteId;
+  if(target==="tasks"){
+    taskFilter=btn.dataset.filter==="overdue" ? "overdue" : (btn.dataset.filter==="today" ? "today" : "open");
+    route("tasks");
+    return;
+  }
+  if(target==="deficiencies"){
+    deficiencyFilter="open";
+    route("deficiencies");
+    return;
+  }
+  if(target==="report"){
+    route("report");
+    return;
+  }
+  route("siteDetail");
+}
+function actionCenter(){
+  const rows=filteredActionCenterRows562();
+  const counts=actionCenterCounts562();
+  const status=actionCenterStatus562();
+  html(`<div class="screen actionCenterScreen562">
+    <div class="row actionCenterTop562"><button class="back ghost" id="backHome562">←</button><div><h1>Action Center</h1><p>Priority field items from every site.</p></div><button class="ghost smallBtn" id="copyActionCenter562">Copy</button></div>
+    <div class="card actionHero562 ${status.cls}"><div><h2>${esc(status.label)}</h2><p>${esc(status.detail)}</p></div><strong>${counts.all}</strong></div>
+    <div class="actionFilters562">
+      ${actionCenterFilterButton562("all","All",counts.all)}
+      ${actionCenterFilterButton562("overdue","Overdue",counts.overdue)}
+      ${actionCenterFilterButton562("today","Today",counts.today)}
+      ${actionCenterFilterButton562("deficiencies","Def.",counts.deficiencies)}
+      ${actionCenterFilterButton562("reports","Reports",counts.reports)}
+      ${actionCenterFilterButton562("attention","Attention",counts.attention)}
+    </div>
+    <div class="actionList562">
+      ${rows.length ? rows.slice(0,40).map(r=>`<button class="card actionRow562 ${actionPriorityClass562(r.rank)}" data-site="${esc(r.siteId)}" data-target="${esc(r.target)}" data-filter="${esc(r.filter)}">
+        <span>${esc(r.kind)}</span>
+        <div><strong>${esc(r.title)}</strong><small>${esc(r.siteName)}${fullAddress((data.sites||[]).find(s=>s.id===r.siteId)||{})?` • ${esc(fullAddress((data.sites||[]).find(s=>s.id===r.siteId)||{}))}`:""}</small>${r.detail?`<em>${esc(r.detail)}</em>`:""}</div>
+      </button>`).join("") : `<div class="card empty actionEmpty562"><h2>No action items</h2><p>This filter is clear right now.</p></div>`}
+    </div>
+  </div>`);
+  document.getElementById("backHome562").onclick=()=>route("home");
+  document.getElementById("copyActionCenter562").onclick=copyActionCenter562;
+  document.querySelectorAll(".actionFilter562").forEach(b=>b.onclick=()=>{actionCenterFilter562=b.dataset.filter||"all"; actionCenter();});
+  document.querySelectorAll(".actionRow562").forEach(b=>b.onclick=()=>openActionRow562(b));
+}
+
+
+/* Build 0.50.62 Field Focus dashboard helpers */
 function fieldFocusStats561(){
   const sites=data.sites||[];
   const openTasks=allTaskRows().filter(r=>!taskIsDone(r.t));
-  const overdue=openTasks.filter(r=>taskDueState(r.t).cls==="overdue");
-  const dueToday=openTasks.filter(r=>taskDueState(r.t).cls==="today");
+  const overdue=openTasks.filter(r=>r.state==="overdue");
+  const dueToday=openTasks.filter(r=>r.state==="today");
   const openDef=sites.reduce((arr,s)=>arr.concat((s.deficiencies||[]).filter(d=>String(d.status||"Open").toLowerCase()!=="closed").map(d=>({s,d}))),[]);
   const attention=attentionRows();
   const photos=sites.reduce((n,s)=>n+(s.docs||[]).filter(docHasPhoto512).length,0);
@@ -4456,7 +4633,7 @@ function fieldFocusMarkup561(){
   return `<div class="card fieldFocus561 ${status.cls}">
     <div class="fieldFocusHead561">
       <div><h2>Field Focus</h2><p>${esc(status.detail)}</p></div>
-      <span>${esc(status.label)}</span>
+      <button class="fieldFocusOpen562" id="openActionCenter562">${esc(status.label)} →</button>
     </div>
     <div class="fieldFocusGrid561">
       <button id="focusAttention561"><strong>${f.attention.length}</strong><span>Attention</span></button>
@@ -4502,18 +4679,19 @@ async function copyFieldFocus561(){
   }
 }
 function wireFieldFocus561(){
-  const attention=document.getElementById("focusAttention561"); if(attention) attention.onclick=()=>route("attention");
-  const tasks=document.getElementById("focusTasks561"); if(tasks) tasks.onclick=()=>route("tasks");
-  const def=document.getElementById("focusDef561"); if(def) def.onclick=()=>{selectedSiteId=null; route("deficiencies");};
+  const openAction=document.getElementById("openActionCenter562"); if(openAction) openAction.onclick=()=>route("actionCenter");
+  const attention=document.getElementById("focusAttention561"); if(attention) attention.onclick=()=>{actionCenterFilter562="attention"; route("actionCenter");};
+  const tasks=document.getElementById("focusTasks561"); if(tasks) tasks.onclick=()=>{actionCenterFilter562="all"; route("actionCenter");};
+  const def=document.getElementById("focusDef561"); if(def) def.onclick=()=>{selectedSiteId=null; actionCenterFilter562="deficiencies"; route("actionCenter");};
   const photos=document.getElementById("focusPhotos561"); if(photos) photos.onclick=()=>route("sites");
-  const today=document.getElementById("focusToday561"); if(today) today.onclick=()=>route("tasks");
-  const overdue=document.getElementById("focusOverdue561"); if(overdue) overdue.onclick=()=>route("tasks");
-  const reports=document.getElementById("focusReports561"); if(reports) reports.onclick=()=>route("sites");
+  const today=document.getElementById("focusToday561"); if(today) today.onclick=()=>{actionCenterFilter562="today"; route("actionCenter");};
+  const overdue=document.getElementById("focusOverdue561"); if(overdue) overdue.onclick=()=>{actionCenterFilter562="overdue"; route("actionCenter");};
+  const reports=document.getElementById("focusReports561"); if(reports) reports.onclick=()=>{actionCenterFilter562="reports"; route("actionCenter");};
   const routes=document.getElementById("focusRoutes561"); if(routes) routes.onclick=()=>route("routeLog");
 }
 
 
-/* Build 0.50.61 Data Tools / Home cleanup helpers */
+/* Build 0.50.62 Data Tools / Home cleanup helpers */
 function dataSafeSummary560(){
   const s=backupSafetyStats552();
   const lastRestore=localStorage.getItem("firevault_last_restore_time");
@@ -4559,6 +4737,7 @@ function dataTools(){
       <div class="dataToolsMaintenanceHead560"><div><h2>Maintenance</h2><p>Use these when troubleshooting, checking startup health, or preparing a support note.</p></div></div>
       <div class="dataToolsActions560">
         <button class="ghost" id="copyFieldFocus561">Copy Field Focus</button>
+        <button class="ghost" id="copyActionCenterData562">Copy Action Center</button>
         <button class="ghost" id="copyDiagnostics560">Copy Diagnostics</button>
         <button class="ghost" id="copyStartupHealth560">Copy Startup Health</button>
         <button class="ghost" id="openDiagnostics560">Open Diagnostics</button>
@@ -4573,6 +4752,7 @@ function dataTools(){
   document.getElementById("backHome560").onclick=()=>route("home");
   wireBackupSafety552();
   const focus=document.getElementById("copyFieldFocus561"); if(focus) focus.onclick=copyFieldFocus561;
+  const actionCopy=document.getElementById("copyActionCenterData562"); if(actionCopy) actionCopy.onclick=copyActionCenter562;
   const diag=document.getElementById("copyDiagnostics560"); if(diag) diag.onclick=copyDiagnostics;
   const startup=document.getElementById("copyStartupHealth560"); if(startup) startup.onclick=copyStartupHealth520;
   const openDiag=document.getElementById("openDiagnostics560"); if(openDiag) openDiag.onclick=()=>route("diagnostics");
@@ -4580,7 +4760,7 @@ function dataTools(){
 }
 
 
-/* Build 0.50.61 Backup Safety helpers */
+/* Build 0.50.62 Backup Safety helpers */
 function backupSafetyStats552(){
   const sites = (data.sites || []).length;
   const visits = (data.sites || []).reduce((n,s)=>n+((s.visits||[]).length),0);
@@ -4697,7 +4877,7 @@ async function copyUpdateChecklist553(){
 }
 
 
-/* Build 0.50.61 Backup Restore Center */
+/* Build 0.50.62 Backup Restore Center */
 let pendingRestoreBackup554 = null;
 
 function normalizeBackupPayload554(raw){
@@ -4906,17 +5086,17 @@ function diagnostics(){
 }
 function showChangelog(){
   const notes = [
-    "Advanced to Build 0.50.61 from the stable 0.50.60 baseline.",
-    "Added a Field Focus dashboard to the Home screen for daily technician priorities.",
-    "Field Focus summarizes attention sites, open tasks, deficiencies, photos, due-today tasks, overdue tasks, selected report photos, and route days.",
-    "Added Copy Field Focus inside Data Tools for quick status sharing or troubleshooting.",
-    "Preserved Home cleanup, Data Tools, expandable Site Activity Timeline, timeline filters, Site Brief, Customer Report Preview, Backup Restore Center, stacked-lines main Settings icon, top-right Add Site button placement, clean splash screen with no loader, fixed splash/header behavior, Startup Health diagnostics, Photo Vault tools, Customer Report Photo workflow, iPad autosizing, simple Home screen, Search Bar Concept #6, and excluded job-status workflow controls."
+    "Advanced to Build 0.50.62 from the stable 0.50.61 baseline.",
+    "Added Action Center for priority field work across every site.",
+    "Action Center groups overdue tasks, due-today tasks, open deficiencies, report photo review items, and attention sites.",
+    "Field Focus now opens filtered Action Center views, and the due-today / overdue counts have been corrected.",
+    "Preserved Home cleanup, Data Tools, Field Focus, expandable Site Activity Timeline, timeline filters, Site Brief, Customer Report Preview, Backup Restore Center, stacked-lines main Settings icon, top-right Add Site button placement, clean splash screen with no loader, fixed splash/header behavior, Startup Health diagnostics, Photo Vault tools, Customer Report Photo workflow, iPad autosizing, simple Home screen, Search Bar Concept #6, and excluded job-status workflow controls."
   ];
   const overlay=document.createElement("div");
   overlay.className="releaseOverlay";
   overlay.innerHTML=`<div class="releaseSheet" role="dialog" aria-modal="true" aria-label="FireVault release notes">
     <div class="releaseHead"><div><strong>FireVault</strong><span>Build ${BUILD}</span></div><button class="ghost iconBtn" id="closeRelease" aria-label="Close release notes">×</button></div>
-    <div class="releaseBody"><h2>Release Notes</h2><p class="releaseIntro">Added Field Focus Home dashboard and Copy Field Focus.</p><ul>${notes.map(n=>`<li>${esc(n)}</li>`).join("")}</ul></div>
+    <div class="releaseBody"><h2>Release Notes</h2><p class="releaseIntro">Added Action Center and corrected Field Focus due/overdue counts.</p><ul>${notes.map(n=>`<li>${esc(n)}</li>`).join("")}</ul></div>
   </div>`;
   document.body.appendChild(overlay);
   const close=()=>overlay.remove();

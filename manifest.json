@@ -8,7 +8,7 @@
   "orientation": "any",
   "background_color": "#0b0d10",
   "theme_color": "#101216",
-  "description": "Field knowledge system for fire alarm technicians. Build 0.50.61 adds a Field Focus dashboard to Home with attention sites, tasks, deficiencies, photos, due-today and overdue counts, report photos, route days, and Copy Field Focus.",
+  "description": "Field knowledge system for fire alarm technicians. Build 0.50.62 adds Action Center for overdue tasks, due-today tasks, deficiencies, report photo review items, and attention sites, with filtered access from Field Focus.",
   "icons": [
     {
       "src": "assets/icon-192.png",
