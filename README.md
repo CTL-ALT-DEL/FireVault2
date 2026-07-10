@@ -1,16 +1,19 @@
-# FireVault Build 0.55.1
+# FireVault Build 0.56.0
 
-Build 0.55.1 is a dedicated Site Detail repair based on Build 0.55.0.
+Build 0.56.0 adds a working Home Field Dashboard Quick Capture workflow while preserving the dedicated Site Detail repair from Build 0.55.1.
 
-## Fixed
+## Highlights
 
-- Account cards no longer shrink into clipped header-height strips on iPhone.
-- Site Detail sections keep their natural content height and scroll normally.
-- Headings, descriptions, action buttons, statistics, photos, and field information remain fully visible.
-- Site Brief, Activity Timeline, Important Site Info, Site Quick Actions, Field Card, Account Photos, and priority sections are protected from flex shrinking.
-- Settings and Email formatting remain scoped to Settings.
-- Build 0.55.0 Home Layout controls and saved user data are preserved.
+- Added Quick Capture from Home → Site Note.
+- Capture a timestamped site note, open follow-up task, or open deficiency.
+- Deficiencies can automatically create matching follow-up tasks.
+- Quick Capture selects the active, recently used, or most recently opened account by default.
+- Activated Notes Today, Note Sites, Route Points, Daily Route, Copy Summary, and All Sites dashboard controls.
+- Saved entries immediately update Home counters and Daily Reports.
+- Preserved the Site Detail natural-height and scrolling repair from Build 0.55.1.
+- Preserved Home Layout controls, Email Settings formatting, Settings scroll recovery, and stored data.
+- Preserved FIRE in red and VAULT in white.
 
 ## Suggested commit message
 
-`Build 0.55.1 repair Site Detail card clipping`
+`Build 0.56.0 add Quick Capture and preserve Site Detail repair`

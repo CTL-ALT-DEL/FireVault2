@@ -1,7 +1,9 @@
-# Clean Install Notes — FireVault Build 0.55.1
+# FireVault Build 0.56.0 — Clean Install
 
-Build 0.55.1 is compatible with data created by Build 0.55.0. No reset is required.
+1. Extract the ZIP so `index.html`, `manifest.json`, `src`, and `assets` remain together at the repository root.
+2. Replace the previous FireVault files with this complete build.
+3. Commit and push all changed files.
+4. Wait for GitHub Pages deployment to complete.
+5. Confirm the green build badge reads **0.56.0**.
 
-After GitHub Pages deploys, confirm the green build badge reads **0.55.1**. If Safari still shows an older badge, refresh the page or clear the site cache before reinstalling the Home Screen app.
-
-This build repairs Account/Site Detail card shrinking and clipping while preserving Settings, Email, and Home Layout preferences.
+This build uses the existing FireVault storage key, so normal upgrades preserve accounts, notes, settings, and Home Layout preferences. It also retains the Build 0.55.1 Site Detail clipping repair.
