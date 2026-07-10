@@ -1,27 +1,21 @@
-# FireVault Build 0.50.75
+# FireVault Build 0.50.76
 
-Build 0.50.75 continues from the stable 0.50.71 baseline and fixes Settings submenu navigation.
+Build 0.50.76 continues directly from the stable 0.50.75 baseline. It fixes Settings scroll-position loss without redesigning existing screens or changing the Home layout.
 
 ## Changes
 
-- Visible app version advanced to 0.50.75.
-- Cache-busting references updated to 0.50.75.
-- Added **Site Quick Actions** card on the account/site screen.
-- Added direct quick actions for:
-  - Add Site Note
-  - Add Photo
-  - Add Deficiency
-  - Add Task
-  - Photo Vault
-  - Report Center
-  - Copy Closeout Packet
-- Kept Snapshot and Navigate available while making the most-used field actions easier to find.
-- Preserved Customer Report Photo tools, Deficiency Photo Workflow, Photo Vault tools, overlay tools, fixed splash/header behavior, the 5-second splash screen, Startup Health diagnostics, Home spacing polish, iPad autosizing, simple Home screen, and Search Bar Concept #6.
-- Did not bring back job-status workflow buttons.
-
-- Preserved the Home layout fixes from 0.50.46, including the lifted Add Account button and tighter Today/date spacing.
-- Preserved Site Quick Actions from 0.50.44.
-- Preserved fixed splash/header behavior, the 5-second splash screen, and stable startup path.
+- Advanced the visible build and cache-busting references to **0.50.76**.
+- Settings now preserves the current scroll position after:
+  - toggling modules while editing
+  - applying Quick View presets
+  - applying Quick Layout presets
+  - saving settings
+  - theme and other Settings rerenders
+  - entering and returning from Settings detail pages
+  - opening Diagnostics or Data Tools from Settings and returning
+- Stores separate scroll positions for the Settings main menu and each Settings detail section.
+- Uses session-scoped restoration so normal app data and saved customer information are untouched.
+- Preserved all existing functionality, the simple Home screen, optional module cards, active-preset highlighting, iPhone/iPad responsive behavior, and the FIRE-red / VAULT-white branding standard.
 
 ## Validation
 
@@ -31,101 +25,11 @@ Run from the project root:
 node --check src/storage.js
 node --check src/app.js
 python -m json.tool manifest.json > /dev/null
-zip -T firevault-build-0.50.75-modular-root.zip
+zip -T firevault-build-0.50.76-modular-root.zip
 ```
 
 ## Suggested commit message
 
 ```text
-Build 0.50.75 settings navigation recovery
+Build 0.50.76 preserve Settings scroll position
 ```
-
-- Lifted the red Home add button above the bottom nav so it should not be blocked by the black bottom area.
-- Removed the extra Home nav safe-area slab that was covering the red add button.
-
-- Removed the bottom floating Add Site button so it can no longer be blocked by the bottom navigation.
-
-- Added Backup Safety counts for sites, visits, docs, photos, tasks, deficiencies, and backup size.
-- Added Copy Backup Summary.
-- Preserved top-right Add Site placement from 0.50.51.
-
-- Added a short Backup Safety reminder for the recommended update order.
-- Preserved Download Backup and Copy Backup Summary.
-
-- Restore Center previews backup build, export date, sites, visits, docs, photos, tasks, and deficiencies.
-- Restore requires confirmation before overwriting current local data.
-- Preserved stacked-lines Settings icon and top-right Add Site placement.
-
-- Added ready/review status with selected photo, caption, and issue counts.
-- Added Copy Preview and Download Preview actions.
-- Preserved Backup Restore Center from 0.50.54.
-
-- Added Copy Brief for a technician-facing site summary.
-- Preserved Customer Report Preview from 0.50.55.
-
-- Added Copy Timeline for a technician-facing activity summary.
-- Preserved Site Brief from 0.50.56.
-
-- Copy Timeline now respects the selected filter.
-- Preserved the Site Activity Timeline from 0.50.57.
-
-- Added Copy Full for the full filtered timeline.
-- Preserved timeline filters from 0.50.58.
-
-- Added a compact Data Safe card on Home.
-- Kept Home focused on Today/date, Add Site, Search, field dashboard, nearby accounts, recent accounts, and daily summary.
-- Preserved expandable Site Activity Timeline from 0.50.59.
-
-- Added Copy Field Focus in Data Tools.
-- Preserved Home cleanup and Data Tools from 0.50.60.
-
-- Field Focus now opens filtered Action Center views.
-- Corrected Field Focus due-today and overdue task counts.
-- Added Copy Action Center from Data Tools.
-
-- Updated visibility presets so Field Focus is tracked as a normal FireVault module.
-- Updated Diagnostics route registration to include Action Center and Data Tools.
-
-- Site Brief and Site Activity Timeline can now be hidden from account screens.
-- Added Layout Controls status and Copy Layout Controls in Data Tools.
-
-- Data Tools now shows the current layout preset and includes Open Layout Settings.
-- Copy Layout Controls now includes the current layout preset.
-
-- Added Settings → Modules toggle for Pinned Sites.
-- Added Copy Pinned Sites on Home and in Data Tools.
-- Pinned Sites are included in Layout Controls and Quick Layout Presets.
-
-- Pinned Sites Manager supports Open, Map, Copy, Unpin, and Unpin All.
-- Added Open Pinned Sites shortcut in Data Tools.
-
-- Added Copy Important Site Info.
-- Added Important Site Info toggle in Settings → Modules and Layout Controls.
-
-- Daily Report now supports selected past dates for notes, route activity, tasks, deficiencies, copy actions, preview, and TXT download.
-- Preserved Important Site Info from 0.50.68.
-
-- Preserved tappable Today/date picker and selected-date Daily Summary reports.
-
-- Calendar opens even if no past daily summaries exist, and any date can be selected.
-
-- Settings now forcibly restores the app header and bottom navigation whenever it renders.
-
-## Build 0.50.75
-
-- Rebuilt Settings full-height scrolling.
-- Removed the large empty black lower area.
-- Stabilized Settings submenu and bottom-navigation recovery.
-
-## Build 0.50.75
-
-- Corrected account screen horizontal overflow and side clipping.
-- Restored consistent iPhone margins and responsive account header sizing.
-- Added distinct colors for Contact, Access, Panel, GPS, Site Brief statistics, Timeline, and Quick Actions.
-- Improved wrapping for long customer names, addresses, GPS coordinates, notes, and panel information.
-
-## Build 0.50.75
-
-- Selected Quick View and Quick Layout presets now remain visibly highlighted.
-- Active preset styling includes a red glow, red border, brighter background, and ✓ Active badge.
-- Standardized visible FireVault wordmarks so FIRE is red and VAULT is white.

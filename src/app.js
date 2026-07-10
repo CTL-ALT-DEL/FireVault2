@@ -7,6 +7,9 @@ let selectedSiteId = null;
 let mode = null;
 let settingsTab = "tech";
 let settingsRailScroll = 0;
+const SETTINGS_SCROLL_KEY_576 = "firevault_settings_scroll_05076";
+let settingsSubmenuReturn576 = false;
+let settingsScrollState576 = loadSettingsScrollState576();
 let lastEmailTemplateField = "emailSubject";
 let overlayLogoDraftDataUrl = "";
 let docPhotoDraftDataUrl512 = "";
@@ -90,6 +93,52 @@ let reportSectionPrefs = loadReportSectionPrefs();
 const appEl = document.getElementById("app");
 function fireVaultBrand575(extraClass=""){
   return `<span class="fireVaultWordmark575 ${esc(extraClass)}"><span>FIRE</span><b>VAULT</b></span>`;
+}
+
+/* Build 0.50.76 Settings scroll-position recovery */
+function loadSettingsScrollState576(){
+  try{
+    const parsed=JSON.parse(sessionStorage.getItem(SETTINGS_SCROLL_KEY_576)||"{}");
+    return {home:Number(parsed.home)||0,details:{...(parsed.details||{})}};
+  }catch{
+    return {home:0,details:{}};
+  }
+}
+function persistSettingsScrollState576(){
+  try{ sessionStorage.setItem(SETTINGS_SCROLL_KEY_576, JSON.stringify(settingsScrollState576)); }catch{}
+}
+function captureSettingsScroll576(){
+  const home=document.querySelector(".settingsHomeScreen488.settingsStable573");
+  if(home) settingsScrollState576.home=Math.max(0,Number(home.scrollTop)||0);
+  const detail=document.querySelector(".settingsDetailBody488, .settingsDetailBody451");
+  if(detail) settingsScrollState576.details[settingsTab]=Math.max(0,Number(detail.scrollTop)||0);
+  settingsRailScroll=settingsScrollState576.home;
+  persistSettingsScrollState576();
+}
+function restoreSettingsScroll576(inDetail){
+  const selector=inDetail ? ".settingsDetailBody488, .settingsDetailBody451" : ".settingsHomeScreen488.settingsStable573";
+  const target=inDetail ? Number(settingsScrollState576.details[settingsTab])||0 : Number(settingsScrollState576.home)||0;
+  const restore=()=>{
+    const el=document.querySelector(selector);
+    if(!el) return;
+    const max=Math.max(0,el.scrollHeight-el.clientHeight);
+    el.scrollTop=Math.min(Math.max(0,target),max);
+  };
+  requestAnimationFrame(()=>{ restore(); requestAnimationFrame(restore); });
+  setTimeout(restore,80);
+}
+function openSettingsSubmenu576(target){
+  captureSettingsScroll576();
+  settingsSubmenuReturn576=true;
+  route(target);
+}
+function returnFromSettingsSubmenu576(fallback="home"){
+  if(settingsSubmenuReturn576){
+    settingsSubmenuReturn576=false;
+    openSettingsHome572();
+    return;
+  }
+  route(fallback);
 }
 const themePresets = {
   "firevault-dark": {label:"FireVault Dark", accentColor:"#ef4444"},
@@ -284,12 +333,15 @@ function val(id){ return document.getElementById(id)?.value?.trim() || ""; }
 function raw(id){ return document.getElementById(id)?.value || ""; }
 function checked(id){ return !!document.getElementById(id)?.checked; }
 function route(v){
+  if(view === "settings") captureSettingsScroll576();
+  if(settingsSubmenuReturn576 && ["diagnostics","dataTools"].includes(view) && !["diagnostics","dataTools","settings"].includes(v)) settingsSubmenuReturn576=false;
   if(v === "library" && !featureOn("library")){ toast("Library is hidden in Simple View. Turn it on in Settings → Modules."); v="home"; }
   if(v === "diagnostics" && !featureOn("diagnostics")){ toast("Diagnostics is hidden in Simple View. Turn it on in Settings → Modules."); v="settings"; }
   if((v === "report") && !featureOn("reports")){ toast("Reports are hidden in Simple View."); v="siteDetail"; }
   if(["equipmentList","equipmentForm"].includes(v) && !featureOn("equipment")){ toast("Equipment Vault is hidden in Simple View."); v="siteDetail"; }
   if((v === "nearbySites") && !featureOn("advancedGps")){ toast("Advanced GPS is hidden in Simple View."); v="home"; }
   if((v === "routeLog") && !activeRoute && !featureOn("dailyRoute")){ toast("Daily Route is hidden in Simple View."); v="home"; }
+  if(settingsSubmenuReturn576 && v === "settings") settingsSubmenuReturn576=false;
   view = v; render();
 }
 function html(content){ appEl.innerHTML = content; }
@@ -4321,6 +4373,7 @@ function leaveSettingsHome572(){
 }
 
 function settings(){
+  captureSettingsScroll576();
   restoreAppChrome572();
   const tabs=settingsTabs();
   const active=tabs.find(t=>t[0]===settingsTab)||tabs[0];
@@ -4340,8 +4393,9 @@ function settings(){
     const homeBtn572=document.getElementById("settingsHomeBtn572"); if(homeBtn572) homeBtn572.onclick=leaveSettingsHome572;
     document.querySelectorAll(".settingsChoice451[data-tab]").forEach(b=>b.onclick=()=>{ settingsTab=b.dataset.tab; mode="settingsDetail"; view="settings"; render(); });
     const mq=document.getElementById("modulesQuickBtn"); if(mq) mq.onclick=()=>{ settingsTab="visibility"; mode="settingsDetail"; view="settings"; render(); };
-    document.getElementById("diagnosticsChoice").onclick=()=>route("diagnostics");
-    const dataToolsChoice560=document.getElementById("dataToolsChoice560"); if(dataToolsChoice560) dataToolsChoice560.onclick=()=>route("dataTools");
+    document.getElementById("diagnosticsChoice").onclick=()=>openSettingsSubmenu576("diagnostics");
+    const dataToolsChoice560=document.getElementById("dataToolsChoice560"); if(dataToolsChoice560) dataToolsChoice560.onclick=()=>openSettingsSubmenu576("dataTools");
+    restoreSettingsScroll576(false);
     return;
   }
   const saveable=!['backup','about'].includes(settingsTab);
@@ -4362,6 +4416,7 @@ function settings(){
   const done=document.getElementById("settingsDoneBtn"); if(done) done.onclick=openSettingsHome572;
   const saveTop=document.getElementById("saveSettingsTop"); if(saveTop) saveTop.onclick=saveSettings;
   wireSettingsPanel();
+  restoreSettingsScroll576(true);
 }
 function fieldBlock(label, inner, note=""){
   return `<div class="settingField"><label>${label}</label>${inner}${note?`<p class="fieldNote">${note}</p>`:""}</div>`;
@@ -4698,6 +4753,9 @@ function wireSettingsPanel(){
   document.querySelectorAll("[data-view-mode]").forEach(b=>b.onclick=()=>setViewMode(b.dataset.viewMode));
   document.querySelectorAll("[data-feature-preset]").forEach(b=>b.onclick=()=>applyFeaturePreset474(b.dataset.featurePreset));
   document.querySelectorAll("[data-layout-preset]").forEach(b=>b.onclick=()=>applyLayoutPreset565(b.dataset.layoutPreset));
+  if(settingsTab==="visibility"){
+    document.querySelectorAll(".featureCheck472 input[type=checkbox], #viewMode").forEach(el=>el.addEventListener("change",captureSettingsScroll576));
+  }
   const exportBtn=document.getElementById("exportBtn"); if(exportBtn) exportBtn.onclick=()=>{ const stamp=new Date().toISOString().slice(0,10); localStorage.setItem("firevault_last_backup_export", new Date().toLocaleString()); downloadBlob(`firevault-backup-${stamp}-build-${BUILD}.json`, JSON.stringify(data,null,2), "application/json"); toast("Backup exported."); settings(); };
   const copyBackupSummaryBtn=document.getElementById("copyBackupSummaryBtn"); if(copyBackupSummaryBtn) copyBackupSummaryBtn.onclick=async()=>{ try{ await navigator.clipboard.writeText(backupSummaryText()); toast("Backup summary copied."); }catch{ toast("Clipboard unavailable."); } };
   const importFile=document.getElementById("importFile"); if(importFile) importFile.onchange=e=>{ const f=e.target.files[0]; if(!f)return; const r=new FileReader(); r.onload=()=>{try{data=loadData(); Object.assign(data, JSON.parse(r.result)); saveData(data); data=loadData(); applyTheme(); toast("Backup imported."); route("home");}catch{alert("Import failed.");}}; r.readAsText(f); };
@@ -5239,7 +5297,7 @@ function dataTools(){
       <p>Download Backup → install / commit the new build → confirm FireVault opens → check one saved account → keep the backup file until the build is confirmed stable.</p>
     </div>
   </div>`);
-  document.getElementById("backHome560").onclick=()=>route("home");
+  document.getElementById("backHome560").onclick=()=>returnFromSettingsSubmenu576("home");
   wireBackupSafety552();
   const layoutCopy=document.getElementById("copyLayoutControls564"); if(layoutCopy) layoutCopy.onclick=copyLayoutControls564;
   const openLayout=document.getElementById("openLayoutSettings565"); if(openLayout) openLayout.onclick=()=>{settingsTab="visibility"; mode="settingsDetail"; route("settings");};
@@ -5571,7 +5629,7 @@ function diagnostics(){
       <div class="card errorBox"><p>Build: ${BUILD}</p><p>Total Tasks: ${totalTasks}</p><p>Due Today: ${taskCounts.today}</p><p>Site Follow-Ups: ${serviceTasks}</p><p>Total Deficiencies: ${totalDef}</p><p>Closed Deficiencies: ${closedDefTotal}</p><p>Total Contacts: ${totalContacts}</p><p>Total Documents: ${totalDocs}</p><p>Report Deliveries: ${totalReportDeliveries}</p><p>Report Follow-Ups: ${reportFollowUps}</p><p>Checklist Items: ${totalChecklist}</p><p>Checklist Issues: ${checklistIssues}</p><p>Completed Inspections: ${completedInspections}</p><p>Attention Sites: ${healthWarn}</p><p>Watch Sites: ${healthWatch}</p><p>Old Job Record: ${activeJob ? esc(activeJob.siteName) : "None"}</p><p>Current Theme: ${esc(data.settings.theme.name)}</p><p>Accent: ${esc(data.settings.theme.accentColor)}</p><p>Route Days: ${(data.routeLogs||[]).length}</p><p>GPS Tools: ${data.settings.gps?.enabled !== false ? "Enabled" : "Hidden"}</p><p>Nearby Radius: ${nearbyRadiusMiles()} mi</p><p>Haptics: ${data.settings.app?.haptics !== false ? "Enabled" : "Off"}</p><p>Last Stability Check: ${esc(lastCheck)}</p><p>Storage key: ${KEY}</p><p>Modules loaded successfully.</p></div>
     </div>
   </div>`);
-  document.getElementById("backHome").onclick=()=>route("home");
+  document.getElementById("backHome").onclick=()=>returnFromSettingsSubmenu576("home");
   document.getElementById("repairVaultBtn").onclick=repairVaultState;
   document.getElementById("copyDiagBtn").onclick=copyDiagnostics;
   const startupBtn=document.getElementById("copyStartupHealth520");
@@ -5580,17 +5638,17 @@ function diagnostics(){
 }
 function showChangelog(){
   const notes = [
-    "Advanced to Build 0.50.75 from the stable 0.50.74 baseline.",
-    "Added persistent visual highlighting for selected Quick View and Quick Layout presets.",
-    "Active presets now show a red accent border, glow, brighter background, and a ✓ Active badge.",
-    "Applied the new branding standard: FIRE in red and VAULT in white across the header, Home, splash screen, About, diagnostics, and release notes.",
-    "Preserved account screen formatting, Settings UI stability, Daily Summary calendar, Home layout correction, Pinned Sites Manager, Action Center, Data Tools, Field Focus, and excluded job-status workflow controls."
+    "Advanced to Build 0.50.76 from the stable 0.50.75 baseline.",
+    "Settings now restores the exact scroll position after Quick View presets, Quick Layout presets, Save, theme changes, and other Settings rerenders.",
+    "Module toggles and App Mode changes retain the current Settings location while editing.",
+    "Returning from Settings detail pages, Diagnostics, or Data Tools restores the previous Settings menu position.",
+    "Preserved active-preset highlighting, account screen formatting, Daily Summary calendar, Home layout, Pinned Sites Manager, Action Center, Data Tools, Field Focus, and FIRE-red / VAULT-white branding."
   ];
   const overlay=document.createElement("div");
   overlay.className="releaseOverlay";
   overlay.innerHTML=`<div class="releaseSheet" role="dialog" aria-modal="true" aria-label="FireVault release notes">
     <div class="releaseHead"><div><strong>${fireVaultBrand575()}</strong><span>Build ${BUILD}</span></div><button class="ghost iconBtn" id="closeRelease" aria-label="Close release notes">×</button></div>
-    <div class="releaseBody"><h2>Release Notes</h2><p class="releaseIntro">Rebuilt Settings full-height layout and navigation stability.</p><ul>${notes.map(n=>`<li>${esc(n)}</li>`).join("")}</ul></div>
+    <div class="releaseBody"><h2>Release Notes</h2><p class="releaseIntro">Settings now stays exactly where you were working.</p><ul>${notes.map(n=>`<li>${esc(n)}</li>`).join("")}</ul></div>
   </div>`;
   document.body.appendChild(overlay);
   const close=()=>overlay.remove();
