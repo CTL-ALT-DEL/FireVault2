@@ -8,7 +8,7 @@
   "orientation": "any",
   "background_color": "#0b0d10",
   "theme_color": "#101216",
-  "description": "Field knowledge system for fire alarm technicians. Build 0.56.0 adds Home Field Dashboard Quick Capture for site notes, tasks, and deficiencies while preserving Home Layout controls and the scoped Settings redesign.",
+  "description": "Field knowledge system for fire alarm technicians. Build 0.55.1 repairs the Site Detail layout so account cards keep their natural height and scroll correctly, while preserving Home Layout controls and the scoped Settings redesign.",
   "icons": [
     {
       "src": "assets/icon-192.png",

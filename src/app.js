@@ -1585,131 +1585,6 @@ function todayAccountsMarkup500(){
   return rows.map(({s,reason})=>`<button class="todayAccountRow500" data-home-site="${esc(s.id)}"><span>${esc((s.name||"?").slice(0,1).toUpperCase())}</span><div><strong>${esc(s.name||"Unnamed Account")}</strong><small>${esc(fullAddress(s)||"No address saved")}</small></div><em>${esc(reason)}</em></button>`).join("");
 }
 
-
-/* Build 0.56.0 Field Dashboard Quick Capture */
-const QUICK_CAPTURE_TYPES_560 = {
-  note:{label:"Site Note", short:"Note", icon:"✎", accent:"blue", help:"Save a timestamped note to the selected account and today’s Daily Report."},
-  task:{label:"Follow-Up Task", short:"Task", icon:"✓", accent:"amber", help:"Create an open task for the selected account without leaving Home."},
-  deficiency:{label:"Deficiency", short:"Deficiency", icon:"!", accent:"red", help:"Record an open deficiency and optionally create a matching follow-up task."}
-};
-function quickCaptureDefaultSite560(){
-  const ids=[activeJob?.siteId,selectedSiteId,...todayAccounts500().map(r=>r.s.id),...recentAccounts476(8).map(s=>s.id)];
-  return ids.map(id=>(data.sites||[]).find(s=>s.id===id)).find(Boolean) || data.sites?.[0] || null;
-}
-function quickCaptureSiteOptions560(activeId=""){
-  const rows=[...(data.sites||[])].sort((a,b)=>{
-    const ap=a.id===activeId?1:0, bp=b.id===activeId?1:0;
-    if(ap!==bp) return bp-ap;
-    return recentSiteTime476(b)-recentSiteTime476(a) || String(a.name||"").localeCompare(String(b.name||""));
-  });
-  return rows.map(s=>`<option value="${esc(s.id)}" ${s.id===activeId?"selected":""}>${esc(s.name||"Unnamed Account")}${fullAddress(s)?` — ${esc(fullAddress(s))}`:""}</option>`).join("");
-}
-function quickCaptureSiteContext560(siteId){
-  const s=(data.sites||[]).find(x=>x.id===siteId);
-  if(!s) return "Choose an account to continue.";
-  const open=(s.tasks||[]).filter(t=>!taskIsDone(t)).length;
-  const defs=(s.deficiencies||[]).filter(d=>(d.status||"Open")!=="Closed").length;
-  return `${fullAddress(s)||"No address saved"} • ${open} open task${open===1?"":"s"} • ${defs} open deficienc${defs===1?"y":"ies"}`;
-}
-function openQuickCapture560(defaultType="note", initialSiteId=""){
-  if(!(data.sites||[]).length){
-    toast("Add an account before using Quick Capture.");
-    selectedSiteId=null; mode=null; route("siteForm");
-    return;
-  }
-  document.querySelector(".quickCaptureOverlay560")?.remove();
-  const fallback=quickCaptureDefaultSite560();
-  const siteId=(data.sites||[]).some(s=>s.id===initialSiteId)?initialSiteId:(fallback?.id||data.sites[0].id);
-  let captureType=QUICK_CAPTURE_TYPES_560[defaultType]?defaultType:"note";
-  const overlay=document.createElement("div");
-  overlay.className="quickCaptureOverlay560";
-  overlay.innerHTML=`<div class="quickCaptureSheet560 tone-${esc(QUICK_CAPTURE_TYPES_560[captureType].accent)}" role="dialog" aria-modal="true" aria-labelledby="quickCaptureTitle560">
-    <div class="quickCaptureHead560"><div><span>FIELD WORKFLOW</span><h2 id="quickCaptureTitle560">Quick Capture</h2><p>Record field information without navigating away from Today.</p></div><button class="ghost iconBtn" id="closeQuickCapture560" aria-label="Close Quick Capture">×</button></div>
-    <div class="quickCaptureTypeGrid560" role="tablist" aria-label="Capture type">${Object.entries(QUICK_CAPTURE_TYPES_560).map(([key,item])=>`<button type="button" class="quickCaptureType560 ${key===captureType?"active":""}" data-quick-capture-type="${key}" aria-selected="${key===captureType?"true":"false"}"><span>${esc(item.icon)}</span><strong>${esc(item.short)}</strong></button>`).join("")}</div>
-    <div class="quickCaptureBody560">
-      <label class="quickCaptureField560"><span>Account</span><select id="quickCaptureSite560">${quickCaptureSiteOptions560(siteId)}</select><small id="quickCaptureSiteContext560">${esc(quickCaptureSiteContext560(siteId))}</small></label>
-      <div class="quickCaptureHelp560" id="quickCaptureHelp560">${esc(QUICK_CAPTURE_TYPES_560[captureType].help)}</div>
-      <label class="quickCaptureField560" id="quickCaptureTitleWrap560" hidden><span id="quickCaptureTitleLabel560">Title</span><input id="quickCaptureEntryTitle560" autocomplete="off" placeholder="Short field description"></label>
-      <label class="quickCaptureField560"><span id="quickCaptureDetailsLabel560">Site note</span><textarea id="quickCaptureDetails560" rows="5" placeholder="What happened on site?"></textarea></label>
-      <div class="quickCaptureOptions560">
-        <label class="quickCaptureField560" id="quickCaptureDueWrap560" hidden><span>Due date</span><input id="quickCaptureDue560" type="date"></label>
-        <label class="quickCaptureField560" id="quickCapturePriorityWrap560" hidden><span>Priority</span><select id="quickCapturePriority560"><option>Normal</option><option>High</option><option>Critical</option></select></label>
-      </div>
-      <label class="quickCaptureFollow560" id="quickCaptureFollowWrap560" hidden><input id="quickCaptureFollow560" type="checkbox" checked><span><strong>Create matching follow-up task</strong><small>Keeps the deficiency visible in the task workflow.</small></span></label>
-    </div>
-    <div class="quickCaptureActions560"><button class="ghost" type="button" id="cancelQuickCapture560">Cancel</button><button class="primary" type="button" id="saveQuickCapture560">Save Site Note</button></div>
-  </div>`;
-  document.body.appendChild(overlay);
-  const close=()=>overlay.remove();
-  const setType=(type)=>{
-    captureType=QUICK_CAPTURE_TYPES_560[type]?type:"note";
-    const cfg=QUICK_CAPTURE_TYPES_560[captureType];
-    const sheet=overlay.querySelector(".quickCaptureSheet560");
-    sheet.className=`quickCaptureSheet560 tone-${cfg.accent}`;
-    overlay.querySelectorAll("[data-quick-capture-type]").forEach(b=>{
-      const on=b.dataset.quickCaptureType===captureType;
-      b.classList.toggle("active",on); b.setAttribute("aria-selected",on?"true":"false");
-    });
-    document.getElementById("quickCaptureHelp560").textContent=cfg.help;
-    document.getElementById("quickCaptureTitleWrap560").hidden=captureType==="note";
-    document.getElementById("quickCaptureDueWrap560").hidden=captureType!=="task";
-    document.getElementById("quickCapturePriorityWrap560").hidden=captureType!=="deficiency";
-    document.getElementById("quickCaptureFollowWrap560").hidden=captureType!=="deficiency";
-    document.getElementById("quickCaptureDetailsLabel560").textContent=captureType==="note"?"Site note":"Details / notes";
-    const details=document.getElementById("quickCaptureDetails560");
-    details.placeholder=captureType==="note"?"What happened on site?":captureType==="task"?"Parts, access, customer request, or next steps…":"Location, device, circuit, symptoms, and customer impact…";
-    document.getElementById("quickCaptureTitleLabel560").textContent=captureType==="task"?"Task title":"Deficiency title";
-    document.getElementById("quickCaptureEntryTitle560").placeholder=captureType==="task"?"Return with batteries, verify signal, order part…":"NAC open, ground fault, device failed…";
-    document.getElementById("saveQuickCapture560").textContent=`Save ${cfg.label}`;
-    requestAnimationFrame(()=>{ (captureType==="note"?details:document.getElementById("quickCaptureEntryTitle560"))?.focus({preventScroll:true}); });
-  };
-  overlay.querySelectorAll("[data-quick-capture-type]").forEach(b=>b.onclick=()=>setType(b.dataset.quickCaptureType));
-  document.getElementById("quickCaptureSite560").onchange=e=>{ document.getElementById("quickCaptureSiteContext560").textContent=quickCaptureSiteContext560(e.target.value); };
-  document.getElementById("closeQuickCapture560").onclick=close;
-  document.getElementById("cancelQuickCapture560").onclick=close;
-  overlay.addEventListener("click",e=>{ if(e.target===overlay) close(); });
-  document.getElementById("saveQuickCapture560").onclick=()=>{
-    const s=(data.sites||[]).find(x=>x.id===document.getElementById("quickCaptureSite560").value);
-    if(!s){ toast("Choose an account."); return; }
-    ensureSite(s);
-    const title=(document.getElementById("quickCaptureEntryTitle560").value||"").trim();
-    const details=(document.getElementById("quickCaptureDetails560").value||"").trim();
-    const now=new Date().toISOString();
-    if(captureType==="note"){
-      if(!details){ toast("Enter a site note."); document.getElementById("quickCaptureDetails560").focus(); return; }
-      appendSiteNote491(s,details);
-      toast(`Note saved to ${s.name||"account"}.`);
-    }else if(captureType==="task"){
-      if(!title){ toast("Enter a task title."); document.getElementById("quickCaptureEntryTitle560").focus(); return; }
-      s.tasks.unshift({id:uid(),title,status:"Open",due:document.getElementById("quickCaptureDue560").value||"",notes:details,source:"Quick Capture",createdAt:now});
-      s.updatedAt=now; save();
-      toast(`Task added to ${s.name||"account"}.`);
-    }else{
-      if(!title){ toast("Enter a deficiency title."); document.getElementById("quickCaptureEntryTitle560").focus(); return; }
-      const priority=document.getElementById("quickCapturePriority560").value||"Normal";
-      s.deficiencies.unshift({id:uid(),title,priority,status:"Open",notes:details,source:"Quick Capture",createdAt:now});
-      if(document.getElementById("quickCaptureFollow560").checked){
-        s.tasks.unshift({id:uid(),title:`Resolve: ${title}`,status:"Open",due:"",notes:details,source:"Quick Capture Deficiency",createdAt:now});
-      }
-      s.updatedAt=now; save();
-      toast(`Deficiency added to ${s.name||"account"}.`);
-    }
-    selectedSiteId=s.id;
-    close();
-    if(view==="home") home(); else render();
-  };
-  setType(captureType);
-}
-function wireFieldDashboard560(){
-  const note=document.getElementById("quickAccountNote500"); if(note) note.onclick=()=>openQuickCapture560("note");
-  const notes=document.getElementById("dashNotes500"); if(notes) notes.onclick=()=>{ setDailySummaryDay569(localDateString()); route("dailySummary"); };
-  const accounts=document.getElementById("dashAccounts500"); if(accounts) accounts.onclick=()=>{ setDailySummaryDay569(localDateString()); route("dailySummary"); };
-  const routePoints=document.getElementById("dashRoute500"); if(routePoints) routePoints.onclick=()=>route("routeLog");
-  const routeBtn=document.getElementById("openRoute500"); if(routeBtn) routeBtn.onclick=()=>route("routeLog");
-  const copy=document.getElementById("copySummary500"); if(copy) copy.onclick=copyDailySummary499;
-  const all=document.getElementById("allTodayAccounts500"); if(all) all.onclick=()=>route("sites");
-}
-
 function legacyNoteBlocks506(s){
   return String(s?.notes || "").split(/\n\s*\n/).map(n=>n.trim()).filter(Boolean);
 }
@@ -2034,7 +1909,6 @@ function home(){
   const installHow=document.getElementById('homeInstallHow482'); if(installHow) installHow.onclick=()=>alert('To get the clean full-screen FireVault view on iPhone: tap Share, choose Add to Home Screen, then open FireVault from the new Home Screen icon.');
   const installHide=document.getElementById('homeInstallHide482'); if(installHide) installHide.onclick=()=>{homeInstallTipHidden=true; localStorage.setItem('firevault_home_install_tip_hidden','1'); home();};
   const todayDateBtn569=document.getElementById('todayDatePickerBtn569'); if(todayDateBtn569) todayDateBtn569.onclick=openHomeDailyDatePicker569;
-  wireFieldDashboard560();
   requestAnimationFrame(()=>{ const hs=document.querySelector('.homeScreen476'); if(hs){ try{ hs.scrollTop=0; hs.scrollTo(0,0); }catch{} } try{ window.scrollTo(0,0); }catch{} });
   const dailySummaryBtn499=document.getElementById('dailySummaryBtn499'); if(dailySummaryBtn499) dailySummaryBtn499.onclick=()=>{ setDailySummaryDay569(localDateString()); route('dailySummary'); };
   document.getElementById('manageModulesBtn476').onclick=()=>{settingsTab='visibility'; mode='settingsDetail'; route('settings');};
@@ -6013,18 +5887,18 @@ function diagnostics(){
 }
 function showChangelog(){
   const notes = [
-    "Build 0.56.0 activates the complete Field Dashboard workflow on Home.",
-    "Added Quick Capture for timestamped site notes, follow-up tasks, and deficiencies without leaving Today.",
-    "Quick Capture defaults to the active or most recently used account and can create a matching task from a deficiency.",
-    "Field Dashboard counters now open the correct Daily Report and Daily Route workspaces.",
-    "Daily Route, Copy Summary, and Today’s Accounts controls are now fully connected.",
-    "Preserved the 0.55.0 Home Layout controls, scoped Settings design, Email composer, responsive layouts, and all existing data."
+    "Build 0.55.0 adds a dedicated Home Layout workspace with presets, per-card visibility, and open/closed behavior controls.",
+    "Build 0.54.0 restored the preferred Email composer and introduced a fully scoped Settings redesign.",
+    "Added collapsible Home cards for Pinned Sites, Field Focus, Nearby Accounts, and Recent Accounts.",
+    "Each Home card remembers its open or closed state between app sessions while remaining open by default for existing users.",
+    "Improved iPad portrait and landscape reflow so Home modules use available width without stretching phone layouts or hiding controls.",
+    "Preserved Settings scroll recovery, active presets, all existing workflows, and FIRE-red / VAULT-white branding."
   ];
   const overlay=document.createElement("div");
   overlay.className="releaseOverlay";
   overlay.innerHTML=`<div class="releaseSheet" role="dialog" aria-modal="true" aria-label="FireVault release notes">
     <div class="releaseHead"><div><strong>${fireVaultBrand575()}</strong><span>Build ${BUILD}</span></div><button class="ghost iconBtn" id="closeRelease" aria-label="Close release notes">×</button></div>
-    <div class="releaseBody"><h2>Release Notes</h2><p class="releaseIntro">Faster field capture directly from Today.</p><ul>${notes.map(n=>`<li>${esc(n)}</li>`).join("")}</ul></div>
+    <div class="releaseBody"><h2>Release Notes</h2><p class="releaseIntro">A cleaner Home that adapts to phones and iPads.</p><ul>${notes.map(n=>`<li>${esc(n)}</li>`).join("")}</ul></div>
   </div>`;
   document.body.appendChild(overlay);
   const close=()=>overlay.remove();

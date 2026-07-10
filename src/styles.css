@@ -48,7 +48,7 @@ nav{min-height:var(--navH);position:fixed;bottom:0;left:0;right:0;display:grid;g
 
 
 /* Build 0.40.5 Settings small-space redesign + logo cache-bust */
-.settingsScreen{gap:6px;min-height:0}.settingsMicrobar{display:flex;align-items:center;justify-content:space-between;gap:8px;min-height:34px;padding:5px 7px;border:1px solid rgba(255,255,255,.07);border-radius:12px;background:rgba(255,255,255,.035)}.settingsCrumb{display:flex;align-items:center;gap:7px;min-width:0;font-size:12px;color:var(--muted);font-weight:850;text-transform:uppercase;letter-spacing:.055em}.settingsCrumb b{color:var(--text);font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-transform:none;letter-spacing:0}.settingsMicroLogo{width:24px;height:24px;border-radius:7px;flex:0 0 auto}.iconBtn{width:32px;height:32px;min-height:32px;padding:0;border-radius:10px;font-size:14px;display:grid;place-items:center}.settingsLayout{grid-template-columns:124px minmax(0,1fr);gap:7px}.settingsRail{gap:5px;padding:0 1px 8px}.settingsRail .tabBtn,.settingsRail .tabBtn.tabBtn{min-height:38px;padding:5px 7px;border-radius:11px;align-items:flex-start;text-align:left}.settingsRail .tabBtn strong{font-size:12px;line-height:1.05}.settingsRail .tabBtn span{font-size:9.5px;line-height:1.05;margin-top:1px;letter-spacing:0}.settingsContent{padding-bottom:12px}.settingsStack{gap:7px}.compactPane{padding:8px 9px;border-left-width:3px}.paneHead{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:2px}.paneHead h2{font-size:15px;line-height:1.1;margin:0}.paneNote{font-size:11px;line-height:1.25;margin:0 0 7px;color:var(--muted)}.saveMini{min-height:32px;padding:6px 10px;border-radius:10px;font-size:12px;flex:0 0 auto}.settingsGrid{grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}.settingField{gap:3px}.settingField label,label{font-size:9.5px;line-height:1.1;letter-spacing:.065em;text-align:left}.settingField input,.settingField textarea,.settingField select,input,textarea,select{min-height:38px;padding:8px 9px;border-radius:10px;font-size:13px;text-align:left}.settingField textarea,textarea{min-height:64px}.fieldNote{font-size:10.5px;line-height:1.2;margin:1px 0 0}.settingsList{gap:6px;margin-top:7px}.settingsList.twoCol{grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}.checkRow{min-height:36px;padding:7px 8px;border-radius:10px;font-size:12px;line-height:1.15;text-align:left;justify-content:flex-start}.checkRow input{width:17px;height:17px;min-height:17px}.presetGrid{grid-template-columns:repeat(2,minmax(0,1fr));gap:6px;margin-bottom:7px}.presetBtn{min-height:38px;padding:6px 8px;border-radius:10px;font-size:12px}.themeSwatch{width:22px;height:22px;border-radius:7px}.previewPanel.compactPreview{min-height:92px;margin:6px 0}.previewOverlay{font-size:11px;padding:7px 8px}.aboutGrid{gap:6px}.aboutGrid div{padding:8px;border-radius:10px}.aboutGrid strong{font-size:9.5px}.aboutGrid span{font-size:12px}.brandMark{content:url('../assets/icon-192.png?v=0.56.0')}
+.settingsScreen{gap:6px;min-height:0}.settingsMicrobar{display:flex;align-items:center;justify-content:space-between;gap:8px;min-height:34px;padding:5px 7px;border:1px solid rgba(255,255,255,.07);border-radius:12px;background:rgba(255,255,255,.035)}.settingsCrumb{display:flex;align-items:center;gap:7px;min-width:0;font-size:12px;color:var(--muted);font-weight:850;text-transform:uppercase;letter-spacing:.055em}.settingsCrumb b{color:var(--text);font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-transform:none;letter-spacing:0}.settingsMicroLogo{width:24px;height:24px;border-radius:7px;flex:0 0 auto}.iconBtn{width:32px;height:32px;min-height:32px;padding:0;border-radius:10px;font-size:14px;display:grid;place-items:center}.settingsLayout{grid-template-columns:124px minmax(0,1fr);gap:7px}.settingsRail{gap:5px;padding:0 1px 8px}.settingsRail .tabBtn,.settingsRail .tabBtn.tabBtn{min-height:38px;padding:5px 7px;border-radius:11px;align-items:flex-start;text-align:left}.settingsRail .tabBtn strong{font-size:12px;line-height:1.05}.settingsRail .tabBtn span{font-size:9.5px;line-height:1.05;margin-top:1px;letter-spacing:0}.settingsContent{padding-bottom:12px}.settingsStack{gap:7px}.compactPane{padding:8px 9px;border-left-width:3px}.paneHead{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:2px}.paneHead h2{font-size:15px;line-height:1.1;margin:0}.paneNote{font-size:11px;line-height:1.25;margin:0 0 7px;color:var(--muted)}.saveMini{min-height:32px;padding:6px 10px;border-radius:10px;font-size:12px;flex:0 0 auto}.settingsGrid{grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}.settingField{gap:3px}.settingField label,label{font-size:9.5px;line-height:1.1;letter-spacing:.065em;text-align:left}.settingField input,.settingField textarea,.settingField select,input,textarea,select{min-height:38px;padding:8px 9px;border-radius:10px;font-size:13px;text-align:left}.settingField textarea,textarea{min-height:64px}.fieldNote{font-size:10.5px;line-height:1.2;margin:1px 0 0}.settingsList{gap:6px;margin-top:7px}.settingsList.twoCol{grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}.checkRow{min-height:36px;padding:7px 8px;border-radius:10px;font-size:12px;line-height:1.15;text-align:left;justify-content:flex-start}.checkRow input{width:17px;height:17px;min-height:17px}.presetGrid{grid-template-columns:repeat(2,minmax(0,1fr));gap:6px;margin-bottom:7px}.presetBtn{min-height:38px;padding:6px 8px;border-radius:10px;font-size:12px}.themeSwatch{width:22px;height:22px;border-radius:7px}.previewPanel.compactPreview{min-height:92px;margin:6px 0}.previewOverlay{font-size:11px;padding:7px 8px}.aboutGrid{gap:6px}.aboutGrid div{padding:8px;border-radius:10px}.aboutGrid strong{font-size:9.5px}.aboutGrid span{font-size:12px}.brandMark{content:url('../assets/icon-192.png?v=0.55.1')}
 @media(max-width:720px){main{padding:7px 7px 14px}.settingsLayout{grid-template-columns:1fr;gap:6px}.settingsRail{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));grid-auto-flow:row;grid-auto-columns:auto;overflow:visible;gap:5px;padding:0}.settingsRail .tabBtn,.settingsRail .tabBtn.tabBtn{min-height:36px;padding:5px 4px;align-items:center;text-align:center}.settingsRail .tabBtn strong{font-size:11px}.settingsRail .tabBtn span{font-size:8.5px}.settingsGrid,.settingsList.twoCol,.presetGrid{grid-template-columns:1fr}.compactPane{padding:8px}.paneHead h2{font-size:14px}.settingsCrumb span{display:none}.settingsMicrobar{min-height:32px}.settingsContent{overflow:auto;padding-bottom:16px}.settingField input,.settingField textarea,.settingField select,input,textarea,select{font-size:13px;min-height:37px}.checkRow{font-size:11.5px}.presetGrid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:390px){.settingsRail{grid-template-columns:repeat(4,minmax(0,1fr));gap:4px}.settingsRail .tabBtn strong{font-size:10.5px}.settingsRail .tabBtn span{display:none}.presetGrid{grid-template-columns:1fr}.paneNote{display:none}.settingsGrid{gap:6px}.compactPane{padding:7px}}
 
@@ -11948,14 +11948,14 @@ body.app-booted533.settingsChrome572 > #appNav{
 }
 
 
-/* Build 0.55.0 Settings scroll-position recovery */
+/* Build 0.55.1 Settings scroll-position recovery */
 .settingsDetailBody488,
 .settingsHomeScreen488.settingsStable573{
   overflow-anchor:none;
   scroll-behavior:auto!important;
 }
 
-/* Build 0.55.0 responsive Home milestone */
+/* Build 0.55.1 responsive Home milestone */
 .homeUtilityGrid5100{
   display:grid;
   grid-template-columns:minmax(0,1fr);
@@ -12101,7 +12101,7 @@ body.app-booted533.settingsChrome572 > #appNav{
   width:100%!important;
 }
 
-/* Build 0.55.0 light-card collapse control contrast */
+/* Build 0.55.1 light-card collapse control contrast */
 .nearbyAccountsHero478 .homeCollapseBtn5100{
   color:#475569!important;
   background:rgba(15,23,42,.06)!important;
@@ -12355,7 +12355,7 @@ body.app-booted533.settingsChrome572 > #appNav{
   .settingsDetailScreen488.settingsStable573.settingsTab-email .emailTagGrid530{grid-template-columns:1fr}
 }
 
-/* Build 0.55.0 — Home Layout workspace, scoped to Settings */
+/* Build 0.55.1 — Home Layout workspace, scoped to Settings */
 .settingsHomeScreen488.settingsStable573 .settingsChoice-homeLayout{--choice540:#2dd4bf;--choiceTint540:rgba(45,212,191,.13)}
 .settingsDetailScreen488.settingsStable573.settingsTab-homeLayout{--settingsAccent540:#2dd4bf;--settingsTint540:rgba(45,212,191,.14)}
 .settingsDetailScreen488.settingsStable573.settingsTab-homeLayout .homeLayoutSettings550{gap:12px!important}
@@ -12434,38 +12434,85 @@ body.app-booted533.settingsChrome572 > #appNav{
   .settingsDetailScreen488.settingsStable573.settingsTab-homeLayout .homeLayoutActionGrid550{grid-template-columns:1fr}
 }
 
-/* Build 0.56.0 — scoped Home Field Dashboard Quick Capture */
-.quickCaptureOverlay560{
-  position:fixed;inset:0;z-index:10000;display:grid;place-items:center;padding:18px;
-  background:rgba(2,6,12,.78);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+/* Build 0.55.1 — Site Detail flex-shrink repair
+   Keep every account section at its natural content height so the screen scrolls
+   instead of crushing card bodies into header-height strips. */
+.siteDetailScreen574{
+  display:flex!important;
+  flex-direction:column!important;
+  height:100%!important;
+  min-height:0!important;
+  overflow-y:auto!important;
+  overflow-x:hidden!important;
+  align-content:flex-start!important;
 }
-.quickCaptureSheet560{
-  --quick560:#38bdf8;width:min(680px,100%);max-height:min(820px,calc(100dvh - 36px));overflow:auto;
-  border:1px solid color-mix(in srgb,var(--quick560) 42%,rgba(255,255,255,.13));border-top:3px solid var(--quick560);border-radius:22px;
-  background:linear-gradient(145deg,color-mix(in srgb,var(--quick560) 10%,#111827 90%),#0d121b 42%,#090d14);
-  box-shadow:0 30px 90px rgba(0,0,0,.62),inset 0 1px 0 rgba(255,255,255,.05);color:#f8fafc;
+.siteDetailScreen574 > *{
+  flex:0 0 auto!important;
+  height:auto!important;
+  max-height:none!important;
 }
-.quickCaptureSheet560.tone-blue{--quick560:#38bdf8}.quickCaptureSheet560.tone-amber{--quick560:#f59e0b}.quickCaptureSheet560.tone-red{--quick560:#ef4444}
-.quickCaptureHead560{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;padding:19px 20px 15px;border-bottom:1px solid rgba(255,255,255,.09)}
-.quickCaptureHead560>div{min-width:0}.quickCaptureHead560 span{display:block;margin-bottom:4px;color:var(--quick560);font-size:10px;font-weight:950;letter-spacing:.15em}
-.quickCaptureHead560 h2{margin:0;color:#fff;font-size:23px;line-height:1.1;letter-spacing:-.025em}.quickCaptureHead560 p{margin:5px 0 0;color:#aeb9c9;font-size:12px;line-height:1.4}
-.quickCaptureHead560 .iconBtn{width:40px;height:40px;min-height:40px;padding:0;border-radius:12px;font-size:24px;flex:0 0 auto}
-.quickCaptureTypeGrid560{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;padding:14px 20px 2px}
-.quickCaptureType560{display:flex;align-items:center;justify-content:center;gap:8px;min-height:48px;padding:9px 10px;border:1px solid rgba(154,171,198,.19);border-radius:13px;background:rgba(255,255,255,.035);color:#bdc7d6;font-weight:900}
-.quickCaptureType560 span{display:grid;place-items:center;width:25px;height:25px;border-radius:8px;background:rgba(255,255,255,.06);font-size:15px}.quickCaptureType560 strong{font-size:12px}
-.quickCaptureType560.active{border-color:color-mix(in srgb,var(--quick560) 70%,white 5%);background:color-mix(in srgb,var(--quick560) 17%,transparent);color:#fff;box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--quick560) 18%,transparent)}
-.quickCaptureType560.active span{background:var(--quick560);color:#071018}
-.quickCaptureBody560{display:grid;gap:13px;padding:16px 20px 18px}.quickCaptureField560{display:grid;gap:6px;min-width:0}
-.quickCaptureField560>span{color:#edf2f8;font-size:12px;font-weight:900;line-height:1.2}.quickCaptureField560 small{color:#98a6ba;font-size:10.8px;line-height:1.4}
-.quickCaptureField560 input,.quickCaptureField560 select,.quickCaptureField560 textarea{width:100%;min-height:47px;padding:11px 12px;border:1px solid rgba(157,177,207,.27);border-radius:12px;background:rgba(5,10,17,.82);color:#fff;font:inherit;font-size:14px;text-align:left;box-sizing:border-box}
-.quickCaptureField560 textarea{min-height:118px;resize:vertical;line-height:1.45}.quickCaptureField560 input:focus,.quickCaptureField560 select:focus,.quickCaptureField560 textarea:focus{outline:2px solid color-mix(in srgb,var(--quick560) 72%,white 5%);outline-offset:1px;border-color:transparent}
-.quickCaptureHelp560{padding:10px 12px;border-left:3px solid var(--quick560);border-radius:4px 11px 11px 4px;background:color-mix(in srgb,var(--quick560) 9%,rgba(255,255,255,.025));color:#b8c3d2;font-size:11.5px;line-height:1.45}
-.quickCaptureOptions560{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.quickCaptureFollow560{display:flex;align-items:flex-start;gap:10px;padding:11px 12px;border:1px solid color-mix(in srgb,var(--quick560) 29%,rgba(255,255,255,.08));border-radius:12px;background:color-mix(in srgb,var(--quick560) 8%,rgba(255,255,255,.025))}
-.quickCaptureFollow560 input{width:20px;height:20px;min-height:20px;margin:1px 0 0;accent-color:var(--quick560);flex:0 0 auto}.quickCaptureFollow560 strong{display:block;color:#f5f7fb;font-size:12.5px}.quickCaptureFollow560 small{display:block;margin-top:3px;color:#9eabbc;font-size:10.6px;line-height:1.35}
-.quickCaptureActions560{display:grid;grid-template-columns:minmax(110px,.45fr) minmax(170px,1fr);gap:10px;padding:14px 20px calc(16px + env(safe-area-inset-bottom));border-top:1px solid rgba(255,255,255,.09);background:rgba(2,6,12,.28)}
-.quickCaptureActions560 button{min-height:48px;font-weight:950}.quickCaptureActions560 .primary{background:linear-gradient(180deg,color-mix(in srgb,var(--quick560) 90%,white 5%),color-mix(in srgb,var(--quick560) 72%,black 13%));border-color:color-mix(in srgb,var(--quick560) 72%,white 5%);color:#fff}
-@media(max-width:620px){
-  .quickCaptureOverlay560{place-items:end center;padding:0}.quickCaptureSheet560{width:100%;max-height:92dvh;border-radius:22px 22px 0 0;border-left-color:rgba(255,255,255,.1);border-right-color:rgba(255,255,255,.1);border-bottom:0}
-  .quickCaptureHead560{padding:16px 16px 13px}.quickCaptureTypeGrid560{padding:12px 16px 1px}.quickCaptureBody560{padding:14px 16px 16px}.quickCaptureActions560{padding:12px 16px calc(13px + env(safe-area-inset-bottom))}
-  .quickCaptureType560{min-height:45px;padding:8px 6px;gap:6px}.quickCaptureType560 strong{font-size:11px}.quickCaptureOptions560{grid-template-columns:1fr}
+.siteDetailScreen574 > .card,
+.siteDetailScreen574 .card{
+  height:auto!important;
+  min-height:0!important;
+  max-height:none!important;
+}
+.siteDetailScreen574 .siteHero566,
+.siteDetailScreen574 .importantInfo568,
+.siteDetailScreen574 .siteBrief556,
+.siteDetailScreen574 .siteTimeline557,
+.siteDetailScreen574 .siteQuickActions544,
+.siteDetailScreen574 .fieldCard489,
+.siteDetailScreen574 .accountPhotoCard523,
+.siteDetailScreen574 .siteSimpleCard477,
+.siteDetailScreen574 .siteNow489,
+.siteDetailScreen574 .siteModulesCard489,
+.siteDetailScreen574 .siteGpsCard477,
+.siteDetailScreen574 .siteNotes477{
+  flex:none!important;
+  height:auto!important;
+  max-height:none!important;
+  overflow:visible!important;
+}
+.siteDetailScreen574 .siteCardHead477,
+.siteDetailScreen574 .siteBriefHead556,
+.siteDetailScreen574 .siteTimelineHead557,
+.siteDetailScreen574 .importantInfoHead568{
+  min-height:0!important;
+  height:auto!important;
+  overflow:visible!important;
+}
+.siteDetailScreen574 h1,
+.siteDetailScreen574 h2,
+.siteDetailScreen574 h3,
+.siteDetailScreen574 p,
+.siteDetailScreen574 strong,
+.siteDetailScreen574 span{
+  max-height:none!important;
+}
+.siteDetailScreen574 .siteCardHead477 h2,
+.siteDetailScreen574 .siteBriefHead556 h2,
+.siteDetailScreen574 .siteTimelineHead557 h2,
+.siteDetailScreen574 .importantInfoHead568 h2{
+  font-size:17px!important;
+  line-height:1.15!important;
+  margin:0 0 4px!important;
+  white-space:normal!important;
+  overflow:visible!important;
+}
+.siteDetailScreen574 .siteCardHead477 p,
+.siteDetailScreen574 .siteBriefHead556 p,
+.siteDetailScreen574 .siteTimelineHead557 p,
+.siteDetailScreen574 .importantInfoHead568 p{
+  font-size:12px!important;
+  line-height:1.35!important;
+  white-space:normal!important;
+  overflow:visible!important;
+}
+@media(max-width:430px){
+  .siteDetailScreen574{padding-bottom:calc(var(--navH) + 34px + env(safe-area-inset-bottom))!important}
+  .siteDetailScreen574 .siteCardHead477 h2,
+  .siteDetailScreen574 .siteBriefHead556 h2,
+  .siteDetailScreen574 .siteTimelineHead557 h2,
+  .siteDetailScreen574 .importantInfoHead568 h2{font-size:16px!important}
 }
