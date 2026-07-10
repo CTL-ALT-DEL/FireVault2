@@ -8,7 +8,7 @@
   "orientation": "any",
   "background_color": "#0b0d10",
   "theme_color": "#101216",
-  "description": "Field knowledge system for fire alarm technicians. Build 0.50.69 tightens Home top placement and adds a tappable Today/date picker for past Daily Summary reports with selected-date copy, preview, and TXT download.",
+  "description": "Field knowledge system for fire alarm technicians. Build 0.50.71 replaces the hidden Home date picker with a reliable FireVault calendar picker and marks dates with saved daily-summary activity in bold.",
   "icons": [
     {
       "src": "assets/icon-192.png",

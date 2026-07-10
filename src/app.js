@@ -19,6 +19,7 @@ let activeJob = loadActiveJob();
 let nearbyState = null;
 let siteSearch = "";
 let dailySummaryDate569 = localStorage.getItem("firevault_daily_summary_date") || "";
+let dailyPickerMonth571 = localDateString().slice(0,7);
 let libraryFolder = "all";
 let docVaultFilter516 = "all";
 let docVaultSearch521 = "";
@@ -1022,11 +1023,102 @@ function shiftDailySummaryDay569(delta){
   setDailySummaryDay569(localDateString(d));
   dailySummary();
 }
+function dailySummaryActivityDates571(){
+  const days=new Set();
+  (data.sites||[]).forEach(s=>{
+    ensureSite(s);
+    (s.notes||[]).forEach(n=>{ if(n?.at) days.add(localDateString(new Date(n.at))); });
+    (s.tasks||[]).forEach(t=>{ if(t?.createdAt) days.add(localDateString(new Date(t.createdAt))); });
+    (s.deficiencies||[]).forEach(d=>{ if(d?.createdAt) days.add(localDateString(new Date(d.createdAt))); });
+  });
+  (data.routeLogs||[]).forEach(r=>{
+    if(r?.date) days.add(r.date);
+    else if(r?.startedAt) days.add(localDateString(new Date(r.startedAt)));
+  });
+  if(activeRoute?.startedAt) days.add(localDateString(new Date(activeRoute.startedAt)));
+  return days;
+}
+function dailySummaryHasActivity571(day){
+  return dailySummaryActivityDates571().has(day);
+}
+function dailyPickerMonthLabel571(month=dailyPickerMonth571){
+  const [y,m]=String(month||localDateString().slice(0,7)).split("-").map(Number);
+  try{return new Date(y,m-1,1).toLocaleDateString([], {month:"long",year:"numeric"});}catch{return month;}
+}
+function shiftDailyPickerMonth571(delta){
+  const [y,m]=String(dailyPickerMonth571||localDateString().slice(0,7)).split("-").map(Number);
+  const d=new Date(y,m-1,1);
+  d.setMonth(d.getMonth()+delta);
+  dailyPickerMonth571=localDateString(d).slice(0,7);
+  renderDailyPickerCalendar571();
+}
+function dailyPickerCalendarMarkup571(){
+  const selected=selectedDailySummaryDay569();
+  const activity=dailySummaryActivityDates571();
+  const [year,month]=String(dailyPickerMonth571||selected.slice(0,7)).split("-").map(Number);
+  const first=new Date(year,month-1,1);
+  const startDow=first.getDay();
+  const daysInMonth=new Date(year,month,0).getDate();
+  const cells=[];
+  for(let i=0;i<startDow;i++) cells.push(`<span class="dailyPickBlank571"></span>`);
+  for(let day=1;day<=daysInMonth;day++){
+    const date=`${year}-${String(month).padStart(2,"0")}-${String(day).padStart(2,"0")}`;
+    const has=activity.has(date);
+    const isSelected=date===selected;
+    const isToday=date===localDateString();
+    cells.push(`<button class="dailyPickDay571 ${has?"hasSummary":""} ${isSelected?"selected":""} ${isToday?"today":""}" data-daily-pick="${esc(date)}"><strong>${day}</strong>${has?`<span>•</span>`:""}</button>`);
+  }
+  return `<div class="dailyPickCalendar571">
+    <div class="dailyPickWeek571"><span>Sun</span><span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span></div>
+    <div class="dailyPickGrid571">${cells.join("")}</div>
+  </div>`;
+}
+function renderDailyPickerCalendar571(){
+  const title=document.getElementById("dailyPickMonthTitle571");
+  const body=document.getElementById("dailyPickBody571");
+  if(title) title.textContent=dailyPickerMonthLabel571();
+  if(body) body.innerHTML=dailyPickerCalendarMarkup571();
+  wireDailyPickerDays571();
+}
+function closeDailyPicker571(){
+  document.querySelector(".dailyPickOverlay571")?.remove();
+}
+function wireDailyPickerDays571(){
+  document.querySelectorAll("[data-daily-pick]").forEach(b=>b.onclick=()=>{
+    setDailySummaryDay569(b.dataset.dailyPick || localDateString());
+    closeDailyPicker571();
+    route("dailySummary");
+  });
+}
 function openHomeDailyDatePicker569(){
-  const input=document.getElementById("homeDailyDatePicker569");
-  if(!input) return;
-  input.value=selectedDailySummaryDay569();
-  try{ input.showPicker ? input.showPicker() : input.click(); }catch{ input.click(); }
+  dailyPickerMonth571=selectedDailySummaryDay569().slice(0,7);
+  document.querySelector(".dailyPickOverlay571")?.remove();
+  const overlay=document.createElement("div");
+  overlay.className="dailyPickOverlay571";
+  overlay.innerHTML=`<div class="dailyPickSheet571" role="dialog" aria-modal="true" aria-label="Daily Summary date picker">
+    <div class="dailyPickHead571">
+      <div><strong>Daily Summary Date</strong><span>Bold dates have saved daily activity.</span></div>
+      <button class="ghost iconBtn" id="closeDailyPick571" aria-label="Close date picker">×</button>
+    </div>
+    <div class="dailyPickMonthRow571">
+      <button class="ghost smallBtn" id="prevDailyPickMonth571">‹</button>
+      <h2 id="dailyPickMonthTitle571">${esc(dailyPickerMonthLabel571())}</h2>
+      <button class="ghost smallBtn" id="nextDailyPickMonth571">›</button>
+    </div>
+    <div id="dailyPickBody571">${dailyPickerCalendarMarkup571()}</div>
+    <div class="dailyPickActions571">
+      <button class="ghost" id="dailyPickToday571">Today</button>
+      <button class="ghost" id="dailyPickSelected571">Selected Date</button>
+    </div>
+  </div>`;
+  document.body.appendChild(overlay);
+  document.getElementById("closeDailyPick571").onclick=closeDailyPicker571;
+  document.getElementById("prevDailyPickMonth571").onclick=()=>shiftDailyPickerMonth571(-1);
+  document.getElementById("nextDailyPickMonth571").onclick=()=>shiftDailyPickerMonth571(1);
+  document.getElementById("dailyPickToday571").onclick=()=>{ setDailySummaryDay569(localDateString()); closeDailyPicker571(); route("dailySummary"); };
+  document.getElementById("dailyPickSelected571").onclick=()=>{ closeDailyPicker571(); route("dailySummary"); };
+  overlay.addEventListener("click",e=>{ if(e.target===overlay) closeDailyPicker571(); });
+  wireDailyPickerDays571();
 }
 
 function taskIsDone(t){ return (t?.status || "Open") === "Done"; }
@@ -1150,6 +1242,7 @@ function render(){
     const routes = {home, dailySummary, routeLog, actionCenter, pinnedSites:pinnedSitesManager567, sites, nearbySites, attention:attentionQueue, siteDetail, visits, visitDetail, checklist, siteForm, contactsList, contactForm, siteDocs, siteDocForm, equipmentList, equipmentForm, tasks, taskForm, deficiencies, deficiencyForm, report, library, resourceForm, jobMode, settings, diagnostics, dataTools};
     (routes[view] || home)();
     document.body.classList.toggle("homeFullscreen480", view === "home");
+    document.body.classList.toggle("homeLayoutFixed570", view === "home");
     stopJobTimer();
     applyFeatureVisibility();
     setActiveNav();
@@ -1403,7 +1496,7 @@ function wireNoteTemplates503(targetId="siteNoteText"){
 }
 
 
-/* Build 0.50.69 Pinned Sites helpers */
+/* Build 0.50.71 Pinned Sites helpers */
 function isPinnedSite566(s){ return !!s?.pinnedAt; }
 function pinnedSites566(limit=5){
   return [...(data.sites||[])].filter(isPinnedSite566).sort((a,b)=>{
@@ -1461,7 +1554,7 @@ function toggleSitePinned566(){
   siteDetail();
 }
 
-/* Build 0.50.69 Pinned Sites Manager */
+/* Build 0.50.71 Pinned Sites Manager */
 function unpinSiteById567(id){
   const s=(data.sites||[]).find(x=>x.id===id);
   if(!s) return;
@@ -1547,7 +1640,6 @@ function home(){
 
     <div class="todayBlock478 todayBlock551 todayBlock569">
       <button class="todayRouteWrap478 todayDateButton569" id="todayDatePickerBtn569" aria-label="Open Daily Summary date picker">${activeRoute?`<span class="${activeRoute.paused?"routeLed470 routeLedPaused470":"routeLed463"}" aria-label="${activeRoute.paused?"Daily route paused":"Daily route recording"}"></span>`:""}<div><h1>Today</h1><p>${esc(dateLine)}</p><em>Tap for past daily reports</em></div></button>
-      <input id="homeDailyDatePicker569" class="dailyDatePickerHidden569" type="date" value="${esc(selectedDailySummaryDay569())}" aria-label="Daily Summary date">
       <button class="todayAddSite551" id="addSiteBtn" aria-label="Add Site">＋</button>
     </div>
 
@@ -1613,8 +1705,7 @@ function home(){
   const installHow=document.getElementById('homeInstallHow482'); if(installHow) installHow.onclick=()=>alert('To get the clean full-screen FireVault view on iPhone: tap Share, choose Add to Home Screen, then open FireVault from the new Home Screen icon.');
   const installHide=document.getElementById('homeInstallHide482'); if(installHide) installHide.onclick=()=>{homeInstallTipHidden=true; localStorage.setItem('firevault_home_install_tip_hidden','1'); home();};
   const todayDateBtn569=document.getElementById('todayDatePickerBtn569'); if(todayDateBtn569) todayDateBtn569.onclick=openHomeDailyDatePicker569;
-  const homeDateInput569=document.getElementById('homeDailyDatePicker569'); if(homeDateInput569) homeDateInput569.onchange=()=>{ setDailySummaryDay569(homeDateInput569.value || localDateString()); route('dailySummary'); };
-  requestAnimationFrame(()=>{ try{ document.querySelector('.homeScreen476')?.scrollTo({top:0,left:0,behavior:'instant'}); }catch{ try{ document.querySelector('.homeScreen476').scrollTop=0; }catch{} } });
+  requestAnimationFrame(()=>{ const hs=document.querySelector('.homeScreen476'); if(hs){ try{ hs.scrollTop=0; hs.scrollTo(0,0); }catch{} } try{ window.scrollTo(0,0); }catch{} });
   const dailySummaryBtn499=document.getElementById('dailySummaryBtn499'); if(dailySummaryBtn499) dailySummaryBtn499.onclick=()=>{ setDailySummaryDay569(localDateString()); route('dailySummary'); };
   document.getElementById('manageModulesBtn476').onclick=()=>{settingsTab='visibility'; mode='settingsDetail'; route('settings');};
   const allAccounts=document.getElementById('allAccountsBtn478'); if(allAccounts) allAccounts.onclick=()=>route('sites');
@@ -2065,7 +2156,7 @@ function siteToolCount477(){
 }
 
 
-/* Build 0.50.69 Site Screen Cleanup helpers */
+/* Build 0.50.71 Site Screen Cleanup helpers */
 function siteOpenTasks556(s={}){
   return (s.tasks||[]).filter(t=>String(t.status||"Open").toLowerCase()!=="done" && String(t.status||"Open").toLowerCase()!=="complete");
 }
@@ -2158,7 +2249,7 @@ function wireSiteBrief556(){
 
 
 
-/* Build 0.50.69 Site Activity Timeline filters */
+/* Build 0.50.71 Site Activity Timeline filters */
 let siteTimelineFilter558 = "all";
 let siteTimelineExpanded559 = false;
 function siteTimelineFilterCounts558(s={}){
@@ -2202,7 +2293,7 @@ function wireSiteTimelineFilters558(){
   });
 }
 
-/* Build 0.50.69 Site Activity Timeline helpers */
+/* Build 0.50.71 Site Activity Timeline helpers */
 function activityDateMs557(value){
   const t=new Date(value || 0).getTime();
   return Number.isFinite(t) ? t : 0;
@@ -2372,7 +2463,7 @@ function wireSiteActivity557(){
 }
 
 
-/* Build 0.50.69 Important Site Info helpers */
+/* Build 0.50.71 Important Site Info helpers */
 function primaryContact568(s={}){
   const contacts=s.contacts||[];
   return contacts.find(c=>/primary|main|manager|owner|contact/i.test([c.role,c.notes,c.accessNotes].filter(Boolean).join(" "))) || contacts[0] || {};
@@ -3830,7 +3921,7 @@ function openReportEmailDraft(s, txt, subject){
 }
 
 
-/* Build 0.50.69 Customer Report Preview helpers */
+/* Build 0.50.71 Customer Report Preview helpers */
 function customerReportPreviewStats555(s={}){
   const selected=reportPhotos526(s);
   const ready=customerReportPhotoReady530(s);
@@ -4713,7 +4804,7 @@ function repairVaultState(){
 
 
 
-/* Build 0.50.69 Action Center helpers */
+/* Build 0.50.71 Action Center helpers */
 function actionPriorityClass562(rank){
   if(rank<=1) return "critical";
   if(rank===2) return "today";
@@ -4888,7 +4979,7 @@ function actionCenter(){
 }
 
 
-/* Build 0.50.69 Field Focus dashboard helpers */
+/* Build 0.50.71 Field Focus dashboard helpers */
 function fieldFocusStats561(){
   const sites=data.sites||[];
   const openTasks=allTaskRows().filter(r=>!taskIsDone(r.t));
@@ -4973,7 +5064,7 @@ function wireFieldFocus561(){
 }
 
 
-/* Build 0.50.69 Data Tools / Home cleanup helpers */
+/* Build 0.50.71 Data Tools / Home cleanup helpers */
 function dataSafeSummary560(){
   const s=backupSafetyStats552();
   const lastRestore=localStorage.getItem("firevault_last_restore_time");
@@ -5096,7 +5187,7 @@ function dataTools(){
 }
 
 
-/* Build 0.50.69 Backup Safety helpers */
+/* Build 0.50.71 Backup Safety helpers */
 function backupSafetyStats552(){
   const sites = (data.sites || []).length;
   const visits = (data.sites || []).reduce((n,s)=>n+((s.visits||[]).length),0);
@@ -5213,7 +5304,7 @@ async function copyUpdateChecklist553(){
 }
 
 
-/* Build 0.50.69 Backup Restore Center */
+/* Build 0.50.71 Backup Restore Center */
 let pendingRestoreBackup554 = null;
 
 function normalizeBackupPayload554(raw){
@@ -5422,17 +5513,17 @@ function diagnostics(){
 }
 function showChangelog(){
   const notes = [
-    "Advanced to Build 0.50.69 from the stable 0.50.68 baseline.",
-    "Tightened the Home screen initial top placement and removed automatic Home search focus to prevent the page from parking low.",
-    "Made the Today/date block tappable and connected it to a Daily Summary date picker.",
-    "Daily Report now supports selected past dates for notes, route activity, tasks, deficiencies, copy actions, preview, and TXT download.",
-    "Preserved Important Site Info, Pinned Sites Manager, Quick Layout Presets, Action Center, Data Tools, Field Focus, Site Brief, Site Activity Timeline, Customer Report Preview, top-right Add Site placement, clean splash screen with no loader, and excluded job-status workflow controls."
+    "Advanced to Build 0.50.71 from the stable 0.50.70 baseline.",
+    "Replaced the unreliable hidden native Home date picker with a FireVault calendar picker that opens every time.",
+    "Dates with saved daily activity are now shown in bold with a marker in the calendar.",
+    "The picker opens even when there are no past daily summaries, so any date can be selected.",
+    "Preserved Home layout correction, selected-date Daily Summary reports, Important Site Info, Pinned Sites Manager, Quick Layout Presets, Action Center, Data Tools, Field Focus, Site Brief, Site Activity Timeline, top-right Add Site placement, clean splash screen with no loader, and excluded job-status workflow controls."
   ];
   const overlay=document.createElement("div");
   overlay.className="releaseOverlay";
   overlay.innerHTML=`<div class="releaseSheet" role="dialog" aria-modal="true" aria-label="FireVault release notes">
     <div class="releaseHead"><div><strong>FireVault</strong><span>Build ${BUILD}</span></div><button class="ghost iconBtn" id="closeRelease" aria-label="Close release notes">×</button></div>
-    <div class="releaseBody"><h2>Release Notes</h2><p class="releaseIntro">Added Today date picker and past Daily Summary reports.</p><ul>${notes.map(n=>`<li>${esc(n)}</li>`).join("")}</ul></div>
+    <div class="releaseBody"><h2>Release Notes</h2><p class="releaseIntro">Fixed Home date picker with bold daily-summary dates.</p><ul>${notes.map(n=>`<li>${esc(n)}</li>`).join("")}</ul></div>
   </div>`;
   document.body.appendChild(overlay);
   const close=()=>overlay.remove();

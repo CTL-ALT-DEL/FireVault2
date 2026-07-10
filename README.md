@@ -1,11 +1,11 @@
-# FireVault Build 0.50.69
+# FireVault Build 0.50.71
 
-Build 0.50.69 continues from the stable 0.50.68 baseline and adds Today/date Daily Summary picker plus Home top-placement cleanup.
+Build 0.50.71 continues from the stable 0.50.70 baseline and replaces the unreliable Home date picker with a FireVault calendar picker.
 
 ## Changes
 
-- Visible app version advanced to 0.50.69.
-- Cache-busting references updated to 0.50.69.
+- Visible app version advanced to 0.50.71.
+- Cache-busting references updated to 0.50.71.
 - Added **Site Quick Actions** card on the account/site screen.
 - Added direct quick actions for:
   - Add Site Note
@@ -31,13 +31,13 @@ Run from the project root:
 node --check src/storage.js
 node --check src/app.js
 python -m json.tool manifest.json > /dev/null
-zip -T firevault-build-0.50.69-modular-root.zip
+zip -T firevault-build-0.50.71-modular-root.zip
 ```
 
 ## Suggested commit message
 
 ```text
-Build 0.50.69 daily summary date picker
+Build 0.50.71 FireVault daily summary calendar
 ```
 
 - Lifted the red Home add button above the bottom nav so it should not be blocked by the black bottom area.
@@ -104,3 +104,7 @@ Build 0.50.69 daily summary date picker
 
 - Daily Report now supports selected past dates for notes, route activity, tasks, deficiencies, copy actions, preview, and TXT download.
 - Preserved Important Site Info from 0.50.68.
+
+- Preserved tappable Today/date picker and selected-date Daily Summary reports.
+
+- Calendar opens even if no past daily summaries exist, and any date can be selected.
