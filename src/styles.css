@@ -48,7 +48,7 @@ nav{min-height:var(--navH);position:fixed;bottom:0;left:0;right:0;display:grid;g
 
 
 /* Build 0.40.5 Settings small-space redesign + logo cache-bust */
-.settingsScreen{gap:6px;min-height:0}.settingsMicrobar{display:flex;align-items:center;justify-content:space-between;gap:8px;min-height:34px;padding:5px 7px;border:1px solid rgba(255,255,255,.07);border-radius:12px;background:rgba(255,255,255,.035)}.settingsCrumb{display:flex;align-items:center;gap:7px;min-width:0;font-size:12px;color:var(--muted);font-weight:850;text-transform:uppercase;letter-spacing:.055em}.settingsCrumb b{color:var(--text);font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-transform:none;letter-spacing:0}.settingsMicroLogo{width:24px;height:24px;border-radius:7px;flex:0 0 auto}.iconBtn{width:32px;height:32px;min-height:32px;padding:0;border-radius:10px;font-size:14px;display:grid;place-items:center}.settingsLayout{grid-template-columns:124px minmax(0,1fr);gap:7px}.settingsRail{gap:5px;padding:0 1px 8px}.settingsRail .tabBtn,.settingsRail .tabBtn.tabBtn{min-height:38px;padding:5px 7px;border-radius:11px;align-items:flex-start;text-align:left}.settingsRail .tabBtn strong{font-size:12px;line-height:1.05}.settingsRail .tabBtn span{font-size:9.5px;line-height:1.05;margin-top:1px;letter-spacing:0}.settingsContent{padding-bottom:12px}.settingsStack{gap:7px}.compactPane{padding:8px 9px;border-left-width:3px}.paneHead{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:2px}.paneHead h2{font-size:15px;line-height:1.1;margin:0}.paneNote{font-size:11px;line-height:1.25;margin:0 0 7px;color:var(--muted)}.saveMini{min-height:32px;padding:6px 10px;border-radius:10px;font-size:12px;flex:0 0 auto}.settingsGrid{grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}.settingField{gap:3px}.settingField label,label{font-size:9.5px;line-height:1.1;letter-spacing:.065em;text-align:left}.settingField input,.settingField textarea,.settingField select,input,textarea,select{min-height:38px;padding:8px 9px;border-radius:10px;font-size:13px;text-align:left}.settingField textarea,textarea{min-height:64px}.fieldNote{font-size:10.5px;line-height:1.2;margin:1px 0 0}.settingsList{gap:6px;margin-top:7px}.settingsList.twoCol{grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}.checkRow{min-height:36px;padding:7px 8px;border-radius:10px;font-size:12px;line-height:1.15;text-align:left;justify-content:flex-start}.checkRow input{width:17px;height:17px;min-height:17px}.presetGrid{grid-template-columns:repeat(2,minmax(0,1fr));gap:6px;margin-bottom:7px}.presetBtn{min-height:38px;padding:6px 8px;border-radius:10px;font-size:12px}.themeSwatch{width:22px;height:22px;border-radius:7px}.previewPanel.compactPreview{min-height:92px;margin:6px 0}.previewOverlay{font-size:11px;padding:7px 8px}.aboutGrid{gap:6px}.aboutGrid div{padding:8px;border-radius:10px}.aboutGrid strong{font-size:9.5px}.aboutGrid span{font-size:12px}.brandMark{content:url('../assets/icon-192.png?v=0.54.0')}
+.settingsScreen{gap:6px;min-height:0}.settingsMicrobar{display:flex;align-items:center;justify-content:space-between;gap:8px;min-height:34px;padding:5px 7px;border:1px solid rgba(255,255,255,.07);border-radius:12px;background:rgba(255,255,255,.035)}.settingsCrumb{display:flex;align-items:center;gap:7px;min-width:0;font-size:12px;color:var(--muted);font-weight:850;text-transform:uppercase;letter-spacing:.055em}.settingsCrumb b{color:var(--text);font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-transform:none;letter-spacing:0}.settingsMicroLogo{width:24px;height:24px;border-radius:7px;flex:0 0 auto}.iconBtn{width:32px;height:32px;min-height:32px;padding:0;border-radius:10px;font-size:14px;display:grid;place-items:center}.settingsLayout{grid-template-columns:124px minmax(0,1fr);gap:7px}.settingsRail{gap:5px;padding:0 1px 8px}.settingsRail .tabBtn,.settingsRail .tabBtn.tabBtn{min-height:38px;padding:5px 7px;border-radius:11px;align-items:flex-start;text-align:left}.settingsRail .tabBtn strong{font-size:12px;line-height:1.05}.settingsRail .tabBtn span{font-size:9.5px;line-height:1.05;margin-top:1px;letter-spacing:0}.settingsContent{padding-bottom:12px}.settingsStack{gap:7px}.compactPane{padding:8px 9px;border-left-width:3px}.paneHead{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:2px}.paneHead h2{font-size:15px;line-height:1.1;margin:0}.paneNote{font-size:11px;line-height:1.25;margin:0 0 7px;color:var(--muted)}.saveMini{min-height:32px;padding:6px 10px;border-radius:10px;font-size:12px;flex:0 0 auto}.settingsGrid{grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}.settingField{gap:3px}.settingField label,label{font-size:9.5px;line-height:1.1;letter-spacing:.065em;text-align:left}.settingField input,.settingField textarea,.settingField select,input,textarea,select{min-height:38px;padding:8px 9px;border-radius:10px;font-size:13px;text-align:left}.settingField textarea,textarea{min-height:64px}.fieldNote{font-size:10.5px;line-height:1.2;margin:1px 0 0}.settingsList{gap:6px;margin-top:7px}.settingsList.twoCol{grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}.checkRow{min-height:36px;padding:7px 8px;border-radius:10px;font-size:12px;line-height:1.15;text-align:left;justify-content:flex-start}.checkRow input{width:17px;height:17px;min-height:17px}.presetGrid{grid-template-columns:repeat(2,minmax(0,1fr));gap:6px;margin-bottom:7px}.presetBtn{min-height:38px;padding:6px 8px;border-radius:10px;font-size:12px}.themeSwatch{width:22px;height:22px;border-radius:7px}.previewPanel.compactPreview{min-height:92px;margin:6px 0}.previewOverlay{font-size:11px;padding:7px 8px}.aboutGrid{gap:6px}.aboutGrid div{padding:8px;border-radius:10px}.aboutGrid strong{font-size:9.5px}.aboutGrid span{font-size:12px}.brandMark{content:url('../assets/icon-192.png?v=0.55.0')}
 @media(max-width:720px){main{padding:7px 7px 14px}.settingsLayout{grid-template-columns:1fr;gap:6px}.settingsRail{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));grid-auto-flow:row;grid-auto-columns:auto;overflow:visible;gap:5px;padding:0}.settingsRail .tabBtn,.settingsRail .tabBtn.tabBtn{min-height:36px;padding:5px 4px;align-items:center;text-align:center}.settingsRail .tabBtn strong{font-size:11px}.settingsRail .tabBtn span{font-size:8.5px}.settingsGrid,.settingsList.twoCol,.presetGrid{grid-template-columns:1fr}.compactPane{padding:8px}.paneHead h2{font-size:14px}.settingsCrumb span{display:none}.settingsMicrobar{min-height:32px}.settingsContent{overflow:auto;padding-bottom:16px}.settingField input,.settingField textarea,.settingField select,input,textarea,select{font-size:13px;min-height:37px}.checkRow{font-size:11.5px}.presetGrid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:390px){.settingsRail{grid-template-columns:repeat(4,minmax(0,1fr));gap:4px}.settingsRail .tabBtn strong{font-size:10.5px}.settingsRail .tabBtn span{display:none}.presetGrid{grid-template-columns:1fr}.paneNote{display:none}.settingsGrid{gap:6px}.compactPane{padding:7px}}
 
@@ -11948,14 +11948,14 @@ body.app-booted533.settingsChrome572 > #appNav{
 }
 
 
-/* Build 0.54.0 Settings scroll-position recovery */
+/* Build 0.55.0 Settings scroll-position recovery */
 .settingsDetailBody488,
 .settingsHomeScreen488.settingsStable573{
   overflow-anchor:none;
   scroll-behavior:auto!important;
 }
 
-/* Build 0.54.0 responsive Home milestone */
+/* Build 0.55.0 responsive Home milestone */
 .homeUtilityGrid5100{
   display:grid;
   grid-template-columns:minmax(0,1fr);
@@ -12101,7 +12101,7 @@ body.app-booted533.settingsChrome572 > #appNav{
   width:100%!important;
 }
 
-/* Build 0.54.0 light-card collapse control contrast */
+/* Build 0.55.0 light-card collapse control contrast */
 .nearbyAccountsHero478 .homeCollapseBtn5100{
   color:#475569!important;
   background:rgba(15,23,42,.06)!important;
@@ -12353,4 +12353,83 @@ body.app-booted533.settingsChrome572 > #appNav{
 @media(max-width:380px){
   .settingsHomeScreen488.settingsStable573 .settingsChoiceIcon451{width:40px!important;height:40px!important}
   .settingsDetailScreen488.settingsStable573.settingsTab-email .emailTagGrid530{grid-template-columns:1fr}
+}
+
+/* Build 0.55.0 — Home Layout workspace, scoped to Settings */
+.settingsHomeScreen488.settingsStable573 .settingsChoice-homeLayout{--choice540:#2dd4bf;--choiceTint540:rgba(45,212,191,.13)}
+.settingsDetailScreen488.settingsStable573.settingsTab-homeLayout{--settingsAccent540:#2dd4bf;--settingsTint540:rgba(45,212,191,.14)}
+.settingsDetailScreen488.settingsStable573.settingsTab-homeLayout .homeLayoutSettings550{gap:12px!important}
+.settingsDetailScreen488.settingsStable573.settingsTab-homeLayout .homeLayoutPresetGrid550{
+  display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;
+}
+.settingsDetailScreen488.settingsStable573.settingsTab-homeLayout .homeLayoutPreset550{
+  position:relative;display:grid;grid-template-columns:34px minmax(0,1fr);grid-template-areas:"icon title" "icon note";
+  align-items:center;text-align:left;gap:2px 10px;min-height:82px;padding:12px;border-radius:14px;
+  border:1px solid rgba(163,184,211,.20);background:rgba(255,255,255,.035);box-shadow:none;
+}
+.settingsDetailScreen488.settingsStable573.settingsTab-homeLayout .homeLayoutPreset550>span{
+  grid-area:icon;display:grid;place-items:center;width:34px;height:34px;border-radius:11px;
+  background:rgba(45,212,191,.12);border:1px solid rgba(45,212,191,.30);color:#7ce9dc;font-size:18px;font-weight:950;
+}
+.settingsDetailScreen488.settingsStable573.settingsTab-homeLayout .homeLayoutPreset550>strong{grid-area:title;font-size:13px;line-height:1.2;color:#fff}
+.settingsDetailScreen488.settingsStable573.settingsTab-homeLayout .homeLayoutPreset550>small{grid-area:note;font-size:10.8px;line-height:1.35;color:#aebacd}
+.settingsDetailScreen488.settingsStable573.settingsTab-homeLayout .homeLayoutPreset550.presetActive575{
+  border-color:rgba(45,212,191,.58)!important;background:linear-gradient(115deg,rgba(45,212,191,.14),rgba(255,255,255,.035))!important;
+}
+.settingsDetailScreen488.settingsStable573.settingsTab-homeLayout .homeLayoutCardList550{display:grid;gap:9px}
+.settingsDetailScreen488.settingsStable573.settingsTab-homeLayout .homeLayoutCardRow550{
+  --homeTone550:#94a3b8;display:grid;grid-template-columns:minmax(0,1.15fr) minmax(210px,.85fr);gap:12px;align-items:center;
+  padding:12px;border:1px solid color-mix(in srgb,var(--homeTone550) 28%,rgba(255,255,255,.10));border-radius:14px;
+  background:linear-gradient(110deg,color-mix(in srgb,var(--homeTone550) 9%,transparent),rgba(255,255,255,.025) 42%);
+}
+.settingsDetailScreen488.settingsStable573.settingsTab-homeLayout .homeLayoutCardRow550.tone-violet{--homeTone550:#a78bfa}
+.settingsDetailScreen488.settingsStable573.settingsTab-homeLayout .homeLayoutCardRow550.tone-red{--homeTone550:#ef4444}
+.settingsDetailScreen488.settingsStable573.settingsTab-homeLayout .homeLayoutCardRow550.tone-cyan{--homeTone550:#22d3ee}
+.settingsDetailScreen488.settingsStable573.settingsTab-homeLayout .homeLayoutCardRow550.tone-amber{--homeTone550:#fbbf24}
+.settingsDetailScreen488.settingsStable573.settingsTab-homeLayout .homeLayoutVisibility550{
+  display:grid!important;grid-template-columns:20px 12px minmax(0,1fr);gap:9px;align-items:center;margin:0!important;
+  font-size:inherit!important;letter-spacing:0!important;text-transform:none!important;color:inherit!important;cursor:pointer;
+}
+.settingsDetailScreen488.settingsStable573.settingsTab-homeLayout .homeLayoutVisibility550 input{
+  width:19px!important;height:19px!important;min-height:19px!important;margin:0!important;accent-color:var(--homeTone550);
+}
+.settingsDetailScreen488.settingsStable573.settingsTab-homeLayout .homeLayoutColor550{
+  width:9px;height:34px;border-radius:999px;background:var(--homeTone550);box-shadow:0 0 14px color-mix(in srgb,var(--homeTone550) 32%,transparent);
+}
+.settingsDetailScreen488.settingsStable573.settingsTab-homeLayout .homeLayoutVisibility550 strong{display:block;font-size:13.5px;line-height:1.2;color:#fff}
+.settingsDetailScreen488.settingsStable573.settingsTab-homeLayout .homeLayoutVisibility550 small{display:block;margin-top:3px;font-size:10.8px;line-height:1.35;color:#aebacd}
+.settingsDetailScreen488.settingsStable573.settingsTab-homeLayout .homeLayoutBehavior550{display:grid;gap:5px}
+.settingsDetailScreen488.settingsStable573.settingsTab-homeLayout .homeLayoutBehavior550 label{
+  margin:0!important;font-size:9.5px!important;line-height:1.1!important;letter-spacing:.09em!important;text-transform:uppercase!important;color:#91a0b5!important;
+}
+.settingsDetailScreen488.settingsStable573.settingsTab-homeLayout .homeLayoutBehavior550 select{min-height:40px!important;font-size:12px!important}
+.settingsDetailScreen488.settingsStable573.settingsTab-homeLayout .homeLayoutBehavior550 em{font-size:10px;line-height:1.3;color:#fbbf24;font-style:normal}
+.settingsDetailScreen488.settingsStable573.settingsTab-homeLayout .moduleUnavailable550{opacity:.65}
+.settingsDetailScreen488.settingsStable573.settingsTab-homeLayout .moduleUnavailable550 .homeLayoutColor550{filter:saturate(.3)}
+.settingsDetailScreen488.settingsStable573.settingsTab-homeLayout .homeLayoutPreviewPanel550{--section540:#a78bfa}
+.settingsDetailScreen488.settingsStable573.settingsTab-homeLayout .homeLayoutPreview550{
+  display:grid;gap:7px;padding:11px;border:1px solid rgba(163,184,211,.17);border-radius:14px;background:rgba(4,8,14,.35);
+}
+.settingsDetailScreen488.settingsStable573.settingsTab-homeLayout .homeLayoutPreview550>div{
+  --previewTone550:#94a3b8;display:grid;grid-template-columns:9px minmax(0,1fr) auto;gap:9px;align-items:center;min-height:42px;padding:9px 11px;
+  border:1px solid color-mix(in srgb,var(--previewTone550) 27%,rgba(255,255,255,.08));border-radius:11px;background:color-mix(in srgb,var(--previewTone550) 8%,rgba(255,255,255,.025));
+  transition:opacity .18s ease,filter .18s ease;
+}
+.settingsDetailScreen488.settingsStable573.settingsTab-homeLayout .homeLayoutPreview550>div.tone-violet{--previewTone550:#a78bfa}
+.settingsDetailScreen488.settingsStable573.settingsTab-homeLayout .homeLayoutPreview550>div.tone-red{--previewTone550:#ef4444}
+.settingsDetailScreen488.settingsStable573.settingsTab-homeLayout .homeLayoutPreview550>div.tone-cyan{--previewTone550:#22d3ee}
+.settingsDetailScreen488.settingsStable573.settingsTab-homeLayout .homeLayoutPreview550>div.tone-amber{--previewTone550:#fbbf24}
+.settingsDetailScreen488.settingsStable573.settingsTab-homeLayout .homeLayoutPreview550>div>span{width:7px;height:26px;border-radius:999px;background:var(--previewTone550)}
+.settingsDetailScreen488.settingsStable573.settingsTab-homeLayout .homeLayoutPreview550>div>strong{font-size:12px;color:#f8fafc}
+.settingsDetailScreen488.settingsStable573.settingsTab-homeLayout .homeLayoutPreview550>div>em{font-size:10px;color:#aebacd;font-style:normal}
+.settingsDetailScreen488.settingsStable573.settingsTab-homeLayout .homeLayoutPreview550 .previewHidden550{opacity:.34;filter:saturate(.2)}
+.settingsDetailScreen488.settingsStable573.settingsTab-homeLayout .homeLayoutPreview550 .previewUnavailable550{opacity:.48;filter:saturate(.25)}
+.settingsDetailScreen488.settingsStable573.settingsTab-homeLayout .homeLayoutActionGrid550{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:10px}
+.settingsDetailScreen488.settingsStable573.settingsTab-homeLayout .homeLayoutActionGrid550 button{min-height:42px;font-size:11.5px}
+
+@media(max-width:620px){
+  .settingsDetailScreen488.settingsStable573.settingsTab-homeLayout .homeLayoutPresetGrid550{grid-template-columns:1fr}
+  .settingsDetailScreen488.settingsStable573.settingsTab-homeLayout .homeLayoutCardRow550{grid-template-columns:1fr;gap:10px}
+  .settingsDetailScreen488.settingsStable573.settingsTab-homeLayout .homeLayoutBehavior550{padding-left:40px}
+  .settingsDetailScreen488.settingsStable573.settingsTab-homeLayout .homeLayoutActionGrid550{grid-template-columns:1fr}
 }

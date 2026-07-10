@@ -1,4 +1,4 @@
-export const BUILD = "0.54.0";
+export const BUILD = "0.55.0";
 export const KEY = "firevault_vault_build_030";
 export const ACTIVE_JOB_KEY = "firevault_active_job_modular";
 
@@ -43,6 +43,14 @@ export function normalize(data){
   data.settings.theme = data.settings.theme || {name:"firevault-dark", accentColor:"#ef4444", highContrast:false, largeText:false, compactLayout:false, buttonStyle:"rounded", cardStyle:"glass"};
   data.settings.advanced = data.settings.advanced || {aiTechnician:false, reverseAddressLookup:false, cloudBackup:false, voiceTranscription:false, ocrReader:false, emailGateway:false, weather:false, traffic:false};
   data.settings.gps = {enabled:true, mapProvider:"apple", highAccuracy:true, includeInReports:true, nearbyRadiusMiles:1, ...(data.settings.gps || {})};
+  const homeCardDefaults = {pinnedSites:{visible:true,behavior:"remember"},fieldFocus:{visible:true,behavior:"remember"},nearbyAccounts:{visible:true,behavior:"remember"},recentAccounts:{visible:true,behavior:"remember"}};
+  data.settings.homeLayout = data.settings.homeLayout || {preset:"custom",cards:{}};
+  data.settings.homeLayout.preset = data.settings.homeLayout.preset || "custom";
+  data.settings.homeLayout.cards = data.settings.homeLayout.cards || {};
+  Object.entries(homeCardDefaults).forEach(([key,defaults])=>{
+    const current=data.settings.homeLayout.cards[key]||{};
+    data.settings.homeLayout.cards[key]={visible:current.visible!==false,behavior:["remember","expanded","collapsed"].includes(current.behavior)?current.behavior:defaults.behavior};
+  });
   data.sites.forEach(ensureSite);
   return data;
 }

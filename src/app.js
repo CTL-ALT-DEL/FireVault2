@@ -97,7 +97,82 @@ function fireVaultBrand575(extraClass=""){
   return `<span class="fireVaultWordmark575 ${esc(extraClass)}"><span>FIRE</span><b>VAULT</b></span>`;
 }
 
-/* Build 0.54.0 Home card collapse memory */
+const HOME_LAYOUT_CARDS_550 = [
+  {key:"pinnedSites", label:"Pinned Sites", note:"Fast shortcuts to high-use customer accounts.", tone:"violet", module:"pinnedSites"},
+  {key:"fieldFocus", label:"Field Focus", note:"Open tasks, deficiencies, photos, and urgent field work.", tone:"red", module:"fieldFocus"},
+  {key:"nearbyAccounts", label:"Nearby Accounts", note:"GPS-based customer accounts near your current location.", tone:"cyan", module:"advancedGps"},
+  {key:"recentAccounts", label:"Recent Accounts", note:"Quick access to the accounts you opened most recently.", tone:"amber", module:""}
+];
+const HOME_LAYOUT_PRESETS_550 = {
+  clean:{label:"Clean Home", icon:"◯", note:"Show only Recent Accounts for the lightest everyday Home screen.", cards:{pinnedSites:[false,"remember"],fieldFocus:[false,"remember"],nearbyAccounts:[false,"remember"],recentAccounts:[true,"expanded"]}},
+  field:{label:"Field Ready", icon:"▣", note:"Prioritize pinned accounts, Field Focus, and nearby work.", cards:{pinnedSites:[true,"remember"],fieldFocus:[true,"expanded"],nearbyAccounts:[true,"remember"],recentAccounts:[false,"remember"]}},
+  compact:{label:"Compact Cards", icon:"▤", note:"Keep every card available but start each one collapsed.", cards:{pinnedSites:[true,"collapsed"],fieldFocus:[true,"collapsed"],nearbyAccounts:[true,"collapsed"],recentAccounts:[true,"collapsed"]}},
+  full:{label:"Full Home", icon:"◆", note:"Show every optional Home card and remember your open/closed choices.", cards:{pinnedSites:[true,"remember"],fieldFocus:[true,"remember"],nearbyAccounts:[true,"remember"],recentAccounts:[true,"remember"]}}
+};
+function homeLayoutSettings550(){
+  data.settings.homeLayout=data.settings.homeLayout||{};
+  data.settings.homeLayout.cards=data.settings.homeLayout.cards||{};
+  HOME_LAYOUT_CARDS_550.forEach(card=>{
+    const current=data.settings.homeLayout.cards[card.key]||{};
+    const behavior=["remember","expanded","collapsed"].includes(current.behavior)?current.behavior:"remember";
+    data.settings.homeLayout.cards[card.key]={visible:current.visible!==false,behavior};
+  });
+  data.settings.homeLayout.preset=data.settings.homeLayout.preset||"custom";
+  return data.settings.homeLayout;
+}
+function homeLayoutCard550(key){ return homeLayoutSettings550().cards[key]||{visible:true,behavior:"remember"}; }
+function homeLayoutModuleAvailable550(key){
+  const card=HOME_LAYOUT_CARDS_550.find(x=>x.key===key);
+  return !card?.module || featureOn(card.module);
+}
+function homeCardVisible550(key){ return homeLayoutCard550(key).visible!==false && homeLayoutModuleAvailable550(key); }
+function homeLayoutPresetMatch550(name){
+  const preset=HOME_LAYOUT_PRESETS_550[name];
+  if(!preset) return false;
+  return Object.entries(preset.cards).every(([key,[visible,behavior]])=>{
+    const card=homeLayoutCard550(key);
+    return card.visible===visible && card.behavior===behavior;
+  });
+}
+function activeHomeLayoutPreset550(){ return Object.keys(HOME_LAYOUT_PRESETS_550).find(homeLayoutPresetMatch550)||""; }
+function applyHomeLayoutPreset550(name){
+  const preset=HOME_LAYOUT_PRESETS_550[name];
+  if(!preset){ toast("Home preset unavailable."); return; }
+  captureSettingsScroll576();
+  const layout=homeLayoutSettings550();
+  Object.entries(preset.cards).forEach(([key,[visible,behavior]])=>layout.cards[key]={visible,behavior});
+  layout.preset=name;
+  homeCardState5100={};
+  persistHomeCardState5100();
+  save();
+  settings();
+  toast(`${preset.label} applied.`);
+}
+function resetHomeLayout550(){
+  captureSettingsScroll576();
+  data.settings.homeLayout={preset:"custom",cards:{}};
+  homeLayoutSettings550();
+  homeCardState5100={};
+  persistHomeCardState5100();
+  save();
+  settings();
+  toast("Home layout reset.");
+}
+function setAllHomeCardState550(collapsed){
+  captureSettingsScroll576();
+  const layout=homeLayoutSettings550();
+  HOME_LAYOUT_CARDS_550.forEach(card=>{
+    homeCardState5100[card.key]=collapsed;
+    layout.cards[card.key]={...layout.cards[card.key],behavior:collapsed?"collapsed":"expanded"};
+  });
+  layout.preset="custom";
+  persistHomeCardState5100();
+  save();
+  settings();
+  toast(collapsed?"All optional Home cards set to collapsed.":"All optional Home cards set to open.");
+}
+
+/* Build 0.55.0 Home card layout controls */
 function loadHomeCardState5100(){
   try{
     const parsed=JSON.parse(localStorage.getItem(HOME_CARD_STATE_KEY_5100)||"{}");
@@ -109,7 +184,12 @@ function loadHomeCardState5100(){
 function persistHomeCardState5100(){
   try{ localStorage.setItem(HOME_CARD_STATE_KEY_5100, JSON.stringify(homeCardState5100)); }catch{}
 }
-function homeCardCollapsed5100(key){ return homeCardState5100[key]===true; }
+function homeCardCollapsed5100(key){
+  const behavior=homeLayoutCard550(key).behavior;
+  if(behavior==="expanded") return false;
+  if(behavior==="collapsed") return true;
+  return homeCardState5100[key]===true;
+}
 function homeCollapseButton5100(key,label){
   const collapsed=homeCardCollapsed5100(key);
   return `<button class="ghost smallBtn homeCollapseBtn5100" type="button" data-home-collapse="${esc(key)}" data-home-label="${esc(label)}" aria-expanded="${collapsed?"false":"true"}" aria-label="${collapsed?"Expand":"Collapse"} ${esc(label)}"><span aria-hidden="true">${collapsed?"⌄":"⌃"}</span></button>`;
@@ -1770,8 +1850,8 @@ function home(){
 
     ${siteSearch?`<div class="card searchResultsPanel478" id="homeSearchResults476">${homeAccountRowsMarkup476()}</div>`:`<div id="homeSearchResults476" class="searchResultsPanel478 hiddenSearchResults478"></div>`}
 
-    ${!siteSearch && featureOn("pinnedSites")?pinnedSitesMarkup566():""}
-    ${!siteSearch && featureOn("fieldFocus")?fieldFocusMarkup561():""}
+    ${!siteSearch && homeCardVisible550("pinnedSites")?pinnedSitesMarkup566():""}
+    ${!siteSearch && homeCardVisible550("fieldFocus")?fieldFocusMarkup561():""}
 
     ${!siteSearch?`<div class="fieldDashboard500">
       <div class="fieldDashHead500"><div><strong>Field Dashboard</strong><span>Site notes, route, and daily summary</span></div><button class="ghost smallBtn" id="dailySummaryBtn500">Summary</button></div>
@@ -1791,11 +1871,11 @@ function home(){
       <div class="todayAccountsList500">${todayAccountsMarkup500()}</div>
     </div>`:""}
 
-    <div class="homeUtilityGrid5100 ${featureOn("advancedGps")?"":"homeUtilityNoGps5100"}">
-      <div class="card nearbyAccountsHero476 nearbyAccountsHero478 homeCollapsible5100 ${homeCardCollapsed5100("nearbyAccounts")?"homeCollapsed5100":""} ${featureOn("advancedGps")?"":"featureHidden472"}" data-home-collapsible="nearbyAccounts">
+    <div class="homeUtilityGrid5100 ${homeCardVisible550("nearbyAccounts")?"":"homeUtilityNoGps5100"}">
+      ${homeCardVisible550("nearbyAccounts")?`<div class="card nearbyAccountsHero476 nearbyAccountsHero478 homeCollapsible5100 ${homeCardCollapsed5100("nearbyAccounts")?"homeCollapsed5100":""}" data-home-collapsible="nearbyAccounts">
         <div class="nearbyHead476 nearbyHead478"><div><h2>Nearby Accounts</h2><p>${homeNearbyTitle486()}</p></div><div class="homeHeaderActions5100"><button class="smallBtn nearbyCount478" id="checkNearbyHomeBtn476">${nearbyState?"Refresh":"Check"}</button>${homeCollapseButton5100("nearbyAccounts","Nearby Accounts")}</div></div>
         <div class="nearbyList476 nearbyList478 homeCollapseBody5100" data-home-collapse-body ${homeCardCollapsed5100("nearbyAccounts")?"hidden":""}>${homeNearbyMarkup476()}</div>
-      </div>
+      </div>`:""}
 
       <div class="grid2 appleStats478">
         <button class="card tile statTile478" id="visitsCard478"><strong>${recentVisits}</strong><span>Recent Visits</span><em>This Week</em></button>
@@ -1806,10 +1886,10 @@ function home(){
     ${activeRoute ? `<div class="card activeRouteMini468 activeRouteMini476 activeRouteMini478 ${activeRoute.paused?"activeRoutePaused470":""}"><div class="activeRouteHead468"><div><h2><span class="${activeRoute.paused?"routeLed470 routeLedPaused470":"routeLed463"} miniLed468"></span>${activeRoute.paused?"Daily Route Paused":"Daily Route Recording"}</h2><p>${esc(routeSummaryLine(activeRoute))}</p></div><button class="primary smallBtn" id="openRouteMiniBtn">Open</button></div><div class="activeRouteStats468"><div><strong>${(activeRoute.events||[]).length}</strong><span>Waypoints</span></div><div><strong>${routeDuration(activeRoute.startedAt)}</strong><span>Time</span></div><div><strong>${esc(routeDistanceLabel(activeRoute))}</strong><span>Distance</span></div></div><div class="activeRouteActions468"><button class="ghost smallBtn" id="homeRoutePointBtn" ${activeRoute.paused?"disabled":""}>Waypoint</button><button class="ghost smallBtn" id="homeRouteNearestBtn" ${activeRoute.paused?"disabled":""}>Nearest</button><button class="${activeRoute.paused?"primary":"ghost"} smallBtn" id="homeRoutePauseBtn">${activeRoute.paused?"Resume":"Pause"}</button><button class="danger smallBtn" id="homeRouteEndBtn">End / Save</button></div></div>` : ""}
     ${activeJob ? `<div class="card activeJobMini activeJobMini478"><div class="row"><div><h2>Service Call Active</h2><p>${esc(activeJob.siteName)} • <span id="jobElapsed">${elapsedText(activeJob.startedAt)}</span></p></div><button class="primary" id="resumeJobBtn">Open</button></div></div>` : ""}
 
-    <div class="recentAccountsPanel478 homeCollapsible5100 ${homeCardCollapsed5100("recentAccounts")?"homeCollapsed5100":""}" data-home-collapsible="recentAccounts">
+    ${homeCardVisible550("recentAccounts")?`<div class="recentAccountsPanel478 homeCollapsible5100 ${homeCardCollapsed5100("recentAccounts")?"homeCollapsed5100":""}" data-home-collapsible="recentAccounts">
       <div class="recentHead478"><div><strong>Recent Accounts</strong><span>${recentAccounts476(5).length} account${recentAccounts476(5).length===1?"":"s"}</span></div><div class="homeHeaderActions5100"><button class="ghost smallBtn" id="allAccountsBtn478">See All</button>${homeCollapseButton5100("recentAccounts","Recent Accounts")}</div></div>
       <div class="recentList478 recentList486 homeCollapseBody5100" data-home-collapse-body ${homeCardCollapsed5100("recentAccounts")?"hidden":""}>${homeRecentRowsOnly486()}</div>
-    </div>
+    </div>`:""}
 
     <button class="card dailySummaryCard499" id="dailySummaryBtn499"><div><strong>Daily Summary</strong><span>${dailySummaryLine499()}</span></div><em>Open</em></button>
     ${featureOn("dataSafeHome")?dataSafeCard560():""}
@@ -4377,6 +4457,7 @@ function settingsTabs(){
     ["email","Email","Default recipients, subject template, signature template, and tag tools."],
     ["overlay","Photo Overlay","Photo stamp preview, template fields, alignment, colors, and logo visibility."],
     ["themes","Theme","Theme presets, accent color, 3D controls, text size, and haptics."],
+    ["homeLayout","Home Layout","Choose which optional Home cards appear and how they open."],
     ["visibility","Modules","Enable or disable FireVault modules for a cleaner field interface."],
     ["advanced","Advanced","Optional future modules marked with an asterisk when services are required."],
     ["backup","Backup","Export, import, data safety snapshot, restore tools, and danger zone."],
@@ -4417,6 +4498,9 @@ function leaveSettingsHome572(){
   route("home");
 }
 
+function settingsIcon550(tab){
+  return ({tech:"👤",gps:"⌖",reports:"▤",email:"✉",overlay:"▧",themes:"◐",homeLayout:"⌂",visibility:"☰",advanced:"⚡",backup:"⇅",about:"ⓘ"})[tab]||"•";
+}
 function settings(){
   captureSettingsScroll576();
   restoreAppChrome572();
@@ -4431,7 +4515,7 @@ function settings(){
         <button class="ghost settingsModulesQuick488" id="modulesQuickBtn">Modules</button>
       </div>
       <div class="settingsChoiceGrid451 grow settingsChoiceGrid488" aria-label="Settings choices">
-        ${tabs.map((t,i)=>`<button class="settingsChoice451 settingsChoice455 settingsChoice456 settingsChoice-${t[0]}" data-tab="${t[0]}"><span class="settingsChoiceIcon451">${["👤","⌖","▤","✉","▧","◐","☰","⚡","⇅","ⓘ"][i]}</span><span class="settingsChoiceText456"><strong>${t[1]}</strong><small>${t[2]}</small></span><span class="settingsChoiceArrow455">›</span></button>`).join("")}
+        ${tabs.map(t=>`<button class="settingsChoice451 settingsChoice455 settingsChoice456 settingsChoice-${t[0]}" data-tab="${t[0]}"><span class="settingsChoiceIcon451">${settingsIcon550(t[0])}</span><span class="settingsChoiceText456"><strong>${t[1]}</strong><small>${t[2]}</small></span><span class="settingsChoiceArrow455">›</span></button>`).join("")}
         <button class="settingsChoice451 settingsChoice455 settingsChoice456 settingsChoiceUtility451 settingsChoice-diagnostics" id="diagnosticsChoice"><span class="settingsChoiceIcon451">⌁</span><span class="settingsChoiceText456"><strong>Diagnostics</strong><small>Build, storage, GPS, module, task, report, and vault health details.</small></span><span class="settingsChoiceArrow455">›</span></button>
       </div>
     </div>`);
@@ -4802,6 +4886,46 @@ function settingsSection540(kicker,title,note,content,tone="blue",action=""){
   </section>`;
 }
 
+function homeLayoutPanel550(){
+  const active=activeHomeLayoutPreset550();
+  const cards=HOME_LAYOUT_CARDS_550.map(card=>{
+    const set=homeLayoutCard550(card.key);
+    const available=homeLayoutModuleAvailable550(card.key);
+    return `<div class="homeLayoutCardRow550 tone-${card.tone} ${available?"":"moduleUnavailable550"}" data-home-layout-row="${card.key}">
+      <label class="homeLayoutVisibility550" for="homeVisible_${card.key}">
+        <input type="checkbox" id="homeVisible_${card.key}" ${set.visible?"checked":""}>
+        <span class="homeLayoutColor550" aria-hidden="true"></span>
+        <span><strong>${esc(card.label)}</strong><small>${esc(card.note)}</small></span>
+      </label>
+      <div class="homeLayoutBehavior550"><label for="homeBehavior_${card.key}">Open behavior</label><select id="homeBehavior_${card.key}"><option value="remember" ${set.behavior==="remember"?"selected":""}>Remember last choice</option><option value="expanded" ${set.behavior==="expanded"?"selected":""}>Always start open</option><option value="collapsed" ${set.behavior==="collapsed"?"selected":""}>Always start collapsed</option></select>${available?"":`<em>Enable ${esc(card.module==="advancedGps"?"GPS / Nearby":card.label)} in Modules to show this card.</em>`}</div>
+    </div>`;
+  }).join("");
+  return `<div class="settingsStack settingsStack540 homeLayoutSettings550">
+    ${settingsSection540("Home workspace","Quick Home Presets","Change only the optional cards on the Home screen. Site, report, and account data are not affected.",`<div class="homeLayoutPresetGrid550">${Object.entries(HOME_LAYOUT_PRESETS_550).map(([key,p])=>`<button class="ghost homeLayoutPreset550 ${active===key?"presetActive575":""}" type="button" data-home-layout-preset="${key}" aria-pressed="${active===key?"true":"false"}"><span>${esc(p.icon)}</span><strong>${esc(p.label)}</strong><small>${esc(p.note)}</small>${active===key?`<em class="presetActiveBadge575">✓ Active</em>`:""}</button>`).join("")}</div>`,"red",`<button class="primary saveMini" id="saveSettings">Save</button>`)}
+    ${settingsSection540("Individual cards","Home Card Controls","Show or hide each optional card and decide how it opens when Home is rendered.",`<div class="homeLayoutCardList550">${cards}</div>`,"cyan")}
+    <section class="card settingGroup compactPane settingsSection540 tone-violet homeLayoutPreviewPanel550">
+      <div class="paneHead settingsPaneHead540"><div><span class="settingsKicker540">Preview</span><h2>Home Card Stack</h2><p class="paneNote">A compact preview of the optional cards that will appear on Home.</p></div></div>
+      <div class="homeLayoutPreview550" id="homeLayoutPreview550">${HOME_LAYOUT_CARDS_550.map(card=>`<div data-home-preview-card="${card.key}" class="tone-${card.tone}"><span></span><strong>${esc(card.label)}</strong><em></em></div>`).join("")}</div>
+      <div class="homeLayoutActionGrid550"><button class="ghost" type="button" data-home-card-state="expand">Set All Open</button><button class="ghost" type="button" data-home-card-state="collapse">Set All Collapsed</button><button class="danger" type="button" id="resetHomeLayout550">Reset Home Layout</button></div>
+    </section>
+  </div>`;
+}
+function updateHomeLayoutPreview550(){
+  HOME_LAYOUT_CARDS_550.forEach(card=>{
+    const row=document.querySelector(`[data-home-preview-card="${card.key}"]`);
+    if(!row) return;
+    const input=document.getElementById(`homeVisible_${card.key}`);
+    const select=document.getElementById(`homeBehavior_${card.key}`);
+    const visible=input?input.checked:homeLayoutCard550(card.key).visible;
+    const behavior=select?.value||homeLayoutCard550(card.key).behavior;
+    const available=homeLayoutModuleAvailable550(card.key);
+    row.classList.toggle("previewHidden550",!visible);
+    row.classList.toggle("previewUnavailable550",!available);
+    const status=row.querySelector("em");
+    if(status) status.textContent=!available?"Module off":!visible?"Hidden":behavior==="expanded"?"Starts open":behavior==="collapsed"?"Starts closed":"Remembers";
+  });
+}
+
 function settingsPanel(){
   const s=data.settings, t=s.theme, tech=s.technician, email=s.email, r=s.reports, o=s.overlay, a=s.advanced, gps=s.gps||{};
   const saveButton=(label="Save")=>`<button class="primary saveMini" id="saveSettings">${esc(label)}</button>`;
@@ -4829,6 +4953,8 @@ function settingsPanel(){
     ${settingsSection540("Appearance","Interface Style","Fine-tune the color and shape of FireVault controls.",`<div class="settingsGrid settingsGrid540">${fieldBlock("Theme",`<select id="themeName">${Object.entries(themePresets).map(([key,p])=>`<option value="${key}" ${t.name===key?"selected":""}>${p.label}</option>`).join("")}</select>`)}${fieldBlock("Accent color",`<input id="themeAccent" type="color" value="${esc(t.accentColor||"#ef4444")}">`)}${fieldBlock("Button shape",`<select id="buttonStyle"><option value="rounded" ${t.buttonStyle!=="squared"?"selected":""}>Rounded</option><option value="squared" ${t.buttonStyle==="squared"?"selected":""}>Squared</option></select>`)}${fieldBlock("Card style",`<select id="cardStyle"><option value="glass" ${t.cardStyle!=="solid"?"selected":""}>Glass</option><option value="solid" ${t.cardStyle==="solid"?"selected":""}>Solid</option></select>`)}</div>`,"pink")}
     ${settingsSection540("Comfort","Readability & Feedback","Adjust contrast, text density, and tactile feedback for field use.",`<div class="settingsList settingsToggleList540 twoCol">${checkBlock("themeHighContrast","High contrast support",t.highContrast)}${checkBlock("themeLargeText","Larger text",t.largeText)}${checkBlock("themeCompact","Compact layout",t.compactLayout)}${checkBlock("themeHaptics","Haptic button feedback",s.app?.haptics!==false)}</div>`,"blue")}
   </div>`;
+
+  if(settingsTab==="homeLayout") return homeLayoutPanel550();
 
   if(settingsTab==="visibility") {
     const mode=appMode(); const v=visibility();
@@ -4861,6 +4987,13 @@ function wireSettingsPanel(){
   document.querySelectorAll("[data-view-mode]").forEach(b=>b.onclick=()=>setViewMode(b.dataset.viewMode));
   document.querySelectorAll("[data-feature-preset]").forEach(b=>b.onclick=()=>applyFeaturePreset474(b.dataset.featurePreset));
   document.querySelectorAll("[data-layout-preset]").forEach(b=>b.onclick=()=>applyLayoutPreset565(b.dataset.layoutPreset));
+  document.querySelectorAll("[data-home-layout-preset]").forEach(b=>b.onclick=()=>applyHomeLayoutPreset550(b.dataset.homeLayoutPreset));
+  document.querySelectorAll("[data-home-card-state]").forEach(b=>b.onclick=()=>setAllHomeCardState550(b.dataset.homeCardState==="collapse"));
+  const resetHome550=document.getElementById("resetHomeLayout550"); if(resetHome550) resetHome550.onclick=()=>{ if(confirm("Reset optional Home cards to their default visibility and remember-last behavior?")) resetHomeLayout550(); };
+  if(settingsTab==="homeLayout"){
+    document.querySelectorAll('[id^="homeVisible_"], [id^="homeBehavior_"]').forEach(el=>el.addEventListener("change",()=>{ captureSettingsScroll576(); updateHomeLayoutPreview550(); }));
+    updateHomeLayoutPreview550();
+  }
   if(settingsTab==="visibility"){
     document.querySelectorAll(".featureCheck472 input[type=checkbox], #viewMode").forEach(el=>el.addEventListener("change",captureSettingsScroll576));
   }
@@ -4877,6 +5010,11 @@ function saveSettings(){
   if(settingsTab==="overlay") s.overlay={...s.overlay,...collectOverlayFromInputs510()};
   if(settingsTab==="gps") s.gps={enabled:checked("gpsEnabled"),mapProvider:val("gpsMapProvider")||"apple",highAccuracy:val("gpsHighAccuracy")!=="false",includeInReports:checked("gpsReports"),nearbyRadiusMiles:Number(val("gpsNearbyRadius"))||1};
   if(settingsTab==="themes") { s.theme={name:val("themeName"),accentColor:val("themeAccent"),highContrast:checked("themeHighContrast"),largeText:checked("themeLargeText"),compactLayout:checked("themeCompact"),buttonStyle:val("buttonStyle"),cardStyle:val("cardStyle")}; s.app={...(s.app||{}),haptics:checked("themeHaptics"),viewMode:s.app?.viewMode||"simple"}; }
+  if(settingsTab==="homeLayout") {
+    const cards={};
+    HOME_LAYOUT_CARDS_550.forEach(card=>cards[card.key]={visible:checked(`homeVisible_${card.key}`),behavior:val(`homeBehavior_${card.key}`)||"remember"});
+    s.homeLayout={preset:"custom",cards};
+  }
   if(settingsTab==="visibility") { s.app={...(s.app||{}),viewMode:val("viewMode")||"simple",activeFeaturePreset575:"",activeLayoutPreset575:""}; const next={...visibility()}; FEATURE_LABELS.forEach(([key])=>next[key]=checked("vis_"+key)); s.visibility=next; }
   if(settingsTab==="advanced") s.advanced={aiTechnician:checked("advAi"),reverseAddressLookup:checked("advReverse"),cloudBackup:checked("advCloud"),voiceTranscription:checked("advVoice"),ocrReader:checked("advOcr"),emailGateway:checked("advEmail"),weather:checked("advWeather"),traffic:checked("advTraffic")};
   save(); toast("Settings saved."); view="settings"; mode="settingsDetail"; render();
@@ -5749,7 +5887,8 @@ function diagnostics(){
 }
 function showChangelog(){
   const notes = [
-    "Build 0.54.0 restores the preferred Email composer and introduces a fully scoped Settings redesign.",
+    "Build 0.55.0 adds a dedicated Home Layout workspace with presets, per-card visibility, and open/closed behavior controls.",
+    "Build 0.54.0 restored the preferred Email composer and introduced a fully scoped Settings redesign.",
     "Added collapsible Home cards for Pinned Sites, Field Focus, Nearby Accounts, and Recent Accounts.",
     "Each Home card remembers its open or closed state between app sessions while remaining open by default for existing users.",
     "Improved iPad portrait and landscape reflow so Home modules use available width without stretching phone layouts or hiding controls.",

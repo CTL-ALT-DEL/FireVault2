@@ -1,18 +1,19 @@
-# FireVault Build 0.54.0
+# FireVault Build 0.55.0
 
-Build 0.54.0 restores the preferred Email Settings composer from 0.53.0 and redesigns the full Settings area without allowing Settings styles to affect Account, Home, or other app screens.
+Build 0.55.0 adds a dedicated Home Layout workspace while preserving the stable 0.54.0 Settings and Email design.
 
 ## Highlights
 
-- Restored the step-by-step Email Setup editor with a separate live email preview.
-- Added live To, CC, subject, and signature preview updates.
-- Redesigned the Settings home menu with distinct color identities for each category.
-- Reorganized Technician, GPS, Reports, Theme, Modules, Advanced, Backup, Photo Overlay, and About content for clearer reading.
-- Improved labels, help text, input sizing, toggle rows, card separation, and phone/iPad spacing.
-- Added restrained color accents to separate Settings sections while retaining FireVault's dark field interface.
-- Strictly scoped every new style to Settings routes so Account and other screens retain the stable 0.53.1 layout.
-- Preserved Settings scroll-position recovery and all existing data/settings IDs.
+- Added Settings → Home Layout as a dedicated customization area.
+- Added Clean Home, Field Ready, Compact Cards, and Full Home presets.
+- Added individual visibility controls for Pinned Sites, Field Focus, Nearby Accounts, and Recent Accounts.
+- Added per-card open behavior: remember the last choice, always start open, or always start collapsed.
+- Added a live Home card preview inside Settings.
+- Added Expand All Now, Collapse All Now, and Reset Home Layout controls.
+- Home-card settings remain separate from module availability, so disabled modules are clearly identified without losing preferences.
+- Preserved the 0.54.0 Email composer, Settings formatting, Settings scroll recovery, responsive iPhone/iPad layout, and all existing account data.
+- Preserved FIRE in red and VAULT in white throughout the app.
 
 ## Commit message
 
-`Build 0.54.0 restore Email composer and redesign scoped Settings UI`
+`Build 0.55.0 add Home Layout presets and card controls`
