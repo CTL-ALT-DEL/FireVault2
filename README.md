@@ -1,11 +1,11 @@
-# FireVault Build 0.50.64
+# FireVault Build 0.50.65
 
-Build 0.50.64 continues from the stable 0.50.63 baseline and expands Settings → Modules into layout controls for Home and account screens.
+Build 0.50.65 continues from the stable 0.50.64 baseline and adds Quick Layout Presets for Home and account screen layout.
 
 ## Changes
 
-- Visible app version advanced to 0.50.64.
-- Cache-busting references updated to 0.50.64.
+- Visible app version advanced to 0.50.65.
+- Cache-busting references updated to 0.50.65.
 - Added **Site Quick Actions** card on the account/site screen.
 - Added direct quick actions for:
   - Add Site Note
@@ -31,13 +31,13 @@ Run from the project root:
 node --check src/storage.js
 node --check src/app.js
 python -m json.tool manifest.json > /dev/null
-zip -T firevault-build-0.50.64-modular-root.zip
+zip -T firevault-build-0.50.65-modular-root.zip
 ```
 
 ## Suggested commit message
 
 ```text
-Build 0.50.64 layout control toggles
+Build 0.50.65 quick layout presets
 ```
 
 - Lifted the red Home add button above the bottom nav so it should not be blocked by the black bottom area.
@@ -88,3 +88,6 @@ Build 0.50.64 layout control toggles
 
 - Site Brief and Site Activity Timeline can now be hidden from account screens.
 - Added Layout Controls status and Copy Layout Controls in Data Tools.
+
+- Data Tools now shows the current layout preset and includes Open Layout Settings.
+- Copy Layout Controls now includes the current layout preset.

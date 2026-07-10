@@ -8,7 +8,7 @@
   "orientation": "any",
   "background_color": "#0b0d10",
   "theme_color": "#101216",
-  "description": "Field knowledge system for fire alarm technicians. Build 0.50.64 adds layout control toggles for Field Focus, Data Safe Home Card, Site Brief, and Site Activity Timeline, plus Layout Controls status in Data Tools.",
+  "description": "Field knowledge system for fire alarm technicians. Build 0.50.65 adds Quick Layout Presets for Home and account screen layout, with current preset status in Data Tools.",
   "icons": [
     {
       "src": "assets/icon-192.png",

@@ -197,6 +197,33 @@ function currentPresetName474(){
   return found?.label || (mode === "power" ? "Power Mode" : mode === "advanced" ? "Custom Advanced" : "Custom Simple");
 }
 
+const LAYOUT_PRESETS_565 = {
+  clean:{label:"Clean Home", icon:"◯", note:"Hide priority and backup cards; keep account screens compact.", values:{fieldFocus:false,dataSafeHome:false,siteBrief:true,siteTimeline:false}},
+  field:{label:"Field Focused", icon:"▣", note:"Show field priorities and data safety, keep site screens useful.", values:{fieldFocus:true,dataSafeHome:true,siteBrief:true,siteTimeline:true}},
+  site:{label:"Site Detail", icon:"▤", note:"Home stays clean while account screens show brief and timeline.", values:{fieldFocus:false,dataSafeHome:false,siteBrief:true,siteTimeline:true}},
+  minimal:{label:"Minimal", icon:"—", note:"Hide optional Home and site-detail cards for the simplest view.", values:{fieldFocus:false,dataSafeHome:false,siteBrief:false,siteTimeline:false}}
+};
+function layoutPresetName565(){
+  const v=visibility();
+  const found=Object.values(LAYOUT_PRESETS_565).find(p=>Object.keys(p.values).every(k=>(v[k]!==false)===(p.values[k]!==false)));
+  return found?.label || "Custom Layout";
+}
+function layoutPresetCards565(){
+  return `<div class="card settingGroup compactPane layoutPresets565">
+    <div class="paneHead"><div><h2>Quick Layout Presets</h2><p class="paneNote">One tap changes only the Home and account-screen layout cards. Your full modules and saved data stay intact.</p></div><span class="layoutPresetBadge565">${esc(layoutPresetName565())}</span></div>
+    <div class="layoutPresetGrid565">${Object.entries(LAYOUT_PRESETS_565).map(([key,p])=>`<button class="ghost layoutPresetBtn565" data-layout-preset="${esc(key)}"><span>${esc(p.icon)}</span><strong>${esc(p.label)}</strong><small>${esc(p.note)}</small></button>`).join("")}</div>
+  </div>`;
+}
+function applyLayoutPreset565(name){
+  const p=LAYOUT_PRESETS_565[name];
+  if(!p){ toast("Layout preset unavailable."); return; }
+  const v=visibility();
+  data.settings.visibility={...v,...p.values};
+  save();
+  toast(`${p.label} layout applied.`);
+  settings();
+}
+
 
 function ensureModuleBaseline476(){
   data.settings.app = data.settings.app || {};
@@ -1860,7 +1887,7 @@ function siteToolCount477(){
 }
 
 
-/* Build 0.50.64 Site Screen Cleanup helpers */
+/* Build 0.50.65 Site Screen Cleanup helpers */
 function siteOpenTasks556(s={}){
   return (s.tasks||[]).filter(t=>String(t.status||"Open").toLowerCase()!=="done" && String(t.status||"Open").toLowerCase()!=="complete");
 }
@@ -1953,7 +1980,7 @@ function wireSiteBrief556(){
 
 
 
-/* Build 0.50.64 Site Activity Timeline filters */
+/* Build 0.50.65 Site Activity Timeline filters */
 let siteTimelineFilter558 = "all";
 let siteTimelineExpanded559 = false;
 function siteTimelineFilterCounts558(s={}){
@@ -1997,7 +2024,7 @@ function wireSiteTimelineFilters558(){
   });
 }
 
-/* Build 0.50.64 Site Activity Timeline helpers */
+/* Build 0.50.65 Site Activity Timeline helpers */
 function activityDateMs557(value){
   const t=new Date(value || 0).getTime();
   return Number.isFinite(t) ? t : 0;
@@ -3557,7 +3584,7 @@ function openReportEmailDraft(s, txt, subject){
 }
 
 
-/* Build 0.50.64 Customer Report Preview helpers */
+/* Build 0.50.65 Customer Report Preview helpers */
 function customerReportPreviewStats555(s={}){
   const selected=reportPhotos526(s);
   const ready=customerReportPhotoReady530(s);
@@ -4253,7 +4280,7 @@ function settingsPanel(){
   if(settingsTab==="overlay") return overlaySettingsPanel510(o);
   if(settingsTab==="gps") return `<div class="settingsStack"><div class="card settingGroup compactPane gpsSettingsPane"><div class="paneHead"><h2>GPS / Maps</h2><button class="primary saveMini" id="saveSettings">Save</button></div><p class="paneNote">Restored GPS tools. Coordinates are saved locally inside each site record.</p><div class="settingsGrid">${fieldBlock("Default Map",`<select id="gpsMapProvider"><option value="apple" ${gps.mapProvider!=="google"?"selected":""}>Apple Maps</option><option value="google" ${gps.mapProvider==="google"?"selected":""}>Google Maps</option></select>`)}${fieldBlock("GPS Accuracy",`<select id="gpsHighAccuracy"><option value="true" ${gps.highAccuracy!==false?"selected":""}>High accuracy</option><option value="false" ${gps.highAccuracy===false?"selected":""}>Standard</option></select>`)}${fieldBlock("Nearby Radius",`<input id="gpsNearbyRadius" inputmode="decimal" value="${esc(gps.nearbyRadiusMiles||1)}">`,`Miles for Nearby Sites detection`)}</div><div class="settingsList">${checkBlock("gpsEnabled","Show GPS capture buttons on site pages",gps.enabled!==false)}${checkBlock("gpsReports","Include GPS coordinates in reports",gps.includeInReports!==false)}</div><p class="fieldNote">Browser GPS works only when allowed by the phone/browser and served from HTTPS.</p></div></div>`;
   if(settingsTab==="themes") return `<div class="settingsStack"><div class="card settingGroup compactPane"><div class="paneHead"><h2>Theme Engine</h2><button class="primary saveMini" id="saveSettings">Apply</button></div><p class="paneNote">Quick presets and live UI controls.</p><div class="presetGrid">${Object.entries(themePresets).map(([key,p])=>`<button class="ghost presetBtn" data-preset="${key}"><span class="themeSwatch" style="background:${p.accentColor}"></span><span>${p.label}</span></button>`).join("")}</div><div class="settingsGrid">${fieldBlock("Theme",`<select id="themeName">${Object.entries(themePresets).map(([key,p])=>`<option value="${key}" ${t.name===key?"selected":""}>${p.label}</option>`).join("")}</select>`)}${fieldBlock("Accent Color",`<input id="themeAccent" type="color" value="${esc(t.accentColor||"#ef4444")}">`)}${fieldBlock("Buttons",`<select id="buttonStyle"><option value="rounded" ${t.buttonStyle!=="squared"?"selected":""}>rounded</option><option value="squared" ${t.buttonStyle==="squared"?"selected":""}>squared</option></select>`)}${fieldBlock("Cards",`<select id="cardStyle"><option value="glass" ${t.cardStyle!=="solid"?"selected":""}>glass</option><option value="solid" ${t.cardStyle==="solid"?"selected":""}>solid</option></select>`)}</div><div class="settingsList">${checkBlock("themeHighContrast","High contrast support",t.highContrast)}${checkBlock("themeLargeText","Larger text",t.largeText)}${checkBlock("themeCompact","Compact layout",t.compactLayout)}${checkBlock("themeHaptics","Haptic button feedback",s.app?.haptics!==false)}</div></div></div>`;
-  if(settingsTab==="visibility") { const mode=appMode(); const v=visibility(); return `<div class="settingsStack simpleSettings472"><div class="card settingGroup compactPane simpleHero472"><div class="paneHead"><div><h2>Modules / Simple View</h2><p class="paneNote">Turn major FireVault modules on or off. Disabled modules disappear from the interface until you enable them again here.</p></div><button class="primary saveMini" id="saveSettings">Save</button></div><div class="settingsGrid">${fieldBlock("App Mode",`<select id="viewMode"><option value="simple" ${mode==="simple"?"selected":""}>Simple View</option><option value="advanced" ${mode==="advanced"?"selected":""}>Advanced View</option><option value="power" ${mode==="power"?"selected":""}>Technician Power Mode</option></select>`,`Simple keeps the field interface clean. Advanced shows enabled modules. Power shows everything.`)}</div><div class="viewModeQuick472"><button class="ghost" data-view-mode="simple">Simple</button><button class="ghost" data-view-mode="advanced">Advanced</button><button class="ghost" data-view-mode="power">Power</button></div></div>${visibilityPresetCards474()}<div class="card settingGroup compactPane"><div class="paneHead"><h2>Modules</h2></div><p class="paneNote">Turn off anything you do not need. Disabled modules are removed from the dashboard, site screens, bottom tabs, and tool menus until enabled again. Field Focus, Data Safe Home Card, Site Brief, and Site Activity Timeline are layout controls; their underlying tools remain available from their full screens.</p><div class="settingsList featureList472">${FEATURE_LABELS.map(([key,label,note])=>`<label class="checkRow featureCheck472"><input type="checkbox" id="vis_${key}" ${v[key]?"checked":""}><span><strong>${esc(label)}</strong><small>${esc(note)}</small></span></label>`).join("")}</div></div></div>`; }
+  if(settingsTab==="visibility") { const mode=appMode(); const v=visibility(); return `<div class="settingsStack simpleSettings472"><div class="card settingGroup compactPane simpleHero472"><div class="paneHead"><div><h2>Modules / Simple View</h2><p class="paneNote">Turn major FireVault modules on or off. Disabled modules disappear from the interface until you enable them again here.</p></div><button class="primary saveMini" id="saveSettings">Save</button></div><div class="settingsGrid">${fieldBlock("App Mode",`<select id="viewMode"><option value="simple" ${mode==="simple"?"selected":""}>Simple View</option><option value="advanced" ${mode==="advanced"?"selected":""}>Advanced View</option><option value="power" ${mode==="power"?"selected":""}>Technician Power Mode</option></select>`,`Simple keeps the field interface clean. Advanced shows enabled modules. Power shows everything.`)}</div><div class="viewModeQuick472"><button class="ghost" data-view-mode="simple">Simple</button><button class="ghost" data-view-mode="advanced">Advanced</button><button class="ghost" data-view-mode="power">Power</button></div></div>${visibilityPresetCards474()}${layoutPresetCards565()}<div class="card settingGroup compactPane"><div class="paneHead"><h2>Modules</h2></div><p class="paneNote">Turn off anything you do not need. Disabled modules are removed from the dashboard, site screens, bottom tabs, and tool menus until enabled again. Field Focus, Data Safe Home Card, Site Brief, and Site Activity Timeline are layout controls; their underlying tools remain available from their full screens.</p><div class="settingsList featureList472">${FEATURE_LABELS.map(([key,label,note])=>`<label class="checkRow featureCheck472"><input type="checkbox" id="vis_${key}" ${v[key]?"checked":""}><span><strong>${esc(label)}</strong><small>${esc(note)}</small></span></label>`).join("")}</div></div></div>`; }
   if(settingsTab==="advanced") return `<div class="settingsStack"><div class="card settingGroup compactPane"><div class="paneHead"><h2>Advanced Features</h2><button class="primary saveMini" id="saveSettings">Save</button></div><p class="paneNote"><span class="featureStar">*</span> Requires outside services, permissions, APIs, or future backend modules.</p><div class="settingsList twoCol">${[["advAi","aiTechnician","AI Technician"],["advReverse","reverseAddressLookup","Reverse Address Lookup *"],["advCloud","cloudBackup","Cloud Backup *"],["advVoice","voiceTranscription","Voice Transcription *"],["advOcr","ocrReader","OCR Reader *"],["advEmail","emailGateway","Email Gateway *"],["advWeather","weather","Weather Context *"],["advTraffic","traffic","Traffic / Routing *"]].map(x=>checkBlock(x[0],x[2],a[x[1]])).join("")}</div></div></div>`;
   if(settingsTab==="backup") return backupSettingsPanel();
   return `<div class="settingsStack"><div class="card settingGroup compactPane"><div class="paneHead"><h2>About FireVault</h2></div><p class="paneNote">A modular field knowledge system for fire alarm technicians.</p><div class="aboutGrid"><div><strong>Build</strong><span>${BUILD}</span></div><div><strong>Storage key</strong><span>${KEY}</span></div><div><strong>Roadmap lane</strong><span>Modular foundation, settings polish, iPhone PWA, deeper service-call modules.</span></div></div></div></div>`;
@@ -4266,6 +4293,7 @@ function wireSettingsPanel(){
   document.querySelectorAll(".presetBtn").forEach(b=>b.onclick=()=>{ const p=themePresets[b.dataset.preset]; data.settings.theme.name=b.dataset.preset; data.settings.theme.accentColor=p.accentColor; if(p.highContrast) data.settings.theme.highContrast=true; save(); settings(); toast("Theme applied."); });
   document.querySelectorAll("[data-view-mode]").forEach(b=>b.onclick=()=>setViewMode(b.dataset.viewMode));
   document.querySelectorAll("[data-feature-preset]").forEach(b=>b.onclick=()=>applyFeaturePreset474(b.dataset.featurePreset));
+  document.querySelectorAll("[data-layout-preset]").forEach(b=>b.onclick=()=>applyLayoutPreset565(b.dataset.layoutPreset));
   const exportBtn=document.getElementById("exportBtn"); if(exportBtn) exportBtn.onclick=()=>{ const stamp=new Date().toISOString().slice(0,10); localStorage.setItem("firevault_last_backup_export", new Date().toLocaleString()); downloadBlob(`firevault-backup-${stamp}-build-${BUILD}.json`, JSON.stringify(data,null,2), "application/json"); toast("Backup exported."); settings(); };
   const copyBackupSummaryBtn=document.getElementById("copyBackupSummaryBtn"); if(copyBackupSummaryBtn) copyBackupSummaryBtn.onclick=async()=>{ try{ await navigator.clipboard.writeText(backupSummaryText()); toast("Backup summary copied."); }catch{ toast("Clipboard unavailable."); } };
   const importFile=document.getElementById("importFile"); if(importFile) importFile.onchange=e=>{ const f=e.target.files[0]; if(!f)return; const r=new FileReader(); r.onload=()=>{try{data=loadData(); Object.assign(data, JSON.parse(r.result)); saveData(data); data=loadData(); applyTheme(); toast("Backup imported."); route("home");}catch{alert("Import failed.");}}; r.readAsText(f); };
@@ -4439,7 +4467,7 @@ function repairVaultState(){
 
 
 
-/* Build 0.50.64 Action Center helpers */
+/* Build 0.50.65 Action Center helpers */
 function actionPriorityClass562(rank){
   if(rank<=1) return "critical";
   if(rank===2) return "today";
@@ -4614,7 +4642,7 @@ function actionCenter(){
 }
 
 
-/* Build 0.50.64 Field Focus dashboard helpers */
+/* Build 0.50.65 Field Focus dashboard helpers */
 function fieldFocusStats561(){
   const sites=data.sites||[];
   const openTasks=allTaskRows().filter(r=>!taskIsDone(r.t));
@@ -4699,7 +4727,7 @@ function wireFieldFocus561(){
 }
 
 
-/* Build 0.50.64 Data Tools / Home cleanup helpers */
+/* Build 0.50.65 Data Tools / Home cleanup helpers */
 function dataSafeSummary560(){
   const s=backupSafetyStats552();
   const lastRestore=localStorage.getItem("firevault_last_restore_time");
@@ -4721,6 +4749,7 @@ function layoutControlSummary564(){
   const v=data.settings.visibility || {};
   const on = k => v[k] !== false;
   return [
+    `Preset: ${layoutPresetName565()}`,
     `Field Focus: ${on("fieldFocus")?"On":"Off"}`,
     `Data Safe Home Card: ${on("dataSafeHome")?"On":"Off"}`,
     `Site Brief: ${on("siteBrief")?"On":"Off"}`,
@@ -4747,14 +4776,14 @@ function layoutControlsCard564(){
   const v=data.settings.visibility || {};
   const state=k=>v[k] !== false ? "On" : "Off";
   return `<div class="card layoutControls564">
-    <div><h2>Layout Controls</h2><p>These Home and account-screen cards can now be enabled or hidden from Settings → Modules.</p></div>
+    <div class="layoutControlsHead565"><div><h2>Layout Controls</h2><p>Current preset: ${esc(layoutPresetName565())}. Home and account-screen cards can be enabled or hidden from Settings → Modules.</p></div><span>${esc(layoutPresetName565())}</span></div>
     <div class="layoutControlGrid564">
       <div><strong>${esc(state("fieldFocus"))}</strong><span>Field Focus</span></div>
       <div><strong>${esc(state("dataSafeHome"))}</strong><span>Data Safe Home</span></div>
       <div><strong>${esc(state("siteBrief"))}</strong><span>Site Brief</span></div>
       <div><strong>${esc(state("siteTimeline"))}</strong><span>Site Timeline</span></div>
     </div>
-    <button class="ghost" id="copyLayoutControls564">Copy Layout Controls</button>
+    <div class="layoutControlActions565"><button class="ghost" id="copyLayoutControls564">Copy Layout Controls</button><button class="ghost" id="openLayoutSettings565">Open Layout Settings</button></div>
   </div>`;
 }
 
@@ -4803,6 +4832,7 @@ function dataTools(){
   document.getElementById("backHome560").onclick=()=>route("home");
   wireBackupSafety552();
   const layoutCopy=document.getElementById("copyLayoutControls564"); if(layoutCopy) layoutCopy.onclick=copyLayoutControls564;
+  const openLayout=document.getElementById("openLayoutSettings565"); if(openLayout) openLayout.onclick=()=>{settingsTab="visibility"; mode="settingsDetail"; route("settings");};
   const focus=document.getElementById("copyFieldFocus561"); if(focus) focus.onclick=copyFieldFocus561;
   const actionCopy=document.getElementById("copyActionCenterData562"); if(actionCopy) actionCopy.onclick=copyActionCenter562;
   const diag=document.getElementById("copyDiagnostics560"); if(diag) diag.onclick=copyDiagnostics;
@@ -4812,7 +4842,7 @@ function dataTools(){
 }
 
 
-/* Build 0.50.64 Backup Safety helpers */
+/* Build 0.50.65 Backup Safety helpers */
 function backupSafetyStats552(){
   const sites = (data.sites || []).length;
   const visits = (data.sites || []).reduce((n,s)=>n+((s.visits||[]).length),0);
@@ -4929,7 +4959,7 @@ async function copyUpdateChecklist553(){
 }
 
 
-/* Build 0.50.64 Backup Restore Center */
+/* Build 0.50.65 Backup Restore Center */
 let pendingRestoreBackup554 = null;
 
 function normalizeBackupPayload554(raw){
@@ -5138,17 +5168,17 @@ function diagnostics(){
 }
 function showChangelog(){
   const notes = [
-    "Advanced to Build 0.50.64 from the stable 0.50.63 baseline.",
-    "Expanded Settings → Modules into layout controls for Field Focus, Data Safe Home Card, Site Brief, and Site Activity Timeline.",
-    "Data Safe can now be hidden from Home while Data Tools stays available.",
-    "Site Brief and Site Activity Timeline can now be disabled on account screens without deleting their underlying data.",
-    "Added Layout Controls status and Copy Layout Controls inside Data Tools, while preserving Action Center, Home cleanup, Data Tools, Field Focus, expandable Site Activity Timeline, timeline filters, Site Brief, Customer Report Preview, Backup Restore Center, top-right Add Site placement, clean splash screen with no loader, and excluded job-status workflow controls."
+    "Advanced to Build 0.50.65 from the stable 0.50.64 baseline.",
+    "Added Quick Layout Presets in Settings → Modules.",
+    "New layout presets include Clean Home, Field Focused, Site Detail, and Minimal.",
+    "Data Tools now shows the current layout preset and includes an Open Layout Settings shortcut.",
+    "Preserved layout control toggles, Action Center, Home cleanup, Data Tools, Field Focus, expandable Site Activity Timeline, timeline filters, Site Brief, Customer Report Preview, Backup Restore Center, top-right Add Site placement, clean splash screen with no loader, and excluded job-status workflow controls."
   ];
   const overlay=document.createElement("div");
   overlay.className="releaseOverlay";
   overlay.innerHTML=`<div class="releaseSheet" role="dialog" aria-modal="true" aria-label="FireVault release notes">
     <div class="releaseHead"><div><strong>FireVault</strong><span>Build ${BUILD}</span></div><button class="ghost iconBtn" id="closeRelease" aria-label="Close release notes">×</button></div>
-    <div class="releaseBody"><h2>Release Notes</h2><p class="releaseIntro">Expanded module toggles for Field Focus, Data Safe, Site Brief, and Site Timeline.</p><ul>${notes.map(n=>`<li>${esc(n)}</li>`).join("")}</ul></div>
+    <div class="releaseBody"><h2>Release Notes</h2><p class="releaseIntro">Added Quick Layout Presets for Home and account screen layout.</p><ul>${notes.map(n=>`<li>${esc(n)}</li>`).join("")}</ul></div>
   </div>`;
   document.body.appendChild(overlay);
   const close=()=>overlay.remove();
