@@ -1508,7 +1508,7 @@ function wireNoteTemplates503(targetId="siteNoteText"){
 }
 
 
-/* Build 0.50.73 Pinned Sites helpers */
+/* Build 0.50.74 Pinned Sites helpers */
 function isPinnedSite566(s){ return !!s?.pinnedAt; }
 function pinnedSites566(limit=5){
   return [...(data.sites||[])].filter(isPinnedSite566).sort((a,b)=>{
@@ -1566,7 +1566,7 @@ function toggleSitePinned566(){
   siteDetail();
 }
 
-/* Build 0.50.73 Pinned Sites Manager */
+/* Build 0.50.74 Pinned Sites Manager */
 function unpinSiteById567(id){
   const s=(data.sites||[]).find(x=>x.id===id);
   if(!s) return;
@@ -2168,7 +2168,7 @@ function siteToolCount477(){
 }
 
 
-/* Build 0.50.73 Site Screen Cleanup helpers */
+/* Build 0.50.74 Site Screen Cleanup helpers */
 function siteOpenTasks556(s={}){
   return (s.tasks||[]).filter(t=>String(t.status||"Open").toLowerCase()!=="done" && String(t.status||"Open").toLowerCase()!=="complete");
 }
@@ -2261,7 +2261,7 @@ function wireSiteBrief556(){
 
 
 
-/* Build 0.50.73 Site Activity Timeline filters */
+/* Build 0.50.74 Site Activity Timeline filters */
 let siteTimelineFilter558 = "all";
 let siteTimelineExpanded559 = false;
 function siteTimelineFilterCounts558(s={}){
@@ -2305,7 +2305,7 @@ function wireSiteTimelineFilters558(){
   });
 }
 
-/* Build 0.50.73 Site Activity Timeline helpers */
+/* Build 0.50.74 Site Activity Timeline helpers */
 function activityDateMs557(value){
   const t=new Date(value || 0).getTime();
   return Number.isFinite(t) ? t : 0;
@@ -2475,7 +2475,7 @@ function wireSiteActivity557(){
 }
 
 
-/* Build 0.50.73 Important Site Info helpers */
+/* Build 0.50.74 Important Site Info helpers */
 function primaryContact568(s={}){
   const contacts=s.contacts||[];
   return contacts.find(c=>/primary|main|manager|owner|contact/i.test([c.role,c.notes,c.accessNotes].filter(Boolean).join(" "))) || contacts[0] || {};
@@ -2526,10 +2526,10 @@ function importantSiteInfoMarkup568(s={}){
       <button class="ghost smallBtn" id="copyImportantInfo568">Copy</button>
     </div>
     <div class="importantInfoGrid568">
-      <div><strong>Contact</strong><span>${esc(contact)}</span><em>${esc(phone)}</em></div>
-      <div><strong>Access</strong><span>${esc(access)}</span></div>
-      <div><strong>Panel</strong><span>${esc(panel)}</span></div>
-      <div><strong>GPS</strong><span>${esc(gps)}</span><em>${esc(hasGps(s)?gpsLine(s):"Capture GPS when on site")}</em></div>
+      <div class="infoContact574"><strong>Contact</strong><span>${esc(contact)}</span><em>${esc(phone)}</em></div>
+      <div class="infoAccess574"><strong>Access</strong><span>${esc(access)}</span></div>
+      <div class="infoPanel574"><strong>Panel</strong><span>${esc(panel)}</span></div>
+      <div class="infoGps574"><strong>GPS</strong><span>${esc(gps)}</span><em>${esc(hasGps(s)?gpsLine(s):"Capture GPS when on site")}</em></div>
     </div>
   </div>`;
 }
@@ -2560,7 +2560,7 @@ function siteDetail(){
   const showChecklistTool=appMode()!=='simple' || featureOn('reports');
   const toolCount=siteToolCount477();
   const nextAction = def ? `${def} deficiency${def===1?'':'ies'} need review` : open ? `${open} open task${open===1?'':'s'}` : 'Ready for service';
-  html(`<div class="screen siteDetailScreen477 siteDetailScreen489"><div class="row siteTopBar siteTopBar477 siteTopBar489"><button class="back ghost" id="backBtn">←</button><div class="siteTopTitle477"><strong>Account</strong><span>${esc(appMode()==='simple'?'Simple tools':'Modules on')}</span></div><button class="ghost" id="editBtn">Edit</button></div>
+  html(`<div class="screen siteDetailScreen477 siteDetailScreen489 siteDetailScreen574"><div class="row siteTopBar siteTopBar477 siteTopBar489"><button class="back ghost" id="backBtn">←</button><div class="siteTopTitle477"><strong>Account</strong><span>${esc(appMode()==='simple'?'Simple tools':'Modules on')}</span></div><button class="ghost" id="editBtn">Edit</button></div>
 
     <div class="card siteHero477 siteHero489 siteHero566"><div class="siteHeroMain477"><span class="accountInitialLarge477">${esc((s.name||'?').slice(0,1).toUpperCase())}</span><div><h1>${esc(s.name||'Unnamed Account')}</h1><p>${esc(fullAddress(s))}</p><em>${esc(nextAction)}</em></div></div><div class="siteHeroActions566"><button class="pinSiteBtn566 ${isPinnedSite566(s)?"pinned":""}" id="pinSiteBtn566">${isPinnedSite566(s)?"★":"☆"}</button><div class="siteHealthDot477 ${health.cls}">${health.score}%</div></div></div>
 
@@ -3933,7 +3933,7 @@ function openReportEmailDraft(s, txt, subject){
 }
 
 
-/* Build 0.50.73 Customer Report Preview helpers */
+/* Build 0.50.74 Customer Report Preview helpers */
 function customerReportPreviewStats555(s={}){
   const selected=reportPhotos526(s);
   const ready=customerReportPhotoReady530(s);
@@ -4273,7 +4273,7 @@ function settingsTabs(){
 }
 
 
-/* Build 0.50.73 Settings navigation recovery */
+/* Build 0.50.74 Settings navigation recovery */
 function restoreAppChrome572(){
   document.body.classList.remove("homeFullscreen480","homeLayoutFixed570");
   const header=document.getElementById("appHeader");
@@ -4856,7 +4856,7 @@ function repairVaultState(){
 
 
 
-/* Build 0.50.73 Action Center helpers */
+/* Build 0.50.74 Action Center helpers */
 function actionPriorityClass562(rank){
   if(rank<=1) return "critical";
   if(rank===2) return "today";
@@ -5031,7 +5031,7 @@ function actionCenter(){
 }
 
 
-/* Build 0.50.73 Field Focus dashboard helpers */
+/* Build 0.50.74 Field Focus dashboard helpers */
 function fieldFocusStats561(){
   const sites=data.sites||[];
   const openTasks=allTaskRows().filter(r=>!taskIsDone(r.t));
@@ -5116,7 +5116,7 @@ function wireFieldFocus561(){
 }
 
 
-/* Build 0.50.73 Data Tools / Home cleanup helpers */
+/* Build 0.50.74 Data Tools / Home cleanup helpers */
 function dataSafeSummary560(){
   const s=backupSafetyStats552();
   const lastRestore=localStorage.getItem("firevault_last_restore_time");
@@ -5239,7 +5239,7 @@ function dataTools(){
 }
 
 
-/* Build 0.50.73 Backup Safety helpers */
+/* Build 0.50.74 Backup Safety helpers */
 function backupSafetyStats552(){
   const sites = (data.sites || []).length;
   const visits = (data.sites || []).reduce((n,s)=>n+((s.visits||[]).length),0);
@@ -5356,7 +5356,7 @@ async function copyUpdateChecklist553(){
 }
 
 
-/* Build 0.50.73 Backup Restore Center */
+/* Build 0.50.74 Backup Restore Center */
 let pendingRestoreBackup554 = null;
 
 function normalizeBackupPayload554(raw){
@@ -5565,11 +5565,11 @@ function diagnostics(){
 }
 function showChangelog(){
   const notes = [
-    "Advanced to Build 0.50.73 from the 0.50.72 Settings navigation baseline.",
-    "Rebuilt the Settings page height and scrolling behavior so the menu fills the usable screen instead of leaving a large black lower section.",
-    "Settings Home now uses one full-page scroll area, while detail pages use a stable internal content scroller above the bottom navigation.",
-    "Bottom navigation and header Settings actions now reset submenu state and always provide a reliable path back to Today.",
-    "Preserved the FireVault Daily Summary calendar, bold activity dates, Home layout correction, Important Site Info, Pinned Sites Manager, Quick Layout Presets, Action Center, Data Tools, Field Focus, Site Brief, Site Activity Timeline, clean splash screen with no loader, and excluded job-status workflow controls."
+    "Advanced to Build 0.50.74 from the stable 0.50.73 baseline.",
+    "Corrected account screen horizontal overflow and restored consistent left/right margins.",
+    "Made the account header, Important Site Info, Site Brief, and Timeline fit properly on iPhone widths.",
+    "Added distinct color identities for Contact, Access, Panel, GPS, Site Brief statistics, and account information sections.",
+    "Preserved Settings UI stability fixes, Daily Summary calendar, Home layout correction, Pinned Sites Manager, Quick Layout Presets, Action Center, Data Tools, Field Focus, clean splash screen with no loader, and excluded job-status workflow controls."
   ];
   const overlay=document.createElement("div");
   overlay.className="releaseOverlay";
