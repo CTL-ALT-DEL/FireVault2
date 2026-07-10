@@ -1,11 +1,11 @@
-# FireVault Build 0.50.51
+# FireVault Build 0.50.52
 
-Build 0.50.51 continues from the stable 0.50.50 baseline and moves the red Add Site button from the bottom of the Home screen to the Today/date row.
+Build 0.50.52 continues from the stable 0.50.51 baseline and adds Backup Safety tools so FireVault data can be saved before installing new builds.
 
 ## Changes
 
-- Visible app version advanced to 0.50.51.
-- Cache-busting references updated to 0.50.51.
+- Visible app version advanced to 0.50.52.
+- Cache-busting references updated to 0.50.52.
 - Added **Site Quick Actions** card on the account/site screen.
 - Added direct quick actions for:
   - Add Site Note
@@ -31,16 +31,20 @@ Run from the project root:
 node --check src/storage.js
 node --check src/app.js
 python -m json.tool manifest.json > /dev/null
-zip -T firevault-build-0.50.51-modular-root.zip
+zip -T firevault-build-0.50.52-modular-root.zip
 ```
 
 ## Suggested commit message
 
 ```text
-Build 0.50.51 top Add Site button placement
+Build 0.50.52 backup safety polish
 ```
 
 - Lifted the red Home add button above the bottom nav so it should not be blocked by the black bottom area.
 - Removed the extra Home nav safe-area slab that was covering the red add button.
 
 - Removed the bottom floating Add Site button so it can no longer be blocked by the bottom navigation.
+
+- Added Backup Safety counts for sites, visits, docs, photos, tasks, deficiencies, and backup size.
+- Added Copy Backup Summary.
+- Preserved top-right Add Site placement from 0.50.51.

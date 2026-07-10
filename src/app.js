@@ -1401,6 +1401,7 @@ function home(){
     </div>
 
     <button class="card dailySummaryCard499" id="dailySummaryBtn499"><div><strong>Daily Summary</strong><span>${dailySummaryLine499()}</span></div><em>Open</em></button>
+    ${backupSafetyMarkup552()}
     <div class="homeModuleSummary476 homeModuleSummary478"><button class="ghost" id="manageModulesBtn476"><strong>Modules</strong><span>${esc(moduleStatus476())}</span></button><button class="ghost" id="defCard"><strong>${def}</strong><span>Deficiencies</span></button></div>
     <div class="buildRevisionSpacer475" aria-hidden="true"></div>
   </div>`);
@@ -1422,6 +1423,7 @@ function home(){
   document.getElementById('tasksCard').onclick=()=>{selectedSiteId=null; route('tasks');};
   document.getElementById('defCard').onclick=()=>{selectedSiteId=null; route('deficiencies');};
   document.getElementById('addSiteBtn').onclick=()=>{selectedSiteId=null; mode=null; route('siteForm');};
+  wireBackupSafety552();
   const openRouteMini=document.getElementById('openRouteMiniBtn'); if(openRouteMini) openRouteMini.onclick=()=>route('routeLog');
   const homeRoutePoint=document.getElementById('homeRoutePointBtn'); if(homeRoutePoint) homeRoutePoint.onclick=()=>{ const note=prompt('Waypoint note', 'Manual waypoint')||'Manual waypoint'; addRouteEvent('Waypoint', note); };
   const homeRouteNearest=document.getElementById('homeRouteNearestBtn'); if(homeRouteNearest) homeRouteNearest.onclick=checkRouteNearestSite;
@@ -4042,6 +4044,96 @@ function repairVaultState(){
   toast("Stability repair completed.");
   diagnostics();
 }
+
+
+/* Build 0.50.52 Backup Safety helpers */
+function backupSafetyStats552(){
+  const sites = (data.sites || []).length;
+  const visits = (data.sites || []).reduce((n,s)=>n+((s.visits||[]).length),0);
+  const docs = (data.sites || []).reduce((n,s)=>n+((s.docs||[]).length),0);
+  const photoDocs = (data.sites || []).reduce((n,s)=>n+((s.docs||[]).filter(d=>{
+    const kind=String(d.kind||d.type||"").toLowerCase();
+    return kind==="photo" || !!d.photoData || !!d.imageData || /^image\//.test(String(d.mime||d.mimeType||""));
+  }).length),0);
+  const tasks = (data.sites || []).reduce((n,s)=>n+((s.tasks||[]).length),0);
+  const deficiencies = (data.sites || []).reduce((n,s)=>n+((s.deficiencies||[]).length),0);
+  const routes = (data.routeLogs || []).length;
+  const resources = (data.resources || []).length;
+  const bytes = (()=>{ try{return new Blob([JSON.stringify(data)]).size;}catch{return 0;} })();
+  return {sites,visits,docs,photoDocs,tasks,deficiencies,routes,resources,bytes};
+}
+function backupFileName552(){
+  const stamp = new Date().toISOString().slice(0,19).replace(/[:T]/g,"-");
+  return `firevault-backup-${BUILD}-${stamp}.json`;
+}
+function downloadVaultBackup552(){
+  try{
+    const payload={app:"FireVault", build:BUILD, exportedAt:new Date().toISOString(), stats:backupSafetyStats552(), data};
+    const blob=new Blob([JSON.stringify(payload,null,2)],{type:"application/json"});
+    const url=URL.createObjectURL(blob);
+    const a=document.createElement("a");
+    a.href=url;
+    a.download=backupFileName552();
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(()=>{URL.revokeObjectURL(url); a.remove();},450);
+    toast("Backup downloaded.");
+  }catch(err){
+    console.error(err);
+    toast("Backup failed.");
+  }
+}
+async function copyBackupSummary552(){
+  const s=backupSafetyStats552();
+  const lines=[
+    "FireVault Backup Summary",
+    `Build: ${BUILD}`,
+    `Date: ${new Date().toLocaleString()}`,
+    `Sites: ${s.sites}`,
+    `Visits: ${s.visits}`,
+    `Documents: ${s.docs}`,
+    `Photos: ${s.photoDocs}`,
+    `Tasks: ${s.tasks}`,
+    `Deficiencies: ${s.deficiencies}`,
+    `Route Days: ${s.routes}`,
+    `Resources: ${s.resources}`,
+    `Approx. Backup Size: ${s.bytes ? Math.max(1,Math.round(s.bytes/1024))+" KB" : "Unknown"}`,
+    "",
+    "Recommended: download a backup before installing new FireVault builds or clearing browser data."
+  ].join("\n");
+  try{
+    await navigator.clipboard.writeText(lines);
+    toast("Backup summary copied.");
+  }catch{
+    toast("Clipboard unavailable.");
+  }
+}
+function backupSafetyMarkup552(){
+  const s=backupSafetyStats552();
+  const kb=s.bytes ? `${Math.max(1,Math.round(s.bytes/1024))} KB` : "Size unknown";
+  return `<div class="card backupSafety552">
+    <div class="backupHead552"><div><h2>Backup Safety</h2><p>Save a copy before installing new builds or clearing browser data.</p></div><span>${esc(kb)}</span></div>
+    <div class="backupStats552">
+      <div><strong>${s.sites}</strong><span>Sites</span></div>
+      <div><strong>${s.visits}</strong><span>Visits</span></div>
+      <div><strong>${s.docs}</strong><span>Docs</span></div>
+      <div><strong>${s.photoDocs}</strong><span>Photos</span></div>
+      <div><strong>${s.tasks}</strong><span>Tasks</span></div>
+      <div><strong>${s.deficiencies}</strong><span>Def.</span></div>
+    </div>
+    <div class="backupActions552">
+      <button class="primary" id="downloadBackup552">Download Backup</button>
+      <button class="ghost" id="copyBackupSummary552">Copy Summary</button>
+    </div>
+  </div>`;
+}
+function wireBackupSafety552(){
+  const dl=document.getElementById("downloadBackup552");
+  if(dl) dl.onclick=downloadVaultBackup552;
+  const copy=document.getElementById("copyBackupSummary552");
+  if(copy) copy.onclick=copyBackupSummary552;
+}
+
 function diagnostics(){
   const taskRows=allTaskRows();
   const taskCounts=taskFilterCounts(taskRows);
@@ -4070,6 +4162,7 @@ function diagnostics(){
       <p>${stability.issues.length ? `${stability.issues.length} issue${stability.issues.length===1?"":"s"} found. Run Repair Vault if needed.` : "Core data structure, routes, GPS records, and active job state look clean."}</p>
     </div>
     ${startupHealthCard520()}
+    ${backupSafetyMarkup552()}
     <div class="grid2 diagnosticsActions460">
       <button class="primary" id="repairVaultBtn">Repair Vault</button>
       <button class="ghost" id="copyDiagBtn">Copy Diagnostics</button>
@@ -4095,20 +4188,21 @@ function diagnostics(){
   document.getElementById("copyDiagBtn").onclick=copyDiagnostics;
   const startupBtn=document.getElementById("copyStartupHealth520");
   if(startupBtn) startupBtn.onclick=copyStartupHealth520;
+  wireBackupSafety552();
 }
 function showChangelog(){
   const notes = [
-    "Advanced to Build 0.50.51 from the stable 0.50.50 baseline.",
-    "Moved the red Add Site button to the top of the Home screen, across from Today and the current date.",
-    "Removed the bottom floating red Add Site button so it can no longer be blocked by the bottom navigation.",
-    "Kept the splash screen loader removed and preserved the clean 5-second splash screen.",
-    "Preserved fixed splash/header behavior, Startup Health diagnostics, Photo Vault tools, Customer Report Photo workflow, iPad autosizing, simple Home screen, Search Bar Concept #6, and excluded job-status workflow controls."
+    "Advanced to Build 0.50.52 from the stable 0.50.51 baseline.",
+    "Added a Backup Safety card so you can download a FireVault JSON backup before installing new builds.",
+    "Backup Safety shows counts for sites, visits, documents, photos, tasks, deficiencies, and estimated backup size.",
+    "Added Copy Backup Summary for quick troubleshooting and record keeping.",
+    "Preserved the top-right Add Site button placement, clean splash screen with no loader, fixed splash/header behavior, Startup Health diagnostics, Photo Vault tools, Customer Report Photo workflow, iPad autosizing, simple Home screen, Search Bar Concept #6, and excluded job-status workflow controls."
   ];
   const overlay=document.createElement("div");
   overlay.className="releaseOverlay";
   overlay.innerHTML=`<div class="releaseSheet" role="dialog" aria-modal="true" aria-label="FireVault release notes">
     <div class="releaseHead"><div><strong>FireVault</strong><span>Build ${BUILD}</span></div><button class="ghost iconBtn" id="closeRelease" aria-label="Close release notes">×</button></div>
-    <div class="releaseBody"><h2>Release Notes</h2><p class="releaseIntro">Moved the Add Site button to the Today/date row and removed the bottom floating button.</p><ul>${notes.map(n=>`<li>${esc(n)}</li>`).join("")}</ul></div>
+    <div class="releaseBody"><h2>Release Notes</h2><p class="releaseIntro">Added Backup Safety download and summary tools.</p><ul>${notes.map(n=>`<li>${esc(n)}</li>`).join("")}</ul></div>
   </div>`;
   document.body.appendChild(overlay);
   const close=()=>overlay.remove();
