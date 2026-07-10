@@ -8,7 +8,7 @@
   "orientation": "any",
   "background_color": "#0b0d10",
   "theme_color": "#101216",
-  "description": "Field knowledge system for fire alarm technicians. Build 0.50.63 adds a Settings \u2192 Modules toggle so Field Focus can be disabled from the Home screen while keeping Action Center tools available.",
+  "description": "Field knowledge system for fire alarm technicians. Build 0.50.64 adds layout control toggles for Field Focus, Data Safe Home Card, Site Brief, and Site Activity Timeline, plus Layout Controls status in Data Tools.",
   "icons": [
     {
       "src": "assets/icon-192.png",

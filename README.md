@@ -1,11 +1,11 @@
-# FireVault Build 0.50.63
+# FireVault Build 0.50.64
 
-Build 0.50.63 continues from the stable 0.50.62 baseline and adds a Settings → Modules toggle for Field Focus.
+Build 0.50.64 continues from the stable 0.50.63 baseline and expands Settings → Modules into layout controls for Home and account screens.
 
 ## Changes
 
-- Visible app version advanced to 0.50.63.
-- Cache-busting references updated to 0.50.63.
+- Visible app version advanced to 0.50.64.
+- Cache-busting references updated to 0.50.64.
 - Added **Site Quick Actions** card on the account/site screen.
 - Added direct quick actions for:
   - Add Site Note
@@ -31,13 +31,13 @@ Run from the project root:
 node --check src/storage.js
 node --check src/app.js
 python -m json.tool manifest.json > /dev/null
-zip -T firevault-build-0.50.63-modular-root.zip
+zip -T firevault-build-0.50.64-modular-root.zip
 ```
 
 ## Suggested commit message
 
 ```text
-Build 0.50.63 field focus module toggle
+Build 0.50.64 layout control toggles
 ```
 
 - Lifted the red Home add button above the bottom nav so it should not be blocked by the black bottom area.
@@ -85,3 +85,6 @@ Build 0.50.63 field focus module toggle
 
 - Updated visibility presets so Field Focus is tracked as a normal FireVault module.
 - Updated Diagnostics route registration to include Action Center and Data Tools.
+
+- Site Brief and Site Activity Timeline can now be hidden from account screens.
+- Added Layout Controls status and Copy Layout Controls in Data Tools.
