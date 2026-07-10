@@ -1849,7 +1849,7 @@ function siteToolCount477(){
 }
 
 
-/* Build 0.50.56 Site Screen Cleanup helpers */
+/* Build 0.50.57 Site Screen Cleanup helpers */
 function siteOpenTasks556(s={}){
   return (s.tasks||[]).filter(t=>String(t.status||"Open").toLowerCase()!=="done" && String(t.status||"Open").toLowerCase()!=="complete");
 }
@@ -1939,6 +1939,133 @@ function wireSiteBrief556(){
   if(visits) visits.onclick=()=>route("visits");
 }
 
+
+
+/* Build 0.50.57 Site Activity Timeline helpers */
+function activityDateMs557(value){
+  const t=new Date(value || 0).getTime();
+  return Number.isFinite(t) ? t : 0;
+}
+function activityDateLabel557(value){
+  const ms=activityDateMs557(value);
+  if(!ms) return "No date";
+  try{return new Date(ms).toLocaleDateString([], {month:"short", day:"numeric", year:"numeric"});}
+  catch{return "No date";}
+}
+function activityTimeLabel557(value){
+  const ms=activityDateMs557(value);
+  if(!ms) return "";
+  try{return new Date(ms).toLocaleTimeString([], {hour:"numeric", minute:"2-digit"});}
+  catch{return "";}
+}
+function siteActivityRows557(s={}){
+  const rows=[];
+  (s.visits||[]).forEach(v=>{
+    const when=v.endedAt||v.startedAt||v.date||v.createdAt;
+    rows.push({
+      type:"Visit",
+      icon:"✓",
+      date:when,
+      sort:activityDateMs557(when),
+      title:v.type||"Visit",
+      detail:[durationText(v.startedAt,v.endedAt), v.notes||v.summary||""].filter(Boolean).join(" • "),
+      route:"visits"
+    });
+  });
+  (s.docs||[]).forEach(d=>{
+    const when=d.updatedAt||d.createdAt||d.date;
+    const isPhoto=typeof docHasPhoto512==="function" ? docHasPhoto512(d) : !!(d.imageData||d.photoData);
+    rows.push({
+      type:isPhoto?"Photo":"Doc",
+      icon:isPhoto?"▣":"▤",
+      date:when,
+      sort:activityDateMs557(when),
+      title:d.title||d.imageName||d.name||(isPhoto?"Photo":"Document"),
+      detail:[d.photoCategory||d.kind||d.type||"", d.customerCaption||d.notes||""].filter(Boolean).join(" • "),
+      route:"siteDocs",
+      photo:isPhoto
+    });
+  });
+  (s.tasks||[]).forEach(t=>{
+    const when=t.updatedAt||t.createdAt||t.due||t.date;
+    rows.push({
+      type:"Task",
+      icon:"□",
+      date:when,
+      sort:activityDateMs557(when),
+      title:t.title||t.name||"Task",
+      detail:[t.status||"Open", t.due?`Due ${t.due}`:"", t.notes||""].filter(Boolean).join(" • "),
+      route:"tasks"
+    });
+  });
+  (s.deficiencies||[]).forEach(d=>{
+    const when=d.updatedAt||d.createdAt||d.date;
+    rows.push({
+      type:"Deficiency",
+      icon:"!",
+      date:when,
+      sort:activityDateMs557(when),
+      title:d.title||d.name||"Deficiency",
+      detail:[d.status||"Open", d.priority||d.severity||"", d.customerNote||d.resolutionNotes||d.notes||""].filter(Boolean).join(" • "),
+      route:"deficiencies"
+    });
+  });
+  return rows.sort((a,b)=>b.sort-a.sort);
+}
+function siteActivityText557(s={}){
+  const rows=siteActivityRows557(s).slice(0,12);
+  const lines=[
+    "FireVault Site Activity Timeline",
+    `Build: ${BUILD}`,
+    "",
+    `Site: ${s.name||"Unnamed Account"}`,
+    `Address: ${fullAddress(s)||"No address saved"}`,
+    "",
+    rows.length ? "Recent Activity:" : "No recent activity saved yet."
+  ];
+  rows.forEach((r,i)=>{
+    lines.push(`${i+1}. ${activityDateLabel557(r.date)} ${activityTimeLabel557(r.date)} - ${r.type}: ${r.title}`);
+    if(r.detail) lines.push(`   ${r.detail}`);
+  });
+  return lines.join("\n");
+}
+async function copySiteActivity557(){
+  const s=site(); if(!s) return;
+  try{
+    await navigator.clipboard.writeText(siteActivityText557(s));
+    toast("Activity timeline copied.");
+  }catch{
+    toast("Clipboard unavailable.");
+  }
+}
+function siteActivityTimelineMarkup557(s={}){
+  const rows=siteActivityRows557(s);
+  const shown=rows.slice(0,6);
+  return `<div class="card siteTimeline557">
+    <div class="siteTimelineHead557">
+      <div><h2>Activity Timeline</h2><p>${shown.length ? `${shown.length} most recent item${shown.length===1?"":"s"}` : "No activity saved yet"}</p></div>
+      <button class="ghost smallBtn" id="copySiteActivity557">Copy Timeline</button>
+    </div>
+    <div class="siteTimelineList557">
+      ${shown.length ? shown.map((r,i)=>`<button class="siteActivityRow557" data-route="${esc(r.route)}">
+        <span class="siteActivityIcon557">${esc(r.icon)}</span>
+        <div><strong>${esc(r.title)}</strong><small>${esc(r.type)} • ${esc(activityDateLabel557(r.date))}${activityTimeLabel557(r.date)?` • ${esc(activityTimeLabel557(r.date))}`:""}</small>${r.detail?`<em>${esc(r.detail)}</em>`:""}</div>
+      </button>`).join("") : `<div class="empty">No visits, photos, documents, tasks, or deficiencies recorded yet.</div>`}
+    </div>
+  </div>`;
+}
+function wireSiteActivity557(){
+  const copy=document.getElementById("copySiteActivity557");
+  if(copy) copy.onclick=copySiteActivity557;
+  document.querySelectorAll(".siteActivityRow557").forEach(b=>{
+    b.onclick=()=>{
+      const r=b.dataset.route;
+      if(r==="siteDocs") docVaultFilter516="all";
+      if(r) route(r);
+    };
+  });
+}
+
 function siteDetail(){
   const s=site(); if(!s){ route('sites'); return; }
   s.lastOpenedAt=new Date().toISOString();
@@ -1965,6 +2092,7 @@ function siteDetail(){
     <div class="card siteHero477 siteHero489"><div class="siteHeroMain477"><span class="accountInitialLarge477">${esc((s.name||'?').slice(0,1).toUpperCase())}</span><div><h1>${esc(s.name||'Unnamed Account')}</h1><p>${esc(fullAddress(s))}</p><em>${esc(nextAction)}</em></div></div><div class="siteHealthDot477 ${health.cls}">${health.score}%</div></div>
 
     ${siteBriefMarkup556(s)}
+    ${siteActivityTimelineMarkup557(s)}
 
     <div class="card siteQuickActions544"><div class="siteCardHead477"><div><h2>Site Quick Actions</h2><p>Fast access to the field tasks used most on this account.</p></div><span class="quickActionBadge544">${open+def+photoDocs.length}</span></div><div class="quickActionGrid544">
       <button class="primary quickAction544" id="qaAddNote544"><strong>＋ Site Note</strong><span>Timestamped note</span></button>
@@ -2023,6 +2151,7 @@ function siteDetail(){
   document.getElementById('openDefMini476').onclick=()=>route('deficiencies');
   document.getElementById('snapshotBtn').onclick=shareSiteSnapshot;
   wireSiteBrief556();
+  wireSiteActivity557();
   const qaNote544=document.getElementById('qaAddNote544'); if(qaNote544) qaNote544.onclick=()=>addSiteNotePrompt();
   const qaPhoto544=document.getElementById('qaAddPhoto544'); if(qaPhoto544) qaPhoto544.onclick=()=>{mode='newPhoto'; route('siteDocForm');};
   const qaDef544=document.getElementById('qaAddDef544'); if(qaDef544) qaDef544.onclick=()=>{mode=null; route('deficiencyForm');};
@@ -3328,7 +3457,7 @@ function openReportEmailDraft(s, txt, subject){
 }
 
 
-/* Build 0.50.56 Customer Report Preview helpers */
+/* Build 0.50.57 Customer Report Preview helpers */
 function customerReportPreviewStats555(s={}){
   const selected=reportPhotos526(s);
   const ready=customerReportPhotoReady530(s);
@@ -4206,7 +4335,7 @@ function repairVaultState(){
 }
 
 
-/* Build 0.50.56 Backup Safety helpers */
+/* Build 0.50.57 Backup Safety helpers */
 function backupSafetyStats552(){
   const sites = (data.sites || []).length;
   const visits = (data.sites || []).reduce((n,s)=>n+((s.visits||[]).length),0);
@@ -4323,7 +4452,7 @@ async function copyUpdateChecklist553(){
 }
 
 
-/* Build 0.50.56 Backup Restore Center */
+/* Build 0.50.57 Backup Restore Center */
 let pendingRestoreBackup554 = null;
 
 function normalizeBackupPayload554(raw){
@@ -4532,17 +4661,17 @@ function diagnostics(){
 }
 function showChangelog(){
   const notes = [
-    "Advanced to Build 0.50.56 from the stable 0.50.55 baseline.",
-    "Added a Site Brief card near the top of each account screen.",
-    "Site Brief summarizes open tasks, deficiencies, photos, visits, panel, contact, access, and last visit.",
-    "Added Copy Brief for a clean technician-facing site summary.",
-    "Preserved Customer Report Preview, Backup Restore Center, stacked-lines main Settings icon, top-right Add Site button placement, Backup Safety download tools, clean splash screen with no loader, fixed splash/header behavior, Startup Health diagnostics, Photo Vault tools, Customer Report Photo workflow, iPad autosizing, simple Home screen, Search Bar Concept #6, and excluded job-status workflow controls."
+    "Advanced to Build 0.50.57 from the stable 0.50.56 baseline.",
+    "Added an Activity Timeline card to each account screen.",
+    "Timeline shows recent visits, photos/documents, tasks, and deficiencies in one compact list.",
+    "Added Copy Timeline for a quick technician-facing activity summary.",
+    "Preserved Site Brief, Customer Report Preview, Backup Restore Center, stacked-lines main Settings icon, top-right Add Site button placement, Backup Safety download tools, clean splash screen with no loader, fixed splash/header behavior, Startup Health diagnostics, Photo Vault tools, Customer Report Photo workflow, iPad autosizing, simple Home screen, Search Bar Concept #6, and excluded job-status workflow controls."
   ];
   const overlay=document.createElement("div");
   overlay.className="releaseOverlay";
   overlay.innerHTML=`<div class="releaseSheet" role="dialog" aria-modal="true" aria-label="FireVault release notes">
     <div class="releaseHead"><div><strong>FireVault</strong><span>Build ${BUILD}</span></div><button class="ghost iconBtn" id="closeRelease" aria-label="Close release notes">×</button></div>
-    <div class="releaseBody"><h2>Release Notes</h2><p class="releaseIntro">Added Site Brief card and Copy Brief on account screens.</p><ul>${notes.map(n=>`<li>${esc(n)}</li>`).join("")}</ul></div>
+    <div class="releaseBody"><h2>Release Notes</h2><p class="releaseIntro">Added Site Activity Timeline and Copy Timeline on account screens.</p><ul>${notes.map(n=>`<li>${esc(n)}</li>`).join("")}</ul></div>
   </div>`;
   document.body.appendChild(overlay);
   const close=()=>overlay.remove();

@@ -8,7 +8,7 @@
   "orientation": "any",
   "background_color": "#0b0d10",
   "theme_color": "#101216",
-  "description": "Field knowledge system for fire alarm technicians. Build 0.50.56 adds a Site Brief card to account screens with quick stats and Copy Brief for technician-facing summaries.",
+  "description": "Field knowledge system for fire alarm technicians. Build 0.50.57 adds a Site Activity Timeline to account screens with recent visits, photos/documents, tasks, deficiencies, and Copy Timeline.",
   "icons": [
     {
       "src": "assets/icon-192.png",
