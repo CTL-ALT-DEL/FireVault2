@@ -18,6 +18,7 @@ let actionCenterFilter562 = "all";
 let activeJob = loadActiveJob();
 let nearbyState = null;
 let siteSearch = "";
+let dailySummaryDate569 = localStorage.getItem("firevault_daily_summary_date") || "";
 let libraryFolder = "all";
 let docVaultFilter516 = "all";
 let docVaultSearch521 = "";
@@ -1000,6 +1001,34 @@ function localDateString(d=new Date()){
   const day=String(d.getDate()).padStart(2,"0");
   return `${y}-${m}-${day}`;
 }
+function localDayDate569(day=localDateString()){
+  const parts=String(day||localDateString()).split("-").map(Number);
+  if(parts.length!==3 || parts.some(n=>!Number.isFinite(n))) return new Date();
+  return new Date(parts[0], parts[1]-1, parts[2]);
+}
+function selectedDailySummaryDay569(){
+  return dailySummaryDate569 || localDateString();
+}
+function dailySummaryDateLabel569(day=selectedDailySummaryDay569(), opts={weekday:"long",month:"long",day:"numeric",year:"numeric"}){
+  try{return localDayDate569(day).toLocaleDateString([], opts);}catch{return String(day||"Today");}
+}
+function setDailySummaryDay569(day){
+  dailySummaryDate569 = day || localDateString();
+  localStorage.setItem("firevault_daily_summary_date", dailySummaryDate569);
+}
+function shiftDailySummaryDay569(delta){
+  const d=localDayDate569(selectedDailySummaryDay569());
+  d.setDate(d.getDate()+delta);
+  setDailySummaryDay569(localDateString(d));
+  dailySummary();
+}
+function openHomeDailyDatePicker569(){
+  const input=document.getElementById("homeDailyDatePicker569");
+  if(!input) return;
+  input.value=selectedDailySummaryDay569();
+  try{ input.showPicker ? input.showPicker() : input.click(); }catch{ input.click(); }
+}
+
 function taskIsDone(t){ return (t?.status || "Open") === "Done"; }
 function taskDueState(t){
   if(taskIsDone(t)) return "done";
@@ -1374,7 +1403,7 @@ function wireNoteTemplates503(targetId="siteNoteText"){
 }
 
 
-/* Build 0.50.68 Pinned Sites helpers */
+/* Build 0.50.69 Pinned Sites helpers */
 function isPinnedSite566(s){ return !!s?.pinnedAt; }
 function pinnedSites566(limit=5){
   return [...(data.sites||[])].filter(isPinnedSite566).sort((a,b)=>{
@@ -1432,7 +1461,7 @@ function toggleSitePinned566(){
   siteDetail();
 }
 
-/* Build 0.50.68 Pinned Sites Manager */
+/* Build 0.50.69 Pinned Sites Manager */
 function unpinSiteById567(id){
   const s=(data.sites||[]).find(x=>x.id===id);
   if(!s) return;
@@ -1516,8 +1545,9 @@ function home(){
 
     ${homeInstallTip482()}
 
-    <div class="todayBlock478 todayBlock551">
-      <div class="todayRouteWrap478">${activeRoute?`<span class="${activeRoute.paused?"routeLed470 routeLedPaused470":"routeLed463"}" aria-label="${activeRoute.paused?"Daily route paused":"Daily route recording"}"></span>`:""}<div><h1>Today</h1><p>${esc(dateLine)}</p></div></div>
+    <div class="todayBlock478 todayBlock551 todayBlock569">
+      <button class="todayRouteWrap478 todayDateButton569" id="todayDatePickerBtn569" aria-label="Open Daily Summary date picker">${activeRoute?`<span class="${activeRoute.paused?"routeLed470 routeLedPaused470":"routeLed463"}" aria-label="${activeRoute.paused?"Daily route paused":"Daily route recording"}"></span>`:""}<div><h1>Today</h1><p>${esc(dateLine)}</p><em>Tap for past daily reports</em></div></button>
+      <input id="homeDailyDatePicker569" class="dailyDatePickerHidden569" type="date" value="${esc(selectedDailySummaryDay569())}" aria-label="Daily Summary date">
       <button class="todayAddSite551" id="addSiteBtn" aria-label="Add Site">＋</button>
     </div>
 
@@ -1575,14 +1605,17 @@ function home(){
   const homeRoot=document.querySelector('.homeScreen476');
   if(homeRoot) homeRoot.onclick=e=>{ const card=e.target.closest('[data-home-site]'); if(card){ selectedSiteId=card.dataset.homeSite; route('siteDetail'); } };
   const search=document.getElementById('homeCustomerSearch476');
-  if(search){ search.oninput=()=>{ siteSearch=search.value; renderHomeSearch476(); }; setTimeout(()=>{ try{ search.focus({preventScroll:true}); search.setSelectionRange(search.value.length, search.value.length); }catch{} },0); }
+  if(search){ search.oninput=()=>{ siteSearch=search.value; renderHomeSearch476(); }; }
   const clear=document.getElementById('clearHomeSearch476'); if(clear) clear.onclick=()=>{ siteSearch=''; const search=document.getElementById('homeCustomerSearch476'); if(search){ search.value=''; search.focus({preventScroll:true}); } renderHomeSearch476(); };
   const checkNearby=document.getElementById('checkNearbyHomeBtn476'); if(checkNearby) checkNearby.onclick=checkNearbyHome476;
   document.getElementById('modulesTopBtn476').onclick=()=>{mode=null; route('settings');};
   const bell=document.getElementById('homeBell478'); if(bell) bell.onclick=showChangelog;
   const installHow=document.getElementById('homeInstallHow482'); if(installHow) installHow.onclick=()=>alert('To get the clean full-screen FireVault view on iPhone: tap Share, choose Add to Home Screen, then open FireVault from the new Home Screen icon.');
   const installHide=document.getElementById('homeInstallHide482'); if(installHide) installHide.onclick=()=>{homeInstallTipHidden=true; localStorage.setItem('firevault_home_install_tip_hidden','1'); home();};
-  const dailySummaryBtn499=document.getElementById('dailySummaryBtn499'); if(dailySummaryBtn499) dailySummaryBtn499.onclick=()=>route('dailySummary');
+  const todayDateBtn569=document.getElementById('todayDatePickerBtn569'); if(todayDateBtn569) todayDateBtn569.onclick=openHomeDailyDatePicker569;
+  const homeDateInput569=document.getElementById('homeDailyDatePicker569'); if(homeDateInput569) homeDateInput569.onchange=()=>{ setDailySummaryDay569(homeDateInput569.value || localDateString()); route('dailySummary'); };
+  requestAnimationFrame(()=>{ try{ document.querySelector('.homeScreen476')?.scrollTo({top:0,left:0,behavior:'instant'}); }catch{ try{ document.querySelector('.homeScreen476').scrollTop=0; }catch{} } });
+  const dailySummaryBtn499=document.getElementById('dailySummaryBtn499'); if(dailySummaryBtn499) dailySummaryBtn499.onclick=()=>{ setDailySummaryDay569(localDateString()); route('dailySummary'); };
   document.getElementById('manageModulesBtn476').onclick=()=>{settingsTab='visibility'; mode='settingsDetail'; route('settings');};
   const allAccounts=document.getElementById('allAccountsBtn478'); if(allAccounts) allAccounts.onclick=()=>route('sites');
   const visitsCard=document.getElementById('visitsCard478'); if(visitsCard) visitsCard.onclick=()=>{selectedSiteId=null; route('sites');};
@@ -1606,20 +1639,18 @@ function sameLocalDay499(iso, day=localDateString()){
   if(!iso) return false;
   try{return localDateString(new Date(iso))===day;}catch{return false;}
 }
-function todayRouteLogs499(){
-  const day=localDateString();
+function todayRouteLogs499(day=localDateString()){
   const saved=(data.routeLogs||[]).filter(log=>(log.date===day)||sameLocalDay499(log.startedAt,day));
-  return activeRoute ? [activeRoute, ...saved.filter(log=>log.id!==activeRoute.id)] : saved;
+  return (activeRoute && day===localDateString()) ? [activeRoute, ...saved.filter(log=>log.id!==activeRoute.id)] : saved;
 }
-function dailySummaryStats499(){
-  const day=localDateString();
+function dailySummaryStats499(day=selectedDailySummaryDay569()){
   const noteRows=(data.sites||[]).map(s=>({s,notes:todaySiteNoteEntries506(s,day)})).filter(r=>r.notes.length);
   const notesSites=noteRows.map(r=>r.s);
   const noteCount=noteRows.reduce((n,r)=>n+r.notes.length,0);
   const openTasks=allTaskRows().filter(r=>!taskIsDone(r.t));
   const tasksToday=allTaskRows().filter(r=>sameLocalDay499(r.t.createdAt,day));
   const defsToday=(data.sites||[]).flatMap(s=>(s.deficiencies||[]).map(d=>({s,d}))).filter(r=>sameLocalDay499(r.d.createdAt,day));
-  const routes=todayRouteLogs499();
+  const routes=todayRouteLogs499(day);
   const routePoints=routes.reduce((n,r)=>n+(r.events||[]).length,0);
   const routeSites=[...new Set(routes.flatMap(r=>(r.events||[]).map(e=>e.siteName).filter(Boolean)))];
   return {day,noteRows,noteCount,notesSites,openTasks,tasksToday,defsToday,routes,routePoints,routeSites};
@@ -1647,8 +1678,8 @@ function dailyDraftsMarkup508(){
   return `<div class="card dailyDrafts508"><div class="routeSectionTitle462"><strong>Unsaved Note Drafts</strong><span>${drafts.length}</span></div>${drafts.map(({s,draft})=>`<button class="dailyDraftRow508" data-draft-site="${esc(s.id)}"><span class="accountInitial476">${esc((s.name||"?").slice(0,1).toUpperCase())}</span><div><strong>${esc(s.name||"Unnamed Site")}</strong><small>${esc(fullAddress(s)||"No address saved")}</small><p>${esc(draft.replaceAll("\n"," / ").slice(0,180))}</p></div><em>Open</em></button>`).join("")}</div>`;
 }
 
-function dailySummaryLine499(){
-  const st=dailySummaryStats499();
+function dailySummaryLine499(day=selectedDailySummaryDay569()){
+  const st=dailySummaryStats499(day);
   const parts=[];
   parts.push(`${st.noteCount} site note${st.noteCount===1?"":"s"}`);
   if(st.notesSites.length) parts.push(`${st.notesSites.length} site${st.notesSites.length===1?"":"s"}`);
@@ -1657,9 +1688,9 @@ function dailySummaryLine499(){
   if(st.defsToday.length) parts.push(`${st.defsToday.length} deficienc${st.defsToday.length===1?"y":"ies"}`);
   return parts.join(" • ") || "No site notes yet today";
 }
-function dailySummaryText499(){
-  const st=dailySummaryStats499();
-  const date=new Date().toLocaleDateString([], {weekday:"long",month:"long",day:"numeric",year:"numeric"});
+function dailySummaryText499(day=selectedDailySummaryDay569()){
+  const st=dailySummaryStats499(day);
+  const date=dailySummaryDateLabel569(day);
   const lines=[
     `FIREVAULT DAILY REPORT`,
     `Date: ${date}`,
@@ -1700,9 +1731,9 @@ function dailySummaryText499(){
   return lines.join("\n");
 }
 
-function dailySiteNotesOnlyText509(){
-  const st=dailySummaryStats499();
-  const date=new Date().toLocaleDateString([], {weekday:"long",month:"long",day:"numeric",year:"numeric"});
+function dailySiteNotesOnlyText509(day=selectedDailySummaryDay569()){
+  const st=dailySummaryStats499(day);
+  const date=dailySummaryDateLabel569(day);
   const drafts=siteNoteDraftRows508();
   const lines=[`FIREVAULT SITE NOTES ONLY`, `Date: ${date}`, ``];
   if(drafts.length){
@@ -1725,14 +1756,14 @@ function dailySiteNotesOnlyText509(){
   return lines.join("\n");
 }
 function copyDailyNotesOnly509(){
-  const text=dailySiteNotesOnlyText509();
+  const text=dailySiteNotesOnlyText509(selectedDailySummaryDay569());
   if(navigator.clipboard?.writeText){ navigator.clipboard.writeText(text).then(()=>toast("Site notes only copied."),()=>toast("Clipboard unavailable.")); }
   else toast("Clipboard unavailable.");
 }
 
-function dailyCustomerSummaryText505(){
-  const st=dailySummaryStats499();
-  const date=new Date().toLocaleDateString([], {weekday:"long",month:"long",day:"numeric",year:"numeric"});
+function dailyCustomerSummaryText505(day=selectedDailySummaryDay569()){
+  const st=dailySummaryStats499(day);
+  const date=dailySummaryDateLabel569(day);
   const lines=[
     `DAILY SERVICE SUMMARY`,
     `Date: ${date}`,
@@ -1760,12 +1791,13 @@ function dailyCustomerSummaryText505(){
   return lines.join("\n");
 }
 function copyCustomerDailySummary505(){
-  const text=dailyCustomerSummaryText505();
+  const text=dailyCustomerSummaryText505(selectedDailySummaryDay569());
   if(navigator.clipboard?.writeText){ navigator.clipboard.writeText(text).then(()=>toast("Customer summary copied."),()=>toast("Clipboard unavailable.")); }
   else toast("Clipboard unavailable.");
 }
 function downloadDailySummary505(){
-  const blob=new Blob([dailySummaryText499()],{type:"text/plain;charset=utf-8"});
+  const day=selectedDailySummaryDay569();
+  const blob=new Blob([dailySummaryText499(day)],{type:"text/plain;charset=utf-8"});
   const a=document.createElement("a");
   a.href=URL.createObjectURL(blob);
   a.download=`firevault-daily-report-${localDateString()}.txt`;
@@ -1774,22 +1806,33 @@ function downloadDailySummary505(){
   setTimeout(()=>{ URL.revokeObjectURL(a.href); a.remove(); },500);
   toast("Daily report TXT downloaded.");
 }
-function dailyReportPreview505(){
-  const full=dailySummaryText499();
+function dailyReportPreview505(day=selectedDailySummaryDay569()){
+  const full=dailySummaryText499(day);
   return full.split("\n").slice(0,18).join("\n");
 }
 
 function copyDailySummary499(){
-  const text=dailySummaryText499();
+  const text=dailySummaryText499(selectedDailySummaryDay569());
   if(navigator.clipboard?.writeText){ navigator.clipboard.writeText(text).then(()=>toast("Daily report copied."),()=>toast("Clipboard unavailable.")); }
   else toast("Clipboard unavailable.");
 }
 function dailySummary(){
-  const st=dailySummaryStats499();
+  const day=selectedDailySummaryDay569();
+  const isToday=day===localDateString();
+  const st=dailySummaryStats499(day);
   const followUps=st.tasksToday.length+st.defsToday.length;
-  html(`<div class="screen dailySummaryScreen499 dailySummaryScreen505 dailyReportScreen506 dailyReportScreen508 dailyReportScreen509">
-    <div class="row dailySummaryTop499 dailySummaryTop505"><button class="back ghost" id="backBtn">←</button><div><h1>Daily Report</h1><p>${new Date().toLocaleDateString([], {weekday:"long",month:"long",day:"numeric"})}</p></div></div>
-    <div class="card dailySummaryHero499 dailyReportHero505 dailyReportHero506"><div><strong>${esc(dailySummaryLine499())}</strong><span>End-of-day site notes report</span></div><p>Review today’s notes first, then copy an internal report, copy a customer summary, or download TXT.</p></div>
+  html(`<div class="screen dailySummaryScreen499 dailySummaryScreen505 dailyReportScreen506 dailyReportScreen508 dailyReportScreen509 dailySummaryScreen569">
+    <div class="row dailySummaryTop499 dailySummaryTop505 dailySummaryTop569"><button class="back ghost" id="backBtn">←</button><div><h1>Daily Report</h1><p>${esc(dailySummaryDateLabel569(day,{weekday:"long",month:"long",day:"numeric",year:"numeric"}))}${isToday?" • Today":""}</p></div></div>
+    <div class="card dailyDatePickerCard569">
+      <div><strong>Report Date</strong><span>Pick any past day with saved notes, route activity, tasks, or deficiencies.</span></div>
+      <div class="dailyDateControls569">
+        <button class="ghost smallBtn" id="prevDailyDate569">‹ Previous</button>
+        <input id="dailySummaryDateInput569" type="date" value="${esc(day)}">
+        <button class="ghost smallBtn" id="nextDailyDate569" ${isToday?"disabled":""}>Next ›</button>
+        <button class="ghost smallBtn" id="todayDailyDate569" ${isToday?"disabled":""}>Today</button>
+      </div>
+    </div>
+    <div class="card dailySummaryHero499 dailyReportHero505 dailyReportHero506"><div><strong>${esc(dailySummaryLine499(day))}</strong><span>${isToday?"End-of-day site notes report":"Past Daily Summary report"}</span></div><p>Review the selected day’s notes first, then copy an internal report, copy a customer summary, or download TXT.</p></div>
     <div class="dailyReportActions505 dailyReportActions506 dailyReportActions509">
       <button class="primary" id="copyDailySummaryBtn499">Copy Full Report</button>
       <button class="ghost" id="copyCustomerSummaryBtn505">Customer Copy</button>
@@ -1802,18 +1845,18 @@ function dailySummary(){
       <div class="card"><strong>${st.routePoints}</strong><span>Route Points</span></div>
       <div class="card"><strong>${followUps}</strong><span>Follow-Ups</span></div>
     </div>
-    ${dailyReportReadyMarkup508(st)}
-    ${dailyDraftsMarkup508()}
+    ${isToday?dailyReportReadyMarkup508(st):""}
+    ${isToday?dailyDraftsMarkup508():""}
     <div class="card dailyReportReview506 dailyReportReview508">
       <div class="routeSectionTitle462"><strong>Note Review Queue</strong><span>${st.noteCount}</span></div>
-      ${st.noteRows.length?st.noteRows.map(({s,notes})=>`<button class="dailyNoteReviewRow506" data-summary-site="${esc(s.id)}"><span class="accountInitial476">${esc((s.name||"?").slice(0,1).toUpperCase())}</span><div><strong>${esc(s.name||"Unnamed Site")}</strong><small>${notes.length} note${notes.length===1?"":"s"} today • ${esc(fullAddress(s)||"No address saved")}</small><p>${esc((notes[0]?.text||"Note saved.").replaceAll("\n"," / "))}</p></div><em>Open</em></button>`).join(""):`<div class="empty">No site notes saved today.</div>`}
+      ${st.noteRows.length?st.noteRows.map(({s,notes})=>`<button class="dailyNoteReviewRow506" data-summary-site="${esc(s.id)}"><span class="accountInitial476">${esc((s.name||"?").slice(0,1).toUpperCase())}</span><div><strong>${esc(s.name||"Unnamed Site")}</strong><small>${notes.length} note${notes.length===1?"":"s"} on selected day • ${esc(fullAddress(s)||"No address saved")}</small><p>${esc((notes[0]?.text||"Note saved.").replaceAll("\n"," / "))}</p></div><em>Open</em></button>`).join(""):`<div class="empty">No site notes saved for this day.</div>`}
     </div>
-    <div class="card dailyReportPreview505"><div class="routeSectionTitle462"><strong>Report Preview</strong><span>TXT</span></div><pre>${esc(dailyReportPreview505())}</pre></div>
+    <div class="card dailyReportPreview505"><div class="routeSectionTitle462"><strong>Report Preview</strong><span>TXT</span></div><pre>${esc(dailyReportPreview505(day))}</pre></div>
     <div class="list grow dailySummaryList499 dailySummaryList505 dailySummaryList506">
       <div class="routeSectionTitle462"><strong>Route Activity</strong><span>${st.routes.length}</span></div>
-      ${st.routes.length?st.routes.map(r=>`<div class="card dailySummaryRoute499 dailySummaryRoute505"><h2>${r.endedAt?"Saved Route":"Active Route"}</h2><p>${esc(routeSummaryLine(r))}</p></div>`).join(""):`<div class="empty">No route activity recorded today.</div>`}
+      ${st.routes.length?st.routes.map(r=>`<div class="card dailySummaryRoute499 dailySummaryRoute505"><h2>${r.endedAt?"Saved Route":"Active Route"}</h2><p>${esc(routeSummaryLine(r))}</p></div>`).join(""):`<div class="empty">No route activity recorded for this day.</div>`}
       <div class="routeSectionTitle462"><strong>Tasks / Deficiencies</strong><span>${followUps}</span></div>
-      <div class="card dailySummaryText499 dailySummaryText505"><p>Open tasks: ${st.openTasks.length}</p><p>New tasks today: ${st.tasksToday.length}</p><p>Deficiencies added today: ${st.defsToday.length}</p></div>
+      <div class="card dailySummaryText499 dailySummaryText505"><p>Open tasks: ${st.openTasks.length}</p><p>New tasks on selected day: ${st.tasksToday.length}</p><p>Deficiencies added on selected day: ${st.defsToday.length}</p></div>
     </div>
   </div>`);
   document.getElementById("backBtn").onclick=()=>route("home");
@@ -1821,6 +1864,11 @@ function dailySummary(){
   document.getElementById("copyCustomerSummaryBtn505").onclick=copyCustomerDailySummary505;
   document.getElementById("copyDailyNotesOnlyBtn509").onclick=copyDailyNotesOnly509;
   document.getElementById("downloadDailySummaryBtn505").onclick=downloadDailySummary505;
+  const input=document.getElementById("dailySummaryDateInput569");
+  if(input) input.onchange=()=>{ setDailySummaryDay569(input.value || localDateString()); dailySummary(); };
+  document.getElementById("prevDailyDate569").onclick=()=>shiftDailySummaryDay569(-1);
+  const next=document.getElementById("nextDailyDate569"); if(next) next.onclick=()=>shiftDailySummaryDay569(1);
+  const today=document.getElementById("todayDailyDate569"); if(today) today.onclick=()=>{ setDailySummaryDay569(localDateString()); dailySummary(); };
   document.querySelectorAll("[data-summary-site]").forEach(b=>b.onclick=()=>{selectedSiteId=b.dataset.summarySite; route("jobMode");});
   document.querySelectorAll("[data-draft-site]").forEach(b=>b.onclick=()=>{selectedSiteId=b.dataset.draftSite; route("jobMode");});
 }
@@ -2017,7 +2065,7 @@ function siteToolCount477(){
 }
 
 
-/* Build 0.50.68 Site Screen Cleanup helpers */
+/* Build 0.50.69 Site Screen Cleanup helpers */
 function siteOpenTasks556(s={}){
   return (s.tasks||[]).filter(t=>String(t.status||"Open").toLowerCase()!=="done" && String(t.status||"Open").toLowerCase()!=="complete");
 }
@@ -2110,7 +2158,7 @@ function wireSiteBrief556(){
 
 
 
-/* Build 0.50.68 Site Activity Timeline filters */
+/* Build 0.50.69 Site Activity Timeline filters */
 let siteTimelineFilter558 = "all";
 let siteTimelineExpanded559 = false;
 function siteTimelineFilterCounts558(s={}){
@@ -2154,7 +2202,7 @@ function wireSiteTimelineFilters558(){
   });
 }
 
-/* Build 0.50.68 Site Activity Timeline helpers */
+/* Build 0.50.69 Site Activity Timeline helpers */
 function activityDateMs557(value){
   const t=new Date(value || 0).getTime();
   return Number.isFinite(t) ? t : 0;
@@ -2324,7 +2372,7 @@ function wireSiteActivity557(){
 }
 
 
-/* Build 0.50.68 Important Site Info helpers */
+/* Build 0.50.69 Important Site Info helpers */
 function primaryContact568(s={}){
   const contacts=s.contacts||[];
   return contacts.find(c=>/primary|main|manager|owner|contact/i.test([c.role,c.notes,c.accessNotes].filter(Boolean).join(" "))) || contacts[0] || {};
@@ -3782,7 +3830,7 @@ function openReportEmailDraft(s, txt, subject){
 }
 
 
-/* Build 0.50.68 Customer Report Preview helpers */
+/* Build 0.50.69 Customer Report Preview helpers */
 function customerReportPreviewStats555(s={}){
   const selected=reportPhotos526(s);
   const ready=customerReportPhotoReady530(s);
@@ -4665,7 +4713,7 @@ function repairVaultState(){
 
 
 
-/* Build 0.50.68 Action Center helpers */
+/* Build 0.50.69 Action Center helpers */
 function actionPriorityClass562(rank){
   if(rank<=1) return "critical";
   if(rank===2) return "today";
@@ -4840,7 +4888,7 @@ function actionCenter(){
 }
 
 
-/* Build 0.50.68 Field Focus dashboard helpers */
+/* Build 0.50.69 Field Focus dashboard helpers */
 function fieldFocusStats561(){
   const sites=data.sites||[];
   const openTasks=allTaskRows().filter(r=>!taskIsDone(r.t));
@@ -4925,7 +4973,7 @@ function wireFieldFocus561(){
 }
 
 
-/* Build 0.50.68 Data Tools / Home cleanup helpers */
+/* Build 0.50.69 Data Tools / Home cleanup helpers */
 function dataSafeSummary560(){
   const s=backupSafetyStats552();
   const lastRestore=localStorage.getItem("firevault_last_restore_time");
@@ -5048,7 +5096,7 @@ function dataTools(){
 }
 
 
-/* Build 0.50.68 Backup Safety helpers */
+/* Build 0.50.69 Backup Safety helpers */
 function backupSafetyStats552(){
   const sites = (data.sites || []).length;
   const visits = (data.sites || []).reduce((n,s)=>n+((s.visits||[]).length),0);
@@ -5165,7 +5213,7 @@ async function copyUpdateChecklist553(){
 }
 
 
-/* Build 0.50.68 Backup Restore Center */
+/* Build 0.50.69 Backup Restore Center */
 let pendingRestoreBackup554 = null;
 
 function normalizeBackupPayload554(raw){
@@ -5374,17 +5422,17 @@ function diagnostics(){
 }
 function showChangelog(){
   const notes = [
-    "Advanced to Build 0.50.68 from the stable 0.50.67 baseline.",
-    "Added Important Site Info strip to account screens.",
-    "Important Site Info summarizes primary contact, phone/email, access notes, panel info, and GPS status.",
-    "Added Copy Important Site Info and a Settings → Modules toggle for Important Site Info.",
-    "Preserved Pinned Sites Manager, Pinned Sites, Quick Layout Presets, Action Center, Home cleanup, Data Tools, Field Focus, Site Brief, Site Activity Timeline, Customer Report Preview, top-right Add Site placement, clean splash screen with no loader, and excluded job-status workflow controls."
+    "Advanced to Build 0.50.69 from the stable 0.50.68 baseline.",
+    "Tightened the Home screen initial top placement and removed automatic Home search focus to prevent the page from parking low.",
+    "Made the Today/date block tappable and connected it to a Daily Summary date picker.",
+    "Daily Report now supports selected past dates for notes, route activity, tasks, deficiencies, copy actions, preview, and TXT download.",
+    "Preserved Important Site Info, Pinned Sites Manager, Quick Layout Presets, Action Center, Data Tools, Field Focus, Site Brief, Site Activity Timeline, Customer Report Preview, top-right Add Site placement, clean splash screen with no loader, and excluded job-status workflow controls."
   ];
   const overlay=document.createElement("div");
   overlay.className="releaseOverlay";
   overlay.innerHTML=`<div class="releaseSheet" role="dialog" aria-modal="true" aria-label="FireVault release notes">
     <div class="releaseHead"><div><strong>FireVault</strong><span>Build ${BUILD}</span></div><button class="ghost iconBtn" id="closeRelease" aria-label="Close release notes">×</button></div>
-    <div class="releaseBody"><h2>Release Notes</h2><p class="releaseIntro">Added Important Site Info strip and Copy Important Site Info.</p><ul>${notes.map(n=>`<li>${esc(n)}</li>`).join("")}</ul></div>
+    <div class="releaseBody"><h2>Release Notes</h2><p class="releaseIntro">Added Today date picker and past Daily Summary reports.</p><ul>${notes.map(n=>`<li>${esc(n)}</li>`).join("")}</ul></div>
   </div>`;
   document.body.appendChild(overlay);
   const close=()=>overlay.remove();

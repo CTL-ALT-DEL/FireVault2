@@ -1,11 +1,11 @@
-# FireVault Build 0.50.68
+# FireVault Build 0.50.69
 
-Build 0.50.68 continues from the stable 0.50.67 baseline and adds Important Site Info on account screens.
+Build 0.50.69 continues from the stable 0.50.68 baseline and adds Today/date Daily Summary picker plus Home top-placement cleanup.
 
 ## Changes
 
-- Visible app version advanced to 0.50.68.
-- Cache-busting references updated to 0.50.68.
+- Visible app version advanced to 0.50.69.
+- Cache-busting references updated to 0.50.69.
 - Added **Site Quick Actions** card on the account/site screen.
 - Added direct quick actions for:
   - Add Site Note
@@ -31,13 +31,13 @@ Run from the project root:
 node --check src/storage.js
 node --check src/app.js
 python -m json.tool manifest.json > /dev/null
-zip -T firevault-build-0.50.68-modular-root.zip
+zip -T firevault-build-0.50.69-modular-root.zip
 ```
 
 ## Suggested commit message
 
 ```text
-Build 0.50.68 important site info
+Build 0.50.69 daily summary date picker
 ```
 
 - Lifted the red Home add button above the bottom nav so it should not be blocked by the black bottom area.
@@ -101,3 +101,6 @@ Build 0.50.68 important site info
 
 - Added Copy Important Site Info.
 - Added Important Site Info toggle in Settings → Modules and Layout Controls.
+
+- Daily Report now supports selected past dates for notes, route activity, tasks, deficiencies, copy actions, preview, and TXT download.
+- Preserved Important Site Info from 0.50.68.
