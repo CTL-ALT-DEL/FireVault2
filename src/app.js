@@ -2553,12 +2553,12 @@ function updateNearbyMapSelection069(){
   const popup=document.getElementById('nearbyStaticPopup069');
   if(!popup)return;
   if(!nearbyMapPopupSite069||nearbyMapPopupSite069!==siteId){popup.hidden=true;return;}
-  const row=mapRow069(siteId);
-  if(!row){popup.hidden=true;return;}
+  const popupRow=mapRow069(siteId);
+  if(!popupRow){popup.hidden=true;return;}
   const marker=document.querySelector(`[data-static-marker069="${cssEscape069(siteId)}"]`);
   if(!marker){popup.hidden=true;return;}
-  const id=accountId069(row.s);
-  popup.innerHTML=`<strong>${esc(row.s.name||'Unnamed Account')}</strong>${id?`<b>${esc(id)}</b>`:''}<span>${esc(distanceLabel(row.meters))}</span><small>${esc(fullAddress(row.s))}</small>`;
+  const id=accountId069(popupRow.s);
+  popup.innerHTML=`<strong>${esc(popupRow.s.name||'Unnamed Account')}</strong>${id?`<b>${esc(id)}</b>`:''}<span>${esc(distanceLabel(popupRow.meters))}</span><small>${esc(fullAddress(popupRow.s))}</small>`;
   const shell=marker.closest('.nearbyMapShell069');
   const mr=marker.getBoundingClientRect(),sr=shell.getBoundingClientRect();
   popup.style.left=Math.max(8,Math.min(sr.width-218,mr.left-sr.left-86))+'px';
@@ -7570,7 +7570,7 @@ function diagnostics(){
 }
 function showChangelog(){
   const notes = [
-    "Build 0.71.2 improves Nearby account readability, moves Account ID beside the category on the bottom line, adds a selected-account name and address overlay to the map, and restores breathing room around the header and map.",
+    "Build 0.71.3 repairs the Nearby module startup error while preserving the improved account metadata layout, selected-account map overlay, and header spacing.",
     "Build 0.69.9 enlarges Nearby Open, Route, and Call controls, changes selected accounts to a glowing green treatment, extends the account list to 25 miles, and adapts the overview radius to the selected account distance.",
     "Build 0.69.8 makes Nearby list taps select the tapped account reliably, zooms the map to street level around that account, and forces all account markers to render as true circles.",
     "Build 0.69.6 hides map details until a marker is tapped, stabilizes momentum list settling, and moves the map closer to the top with a simpler header.",
