@@ -1,3 +1,3 @@
-# FireVault Build 0.69.7
+# FireVault Build 0.69.8
 
-Deep Nearby Accounts interaction audit: corrected scroll-coordinate math, stable wheel scrolling in both directions, no forced jump to the first or last account, and high-contrast gold selected markers and rows.
+Nearby account selection repair: true circular map markers, reliable row-tap selection, and street-level map focus centered on the selected account without moving the account list.

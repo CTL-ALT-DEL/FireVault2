@@ -2210,6 +2210,10 @@ let nearbyStaticVisibleMiles069=null;
 let nearbyStaticCurrentBounds069=null;
 let nearbyMapPopupSite069="";
 let nearbyScrollActivated069=false;
+let nearbyStaticCenter069=null;
+let nearbyStreetFocusSite069="";
+let nearbyTouchStartScroll069=0;
+let nearbyTouchMoved069=false;
 
 function accountId069(s){ return String(s?.externalAccountId||s?.accountId||"").trim(); }
 function phone069(s){ const c=primaryContact477(s); return String(s?.sitePhone||c?.phone||"").trim(); }
@@ -2276,21 +2280,48 @@ function home(){
   document.getElementById('homeAccounts069').onclick=()=>route('sites');
   document.getElementById('homeToolsNav069').onclick=()=>route('dashboard068');
   document.getElementById('homeSettingsNav069').onclick=()=>route('settings');
-  document.getElementById('scanHome069').onclick=()=>runNearbyScan0652('home');
+  document.getElementById('scanHome069').onclick=()=>{resetNearbyMapOverview069(false);runNearbyScan0652('home');};
   document.getElementById('radiusHome069').onclick=()=>{settingsTab='gps';mode='settingsDetail';route('settings');};
   document.getElementById('nearbyViewToggle069').onclick=()=>{homeNearbyView069=homeNearbyView069==='map'?'list':'map';localStorage.setItem(HOME_NEARBY_VIEW_KEY_069,homeNearbyView069);home();};
   document.querySelectorAll('[data-nearby-open069]').forEach(b=>b.onclick=e=>{e.stopPropagation();selectedSiteId=b.dataset.nearbyOpen069;route('siteDetail');});
   document.querySelectorAll('[data-nearby-route069]').forEach(b=>b.onclick=e=>{e.stopPropagation();const s=(data.sites||[]).find(x=>x.id===b.dataset.nearbyRoute069);if(s) window.open(mapUrl(s,data.settings.gps?.mapProvider||'apple'),'_blank');});
   document.querySelectorAll('[data-nearby-call069]').forEach(b=>b.onclick=e=>{e.stopPropagation();const s=(data.sites||[]).find(x=>x.id===b.dataset.nearbyCall069);const ph=phone069(s);if(ph) location.href=`tel:${ph.replace(/[^+\\d]/g,'')}`;});
-  document.querySelectorAll('[data-nearby-card069]').forEach(c=>c.onclick=e=>{if(e.target.closest('button'))return;selectNearby069(c.dataset.nearbyCard069,true);});
+  document.querySelectorAll('[data-nearby-card069]').forEach(c=>c.onclick=e=>{
+    if(e.target.closest('button'))return;
+    nearbyScrollActivated069=false;
+    clearTimeout(nearbySnapTimer069);
+    selectNearby069(c.dataset.nearbyCard069,true,false,true);
+  });
   const list=document.getElementById('nearbyCards069');
   if(list){
     nearbyScrollActivated069=false;
     list.scrollTop=0;
-    list.addEventListener('touchstart',()=>{nearbyScrollActivated069=true;nearbyTouching069=true;clearTimeout(nearbySnapTimer069);nearbyMapPopupSite069="";updateNearbyMapSelection069();},{passive:true});
-    list.addEventListener('touchend',()=>{nearbyTouching069=false;scheduleNearbySnap069(list,260);},{passive:true});
-    list.addEventListener('wheel',()=>{nearbyScrollActivated069=true;clearTimeout(nearbySnapTimer069);},{passive:true});
-    list.addEventListener('scroll',()=>syncNearbyScroll069(list),{passive:true});
+    list.addEventListener('touchstart',()=>{
+      nearbyTouching069=true;
+      nearbyTouchStartScroll069=list.scrollTop;
+      nearbyTouchMoved069=false;
+      clearTimeout(nearbySnapTimer069);
+      nearbyMapPopupSite069="";
+      updateNearbyMapSelection069();
+    },{passive:true});
+    list.addEventListener('touchend',()=>{
+      nearbyTouching069=false;
+      if(nearbyTouchMoved069){nearbyScrollActivated069=true;scheduleNearbySnap069(list,260);}
+    },{passive:true});
+    list.addEventListener('wheel',()=>{
+      nearbyScrollActivated069=true;
+      nearbyTouchMoved069=true;
+      clearTimeout(nearbySnapTimer069);
+      if(nearbyStreetFocusSite069) resetNearbyMapOverview069(true);
+    },{passive:true});
+    list.addEventListener('scroll',()=>{
+      if(nearbyTouching069&&Math.abs(list.scrollTop-nearbyTouchStartScroll069)>4){
+        if(!nearbyTouchMoved069&&nearbyStreetFocusSite069) resetNearbyMapOverview069(true);
+        nearbyTouchMoved069=true;
+        nearbyScrollActivated069=true;
+      }
+      syncNearbyScroll069(list);
+    },{passive:true});
     requestAnimationFrame(()=>{prepareNearbyScrollTail069(list);list.scrollTop=0;});
     window.addEventListener('resize',()=>prepareNearbyScrollTail069(list),{once:true});
   }
@@ -2298,6 +2329,30 @@ function home(){
   if(homeNearbyView069==='map') setTimeout(()=>initNearbyMap069(),60);
 }
 function mapRow069(siteId){ return nearbyRows069().find(r=>r.s.id===siteId)||null; }
+function nearbyGps069(site){
+  if(!site||!hasGps(site)) return null;
+  const lat=Number(site.gps?.lat),lng=Number(site.gps?.lng);
+  return Number.isFinite(lat)&&Number.isFinite(lng)?{lat,lng}:null;
+}
+function streetVisibleMiles069(){ return .14; }
+function resetNearbyMapOverview069(redraw=true){
+  nearbyStreetFocusSite069="";
+  nearbyStaticCenter069=null;
+  nearbyMapPopupSite069="";
+  nearbyStaticVisibleMiles069=initialVisibleMiles069(nearbyRows069());
+  if(redraw&&homeNearbyView069==="map"&&document.getElementById('nearbyStaticOverlay069')) drawStaticNearbyMap069();
+}
+function focusNearbyAccountMap069(row,showPopup=false){
+  const g=nearbyGps069(row?.s);
+  if(!g)return false;
+  nearbyStreetFocusSite069=row.s.id;
+  nearbyStaticCenter069={lat:g.lat,lng:g.lng};
+  nearbyStaticVisibleMiles069=streetVisibleMiles069();
+  nearbyMapPopupSite069=showPopup?row.s.id:"";
+  if(homeNearbyView069==="map"&&document.getElementById('nearbyStaticOverlay069')) drawStaticNearbyMap069();
+  else updateNearbyMapSelection069();
+  return true;
+}
 function initialVisibleMiles069(rows){
   const configured=Math.max(.5,Number(nearbyRadiusMiles())||1);
   if(!rows.length) return Math.min(configured,1.25);
@@ -2335,12 +2390,13 @@ function updateNearbyMapSelection069(){
   popup.style.top=Math.max(8,mr.top-sr.top-104)+'px';
   popup.hidden=false;
 }
-function selectNearby069(siteId,fromList=false,showPopup=false){
+function selectNearby069(siteId,fromList=false,showPopup=false,streetFocus=false){
   homeNearbySelected069=siteId;
   if(fromList||!showPopup) nearbyMapPopupSite069="";
   else nearbyMapPopupSite069=siteId;
   document.querySelectorAll('[data-nearby-card069]').forEach(c=>c.classList.toggle('selected',c.dataset.nearbyCard069===siteId));
   const row=mapRow069(siteId);
+  if(row&&streetFocus&&focusNearbyAccountMap069(row,showPopup)) return;
   if(row&&ensureSelectedVisible069(row)){drawStaticNearbyMap069();return;}
   updateNearbyMapSelection069();
 }
@@ -2399,10 +2455,10 @@ function prepareNearbyScrollTail069(list){
   const h=Math.max(0,list.clientHeight-(first?.offsetHeight||54)-6);
   tail.style.flexBasis=h+'px';
 }
-function staticMapBounds069(visibleMiles,aspect=1){
-  const lat=Number(nearbyState?.lat),lng=Number(nearbyState?.lng);
+function staticMapBounds069(visibleMiles,aspect=1,centerLat=nearbyState?.lat,centerLng=nearbyState?.lng){
+  const lat=Number(centerLat),lng=Number(centerLng);
   if(!Number.isFinite(lat)||!Number.isFinite(lng)) return null;
-  const verticalMiles=Math.max(.25,Number(visibleMiles)||1);
+  const verticalMiles=Math.max(.06,Number(visibleMiles)||1);
   const safeAspect=Math.max(.55,Math.min(2.4,Number(aspect)||1));
   const horizontalMiles=verticalMiles*safeAspect;
   const latDelta=verticalMiles/69;
@@ -2420,21 +2476,26 @@ function drawStaticNearbyMap069(){
   try{
     const shell=document.querySelector('.staticMapShell069'),base=document.getElementById('nearbyStaticBase069'),overlay=document.getElementById('nearbyStaticOverlay069'),count=document.getElementById('nearbyMapCount069');
     if(!shell||!base||!overlay||!nearbyState)return;
-    const lat=Number(nearbyState.lat),lng=Number(nearbyState.lng);
-    if(!Number.isFinite(lat)||!Number.isFinite(lng)){overlay.innerHTML='<div class="staticMapMessage069">Waiting for a valid GPS location…</div>';return;}
+    const userLat=Number(nearbyState.lat),userLng=Number(nearbyState.lng);
+    if(!Number.isFinite(userLat)||!Number.isFinite(userLng)){overlay.innerHTML='<div class="staticMapMessage069">Waiting for a valid GPS location…</div>';return;}
+    const mapLat=Number(nearbyStaticCenter069?.lat ?? userLat),mapLng=Number(nearbyStaticCenter069?.lng ?? userLng);
+    if(!Number.isFinite(mapLat)||!Number.isFinite(mapLng)){overlay.innerHTML='<div class="staticMapMessage069">Map center is unavailable.</div>';return;}
     const rows=nearbyRows069();
     if(!Number.isFinite(nearbyStaticVisibleMiles069)) nearbyStaticVisibleMiles069=initialVisibleMiles069(rows);
     const aspect=Math.max(.55,shell.clientWidth/Math.max(1,shell.clientHeight));
-    const b=staticMapBounds069(nearbyStaticVisibleMiles069,aspect);
+    const b=staticMapBounds069(nearbyStaticVisibleMiles069,aspect,mapLat,mapLng);
     if(!b){overlay.innerHTML='<div class="staticMapMessage069">Map coordinates are unavailable.</div>';return;}
     nearbyStaticCurrentBounds069=b;
     const bbox=[b.west,b.south,b.east,b.north].map(n=>Number(n).toFixed(6)).join('%2C');
     const nextSrc=`https://www.openstreetmap.org/export/embed.html?bbox=${bbox}&layer=mapnik`;
     if(base.dataset.mapSrc!==nextSrc){base.dataset.mapSrc=nextSrc;base.src=nextSrc;}
-    const center=staticPoint069(lat,lng,b);
+    const userPoint=staticPoint069(userLat,userLng,b);
+    const userVisible=userPoint&&userPoint.x>=0&&userPoint.x<=100&&userPoint.y>=0&&userPoint.y<=100;
     const configuredRadius=Math.max(.1,Number(nearbyRadiusMiles())||1);
     const radiusPx=Math.max(8,Math.min(shell.clientWidth,shell.clientHeight)*(configuredRadius/Math.max(.01,b.verticalMiles))/2);
-    let html=center?`<span class="staticRadius069" style="left:${center.x}%;top:${center.y}%;width:${radiusPx*2}px;height:${radiusPx*2}px"></span><span class="staticUser069" style="left:${center.x}%;top:${center.y}%"></span>`:'';
+    let html='';
+    if(userVisible&&!nearbyStreetFocusSite069) html+=`<span class="staticRadius069" style="left:${userPoint.x}%;top:${userPoint.y}%;width:${radiusPx*2}px;height:${radiusPx*2}px"></span>`;
+    if(userVisible) html+=`<span class="staticUser069" style="left:${userPoint.x}%;top:${userPoint.y}%"></span>`;
     let rendered=0;
     rows.forEach((r,index)=>{
       const g=hasGps(r.s)?{lat:Number(r.s.gps.lat),lng:Number(r.s.gps.lng)}:null;
@@ -2447,7 +2508,7 @@ function drawStaticNearbyMap069(){
     if(count){count.textContent=`${rendered} mapped • ${nearbyStaticVisibleMiles069.toFixed(1)} mi`;count.hidden=false;}
     overlay.querySelectorAll('[data-static-marker069]').forEach(m=>m.onclick=e=>{
       e.stopPropagation();
-      const id=m.dataset.staticMarker069; selectNearby069(id,false,true);
+      const id=m.dataset.staticMarker069; selectNearby069(id,false,true,true);
       const card=document.querySelector(`[data-nearby-card069="${cssEscape069(id)}"]`);
       if(card){nearbyScrollLock069=true;const list=document.getElementById('nearbyCards069');if(list){prepareNearbyScrollTail069(list);const target=Math.min(Math.max(0,list.scrollHeight-list.clientHeight),nearbyCardTop069(list,card));list.scrollTo({top:target,behavior:'smooth'});}setTimeout(()=>nearbyScrollLock069=false,380);}
     });
@@ -2462,9 +2523,9 @@ function initNearbyMap069(){
   if(!nearbyState)return;
   drawStaticNearbyMap069();
   const zin=document.getElementById('mapZoomIn069'),zout=document.getElementById('mapZoomOut069'),center=document.getElementById('mapCenter069');
-  if(zin)zin.onclick=()=>{nearbyStaticVisibleMiles069=Math.max(.25,(nearbyStaticVisibleMiles069||initialVisibleMiles069(nearbyRows069()))/1.35);drawStaticNearbyMap069();};
+  if(zin)zin.onclick=()=>{nearbyStaticVisibleMiles069=Math.max(.06,(nearbyStaticVisibleMiles069||initialVisibleMiles069(nearbyRows069()))/1.35);drawStaticNearbyMap069();};
   if(zout)zout.onclick=()=>{nearbyStaticVisibleMiles069=Math.min(maxVisibleMiles069(nearbyRows069()),(nearbyStaticVisibleMiles069||initialVisibleMiles069(nearbyRows069()))*1.35);drawStaticNearbyMap069();};
-  if(center)center.onclick=()=>{nearbyMapPopupSite069="";nearbyStaticVisibleMiles069=initialVisibleMiles069(nearbyRows069());drawStaticNearbyMap069();};
+  if(center)center.onclick=()=>resetNearbyMapOverview069(true);
   const shell=document.querySelector('.staticMapShell069');
   if(shell)shell.onclick=e=>{if(!e.target.closest('[data-static-marker069]')){nearbyMapPopupSite069="";updateNearbyMapSelection069();}};
 }
@@ -7327,7 +7388,7 @@ function diagnostics(){
 }
 function showChangelog(){
   const notes = [
-    "Build 0.69.7 completes the Nearby interaction audit with corrected row positioning, stable two-way wheel scrolling, and high-contrast selected account markers.",
+    "Build 0.69.8 makes Nearby list taps select the tapped account reliably, zooms the map to street level around that account, and forces all account markers to render as true circles.",
     "Build 0.69.6 hides map details until a marker is tapped, stabilizes momentum list settling, and moves the map closer to the top with a simpler header.",
     "Manual chapters document installation, Today, Sites, Site Detail, field workflow, notes, tasks, deficiencies, photos, GPS, route tracking, reports, email, settings, backups, updates, and troubleshooting.",
     "Added living-documentation revision metadata and a release-state review requirement.",

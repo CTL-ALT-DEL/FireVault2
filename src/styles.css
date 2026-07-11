@@ -13474,3 +13474,45 @@ nav button.active{background:color-mix(in srgb,var(--accent) 17%,rgba(30,41,59,.
 .staticMarker069.selected span{color:#17120a!important;font-size:.72rem!important}
 .nearbyCards069{scroll-anchor:none!important;overflow-anchor:none!important}
 .nearbyAccount069{overflow-anchor:none!important}
+
+/* Build 0.69.8 — true circular markers and street-level account focus */
+.staticMarker069{
+  -webkit-appearance:none!important;
+  appearance:none!important;
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  width:30px!important;
+  min-width:30px!important;
+  max-width:30px!important;
+  height:30px!important;
+  min-height:30px!important;
+  max-height:30px!important;
+  aspect-ratio:1/1!important;
+  padding:0!important;
+  margin:0!important;
+  box-sizing:border-box!important;
+  border-radius:999px!important;
+  line-height:1!important;
+  transform:translate(-50%,-50%)!important;
+  background-image:none!important;
+}
+.staticMarker069 span{
+  display:block!important;
+  width:auto!important;
+  height:auto!important;
+  line-height:1!important;
+  transform:none!important;
+}
+.staticMarker069.selected{
+  width:40px!important;
+  min-width:40px!important;
+  max-width:40px!important;
+  height:40px!important;
+  min-height:40px!important;
+  max-height:40px!important;
+  aspect-ratio:1/1!important;
+  border-radius:999px!important;
+}
+.nearbyCards069{-webkit-tap-highlight-color:transparent!important}
+.nearbyAccount069{cursor:pointer!important}
