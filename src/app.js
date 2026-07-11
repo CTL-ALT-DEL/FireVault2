@@ -7572,6 +7572,7 @@ function diagnostics(){
 }
 function showChangelog(){
   const notes = [
+    "Build 0.71.5 removes the selected-account map box and displays the account name and address as clean white text with a strong black shadow.",
     "Build 0.71.4 keeps MAP / LIST visible on narrow screens, replaces the category dropdown with a compact filter icon, moves the selected account overlay to the map’s top-left, and refreshes GPS/map from the bottom Nearby button.",
     "Build 0.71.3 repairs the Nearby module startup error while preserving the improved account metadata layout, selected-account map overlay, and header spacing.",
     "Build 0.69.9 enlarges Nearby Open, Route, and Call controls, changes selected accounts to a glowing green treatment, extends the account list to 25 miles, and adapts the overview radius to the selected account distance.",

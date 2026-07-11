@@ -13932,3 +13932,76 @@ nav button.active{background:color-mix(in srgb,var(--accent) 17%,rgba(30,41,59,.
   .nearbyCategoryFilter070{width:29px!important;min-width:29px!important;height:29px!important;min-height:29px!important}
   .nearbySelectedOverlay0712{top:9px!important;left:9px!important;width:calc(100% - 18px)!important;max-width:calc(100% - 18px)!important}
 }
+
+
+/* Build 0.71.5 — Clean text-only selected account map label */
+.nearbySelectedOverlay0712{
+  top:12px!important;
+  right:auto!important;
+  bottom:auto!important;
+  left:12px!important;
+  display:flex!important;
+  box-sizing:border-box!important;
+  width:min(520px,calc(100% - 24px))!important;
+  max-width:calc(100% - 24px)!important;
+  min-height:0!important;
+  flex-direction:column!important;
+  justify-content:flex-start!important;
+  gap:3px!important;
+  padding:0!important;
+  border:0!important;
+  border-radius:0!important;
+  background:transparent!important;
+  box-shadow:none!important;
+  text-align:left!important;
+  backdrop-filter:none!important;
+  -webkit-backdrop-filter:none!important;
+  pointer-events:none!important;
+}
+.nearbySelectedOverlay0712 strong{
+  display:block!important;
+  overflow:hidden!important;
+  color:#fff!important;
+  font-size:.94rem!important;
+  font-weight:900!important;
+  line-height:1.16!important;
+  letter-spacing:.005em!important;
+  text-overflow:ellipsis!important;
+  white-space:nowrap!important;
+  text-shadow:
+    -1px -1px 0 #000,
+     1px -1px 0 #000,
+    -1px  1px 0 #000,
+     1px  1px 0 #000,
+     0  2px 4px rgba(0,0,0,.98),
+     0  0 8px rgba(0,0,0,.95)!important;
+}
+.nearbySelectedOverlay0712 span{
+  display:block!important;
+  overflow:hidden!important;
+  margin-top:0!important;
+  color:#fff!important;
+  font-size:.68rem!important;
+  font-weight:700!important;
+  line-height:1.22!important;
+  text-overflow:ellipsis!important;
+  white-space:nowrap!important;
+  text-shadow:
+    -1px -1px 0 #000,
+     1px -1px 0 #000,
+    -1px  1px 0 #000,
+     1px  1px 0 #000,
+     0  2px 4px rgba(0,0,0,.98),
+     0  0 7px rgba(0,0,0,.95)!important;
+}
+@media(max-width:390px){
+  .nearbySelectedOverlay0712{
+    top:9px!important;
+    left:9px!important;
+    width:calc(100% - 18px)!important;
+    max-width:calc(100% - 18px)!important;
+    padding:0!important;
+  }
+  .nearbySelectedOverlay0712 strong{font-size:.86rem!important}
+  .nearbySelectedOverlay0712 span{font-size:.62rem!important}
+}

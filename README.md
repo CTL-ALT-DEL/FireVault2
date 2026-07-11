@@ -1,6 +1,13 @@
-# FireVault Build 0.71.4
+# FireVault Build 0.71.5
 
 Nearby Accounts category and header redesign.
+
+
+## Build 0.71.5 — Clean selected-account map label
+
+- Removes the black background box, border, blur, and panel shadow from the selected-account overlay.
+- Displays the selected account name and address as white text with a strong black outline/shadow for map readability.
+- Keeps the text anchored at the top-left and gives it nearly the full available map width.
 
 - Removes the Home build badge and top Settings icon.
 - Displays right-aligned TODAY, weekday, and date.
