@@ -1,10 +1,11 @@
-# FireVault Build 0.69.3
+# FireVault Build 0.69.4
 
-Dedicated repair for the Nearby Accounts static map crash found in Build 0.69.2.
+Nearby Accounts map reliability and layout repair.
 
-## Repairs
-- Corrects the static map bounds function call that caused the diagnostics screen.
-- Prevents invalid or incomplete coordinates from crashing FireVault.
-- Adds a safe map fallback message while keeping the account list usable.
-- Preserves wheel-style account scrolling and scroll-linked map selection.
-- Preserves all data and features from Build 0.69.2.
+- Fixes GPS-ready account markers by reading the saved site GPS fields directly.
+- Starts the map at a closer radius based on the nearest accounts instead of the full configured radius.
+- Keeps the map centered and non-draggable; only + / - changes the visible distance.
+- Automatically expands the map range when the selected list account is farther away.
+- Compacts GPS status, Map/List, Refresh, Tools, and radius information above the map.
+- Crops external map chrome from the visible map surface.
+- Preserves momentum account scrolling and settles the nearest complete row at the top.

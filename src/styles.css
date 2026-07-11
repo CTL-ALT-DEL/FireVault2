@@ -13343,3 +13343,74 @@ nav button.active{background:color-mix(in srgb,var(--accent) 17%,rgba(30,41,59,.
 .staticMapControls069 button{width:38px;height:36px;border:0;border-bottom:1px solid #35404d;border-radius:0;background:rgba(13,18,25,.93);color:#fff;font-size:1.25rem}.staticMapControls069 button:last-child{border-bottom:0}
 .nearbyCards069{-webkit-overflow-scrolling:touch;overscroll-behavior-y:contain;scroll-snap-type:y proximity!important;scroll-behavior:auto!important;touch-action:pan-y;will-change:scroll-position}
 .nearbyAccount069{scroll-snap-align:start!important;scroll-snap-stop:normal!important}
+
+/* Build 0.69.4 — compact Nearby header, reliable local marker layer, fixed map */
+.nearbyHome069{
+  gap:6px!important;
+  padding:calc(8px + env(safe-area-inset-top)) 10px calc(68px + env(safe-area-inset-bottom))!important;
+}
+.nearbyTop069{min-height:42px!important;padding-bottom:5px!important}
+.nearbyLogo069 img{width:36px!important;height:36px!important;border-radius:10px!important}
+.nearbyLogo069 strong{font-size:1.06rem!important}
+.homeBuild069{height:34px!important;padding:0 10px!important;border-radius:999px!important;font-size:.72rem!important}
+.homeSettings069{width:35px!important;height:35px!important;border-radius:10px!important;font-size:.9rem!important}
+.nearbyCompactHead069{display:flex;align-items:center;justify-content:space-between;gap:8px;min-height:40px}
+.nearbyCompactTitle069{min-width:0}
+.nearbyCompactTitle069 h1{margin:0;color:#fff;font-size:1.12rem;line-height:1.05;text-transform:uppercase;letter-spacing:.015em;white-space:nowrap}
+.nearbyCompactTitle069 span{display:flex;align-items:center;gap:5px;margin-top:4px;color:#9ca7b5;font-size:.59rem;white-space:nowrap}
+.nearbyCompactTitle069 span i{width:6px;height:6px;border-radius:50%;background:#2ada65;box-shadow:0 0 8px rgba(42,218,101,.45)}
+.nearbyCompactActions069{display:flex;align-items:center;gap:5px;flex:0 0 auto}
+.nearbyViewToggle069{min-width:74px!important;height:31px!important;padding:0 9px!important;gap:5px!important;border-radius:9px!important;font-size:.64rem!important}
+.iconCompact069{display:grid;place-items:center;width:31px;height:31px;min-height:31px;padding:0;border:1px solid #394451;border-radius:9px;background:#161d25;color:#fff;font-size:.84rem}
+.iconCompact069:disabled{opacity:.45}
+.nearbyStatsLine069{display:flex;align-items:center;gap:5px;min-height:30px;padding:4px 7px;border:1px solid #2e3844;border-radius:10px;background:#121820;overflow:hidden;white-space:nowrap}
+.nearbyStatsLine069 span,.nearbyStatsLine069 button{display:flex;align-items:center;gap:3px;min-width:0;padding:0 7px 0 0;border:0;border-right:1px solid #313a46;background:transparent;color:#9ca7b5;font-size:.57rem}
+.nearbyStatsLine069 span b{color:#49df70;font-size:.68rem}
+.nearbyStatsLine069 span.warn b{color:#ffad2d}
+.nearbyStatsLine069 button{margin-left:auto;padding:0;border-right:0;color:#9ca7b5}
+.nearbyStatsLine069 button b{color:#49a8ff;font-size:.66rem}
+.nearbyWorkspace069{gap:5px!important;grid-template-rows:auto auto minmax(0,1fr)!important}
+.nearbyWorkspace069.list{grid-template-rows:auto minmax(0,1fr)!important}
+.nearbyMapShell069{height:clamp(225px,34vh,320px)!important;min-height:205px!important;border-radius:12px!important}
+.nearbyStaticBase069{top:0!important;bottom:auto!important;height:calc(100% + 38px)!important;pointer-events:none!important}
+.nearbyStaticOverlay069{z-index:30!important;background:linear-gradient(rgba(8,16,26,.02),rgba(8,16,26,.07))!important}
+.nearbyMapCount069{position:absolute;left:8px;top:8px;z-index:80;padding:5px 8px;border:1px solid rgba(85,101,118,.7);border-radius:999px;background:rgba(10,15,21,.86);color:#dce4ed;font-size:.56rem;font-weight:800;pointer-events:none;backdrop-filter:blur(8px)}
+.staticRadius069{border-width:1.5px!important;background:rgba(45,139,255,.09)!important}
+.staticUser069{z-index:7;width:18px!important;height:18px!important;border-width:3px!important;box-shadow:0 0 0 8px rgba(39,135,255,.18),0 3px 9px rgba(0,0,0,.35)!important}
+.staticMarker069{z-index:5;width:28px!important;height:28px!important;transform:translate(-50%,-80%) rotate(-45deg)!important;rotate:none!important;border-width:2px!important}
+.staticMarker069 span{transform:rotate(45deg)!important;rotate:none!important;font-size:.62rem!important}
+.staticMarker069.selected{z-index:9;width:35px!important;height:35px!important}
+.nearbyStaticPopup069{z-index:90!important;width:205px!important;padding:9px!important}
+.staticMapControls069{right:8px!important;top:8px!important;z-index:90!important}
+.staticMapControls069 button{width:34px!important;height:32px!important;font-size:1.05rem!important}
+.mapCenter069{right:8px!important;bottom:8px!important;z-index:90!important;width:35px!important;height:35px!important;font-size:.95rem!important}
+.nearbyListHead069{min-height:23px;padding:0 2px!important}
+.nearbyListHead069 strong{font-size:.67rem!important}
+.nearbyListHead069 span{font-size:.58rem!important}
+.nearbyCards069{gap:4px!important;padding-bottom:8px!important;scroll-snap-type:none!important;scroll-behavior:auto!important;-webkit-overflow-scrolling:touch!important}
+.nearbyAccount069{scroll-snap-align:none!important;scroll-snap-stop:normal!important;min-height:52px!important;padding:5px 7px!important;grid-template-columns:24px 15px minmax(0,1fr) auto auto!important;gap:5px!important;border-radius:9px!important}
+.nearbyNumber069{width:24px!important;height:27px!important;font-size:.62rem!important}
+.nearbyPin069{font-size:.78rem!important}
+.nearbyInfo069>strong{font-size:.69rem!important}
+.nearbyInfo069>div{margin-top:2px!important;font-size:.55rem!important;gap:4px!important}
+.nearbyDistance069{font-size:.57rem!important}
+.nearbyActions069{gap:3px!important}
+.nearbyActions069 button{height:29px!important;min-width:29px!important;padding:0 5px!important;border-radius:8px!important;font-size:.58rem!important}
+.nearbyBottomNav069{padding-top:5px!important;padding-bottom:calc(6px + env(safe-area-inset-bottom))!important}
+.nearbyBottomNav069 button{min-height:43px!important}
+.staticMapMessage069{position:absolute;inset:0;display:grid;place-items:center;padding:24px;color:#d5dde7;background:linear-gradient(145deg,#162231,#0e151e);font-size:.7rem;text-align:center}
+@media(max-width:390px){
+  .nearbyCompactTitle069 h1{font-size:1rem}
+  .nearbyCompactTitle069 span{font-size:.54rem}
+  .nearbyViewToggle069{min-width:66px!important;padding:0 7px!important}
+  .nearbyStatsLine069 span,.nearbyStatsLine069 button{font-size:.52rem}
+  .nearbyMapShell069{height:clamp(205px,31vh,260px)!important}
+  .nearbyAccount069{grid-template-columns:22px 13px minmax(0,1fr) auto auto!important;padding:5px!important}
+  .nearbyNumber069{width:22px!important;height:25px!important}
+  .nearbyActions069 button{min-width:28px!important;width:28px!important;padding:0!important}
+}
+@media(min-width:760px){
+  .nearbyMapShell069{height:clamp(290px,40vh,440px)!important}
+  .nearbyCompactTitle069 h1{font-size:1.35rem}
+  .nearbyAccount069{grid-template-columns:30px 18px minmax(0,1fr) 64px 160px!important;min-height:58px!important}
+}
