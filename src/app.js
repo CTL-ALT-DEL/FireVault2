@@ -438,7 +438,7 @@ ensureModuleBaseline476();
 
 
 applyTheme();
-document.getElementById("buildButton").addEventListener("click", showChangelog);
+
 document.querySelectorAll("nav button").forEach(btn => btn.addEventListener("click", () => {
   const target=btn.dataset.route;
   if(target==="settings"){
@@ -607,11 +607,104 @@ function gpsLine(s){
   const when=g.capturedAt ? ` • Saved ${new Date(g.capturedAt).toLocaleString([], {month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}` : "";
   return `${Number(g.lat).toFixed(6)}, ${Number(g.lng).toFixed(6)}${acc}${when}`;
 }
+const PLUS_CODE_ALPHABET_071="23456789CFGHJMPQRVWX";
+const PLUS_CODE_RESOLUTIONS_071=[20,1,.05,.0025,.000125];
+const LOCATION_POINT_TYPES_071=["Main Entrance","Parking","Exterior Door","Riser Room","Fire Alarm Panel","FDC","Sprinkler Room","Other"];
+function encodePlusCode071(latitude,longitude){
+  let lat=Number(latitude),lng=Number(longitude);
+  if(!Number.isFinite(lat)||!Number.isFinite(lng)) return "";
+  lat=Math.min(90,Math.max(-90,lat));
+  if(lat===90) lat=90-1e-12;
+  while(lng<-180) lng+=360; while(lng>=180) lng-=360;
+  lat+=90; lng+=180;
+  let code="";
+  for(const resolution of PLUS_CODE_RESOLUTIONS_071){
+    const latDigit=Math.floor(lat/resolution),lngDigit=Math.floor(lng/resolution);
+    code+=PLUS_CODE_ALPHABET_071[latDigit]+PLUS_CODE_ALPHABET_071[lngDigit];
+    lat-=latDigit*resolution; lng-=lngDigit*resolution;
+    if(code.length===8) code+="+";
+  }
+  return code;
+}
+function sitePlusCode071(s){
+  if(!s) return "";
+  if(hasGps(s)){
+    const code=encodePlusCode071(s.gps.lat,s.gps.lng);
+    if(code&&s.plusCode!==code) s.plusCode=code;
+    return code;
+  }
+  return String(s.plusCode||"").trim();
+}
+function locationPoints071(s){
+  if(!s) return [];
+  s.locationPoints=Array.isArray(s.locationPoints)?s.locationPoints:[];
+  s.locationPoints.forEach(p=>{
+    if(!p.id)p.id=uid();
+    if(!p.plusCode&&Number.isFinite(Number(p.lat))&&Number.isFinite(Number(p.lng)))p.plusCode=encodePlusCode071(p.lat,p.lng);
+  });
+  return s.locationPoints;
+}
+function preferredLocation071(s){
+  const points=locationPoints071(s);
+  return points.find(p=>p.id===s.preferredLocationPointId)||null;
+}
+function navigationPlusCode071(s){ return preferredLocation071(s)?.plusCode||sitePlusCode071(s); }
+function mapRouteUrl071(s){
+  const destination=navigationPlusCode071(s)||(hasGps(s)?`${s.gps.lat},${s.gps.lng}`:fullAddress(s));
+  return `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(destination)}`;
+}
+function updateGlobalToday071(){
+  const el=document.getElementById('globalToday071'); if(!el)return;
+  const now=new Date();
+  el.innerHTML=`<strong>TODAY</strong><span>${esc(now.toLocaleDateString(undefined,{weekday:'long'}))}</span><b>${esc(now.toLocaleDateString(undefined,{month:'short',day:'numeric'}))}</b>`;
+}
+function ensureAllPlusCodes071(){
+  let changed=false;
+  (data.sites||[]).forEach(s=>{
+    const before=s.plusCode||""; const code=sitePlusCode071(s); locationPoints071(s);
+    if(code!==before)changed=true;
+  });
+  if(changed) saveData(data);
+}
+function copyText071(text,label="Copied"){
+  if(navigator.clipboard?.writeText) navigator.clipboard.writeText(String(text||"")).then(()=>toast(label),()=>toast("Clipboard unavailable."));
+  else toast("Clipboard unavailable.");
+}
+function plusCodePointNote071(point){ return `[Location: ${point.label||point.type||'Saved Point'}] Plus Code: ${point.plusCode}${point.notes?` — ${point.notes}`:''}`; }
+function addLocationPoint071(){
+  const s=site(); if(!s)return;
+  if(!navigator.geolocation){toast("GPS is not available in this browser.");return;}
+  const type=prompt(`Location type:\n${LOCATION_POINT_TYPES_071.join(', ')}`,"Main Entrance"); if(type===null)return;
+  const label=prompt("Location name",type||"Saved Location"); if(label===null)return;
+  const notes=prompt("Optional location notes (parking instructions, door description, access details)","")||"";
+  toast("Capturing precise location…");
+  navigator.geolocation.getCurrentPosition(pos=>{
+    const lat=Number(pos.coords.latitude.toFixed(7)),lng=Number(pos.coords.longitude.toFixed(7));
+    const point={id:uid(),type:type||"Other",label:(label||type||"Saved Location").trim(),notes:notes.trim(),lat,lng,accuracy:Math.round(pos.coords.accuracy||0),plusCode:encodePlusCode071(lat,lng),createdAt:new Date().toISOString()};
+    locationPoints071(s).push(point);
+    s.notes=[String(s.notes||"").trim(),plusCodePointNote071(point)].filter(Boolean).join("\n");
+    if(!s.preferredLocationPointId)s.preferredLocationPointId=point.id;
+    save(); toast(`${point.label} saved.`); siteDetail();
+  },err=>toast("GPS failed: "+(err.message||"permission denied")),{enableHighAccuracy:true,timeout:20000,maximumAge:0});
+}
+function setPreferredLocation071(id){ const s=site();if(!s)return;s.preferredLocationPointId=id||"";save();toast("Route destination updated.");siteDetail(); }
+function deleteLocationPoint071(id){ const s=site();if(!s)return;const p=locationPoints071(s).find(x=>x.id===id);if(!p||!confirm(`Delete ${p.label||'this location'}?`))return;s.locationPoints=s.locationPoints.filter(x=>x.id!==id);if(s.preferredLocationPointId===id)s.preferredLocationPointId="";save();siteDetail(); }
+function routeLocationPoint071(id){ const s=site();const p=locationPoints071(s).find(x=>x.id===id);if(p)window.open(`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(p.plusCode||`${p.lat},${p.lng}`)}`,'_blank'); }
+function plusCodeSection071(s){
+  const code=sitePlusCode071(s),points=locationPoints071(s),preferred=preferredLocation071(s);
+  return `<details class="accountSection067 tone-cyan plusCodes071" open><summary><span>＋</span><div><strong>Plus Codes & Site Locations</strong><small>Exact entrances, parking, exterior doors, riser rooms, and field access points</small></div><b>⌄</b></summary><div class="accountSectionBody067">
+    <div class="primaryPlus071"><div><span>Account Plus Code</span><strong>${esc(code||'GPS required')}</strong><small>${preferred?`Route currently targets ${esc(preferred.label)}`:'Route targets the account location'}</small></div><div>${code?`<button class="ghost" id="copyPrimaryPlus071">Copy</button>`:''}<button class="primary" id="addLocationPoint071">＋ Drop Pin</button></div></div>
+    ${points.length?`<div class="locationPointList071">${points.map(p=>`<article class="locationPoint071 ${s.preferredLocationPointId===p.id?'preferred':''}"><div><span>${esc(p.type||'Saved Location')}</span><strong>${esc(p.label||'Saved Location')}</strong><b>${esc(p.plusCode||'')}</b>${p.notes?`<small>${esc(p.notes)}</small>`:''}</div><div><button class="ghost" data-copy-plus071="${esc(p.id)}">Copy</button><button class="ghost" data-route-plus071="${esc(p.id)}">Route</button><button class="${s.preferredLocationPointId===p.id?'primary':'ghost'}" data-prefer-plus071="${esc(p.id)}">${s.preferredLocationPointId===p.id?'Default':'Use'}</button><button class="danger" data-delete-plus071="${esc(p.id)}">×</button></div></article>`).join('')}</div>`:`<p class="accountEmpty067">Drop pins at the main entrance, preferred parking, exterior access door, riser room, FDC, or another exact field location.</p>`}
+  </div></details>`;
+}
 function mapQuery(s){ return hasGps(s) ? `${Number(s.gps.lat).toFixed(6)},${Number(s.gps.lng).toFixed(6)}` : fullAddress(s); }
 function mapUrl(s, provider){
-  const q=encodeURIComponent(mapQuery(s));
-  return provider === "google" ? `https://www.google.com/maps/search/?api=1&query=${q}` : `https://maps.apple.com/?q=${q}`;
+  const plus=navigationPlusCode071(s);
+  const q=encodeURIComponent(plus||mapQuery(s));
+  return provider === "google" ? `https://www.google.com/maps/search/?api=1&query=${q}` : `https://maps.apple.com/?q=${encodeURIComponent(mapQuery(s))}`;
 }
+ensureAllPlusCodes071();
+updateGlobalToday071();
 function gpsOptions(){ const g=data.settings.gps||{}; return {enableHighAccuracy:g.highAccuracy!==false,timeout:15000,maximumAge:60000}; }
 function captureGpsForSite(){
   const s=site();
@@ -1547,7 +1640,7 @@ function addServiceFollowUp(kind="Follow-up"){
 function startJobTimer(){ stopJobTimer(); jobTimer=setInterval(()=>{ const el=document.getElementById("jobElapsed"); if(el && activeJob) el.textContent=elapsedText(activeJob.startedAt); },1000); }
 function stopJobTimer(){ if(jobTimer){ clearInterval(jobTimer); jobTimer=null; } }
 function setActiveNav(){ document.querySelectorAll("nav button").forEach(b=>b.classList.remove("active")); const section=["routeLog","dailySummary","actionCenter","pinnedSites","dashboard068"].includes(view)?"home":(["siteDetail","visits","visitDetail","checklist","siteForm","contactsList","contactForm","siteDocs","siteDocForm","equipmentList","equipmentForm","tasks","taskForm","deficiencies","deficiencyForm","report","jobMode","serviceVisit","nearbySites","attention"].includes(view)?"sites":view); document.getElementById("nav-"+section)?.classList.add("active"); }
-function wireGlobalHeader537(){ const b=document.getElementById("headerSettingsBtn537"); if(b) b.onclick=openSettingsHome572; }
+function wireGlobalHeader537(){ updateGlobalToday071(); }
 function showGlobalChrome537(){ const h=document.getElementById("appHeader"); const n=document.getElementById("appNav"); if(h){ h.style.display="flex"; h.style.visibility="visible"; h.style.opacity="1"; } if(n){ n.style.display="grid"; n.style.visibility="visible"; n.style.opacity="1"; } wireGlobalHeader537(); }
 
 function contextualHelpInfo060(){
@@ -1567,7 +1660,7 @@ function returnFromContextualHelp060(){
   view=back.view; mode=back.mode; settingsTab=back.settingsTab; selectedSiteId=back.selectedSiteId; render();
 }
 function injectContextualHelp060(){
-  /* Build 0.70.0: the floating blue Help circle is retired. Help remains available in Settings → Data, Sync & Support → FireVault Academy. */
+  /* Build 0.71.0: the floating blue Help circle is retired. Help remains available in Settings → Data, Sync & Support → FireVault Academy. */
   document.getElementById("contextHelp060")?.remove();
 }
 function render(){
@@ -2321,7 +2414,7 @@ function home(){
     home();
   };
   document.querySelectorAll('[data-nearby-open069]').forEach(b=>b.onclick=e=>{e.stopPropagation();selectedSiteId=b.dataset.nearbyOpen069;route('siteDetail');});
-  document.querySelectorAll('[data-nearby-route069]').forEach(b=>b.onclick=e=>{e.stopPropagation();const s=(data.sites||[]).find(x=>x.id===b.dataset.nearbyRoute069);if(s) window.open(mapUrl(s,data.settings.gps?.mapProvider||'apple'),'_blank');});
+  document.querySelectorAll('[data-nearby-route069]').forEach(b=>b.onclick=e=>{e.stopPropagation();const s=(data.sites||[]).find(x=>x.id===b.dataset.nearbyRoute069);if(s) window.open(mapRouteUrl071(s),'_blank');});
   document.querySelectorAll('[data-nearby-call069]').forEach(b=>b.onclick=e=>{e.stopPropagation();const s=(data.sites||[]).find(x=>x.id===b.dataset.nearbyCall069);const ph=phone069(s);if(ph) location.href=`tel:${ph.replace(/[^+\\d]/g,'')}`;});
   document.querySelectorAll('[data-nearby-card069]').forEach(c=>c.onclick=e=>{
     if(e.target.closest('button'))return;
@@ -3494,6 +3587,8 @@ function siteDetail(){
       </div>
     </details>
 
+    ${plusCodeSection071(s)}
+
     ${featureOn('advancedGps')?`<details class="accountSection067 tone-cyan">
       <summary><span>⌖</span><div><strong>Location & Navigation</strong><small>${esc(hasGps(s)?gpsLine(s):'No saved coordinates')}</small></div><b>⌄</b></summary>
       <div class="accountSectionBody067"><div class="accountGps067"><div><span>GPS location</span><strong>${esc(gpsLine(s))}</strong></div>${data.settings.gps?.enabled===false?'':`<button class="primary" id="captureGpsBtn">Capture GPS</button>`}</div><div class="accountInlineActions067"><button class="ghost" id="navigateBtn477">Navigate</button><button class="ghost" id="appleBtn">Apple Maps</button><button class="ghost" id="googleBtn">Google Maps</button></div></div>
@@ -3528,9 +3623,15 @@ function siteDetail(){
   document.getElementById('manageDocsBtn')?.addEventListener('click',()=>route('siteDocs'));
   document.getElementById('equipmentBtn')?.addEventListener('click',()=>route('equipmentList'));
   document.getElementById('captureGpsBtn')?.addEventListener('click',captureGpsForSite);
-  document.getElementById('navigateBtn477')?.addEventListener('click',()=>window.open(mapUrl(s,(data.settings.gps&&data.settings.gps.mapProvider)||'apple'),'_blank'));
+  document.getElementById('navigateBtn477')?.addEventListener('click',()=>window.open(mapRouteUrl071(s),'_blank'));
   document.getElementById('appleBtn')?.addEventListener('click',()=>window.open(mapUrl(s,'apple'),'_blank'));
   document.getElementById('googleBtn')?.addEventListener('click',()=>window.open(mapUrl(s,'google'),'_blank'));
+  document.getElementById('copyPrimaryPlus071')?.addEventListener('click',()=>copyText071(sitePlusCode071(s),'Plus Code copied.'));
+  document.getElementById('addLocationPoint071')?.addEventListener('click',addLocationPoint071);
+  document.querySelectorAll('[data-copy-plus071]').forEach(b=>b.onclick=()=>{const p=locationPoints071(s).find(x=>x.id===b.dataset.copyPlus071);if(p)copyText071(p.plusCode,'Plus Code copied.');});
+  document.querySelectorAll('[data-route-plus071]').forEach(b=>b.onclick=()=>routeLocationPoint071(b.dataset.routePlus071));
+  document.querySelectorAll('[data-prefer-plus071]').forEach(b=>b.onclick=()=>setPreferredLocation071(b.dataset.preferPlus071));
+  document.querySelectorAll('[data-delete-plus071]').forEach(b=>b.onclick=()=>deleteLocationPoint071(b.dataset.deletePlus071));
   wireImportantSiteInfo568(); wireSiteBrief556(); wireSiteActivity557();
 }
 
@@ -7441,7 +7542,7 @@ function diagnostics(){
 }
 function showChangelog(){
   const notes = [
-    "Build 0.70.0 simplifies the Nearby header, replaces the build/settings controls with today’s day and date, removes floating Help and map controls, and adds color-coded Basic, CLSS, AlarmNet, and IPDACT filtering based on Account ID.",
+    "Build 0.71.0 simplifies the Nearby header, replaces the build/settings controls with today’s day and date, removes floating Help and map controls, and adds color-coded Basic, CLSS, AlarmNet, and IPDACT filtering based on Account ID.",
     "Build 0.69.9 enlarges Nearby Open, Route, and Call controls, changes selected accounts to a glowing green treatment, extends the account list to 25 miles, and adapts the overview radius to the selected account distance.",
     "Build 0.69.8 makes Nearby list taps select the tapped account reliably, zooms the map to street level around that account, and forces all account markers to render as true circles.",
     "Build 0.69.6 hides map details until a marker is tapped, stabilizes momentum list settling, and moves the map closer to the top with a simpler header.",
