@@ -1,4 +1,4 @@
-export const BUILD = "0.72.0";
+export const BUILD = "0.72.1";
 export const KEY = "firevault_vault_build_030";
 export const ACTIVE_JOB_KEY = "firevault_active_job_modular";
 export const DEVICE_KEY = "firevault_device_identity_062";
@@ -174,15 +174,54 @@ export function importSyncPackage(data,pkg){
 
 export function uid(){ return Date.now().toString(36)+Math.random().toString(36).slice(2,7); }
 export function esc(s){ return String(s ?? "").replace(/[&<>"']/g, m => ({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#039;"}[m])); }
+const RECOVERY_KEY = `${KEY}_recovery`;
+function parseVaultCandidate(raw,key){
+  if(!raw) return null;
+  try{
+    const value=JSON.parse(raw);
+    if(!value || typeof value!=="object" || !Array.isArray(value.sites)) return null;
+    return {key,value,count:value.sites.length,updated:value.syncState?.lastLocalSave||""};
+  }catch{return null;}
+}
+function recoverBestLocalVault(){
+  const candidates=[];
+  try{
+    [KEY,RECOVERY_KEY].forEach(key=>{const c=parseVaultCandidate(localStorage.getItem(key),key);if(c)candidates.push(c);});
+    for(let i=0;i<localStorage.length;i++){
+      const key=localStorage.key(i)||"";
+      if(!key.toLowerCase().includes("firevault") || key===KEY || key===RECOVERY_KEY) continue;
+      const c=parseVaultCandidate(localStorage.getItem(key),key); if(c)candidates.push(c);
+    }
+  }catch(err){console.error("Vault recovery scan failed",err);}
+  candidates.sort((a,b)=>b.count-a.count || String(b.updated).localeCompare(String(a.updated)));
+  return candidates[0]||null;
+}
 export function loadData(){
-  try{ const raw = localStorage.getItem(KEY); if(raw) return normalize(JSON.parse(raw)); }
-  catch(err){ console.error("Load failed", err); }
+  const best=recoverBestLocalVault();
+  if(best){
+    try{
+      if(best.key!==KEY && best.count>0){
+        localStorage.setItem(KEY,JSON.stringify(best.value));
+        localStorage.setItem(RECOVERY_KEY,JSON.stringify(best.value));
+        localStorage.setItem("firevault_last_recovery_source",best.key);
+      }
+    }catch{}
+    return normalize(best.value);
+  }
   return normalize({sites:[], resources:[], breadcrumbs:[]});
 }
 export function saveData(data){
   let previous=null;
   try{ previous=JSON.parse(localStorage.getItem(KEY)||"null"); }catch{}
   normalize(data);
+  const previousCount=Array.isArray(previous?.sites)?previous.sites.length:0;
+  const nextCount=Array.isArray(data?.sites)?data.sites.length:0;
+  if(previousCount>0 && nextCount===0){
+    console.error("Blocked unsafe empty-vault overwrite",{previousCount,nextCount});
+    try{localStorage.setItem(RECOVERY_KEY,JSON.stringify(previous));}catch{}
+    return previous;
+  }
+  if(previousCount>0){try{localStorage.setItem(RECOVERY_KEY,JSON.stringify(previous));}catch{}}
   const prevSites=new Map((previous?.sites||[]).map(x=>[x?.id,x]));
   data.sites.forEach(site=>migrateRecordTree(site,data,prevSites.get(site.id)));
   const prevResources=new Map((previous?.resources||[]).map(x=>[x?.id,x]));

@@ -1,5 +1,5 @@
 {
-  "build": "0.72.0",
+  "build": "0.72.1",
   "released": "2026-07-11",
-  "message": "Reliable PWA updates and cache maintenance"
+  "note": "Protect and recover locally stored account vaults during PWA updates."
 }
