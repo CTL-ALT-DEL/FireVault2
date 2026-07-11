@@ -6,6 +6,7 @@ let view = new URLSearchParams(location.search).get("route") || data.settings.ap
 let selectedSiteId = null;
 let mode = null;
 let settingsTab = "tech";
+let settingsGroup067 = "";
 let settingsRailScroll = 0;
 const SETTINGS_SCROLL_KEY_576 = "firevault_settings_scroll_05076";
 let settingsSubmenuReturn576 = false;
@@ -3020,127 +3021,133 @@ function wireImportantSiteInfo568(){
 
 function siteDetail(){
   const s=site(); if(!s){ route('sites'); return; }
-  s.lastOpenedAt=new Date().toISOString();
-  saveData(data);
+  s.lastOpenedAt=new Date().toISOString(); saveData(data);
   const open=(s.tasks||[]).filter(t=>(t.status||'Open')!=='Done').length;
   const def=(s.deficiencies||[]).filter(d=>(d.status||'Open')!=='Closed').length;
-  const siteVisits=Array.isArray(s.visits) ? s.visits : [];
-  const equipment=Array.isArray(s.equipment) ? s.equipment : [];
-  const contacts=Array.isArray(s.contacts) ? s.contacts : [];
-  const docs=Array.isArray(s.docs) ? s.docs : [];
+  const siteVisits=Array.isArray(s.visits)?s.visits:[];
+  const equipment=Array.isArray(s.equipment)?s.equipment:[];
+  const contacts=Array.isArray(s.contacts)?s.contacts:[];
+  const docs=Array.isArray(s.docs)?s.docs:[];
   const photoDocs=docs.filter(docHasPhoto512);
-  const checklistItems=Array.isArray(s.checklist) ? s.checklist : [];
+  const checklistItems=Array.isArray(s.checklist)?s.checklist:[];
   const checkStats=checklistStats(s);
   const health=siteHealth(s);
   const lastVisit=siteVisits[0];
   const panel=[s.panelManufacturer,s.panelModel].filter(Boolean).join(' ')||'Panel not entered';
   const primary=primaryContact477(s);
   const access=accessSummary477(s);
-  const showChecklistTool=appMode()!=='simple' || featureOn('reports');
-  const toolCount=siteToolCount477();
-  const nextAction = def ? `${def} deficiency${def===1?'':'ies'} need review` : open ? `${open} open task${open===1?'':'s'}` : 'Ready for service';
-  html(`<div class="screen siteDetailScreen477 siteDetailScreen489 siteDetailScreen574"><div class="row siteTopBar siteTopBar477 siteTopBar489"><button class="back ghost" id="backBtn">←</button><div class="siteTopTitle477"><strong>Account</strong><span>${esc(appMode()==='simple'?'Simple tools':'Modules on')}</span></div><button class="ghost" id="editBtn">Edit</button></div>
+  const showChecklistTool=appMode()!=='simple'||featureOn('reports');
+  const nextAction=def?`${def} deficienc${def===1?'y':'ies'} need review`:open?`${open} open task${open===1?'':'s'}`:'Ready for service';
+  const activeHere=activeJob&&activeJob.siteId===s.id;
+  const primaryMeta=primary?[primary.phone,primary.email].filter(Boolean).join(' • '):'';
 
-    <div class="card siteHero477 siteHero489 siteHero566"><div class="siteHeroMain477"><span class="accountInitialLarge477">${esc((s.name||'?').slice(0,1).toUpperCase())}</span><div><h1>${esc(s.name||'Unnamed Account')}</h1><p>${esc(fullAddress(s))}</p><em>${esc(nextAction)}</em></div></div><div class="siteHeroActions566"><button class="pinSiteBtn566 ${isPinnedSite566(s)?"pinned":""}" id="pinSiteBtn566">${isPinnedSite566(s)?"★":"☆"}</button><div class="siteHealthDot477 ${health.cls}">${health.score}%</div></div></div>
+  html(`<div class="screen siteDetail067">
+    <header class="accountTop067"><button class="ghost" id="backBtn" aria-label="Back to Sites">←</button><div><span>Customer account</span><strong>${esc(s.name||'Unnamed Account')}</strong></div><button class="ghost" id="editBtn">Edit</button></header>
 
-    ${featureOn("importantSiteInfo")?importantSiteInfoMarkup568(s):""}
-    ${featureOn("siteBrief")?siteBriefMarkup556(s):""}
-    ${featureOn("siteTimeline")?siteActivityTimelineMarkup557(s):""}
+    <section class="accountHero067 tone-${health.cls}">
+      <div class="accountHeroIdentity067"><span class="accountInitial067">${esc((s.name||'?').slice(0,1).toUpperCase())}</span><div><h1>${esc(s.name||'Unnamed Account')}</h1><p>${esc(fullAddress(s))}</p><em>${esc(nextAction)}</em></div></div>
+      <div class="accountHeroTools067"><button class="accountPin067 ${isPinnedSite566(s)?'pinned':''}" id="pinSiteBtn566" aria-label="Pin account">${isPinnedSite566(s)?'★':'☆'}</button><div class="accountHealth067"><strong>${health.score}%</strong><span>Site ready</span></div></div>
+    </section>
 
-    <div class="card siteQuickActions544"><div class="siteCardHead477"><div><h2>Site Quick Actions</h2><p>Fast access to the field tasks used most on this account.</p></div><span class="quickActionBadge544">${open+def+photoDocs.length}</span></div><div class="quickActionGrid544">
-      <button class="primary quickAction544" id="qaStartVisit610"><strong>${activeJob&&activeJob.siteId===s.id?"Resume Visit":"Start Visit"}</strong><span>${activeJob&&activeJob.siteId===s.id?elapsedText(activeJob.startedAt):"Timed service workspace"}</span></button>
-      <button class="ghost quickAction544" id="qaAddNote544"><strong>＋ Site Note</strong><span>Timestamped note</span></button>
-      <button class="ghost quickAction544" id="qaAddPhoto544"><strong>＋ Photo</strong><span>Panel, device, deficiency</span></button>
-      <button class="ghost quickAction544" id="qaAddDef544"><strong>＋ Deficiency</strong><span>Document a problem</span></button>
-      <button class="ghost quickAction544" id="qaAddTask544"><strong>＋ Task</strong><span>Follow-up item</span></button>
-      <button class="ghost quickAction544" id="qaPhotoVault544"><strong>Photo Vault</strong><span>${photoDocs.length} saved photo${photoDocs.length===1?'':'s'}</span></button>
-      <button class="ghost quickAction544" id="qaReport544"><strong>Report Center</strong><span>Customer closeout</span></button>
-      <button class="ghost quickAction544 wideAction544" id="qaCloseout544"><strong>Copy Closeout Packet</strong><span>Customer-facing summary</span></button>
-    </div></div>
+    <section class="accountActionDock067">
+      <button class="primary accountVisit067" id="qaStartVisit610"><span>${activeHere?'▶':'＋'}</span><div><strong>${activeHere?'Resume Service Visit':'Start Service Visit'}</strong><small>${activeHere?elapsedText(activeJob.startedAt):'Timed field workspace and closeout'}</small></div><b>›</b></button>
+      <div class="accountQuickGrid067">
+        <button id="qaAddNote544"><span>✎</span><strong>Note</strong></button>
+        <button id="qaAddPhoto544"><span>▣</span><strong>Photo</strong></button>
+        <button id="qaAddDef544" class="danger"><span>!</span><strong>Deficiency</strong></button>
+        <button id="qaAddTask544"><span>□</span><strong>Task</strong></button>
+      </div>
+    </section>
 
-    <div class="grid2 sitePrimaryActions477 sitePrimaryActions489 compactPrimaryActions544"><button class="ghost tile" id="snapshotBtn"><strong>Snapshot</strong><span>Copy field summary</span></button>${featureOn('advancedGps')?`<button class="ghost tile" id="navigateBtn477"><strong>Navigate</strong><span>Open maps</span></button>`:''}</div>
+    <section class="accountMetricGrid067" aria-label="Account activity">
+      <button id="taskBtn" class="tone-amber"><strong>${open}</strong><span>Open Tasks</span></button>
+      <button id="defBtn" class="tone-red"><strong>${def}</strong><span>Deficiencies</span></button>
+      <button id="visitsMini477" class="tone-green"><strong>${siteVisits.length}</strong><span>Visits</span></button>
+      <button id="qaPhotoVault544" class="tone-blue"><strong>${photoDocs.length}</strong><span>Photos</span></button>
+    </section>
 
-    <div class="card fieldCard477 fieldCard489"><div class="siteCardHead477"><div><h2>Field Card</h2><p>Most-used account information first.</p></div><button class="ghost smallBtn" id="contactsQuick477">Contacts</button></div><div class="fieldGrid477">
-      ${fieldValue477('Panel', panel)}
-      ${fieldValue477('Primary Contact', primary ? contactTitle(primary) : 'No contact saved', primary?.phone?`<button class="ghost microBtn477" id="callPrimary477">Call</button>`:'')}
-      ${fieldValue477('Access', access)}
-      ${fieldValue477('Last Visit', lastVisit ? `${visitDateLabel(lastVisit)} • ${durationText(lastVisit.startedAt,lastVisit.endedAt)}` : 'No completed visits')}
-    </div></div>
+    <details class="accountSection067 tone-blue" open>
+      <summary><span>▤</span><div><strong>Account Snapshot</strong><small>Panel, contact, access, and last service information</small></div><b>⌄</b></summary>
+      <div class="accountSectionBody067">
+        <div class="accountSnapshotGrid067">
+          <div><span>Panel</span><strong>${esc(panel)}</strong></div>
+          <div><span>Primary Contact</span><strong>${esc(primary?contactTitle(primary):'No contact saved')}</strong>${primaryMeta?`<small>${esc(primaryMeta)}</small>`:''}</div>
+          <div><span>Access</span><strong>${esc(access||'No access notes')}</strong></div>
+          <div><span>Last Visit</span><strong>${esc(lastVisit?`${visitDateLabel(lastVisit)} • ${durationText(lastVisit.startedAt,lastVisit.endedAt)}`:'No completed visits')}</strong></div>
+        </div>
+        <div class="accountInlineActions067">
+          <button class="ghost" id="copyImportantInfo568">Copy Site Info</button>
+          <button class="ghost" id="snapshotBtn">Copy Snapshot</button>
+          <button class="ghost" id="contactsQuick477">Contacts</button>
+          ${primary?.phone?`<button class="ghost" id="callPrimary477">Call Contact</button>`:''}
+        </div>
+        ${importedAccountCard065(s)}
+      </div>
+    </details>
 
-    ${importedAccountCard065(s)}
+    <details class="accountSection067 tone-red" open>
+      <summary><span>⚒</span><div><strong>Work & History</strong><small>Notes, priorities, recent visits, and account activity</small></div><b>⌄</b></summary>
+      <div class="accountSectionBody067">
+        <div class="accountPriority067"><div><span>Today’s priority</span><strong>${esc(health.details.join(' • ')||nextAction)}</strong></div><button class="ghost" id="qaReport544">Report Center</button></div>
+        <div class="accountNotes067"><div><span>Site Notes</span><p>${esc((s.notes||'No notes entered.').split('\n').slice(0,4).join('\n'))}</p></div><div><button class="primary" id="addSiteNoteBtn491">＋ Add Note</button><button class="ghost" id="openSiteNotesBtn494">Open Notes</button></div></div>
+        <div class="accountRecent067"><div><span>Recent Visit</span><strong>${esc(lastVisit?`${visitDateLabel(lastVisit)} • ${visitNotesPreview(lastVisit,1)}`:'No completed visits yet.')}</strong></div>${siteVisits.length?`<button class="ghost" id="allVisitsBtn">View History</button>`:''}</div>
+        ${featureOn('siteTimeline')?siteActivityTimelineMarkup557(s):''}
+      </div>
+    </details>
 
-    <div class="grid3 siteQuickStats477 siteQuickStats489"><button class="card tile" id="taskBtn"><strong>${open}</strong><span>Open Tasks</span></button><button class="card tile" id="defBtn"><strong>${def}</strong><span>Deficiencies</span></button><button class="card tile" id="visitsMini477"><strong>${siteVisits.length}</strong><span>Visits</span></button></div>
+    <details class="accountSection067 tone-violet">
+      <summary><span>▣</span><div><strong>Photos & Resources</strong><small>Account photos, documents, equipment, reports, and checklists</small></div><b>⌄</b></summary>
+      <div class="accountSectionBody067">
+        <div class="accountResourceHead067"><div><span>Account Photos</span><strong>${photoDocs.length?`${photoDocs.length} saved photo${photoDocs.length===1?'':'s'}`:'No photos saved'}</strong></div><div><button class="ghost" id="openPhotoVaultBtn523">Photo Vault</button><button class="primary" id="addAccountPhotoBtn523">＋ Photo</button></div></div>
+        ${photoDocs.length?`<div class="accountPhotoStrip067">${photoDocs.slice(0,4).map(d=>`<button class="accountPhotoThumb523" data-doc="${esc(d.id)}">${docPhotoThumb512(d)}<span>${esc(d.title||d.imageName||'Photo')}</span></button>`).join('')}</div>`:`<p class="accountEmpty067">Add panel, device, wiring, deficiency, or completed-work photos.</p>`}
+        <div class="accountToolGrid067">
+          ${featureOn('reports')?`<button id="reportBtn"><span>▤</span><strong>Report</strong><small>Customer closeout</small></button>`:''}
+          ${showChecklistTool?`<button id="checklistBtn"><span>✓</span><strong>Checklist</strong><small>${checklistItems.length?`${checkStats.progress}% complete`:'Start checklist'}</small></button>`:''}
+          ${featureOn('library')?`<button id="manageDocsBtn"><span>▧</span><strong>Documents</strong><small>${docs.length} saved</small></button>`:''}
+          ${featureOn('equipment')?`<button id="equipmentBtn"><span>⌁</span><strong>Equipment</strong><small>${equipment.length} items</small></button>`:''}
+          <button id="qaCloseout544"><span>↗</span><strong>Copy Closeout</strong><small>Customer packet</small></button>
+        </div>
+      </div>
+    </details>
 
-    <div class="card accountPhotoCard523 siteSimpleCard477"><div class="row"><div><h2>Account Photos</h2><p>${photoDocs.length ? `${photoDocs.length} saved photo${photoDocs.length===1?'':'s'} for this account.` : 'Add panel, device, wiring, deficiency, and site condition photos here.'}</p></div><div class="photoCardActions523"><button class="ghost smallBtn" id="openPhotoVaultBtn523">Photo Vault</button><button class="primary smallBtn" id="addAccountPhotoBtn523">＋ Add Photo</button></div></div>${photoDocs.length?`<div class="accountPhotoStrip523 accountPhotoStrip524">${photoDocs.slice(0,3).map(d=>`<button class="accountPhotoThumb523 accountPhotoThumb524" data-doc="${esc(d.id)}">${docPhotoThumb512(d)}<span>${esc(d.title||d.imageName||'Photo')}</span><em>${esc(photoCategory524(d)||'Photo')}</em></button>`).join('')}</div>`:`<p class="fieldNote">This is now visible directly on the account screen so photos are not hidden under Documents.</p>`}</div>
-
-    <div class="card siteNow477 siteNow489"><div class="siteNowHead477"><div><h2>Today’s Priority</h2><p>${esc(health.details.join(' • '))}</p></div><span>${health.score}%</span></div><div class="siteNowGrid477"><button id="openTasksMini476"><strong>${open}</strong><small>Open Tasks</small></button><button id="openDefMini476"><strong>${def}</strong><small>Deficiencies</small></button><button id="addDefQuick477"><strong>＋</strong><small>Add Deficiency</small></button></div></div>
-
-    <div class="card contactsMiniCard477 siteSimpleCard477"><div class="row"><div><h2>Contacts & Access</h2><p>${contacts.length ? `${contacts.length} saved contact${contacts.length===1?'':'s'}` : 'Customer, access, gate, and after-hours details.'}</p></div><button class="ghost smallBtn" id="manageContactsBtn">Manage</button></div>${contacts.length?contacts.slice(0,2).map(c=>`<button class="contactLine contactLine477" data-contact="${esc(c.id)}"><strong>${esc(contactTitle(c))}</strong><span>${esc(contactMeta(c))}</span>${c.accessNotes?`<em>${esc(c.accessNotes)}</em>`:''}</button>`).join(''):`<p class="fieldNote">Add customer contacts, access codes, lockbox notes, or monitoring center details here.</p>`}</div>
-
-    <div class="card recentVisitsCard477 siteSimpleCard477"><div class="row"><div><h2>Recent Visit</h2><p>${lastVisit ? `${visitDateLabel(lastVisit)} • ${durationText(lastVisit.startedAt,lastVisit.endedAt)}` : 'No completed visits yet.'}</p></div>${siteVisits.length?`<button class="ghost smallBtn" id="allVisitsBtn">All</button>`:''}</div>${lastVisit?`<button class="visitMini visitMiniButton" data-visit="${esc(lastVisit.id)}"><strong>${esc(visitNotesPreview(lastVisit,1))}</strong><span>Open visit detail</span></button>`:`<p class="fieldNote">Use Add Note to keep timestamped site notes for this account.</p>`}</div>
-
-    ${toolCount?`<div class="card siteModulesCard477 siteModulesCard489"><div class="siteModulesHead477"><h2>More Site Tools</h2><p>Disabled modules are removed from this account screen.</p></div><div class="grid2 siteModuleGrid477">
-      ${featureOn('reports')?`<button class="ghost tile" id="reportBtn"><strong>Report</strong><span>Copy / download</span></button>`:''}
-      ${showChecklistTool?`<button class="ghost tile" id="checklistBtn"><strong>${checklistItems.length ? checkStats.progress + '%' : 'New'}</strong><span>Checklist</span></button>`:''}
-      ${featureOn('library')?`<button class="ghost tile" id="manageDocsBtn"><strong>${docs.length}</strong><span>Documents</span></button>`:''}
-      ${featureOn('equipment')?`<button class="ghost tile" id="equipmentBtn"><strong>${equipment.length}</strong><span>Equipment</span></button>`:''}
-      ${featureOn('advancedGps')?`<button class="ghost tile" id="gpsToolsBtn"><strong>GPS</strong><span>${hasGps(s)?'Saved':'Capture'}</span></button>`:''}
-    </div></div>`:''}
-
-    ${featureOn('advancedGps')?`<div class="card gpsCard siteGpsCard477"><div class="row"><div><h2>GPS / Maps</h2><p>${esc(gpsLine(s))}</p></div>${data.settings.gps?.enabled===false?'':`<button id="captureGpsBtn" class="primary smallBtn">Capture GPS</button>`}</div><div class="mapActions"><button id="appleBtn" class="ghost">Apple Maps</button><button id="googleBtn" class="ghost">Google Maps</button></div></div>`:''}
-
-    ${featureOn('equipment') && equipment.length?`<div class="card equipmentMiniCard477 siteSimpleCard477"><div class="row"><div><h2>Equipment Snapshot</h2><p>${equipment.length} saved equipment item${equipment.length===1?'':'s'}</p></div><button class="ghost smallBtn" id="manageEquipmentBtn">Manage</button></div>${equipment.slice(0,2).map(e=>`<button class="equipmentLine" data-eq="${esc(e.id)}"><strong>${esc(equipmentTitle(e))}</strong><span>${esc(e.location||e.type||'No location entered')}</span></button>`).join('')}</div>`:''}
-
-    ${featureOn('library') && docs.length?`<div class="card docsMiniCard477 siteSimpleCard477"><div class="row"><div><h2>Documents / Links</h2><p>${docs.length} saved document${docs.length===1?'':'s'}</p></div><button class="ghost smallBtn" id="manageDocsBtn2">Manage</button></div>${docs.slice(0,2).map(d=>`<button class="docLineMini" data-doc="${esc(d.id)}"><strong>${esc(docTitle(d))}</strong><span>${esc(docMeta(d))}</span></button>`).join('')}</div>`:''}
-
-    <div class="card grow siteNotes477 siteNotes491 siteNotes494"><div class="row"><div><h2>Site Notes</h2><p>Timestamped notes for this account.</p></div><div class="noteCardActions494"><button class="ghost smallBtn" id="openSiteNotesBtn494">Open</button><button class="primary smallBtn" id="addSiteNoteBtn491">＋ Note</button></div></div><pre>${esc(s.notes || 'No notes entered.')}</pre></div>
+    ${featureOn('advancedGps')?`<details class="accountSection067 tone-cyan">
+      <summary><span>⌖</span><div><strong>Location & Navigation</strong><small>${esc(hasGps(s)?gpsLine(s):'No saved coordinates')}</small></div><b>⌄</b></summary>
+      <div class="accountSectionBody067"><div class="accountGps067"><div><span>GPS location</span><strong>${esc(gpsLine(s))}</strong></div>${data.settings.gps?.enabled===false?'':`<button class="primary" id="captureGpsBtn">Capture GPS</button>`}</div><div class="accountInlineActions067"><button class="ghost" id="navigateBtn477">Navigate</button><button class="ghost" id="appleBtn">Apple Maps</button><button class="ghost" id="googleBtn">Google Maps</button></div></div>
+    </details>`:''}
   </div>`);
-  document.getElementById('backBtn').onclick=()=>route('sites');
-  document.getElementById('editBtn').onclick=()=>{mode='edit'; route('siteForm');};
-  const pinBtn566=document.getElementById('pinSiteBtn566'); if(pinBtn566) pinBtn566.onclick=toggleSitePinned566;
-  document.getElementById('taskBtn').onclick=()=>route('tasks');
-  document.getElementById('defBtn').onclick=()=>route('deficiencies');
-  document.getElementById('visitsMini477').onclick=()=>route('visits');
-  const openPhotoVault523=document.getElementById('openPhotoVaultBtn523'); if(openPhotoVault523) openPhotoVault523.onclick=()=>{docVaultFilter516='photos'; route('siteDocs');};
-  const addAccountPhoto523=document.getElementById('addAccountPhotoBtn523'); if(addAccountPhoto523) addAccountPhoto523.onclick=()=>{mode='newPhoto'; route('siteDocForm');};
-  document.querySelectorAll('.accountPhotoThumb523').forEach(b=>b.onclick=()=>{ const d=(site()?.docs||[]).find(x=>x.id===b.dataset.doc); if(d) photoPreviewModal524(d); });
-  document.getElementById('openTasksMini476').onclick=()=>route('tasks');
-  document.getElementById('openDefMini476').onclick=()=>route('deficiencies');
-  document.getElementById('snapshotBtn').onclick=shareSiteSnapshot;
-  wireImportantSiteInfo568();
-  wireSiteBrief556();
-  wireSiteActivity557();
-  const qaVisit610=document.getElementById('qaStartVisit610'); if(qaVisit610) qaVisit610.onclick=startServiceVisit610;
-  const qaNote544=document.getElementById('qaAddNote544'); if(qaNote544) qaNote544.onclick=()=>addSiteNotePrompt();
-  const qaPhoto544=document.getElementById('qaAddPhoto544'); if(qaPhoto544) qaPhoto544.onclick=()=>{mode='newPhoto'; route('siteDocForm');};
-  const qaDef544=document.getElementById('qaAddDef544'); if(qaDef544) qaDef544.onclick=()=>{mode=null; route('deficiencyForm');};
-  const qaTask544=document.getElementById('qaAddTask544'); if(qaTask544) qaTask544.onclick=()=>{mode=null; route('taskForm');};
-  const qaVault544=document.getElementById('qaPhotoVault544'); if(qaVault544) qaVault544.onclick=()=>{docVaultFilter516='photos'; route('siteDocs');};
-  const qaReport544=document.getElementById('qaReport544'); if(qaReport544) qaReport544.onclick=()=>route('report');
-  const qaCloseout544=document.getElementById('qaCloseout544'); if(qaCloseout544) qaCloseout544.onclick=copyCustomerCloseoutPacket539;
-  const siteNoteBtn491=document.getElementById('addSiteNoteBtn491'); if(siteNoteBtn491) siteNoteBtn491.onclick=()=>addSiteNotePrompt();
-  const openNotes494=document.getElementById('openSiteNotesBtn494'); if(openNotes494) openNotes494.onclick=()=>route('jobMode');
-  const addTask=document.getElementById('addTaskQuick477'); if(addTask) addTask.onclick=()=>{mode=null; route('taskForm');};
-  const addDef=document.getElementById('addDefQuick477'); if(addDef) addDef.onclick=()=>{mode=null; route('deficiencyForm');};
-  const nav=document.getElementById('navigateBtn477'); if(nav) nav.onclick=()=>window.open(mapUrl(s,(data.settings.gps&&data.settings.gps.mapProvider)||'apple'),'_blank');
-  const call=document.getElementById('callPrimary477'); if(call && primary?.phone) call.onclick=()=>{location.href=`tel:${primary.phone}`;};
-  const contactQuick=document.getElementById('contactsQuick477'); if(contactQuick) contactQuick.onclick=()=>route('contactsList');
-  const report=document.getElementById('reportBtn'); if(report) report.onclick=()=>route('report');
-  const checklist=document.getElementById('checklistBtn'); if(checklist) checklist.onclick=()=>route('checklist');
-  const equipmentBtn=document.getElementById('equipmentBtn'); if(equipmentBtn) equipmentBtn.onclick=()=>route('equipmentList');
-  const gpsTools=document.getElementById('gpsToolsBtn'); if(gpsTools) gpsTools.onclick=()=>{ const gps=document.querySelector('.siteGpsCard477'); if(gps) gps.scrollIntoView({behavior:'smooth',block:'center'}); };
-  const gpsBtn=document.getElementById('captureGpsBtn'); if(gpsBtn) gpsBtn.onclick=captureGpsForSite;
-  const apple=document.getElementById('appleBtn'); if(apple) apple.onclick=()=>window.open(mapUrl(s,'apple'),'_blank');
-  const google=document.getElementById('googleBtn'); if(google) google.onclick=()=>window.open(mapUrl(s,'google'),'_blank');
-  const manageContacts=document.getElementById('manageContactsBtn'); if(manageContacts) manageContacts.onclick=()=>route('contactsList');
-  document.querySelectorAll('.contactLine').forEach(b=>b.onclick=()=>{mode=b.dataset.contact; route('contactForm');});
-  const manageEq=document.getElementById('manageEquipmentBtn'); if(manageEq) manageEq.onclick=()=>route('equipmentList');
-  document.querySelectorAll('.equipmentLine').forEach(b=>b.onclick=()=>{mode=b.dataset.eq; route('equipmentForm');});
-  const manageDocs=document.getElementById('manageDocsBtn'); if(manageDocs) manageDocs.onclick=()=>route('siteDocs');
-  const manageDocs2=document.getElementById('manageDocsBtn2'); if(manageDocs2) manageDocs2.onclick=()=>route('siteDocs');
-  document.querySelectorAll('.docLineMini').forEach(b=>b.onclick=()=>{mode=b.dataset.doc; route('siteDocForm');});
-  const allVisits=document.getElementById('allVisitsBtn'); if(allVisits) allVisits.onclick=()=>route('visits');
-  document.querySelectorAll('.visitMiniButton').forEach(b=>b.onclick=()=>{mode=b.dataset.visit; route('visitDetail');});
+
+  document.getElementById('backBtn')?.addEventListener('click',()=>route('sites'));
+  document.getElementById('editBtn')?.addEventListener('click',()=>{mode='edit';route('siteForm');});
+  document.getElementById('pinSiteBtn566')?.addEventListener('click',toggleSitePinned566);
+  document.getElementById('qaStartVisit610')?.addEventListener('click',startServiceVisit610);
+  document.getElementById('qaAddNote544')?.addEventListener('click',addSiteNotePrompt);
+  document.getElementById('qaAddPhoto544')?.addEventListener('click',()=>{mode='newPhoto';route('siteDocForm');});
+  document.getElementById('qaAddDef544')?.addEventListener('click',()=>{mode=null;route('deficiencyForm');});
+  document.getElementById('qaAddTask544')?.addEventListener('click',()=>{mode=null;route('taskForm');});
+  document.getElementById('taskBtn')?.addEventListener('click',()=>route('tasks'));
+  document.getElementById('defBtn')?.addEventListener('click',()=>route('deficiencies'));
+  document.getElementById('visitsMini477')?.addEventListener('click',()=>route('visits'));
+  document.getElementById('qaPhotoVault544')?.addEventListener('click',()=>{docVaultFilter516='photos';route('siteDocs');});
+  document.getElementById('openPhotoVaultBtn523')?.addEventListener('click',()=>{docVaultFilter516='photos';route('siteDocs');});
+  document.getElementById('addAccountPhotoBtn523')?.addEventListener('click',()=>{mode='newPhoto';route('siteDocForm');});
+  document.querySelectorAll('.accountPhotoThumb523').forEach(b=>b.onclick=()=>{const d=(site()?.docs||[]).find(x=>x.id===b.dataset.doc);if(d)photoPreviewModal524(d);});
+  document.getElementById('snapshotBtn')?.addEventListener('click',shareSiteSnapshot);
+  document.getElementById('qaReport544')?.addEventListener('click',()=>route('report'));
+  document.getElementById('qaCloseout544')?.addEventListener('click',copyCustomerCloseoutPacket539);
+  document.getElementById('addSiteNoteBtn491')?.addEventListener('click',addSiteNotePrompt);
+  document.getElementById('openSiteNotesBtn494')?.addEventListener('click',()=>route('jobMode'));
+  document.getElementById('contactsQuick477')?.addEventListener('click',()=>route('contactsList'));
+  if(primary?.phone) document.getElementById('callPrimary477')?.addEventListener('click',()=>{location.href=`tel:${primary.phone}`;});
+  document.getElementById('allVisitsBtn')?.addEventListener('click',()=>route('visits'));
+  document.getElementById('reportBtn')?.addEventListener('click',()=>route('report'));
+  document.getElementById('checklistBtn')?.addEventListener('click',()=>route('checklist'));
+  document.getElementById('manageDocsBtn')?.addEventListener('click',()=>route('siteDocs'));
+  document.getElementById('equipmentBtn')?.addEventListener('click',()=>route('equipmentList'));
+  document.getElementById('captureGpsBtn')?.addEventListener('click',captureGpsForSite);
+  document.getElementById('navigateBtn477')?.addEventListener('click',()=>window.open(mapUrl(s,(data.settings.gps&&data.settings.gps.mapProvider)||'apple'),'_blank'));
+  document.getElementById('appleBtn')?.addEventListener('click',()=>window.open(mapUrl(s,'apple'),'_blank'));
+  document.getElementById('googleBtn')?.addEventListener('click',()=>window.open(mapUrl(s,'google'),'_blank'));
+  wireImportantSiteInfo568(); wireSiteBrief556(); wireSiteActivity557();
 }
 
 function photoCategory524(d={}){ return d.photoCategory || (docHasPhoto512(d) ? "Panel" : ""); }
@@ -5237,6 +5244,23 @@ function importedAccountCard065(s={}){
 }
 
 
+
+const SETTINGS_GROUPS_067 = [
+  {key:"profile",icon:"👤",title:"Profile & Organization",note:"Technician identity and company details.",tone:"blue",tabs:["tech"]},
+  {key:"appearance",icon:"◐",title:"App & Home",note:"Theme, Home layout, and visible modules.",tone:"violet",tabs:["themes","homeLayout","visibility"]},
+  {key:"field",icon:"🧰",title:"Field Tools",note:"GPS, photo overlays, and optional field services.",tone:"cyan",tabs:["gps","overlay","advanced"]},
+  {key:"reports",icon:"▤",title:"Reports & Communication",note:"Report content, email delivery, and customer closeout.",tone:"amber",tabs:["reports","email"]},
+  {key:"data",icon:"☁",title:"Data, Sync & Support",note:"Imports, backup, team sync, Help, About, and diagnostics.",tone:"red",tabs:["sync","customerImport","backup","manual","about","diagnostics"]}
+];
+function settingsGroupForTab067(tab){ return SETTINGS_GROUPS_067.find(g=>g.tabs.includes(tab))?.key || "data"; }
+function settingsGroup067ByKey(key){ return SETTINGS_GROUPS_067.find(g=>g.key===key) || SETTINGS_GROUPS_067[0]; }
+function openSettingsGroup067(key){ settingsGroup067=key||"profile"; mode="settingsGroup"; view="settings"; render(); }
+function settingsGroupSummary067(group,tabs){
+  const labels=group.tabs.filter(x=>x!=="diagnostics").map(id=>tabs.find(t=>t[0]===id)?.[1]).filter(Boolean);
+  if(group.tabs.includes("diagnostics")) labels.push("Diagnostics");
+  return labels.slice(0,4).join(" • ") + (labels.length>4?` • +${labels.length-4}`:"");
+}
+
 function settingsTabs(){
   return [
     ["tech","Technician","Name, company, phone, email, and license information used in reports."],
@@ -5278,12 +5302,14 @@ function restoreAppChrome572(){
   showGlobalChrome537();
 }
 function openSettingsHome572(){
+  settingsGroup067="";
   mode=null;
   view="settings";
   restoreAppChrome572();
   render();
 }
 function leaveSettingsHome572(){
+  settingsGroup067="";
   mode=null;
   settingsTab="tech";
   route("home");
@@ -5298,43 +5324,87 @@ function settings(){
   const tabs=settingsTabs();
   const active=tabs.find(t=>t[0]===settingsTab)||tabs[0];
   const inDetail = mode === "settingsDetail";
-  if(!inDetail){
-    html(`<div class="screen settingsHomeScreen settingsHomeScreen451 settingsHomeScreen488 settingsStable573">
-      <div class="settingsHeader488 settingsHeader572">
+  const inGroup = mode === "settingsGroup";
+
+  if(!inDetail && !inGroup){
+    html(`<div class="screen settingsHome067 settingsStable573">
+      <header class="settingsLandingHead067">
         <button class="ghost settingsHomeBtn572" id="settingsHomeBtn572" aria-label="Return to Home">⌂</button>
-        <div class="settingsHeaderTitle572"><h1>Settings</h1><p>Modules, app setup, and maintenance.</p></div>
+        <div><span>FireVault configuration</span><h1>Settings</h1><p>Five organized areas replace the long list of individual menus.</p></div>
         <button class="ghost settingsModulesQuick488" id="modulesQuickBtn">Modules</button>
-      </div>
-      <div class="settingsChoiceGrid451 grow settingsChoiceGrid488" aria-label="Settings choices">
-        ${tabs.map(t=>`<button class="settingsChoice451 settingsChoice455 settingsChoice456 settingsChoice-${t[0]}" data-tab="${t[0]}"><span class="settingsChoiceIcon451">${settingsIcon550(t[0])}</span><span class="settingsChoiceText456"><strong>${t[1]}</strong><small>${t[2]}</small></span><span class="settingsChoiceArrow455">›</span></button>`).join("")}
-        <button class="settingsChoice451 settingsChoice455 settingsChoice456 settingsChoiceUtility451 settingsChoice-diagnostics" id="diagnosticsChoice"><span class="settingsChoiceIcon451">⌁</span><span class="settingsChoiceText456"><strong>Diagnostics</strong><small>Build, storage, GPS, module, task, report, and vault health details.</small></span><span class="settingsChoiceArrow455">›</span></button>
+      </header>
+      <section class="settingsLandingIntro067">
+        <div><strong>Everything is still here.</strong><p>Features were grouped by purpose so they are faster to find and easier to maintain.</p></div>
+        <span>${SETTINGS_GROUPS_067.length} folders</span>
+      </section>
+      <div class="settingsGroupGrid067" aria-label="Settings folders">
+        ${SETTINGS_GROUPS_067.map(g=>`<button class="settingsGroupCard067 tone-${g.tone}" data-settings-group067="${g.key}"><span class="settingsGroupIcon067">${g.icon}</span><span class="settingsGroupCopy067"><strong>${esc(g.title)}</strong><small>${esc(g.note)}</small><em>${esc(settingsGroupSummary067(g,tabs))}</em></span><b>›</b></button>`).join("")}
       </div>
     </div>`);
-    const homeBtn572=document.getElementById("settingsHomeBtn572"); if(homeBtn572) homeBtn572.onclick=leaveSettingsHome572;
-    document.querySelectorAll(".settingsChoice451[data-tab]").forEach(b=>b.onclick=()=>{ settingsTab=b.dataset.tab; mode="settingsDetail"; view="settings"; render(); });
-    const mq=document.getElementById("modulesQuickBtn"); if(mq) mq.onclick=()=>{ settingsTab="visibility"; mode="settingsDetail"; view="settings"; render(); };
-    document.getElementById("diagnosticsChoice").onclick=()=>openSettingsSubmenu576("diagnostics");
-    const dataToolsChoice560=document.getElementById("dataToolsChoice560"); if(dataToolsChoice560) dataToolsChoice560.onclick=()=>openSettingsSubmenu576("dataTools");
+    document.getElementById("settingsHomeBtn572")?.addEventListener("click",leaveSettingsHome572);
+    document.getElementById("modulesQuickBtn")?.addEventListener("click",()=>{settingsGroup067="appearance";settingsTab="visibility";mode="settingsDetail";render();});
+    document.querySelectorAll("[data-settings-group067]").forEach(b=>b.onclick=()=>openSettingsGroup067(b.dataset.settingsGroup067));
     restoreSettingsScroll576(false);
     return;
   }
-  const saveable=!['customerImport','backup','manual','about'].includes(settingsTab);
-  html(`<div class="screen settingsDetailScreen451 settingsScreen settingsScreen448 settingsScreen449 settingsDetailScreen488 settingsStable573 settingsTab-${settingsTab}" data-settings-tab="${settingsTab}">
-    <div class="settingsDetailTop451 settingsDetailTop488 settingsDetailTop572">
-      <button class="ghost settingsBack451 settingsBack488" id="settingsBackBtn" aria-label="Back to Settings">←</button>
-      <div class="settingsDetailTitle451 settingsDetailTitle488"><h1>${active[1]}</h1></div>
-      <div class="settingsDetailActions572">
-        <button class="ghost settingsDetailHome572" id="settingsDetailHome572" aria-label="Return to Home">⌂</button>
-        ${saveable?`<button class="primary settingsTopSave451 settingsTopSave488" id="saveSettingsTop">Save</button>`:`<button class="ghost settingsTopSave451 settingsTopSave488" id="settingsDoneBtn">Done</button>`}
+
+  if(inGroup){
+    const group=settingsGroup067ByKey(settingsGroup067);
+    const groupItems=group.tabs.map(id=>id==="diagnostics"?["diagnostics","Diagnostics","Build, storage, GPS, database, and module health checks."]:tabs.find(t=>t[0]===id)).filter(Boolean);
+    html(`<div class="screen settingsGroupScreen067 settingsStable573 tone-${group.tone}">
+      <header class="settingsGroupHead067">
+        <button class="ghost" id="settingsGroupBack067" aria-label="Back to Settings">←</button>
+        <div><span>${group.icon} Settings folder</span><h1>${esc(group.title)}</h1><p>${esc(group.note)}</p></div>
+        <button class="ghost" id="settingsGroupHome067" aria-label="Return to Home">⌂</button>
+      </header>
+      <div class="settingsFolderList067">
+        ${groupItems.map(t=>`<button class="settingsFolderRow067 settingsChoice-${t[0]}" ${t[0]==="diagnostics"?'data-settings-route067="diagnostics"':`data-tab="${t[0]}"`}><span>${settingsIcon550(t[0])}</span><div><strong>${esc(t[1])}</strong><small>${esc(t[2])}</small></div><b>›</b></button>`).join("")}
       </div>
-    </div>
-    <p class="settingsDetailSub488">${active[2]}</p>
-    <div class="settingsDetailBody451 grow settingsContent448 settingsContent449 settingsDetailBody488">${settingsPanel()}</div>
+      <aside class="settingsFolderTip067"><strong>Tip</strong><span>Use the Home icon to leave Settings, or the back arrow to choose another folder.</span></aside>
+    </div>`);
+    document.getElementById("settingsGroupBack067")?.addEventListener("click",openSettingsHome572);
+    document.getElementById("settingsGroupHome067")?.addEventListener("click",leaveSettingsHome572);
+    document.querySelectorAll(".settingsFolderRow067[data-tab]").forEach(b=>b.onclick=()=>{settingsTab=b.dataset.tab;settingsGroup067=settingsGroupForTab067(settingsTab);if(settingsTab==="manual"){contextualHelpReturn060=null;manualView058="home";manualQuery058="";}mode="settingsDetail";render();});
+    document.querySelectorAll("[data-settings-route067]").forEach(b=>b.onclick=()=>openSettingsSubmenu576(b.dataset.settingsRoute067));
+    restoreSettingsScroll576(false);
+    return;
+  }
+
+  if(inDetail && settingsTab==="manual"){
+    settingsGroup067="data";
+    html(`<div class="screen settingsManualScreen067 settingsStable573">
+      <div class="settingsManualShell067">
+        <button class="ghost" id="settingsManualBack067" aria-label="Back to Data, Sync & Support">←</button>
+        <div><span>Data, Sync & Support</span><strong>FireVault Academy</strong></div>
+        <button class="ghost" id="settingsManualHome067" aria-label="Return to Home">⌂</button>
+      </div>
+      <div class="settingsManualBody067 settingsDetailBody488">${manualPanel058()}</div>
+    </div>`);
+    document.getElementById("settingsManualBack067")?.addEventListener("click",()=>openSettingsGroup067("data"));
+    document.getElementById("settingsManualHome067")?.addEventListener("click",leaveSettingsHome572);
+    wireSettingsPanel();
+    restoreSettingsScroll576(true);
+    return;
+  }
+
+  settingsGroup067=settingsGroupForTab067(settingsTab);
+  const group=settingsGroup067ByKey(settingsGroup067);
+  const saveable=!['customerImport','backup','manual','about'].includes(settingsTab);
+  html(`<div class="screen settingsDetailScreen067 settingsScreen settingsStable573 settingsTab-${settingsTab}" data-settings-tab="${settingsTab}">
+    <header class="settingsDetailHead067 tone-${group.tone}">
+      <button class="ghost" id="settingsBackBtn" aria-label="Back to ${esc(group.title)}">←</button>
+      <div><span>${group.icon} ${esc(group.title)}</span><h1>${esc(active[1])}</h1><p>${esc(active[2])}</p></div>
+      <div class="settingsDetailActions067">
+        <button class="ghost" id="settingsDetailHome572" aria-label="Return to Home">⌂</button>
+        ${saveable?`<button class="primary" id="saveSettingsTop">Save</button>`:`<button class="ghost" id="settingsDoneBtn">Done</button>`}
+      </div>
+    </header>
+    <div class="settingsDetailBody067 settingsDetailBody488 settingsContent448">${settingsPanel()}</div>
   </div>`);
-  document.getElementById("settingsBackBtn").onclick=openSettingsHome572;
-  const homeDetail572=document.getElementById("settingsDetailHome572"); if(homeDetail572) homeDetail572.onclick=leaveSettingsHome572;
-  const done=document.getElementById("settingsDoneBtn"); if(done) done.onclick=openSettingsHome572;
-  const saveTop=document.getElementById("saveSettingsTop"); if(saveTop) saveTop.onclick=saveSettings;
+  document.getElementById("settingsBackBtn")?.addEventListener("click",()=>openSettingsGroup067(settingsGroup067));
+  document.getElementById("settingsDetailHome572")?.addEventListener("click",leaveSettingsHome572);
+  document.getElementById("settingsDoneBtn")?.addEventListener("click",()=>openSettingsGroup067(settingsGroup067));
+  document.getElementById("saveSettingsTop")?.addEventListener("click",saveSettings);
   wireSettingsPanel();
   restoreSettingsScroll576(true);
 }
@@ -5817,7 +5887,7 @@ const FIREVAULT_MANUAL_058 = [
     ["Restore fails","Use an unmodified FireVault JSON backup, verify the file is readable, and compare its preview details before confirming restore."]
   ]},
   {id:"release",title:"Release & Manual Status",icon:"ⓘ",status:"Living document",summary:"Understand how this documentation will be maintained through Version 1.0.",topics:[
-    ["Manual revision","This manual revision matches FireVault Build 0.66.0 and was last reviewed in July 2026."],
+    ["Manual revision","This manual revision matches FireVault Build 0.67.0 and was last reviewed in July 2026."],
     ["Living documentation","Every feature release should include a documentation review. New controls must be documented and changed workflows must be rechecked."],
     ["Pre-release warning","FireVault is still under active development. Labels, layouts, and workflows may change before Version 1.0."],
     ["Screenshot policy","Annotated screenshots should be added after major screens reach release-candidate stability."],
@@ -5858,40 +5928,44 @@ function manualMinutes058(ch){ return Math.max(2,Math.ceil(ch.topics.length*0.8)
 function manualTile058(icon,title,note,view,tone="blue",badge=""){ return `<button class="academyTile058 tone-${tone}" data-manual-view="${view}"><span>${icon}</span><div><strong>${esc(title)}</strong><small>${esc(note)}</small></div>${badge?`<em>${esc(badge)}</em>`:""}</button>`; }
 function manualHome058(){
   const bookmarked=FIREVAULT_MANUAL_058.filter(ch=>manualBookmarks058.includes(ch.id));
-  return `<div class="academyHome058">
-    <section class="academyHero058"><div><span class="academyEyebrow058">FireVault Academy</span><h2>${fireVaultBrand575()} Knowledge Center</h2><p>Manuals, quick-start guidance, field tips, release notes, and troubleshooting for Build ${BUILD}.</p></div><div class="academyMeta058"><span><b>${BUILD}</b>App build</span><span><b>0.66.0</b>Manual revision</span><span><b>July 2026</b>Last reviewed</span></div></section>
-    <div class="academySearch058"><span>⌕</span><input id="manualSearch058" type="search" value="${esc(manualQuery058)}" placeholder="Search FireVault Academy…"><button class="ghost" id="manualSearchGo058">Search</button></div>
-    <section class="academyTileGrid058">
-      ${manualTile058("📘","User Manual","Browse all chapters and step-by-step instructions.","manual","blue")}
-      ${manualTile058("🚀","Quick Start Guide","Set up FireVault and complete a basic field workflow.","quick","green")}
-      ${manualTile058("🆕","What’s New","Review changes included in the current release.","new","red","0.66.0")}
-      ${manualTile058("🧰","Field Tips","Practical documentation and reporting advice.","tips","amber")}
-      ${manualTile058("❓","Troubleshooting","Resolve common GPS, storage, photo, and update issues.","trouble","violet")}
-      ${manualTile058("📋","Revision History","Track app and manual revision checkpoints.","revisions","slate")}
-      ${manualTile058("🎓","Interactive Tutorials","Guided learning with progress tracking.","tutorials","cyan","New")}
-      ${manualTile058("🧭","Show Me Around","Restart the guided FireVault orientation tour.","tour","pink","New")}
-    </section>
-    ${bookmarked.length?`<section class="academyBookmarks058"><div class="academySectionHead058"><div><span>Saved references</span><h3>Bookmarked Chapters</h3></div></div><div class="academyBookmarkGrid058">${bookmarked.map(ch=>`<button data-manual-chapter="${ch.id}"><span>${ch.icon}</span><strong>${esc(ch.title)}</strong><small>${manualMinutes058(ch)} min read</small></button>`).join("")}</div></section>`:""}
-    <div class="academyCheckpoint058"><strong>Documentation checkpoint</strong><p>Every feature build must include a manual review. Screenshots will be added after the interface reaches release-state stability.</p></div>
+  return `<div class="academyHome067">
+    <header class="academyWelcome067"><div><span>FireVault Academy</span><h2>Help that is easy to read</h2><p>Search the manual or choose one of four simple starting points.</p></div><em>Build ${BUILD}</em></header>
+    <div class="academySearch067"><span>⌕</span><input id="manualSearch058" type="search" value="${esc(manualQuery058)}" placeholder="Search Help…"><button class="primary" id="manualSearchGo058">Search</button></div>
+    <div class="academyPrimary067">
+      <button data-manual-view="manual"><span>📘</span><div><strong>User Manual</strong><small>Browse every feature and workflow</small></div><b>›</b></button>
+      <button data-manual-view="quick"><span>🚀</span><div><strong>Quick Start</strong><small>Set up FireVault and begin a visit</small></div><b>›</b></button>
+      <button data-manual-view="trouble"><span>?</span><div><strong>Troubleshooting</strong><small>GPS, storage, photos, and updates</small></div><b>›</b></button>
+      <button data-manual-view="new"><span>🆕</span><div><strong>What’s New</strong><small>Changes in Build ${BUILD}</small></div><b>›</b></button>
+    </div>
+    ${bookmarked.length?`<section class="academySaved067"><div><span>Saved pages</span><strong>Bookmarks</strong></div>${bookmarked.map(ch=>`<button data-manual-chapter="${ch.id}"><span>${ch.icon}</span><strong>${esc(ch.title)}</strong><b>›</b></button>`).join('')}</section>`:''}
+    <details class="academyMore067"><summary><span>More learning tools</span><b>⌄</b></summary><div><button data-manual-view="tutorials">Interactive Tutorials</button><button data-manual-view="tips">Field Tips</button><button data-manual-view="tour">Show Me Around</button><button data-manual-view="revisions">Revision History</button><button data-manual-view="tracker">Documentation Tracker</button></div></details>
+    ${pinnedLearning059()}
+    <p class="academyReviewNote067">Manual revision 0.67.0 · Reviewed July 2026. Documentation must be checked with every feature release.</p>
   </div>`;
 }
 function manualList058(){
   const expanded=manualExpandedQuery058(manualQuery058);
   const terms=expanded.split(/\s+/).filter(Boolean);
-  const chapters=FIREVAULT_MANUAL_058.filter(ch=>!terms.length||terms.every(t=>manualSearchText058(ch).includes(t))||terms.some(t=>manualSearchText058(ch).includes(t)));
-  return `<div class="academyReader058"><div class="academyReaderTop058"><button class="ghost" data-manual-view="home">‹ Academy</button><div><span>User Manual</span><h2>FireVault Chapters</h2></div></div><div class="academySearch058"><span>⌕</span><input id="manualSearch058" type="search" value="${esc(manualQuery058)}" placeholder="Search titles, keywords, or synonyms…"><button class="ghost" id="manualClear058" ${manualQuery058?"":"disabled"}>Clear</button></div><div class="academyChapterList058">${chapters.length?chapters.map(ch=>{const status=manualStatus058(ch);return `<article class="academyChapterCard058"><button class="academyChapterOpen058" data-manual-chapter="${ch.id}"><span class="academyChapterIcon058">${ch.icon}</span><div><strong>${esc(ch.title)}</strong><small>${esc(ch.summary)}</small><em class="status-${status.toLowerCase().replace(/\s+/g,'-')}">${status==="Complete"?"✓":"●"} ${status}</em></div><b>${manualMinutes058(ch)} min ›</b></button><button class="academyStar058 ${manualBookmarks058.includes(ch.id)?"active":""}" data-manual-bookmark="${ch.id}" aria-label="Bookmark ${esc(ch.title)}">★</button></article>`}).join(""):`<div class="manualEmpty057"><strong>No matching topics</strong><p>Try email, GPS, pictures, customer, backup, reports, or troubleshooting.</p></div>`}</div></div>`;
+  const chapters=FIREVAULT_MANUAL_058.filter(ch=>!terms.length||terms.some(t=>manualSearchText058(ch).includes(t)));
+  return `<div class="academyReader067"><header class="academyReaderHead067"><button class="ghost" data-manual-view="home">←</button><div><span>User Manual</span><h2>FireVault Chapters</h2><p>Choose a topic. Articles open as one continuous page.</p></div></header><div class="academySearch067"><span>⌕</span><input id="manualSearch058" type="search" value="${esc(manualQuery058)}" placeholder="Search chapters…"><button class="ghost" id="manualClear058" ${manualQuery058?'':'disabled'}>Clear</button></div><div class="academyChapterList067">${chapters.length?chapters.map(ch=>`<button data-manual-chapter="${ch.id}"><span>${ch.icon}</span><div><strong>${esc(ch.title)}</strong><small>${esc(ch.summary)}</small></div><b>›</b></button>`).join(''):`<div class="manualEmpty057"><strong>No matching topics</strong><p>Try email, GPS, pictures, customer, backup, reports, or troubleshooting.</p></div>`}</div></div>`;
 }
 function manualChapterView058(){
   const ch=FIREVAULT_MANUAL_058.find(x=>x.id===manualChapter058)||FIREVAULT_MANUAL_058[0];
-  const idx=FIREVAULT_MANUAL_058.indexOf(ch), prev=FIREVAULT_MANUAL_058[idx-1], next=FIREVAULT_MANUAL_058[idx+1], status=manualStatus058(ch);
-  return `<div class="academyArticle058">${contextualHelpReturn060?`<div class="contextReturn060"><div><span>Screen-linked help</span><strong>${esc(contextualHelpReturn060.label)}</strong></div><button class="primary" id="contextHelpReturn060">Return to screen</button></div>`:""}<header class="academyArticleHead058"><button class="ghost" data-manual-view="manual">‹ Chapters</button><div><span>${ch.icon} User Manual</span><h2>${esc(ch.title)}</h2><p>${esc(ch.summary)}</p><p class="academyArticleInfo0641">${status} · ${manualMinutes058(ch)} minute read · Reviewed July 2026 · Build ${BUILD}</p></div><button class="academyStar058 ${manualBookmarks058.includes(ch.id)?"active":""}" data-manual-bookmark="${ch.id}">★</button></header><div class="academyProgress058"><span style="width:${Math.round(((idx+1)/FIREVAULT_MANUAL_058.length)*100)}%"></span></div><main class="academyArticleBody058">${ch.topics.map(([title,body],i)=>`<section><span>${String(i+1).padStart(2,'0')}</span><div><h3>${esc(title)}</h3><p>${esc(body)}</p></div></section>`).join("")}</main>${contextualHelpReturn060?`<section class="contextSuggestions060"><span>Suggested for this screen</span><div>${(CONTEXT_HELP_060[contextualHelpReturn060.view]?.suggestions||["Related settings","Common workflow","Troubleshooting"]).map(q=>`<button class="ghost" data-context-search060="${esc(q)}">${esc(q)}</button>`).join("")}</div></section>`:""}<footer class="academyArticleNav058">${prev?`<button class="ghost" data-manual-chapter="${prev.id}"><small>Previous</small><strong>‹ ${esc(prev.title)}</strong></button>`:`<span></span>`}${next?`<button class="ghost" data-manual-chapter="${next.id}"><small>Next</small><strong>${esc(next.title)} ›</strong></button>`:`<button class="ghost" data-manual-view="home"><small>Finished</small><strong>Academy Home ›</strong></button>`}</footer></div>`;
+  const idx=FIREVAULT_MANUAL_058.indexOf(ch),prev=FIREVAULT_MANUAL_058[idx-1],next=FIREVAULT_MANUAL_058[idx+1];
+  return `<article class="academyArticle067">
+    ${contextualHelpReturn060?`<div class="contextReturn067"><div><span>Help opened from</span><strong>${esc(contextualHelpReturn060.label)}</strong></div><button class="primary" id="contextHelpReturn060">Return</button></div>`:''}
+    <header class="academyArticleHead067"><button class="ghost" data-manual-view="manual">← Chapters</button><div><span>${ch.icon} User Manual</span><h2>${esc(ch.title)}</h2><p>${esc(ch.summary)}</p><small>Reviewed July 2026 · Build ${BUILD}</small></div><button class="academyBookmark067 ${manualBookmarks058.includes(ch.id)?'active':''}" data-manual-bookmark="${ch.id}" aria-label="Bookmark chapter">★</button></header>
+    <main class="academyArticleBody067">${ch.topics.map(([title,body])=>`<section><h3>${esc(title)}</h3><p>${esc(body)}</p></section>`).join('')}</main>
+    ${contextualHelpReturn060?`<section class="contextSuggestions067"><strong>Related topics</strong><div>${(CONTEXT_HELP_060[contextualHelpReturn060.view]?.suggestions||['Related settings','Common workflow','Troubleshooting']).map(q=>`<button class="ghost" data-context-search060="${esc(q)}">${esc(q)}</button>`).join('')}</div></section>`:''}
+    <footer class="academyArticleNav067">${prev?`<button class="ghost" data-manual-chapter="${prev.id}"><span>Previous</span><strong>← ${esc(prev.title)}</strong></button>`:'<span></span>'}${next?`<button class="ghost" data-manual-chapter="${next.id}"><span>Next</span><strong>${esc(next.title)} →</strong></button>`:`<button class="ghost" data-manual-view="home"><span>Finished</span><strong>Academy Home →</strong></button>`}</footer>
+  </article>`;
 }
 function manualSimplePage058(type){
  const pages={
-  quick:["🚀","Quick Start Guide","Get FireVault ready for a normal field day.",[["1. Verify the build","Confirm the green build badge shows 0.66.0 before entering production information."],["2. Complete Technician Profile","Enter your name, company, phone, email, and license or employee identification."],["3. Review permissions","Allow location and photo access only when FireVault requests them and the feature is needed."],["4. Create or open a site","Add the customer name, full address, panel details, contacts, access notes, and GPS location."],["5. Document the visit","Record notes, photos, tasks, deficiencies, equipment changes, and a service visit."],["6. Finish and protect the data","Review the report, send or copy the required summary, then export a current backup."]]],
-  new:["🆕","What’s New in 0.66.0","Application-wide visual cleanup and layout consolidation.",[["Unified visual system","Standardized typography, spacing, card surfaces, borders, controls, and responsive behavior across FireVault."],["Settings cleanup","Improved Settings home cards and every submenu while preserving the preferred Email setup workflow."],["Help readability","Converted contextual Help and Academy articles into one uninterrupted scrolling reading column with no floating metadata."],["Site Detail stability","Reinforced natural-height cards, readable text, and scroll-safe account sections."],["Operational screens","Simplified Customer Import, Team Sync, Conflict Center, and Nearby Sites presentation without changing their workflows."],["Phone and iPad layouts","Added consistent narrow-phone and tablet behavior, bottom-navigation clearance, and overflow protection."],["Nearby scan diagnostics","Nearby Sites now shows total sites, GPS-ready records, missing coordinates, phone-location progress, and persistent error messages."],["Coordinate recovery","FireVault recovers valid latitude and longitude stored in compatible legacy or imported fields and normalizes them into the site GPS record."],["Location retry","If high-accuracy location times out or is unavailable, FireVault retries once using standard accuracy."],["Nearest-site fallback","When no site is inside the selected radius, the nearest GPS-ready sites remain visible instead of presenting an empty result."],["Latitude and longitude","Customer Import can calculate missing coordinates from each usable U.S. street address before saving records."],["Coordinate requirement","The importer requires calculated, supplied, or existing GPS coordinates by default. Unmatched addresses remain in review."],["Census address matching","Only address fields are sent to the U.S. Census Geocoder. The returned point is an address-range calculation, not a guaranteed building entrance."],["Account Id matching","Repeat imports update the matching FireVault site instead of creating duplicates or deleting field history."],["CSV coordinate columns","Files that already contain Latitude and Longitude columns use those values directly."],["Sync-ready changes","Added and updated customer records enter the pending synchronization queue and create a Sync Activity entry."]]],
+  quick:["🚀","Quick Start Guide","Get FireVault ready for a normal field day.",[["1. Verify the build","Confirm the green build badge shows 0.67.0 before entering production information."],["2. Complete Technician Profile","Enter your name, company, phone, email, and license or employee identification."],["3. Review permissions","Allow location and photo access only when FireVault requests them and the feature is needed."],["4. Create or open a site","Add the customer name, full address, panel details, contacts, access notes, and GPS location."],["5. Document the visit","Record notes, photos, tasks, deficiencies, equipment changes, and a service visit."],["6. Finish and protect the data","Review the report, send or copy the required summary, then export a current backup."]]],
+  new:["🆕","What’s New in 0.67.0","Account View, Settings navigation, and FireVault Academy redesign.",[["Unified visual system","Standardized typography, spacing, card surfaces, borders, controls, and responsive behavior across FireVault."],["Settings cleanup","Improved Settings home cards and every submenu while preserving the preferred Email setup workflow."],["Help readability","Converted contextual Help and Academy articles into one uninterrupted scrolling reading column with no floating metadata."],["Site Detail stability","Reinforced natural-height cards, readable text, and scroll-safe account sections."],["Operational screens","Simplified Customer Import, Team Sync, Conflict Center, and Nearby Sites presentation without changing their workflows."],["Phone and iPad layouts","Added consistent narrow-phone and tablet behavior, bottom-navigation clearance, and overflow protection."],["Nearby scan diagnostics","Nearby Sites now shows total sites, GPS-ready records, missing coordinates, phone-location progress, and persistent error messages."],["Coordinate recovery","FireVault recovers valid latitude and longitude stored in compatible legacy or imported fields and normalizes them into the site GPS record."],["Location retry","If high-accuracy location times out or is unavailable, FireVault retries once using standard accuracy."],["Nearest-site fallback","When no site is inside the selected radius, the nearest GPS-ready sites remain visible instead of presenting an empty result."],["Latitude and longitude","Customer Import can calculate missing coordinates from each usable U.S. street address before saving records."],["Coordinate requirement","The importer requires calculated, supplied, or existing GPS coordinates by default. Unmatched addresses remain in review."],["Census address matching","Only address fields are sent to the U.S. Census Geocoder. The returned point is an address-range calculation, not a guaranteed building entrance."],["Account Id matching","Repeat imports update the matching FireVault site instead of creating duplicates or deleting field history."],["CSV coordinate columns","Files that already contain Latitude and Longitude columns use those values directly."],["Sync-ready changes","Added and updated customer records enter the pending synchronization queue and create a Sync Activity entry."]]],
   tips:["🧰","Field Tips","Short practices that improve the usefulness of FireVault records.",[["Write for the next technician","Include the exact panel, circuit, device, location, symptom, test result, and next action instead of relying on memory."],["Photograph context first","Take one wide photo showing the equipment location before close-up terminal, label, or damage photos."],["Separate facts from follow-up","Use notes for what occurred, deficiencies for code or system problems, and tasks for work that still needs completion."],["Confirm the account","Before using Quick Capture, verify the selected customer site to prevent records from being stored under the wrong account."],["Back up before updates","Export a backup before installing every development build and after completing a significant amount of field documentation."]]],
-  revisions:["📋","Revision History","Application and documentation checkpoints.",[["0.66.0","Completed an application-wide visual audit and consolidated typography, spacing, card hierarchy, scrolling, Settings, contextual Help, Site Detail, Customer Import, Team Sync, and Nearby layouts."],["0.65.2","Repaired Nearby Sites with GPS inventory counts, imported-coordinate recovery, persistent permission and timeout messages, a standard-accuracy retry, and nearest-site fallback results."],["0.65.1","Added online latitude/longitude calculation, coordinate validation, geocoding progress, unmatched-address review, optional CSV coordinates, and coordinate-safe repeat importing."],["0.65.0","Added preview-first customer CSV importing, Account Id update matching, validation warnings, imported monitoring details, and sync activity tracking."],["0.64.1","Simplified Academy article headers, removed floating metadata badges, and improved continuous scrolling and readability."],["0.64.0","Added Sync Activity, a conflict review center, export/import audit entries, and an automatic OneDrive connection-readiness checklist."],["0.63.1","Overhauled contextual Help and Academy reader formatting, removed overlapping sticky article headers, and restored full scrolling on phones and tablets."],["0.63.0","Added permanent record IDs, audit metadata, local version tracking, pending-sync states, conflict readiness, device identity, and a Team Sync settings workspace."],["0.60.0","Connected major screens and Settings areas directly to matching Academy chapters with return-to-screen navigation."],["0.59.0","Added interactive tutorials, guided orientation, pinned learning, field tips, and documentation tracking."],["0.58.0","Expanded Help & Manual into FireVault Academy with bookmarks, smart search, Quick Start, and reader navigation."],["0.57.0","Added the first complete searchable in-app FireVault User Manual."],["Ongoing review rule","Any change to navigation, labels, storage, workflows, permissions, or supported layouts requires the related manual chapter to be checked."]]],
+  revisions:["📋","Revision History","Application and documentation checkpoints.",[["0.67.0","Redesigned Account View around service actions and grouped information, consolidated Settings into five folders, and simplified FireVault Academy and contextual Help for continuous reading."],["0.65.2","Repaired Nearby Sites with GPS inventory counts, imported-coordinate recovery, persistent permission and timeout messages, a standard-accuracy retry, and nearest-site fallback results."],["0.65.1","Added online latitude/longitude calculation, coordinate validation, geocoding progress, unmatched-address review, optional CSV coordinates, and coordinate-safe repeat importing."],["0.65.0","Added preview-first customer CSV importing, Account Id update matching, validation warnings, imported monitoring details, and sync activity tracking."],["0.64.1","Simplified Academy article headers, removed floating metadata badges, and improved continuous scrolling and readability."],["0.64.0","Added Sync Activity, a conflict review center, export/import audit entries, and an automatic OneDrive connection-readiness checklist."],["0.63.1","Overhauled contextual Help and Academy reader formatting, removed overlapping sticky article headers, and restored full scrolling on phones and tablets."],["0.63.0","Added permanent record IDs, audit metadata, local version tracking, pending-sync states, conflict readiness, device identity, and a Team Sync settings workspace."],["0.60.0","Connected major screens and Settings areas directly to matching Academy chapters with return-to-screen navigation."],["0.59.0","Added interactive tutorials, guided orientation, pinned learning, field tips, and documentation tracking."],["0.58.0","Expanded Help & Manual into FireVault Academy with bookmarks, smart search, Quick Start, and reader navigation."],["0.57.0","Added the first complete searchable in-app FireVault User Manual."],["Ongoing review rule","Any change to navigation, labels, storage, workflows, permissions, or supported layouts requires the related manual chapter to be checked."]]],
   trouble:["❓","Troubleshooting","Common problems and safe first checks.",FIREVAULT_MANUAL_058.find(x=>x.id==="trouble")?.topics||[]]
  };
  const [icon,title,note,items]=pages[type]||["🚧","Coming Soon","This Academy area is reserved for a future milestone.",[["Development status","The feature is not active yet. No outside service has been connected or purchased."]]];
@@ -5938,8 +6012,6 @@ function tourView059(){const [title,body]=ACADEMY_TOUR_059[activeTourStep059];co
 function tipsView059(){return `<div class="academySimple058"><div class="academyReaderTop058"><button class="ghost" data-manual-view="home">‹ Academy</button><div><span>🧰 Practical Guidance</span><h2>Field Tips Library</h2><p>Short reminders that improve documentation quality and consistency.</p></div></div><div class="tipGrid059">${ACADEMY_TIPS_059.map((t,i)=>`<article class="tipCard059"><span>${t[0]}</span><div><h3>${esc(t[1])}</h3><p>${esc(t[2])}</p></div><button class="academyPin059 ${academyPins059.includes('tip:'+i)?'active':''}" data-academy-pin="tip:${i}">★</button></article>`).join("")}</div></div>`}
 function trackerView059(){const rows=[...FIREVAULT_MANUAL_058.map(ch=>[ch.title,manualStatus058(ch),"Manual chapter"]),...ACADEMY_TUTORIALS_059.map(t=>[t.title,tutorialProgress059(t)===100?"Complete":"In Development","Tutorial"])];return `<div class="academyReader058"><div class="academyReaderTop058"><button class="ghost" data-manual-view="home">‹ Academy</button><div><span>📋 Maintenance Control</span><h2>Documentation Tracker</h2><p>Use this list during every feature release to identify material that requires review.</p></div></div><div class="docTracker059">${rows.map(r=>`<div><strong>${esc(r[0])}</strong><small>${r[2]}</small><em class="status-${r[1].toLowerCase().replace(/\s+/g,'-')}">${r[1]}</em></div>`).join("")}</div></div>`}
 function pinnedLearning059(){if(!academyPins059.length)return "";const cards=academyPins059.map(key=>{if(key.startsWith('tutorial:')){const t=ACADEMY_TUTORIALS_059.find(x=>x.id===key.slice(9));return t?`<button data-tutorial-open="${t.id}"><span>${t.icon}</span><strong>${esc(t.title)}</strong><small>Tutorial · ${tutorialProgress059(t)}%</small></button>`:""}if(key.startsWith('tip:')){const i=Number(key.slice(4)),t=ACADEMY_TIPS_059[i];return t?`<button data-manual-view="tips"><span>${t[0]}</span><strong>${esc(t[1])}</strong><small>Field tip</small></button>`:""}return ""}).join("");return cards?`<section class="academyBookmarks058"><div class="academySectionHead058"><div><span>Saved learning</span><h3>Pinned Tutorials & Tips</h3></div></div><div class="academyBookmarkGrid058">${cards}</div></section>`:""}
-const manualHome058Base=manualHome058;
-manualHome058=function(){return manualHome058Base().replace('<div class="academyCheckpoint058">',pinnedLearning059()+`<div class="academyQuickLinks059"><button data-manual-view="tracker"><span>📋</span><strong>Documentation Tracker</strong><small>Review status across manuals and tutorials</small></button></div><div class="academyCheckpoint058">`)};
 function manualPanel058(){ if(manualView058==="home")return manualHome058(); if(manualView058==="manual")return manualList058(); if(manualView058==="chapter")return manualChapterView058(); if(manualView058==="tutorials")return tutorialList059(); if(manualView058==="tutorial")return tutorialView059(); if(manualView058==="tour")return tourView059(); if(manualView058==="tips")return tipsView059(); if(manualView058==="tracker")return trackerView059(); return manualSimplePage058(manualView058); }
 function wireManual058(){
   const contextReturn=document.getElementById("contextHelpReturn060"); if(contextReturn) contextReturn.onclick=returnFromContextualHelp060;
@@ -6985,7 +7057,7 @@ function diagnostics(){
 }
 function showChangelog(){
   const notes = [
-    "Build 0.66.0 completes an application-wide visual cleanup while preserving the 0.65.2 Nearby Sites diagnostics and importer workflows.",
+    "Build 0.67.0 redesigns Account View, consolidates Settings into five folders, and simplifies FireVault Academy while preserving the importer, Nearby Sites diagnostics, Team Sync foundation, and field workflows.",
     "Manual chapters document installation, Today, Sites, Site Detail, field workflow, notes, tasks, deficiencies, photos, GPS, route tracking, reports, email, settings, backups, updates, and troubleshooting.",
     "Added living-documentation revision metadata and a release-state review requirement.",
     "Added Quick Capture for timestamped site notes, follow-up tasks, and deficiencies without leaving Today.",
@@ -6998,7 +7070,7 @@ function showChangelog(){
   overlay.className="releaseOverlay";
   overlay.innerHTML=`<div class="releaseSheet" role="dialog" aria-modal="true" aria-label="FireVault release notes">
     <div class="releaseHead"><div><strong>${fireVaultBrand575()}</strong><span>Build ${BUILD}</span></div><button class="ghost iconBtn" id="closeRelease" aria-label="Close release notes">×</button></div>
-    <div class="releaseBody"><h2>Release Notes</h2><p class="releaseIntro">Address coordinate calculation with duplicate-safe customer importing.</p><ul>${notes.map(n=>`<li>${esc(n)}</li>`).join("")}</ul></div>
+    <div class="releaseBody"><h2>Release Notes</h2><p class="releaseIntro">Major Account View, Settings navigation, and FireVault Academy redesign.</p><ul>${notes.map(n=>`<li>${esc(n)}</li>`).join("")}</ul></div>
   </div>`;
   document.body.appendChild(overlay);
   const close=()=>overlay.remove();

@@ -8,7 +8,7 @@
   "orientation": "any",
   "background_color": "#0b0d10",
   "theme_color": "#101216",
-  "description": "Field knowledge system for fire alarm technicians. Build 0.66.0 consolidates FireVault typography, spacing, contrast, cards, scrolling, Settings, Help, Site Detail, import, sync, and Nearby layouts.",
+  "description": "Field knowledge system for fire alarm technicians. Build 0.67.0 redesigns Account View, consolidates Settings into five folders, and simplifies FireVault Academy.",
   "icons": [
     {
       "src": "assets/icon-192.png",
@@ -48,5 +48,6 @@
       "url": "./?route=settings",
       "description": "Open FireVault settings"
     }
-  ]
+  ],
+  "version": "0.67.0"
 }
