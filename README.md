@@ -1,11 +1,10 @@
-# FireVault Build 0.69.2
+# FireVault Build 0.69.3
 
-Nearby Accounts reliability and scrolling repair.
+Dedicated repair for the Nearby Accounts static map crash found in Build 0.69.2.
 
-- Replaces the CDN-dependent Leaflet marker layer with a built-in static marker overlay.
-- Uses a non-interactive OpenStreetMap base centered on current GPS.
-- Account markers render from locally stored latitude and longitude even if the map library CDN is unavailable.
-- Map cannot be dragged or scrolled by touch.
-- Plus/minus controls change the visible radius.
-- Account list uses iOS momentum scrolling and settles the nearest complete row at the top.
-- The top account highlights its matching marker and opens the map detail popup.
+## Repairs
+- Corrects the static map bounds function call that caused the diagnostics screen.
+- Prevents invalid or incomplete coordinates from crashing FireVault.
+- Adds a safe map fallback message while keeping the account list usable.
+- Preserves wheel-style account scrolling and scroll-linked map selection.
+- Preserves all data and features from Build 0.69.2.

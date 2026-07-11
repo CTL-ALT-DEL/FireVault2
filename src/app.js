@@ -2209,7 +2209,7 @@ let nearbyScrollLock069=false;
 let nearbySnapTimer069=null;
 let nearbyLeafletPromise069=null;
 let nearbyStaticZoom069=1;
-let nearbyStaticBounds069=null;
+let nearbyStaticCurrentBounds069=null;
 
 function accountId069(s){ return String(s?.externalAccountId||s?.accountId||"").trim(); }
 function phone069(s){ const c=primaryContact477(s); return String(s?.sitePhone||c?.phone||"").trim(); }
@@ -2322,27 +2322,51 @@ function ensureLeaflet069(){ return Promise.resolve(null); }
 function markerIcon069(){ return null; }
 function staticMapBounds069(rows,zoom=1){
   const lat=Number(nearbyState?.lat),lng=Number(nearbyState?.lng);
-  const radius=Math.max(0.5,nearbyRadiusMiles())/Math.max(.55,zoom);
+  if(!Number.isFinite(lat)||!Number.isFinite(lng)) return null;
+  const radius=Math.max(0.5,Number(nearbyRadiusMiles())||5)/Math.max(.55,Number(zoom)||1);
   const latDelta=radius/69;
   const lngDelta=radius/(69*Math.max(.25,Math.cos(lat*Math.PI/180)));
   return {south:lat-latDelta,north:lat+latDelta,west:lng-lngDelta,east:lng+lngDelta};
 }
 function staticPoint069(lat,lng,b){
-  return {x:((lng-b.west)/(b.east-b.west))*100,y:((b.north-lat)/(b.north-b.south))*100};
+  lat=Number(lat); lng=Number(lng);
+  if(!b||!Number.isFinite(lat)||!Number.isFinite(lng)) return null;
+  const width=b.east-b.west,height=b.north-b.south;
+  if(!Number.isFinite(width)||!Number.isFinite(height)||width===0||height===0) return null;
+  return {x:((lng-b.west)/width)*100,y:((b.north-lat)/height)*100};
 }
 function drawStaticNearbyMap069(){
-  const shell=document.querySelector('.staticMapShell069'),base=document.getElementById('nearbyStaticBase069'),overlay=document.getElementById('nearbyStaticOverlay069');
-  if(!shell||!base||!overlay||!nearbyState)return;
-  const rows=nearbyRows069();
-  const b=nearbyStaticBounds069(rows,nearbyStaticZoom069); nearbyStaticBounds069=b;
-  const bbox=[b.west,b.south,b.east,b.north].map(n=>n.toFixed(6)).join('%2C');
-  base.src=`https://www.openstreetmap.org/export/embed.html?bbox=${bbox}&layer=mapnik&marker=${Number(nearbyState.lat).toFixed(6)}%2C${Number(nearbyState.lng).toFixed(6)}`;
-  const center=staticPoint069(nearbyState.lat,nearbyState.lng,b);
-  let html=`<span class="staticRadius069" style="left:8%;top:8%;width:84%;height:84%"></span><span class="staticUser069" style="left:${center.x}%;top:${center.y}%"></span>`;
-  rows.forEach((r,index)=>{const g=gpsPair0652(r.s);if(!g)return;const p=staticPoint069(Number(g.lat),Number(g.lng),b);if(p.x<0||p.x>100||p.y<0||p.y>100)return;html+=`<button class="staticMarker069 ${r.s.id===homeNearbySelected069?'selected':''}" style="left:${p.x}%;top:${p.y}%" data-static-marker069="${esc(r.s.id)}" aria-label="${esc(r.s.name||'Account')}"><span>${index+1}</span></button>`;});
-  overlay.innerHTML=html;
-  overlay.querySelectorAll('[data-static-marker069]').forEach(m=>m.onclick=()=>{const id=m.dataset.staticMarker069;selectNearby069(id,false);const card=document.querySelector(`[data-nearby-card069="${CSS.escape(id)}"]`);if(card){nearbyScrollLock069=true;card.scrollIntoView({block:'start',behavior:'smooth'});setTimeout(()=>nearbyScrollLock069=false,300);}});
-  if(homeNearbySelected069) selectNearby069(homeNearbySelected069,true);
+  try{
+    const shell=document.querySelector('.staticMapShell069'),base=document.getElementById('nearbyStaticBase069'),overlay=document.getElementById('nearbyStaticOverlay069');
+    if(!shell||!base||!overlay||!nearbyState)return;
+    const lat=Number(nearbyState.lat),lng=Number(nearbyState.lng);
+    if(!Number.isFinite(lat)||!Number.isFinite(lng)){overlay.innerHTML='<div class="staticMapMessage069">Waiting for a valid GPS location…</div>';return;}
+    const rows=nearbyRows069();
+    const b=staticMapBounds069(rows,nearbyStaticZoom069);
+    if(!b){overlay.innerHTML='<div class="staticMapMessage069">Map coordinates are unavailable.</div>';return;}
+    nearbyStaticCurrentBounds069=b;
+    const bbox=[b.west,b.south,b.east,b.north].map(n=>Number(n).toFixed(6)).join('%2C');
+    base.src=`https://www.openstreetmap.org/export/embed.html?bbox=${bbox}&layer=mapnik&marker=${lat.toFixed(6)}%2C${lng.toFixed(6)}`;
+    const center=staticPoint069(lat,lng,b);
+    let html=center?`<span class="staticRadius069" style="left:8%;top:8%;width:84%;height:84%"></span><span class="staticUser069" style="left:${center.x}%;top:${center.y}%"></span>`:'';
+    rows.forEach((r,index)=>{
+      const g=gpsPair0652(r.s); if(!g)return;
+      const p=staticPoint069(g.lat,g.lng,b); if(!p||p.x<0||p.x>100||p.y<0||p.y>100)return;
+      html+=`<button class="staticMarker069 ${r.s.id===homeNearbySelected069?'selected':''}" style="left:${p.x}%;top:${p.y}%" data-static-marker069="${esc(r.s.id)}" aria-label="${esc(r.s.name||'Account')}"><span>${index+1}</span></button>`;
+    });
+    overlay.innerHTML=html||'<div class="staticMapMessage069">No mapped accounts are inside the current radius.</div>';
+    overlay.querySelectorAll('[data-static-marker069]').forEach(m=>m.onclick=()=>{
+      const id=m.dataset.staticMarker069; selectNearby069(id,false);
+      const safeId=(window.CSS&&CSS.escape)?CSS.escape(id):String(id).replace(/["\\]/g,'\\$&');
+      const card=document.querySelector(`[data-nearby-card069="${safeId}"]`);
+      if(card){nearbyScrollLock069=true;card.scrollIntoView({block:'start',behavior:'smooth'});setTimeout(()=>nearbyScrollLock069=false,300);}
+    });
+    if(homeNearbySelected069) selectNearby069(homeNearbySelected069,true);
+  }catch(err){
+    console.error('Nearby static map render failed',err);
+    const overlay=document.getElementById('nearbyStaticOverlay069');
+    if(overlay)overlay.innerHTML='<div class="staticMapMessage069">The account list is available, but the map could not be drawn. Tap Refresh to retry.</div>';
+  }
 }
 function initNearbyMap069(){
   if(!nearbyState)return;
@@ -7211,7 +7235,7 @@ function diagnostics(){
 }
 function showChangelog(){
   const notes = [
-    "Build 0.69.2 repairs Nearby map rendering, refreshes GPS on launch, locks map panning, adds a compact Map/List toggle, and snaps account rows into place while synchronizing map selection.",
+    "Build 0.69.3 repairs the Nearby static map crash and adds defensive coordinate rendering so map errors cannot take down the app.",
     "Manual chapters document installation, Today, Sites, Site Detail, field workflow, notes, tasks, deficiencies, photos, GPS, route tracking, reports, email, settings, backups, updates, and troubleshooting.",
     "Added living-documentation revision metadata and a release-state review requirement.",
     "Added Quick Capture for timestamped site notes, follow-up tasks, and deficiencies without leaving Today.",
