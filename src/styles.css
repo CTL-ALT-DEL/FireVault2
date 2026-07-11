@@ -14125,3 +14125,10 @@ nav button.active{background:color-mix(in srgb,var(--accent) 17%,rgba(30,41,59,.
     padding:6px 8px!important;
   }
 }
+
+
+/* Build 0.72.0 — reliable PWA update controls */
+#fvUpdateBanner072{position:fixed;left:12px;right:12px;bottom:calc(82px + env(safe-area-inset-bottom));z-index:99999;display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:10px;align-items:center;padding:12px;border:1px solid #3a4655;border-radius:14px;background:rgba(17,22,29,.97);box-shadow:0 12px 36px #0009;color:#fff;backdrop-filter:blur(16px)}
+#fvUpdateBanner072 div{display:grid;gap:2px;min-width:0}#fvUpdateBanner072 strong{font-size:.9rem}#fvUpdateBanner072 span{font-size:.72rem;color:#aeb8c5}#fvUpdateBanner072 button{min-height:42px;border-radius:10px;border:1px solid #465365;background:#202833;color:#fff;font-weight:800;padding:0 13px}#fvUpdateBanner072 #fvUpdateNow072{border-color:#b6232d;background:linear-gradient(145deg,#7e141c,#b9232d)}#fvUpdateBanner072 #fvUpdateLater072{width:42px;padding:0;font-size:1.25rem}
+.updateCenter072{max-width:760px;margin:0 auto}.updateBuild072{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.updateBuild072>div{display:grid;gap:3px;padding:14px;border:1px solid #303a47;border-radius:12px;background:#11171e}.updateBuild072 strong{font-size:1.15rem}.updateBuild072 span{color:#9eabb9;font-size:.75rem}.updateActions072{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}.updateActions072 button{min-height:48px}
+@media(max-width:560px){#fvUpdateBanner072{grid-template-columns:minmax(0,1fr) auto}#fvUpdateBanner072 #fvUpdateLater072{position:absolute;right:5px;top:5px;width:32px;min-height:32px;border:0;background:transparent}.updateBuild072,.updateActions072{grid-template-columns:1fr}}

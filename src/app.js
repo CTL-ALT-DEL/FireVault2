@@ -5765,7 +5765,7 @@ const SETTINGS_GROUPS_067 = [
   {key:"appearance",icon:"◐",title:"App & Home",note:"Theme, Home layout, and visible modules.",tone:"violet",tabs:["themes","homeLayout","visibility"]},
   {key:"field",icon:"🧰",title:"Field Tools",note:"GPS, photo overlays, and optional field services.",tone:"cyan",tabs:["gps","overlay","advanced"]},
   {key:"reports",icon:"▤",title:"Reports & Communication",note:"Report content, email delivery, and customer closeout.",tone:"amber",tabs:["reports","email"]},
-  {key:"data",icon:"☁",title:"Data, Sync & Support",note:"Imports, backup, team sync, Help, About, and diagnostics.",tone:"red",tabs:["sync","customerImport","backup","manual","about","diagnostics"]}
+  {key:"data",icon:"☁",title:"Data, Sync & Support",note:"Imports, backup, team sync, Help, About, and diagnostics.",tone:"red",tabs:["sync","customerImport","backup","updates","manual","about","diagnostics"]}
 ];
 function settingsGroupForTab067(tab){ return SETTINGS_GROUPS_067.find(g=>g.tabs.includes(tab))?.key || "data"; }
 function settingsGroup067ByKey(key){ return SETTINGS_GROUPS_067.find(g=>g.key===key) || SETTINGS_GROUPS_067[0]; }
@@ -5790,6 +5790,7 @@ function settingsTabs(){
     ["sync","Team Sync","Multi-technician identity, pending changes, conflict policy, and OneDrive readiness."],
     ["customerImport","Customer Import","Preview and safely import customer records from a CSV export using Account Id."],
     ["backup","Backup","Export, import, data safety snapshot, restore tools, and danger zone."],
+    ["updates","App Updates","Check for a new build, clear cached app files, and reload FireVault."],
     ["manual","Help & Manual","Searchable instructions for using FireVault, field workflows, settings, reports, photos, GPS, and troubleshooting."],
     ["about","About","Build information, storage key, and FireVault roadmap notes."]
   ];
@@ -5831,7 +5832,7 @@ function leaveSettingsHome572(){
 }
 
 function settingsIcon550(tab){
-  return ({tech:"👤",gps:"⌖",reports:"▤",email:"✉",overlay:"▧",themes:"◐",homeLayout:"⌂",visibility:"☰",advanced:"⚡",sync:"☁",customerImport:"⇩",backup:"⇅",manual:"?",about:"ⓘ"})[tab]||"•";
+  return ({tech:"👤",gps:"⌖",reports:"▤",email:"✉",overlay:"▧",themes:"◐",homeLayout:"⌂",visibility:"☰",advanced:"⚡",sync:"☁",customerImport:"⇩",backup:"⇅",updates:"↻",manual:"?",about:"ⓘ"})[tab]||"•";
 }
 function settings(){
   captureSettingsScroll576();
@@ -5904,7 +5905,7 @@ function settings(){
 
   settingsGroup067=settingsGroupForTab067(settingsTab);
   const group=settingsGroup067ByKey(settingsGroup067);
-  const saveable=!['customerImport','backup','manual','about'].includes(settingsTab);
+  const saveable=!['customerImport','backup','updates','manual','about'].includes(settingsTab);
   html(`<div class="screen settingsDetailScreen067 settingsScreen settingsStable573 settingsTab-${settingsTab}" data-settings-tab="${settingsTab}">
     <header class="settingsDetailHead067 tone-${group.tone}">
       <button class="ghost" id="settingsBackBtn" aria-label="Back to ${esc(group.title)}">←</button>
@@ -6647,6 +6648,11 @@ function settingsPanel(){
   if(settingsTab==="backup") return backupSettingsPanel();
   if(settingsTab==="manual") return manualPanel058();
 
+  if(settingsTab==="updates") return `<div class="settingsStack settingsStack540 updateCenter072">
+    ${settingsSection540("Installed version","FireVault Updates","FireVault checks the published site for newer app files while preserving your locally stored vault.",`<div class="updateBuild072"><div><strong>${BUILD}</strong><span>Installed build</span></div><div id="updateState072"><strong>Ready</strong><span>Automatic checks enabled</span></div></div>`,"green")}
+    ${settingsSection540("Update controls","Maintenance","Use Check for Updates first. Clear App Cache removes only downloaded app files—it does not delete sites, notes, photos, or settings stored in FireVault.",`<div class="updateActions072"><button class="primary" id="checkUpdates072">Check for Updates</button><button class="ghost" id="reloadApp072">Reload FireVault</button><button class="ghost" id="clearAppCache072">Clear App Cache</button></div><p class="fieldNote">Home Screen PWAs still require an internet connection to receive a newly published build. Offline startup continues using the last successfully installed version.</p>`,"cyan")}
+  </div>`;
+
   return `<div class="settingsStack settingsStack540">
     ${settingsSection540("Fire alarm field system",`About FireVault`,`A modular field knowledge system built to keep account history, service notes, and technician tools together.`,`<div class="aboutBrand540">${fireVaultBrand575()}<span>Field Vault System</span></div><p class="aboutCopy540">FireVault is designed for fast field reference, local-first reliability, and a simple interface that can reveal advanced tools only when they are needed.</p>`,"red")}
     ${settingsSection540("Application details","Build Information","Use these details when reporting a problem or confirming which release is installed.",`<div class="aboutGrid aboutGrid540"><div><strong>Build</strong><span>${BUILD}</span></div><div><strong>Storage key</strong><span>${KEY}</span></div><div class="wide"><strong>Roadmap lane</strong><span>Stable modular foundation, refined settings, responsive iPhone and iPad layouts, and deeper service-call tools.</span></div></div>`,"slate")}
@@ -6657,6 +6663,13 @@ function wireSettingsPanel(){
   if(settingsTab==="overlay") wireOverlaySettings510();
   if(settingsTab==="manual") wireManual058();
   if(settingsTab==="customerImport") wireCustomerImport065();
+  if(settingsTab==="updates"){
+    const state=document.getElementById("updateState072");
+    const setState=(title,note)=>{if(state)state.innerHTML=`<strong>${esc(title)}</strong><span>${esc(note)}</span>`;};
+    document.getElementById("checkUpdates072")?.addEventListener("click",async()=>{setState("Checking…","Contacting the published FireVault site");try{const result=await window.fireVaultCheckForUpdates?.({reloadWhenNew:false});if(result?.newer)setState("Update found",`Build ${result.remote} is being prepared`);else setState("Up to date",`Build ${BUILD} is current`);}catch(err){setState("Check failed",err?.message||"Internet connection unavailable");}});
+    document.getElementById("reloadApp072")?.addEventListener("click",()=>location.reload());
+    document.getElementById("clearAppCache072")?.addEventListener("click",async()=>{if(!confirm("Clear downloaded FireVault app files and reload? Your saved vault data will not be deleted."))return;setState("Clearing…","Removing cached app files");try{await window.fireVaultClearAppCache?.();location.reload();}catch(err){setState("Could not clear",err?.message||"Cache operation failed");}});
+  }
   ["emailSubject","emailSig"].forEach(id=>{ const el=document.getElementById(id); if(el){ el.addEventListener("focus",()=>lastEmailTemplateField=id); el.addEventListener("input",updateEmailPreview); } });
   [["emailTo","emailPreviewTo530","Customer email added when sending"],["emailCc","emailPreviewCc530","None"]].forEach(([inputId,previewId,fallback])=>{ const input=document.getElementById(inputId); const preview=document.getElementById(previewId); if(input&&preview) input.addEventListener("input",()=>preview.textContent=input.value.trim()||fallback); });
   document.querySelectorAll(".emailTagChip").forEach(b=>b.onclick=()=>{ const target=document.getElementById(lastEmailTemplateField) || document.getElementById("emailSubject"); insertAtCursor(target, b.dataset.emailTag || ""); });

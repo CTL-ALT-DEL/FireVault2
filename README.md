@@ -1,7 +1,7 @@
-# FireVault Build 0.71.8
+# FireVault Build 0.72.0
 
 
-## Build 0.71.8 — Compact map label and component foundation
+## Build 0.72.0 — Compact map label and component foundation
 
 - Replaces the unrelated grey map-control cover with a compact translucent badge that sizes itself only to the selected site name and address.
 - Keeps white text and strong black shadow for map readability.
@@ -11,7 +11,7 @@
 Nearby Accounts category and header redesign.
 
 
-## Build 0.71.8 — Nearby control and navigation refinement
+## Build 0.72.0 — Nearby control and navigation refinement
 
 - Removes the black background box, border, blur, and panel shadow from the selected-account overlay.
 - Displays the selected account name and address as white text with a strong black outline/shadow for map readability.
@@ -54,3 +54,12 @@ Nearby Accounts category and header redesign.
 ## Repair note
 - Removed the duplicate `const row` declaration that prevented the JavaScript module from loading on Safari/iPhone.
 - Preserved the 0.71.2 Nearby layout changes.
+
+
+## Build 0.72.0
+- Added versioned service-worker caching and automatic old-cache cleanup.
+- HTML, manifest, and version checks use network-first/no-store behavior.
+- New service workers activate immediately and notify open app windows.
+- Added Settings > Data, Sync & Support > App Updates.
+- Added Check for Updates, Clear App Cache, and Reload FireVault controls.
+- FireVault local vault storage remains unchanged.

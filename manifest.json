@@ -8,7 +8,7 @@
   "orientation": "any",
   "background_color": "#0b0d10",
   "theme_color": "#101216",
-  "description": "Field knowledge system for fire alarm technicians. Build 0.71.8 adds a compact auto-sized selected-site map label and begins a reusable FireVault control design system.",
+  "description": "Field knowledge system for fire alarm technicians. Build 0.72.0 adds a compact auto-sized selected-site map label and begins a reusable FireVault control design system.",
   "icons": [
     {
       "src": "assets/icon-192.png",
@@ -49,5 +49,5 @@
       "description": "Open FireVault settings"
     }
   ],
-  "version": "0.71.8"
+  "version": "0.72.0"
 }
