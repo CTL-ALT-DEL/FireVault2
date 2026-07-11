@@ -1434,6 +1434,31 @@ function setActiveNav(){ document.querySelectorAll("nav button").forEach(b=>b.cl
 function wireGlobalHeader537(){ const b=document.getElementById("headerSettingsBtn537"); if(b) b.onclick=openSettingsHome572; }
 function showGlobalChrome537(){ const h=document.getElementById("appHeader"); const n=document.getElementById("appNav"); if(h){ h.style.display="flex"; h.style.visibility="visible"; h.style.opacity="1"; } if(n){ n.style.display="grid"; n.style.visibility="visible"; n.style.opacity="1"; } wireGlobalHeader537(); }
 
+function contextualHelpInfo060(){
+  if(view!=="settings") return CONTEXT_HELP_060[view]||null;
+  if(settingsTab==="manual") return null;
+  const tabMap={tech:["settings","Technician Profile"],gps:["route","GPS / Maps"],reports:["reports","Report Settings"],email:["reports","Email Settings"],overlay:["photos","Photo Overlay"],themes:["settings","Theme Settings"],homeLayout:["home","Home Layout"],visibility:["settings","Modules / Simple View"],advanced:["settings","Advanced Settings"],backup:["backup","Backup & Restore"],about:["release","About FireVault"]};
+  const item=tabMap[settingsTab]||["settings","Settings"];
+  return {chapter:item[0],label:item[1],suggestions:settingsTab==="email"?["Recipients","Subject tags","Signature preview"]:settingsTab==="backup"?["Export backup","Restore safely","Clean update"]:["What this controls","Recommended setup","Related features"]};
+}
+function openContextualHelp060(chapter,label){
+  contextualHelpReturn060={view,mode,settingsTab,selectedSiteId,label:label||contextualHelpInfo060()?.label||"Previous screen"};
+  settingsTab="manual"; manualView058="chapter"; manualChapter058=chapter||"start"; mode="settingsDetail"; view="settings"; render();
+}
+function returnFromContextualHelp060(){
+  const back=contextualHelpReturn060; contextualHelpReturn060=null;
+  if(!back){ openSettingsHome572(); return; }
+  view=back.view; mode=back.mode; settingsTab=back.settingsTab; selectedSiteId=back.selectedSiteId; render();
+}
+function injectContextualHelp060(){
+  document.getElementById("contextHelp060")?.remove();
+  const info=contextualHelpInfo060();
+  if(!info) return;
+  const button=document.createElement("button");
+  button.id="contextHelp060"; button.className="contextHelp060"; button.type="button";
+  button.setAttribute("aria-label",`Help for ${info.label}`); button.innerHTML=`<span>?</span><b>Help</b>`;
+  button.onclick=()=>openContextualHelp060(info.chapter,info.label); document.body.appendChild(button);
+}
 function render(){
   try{
     if(view!=="home") restoreAppChrome572();
@@ -1446,6 +1471,7 @@ function render(){
     stopJobTimer();
     applyFeatureVisibility();
     setActiveNav();
+    injectContextualHelp060();
   }catch(err){ showError(err); }
 }
 
@@ -5148,7 +5174,7 @@ const FIREVAULT_MANUAL_058 = [
     ["Restore fails","Use an unmodified FireVault JSON backup, verify the file is readable, and compare its preview details before confirming restore."]
   ]},
   {id:"release",title:"Release & Manual Status",icon:"ⓘ",status:"Living document",summary:"Understand how this documentation will be maintained through Version 1.0.",topics:[
-    ["Manual revision","This manual revision matches FireVault Build 0.57.0 and was last reviewed in July 2026."],
+    ["Manual revision","This manual revision matches FireVault Build 0.60.0 and was last reviewed in July 2026."],
     ["Living documentation","Every feature release should include a documentation review. New controls must be documented and changed workflows must be rechecked."],
     ["Pre-release warning","FireVault is still under active development. Labels, layouts, and workflows may change before Version 1.0."],
     ["Screenshot policy","Annotated screenshots should be added after major screens reach release-candidate stability."],
@@ -5161,6 +5187,24 @@ const MANUAL_BOOKMARKS_KEY_058="firevault_manual_bookmarks_058";
 let manualQuery058="";
 let manualView058="home";
 let manualChapter058="";
+let contextualHelpReturn060=null;
+const CONTEXT_HELP_060={
+  home:{chapter:"home",label:"Today / Home",suggestions:["Quick Capture","Home cards","Field Dashboard"]},
+  sites:{chapter:"sites",label:"Customer Database",suggestions:["Create a site","Search accounts","Save GPS"]},
+  nearbySites:{chapter:"route",label:"Nearby Sites",suggestions:["GPS permission","Nearby radius","Save coordinates"]},
+  siteDetail:{chapter:"detail",label:"Site Detail",suggestions:["Important Site Info","Quick Actions","Activity Timeline"]},
+  siteDocs:{chapter:"photos",label:"Photos & Documents",suggestions:["Add a photo","Photo notes","Storage caution"]},
+  siteDocForm:{chapter:"photos",label:"Add Photo / Document",suggestions:["Photo categories","Overlay settings","Useful notes"]},
+  jobMode:{chapter:"notes",label:"Site Notes",suggestions:["Save notes","Templates","Daily Report"]},
+  tasks:{chapter:"notes",label:"Task Center",suggestions:["Create tasks","Due dates","Mark complete"]},
+  taskForm:{chapter:"notes",label:"Task Editor",suggestions:["Task title","Status","Follow-up notes"]},
+  deficiencies:{chapter:"notes",label:"Deficiency Center",suggestions:["Document condition","Create follow-up","Close deficiency"]},
+  deficiencyForm:{chapter:"notes",label:"Deficiency Editor",suggestions:["Location","Impact","Recommended correction"]},
+  report:{chapter:"reports",label:"Site Report",suggestions:["Report defaults","Email report","Final verification"]},
+  dailySummary:{chapter:"reports",label:"Daily Report",suggestions:["Daily summary","Copy report","Email settings"]},
+  routeLog:{chapter:"route",label:"Daily Route",suggestions:["Start route","Waypoints","iPhone limitations"]},
+  settings:{chapter:"settings",label:"Settings",suggestions:["Recommended settings","Modules","Backup"]}
+};
 function loadManualBookmarks058(){ try{return JSON.parse(localStorage.getItem(MANUAL_BOOKMARKS_KEY_058)||"[]")}catch{return []} }
 let manualBookmarks058=loadManualBookmarks058();
 function saveManualBookmarks058(){ localStorage.setItem(MANUAL_BOOKMARKS_KEY_058,JSON.stringify(manualBookmarks058)); }
@@ -5172,12 +5216,12 @@ function manualTile058(icon,title,note,view,tone="blue",badge=""){ return `<butt
 function manualHome058(){
   const bookmarked=FIREVAULT_MANUAL_058.filter(ch=>manualBookmarks058.includes(ch.id));
   return `<div class="academyHome058">
-    <section class="academyHero058"><div><span class="academyEyebrow058">FireVault Academy</span><h2>${fireVaultBrand575()} Knowledge Center</h2><p>Manuals, quick-start guidance, field tips, release notes, and troubleshooting for Build ${BUILD}.</p></div><div class="academyMeta058"><span><b>${BUILD}</b>App build</span><span><b>0.59.0</b>Manual revision</span><span><b>July 2026</b>Last reviewed</span></div></section>
+    <section class="academyHero058"><div><span class="academyEyebrow058">FireVault Academy</span><h2>${fireVaultBrand575()} Knowledge Center</h2><p>Manuals, quick-start guidance, field tips, release notes, and troubleshooting for Build ${BUILD}.</p></div><div class="academyMeta058"><span><b>${BUILD}</b>App build</span><span><b>0.60.0</b>Manual revision</span><span><b>July 2026</b>Last reviewed</span></div></section>
     <div class="academySearch058"><span>⌕</span><input id="manualSearch058" type="search" value="${esc(manualQuery058)}" placeholder="Search FireVault Academy…"><button class="ghost" id="manualSearchGo058">Search</button></div>
     <section class="academyTileGrid058">
       ${manualTile058("📘","User Manual","Browse all chapters and step-by-step instructions.","manual","blue")}
       ${manualTile058("🚀","Quick Start Guide","Set up FireVault and complete a basic field workflow.","quick","green")}
-      ${manualTile058("🆕","What’s New","Review changes included in the current release.","new","red","0.59.0")}
+      ${manualTile058("🆕","What’s New","Review changes included in the current release.","new","red","0.60.0")}
       ${manualTile058("🧰","Field Tips","Practical documentation and reporting advice.","tips","amber")}
       ${manualTile058("❓","Troubleshooting","Resolve common GPS, storage, photo, and update issues.","trouble","violet")}
       ${manualTile058("📋","Revision History","Track app and manual revision checkpoints.","revisions","slate")}
@@ -5197,14 +5241,14 @@ function manualList058(){
 function manualChapterView058(){
   const ch=FIREVAULT_MANUAL_058.find(x=>x.id===manualChapter058)||FIREVAULT_MANUAL_058[0];
   const idx=FIREVAULT_MANUAL_058.indexOf(ch), prev=FIREVAULT_MANUAL_058[idx-1], next=FIREVAULT_MANUAL_058[idx+1], status=manualStatus058(ch);
-  return `<div class="academyArticle058"><header class="academyArticleHead058"><button class="ghost" data-manual-view="manual">‹ Chapters</button><div><span>${ch.icon} User Manual</span><h2>${esc(ch.title)}</h2><p>${esc(ch.summary)}</p><div class="academyArticleMeta058"><em class="status-${status.toLowerCase().replace(/\s+/g,'-')}">${status==="Complete"?"✓":"●"} ${status}</em><span>${manualMinutes058(ch)} min read</span><span>Reviewed July 2026</span><span>Build ${BUILD}</span></div></div><button class="academyStar058 ${manualBookmarks058.includes(ch.id)?"active":""}" data-manual-bookmark="${ch.id}">★</button></header><div class="academyProgress058"><span style="width:${Math.round(((idx+1)/FIREVAULT_MANUAL_058.length)*100)}%"></span></div><main class="academyArticleBody058">${ch.topics.map(([title,body],i)=>`<section><span>${String(i+1).padStart(2,'0')}</span><div><h3>${esc(title)}</h3><p>${esc(body)}</p></div></section>`).join("")}</main><footer class="academyArticleNav058">${prev?`<button class="ghost" data-manual-chapter="${prev.id}"><small>Previous</small><strong>‹ ${esc(prev.title)}</strong></button>`:`<span></span>`}${next?`<button class="ghost" data-manual-chapter="${next.id}"><small>Next</small><strong>${esc(next.title)} ›</strong></button>`:`<button class="ghost" data-manual-view="home"><small>Finished</small><strong>Academy Home ›</strong></button>`}</footer></div>`;
+  return `<div class="academyArticle058">${contextualHelpReturn060?`<div class="contextReturn060"><div><span>Screen-linked help</span><strong>${esc(contextualHelpReturn060.label)}</strong></div><button class="primary" id="contextHelpReturn060">Return to screen</button></div>`:""}<header class="academyArticleHead058"><button class="ghost" data-manual-view="manual">‹ Chapters</button><div><span>${ch.icon} User Manual</span><h2>${esc(ch.title)}</h2><p>${esc(ch.summary)}</p><div class="academyArticleMeta058"><em class="status-${status.toLowerCase().replace(/\s+/g,'-')}">${status==="Complete"?"✓":"●"} ${status}</em><span>${manualMinutes058(ch)} min read</span><span>Reviewed July 2026</span><span>Build ${BUILD}</span></div></div><button class="academyStar058 ${manualBookmarks058.includes(ch.id)?"active":""}" data-manual-bookmark="${ch.id}">★</button></header><div class="academyProgress058"><span style="width:${Math.round(((idx+1)/FIREVAULT_MANUAL_058.length)*100)}%"></span></div><main class="academyArticleBody058">${ch.topics.map(([title,body],i)=>`<section><span>${String(i+1).padStart(2,'0')}</span><div><h3>${esc(title)}</h3><p>${esc(body)}</p></div></section>`).join("")}</main>${contextualHelpReturn060?`<section class="contextSuggestions060"><span>Suggested for this screen</span><div>${(CONTEXT_HELP_060[contextualHelpReturn060.view]?.suggestions||["Related settings","Common workflow","Troubleshooting"]).map(q=>`<button class="ghost" data-context-search060="${esc(q)}">${esc(q)}</button>`).join("")}</div></section>`:""}<footer class="academyArticleNav058">${prev?`<button class="ghost" data-manual-chapter="${prev.id}"><small>Previous</small><strong>‹ ${esc(prev.title)}</strong></button>`:`<span></span>`}${next?`<button class="ghost" data-manual-chapter="${next.id}"><small>Next</small><strong>${esc(next.title)} ›</strong></button>`:`<button class="ghost" data-manual-view="home"><small>Finished</small><strong>Academy Home ›</strong></button>`}</footer></div>`;
 }
 function manualSimplePage058(type){
  const pages={
-  quick:["🚀","Quick Start Guide","Get FireVault ready for a normal field day.",[["1. Verify the build","Confirm the green build badge shows 0.59.0 before entering production information."],["2. Complete Technician Profile","Enter your name, company, phone, email, and license or employee identification."],["3. Review permissions","Allow location and photo access only when FireVault requests them and the feature is needed."],["4. Create or open a site","Add the customer name, full address, panel details, contacts, access notes, and GPS location."],["5. Document the visit","Record notes, photos, tasks, deficiencies, equipment changes, and a service visit."],["6. Finish and protect the data","Review the report, send or copy the required summary, then export a current backup."]]],
-  new:["🆕","What’s New in 0.59.0","Interactive tutorials and guided learning.",[["Academy home","Added a professional knowledge-center home page with direct access to documentation areas."],["Chapter reader","Added reading time, build compatibility, last-reviewed information, progress, and previous or next navigation."],["Bookmarks","Technicians can save frequently used manual chapters on the Academy home page."],["Smarter search","Search now recognizes useful synonyms such as pictures for photos, mail for email, and location for GPS."],["Documentation status","Chapters clearly show Complete or Needs Review status."]]],
+  quick:["🚀","Quick Start Guide","Get FireVault ready for a normal field day.",[["1. Verify the build","Confirm the green build badge shows 0.60.0 before entering production information."],["2. Complete Technician Profile","Enter your name, company, phone, email, and license or employee identification."],["3. Review permissions","Allow location and photo access only when FireVault requests them and the feature is needed."],["4. Create or open a site","Add the customer name, full address, panel details, contacts, access notes, and GPS location."],["5. Document the visit","Record notes, photos, tasks, deficiencies, equipment changes, and a service visit."],["6. Finish and protect the data","Review the report, send or copy the required summary, then export a current backup."]]],
+  new:["🆕","What’s New in 0.60.0","Contextual help and screen-linked Academy guidance.",[["Help where you work","Major field screens now include a compact Help control that opens the exact matching manual chapter."],["Screen-linked guidance","Today, Sites, Site Detail, Photos, Notes, Tasks, Deficiencies, Reports, GPS, Daily Route, and Settings are connected to relevant Academy guidance."],["Return to screen","The Academy remembers the previous workflow and active account so the technician can return directly to the same screen."],["Suggested topics","Contextual chapters display practical topic suggestions based on the screen that opened Help."],["Settings guidance","Email, Reports, GPS, Photo Overlay, Modules, Backup, Home Layout, and other Settings areas open the most relevant documentation."]]],
   tips:["🧰","Field Tips","Short practices that improve the usefulness of FireVault records.",[["Write for the next technician","Include the exact panel, circuit, device, location, symptom, test result, and next action instead of relying on memory."],["Photograph context first","Take one wide photo showing the equipment location before close-up terminal, label, or damage photos."],["Separate facts from follow-up","Use notes for what occurred, deficiencies for code or system problems, and tasks for work that still needs completion."],["Confirm the account","Before using Quick Capture, verify the selected customer site to prevent records from being stored under the wrong account."],["Back up before updates","Export a backup before installing every development build and after completing a significant amount of field documentation."]]],
-  revisions:["📋","Revision History","Application and documentation checkpoints.",[["0.58.0","Expanded Help & Manual into FireVault Academy with bookmarks, smart search, field tips, Quick Start, reader navigation, and documentation status."],["0.57.0","Added the first complete searchable in-app FireVault User Manual."],["Ongoing review rule","Any change to navigation, labels, storage, workflows, permissions, or supported layouts requires the related manual chapter to be checked."]]],
+  revisions:["📋","Revision History","Application and documentation checkpoints.",[["0.60.0","Connected major screens and Settings areas directly to matching Academy chapters with return-to-screen navigation."],["0.59.0","Added interactive tutorials, guided orientation, pinned learning, field tips, and documentation tracking."],["0.58.0","Expanded Help & Manual into FireVault Academy with bookmarks, smart search, Quick Start, and reader navigation."],["0.57.0","Added the first complete searchable in-app FireVault User Manual."],["Ongoing review rule","Any change to navigation, labels, storage, workflows, permissions, or supported layouts requires the related manual chapter to be checked."]]],
   trouble:["❓","Troubleshooting","Common problems and safe first checks.",FIREVAULT_MANUAL_058.find(x=>x.id==="trouble")?.topics||[]]
  };
  const [icon,title,note,items]=pages[type]||["🚧","Coming Soon","This Academy area is reserved for a future milestone.",[["Development status","The feature is not active yet. No outside service has been connected or purchased."]]];
@@ -5255,6 +5299,8 @@ const manualHome058Base=manualHome058;
 manualHome058=function(){return manualHome058Base().replace('<div class="academyCheckpoint058">',pinnedLearning059()+`<div class="academyQuickLinks059"><button data-manual-view="tracker"><span>📋</span><strong>Documentation Tracker</strong><small>Review status across manuals and tutorials</small></button></div><div class="academyCheckpoint058">`)};
 function manualPanel058(){ if(manualView058==="home")return manualHome058(); if(manualView058==="manual")return manualList058(); if(manualView058==="chapter")return manualChapterView058(); if(manualView058==="tutorials")return tutorialList059(); if(manualView058==="tutorial")return tutorialView059(); if(manualView058==="tour")return tourView059(); if(manualView058==="tips")return tipsView059(); if(manualView058==="tracker")return trackerView059(); return manualSimplePage058(manualView058); }
 function wireManual058(){
+  const contextReturn=document.getElementById("contextHelpReturn060"); if(contextReturn) contextReturn.onclick=returnFromContextualHelp060;
+  document.querySelectorAll("[data-context-search060]").forEach(b=>b.onclick=()=>{ manualQuery058=b.dataset.contextSearch060||""; manualView058="manual"; settings(); });
  document.querySelectorAll("[data-manual-view]").forEach(b=>b.onclick=()=>{manualView058=b.dataset.manualView;settings();});
  document.querySelectorAll("[data-manual-chapter]").forEach(b=>b.onclick=()=>{manualChapter058=b.dataset.manualChapter;manualView058="chapter";settings();requestAnimationFrame(()=>document.querySelector('.settingsDetailBody488')?.scrollTo({top:0}));});
  document.querySelectorAll("[data-manual-bookmark]").forEach(b=>b.onclick=e=>{e.stopPropagation();const id=b.dataset.manualBookmark;manualBookmarks058=manualBookmarks058.includes(id)?manualBookmarks058.filter(x=>x!==id):[...manualBookmarks058,id];saveManualBookmarks058();settings();});
@@ -6232,7 +6278,7 @@ function diagnostics(){
 }
 function showChangelog(){
   const notes = [
-    "Build 0.59.0 expands FireVault Academy with interactive tutorials, guided orientation, pinned learning, and documentation tracking.",
+    "Build 0.60.0 connects major FireVault screens directly to the matching Academy guidance and preserves the technician's return location.",
     "Manual chapters document installation, Today, Sites, Site Detail, field workflow, notes, tasks, deficiencies, photos, GPS, route tracking, reports, email, settings, backups, updates, and troubleshooting.",
     "Added living-documentation revision metadata and a release-state review requirement.",
     "Added Quick Capture for timestamped site notes, follow-up tasks, and deficiencies without leaving Today.",
