@@ -14005,3 +14005,69 @@ nav button.active{background:color-mix(in srgb,var(--accent) 17%,rgba(30,41,59,.
   .nearbySelectedOverlay0712 strong{font-size:.86rem!important}
   .nearbySelectedOverlay0712 span{font-size:.62rem!important}
 }
+
+
+/* Build 0.71.7 — Nearby button cleanup and reusable square navigation language */
+.nearbyCompactActions069{
+  grid-template-columns:88px 42px!important;
+  gap:7px!important;
+}
+.nearbyViewToggle069{
+  width:88px!important;
+  min-width:88px!important;
+  height:40px!important;
+  min-height:40px!important;
+  padding:0 12px!important;
+  gap:7px!important;
+  border-radius:10px!important;
+  font-size:.72rem!important;
+}
+.nearbyViewToggle069 span{font-size:.92rem!important}
+.nearbyViewToggle069 b{font-size:.68rem!important;letter-spacing:.045em!important}
+.nearbyCategoryFilter070{
+  width:42px!important;
+  min-width:42px!important;
+  height:40px!important;
+  min-height:40px!important;
+  border-radius:10px!important;
+}
+.nearbyFilterGlyph0714{width:20px!important;height:19px!important}
+.nearbyFilterGlyph0714::before{width:18px!important;height:17px!important}
+.nearbyMapControlMask0717{
+  position:absolute;
+  left:6px;
+  top:6px;
+  z-index:34;
+  width:42px;
+  height:76px;
+  border-radius:9px;
+  background:rgba(20,28,37,.18);
+  -webkit-backdrop-filter:blur(14px) saturate(.7);
+  backdrop-filter:blur(14px) saturate(.7);
+  pointer-events:none;
+}
+.nearbySelectedOverlay0712{z-index:85!important}
+.nearbyBottomNav069{
+  gap:7px!important;
+  padding-left:8px!important;
+  padding-right:8px!important;
+}
+.nearbyBottomNav069 button{
+  min-height:52px!important;
+  padding:6px 4px!important;
+  border:1px solid #313b47!important;
+  border-radius:7px!important;
+  background:linear-gradient(145deg,#171e26,#10151b)!important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.025)!important;
+}
+.nearbyBottomNav069 button.active{
+  border-color:#b82a31!important;
+  background:linear-gradient(145deg,#721219,#a91d25)!important;
+}
+.nearbyBottomNav069 button span{font-size:.6rem!important;font-weight:750!important;letter-spacing:.025em!important}
+@media(max-width:390px){
+  .nearbyCompactActions069{grid-template-columns:80px 40px!important;gap:5px!important}
+  .nearbyViewToggle069{width:80px!important;min-width:80px!important;height:38px!important;min-height:38px!important;padding:0 9px!important}
+  .nearbyCategoryFilter070{width:40px!important;min-width:40px!important;height:38px!important;min-height:38px!important}
+  .nearbyBottomNav069{gap:5px!important;padding-left:6px!important;padding-right:6px!important}
+}
