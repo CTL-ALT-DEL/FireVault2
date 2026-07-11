@@ -2287,6 +2287,8 @@ function home(){
     list.addEventListener('touchstart',()=>{nearbyTouching069=true;clearTimeout(nearbySnapTimer069);nearbyMapPopupSite069="";updateNearbyMapSelection069();},{passive:true});
     list.addEventListener('touchend',()=>{nearbyTouching069=false;},{passive:true});
     list.addEventListener('scroll',()=>syncNearbyScroll069(list),{passive:true});
+    requestAnimationFrame(()=>prepareNearbyScrollTail069(list));
+    window.addEventListener('resize',()=>prepareNearbyScrollTail069(list),{once:true});
   }
   if(rows[0]&&!homeNearbySelected069) homeNearbySelected069=rows[0].s.id;
   if(homeNearbyView069==='map') setTimeout(()=>initNearbyMap069(),60);
@@ -2338,43 +2340,62 @@ function selectNearby069(siteId,fromList=false,showPopup=false){
   if(row&&ensureSelectedVisible069(row)){drawStaticNearbyMap069();return;}
   updateNearbyMapSelection069();
 }
-function scheduleNearbySnap069(list,delay=260){
+function scheduleNearbySnap069(list,delay=180){
   clearTimeout(nearbySnapTimer069);
-  nearbySnapTimer069=setTimeout(()=>{if(!nearbyTouching069)snapNearbyList069(list);},delay);
+  nearbySnapTimer069=setTimeout(()=>{if(!nearbyTouching069)settleNearbyList069(list);},delay);
 }
 function closestNearbyCard069(list){
-  const cards=[...list.querySelectorAll('[data-nearby-card069]')]; if(!cards.length)return null;
-  const lr=list.getBoundingClientRect(),target=lr.top+3;
-  const covering=cards.find(c=>{const r=c.getBoundingClientRect();return r.top<=target&&r.bottom>target+8;});
-  if(covering)return covering;
+  const cards=[...list.querySelectorAll('[data-nearby-card069]')];
+  if(!cards.length)return null;
+  const top=list.scrollTop;
   let best=cards[0],dist=Infinity;
-  for(const c of cards){const r=c.getBoundingClientRect();const d=Math.abs(r.top-target);if(d<dist){dist=d;best=c;}}
+  for(const c of cards){
+    const d=Math.abs(c.offsetTop-top);
+    if(d<dist){dist=d;best=c;}
+  }
   return best;
 }
 function syncNearbyScroll069(list){
   if(nearbyScrollLock069) return;
   nearbyMapPopupSite069="";
-  const best=closestNearbyCard069(list); if(!best)return;
-  if(best.dataset.nearbyCard069!==homeNearbySelected069) selectNearby069(best.dataset.nearbyCard069,true,false);
-  scheduleNearbySnap069(list,260);
+  const best=closestNearbyCard069(list);
+  if(best&&best.dataset.nearbyCard069!==homeNearbySelected069){
+    homeNearbySelected069=best.dataset.nearbyCard069;
+    document.querySelectorAll('[data-nearby-card069]').forEach(c=>c.classList.toggle('selected',c===best));
+    updateNearbyMapSelection069();
+  }
+  scheduleNearbySnap069(list,180);
 }
-function snapNearbyList069(list){
+function settleNearbyList069(list){
   if(nearbyScrollLock069||nearbyTouching069) return;
   const best=closestNearbyCard069(list); if(!best)return;
-  const delta=best.getBoundingClientRect().top-list.getBoundingClientRect().top;
-  if(Math.abs(delta)<2){selectNearby069(best.dataset.nearbyCard069,true,false);return;}
+  const target=Math.max(0,best.offsetTop);
+  if(Math.abs(list.scrollTop-target)<2){
+    selectNearby069(best.dataset.nearbyCard069,true,false);
+    return;
+  }
   nearbyScrollLock069=true;
-  list.scrollTop=list.scrollTop+delta;
+  list.scrollTo({top:target,behavior:'smooth'});
   selectNearby069(best.dataset.nearbyCard069,true,false);
-  setTimeout(()=>nearbyScrollLock069=false,90);
+  setTimeout(()=>nearbyScrollLock069=false,260);
 }
-function staticMapBounds069(visibleMiles){
+function prepareNearbyScrollTail069(list){
+  if(!list)return;
+  let tail=list.querySelector('.nearbyScrollTail069');
+  if(!tail){tail=document.createElement('div');tail.className='nearbyScrollTail069';tail.setAttribute('aria-hidden','true');list.appendChild(tail);}
+  const first=list.querySelector('[data-nearby-card069]');
+  const h=Math.max(0,list.clientHeight-(first?.offsetHeight||54)-6);
+  tail.style.flexBasis=h+'px';
+}
+function staticMapBounds069(visibleMiles,aspect=1){
   const lat=Number(nearbyState?.lat),lng=Number(nearbyState?.lng);
   if(!Number.isFinite(lat)||!Number.isFinite(lng)) return null;
-  const radius=Math.max(.25,Number(visibleMiles)||1);
-  const latDelta=radius/69;
-  const lngDelta=radius/(69*Math.max(.25,Math.cos(lat*Math.PI/180)));
-  return {south:lat-latDelta,north:lat+latDelta,west:lng-lngDelta,east:lng+lngDelta};
+  const verticalMiles=Math.max(.25,Number(visibleMiles)||1);
+  const safeAspect=Math.max(.55,Math.min(2.4,Number(aspect)||1));
+  const horizontalMiles=verticalMiles*safeAspect;
+  const latDelta=verticalMiles/69;
+  const lngDelta=horizontalMiles/(69*Math.max(.25,Math.cos(lat*Math.PI/180)));
+  return {south:lat-latDelta,north:lat+latDelta,west:lng-lngDelta,east:lng+lngDelta,verticalMiles,horizontalMiles};
 }
 function staticPoint069(lat,lng,b){
   lat=Number(lat); lng=Number(lng);
@@ -2391,14 +2412,17 @@ function drawStaticNearbyMap069(){
     if(!Number.isFinite(lat)||!Number.isFinite(lng)){overlay.innerHTML='<div class="staticMapMessage069">Waiting for a valid GPS location…</div>';return;}
     const rows=nearbyRows069();
     if(!Number.isFinite(nearbyStaticVisibleMiles069)) nearbyStaticVisibleMiles069=initialVisibleMiles069(rows);
-    const b=staticMapBounds069(nearbyStaticVisibleMiles069);
+    const aspect=Math.max(.55,shell.clientWidth/Math.max(1,shell.clientHeight));
+    const b=staticMapBounds069(nearbyStaticVisibleMiles069,aspect);
     if(!b){overlay.innerHTML='<div class="staticMapMessage069">Map coordinates are unavailable.</div>';return;}
     nearbyStaticCurrentBounds069=b;
     const bbox=[b.west,b.south,b.east,b.north].map(n=>Number(n).toFixed(6)).join('%2C');
     const nextSrc=`https://www.openstreetmap.org/export/embed.html?bbox=${bbox}&layer=mapnik`;
     if(base.dataset.mapSrc!==nextSrc){base.dataset.mapSrc=nextSrc;base.src=nextSrc;}
     const center=staticPoint069(lat,lng,b);
-    let html=center?`<span class="staticRadius069" style="left:6%;top:6%;width:88%;height:88%"></span><span class="staticUser069" style="left:${center.x}%;top:${center.y}%"></span>`:'';
+    const configuredRadius=Math.max(.1,Number(nearbyRadiusMiles())||1);
+    const radiusPx=Math.max(8,Math.min(shell.clientWidth,shell.clientHeight)*(configuredRadius/Math.max(.01,b.verticalMiles))/2);
+    let html=center?`<span class="staticRadius069" style="left:${center.x}%;top:${center.y}%;width:${radiusPx*2}px;height:${radiusPx*2}px"></span><span class="staticUser069" style="left:${center.x}%;top:${center.y}%"></span>`:'';
     let rendered=0;
     rows.forEach((r,index)=>{
       const g=hasGps(r.s)?{lat:Number(r.s.gps.lat),lng:Number(r.s.gps.lng)}:null;
@@ -2413,7 +2437,7 @@ function drawStaticNearbyMap069(){
       e.stopPropagation();
       const id=m.dataset.staticMarker069; selectNearby069(id,false,true);
       const card=document.querySelector(`[data-nearby-card069="${cssEscape069(id)}"]`);
-      if(card){nearbyScrollLock069=true;const list=document.getElementById('nearbyCards069');if(list){const delta=card.getBoundingClientRect().top-list.getBoundingClientRect().top;list.scrollTo({top:list.scrollTop+delta,behavior:'smooth'});}setTimeout(()=>nearbyScrollLock069=false,360);}
+      if(card){nearbyScrollLock069=true;const list=document.getElementById('nearbyCards069');if(list){prepareNearbyScrollTail069(list);list.scrollTo({top:card.offsetTop,behavior:'smooth'});}setTimeout(()=>nearbyScrollLock069=false,360);}
     });
     updateNearbyMapSelection069();
   }catch(err){
@@ -7291,7 +7315,7 @@ function diagnostics(){
 }
 function showChangelog(){
   const notes = [
-    "Build 0.69.5 hides map details until a marker is tapped, stabilizes momentum list settling, and moves the map closer to the top with a simpler header.",
+    "Build 0.69.6 hides map details until a marker is tapped, stabilizes momentum list settling, and moves the map closer to the top with a simpler header.",
     "Manual chapters document installation, Today, Sites, Site Detail, field workflow, notes, tasks, deficiencies, photos, GPS, route tracking, reports, email, settings, backups, updates, and troubleshooting.",
     "Added living-documentation revision metadata and a release-state review requirement.",
     "Added Quick Capture for timestamped site notes, follow-up tasks, and deficiencies without leaving Today.",
