@@ -8,7 +8,7 @@
   "orientation": "any",
   "background_color": "#0b0d10",
   "theme_color": "#101216",
-  "description": "Field knowledge system for fire alarm technicians. Build 0.71.5 replaces the selected-account map box with clean white name and address text using a strong black shadow.",
+  "description": "Field knowledge system for fire alarm technicians. Build 0.71.6 repairs a Nearby startup crash caused by an empty selected-account contact lookup.",
   "icons": [
     {
       "src": "assets/icon-192.png",
@@ -49,5 +49,5 @@
       "description": "Open FireVault settings"
     }
   ],
-  "version": "0.71.5"
+  "version": "0.71.6"
 }

@@ -13934,7 +13934,7 @@ nav button.active{background:color-mix(in srgb,var(--accent) 17%,rgba(30,41,59,.
 }
 
 
-/* Build 0.71.5 — Clean text-only selected account map label */
+/* Build 0.71.6 — Clean text-only selected account map label */
 .nearbySelectedOverlay0712{
   top:12px!important;
   right:auto!important;

@@ -3127,7 +3127,7 @@ function nearbySites(){
 
 
 function primaryContact477(s){
-  const contacts=Array.isArray(s.contacts)?s.contacts:[];
+  const contacts=Array.isArray(s?.contacts)?s.contacts:[];
   return contacts.find(c=>c.afterHours) || contacts.find(c=>c.phone) || contacts.find(c=>c.email) || contacts[0] || null;
 }
 function accessSummary477(s){
@@ -7572,6 +7572,7 @@ function diagnostics(){
 }
 function showChangelog(){
   const notes = [
+    "Build 0.71.6 fixes a Nearby startup crash by making the selected-account phone/contact lookup safe when no account is selected yet.",
     "Build 0.71.5 removes the selected-account map box and displays the account name and address as clean white text with a strong black shadow.",
     "Build 0.71.4 keeps MAP / LIST visible on narrow screens, replaces the category dropdown with a compact filter icon, moves the selected account overlay to the map’s top-left, and refreshes GPS/map from the bottom Nearby button.",
     "Build 0.71.3 repairs the Nearby module startup error while preserving the improved account metadata layout, selected-account map overlay, and header spacing.",

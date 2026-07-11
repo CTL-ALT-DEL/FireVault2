@@ -1,9 +1,9 @@
-# FireVault Build 0.71.5
+# FireVault Build 0.71.6
 
 Nearby Accounts category and header redesign.
 
 
-## Build 0.71.5 — Clean selected-account map label
+## Build 0.71.6 — Nearby startup repair
 
 - Removes the black background box, border, blur, and panel shadow from the selected-account overlay.
 - Displays the selected account name and address as white text with a strong black outline/shadow for map readability.
