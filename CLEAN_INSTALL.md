@@ -1,10 +1,10 @@
-# FireVault Build 0.63.0 — Clean Install
+# FireVault Build 0.63.1 — Clean Install
 
-1. Export a FireVault backup before updating.
-2. Replace the repository root files with this build.
-3. Commit and push the changes.
-4. Wait for GitHub Pages deployment to complete.
-5. Confirm the build badge shows 0.63.0.
-6. Open Settings → Team Sync and confirm records are tracked locally.
+1. Back up FireVault from Settings before replacing an existing installation.
+2. Replace the repository files with the contents of this ZIP, keeping `index.html` at the repository root.
+3. Commit and push the files to GitHub.
+4. Wait for GitHub Pages deployment to finish.
+5. Open FireVault and confirm the build badge shows 0.63.1.
+6. Open several screens, tap the blue Help button, and verify each Help article scrolls completely to its Previous/Next controls.
 
-Build 0.63.0 prepares local records for future multi-user synchronization. It does not connect to or upload data to OneDrive yet.
+This build preserves the Build 0.63.0 Shared Vault package and sync-ready database foundation.

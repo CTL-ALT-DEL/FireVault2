@@ -1,18 +1,17 @@
-# FireVault Build 0.63.0
+# FireVault Build 0.63.1
 
-Build 0.63.0 adds the first working multi-device data handoff and merge workflow while preserving FireVault's offline-first operation.
+Build 0.63.1 is a dedicated FireVault Academy and contextual Help repair based on Build 0.63.0.
 
-## Included
-- Detailed synchronization queue in Settings → Team Sync
-- Exportable Shared Vault Packages suitable for storage in OneDrive
-- Import and merge workflow for a package created on another FireVault device
-- Record-version comparison and newer-record merging
-- Equal-version conflict detection without silent overwrites
-- Sync package origin, technician, device, workspace, and timestamp metadata
-- Updated Team Sync guidance and Academy revision references
+## Changes
 
-Automatic Microsoft sign-in and Microsoft Graph synchronization are not enabled yet.
+- Removed the sticky Help article header that could cover text and cards.
+- Restored full vertical scrolling when Help is opened from the blue contextual Help button.
+- Added safe bottom spacing above the application navigation bar.
+- Improved chapter typography, line height, wrapping, and section contrast.
+- Simplified narrow-phone article cards and previous/next navigation.
+- Improved tutorials, Field Tips, the Documentation Tracker, and contextual suggestions.
+- Preserved Shared Vault package export/import and sync-ready record metadata.
 
-Suggested commit message:
+## Suggested commit message
 
-`Build 0.63.0 add Shared Vault package export import and conflict-safe merging`
+`Build 0.63.1 overhaul contextual Help formatting and scrolling`
