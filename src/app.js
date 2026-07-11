@@ -37,6 +37,9 @@ let docVaultSort522 = "recent";
 let routeReviewId = "";
 let routeHistorySearch = "";
 let simpleToolsOpen = false;
+let accountDetailTab0735 = "overview";
+let accountDetailSite0735 = "";
+let nearbyMapGroups0735 = [];
 let homeInstallTipHidden = localStorage.getItem("firevault_home_install_tip_hidden") === "1";
 let jobTimer = null;
 const ACTIVE_ROUTE_KEY = "firevault_active_route_day";
@@ -2195,81 +2198,28 @@ function pinnedSitesManager567(){
 
 
 
-const CELLULAR_COVERAGE_LINKS_0734={
-  att:"https://www.att.com/maps/wireless-coverage.html",
-  verizon:"https://www.verizon.com/coverage-map/",
-  tmobile:"https://www.t-mobile.com/coverage/coverage-map",
-  fcc:"https://broadbandmap.fcc.gov/"
-};
-let coverageLocation0734=null;
-
-function openCoverageMap0734(carrier){
-  const url=CELLULAR_COVERAGE_LINKS_0734[carrier];
-  if(!url){ toast("Coverage map is unavailable."); return; }
-  const opened=window.open(url,"_blank","noopener,noreferrer");
-  if(!opened) location.href=url;
-}
-function coverageCoordinateLine0734(){
-  if(!coverageLocation0734) return "Use your current GPS position, then paste the coordinates into a carrier map when needed.";
-  return `${coverageLocation0734.lat.toFixed(6)}, ${coverageLocation0734.lng.toFixed(6)} • ${new Date(coverageLocation0734.at).toLocaleTimeString([], {hour:"numeric",minute:"2-digit"})}`;
-}
-function refreshCoverageLocation0734(){
-  const line=document.getElementById("coverageLocationLine0734");
-  const copy=document.getElementById("copyCoverageLocation0734");
-  if(!navigator.geolocation){ if(line) line.textContent="GPS is unavailable in this browser."; return; }
-  if(line) line.textContent="Getting current GPS position…";
-  navigator.geolocation.getCurrentPosition(pos=>{
-    coverageLocation0734={lat:Number(pos.coords.latitude),lng:Number(pos.coords.longitude),at:Date.now()};
-    if(line) line.textContent=coverageCoordinateLine0734();
-    if(copy) copy.disabled=false;
-  },err=>{
-    if(line) line.textContent=err?.message||"Current location could not be retrieved.";
-  },{enableHighAccuracy:true,timeout:12000,maximumAge:30000});
-}
-function copyCoverageLocation0734(){
-  if(!coverageLocation0734){ refreshCoverageLocation0734(); return; }
-  const text=`${coverageLocation0734.lat.toFixed(6)}, ${coverageLocation0734.lng.toFixed(6)}`;
-  if(navigator.clipboard?.writeText) navigator.clipboard.writeText(text).then(()=>toast("Coordinates copied."),()=>toast("Clipboard unavailable."));
-  else toast("Clipboard unavailable.");
-}
 function tools0734(){
   html(`<div class="screen toolsScreen0734">
     <div class="toolsHero0734">
-      <div><span>FIELD UTILITIES</span><h1>Tools</h1><p>Live reference tools for service calls and travel.</p></div>
+      <div><span>FIELD UTILITIES</span><h1>Tools</h1><p>FireVault utilities for route records, reference material, backups, and diagnostics.</p></div>
       <button class="homeBuildPill481 toolsBuild0734" id="toolsRelease0734" aria-label="Release notes">${BUILD}</button>
     </div>
 
-    <section class="card coverageTool0734">
-      <div class="coverageHead0734"><div><span class="coverageEyebrow0734">CELLULAR COVERAGE</span><h2>Carrier Coverage Maps</h2><p>Open the latest official coverage map for each nationwide carrier.</p></div><div class="coverageSignal0734" aria-hidden="true"><i></i><i></i><i></i><i></i></div></div>
-      <div class="carrierGrid0734">
-        <button class="carrierBtn0734 att0734" data-coverage-carrier="att"><strong>AT&amp;T</strong><span>Official wireless map</span><em>Open Map →</em></button>
-        <button class="carrierBtn0734 verizon0734" data-coverage-carrier="verizon"><strong>Verizon</strong><span>Official coverage map</span><em>Open Map →</em></button>
-        <button class="carrierBtn0734 tmobile0734" data-coverage-carrier="tmobile"><strong>T-Mobile</strong><span>Official 5G &amp; LTE map</span><em>Open Map →</em></button>
-      </div>
-      <button class="fccCompare0734" data-coverage-carrier="fcc"><span><strong>FCC National Broadband Map</strong><small>Independent mobile-coverage comparison</small></span><em>Compare →</em></button>
-      <div class="coverageLocation0734">
-        <div><strong>Current job location</strong><span id="coverageLocationLine0734">${esc(coverageCoordinateLine0734())}</span></div>
-        <div><button class="ghost" id="getCoverageLocation0734">Use GPS</button><button class="ghost" id="copyCoverageLocation0734" ${coverageLocation0734?"":"disabled"}>Copy</button></div>
-      </div>
-      <p class="coverageNote0734">Coverage maps show estimated outdoor service. Buildings, terrain, weather, network load, antennas, and device bands can change actual field performance.</p>
-    </section>
-
     <div class="toolsSectionTitle0734"><strong>FireVault Utilities</strong><span>Quick access</span></div>
-    <div class="toolsGrid0734">
-      <button class="card toolTile0734" id="toolsRoute0734">${fvIcon073("nearby","toolIcon0734")}<span><strong>Daily Route</strong><small>Waypoints and travel history</small></span></button>
-      <button class="card toolTile0734" id="toolsData0734">${fvIcon073("settings","toolIcon0734")}<span><strong>Backup &amp; Data</strong><small>Snapshots, restore, and updates</small></span></button>
-      ${featureOn("library")?`<button class="card toolTile0734" id="toolsLibrary0734">${fvIcon073("library","toolIcon0734")}<span><strong>Library</strong><small>Manuals and reference files</small></span></button>`:""}
-      ${featureOn("diagnostics")?`<button class="card toolTile0734" id="toolsDiagnostics0734">${fvIcon073("tools","toolIcon0734")}<span><strong>Diagnostics</strong><small>Startup and vault health</small></span></button>`:""}
+    <div class="toolsGrid0734 toolsGridClean0735">
+      <button class="card toolTile0734" id="toolsRoute0734">${fvIcon073("nearby","toolIcon0734")}<span><strong>Daily Route</strong><small>Waypoints, stops, and travel history</small></span></button>
+      <button class="card toolTile0734" id="toolsData0734">${fvIcon073("settings","toolIcon0734")}<span><strong>Backup &amp; Data</strong><small>Snapshots, restore, imports, and updates</small></span></button>
+      ${featureOn("library")?`<button class="card toolTile0734" id="toolsLibrary0734">${fvIcon073("library","toolIcon0734")}<span><strong>Library</strong><small>Manuals, documents, and reference files</small></span></button>`:""}
+      ${featureOn("diagnostics")?`<button class="card toolTile0734" id="toolsDiagnostics0734">${fvIcon073("tools","toolIcon0734")}<span><strong>Diagnostics</strong><small>Startup, storage, and vault health</small></span></button>`:""}
     </div>
+    <section class="card toolsSafety0735"><span>DATA SAFETY</span><strong>Automatic snapshots are active</strong><p>Download an external backup before deleting or reinstalling the Home Screen app.</p><button class="ghost" id="toolsBackup0735">Open Backup Controls</button></section>
     <div class="buildRevisionSpacer475" aria-hidden="true"></div>
   </div>`);
-  document.querySelectorAll("[data-coverage-carrier]").forEach(btn=>btn.onclick=()=>openCoverageMap0734(btn.dataset.coverageCarrier));
-  document.getElementById("getCoverageLocation0734")?.addEventListener("click",refreshCoverageLocation0734);
-  document.getElementById("copyCoverageLocation0734")?.addEventListener("click",copyCoverageLocation0734);
   document.getElementById("toolsRoute0734")?.addEventListener("click",()=>route("routeLog"));
   document.getElementById("toolsData0734")?.addEventListener("click",()=>route("dataTools"));
   document.getElementById("toolsLibrary0734")?.addEventListener("click",()=>route("library"));
   document.getElementById("toolsDiagnostics0734")?.addEventListener("click",()=>route("diagnostics"));
+  document.getElementById("toolsBackup0735")?.addEventListener("click",()=>{settingsTab="backup";mode="settingsDetail";view="settings";render();});
   document.getElementById("toolsRelease0734")?.addEventListener("click",showChangelog);
 }
 
@@ -2651,16 +2601,22 @@ function updateNearbyMapSelection069(){
       selectedOverlay0712.innerHTML='';
     }
   }
-  document.querySelectorAll('[data-static-marker069]').forEach(m=>m.classList.toggle('selected',m.dataset.staticMarker069===siteId));
+  document.querySelectorAll('[data-static-marker069]').forEach(m=>m.classList.toggle('selected',markerContainsSite0735(m,siteId)));
   const popup=document.getElementById('nearbyStaticPopup069');
   if(!popup)return;
   if(!nearbyMapPopupSite069||nearbyMapPopupSite069!==siteId){popup.hidden=true;return;}
   const popupRow=mapRow069(siteId);
   if(!popupRow){popup.hidden=true;return;}
-  const marker=document.querySelector(`[data-static-marker069="${cssEscape069(siteId)}"]`);
+  const marker=[...document.querySelectorAll('[data-static-marker069]')].find(m=>markerContainsSite0735(m,siteId));
   if(!marker){popup.hidden=true;return;}
+  const group=popupGroupForSite0735(siteId);
   const id=accountId069(popupRow.s);
-  popup.innerHTML=`<strong>${esc(popupRow.s.name||'Unnamed Account')}</strong>${id?`<b>${esc(id)}</b>`:''}<span>${esc(distanceLabel(popupRow.meters))}</span><small>${esc(fullAddress(popupRow.s))}</small>`;
+  if(group&&group.rows.length>1){
+    const ids=group.rows.map(r=>accountId069(r.s)||r.s.name||"Account").slice(0,5);
+    popup.innerHTML=`<strong>${group.rows.length} accounts at this address</strong><b>${esc(ids.join(" • "))}${group.rows.length>5?` • +${group.rows.length-5} more`:""}</b><span>${esc(distanceLabel(popupRow.meters))}</span><small>${esc(fullAddress(popupRow.s))}</small>`;
+  }else{
+    popup.innerHTML=`<strong>${esc(popupRow.s.name||'Unnamed Account')}</strong>${id?`<b>${esc(id)}</b>`:''}<span>${esc(distanceLabel(popupRow.meters))}</span><small>${esc(fullAddress(popupRow.s))}</small>`;
+  }
   const shell=marker.closest('.nearbyMapShell069');
   const mr=marker.getBoundingClientRect(),sr=shell.getBoundingClientRect();
   popup.style.left=Math.max(8,Math.min(sr.width-218,mr.left-sr.left-86))+'px';
@@ -2749,6 +2705,35 @@ function staticPoint069(lat,lng,b){
   if(!Number.isFinite(width)||!Number.isFinite(height)||width===0||height===0) return null;
   return {x:((lng-b.west)/width)*100,y:((b.north-lat)/height)*100};
 }
+function normalizedMapAddress0735(s={}){
+  const raw=String(fullAddress(s)||"").trim();
+  if(!raw || /no address/i.test(raw)) return "";
+  return raw.toLowerCase().replace(/[^a-z0-9]/g,"");
+}
+function nearbyLocationGroups0735(rows,b){
+  const groups=new Map();
+  rows.forEach((r,index)=>{
+    const g=nearbyGps069(r.s); if(!g)return;
+    const p=staticPoint069(g.lat,g.lng,b); if(!p||p.x<1||p.x>99||p.y<1||p.y>99)return;
+    const addr=normalizedMapAddress0735(r.s);
+    const key=addr?`a:${addr}`:`g:${g.lat.toFixed(5)},${g.lng.toFixed(5)}`;
+    if(!groups.has(key))groups.set(key,{key,rows:[],lat:0,lng:0,p,index});
+    const group=groups.get(key);group.rows.push(r);group.lat+=g.lat;group.lng+=g.lng;group.index=Math.min(group.index,index);
+  });
+  return [...groups.values()].map(group=>{
+    group.lat/=group.rows.length;group.lng/=group.rows.length;group.p=staticPoint069(group.lat,group.lng,b);
+    group.selected=group.rows.some(r=>r.s.id===homeNearbySelected069);
+    group.primary=group.rows.find(r=>r.s.id===homeNearbySelected069)||group.rows[0];
+    return group;
+  }).sort((a,b)=>a.index-b.index);
+}
+function markerContainsSite0735(marker,siteId){
+  const ids=String(marker?.dataset?.staticGroup0735||marker?.dataset?.staticMarker069||"").split("|");
+  return ids.includes(siteId);
+}
+function popupGroupForSite0735(siteId){
+  return nearbyMapGroups0735.find(g=>g.rows.some(r=>r.s.id===siteId))||null;
+}
 function drawStaticNearbyMap069(){
   try{
     const shell=document.querySelector('.staticMapShell069'),base=document.getElementById('nearbyStaticBase069'),overlay=document.getElementById('nearbyStaticOverlay069'),count=document.getElementById('nearbyMapCount069');
@@ -2775,20 +2760,25 @@ function drawStaticNearbyMap069(){
     let html='';
     if(userVisible&&!nearbyStreetFocusSite069) html+=`<span class="staticRadius069" style="left:${userPoint.x}%;top:${userPoint.y}%;width:${radiusPx*2}px;height:${radiusPx*2}px"></span>`;
     if(userVisible) html+=`<span class="staticUser069" style="left:${userPoint.x}%;top:${userPoint.y}%"></span>`;
-    let rendered=0;
-    rows.forEach((r,index)=>{
-      const g=hasGps(r.s)?{lat:Number(r.s.gps.lat),lng:Number(r.s.gps.lng)}:null;
-      if(!g||!Number.isFinite(g.lat)||!Number.isFinite(g.lng))return;
-      const p=staticPoint069(g.lat,g.lng,b); if(!p||p.x<1||p.x>99||p.y<1||p.y>99)return;
-      rendered++;
-      const category=accountCategory070(r.s);
-      html+=`<button class="staticMarker069 category-${category} ${r.s.id===homeNearbySelected069?'selected':''}" style="left:${p.x}%;top:${p.y}%" data-static-marker069="${esc(r.s.id)}" data-marker-category070="${category}" aria-label="${esc(r.s.name||'Account')}"><span>${index+1}</span></button>`;
+    const groups=nearbyLocationGroups0735(rows,b);
+    nearbyMapGroups0735=groups;
+    const rendered=groups.reduce((n,g)=>n+g.rows.length,0);
+    groups.forEach((group,groupIndex)=>{
+      const r=group.primary,p=group.p;if(!r||!p)return;
+      const categories=[...new Set(group.rows.map(x=>accountCategory070(x.s)))];
+      const category=categories.length===1?categories[0]:"multi";
+      const ids=group.rows.map(x=>x.s.id).join("|");
+      const countLabel=group.rows.length>1?group.rows.length:group.index+1;
+      const aria=group.rows.length>1?`${group.rows.length} accounts at ${fullAddress(r.s)}`:(r.s.name||"Account");
+      html+=`<button class="staticMarker069 category-${category} ${group.selected?'selected':''} ${group.rows.length>1?'multiAccountMarker0735':''}" style="left:${p.x}%;top:${p.y}%" data-static-marker069="${esc(r.s.id)}" data-static-group0735="${esc(ids)}" data-marker-category070="${category}" aria-label="${esc(aria)}"><span>${countLabel}</span>${group.rows.length>1?`<b>ACCTS</b>`:""}</button>`;
     });
     overlay.innerHTML=html||'<div class="staticMapMessage069">No mapped accounts are inside the current view.</div>';
-    if(count){count.textContent=`${rendered} mapped • ${nearbyAdaptiveRadiusMiles069.toFixed(1)} mi radius`;count.hidden=false;}
+    if(count){count.textContent=`${rendered} account${rendered===1?'':'s'} • ${groups.length} location${groups.length===1?'':'s'} • ${nearbyAdaptiveRadiusMiles069.toFixed(1)} mi radius`;count.hidden=false;}
     overlay.querySelectorAll('[data-static-marker069]').forEach(m=>m.onclick=e=>{
       e.stopPropagation();
-      const id=m.dataset.staticMarker069; selectNearby069(id,false,true,true);
+      const ids=String(m.dataset.staticGroup0735||m.dataset.staticMarker069).split("|");
+      const id=ids.includes(homeNearbySelected069)?homeNearbySelected069:ids[0];
+      selectNearby069(id,false,true,true);
       const card=document.querySelector(`[data-nearby-card069="${cssEscape069(id)}"]`);
       if(card){nearbyScrollLock069=true;const list=document.getElementById('nearbyCards069');if(list){prepareNearbyScrollTail069(list);const target=Math.min(Math.max(0,list.scrollHeight-list.clientHeight),nearbyCardTop069(list,card));list.scrollTo({top:target,behavior:'smooth'});}setTimeout(()=>nearbyScrollLock069=false,380);}
     });
@@ -3626,142 +3616,198 @@ function wireImportantSiteInfo568(){
 }
 
 
+function accountCategoryLabel0735(s={}){
+  const category=accountCategory070(s);
+  return ({clss:"CLSS",alarmnet:"AlarmNet",ipdact:"IPDACT",basic:"Basic"})[category]||"Basic";
+}
+function accountSince0735(s={}){
+  const value=s.createdAt||s.importMetadata?.lastImportedAt||s.updatedAt;
+  if(!value) return "Not recorded";
+  const d=new Date(value); if(Number.isNaN(d.getTime())) return "Not recorded";
+  return d.toLocaleDateString([], {month:"short",day:"numeric",year:"numeric"});
+}
+function accountNextDue0735(s={}){
+  const dates=(s.tasks||[]).filter(t=>!taskIsDone(t)&&t.due).map(t=>({raw:t.due,time:new Date(`${t.due}T12:00:00`).getTime()})).filter(x=>Number.isFinite(x.time)).sort((a,b)=>a.time-b.time);
+  if(!dates.length) return "None";
+  return new Date(dates[0].time).toLocaleDateString([], {month:"short",day:"numeric"});
+}
+function accountMapPreview0735(s={}){
+  if(!hasGps(s)) return `<div class="accountMapEmpty0735"><span>⌖</span><strong>No GPS location saved</strong><small>Capture GPS from the Details tab when you are on site.</small></div>`;
+  const lat=Number(s.gps.lat),lng=Number(s.gps.lng),d=.0032;
+  const bbox=[lng-d,lat-d,lng+d,lat+d].map(n=>n.toFixed(6)).join("%2C");
+  const src=`https://www.openstreetmap.org/export/embed.html?bbox=${bbox}&layer=mapnik&marker=${lat.toFixed(6)}%2C${lng.toFixed(6)}`;
+  return `<div class="accountMapPreview0735"><iframe src="${esc(src)}" title="Map preview for ${esc(s.name||"account")}" loading="lazy" tabindex="-1"></iframe><span class="accountMapPin0735" aria-hidden="true"></span><button id="accountMapRoute0735">Route</button></div>`;
+}
+function accountRecentActivity0735(s={},limit=5){
+  const rows=[];
+  const add=(at,kind,title,detail,routeName)=>{const t=new Date(at||0).getTime();if(Number.isFinite(t)&&t>0)rows.push({t,kind,title,detail,routeName});};
+  (s.visits||[]).forEach(v=>add(v.endedAt||v.startedAt||v.date,"visit","Service visit",visitNotesPreview(v,1),"visits"));
+  (s.deficiencies||[]).forEach(d=>add(d.createdAt||d.updatedAt,"deficiency",d.title||"Deficiency",`${d.priority||"Normal"} • ${d.status||"Open"}`,"deficiencies"));
+  (s.tasks||[]).forEach(t=>add(t.createdAt||t.updatedAt,"task",t.title||"Task",t.status||"Open","tasks"));
+  (s.docs||[]).forEach(d=>add(d.createdAt||d.updatedAt,"document",d.title||d.imageName||"Document",docHasPhoto512(d)?"Photo added":"Document added","siteDocs"));
+  return rows.sort((a,b)=>b.t-a.t).slice(0,limit);
+}
+function accountRecentMarkup0735(s={}){
+  const rows=accountRecentActivity0735(s,6);
+  if(!rows.length) return `<div class="accountEmptyState0735"><strong>No recent activity</strong><span>Visits, tasks, deficiencies, photos, and documents will appear here.</span></div>`;
+  const icons={visit:"✓",deficiency:"!",task:"□",document:"▣"};
+  return `<div class="accountRecentList0735">${rows.map(r=>`<button data-account-activity0735="${esc(r.routeName)}"><span class="kind-${esc(r.kind)}">${icons[r.kind]||"•"}</span><div><strong>${esc(r.title)}</strong><small>${esc(new Date(r.t).toLocaleDateString([], {month:"short",day:"numeric",year:"numeric"}))}${r.detail?` • ${esc(r.detail)}`:""}</small></div><b>›</b></button>`).join("")}</div>`;
+}
+function accountOverviewTab0735(s,ctx){
+  const {health,primary,lastVisit,def,open}=ctx;
+  const status=health.label;
+  const contactName=primary?contactTitle(primary):"No contact saved";
+  const contactPhone=primary?.phone||s.sitePhone||"";
+  return `<div class="accountTabPanel0735 accountOverview0735">
+    <section class="accountLocationCard0735">
+      <div class="accountAddress0735"><span>LOCATION</span><strong>${esc(fullAddress(s)||"No address saved")}</strong>${hasGps(s)?`<small>${esc(gpsLine(s))}</small>`:""}</div>
+      ${accountMapPreview0735(s)}
+    </section>
+    <section class="accountInfoCard0735">
+      <button><span>Status</span><strong class="accountStatus0735 status-${esc(health.cls)}">${esc(status)}</strong></button>
+      <button><span>Category</span><strong>${esc(accountCategoryLabel0735(s))}</strong></button>
+      <button><span>Account Since</span><strong>${esc(accountSince0735(s))}</strong></button>
+      <button id="contactsQuick477"><span>Contact</span><strong>${esc(contactName)}</strong>${contactPhone?`<small>${esc(contactPhone)}</small>`:""}</button>
+      ${primary?.email?`<a href="mailto:${esc(primary.email)}"><span>Email</span><strong>${esc(primary.email)}</strong></a>`:""}
+    </section>
+    <section class="accountMetricCards0735">
+      <button id="visitsMini477"><span>LAST VISIT</span><strong>${esc(lastVisit?visitDateLabel(lastVisit):"None")}</strong></button>
+      <button id="defBtn" class="metricDanger0735"><span>DEFICIENCIES</span><strong>${def} Open</strong></button>
+      <button id="taskBtn" class="metricBlue0735"><span>NEXT DUE</span><strong>${esc(accountNextDue0735(s))}</strong><small>${open} open task${open===1?"":"s"}</small></button>
+    </section>
+    <section class="accountQuickBar0735">
+      <button id="callPrimary477" ${contactPhone?"":"disabled"}><span>☎</span><strong>Call</strong></button>
+      <button id="navigateBtn477" ${hasGps(s)?"":"disabled"}><span>➤</span><strong>Route</strong></button>
+      <button id="qaAddNote544"><span>✎</span><strong>Note</strong></button>
+      <button id="qaStartVisit610"><span>${ctx.activeHere?"▶":"＋"}</span><strong>${ctx.activeHere?"Resume":"Visit"}</strong></button>
+    </section>
+    <section class="accountPanel0735"><div class="accountPanelHead0735"><div><span>RECENT ACTIVITY</span><h2>Account Timeline</h2></div><button class="ghost" id="allVisitsBtn">View All</button></div>${accountRecentMarkup0735(s)}</section>
+  </div>`;
+}
+function accountDetailsTab0735(s,ctx){
+  const {panel,primary,access}=ctx;
+  const primaryMeta=primary?[primary.phone,primary.email].filter(Boolean).join(" • "):"";
+  return `<div class="accountTabPanel0735">
+    <section class="accountPanel0735"><div class="accountPanelHead0735"><div><span>SITE DETAILS</span><h2>System &amp; Access</h2></div><button class="ghost" id="editDetails0735">Edit</button></div>
+      <div class="accountDetailGrid0735">
+        <div><span>Panel</span><strong>${esc(panel)}</strong></div>
+        <div><span>Primary Contact</span><strong>${esc(primary?contactTitle(primary):"No contact saved")}</strong>${primaryMeta?`<small>${esc(primaryMeta)}</small>`:""}</div>
+        <div><span>Access</span><strong>${esc(access||"No access notes")}</strong></div>
+        <div><span>Account ID</span><strong>${esc(accountId069(s)||"Not assigned")}</strong></div>
+        <div><span>Site Phone</span><strong>${esc(s.sitePhone||"Not entered")}</strong></div>
+        <div><span>Health</span><strong>${esc(siteHealthLine(s))}</strong></div>
+      </div>
+      <div class="accountInlineActions067"><button class="ghost" id="copyImportantInfo568">Copy Site Info</button><button class="ghost" id="snapshotBtn">Copy Snapshot</button><button class="ghost" id="contactsQuick477">Contacts</button></div>
+    </section>
+    ${importedAccountCard065(s)}
+    <section class="accountPanel0735"><div class="accountPanelHead0735"><div><span>LOCATION</span><h2>GPS &amp; Navigation</h2></div></div>
+      <div class="accountGpsCard0735"><div><span>Saved Coordinates</span><strong>${esc(gpsLine(s))}</strong></div>${data.settings.gps?.enabled===false?"":`<button class="primary" id="captureGpsBtn">Capture GPS</button>`}</div>
+      <div class="accountInlineActions067"><button class="ghost" id="navigateBtn477" ${hasGps(s)?"":"disabled"}>Navigate</button><button class="ghost" id="appleBtn" ${hasGps(s)?"":"disabled"}>Apple Maps</button><button class="ghost" id="googleBtn" ${hasGps(s)?"":"disabled"}>Google Maps</button></div>
+    </section>
+    ${plusCodeSection071(s)}
+  </div>`;
+}
+function accountEquipmentTab0735(s){
+  const equipment=Array.isArray(s.equipment)?s.equipment:[];
+  return `<div class="accountTabPanel0735">
+    <section class="accountPanel0735"><div class="accountPanelHead0735"><div><span>EQUIPMENT</span><h2>${equipment.length} Saved Item${equipment.length===1?"":"s"}</h2></div><div><button class="ghost" id="openEquipment0735">Open Vault</button><button class="primary" id="addEquipment0735">＋ Add</button></div></div>
+      ${equipment.length?`<div class="accountEquipmentList0735">${equipment.slice(0,10).map(e=>`<button data-account-equipment0735="${esc(e.id)}"><span class="equipmentState0735 ${esc(equipmentStatusClass(e))}"></span><div><strong>${esc(equipmentTitle(e))}</strong><small>${esc(equipmentMeta(e))}</small></div><em>${esc(e.status||"Active")}</em><b>›</b></button>`).join("")}</div>`:`<div class="accountEmptyState0735"><strong>No equipment saved</strong><span>Add the fire alarm panel, communicator, power supplies, and other serviceable equipment.</span><button class="primary" id="addEquipmentEmpty0735">Add First Item</button></div>`}
+    </section>
+  </div>`;
+}
+function accountDocsTab0735(s){
+  const docs=Array.isArray(s.docs)?s.docs:[];
+  const photos=docs.filter(docHasPhoto512);
+  return `<div class="accountTabPanel0735">
+    <section class="accountPanel0735"><div class="accountPanelHead0735"><div><span>PHOTOS</span><h2>${photos.length} Account Photo${photos.length===1?"":"s"}</h2></div><div><button class="ghost" id="openPhotoVaultBtn523">Open Vault</button><button class="primary" id="addAccountPhotoBtn523">＋ Photo</button></div></div>
+      ${photos.length?`<div class="accountPhotoGrid0735">${photos.slice(0,8).map(d=>`<button class="accountPhotoThumb523" data-doc="${esc(d.id)}">${docPhotoThumb512(d)}<span>${esc(d.title||d.imageName||"Photo")}</span></button>`).join("")}</div>`:`<div class="accountEmptyState0735"><strong>No photos saved</strong><span>Add panel, device, wiring, deficiency, or completed-work photos.</span></div>`}
+    </section>
+    <section class="accountPanel0735"><div class="accountPanelHead0735"><div><span>DOCUMENTS</span><h2>${docs.length} Total File${docs.length===1?"":"s"}</h2></div><button class="ghost" id="manageDocsBtn">Manage</button></div>
+      <div class="accountDocActions0735"><button id="reportBtn"><span>▤</span><strong>Report</strong><small>Customer closeout</small></button><button id="checklistBtn"><span>✓</span><strong>Checklist</strong><small>Inspection workflow</small></button><button id="qaCloseout544"><span>↗</span><strong>Copy Closeout</strong><small>Customer packet</small></button></div>
+    </section>
+  </div>`;
+}
+function accountNotesTab0735(s,ctx){
+  const {health,lastVisit,def,open}=ctx;
+  return `<div class="accountTabPanel0735">
+    <section class="accountPanel0735"><div class="accountPanelHead0735"><div><span>SITE NOTES</span><h2>Technician Notes</h2></div><button class="primary" id="addSiteNoteBtn491">＋ Add Note</button></div><div class="accountNotesBody0735">${esc(s.notes||"No notes entered.")}</div><button class="ghost accountWideButton0735" id="openSiteNotesBtn494">Open Full Notes Workspace</button></section>
+    <section class="accountMetricCards0735 accountWorkMetrics0735"><button id="taskBtn"><span>OPEN TASKS</span><strong>${open}</strong></button><button id="defBtn" class="metricDanger0735"><span>DEFICIENCIES</span><strong>${def}</strong></button><button id="visitsMini477"><span>LAST VISIT</span><strong>${esc(lastVisit?visitDateLabel(lastVisit):"None")}</strong></button></section>
+    <section class="accountQuickBar0735 accountWorkActions0735"><button id="qaAddTask544"><span>□</span><strong>Task</strong></button><button id="qaAddDef544"><span>!</span><strong>Deficiency</strong></button><button id="qaAddPhoto544"><span>▣</span><strong>Photo</strong></button><button id="qaReport544"><span>▤</span><strong>Report</strong></button></section>
+    <section class="accountPanel0735"><div class="accountPanelHead0735"><div><span>RECENT VISIT</span><h2>${esc(lastVisit?visitDateLabel(lastVisit):"No completed visits")}</h2></div>${lastVisit?`<button class="ghost" id="allVisitsBtn">History</button>`:""}</div>${lastVisit?`<p class="accountVisitPreview0735">${esc(visitNotesPreview(lastVisit,3))}</p>`:`<div class="accountEmptyState0735"><span>Start a service visit to create an account history.</span></div>`}</section>
+    ${featureOn("siteTimeline")?siteActivityTimelineMarkup557(s):""}
+  </div>`;
+}
 function siteDetail(){
-  const s=site(); if(!s){ route('sites'); return; }
+  const s=site(); if(!s){ route("sites"); return; }
+  if(accountDetailSite0735!==s.id){accountDetailSite0735=s.id;accountDetailTab0735="overview";}
   s.lastOpenedAt=new Date().toISOString(); saveData(data);
-  const open=(s.tasks||[]).filter(t=>(t.status||'Open')!=='Done').length;
-  const def=(s.deficiencies||[]).filter(d=>(d.status||'Open')!=='Closed').length;
+  const open=(s.tasks||[]).filter(t=>(t.status||"Open")!=="Done").length;
+  const def=(s.deficiencies||[]).filter(d=>(d.status||"Open")!=="Closed").length;
   const siteVisits=Array.isArray(s.visits)?s.visits:[];
   const equipment=Array.isArray(s.equipment)?s.equipment:[];
-  const contacts=Array.isArray(s.contacts)?s.contacts:[];
   const docs=Array.isArray(s.docs)?s.docs:[];
-  const photoDocs=docs.filter(docHasPhoto512);
-  const checklistItems=Array.isArray(s.checklist)?s.checklist:[];
-  const checkStats=checklistStats(s);
   const health=siteHealth(s);
   const lastVisit=siteVisits[0];
-  const panel=[s.panelManufacturer,s.panelModel].filter(Boolean).join(' ')||'Panel not entered';
+  const panel=[s.panelManufacturer,s.panelModel].filter(Boolean).join(" ")||"Panel not entered";
   const primary=primaryContact477(s);
   const access=accessSummary477(s);
-  const showChecklistTool=appMode()!=='simple'||featureOn('reports');
-  const nextAction=def?`${def} deficienc${def===1?'y':'ies'} need review`:open?`${open} open task${open===1?'':'s'}`:'Ready for service';
   const activeHere=activeJob&&activeJob.siteId===s.id;
-  const primaryMeta=primary?[primary.phone,primary.email].filter(Boolean).join(' • '):'';
+  const ctx={open,def,siteVisits,equipment,docs,health,lastVisit,panel,primary,access,activeHere};
+  const accountId=accountId069(s)||"No Account ID";
+  const tabs=[["overview","Overview"],["details","Details"],["equipment","Equipment"],["docs","Docs"],["notes","Notes"]];
+  const panelMarkup=accountDetailTab0735==="details"?accountDetailsTab0735(s,ctx):accountDetailTab0735==="equipment"?accountEquipmentTab0735(s):accountDetailTab0735==="docs"?accountDocsTab0735(s):accountDetailTab0735==="notes"?accountNotesTab0735(s,ctx):accountOverviewTab0735(s,ctx);
 
-  html(`<div class="screen siteDetail067">
-    <header class="accountTop067"><button class="ghost" id="backBtn" aria-label="Back to Sites">←</button><div><span>Customer account</span><strong>${esc(s.name||'Unnamed Account')}</strong></div><button class="ghost" id="editBtn">Edit</button></header>
-
-    <section class="accountHero067 tone-${health.cls}">
-      <div class="accountHeroIdentity067"><span class="accountInitial067">${esc((s.name||'?').slice(0,1).toUpperCase())}</span><div><h1>${esc(s.name||'Unnamed Account')}</h1><p>${esc(fullAddress(s))}</p><em>${esc(nextAction)}</em></div></div>
-      <div class="accountHeroTools067"><button class="accountPin067 ${isPinnedSite566(s)?'pinned':''}" id="pinSiteBtn566" aria-label="Pin account">${isPinnedSite566(s)?'★':'☆'}</button><div class="accountHealth067"><strong>${health.score}%</strong><span>Site ready</span></div></div>
-    </section>
-
-    <section class="accountActionDock067">
-      <button class="primary accountVisit067" id="qaStartVisit610"><span>${activeHere?'▶':'＋'}</span><div><strong>${activeHere?'Resume Service Visit':'Start Service Visit'}</strong><small>${activeHere?elapsedText(activeJob.startedAt):'Timed field workspace and closeout'}</small></div><b>›</b></button>
-      <div class="accountQuickGrid067">
-        <button id="qaAddNote544"><span>✎</span><strong>Note</strong></button>
-        <button id="qaAddPhoto544"><span>▣</span><strong>Photo</strong></button>
-        <button id="qaAddDef544" class="danger"><span>!</span><strong>Deficiency</strong></button>
-        <button id="qaAddTask544"><span>□</span><strong>Task</strong></button>
-      </div>
-    </section>
-
-    <section class="accountMetricGrid067" aria-label="Account activity">
-      <button id="taskBtn" class="tone-amber"><strong>${open}</strong><span>Open Tasks</span></button>
-      <button id="defBtn" class="tone-red"><strong>${def}</strong><span>Deficiencies</span></button>
-      <button id="visitsMini477" class="tone-green"><strong>${siteVisits.length}</strong><span>Visits</span></button>
-      <button id="qaPhotoVault544" class="tone-blue"><strong>${photoDocs.length}</strong><span>Photos</span></button>
-    </section>
-
-    <details class="accountSection067 tone-blue" open>
-      <summary><span>▤</span><div><strong>Account Snapshot</strong><small>Panel, contact, access, and last service information</small></div><b>⌄</b></summary>
-      <div class="accountSectionBody067">
-        <div class="accountSnapshotGrid067">
-          <div><span>Panel</span><strong>${esc(panel)}</strong></div>
-          <div><span>Primary Contact</span><strong>${esc(primary?contactTitle(primary):'No contact saved')}</strong>${primaryMeta?`<small>${esc(primaryMeta)}</small>`:''}</div>
-          <div><span>Access</span><strong>${esc(access||'No access notes')}</strong></div>
-          <div><span>Last Visit</span><strong>${esc(lastVisit?`${visitDateLabel(lastVisit)} • ${durationText(lastVisit.startedAt,lastVisit.endedAt)}`:'No completed visits')}</strong></div>
-        </div>
-        <div class="accountInlineActions067">
-          <button class="ghost" id="copyImportantInfo568">Copy Site Info</button>
-          <button class="ghost" id="snapshotBtn">Copy Snapshot</button>
-          <button class="ghost" id="contactsQuick477">Contacts</button>
-          ${primary?.phone?`<button class="ghost" id="callPrimary477">Call Contact</button>`:''}
-        </div>
-        ${importedAccountCard065(s)}
-      </div>
-    </details>
-
-    <details class="accountSection067 tone-red" open>
-      <summary><span>⚒</span><div><strong>Work & History</strong><small>Notes, priorities, recent visits, and account activity</small></div><b>⌄</b></summary>
-      <div class="accountSectionBody067">
-        <div class="accountPriority067"><div><span>Today’s priority</span><strong>${esc(health.details.join(' • ')||nextAction)}</strong></div><button class="ghost" id="qaReport544">Report Center</button></div>
-        <div class="accountNotes067"><div><span>Site Notes</span><p>${esc((s.notes||'No notes entered.').split('\n').slice(0,4).join('\n'))}</p></div><div><button class="primary" id="addSiteNoteBtn491">＋ Add Note</button><button class="ghost" id="openSiteNotesBtn494">Open Notes</button></div></div>
-        <div class="accountRecent067"><div><span>Recent Visit</span><strong>${esc(lastVisit?`${visitDateLabel(lastVisit)} • ${visitNotesPreview(lastVisit,1)}`:'No completed visits yet.')}</strong></div>${siteVisits.length?`<button class="ghost" id="allVisitsBtn">View History</button>`:''}</div>
-        ${featureOn('siteTimeline')?siteActivityTimelineMarkup557(s):''}
-      </div>
-    </details>
-
-    <details class="accountSection067 tone-violet">
-      <summary><span>▣</span><div><strong>Photos & Resources</strong><small>Account photos, documents, equipment, reports, and checklists</small></div><b>⌄</b></summary>
-      <div class="accountSectionBody067">
-        <div class="accountResourceHead067"><div><span>Account Photos</span><strong>${photoDocs.length?`${photoDocs.length} saved photo${photoDocs.length===1?'':'s'}`:'No photos saved'}</strong></div><div><button class="ghost" id="openPhotoVaultBtn523">Photo Vault</button><button class="primary" id="addAccountPhotoBtn523">＋ Photo</button></div></div>
-        ${photoDocs.length?`<div class="accountPhotoStrip067">${photoDocs.slice(0,4).map(d=>`<button class="accountPhotoThumb523" data-doc="${esc(d.id)}">${docPhotoThumb512(d)}<span>${esc(d.title||d.imageName||'Photo')}</span></button>`).join('')}</div>`:`<p class="accountEmpty067">Add panel, device, wiring, deficiency, or completed-work photos.</p>`}
-        <div class="accountToolGrid067">
-          ${featureOn('reports')?`<button id="reportBtn"><span>▤</span><strong>Report</strong><small>Customer closeout</small></button>`:''}
-          ${showChecklistTool?`<button id="checklistBtn"><span>✓</span><strong>Checklist</strong><small>${checklistItems.length?`${checkStats.progress}% complete`:'Start checklist'}</small></button>`:''}
-          ${featureOn('library')?`<button id="manageDocsBtn"><span>▧</span><strong>Documents</strong><small>${docs.length} saved</small></button>`:''}
-          ${featureOn('equipment')?`<button id="equipmentBtn"><span>⌁</span><strong>Equipment</strong><small>${equipment.length} items</small></button>`:''}
-          <button id="qaCloseout544"><span>↗</span><strong>Copy Closeout</strong><small>Customer packet</small></button>
-        </div>
-      </div>
-    </details>
-
-    ${plusCodeSection071(s)}
-
-    ${featureOn('advancedGps')?`<details class="accountSection067 tone-cyan">
-      <summary><span>⌖</span><div><strong>Location & Navigation</strong><small>${esc(hasGps(s)?gpsLine(s):'No saved coordinates')}</small></div><b>⌄</b></summary>
-      <div class="accountSectionBody067"><div class="accountGps067"><div><span>GPS location</span><strong>${esc(gpsLine(s))}</strong></div>${data.settings.gps?.enabled===false?'':`<button class="primary" id="captureGpsBtn">Capture GPS</button>`}</div><div class="accountInlineActions067"><button class="ghost" id="navigateBtn477">Navigate</button><button class="ghost" id="appleBtn">Apple Maps</button><button class="ghost" id="googleBtn">Google Maps</button></div></div>
-    </details>`:''}
+  html(`<div class="screen siteDetail0735">
+    <header class="accountHeader0735"><button class="accountBack0735" id="backBtn" aria-label="Back to Accounts">‹</button><div><strong>${esc(s.name||"Unnamed Account")}</strong><span>${esc(accountId)}</span></div><button class="accountPin0735 ${isPinnedSite566(s)?"pinned":""}" id="pinSiteBtn566" aria-label="Pin account">${isPinnedSite566(s)?"★":"☆"}</button><button class="accountEdit0735" id="editBtn">Edit</button></header>
+    <nav class="accountTabs0735" aria-label="Account sections">${tabs.map(([key,label])=>`<button class="${accountDetailTab0735===key?"active":""}" data-account-tab0735="${key}">${label}</button>`).join("")}</nav>
+    <div class="accountTabScroll0735">${panelMarkup}</div>
   </div>`);
 
-  document.getElementById('backBtn')?.addEventListener('click',()=>route('sites'));
-  document.getElementById('editBtn')?.addEventListener('click',()=>{mode='edit';route('siteForm');});
-  document.getElementById('pinSiteBtn566')?.addEventListener('click',toggleSitePinned566);
-  document.getElementById('qaStartVisit610')?.addEventListener('click',startServiceVisit610);
-  document.getElementById('qaAddNote544')?.addEventListener('click',addSiteNotePrompt);
-  document.getElementById('qaAddPhoto544')?.addEventListener('click',()=>{mode='newPhoto';route('siteDocForm');});
-  document.getElementById('qaAddDef544')?.addEventListener('click',()=>{mode=null;route('deficiencyForm');});
-  document.getElementById('qaAddTask544')?.addEventListener('click',()=>{mode=null;route('taskForm');});
-  document.getElementById('taskBtn')?.addEventListener('click',()=>route('tasks'));
-  document.getElementById('defBtn')?.addEventListener('click',()=>route('deficiencies'));
-  document.getElementById('visitsMini477')?.addEventListener('click',()=>route('visits'));
-  document.getElementById('qaPhotoVault544')?.addEventListener('click',()=>{docVaultFilter516='photos';route('siteDocs');});
-  document.getElementById('openPhotoVaultBtn523')?.addEventListener('click',()=>{docVaultFilter516='photos';route('siteDocs');});
-  document.getElementById('addAccountPhotoBtn523')?.addEventListener('click',()=>{mode='newPhoto';route('siteDocForm');});
-  document.querySelectorAll('.accountPhotoThumb523').forEach(b=>b.onclick=()=>{const d=(site()?.docs||[]).find(x=>x.id===b.dataset.doc);if(d)photoPreviewModal524(d);});
-  document.getElementById('snapshotBtn')?.addEventListener('click',shareSiteSnapshot);
-  document.getElementById('qaReport544')?.addEventListener('click',()=>route('report'));
-  document.getElementById('qaCloseout544')?.addEventListener('click',copyCustomerCloseoutPacket539);
-  document.getElementById('addSiteNoteBtn491')?.addEventListener('click',addSiteNotePrompt);
-  document.getElementById('openSiteNotesBtn494')?.addEventListener('click',()=>route('jobMode'));
-  document.getElementById('contactsQuick477')?.addEventListener('click',()=>route('contactsList'));
-  if(primary?.phone) document.getElementById('callPrimary477')?.addEventListener('click',()=>{location.href=`tel:${primary.phone}`;});
-  document.getElementById('allVisitsBtn')?.addEventListener('click',()=>route('visits'));
-  document.getElementById('reportBtn')?.addEventListener('click',()=>route('report'));
-  document.getElementById('checklistBtn')?.addEventListener('click',()=>route('checklist'));
-  document.getElementById('manageDocsBtn')?.addEventListener('click',()=>route('siteDocs'));
-  document.getElementById('equipmentBtn')?.addEventListener('click',()=>route('equipmentList'));
-  document.getElementById('captureGpsBtn')?.addEventListener('click',captureGpsForSite);
-  document.getElementById('navigateBtn477')?.addEventListener('click',()=>window.open(mapRouteUrl071(s),'_blank'));
-  document.getElementById('appleBtn')?.addEventListener('click',()=>window.open(mapUrl(s,'apple'),'_blank'));
-  document.getElementById('googleBtn')?.addEventListener('click',()=>window.open(mapUrl(s,'google'),'_blank'));
-  document.getElementById('copyPrimaryPlus071')?.addEventListener('click',()=>copyText071(sitePlusCode071(s),'Plus Code copied.'));
-  document.getElementById('addLocationPoint071')?.addEventListener('click',addLocationPoint071);
-  document.querySelectorAll('[data-copy-plus071]').forEach(b=>b.onclick=()=>{const p=locationPoints071(s).find(x=>x.id===b.dataset.copyPlus071);if(p)copyText071(p.plusCode,'Plus Code copied.');});
-  document.querySelectorAll('[data-route-plus071]').forEach(b=>b.onclick=()=>routeLocationPoint071(b.dataset.routePlus071));
-  document.querySelectorAll('[data-prefer-plus071]').forEach(b=>b.onclick=()=>setPreferredLocation071(b.dataset.preferPlus071));
-  document.querySelectorAll('[data-delete-plus071]').forEach(b=>b.onclick=()=>deleteLocationPoint071(b.dataset.deletePlus071));
+  document.getElementById("backBtn")?.addEventListener("click",()=>route("sites"));
+  document.getElementById("editBtn")?.addEventListener("click",()=>{mode="edit";route("siteForm");});
+  document.getElementById("pinSiteBtn566")?.addEventListener("click",toggleSitePinned566);
+  document.querySelectorAll("[data-account-tab0735]").forEach(b=>b.onclick=()=>{accountDetailTab0735=b.dataset.accountTab0735;siteDetail();});
+  document.getElementById("editDetails0735")?.addEventListener("click",()=>{mode="edit";route("siteForm");});
+  document.getElementById("qaStartVisit610")?.addEventListener("click",startServiceVisit610);
+  document.getElementById("qaAddNote544")?.addEventListener("click",addSiteNotePrompt);
+  document.getElementById("qaAddPhoto544")?.addEventListener("click",()=>{mode="newPhoto";route("siteDocForm");});
+  document.getElementById("qaAddDef544")?.addEventListener("click",()=>{mode=null;route("deficiencyForm");});
+  document.getElementById("qaAddTask544")?.addEventListener("click",()=>{mode=null;route("taskForm");});
+  document.getElementById("taskBtn")?.addEventListener("click",()=>route("tasks"));
+  document.getElementById("defBtn")?.addEventListener("click",()=>route("deficiencies"));
+  document.getElementById("visitsMini477")?.addEventListener("click",()=>route("visits"));
+  document.getElementById("contactsQuick477")?.addEventListener("click",()=>route("contactsList"));
+  const contactPhone=primary?.phone||s.sitePhone||"";
+  if(contactPhone) document.getElementById("callPrimary477")?.addEventListener("click",()=>{location.href=`tel:${contactPhone.replace(/[^+\d]/g,"")}`;});
+  document.getElementById("navigateBtn477")?.addEventListener("click",()=>{if(hasGps(s))window.open(mapRouteUrl071(s),"_blank");});
+  document.getElementById("accountMapRoute0735")?.addEventListener("click",()=>window.open(mapRouteUrl071(s),"_blank"));
+  document.getElementById("allVisitsBtn")?.addEventListener("click",()=>route("visits"));
+  document.querySelectorAll("[data-account-activity0735]").forEach(b=>b.onclick=()=>route(b.dataset.accountActivity0735));
+  document.getElementById("snapshotBtn")?.addEventListener("click",shareSiteSnapshot);
+  document.getElementById("captureGpsBtn")?.addEventListener("click",captureGpsForSite);
+  document.getElementById("appleBtn")?.addEventListener("click",()=>{if(hasGps(s))window.open(mapUrl(s,"apple"),"_blank");});
+  document.getElementById("googleBtn")?.addEventListener("click",()=>{if(hasGps(s))window.open(mapUrl(s,"google"),"_blank");});
+  document.getElementById("copyPrimaryPlus071")?.addEventListener("click",()=>copyText071(sitePlusCode071(s),"Plus Code copied."));
+  document.getElementById("addLocationPoint071")?.addEventListener("click",addLocationPoint071);
+  document.querySelectorAll("[data-copy-plus071]").forEach(b=>b.onclick=()=>{const p=locationPoints071(s).find(x=>x.id===b.dataset.copyPlus071);if(p)copyText071(p.plusCode,"Plus Code copied.");});
+  document.querySelectorAll("[data-route-plus071]").forEach(b=>b.onclick=()=>routeLocationPoint071(b.dataset.routePlus071));
+  document.querySelectorAll("[data-prefer-plus071]").forEach(b=>b.onclick=()=>setPreferredLocation071(b.dataset.preferPlus071));
+  document.querySelectorAll("[data-delete-plus071]").forEach(b=>b.onclick=()=>deleteLocationPoint071(b.dataset.deletePlus071));
+  document.getElementById("openEquipment0735")?.addEventListener("click",()=>route("equipmentList"));
+  const addEquipment=()=>{mode=null;route("equipmentForm");};
+  document.getElementById("addEquipment0735")?.addEventListener("click",addEquipment);
+  document.getElementById("addEquipmentEmpty0735")?.addEventListener("click",addEquipment);
+  document.querySelectorAll("[data-account-equipment0735]").forEach(b=>b.onclick=()=>{mode=b.dataset.accountEquipment0735;route("equipmentForm");});
+  document.getElementById("openPhotoVaultBtn523")?.addEventListener("click",()=>{docVaultFilter516="photos";route("siteDocs");});
+  document.getElementById("addAccountPhotoBtn523")?.addEventListener("click",()=>{mode="newPhoto";route("siteDocForm");});
+  document.querySelectorAll(".accountPhotoThumb523").forEach(b=>b.onclick=()=>{const d=(site()?.docs||[]).find(x=>x.id===b.dataset.doc);if(d)photoPreviewModal524(d);});
+  document.getElementById("manageDocsBtn")?.addEventListener("click",()=>route("siteDocs"));
+  document.getElementById("reportBtn")?.addEventListener("click",()=>route("report"));
+  document.getElementById("checklistBtn")?.addEventListener("click",()=>route("checklist"));
+  document.getElementById("qaCloseout544")?.addEventListener("click",copyCustomerCloseoutPacket539);
+  document.getElementById("addSiteNoteBtn491")?.addEventListener("click",addSiteNotePrompt);
+  document.getElementById("openSiteNotesBtn494")?.addEventListener("click",()=>route("jobMode"));
+  document.getElementById("qaReport544")?.addEventListener("click",()=>route("report"));
   wireImportantSiteInfo568(); wireSiteBrief556(); wireSiteActivity557();
 }
 
@@ -7706,7 +7752,8 @@ function diagnostics(){
 }
 function showChangelog(){
   const notes = [
-    "Build 0.73.4 rebuilds the bottom navigation used outside Nearby Accounts, aligns every button in equal-width safe-area-aware cells, and replaces internal planning language with clear descriptions of current controls and limitations.",
+    "Build 0.73.5 redesigns Account Detail with five information tabs, groups same-address accounts on the Nearby map, and removes the cellular coverage tool.",
+    "Build 0.73.4 adds the Tools hub and global navigation structure.",
     "Build 0.73.2 restores the brighter selected-account green and adds an old-school terminal typing sequence for database and latest-version checks on the splash screen.",
     "Build 0.73.1 keeps different buildings at the same address as separate customer records by matching the complete Account ID, including CLSS dash suffixes such as G7C1234-01 and G7C1234-02.",
     "Build 0.73.0 introduced the unified FireVault design system and consistent dynamic navigation controls.",
@@ -7729,7 +7776,7 @@ function showChangelog(){
   overlay.className="releaseOverlay";
   overlay.innerHTML=`<div class="releaseSheet" role="dialog" aria-modal="true" aria-label="FireVault release notes">
     <div class="releaseHead"><div><strong>${fireVaultBrand575()}</strong><span>Build ${BUILD}</span></div><button class="ghost iconBtn" id="closeRelease" aria-label="Close release notes">×</button></div>
-    <div class="releaseBody"><h2>Release Notes</h2><p class="releaseIntro">Brighter Nearby selection and terminal-style startup checks.</p><ul>${notes.map(n=>`<li>${esc(n)}</li>`).join("")}</ul></div>
+    <div class="releaseBody"><h2>Release Notes</h2><p class="releaseIntro">Tabbed account detail and grouped multi-account map locations.</p><ul>${notes.map(n=>`<li>${esc(n)}</li>`).join("")}</ul></div>
   </div>`;
   document.body.appendChild(overlay);
   const close=()=>overlay.remove();

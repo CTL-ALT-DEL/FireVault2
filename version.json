@@ -1,6 +1,6 @@
 {
-  "build": "0.73.4",
+  "build": "0.73.5",
   "released": "2026-07-11",
-  "note": "Adds a Tools hub with live cellular coverage references for AT&T, Verizon, and T-Mobile.",
-  "notes": "Uses official carrier maps, adds an FCC comparison map, current-location coordinate capture, and makes Tools a consistent global navigation destination."
+  "note": "Redesigns individual Account Detail with Info Tabs and groups multiple accounts at one address on the Nearby map.",
+  "notes": "Removes Cellular Coverage from Tools, adds Overview, Details, Equipment, Docs, and Notes tabs, and displays account counts on shared-address map markers."
 }

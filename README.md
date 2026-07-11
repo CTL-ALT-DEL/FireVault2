@@ -1,7 +1,7 @@
-# FireVault Build 0.73.4
+# FireVault Build 0.73.5
 
-Build 0.73.4 adds a dedicated Tools hub. Cellular Coverage provides direct access to the official live AT&T, Verizon, and T-Mobile coverage maps, plus the FCC National Broadband Map for independent comparison. A GPS utility can capture and copy the current job coordinates for use in carrier map searches.
+Build 0.73.5 completely redesigns the individual Account Detail page around the selected Info Tabs concept. Each account now opens with Overview, Details, Equipment, Docs, and Notes tabs, keeping the site name and imported Account ID visible while organizing field information into focused workspaces.
 
-The global bottom navigation now uses Nearby, Accounts, Tools, and Settings consistently. Library remains available inside Tools when the Library module is enabled.
+The Nearby Accounts map now groups records that share the same complete address. A grouped marker displays the number of accounts at that location, and its popup lists the individual Account IDs so separate buildings such as `G7C1234-01` and `G7C1234-02` remain visible and independently selectable.
 
-Coverage maps are external live references and require internet access. They display estimated outdoor coverage rather than guaranteed indoor signal. The existing `firevault_vault_build_030` storage key, account data, automatic backups, update system, multi-building import behavior, and terminal splash checks remain unchanged.
+The Cellular Coverage feature has been removed from Tools. Daily Route, Backup & Data, Library, and Diagnostics remain available. The existing `firevault_vault_build_030` storage key, account data, automatic backups, update system, and multi-building import behavior remain unchanged.
