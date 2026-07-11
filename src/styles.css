@@ -13414,3 +13414,34 @@ nav button.active{background:color-mix(in srgb,var(--accent) 17%,rgba(30,41,59,.
   .nearbyCompactTitle069 h1{font-size:1.35rem}
   .nearbyAccount069{grid-template-columns:30px 18px minmax(0,1fr) 64px 160px!important;min-height:58px!important}
 }
+
+/* Build 0.69.5 — quieter map header, tap-only popup, stable wheel settling */
+.nearbyHome069{gap:4px!important;padding-top:calc(5px + env(safe-area-inset-top))!important}
+.nearbyTop069{min-height:36px!important;padding-bottom:3px!important}
+.nearbyLogo069{gap:7px!important}
+.nearbyLogo069 img{width:31px!important;height:31px!important}
+.nearbyLogo069 strong{font-size:.96rem!important}
+.homeBuild069{height:29px!important;padding:0 8px!important;font-size:.63rem!important}
+.homeSettings069{width:30px!important;height:30px!important;font-size:.78rem!important}
+.nearbyCompactHead069{min-height:32px!important;gap:5px!important}
+.nearbyCompactTitle069 h1{font-size:1.02rem!important}
+.nearbyCompactTitle069 span{margin-top:2px!important;font-size:.51rem!important}
+.nearbyCompactTitle069 span b{font-weight:650;color:#7f8b98}
+.nearbyCompactActions069{gap:3px!important}
+.nearbyViewToggle069{min-width:61px!important;height:28px!important;padding:0 7px!important;font-size:.59rem!important}
+.iconCompact069{width:28px!important;height:28px!important;min-height:28px!important;font-size:.72rem!important}
+.nearbyWorkspace069{gap:3px!important}
+.nearbyMapShell069{height:clamp(235px,36vh,335px)!important;min-height:215px!important}
+.nearbyMapCount069{display:none!important}
+.nearbyStaticPopup069{transition:none!important}
+.nearbyCards069{scroll-snap-type:none!important;scroll-padding-top:0!important;overscroll-behavior-y:contain!important}
+.nearbyAccount069{scroll-snap-align:none!important;scroll-snap-stop:normal!important}
+@media(max-width:390px){
+  .nearbyHome069{padding-left:6px!important;padding-right:6px!important}
+  .nearbyTop069{min-height:34px!important}
+  .nearbyLogo069 img{width:29px!important;height:29px!important}
+  .nearbyLogo069 strong{font-size:.9rem!important}
+  .nearbyCompactTitle069 h1{font-size:.95rem!important}
+  .nearbyCompactTitle069 span{font-size:.48rem!important}
+  .nearbyMapShell069{height:clamp(225px,35vh,310px)!important}
+}

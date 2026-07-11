@@ -2208,6 +2208,7 @@ let nearbySnapTimer069=null;
 let nearbyTouching069=false;
 let nearbyStaticVisibleMiles069=null;
 let nearbyStaticCurrentBounds069=null;
+let nearbyMapPopupSite069="";
 
 function accountId069(s){ return String(s?.externalAccountId||s?.accountId||"").trim(); }
 function phone069(s){ const c=primaryContact477(s); return String(s?.sitePhone||c?.phone||"").trim(); }
@@ -2258,10 +2259,9 @@ function home(){
   html(`<div class="screen nearbyHome069">
     <section class="nearbyTop069"><div class="nearbyLogo069"><img src="assets/favicon.png?v=${BUILD}" alt=""><strong>${fireVaultBrand575()}</strong></div><div class="nearbyTopActions069"><button class="homeBuild069" id="homeBuild069"><i></i>${BUILD}</button><button class="homeSettings069" id="homeSettings069">⚙</button></div></section>
     <section class="nearbyCompactHead069">
-      <div class="nearbyCompactTitle069"><h1>Nearby Accounts</h1><span><i></i>${esc(gpsText)}</span></div>
-      <div class="nearbyCompactActions069"><button class="nearbyViewToggle069" id="nearbyViewToggle069" aria-label="Switch between map and list"><span>${homeNearbyView069==='map'?'⌖':'☷'}</span><b>${homeNearbyView069==='map'?'Map':'List'}</b></button><button class="iconCompact069" id="scanHome069" aria-label="Refresh GPS" ${status==='scanning'?'disabled':''}>↻</button><button class="iconCompact069" id="openDashboard069" aria-label="Open tools">⚒</button></div>
+      <div class="nearbyCompactTitle069"><h1>Nearby Accounts</h1><span><i></i>${esc(gpsText)} <b>• ${nearby} nearby • ${inv.ready} GPS • ${nearbyRadiusMiles()} mi</b></span></div>
+      <div class="nearbyCompactActions069"><button class="nearbyViewToggle069" id="nearbyViewToggle069" aria-label="Switch between map and list"><span>${homeNearbyView069==='map'?'⌖':'☷'}</span><b>${homeNearbyView069==='map'?'Map':'List'}</b></button><button class="iconCompact069" id="scanHome069" aria-label="Refresh GPS" ${status==='scanning'?'disabled':''}>↻</button><button class="iconCompact069" id="radiusHome069" aria-label="Nearby radius settings">◎</button></div>
     </section>
-    <section class="nearbyStatsLine069"><span><b>${nearby}</b> nearby</span><span><b>${inv.ready}</b> GPS</span>${inv.missing?`<span class="warn"><b>${inv.missing}</b> missing</span>`:''}<button id="radiusHome069"><b>${nearbyRadiusMiles()} mi</b> radius</button></section>
     ${status==='error'?`<div class="nearbyNotice069"><strong>Location problem:</strong> ${esc(nearbyScanStatus0652.message)}</div>`:''}
     <section class="nearbyWorkspace069 ${homeNearbyView069}">
       ${homeNearbyView069==='map'?homeNearbyMapShell069():''}
@@ -2275,7 +2275,6 @@ function home(){
   document.getElementById('homeAccounts069').onclick=()=>route('sites');
   document.getElementById('homeToolsNav069').onclick=()=>route('dashboard068');
   document.getElementById('homeSettingsNav069').onclick=()=>route('settings');
-  document.getElementById('openDashboard069').onclick=()=>route('dashboard068');
   document.getElementById('scanHome069').onclick=()=>runNearbyScan0652('home');
   document.getElementById('radiusHome069').onclick=()=>{settingsTab='gps';mode='settingsDetail';route('settings');};
   document.getElementById('nearbyViewToggle069').onclick=()=>{homeNearbyView069=homeNearbyView069==='map'?'list':'map';localStorage.setItem(HOME_NEARBY_VIEW_KEY_069,homeNearbyView069);home();};
@@ -2285,10 +2284,9 @@ function home(){
   document.querySelectorAll('[data-nearby-card069]').forEach(c=>c.onclick=e=>{if(e.target.closest('button'))return;selectNearby069(c.dataset.nearbyCard069,true);});
   const list=document.getElementById('nearbyCards069');
   if(list){
-    list.addEventListener('touchstart',()=>{nearbyTouching069=true;clearTimeout(nearbySnapTimer069);},{passive:true});
-    list.addEventListener('touchend',()=>{nearbyTouching069=false;scheduleNearbySnap069(list,190);},{passive:true});
+    list.addEventListener('touchstart',()=>{nearbyTouching069=true;clearTimeout(nearbySnapTimer069);nearbyMapPopupSite069="";updateNearbyMapSelection069();},{passive:true});
+    list.addEventListener('touchend',()=>{nearbyTouching069=false;},{passive:true});
     list.addEventListener('scroll',()=>syncNearbyScroll069(list),{passive:true});
-    if('onscrollend' in window) list.addEventListener('scrollend',()=>{if(!nearbyTouching069)snapNearbyList069(list);},{passive:true});
   }
   if(rows[0]&&!homeNearbySelected069) homeNearbySelected069=rows[0].s.id;
   if(homeNearbyView069==='map') setTimeout(()=>initNearbyMap069(),60);
@@ -2316,8 +2314,10 @@ function ensureSelectedVisible069(row){
 function updateNearbyMapSelection069(){
   const siteId=homeNearbySelected069;
   document.querySelectorAll('[data-static-marker069]').forEach(m=>m.classList.toggle('selected',m.dataset.staticMarker069===siteId));
-  const row=mapRow069(siteId),popup=document.getElementById('nearbyStaticPopup069');
-  if(!popup){return;}
+  const popup=document.getElementById('nearbyStaticPopup069');
+  if(!popup)return;
+  if(!nearbyMapPopupSite069||nearbyMapPopupSite069!==siteId){popup.hidden=true;return;}
+  const row=mapRow069(siteId);
   if(!row){popup.hidden=true;return;}
   const marker=document.querySelector(`[data-static-marker069="${cssEscape069(siteId)}"]`);
   if(!marker){popup.hidden=true;return;}
@@ -2329,39 +2329,44 @@ function updateNearbyMapSelection069(){
   popup.style.top=Math.max(8,mr.top-sr.top-104)+'px';
   popup.hidden=false;
 }
-function selectNearby069(siteId,fromList=false){
+function selectNearby069(siteId,fromList=false,showPopup=false){
   homeNearbySelected069=siteId;
+  if(fromList||!showPopup) nearbyMapPopupSite069="";
+  else nearbyMapPopupSite069=siteId;
   document.querySelectorAll('[data-nearby-card069]').forEach(c=>c.classList.toggle('selected',c.dataset.nearbyCard069===siteId));
   const row=mapRow069(siteId);
   if(row&&ensureSelectedVisible069(row)){drawStaticNearbyMap069();return;}
   updateNearbyMapSelection069();
 }
-function scheduleNearbySnap069(list,delay=180){
+function scheduleNearbySnap069(list,delay=260){
   clearTimeout(nearbySnapTimer069);
   nearbySnapTimer069=setTimeout(()=>{if(!nearbyTouching069)snapNearbyList069(list);},delay);
 }
 function closestNearbyCard069(list){
   const cards=[...list.querySelectorAll('[data-nearby-card069]')]; if(!cards.length)return null;
-  const top=list.getBoundingClientRect().top+1;
+  const lr=list.getBoundingClientRect(),target=lr.top+3;
+  const covering=cards.find(c=>{const r=c.getBoundingClientRect();return r.top<=target&&r.bottom>target+8;});
+  if(covering)return covering;
   let best=cards[0],dist=Infinity;
-  for(const c of cards){const d=Math.abs(c.getBoundingClientRect().top-top);if(d<dist){dist=d;best=c;}}
+  for(const c of cards){const r=c.getBoundingClientRect();const d=Math.abs(r.top-target);if(d<dist){dist=d;best=c;}}
   return best;
 }
 function syncNearbyScroll069(list){
   if(nearbyScrollLock069) return;
+  nearbyMapPopupSite069="";
   const best=closestNearbyCard069(list); if(!best)return;
-  if(best.dataset.nearbyCard069!==homeNearbySelected069) selectNearby069(best.dataset.nearbyCard069,true);
-  if(!nearbyTouching069) scheduleNearbySnap069(list,180);
+  if(best.dataset.nearbyCard069!==homeNearbySelected069) selectNearby069(best.dataset.nearbyCard069,true,false);
+  scheduleNearbySnap069(list,260);
 }
 function snapNearbyList069(list){
   if(nearbyScrollLock069||nearbyTouching069) return;
   const best=closestNearbyCard069(list); if(!best)return;
   const delta=best.getBoundingClientRect().top-list.getBoundingClientRect().top;
-  if(Math.abs(delta)<2){selectNearby069(best.dataset.nearbyCard069,true);return;}
+  if(Math.abs(delta)<2){selectNearby069(best.dataset.nearbyCard069,true,false);return;}
   nearbyScrollLock069=true;
-  list.scrollTo({top:list.scrollTop+delta,behavior:'smooth'});
-  selectNearby069(best.dataset.nearbyCard069,true);
-  setTimeout(()=>nearbyScrollLock069=false,260);
+  list.scrollTop=list.scrollTop+delta;
+  selectNearby069(best.dataset.nearbyCard069,true,false);
+  setTimeout(()=>nearbyScrollLock069=false,90);
 }
 function staticMapBounds069(visibleMiles){
   const lat=Number(nearbyState?.lat),lng=Number(nearbyState?.lng);
@@ -2404,10 +2409,11 @@ function drawStaticNearbyMap069(){
     });
     overlay.innerHTML=html||'<div class="staticMapMessage069">No mapped accounts are inside the current view.</div>';
     if(count){count.textContent=`${rendered} mapped • ${nearbyStaticVisibleMiles069.toFixed(1)} mi`;count.hidden=false;}
-    overlay.querySelectorAll('[data-static-marker069]').forEach(m=>m.onclick=()=>{
-      const id=m.dataset.staticMarker069; selectNearby069(id,false);
+    overlay.querySelectorAll('[data-static-marker069]').forEach(m=>m.onclick=e=>{
+      e.stopPropagation();
+      const id=m.dataset.staticMarker069; selectNearby069(id,false,true);
       const card=document.querySelector(`[data-nearby-card069="${cssEscape069(id)}"]`);
-      if(card){nearbyScrollLock069=true;const list=document.getElementById('nearbyCards069');if(list){const delta=card.getBoundingClientRect().top-list.getBoundingClientRect().top;list.scrollTo({top:list.scrollTop+delta,behavior:'smooth'});}setTimeout(()=>nearbyScrollLock069=false,320);}
+      if(card){nearbyScrollLock069=true;const list=document.getElementById('nearbyCards069');if(list){const delta=card.getBoundingClientRect().top-list.getBoundingClientRect().top;list.scrollTo({top:list.scrollTop+delta,behavior:'smooth'});}setTimeout(()=>nearbyScrollLock069=false,360);}
     });
     updateNearbyMapSelection069();
   }catch(err){
@@ -2422,7 +2428,9 @@ function initNearbyMap069(){
   const zin=document.getElementById('mapZoomIn069'),zout=document.getElementById('mapZoomOut069'),center=document.getElementById('mapCenter069');
   if(zin)zin.onclick=()=>{nearbyStaticVisibleMiles069=Math.max(.25,(nearbyStaticVisibleMiles069||initialVisibleMiles069(nearbyRows069()))/1.35);drawStaticNearbyMap069();};
   if(zout)zout.onclick=()=>{nearbyStaticVisibleMiles069=Math.min(maxVisibleMiles069(nearbyRows069()),(nearbyStaticVisibleMiles069||initialVisibleMiles069(nearbyRows069()))*1.35);drawStaticNearbyMap069();};
-  if(center)center.onclick=()=>{nearbyStaticVisibleMiles069=initialVisibleMiles069(nearbyRows069());drawStaticNearbyMap069();};
+  if(center)center.onclick=()=>{nearbyMapPopupSite069="";nearbyStaticVisibleMiles069=initialVisibleMiles069(nearbyRows069());drawStaticNearbyMap069();};
+  const shell=document.querySelector('.staticMapShell069');
+  if(shell)shell.onclick=e=>{if(!e.target.closest('[data-static-marker069]')){nearbyMapPopupSite069="";updateNearbyMapSelection069();}};
 }
 
 function sameLocalDay499(iso, day=localDateString()){
@@ -7283,7 +7291,7 @@ function diagnostics(){
 }
 function showChangelog(){
   const notes = [
-    "Build 0.69.4 fixes Nearby marker rendering, starts at a closer useful zoom, compacts the controls above the map, and keeps the map fixed while the account list scrolls.",
+    "Build 0.69.5 hides map details until a marker is tapped, stabilizes momentum list settling, and moves the map closer to the top with a simpler header.",
     "Manual chapters document installation, Today, Sites, Site Detail, field workflow, notes, tasks, deficiencies, photos, GPS, route tracking, reports, email, settings, backups, updates, and troubleshooting.",
     "Added living-documentation revision metadata and a release-state review requirement.",
     "Added Quick Capture for timestamped site notes, follow-up tasks, and deficiencies without leaving Today.",

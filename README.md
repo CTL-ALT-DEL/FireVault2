@@ -1,11 +1,3 @@
-# FireVault Build 0.69.4
+# FireVault Build 0.69.5
 
-Nearby Accounts map reliability and layout repair.
-
-- Fixes GPS-ready account markers by reading the saved site GPS fields directly.
-- Starts the map at a closer radius based on the nearest accounts instead of the full configured radius.
-- Keeps the map centered and non-draggable; only + / - changes the visible distance.
-- Automatically expands the map range when the selected list account is farther away.
-- Compacts GPS status, Map/List, Refresh, Tools, and radius information above the map.
-- Crops external map chrome from the visible map surface.
-- Preserves momentum account scrolling and settles the nearest complete row at the top.
+Focused Nearby Accounts refinement. Map details remain hidden until a marker is tapped, account-list momentum settles on the row where scrolling stops without jumping back to the first row, and the map sits closer to the top under a simplified header.
