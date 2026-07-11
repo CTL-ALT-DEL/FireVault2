@@ -14132,3 +14132,26 @@ nav button.active{background:color-mix(in srgb,var(--accent) 17%,rgba(30,41,59,.
 #fvUpdateBanner072 div{display:grid;gap:2px;min-width:0}#fvUpdateBanner072 strong{font-size:.9rem}#fvUpdateBanner072 span{font-size:.72rem;color:#aeb8c5}#fvUpdateBanner072 button{min-height:42px;border-radius:10px;border:1px solid #465365;background:#202833;color:#fff;font-weight:800;padding:0 13px}#fvUpdateBanner072 #fvUpdateNow072{border-color:#b6232d;background:linear-gradient(145deg,#7e141c,#b9232d)}#fvUpdateBanner072 #fvUpdateLater072{width:42px;padding:0;font-size:1.25rem}
 .updateCenter072{max-width:760px;margin:0 auto}.updateBuild072{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.updateBuild072>div{display:grid;gap:3px;padding:14px;border:1px solid #303a47;border-radius:12px;background:#11171e}.updateBuild072 strong{font-size:1.15rem}.updateBuild072 span{color:#9eabb9;font-size:.75rem}.updateActions072{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}.updateActions072 button{min-height:48px}
 @media(max-width:560px){#fvUpdateBanner072{grid-template-columns:minmax(0,1fr) auto}#fvUpdateBanner072 #fvUpdateLater072{position:absolute;right:5px;top:5px;width:32px;min-height:32px;border:0;background:transparent}.updateBuild072,.updateActions072{grid-template-columns:1fr}}
+
+
+/* Build 0.72.3 — portrait-first operation and darker selected-account state */
+.nearbyAccount069.selected{
+  border-color:#166534!important;
+  border-left-color:#166534!important;
+  background:linear-gradient(145deg,rgba(6,48,25,.98),rgba(9,28,19,.98) 60%)!important;
+  box-shadow:0 0 0 1px rgba(22,101,52,.9),0 6px 18px rgba(0,0,0,.3)!important;
+}
+.nearbyAccount069.selected .nearbyNumber069{
+  background:#14532d!important;
+  color:#f0fdf4!important;
+  box-shadow:0 0 0 1px rgba(134,239,172,.45)!important;
+}
+.nearbyAccount069.selected .nearbyPin069,
+.nearbyAccount069.selected .nearbyDistance069{color:#86efac!important}
+.staticMarker069.selected{
+  background:#166534!important;
+  color:#fff!important;
+  border-color:#dcfce7!important;
+  box-shadow:0 0 0 4px rgba(22,101,52,.34),0 5px 14px rgba(0,0,0,.55)!important;
+}
+.staticMarker069.selected span{color:#fff!important}

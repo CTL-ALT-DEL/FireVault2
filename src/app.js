@@ -2,6 +2,8 @@ import { BUILD, KEY, ACTIVE_JOB_KEY, loadData, saveData, ensureSite, fullAddress
 window.__FIREVAULT_MODULE_READY = true;
 
 let data = loadData();
+const splashStatus0723=document.getElementById("splashStatus072");
+if(splashStatus0723) splashStatus0723.textContent=`Database verified • ${Array.isArray(data?.sites)?data.sites.length:0} accounts loaded`;
 let view = new URLSearchParams(location.search).get("route") || data.settings.app?.defaultScreen || "home";
 let selectedSiteId = null;
 let mode = null;

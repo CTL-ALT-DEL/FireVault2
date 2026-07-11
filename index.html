@@ -8,14 +8,14 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black" />
   <meta name="apple-mobile-web-app-title" content="FireVault" />
   <title>FireVault</title>
-  <link rel="manifest" href="manifest.json?v=0.72.2" />
-  <link rel="apple-touch-icon" href="assets/apple-touch-icon.png?v=0.72.2" />
-  <link rel="icon" type="image/png" href="assets/favicon.png?v=0.72.2" />
-  <link rel="stylesheet" href="src/styles.css?v=0.72.2" />
+  <link rel="manifest" href="manifest.json?v=0.72.3" />
+  <link rel="apple-touch-icon" href="assets/apple-touch-icon.png?v=0.72.3" />
+  <link rel="icon" type="image/png" href="assets/favicon.png?v=0.72.3" />
+  <link rel="stylesheet" href="src/styles.css?v=0.72.3" />
 </head>
 <body class="app-loading533">
   <header id="appHeader" class="appHeader537" style="display:none">
-    <div class="brand"><img class="brandMark" src="assets/favicon.png?v=0.72.2" alt=""><div><div class="fireVaultWordmark575"><span>FIRE</span><b>VAULT</b></div><small>Field Vault System</small></div></div>
+    <div class="brand"><img class="brandMark" src="assets/favicon.png?v=0.72.3" alt=""><div><div class="fireVaultWordmark575"><span>FIRE</span><b>VAULT</b></div><small>Field Vault System</small></div></div>
     <div class="globalToday071" id="globalToday071" aria-label="Today"></div>
   </header>
 
@@ -24,14 +24,14 @@
       <div class="splashAura492"></div>
       <div class="splashOrb457 splashOrb492">
         <span class="splashRing492"></span>
-        <img src="assets/favicon.png?v=0.72.2" alt="FireVault">
+        <img src="assets/favicon.png?v=0.72.3" alt="FireVault">
       </div>
       <div class="splashText457 splashText492">
         <h1 class="fireVaultWordmark575"><span>FIRE</span><b>VAULT</b></h1>
-        <p id="splashStatus072">Checking for updates…</p>
+        <p id="splashStatus072">Checking database…</p>
       </div>
       <div class="splashMeter457 splashMeter492"><span></span></div>
-      <small class="splashBuild492">0.72.2</small>
+      <small class="splashBuild492">0.72.3</small>
     </div>
   </main>
 
@@ -67,7 +67,7 @@
   </script>
 
   <script>
-    window.FIREVAULT_BUILD = "0.72.2";
+    window.FIREVAULT_BUILD = "0.72.3";
     window.FIREVAULT_UPDATE = { registration:null, waiting:null, checking:false };
     window.fireVaultCheckForUpdates = async function(options){
       options = options || {};
@@ -101,28 +101,48 @@
       if ("serviceWorker" in navigator) { const regs=await navigator.serviceWorker.getRegistrations(); await Promise.all(regs.map(r=>r.update())); }
       return true;
     };
+    window.fireVaultLockPortrait0723 = async function(){
+      try {
+        if (screen.orientation && typeof screen.orientation.lock === "function") {
+          await screen.orientation.lock("portrait-primary");
+          return true;
+        }
+      } catch(e) {}
+      return false;
+    };
+    ["pageshow","focus"].forEach(function(name){ window.addEventListener(name,function(){ window.fireVaultLockPortrait0723(); }); });
+    document.addEventListener("visibilitychange",function(){ if(!document.hidden) window.fireVaultLockPortrait0723(); });
+    document.addEventListener("pointerdown",function portraitFirstGesture0723(){ window.fireVaultLockPortrait0723(); document.removeEventListener("pointerdown",portraitFirstGesture0723); },{once:true});
+    window.fireVaultLockPortrait0723();
     if ("serviceWorker" in navigator) {
       let refreshing=false;
       navigator.serviceWorker.addEventListener("controllerchange", function(){
         if (refreshing) return; refreshing=true; location.reload();
       });
       window.addEventListener("load", async function(){
+        const status=document.getElementById("splashStatus072");
+        if(status) status.textContent="Database checked • Getting latest version…";
         try {
-          const reg=await navigator.serviceWorker.register("sw.js?v=0.72.2", {scope:"./", updateViaCache:"none"});
+          await window.fireVaultLockPortrait0723();
+          const reg=await navigator.serviceWorker.register("sw.js?v=0.72.3", {scope:"./", updateViaCache:"none"});
           window.FIREVAULT_UPDATE.registration=reg;
-          if (reg.waiting) window.fireVaultShowUpdate(reg.waiting,"0.72.2");
+          if (reg.waiting) window.fireVaultShowUpdate(reg.waiting,"0.72.3");
           reg.addEventListener("updatefound", function(){
             const worker=reg.installing; if(!worker)return;
             worker.addEventListener("statechange", function(){
               if(worker.state==="installed" && navigator.serviceWorker.controller) window.fireVaultShowUpdate(worker,"latest");
             });
           });
-          setTimeout(function(){ window.fireVaultCheckForUpdates({reloadWhenNew:false}).catch(function(){}); },1500);
-          const status=document.getElementById("splashStatus072"); if(status) status.textContent="Build 0.72.2 • Ready";
-        } catch(e) { const status=document.getElementById("splashStatus072"); if(status) status.textContent="Offline-ready mode"; }
+          try {
+            await window.fireVaultCheckForUpdates({reloadWhenNew:false});
+            if(status) status.textContent="Database ready • Latest version checked";
+          } catch(updateError) {
+            if(status) status.textContent="Database ready • Offline-ready mode";
+          }
+        } catch(e) { if(status) status.textContent="Database ready • Offline-ready mode"; }
       });
     }
   </script>
-  <script type="module" src="src/app.js?v=0.72.2"></script>
+  <script type="module" src="src/app.js?v=0.72.3"></script>
 </body>
 </html>
