@@ -656,7 +656,7 @@ function mapRouteUrl071(s){
 function updateGlobalToday071(){
   const el=document.getElementById('globalToday071'); if(!el)return;
   const now=new Date();
-  el.innerHTML=`<strong>TODAY</strong><span>${esc(now.toLocaleDateString(undefined,{weekday:'long'}))}</span><b>${esc(now.toLocaleDateString(undefined,{month:'short',day:'numeric'}))}</b>`;
+  el.innerHTML=`<span>${esc(now.toLocaleDateString(undefined,{weekday:'long'}))}</span><b>${esc(now.toLocaleDateString(undefined,{month:'long',day:'numeric'}))}</b>`;
 }
 function ensureAllPlusCodes071(){
   let changed=false;
@@ -1660,7 +1660,7 @@ function returnFromContextualHelp060(){
   view=back.view; mode=back.mode; settingsTab=back.settingsTab; selectedSiteId=back.selectedSiteId; render();
 }
 function injectContextualHelp060(){
-  /* Build 0.71.0: the floating blue Help circle is retired. Help remains available in Settings → Data, Sync & Support → FireVault Academy. */
+  /* Build 0.71.1: the floating blue Help circle is retired. Help remains available in Settings → Data, Sync & Support → FireVault Academy. */
   document.getElementById("contextHelp060")?.remove();
 }
 function render(){
@@ -2325,8 +2325,8 @@ function phone069(s){ const c=primaryContact477(s); return String(s?.sitePhone||
 function todayHeader070(){
   const now=new Date();
   const day=now.toLocaleDateString(undefined,{weekday:"long"});
-  const date=now.toLocaleDateString(undefined,{month:"short",day:"numeric"});
-  return `<div class="nearbyToday070"><strong>TODAY</strong><span>${esc(day)}</span><b>${esc(date)}</b></div>`;
+  const date=now.toLocaleDateString(undefined,{month:"long",day:"numeric"});
+  return `<div class="nearbyToday070"><span>${esc(day)}</span><b>${esc(date)}</b></div>`;
 }
 function cssEscape069(value){
   const raw=String(value??"");
@@ -2352,13 +2352,11 @@ function nearbySummary069(){
   return {inv,allRows,rows,nearby:rows.length};
 }
 function nearbyAccountCard069(r,index){
-  const s=r.s,id=accountId069(s),phone=phone069(s),category=accountCategory070(s);
+  const s=r.s,id=accountId069(s),category=accountCategory070(s),plus=sitePlusCode071(s);
   return `<article class="nearbyAccount069 category-${category} ${homeNearbySelected069===s.id?'selected':''}" data-nearby-card069="${esc(s.id)}" data-nearby-index069="${index}" data-nearby-category070="${category}">
     <span class="nearbyNumber069">${index+1}</span>
-    <span class="nearbyPin069">●</span>
-    <div class="nearbyInfo069"><strong>${esc(s.name||'Unnamed Account')}</strong><div>${id?`<b>${esc(id)}</b><i>•</i>`:''}<span>${esc(fullAddress(s)||'No address saved')}</span></div></div>
+    <div class="nearbyInfo069"><strong>${esc(s.name||'Unnamed Account')}</strong><div>${id?`<b>${esc(id)}</b><i>•</i>`:''}<span>${esc(fullAddress(s)||'No address saved')}</span></div>${plus?`<small>${esc(NEARBY_CATEGORY_META_070[category]?.label||'Basic')} · ${esc(plus)}</small>`:''}</div>
     <span class="nearbyDistance069">${esc(distanceLabel(r.meters))}<i class="gpsDot069"></i></span>
-    <div class="nearbyActions069"><button aria-label="Open account" title="Open" data-nearby-open069="${esc(s.id)}">▣ <span>Open</span></button><button aria-label="Route to account" title="Route" data-nearby-route069="${esc(s.id)}">➤</button><button aria-label="Call account" title="Call" data-nearby-call069="${esc(s.id)}" ${phone?'':'disabled'}>☎</button></div>
   </article>`;
 }
 function homeNearbyMapShell069(){
@@ -2367,6 +2365,10 @@ function homeNearbyMapShell069(){
     <div id="nearbyStaticOverlay069" class="nearbyStaticOverlay069"></div>
     <div id="nearbyStaticPopup069" class="nearbyStaticPopup069" hidden></div>
     <div id="nearbyMapCount069" class="nearbyMapCount069" hidden></div>
+    <div id="nearbyMapActions0711" class="nearbyMapActions0711" hidden>
+      <button id="nearbyMapRoute0711" aria-label="Route to selected account"><span>➤</span><b>Route</b></button>
+      <button id="nearbyMapCall0711" aria-label="Call selected account"><span>☎</span><b>Call</b></button>
+    </div>
   </div>`;
 }
 function setHomeChrome069(hidden){
@@ -2413,9 +2415,11 @@ function home(){
     nearbyStaticCenter069=null;
     home();
   };
-  document.querySelectorAll('[data-nearby-open069]').forEach(b=>b.onclick=e=>{e.stopPropagation();selectedSiteId=b.dataset.nearbyOpen069;route('siteDetail');});
-  document.querySelectorAll('[data-nearby-route069]').forEach(b=>b.onclick=e=>{e.stopPropagation();const s=(data.sites||[]).find(x=>x.id===b.dataset.nearbyRoute069);if(s) window.open(mapRouteUrl071(s),'_blank');});
   document.querySelectorAll('[data-nearby-call069]').forEach(b=>b.onclick=e=>{e.stopPropagation();const s=(data.sites||[]).find(x=>x.id===b.dataset.nearbyCall069);const ph=phone069(s);if(ph) location.href=`tel:${ph.replace(/[^+\\d]/g,'')}`;});
+  const mapRoute0711=document.getElementById('nearbyMapRoute0711');
+  if(mapRoute0711) mapRoute0711.onclick=e=>{e.stopPropagation();const row=mapRow069(homeNearbySelected069);if(row)window.open(mapRouteUrl071(row.s),'_blank');};
+  const mapCall0711=document.getElementById('nearbyMapCall0711');
+  if(mapCall0711) mapCall0711.onclick=e=>{e.stopPropagation();const row=mapRow069(homeNearbySelected069),ph=phone069(row?.s);if(ph)location.href=`tel:${ph.replace(/[^+\d]/g,'')}`;};
   document.querySelectorAll('[data-nearby-card069]').forEach(c=>c.onclick=e=>{
     if(e.target.closest('button'))return;
     nearbyScrollActivated069=false;
@@ -2521,6 +2525,14 @@ function ensureSelectedVisible069(row){
 }
 function updateNearbyMapSelection069(){
   const siteId=homeNearbySelected069;
+  const actions=document.getElementById('nearbyMapActions0711');
+  if(actions){
+    const row=mapRow069(siteId),ph=phone069(row?.s);
+    const active=Boolean(row&&nearbyStreetFocusSite069===siteId);
+    actions.hidden=!active;
+    const call=document.getElementById('nearbyMapCall0711');
+    if(call)call.disabled=!ph;
+  }
   document.querySelectorAll('[data-static-marker069]').forEach(m=>m.classList.toggle('selected',m.dataset.staticMarker069===siteId));
   const popup=document.getElementById('nearbyStaticPopup069');
   if(!popup)return;
@@ -7542,7 +7554,7 @@ function diagnostics(){
 }
 function showChangelog(){
   const notes = [
-    "Build 0.71.0 simplifies the Nearby header, replaces the build/settings controls with today’s day and date, removes floating Help and map controls, and adds color-coded Basic, CLSS, AlarmNet, and IPDACT filtering based on Account ID.",
+    "Build 0.71.1 simplifies the Nearby header, replaces the build/settings controls with today’s day and date, removes floating Help and map controls, and adds color-coded Basic, CLSS, AlarmNet, and IPDACT filtering based on Account ID.",
     "Build 0.69.9 enlarges Nearby Open, Route, and Call controls, changes selected accounts to a glowing green treatment, extends the account list to 25 miles, and adapts the overview radius to the selected account distance.",
     "Build 0.69.8 makes Nearby list taps select the tapped account reliably, zooms the map to street level around that account, and forces all account markers to render as true circles.",
     "Build 0.69.6 hides map details until a marker is tapped, stabilizes momentum list settling, and moves the map closer to the top with a simpler header.",
