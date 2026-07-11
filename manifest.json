@@ -8,7 +8,7 @@
   "orientation": "any",
   "background_color": "#0b0d10",
   "theme_color": "#101216",
-  "description": "Field knowledge system for fire alarm technicians. Build 0.69.6 fixes Nearby account marker rendering, tightens initial map zoom, removes map-brand clutter, and compacts the controls above the map.",
+  "description": "Field knowledge system for fire alarm technicians. Build 0.69.7 fixes Nearby account marker rendering, tightens initial map zoom, removes map-brand clutter, and compacts the controls above the map.",
   "icons": [
     {
       "src": "assets/icon-192.png",
@@ -49,5 +49,5 @@
       "description": "Open FireVault settings"
     }
   ],
-  "version": "0.69.6"
+  "version": "0.69.7"
 }

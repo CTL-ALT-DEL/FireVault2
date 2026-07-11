@@ -2209,6 +2209,7 @@ let nearbyTouching069=false;
 let nearbyStaticVisibleMiles069=null;
 let nearbyStaticCurrentBounds069=null;
 let nearbyMapPopupSite069="";
+let nearbyScrollActivated069=false;
 
 function accountId069(s){ return String(s?.externalAccountId||s?.accountId||"").trim(); }
 function phone069(s){ const c=primaryContact477(s); return String(s?.sitePhone||c?.phone||"").trim(); }
@@ -2284,10 +2285,13 @@ function home(){
   document.querySelectorAll('[data-nearby-card069]').forEach(c=>c.onclick=e=>{if(e.target.closest('button'))return;selectNearby069(c.dataset.nearbyCard069,true);});
   const list=document.getElementById('nearbyCards069');
   if(list){
-    list.addEventListener('touchstart',()=>{nearbyTouching069=true;clearTimeout(nearbySnapTimer069);nearbyMapPopupSite069="";updateNearbyMapSelection069();},{passive:true});
-    list.addEventListener('touchend',()=>{nearbyTouching069=false;},{passive:true});
+    nearbyScrollActivated069=false;
+    list.scrollTop=0;
+    list.addEventListener('touchstart',()=>{nearbyScrollActivated069=true;nearbyTouching069=true;clearTimeout(nearbySnapTimer069);nearbyMapPopupSite069="";updateNearbyMapSelection069();},{passive:true});
+    list.addEventListener('touchend',()=>{nearbyTouching069=false;scheduleNearbySnap069(list,260);},{passive:true});
+    list.addEventListener('wheel',()=>{nearbyScrollActivated069=true;clearTimeout(nearbySnapTimer069);},{passive:true});
     list.addEventListener('scroll',()=>syncNearbyScroll069(list),{passive:true});
-    requestAnimationFrame(()=>prepareNearbyScrollTail069(list));
+    requestAnimationFrame(()=>{prepareNearbyScrollTail069(list);list.scrollTop=0;});
     window.addEventListener('resize',()=>prepareNearbyScrollTail069(list),{once:true});
   }
   if(rows[0]&&!homeNearbySelected069) homeNearbySelected069=rows[0].s.id;
@@ -2344,19 +2348,25 @@ function scheduleNearbySnap069(list,delay=180){
   clearTimeout(nearbySnapTimer069);
   nearbySnapTimer069=setTimeout(()=>{if(!nearbyTouching069)settleNearbyList069(list);},delay);
 }
+function nearbyCardTop069(list,card){
+  if(!list||!card)return 0;
+  const lr=list.getBoundingClientRect(),cr=card.getBoundingClientRect();
+  return Math.max(0,list.scrollTop+(cr.top-lr.top));
+}
 function closestNearbyCard069(list){
   const cards=[...list.querySelectorAll('[data-nearby-card069]')];
   if(!cards.length)return null;
-  const top=list.scrollTop;
+  const lr=list.getBoundingClientRect();
   let best=cards[0],dist=Infinity;
   for(const c of cards){
-    const d=Math.abs(c.offsetTop-top);
+    const cr=c.getBoundingClientRect();
+    const d=Math.abs(cr.top-lr.top);
     if(d<dist){dist=d;best=c;}
   }
   return best;
 }
 function syncNearbyScroll069(list){
-  if(nearbyScrollLock069) return;
+  if(nearbyScrollLock069||!nearbyScrollActivated069) return;
   nearbyMapPopupSite069="";
   const best=closestNearbyCard069(list);
   if(best&&best.dataset.nearbyCard069!==homeNearbySelected069){
@@ -2364,20 +2374,22 @@ function syncNearbyScroll069(list){
     document.querySelectorAll('[data-nearby-card069]').forEach(c=>c.classList.toggle('selected',c===best));
     updateNearbyMapSelection069();
   }
-  scheduleNearbySnap069(list,180);
+  scheduleNearbySnap069(list,230);
 }
 function settleNearbyList069(list){
-  if(nearbyScrollLock069||nearbyTouching069) return;
+  if(nearbyScrollLock069||nearbyTouching069||!nearbyScrollActivated069) return;
   const best=closestNearbyCard069(list); if(!best)return;
-  const target=Math.max(0,best.offsetTop);
-  if(Math.abs(list.scrollTop-target)<2){
+  const target=nearbyCardTop069(list,best);
+  const maxTop=Math.max(0,list.scrollHeight-list.clientHeight);
+  const safeTarget=Math.min(maxTop,target);
+  if(Math.abs(list.scrollTop-safeTarget)<2){
     selectNearby069(best.dataset.nearbyCard069,true,false);
     return;
   }
   nearbyScrollLock069=true;
-  list.scrollTo({top:target,behavior:'smooth'});
   selectNearby069(best.dataset.nearbyCard069,true,false);
-  setTimeout(()=>nearbyScrollLock069=false,260);
+  list.scrollTo({top:safeTarget,behavior:'smooth'});
+  setTimeout(()=>nearbyScrollLock069=false,320);
 }
 function prepareNearbyScrollTail069(list){
   if(!list)return;
@@ -2437,7 +2449,7 @@ function drawStaticNearbyMap069(){
       e.stopPropagation();
       const id=m.dataset.staticMarker069; selectNearby069(id,false,true);
       const card=document.querySelector(`[data-nearby-card069="${cssEscape069(id)}"]`);
-      if(card){nearbyScrollLock069=true;const list=document.getElementById('nearbyCards069');if(list){prepareNearbyScrollTail069(list);list.scrollTo({top:card.offsetTop,behavior:'smooth'});}setTimeout(()=>nearbyScrollLock069=false,360);}
+      if(card){nearbyScrollLock069=true;const list=document.getElementById('nearbyCards069');if(list){prepareNearbyScrollTail069(list);const target=Math.min(Math.max(0,list.scrollHeight-list.clientHeight),nearbyCardTop069(list,card));list.scrollTo({top:target,behavior:'smooth'});}setTimeout(()=>nearbyScrollLock069=false,380);}
     });
     updateNearbyMapSelection069();
   }catch(err){
@@ -7315,6 +7327,7 @@ function diagnostics(){
 }
 function showChangelog(){
   const notes = [
+    "Build 0.69.7 completes the Nearby interaction audit with corrected row positioning, stable two-way wheel scrolling, and high-contrast selected account markers.",
     "Build 0.69.6 hides map details until a marker is tapped, stabilizes momentum list settling, and moves the map closer to the top with a simpler header.",
     "Manual chapters document installation, Today, Sites, Site Detail, field workflow, notes, tasks, deficiencies, photos, GPS, route tracking, reports, email, settings, backups, updates, and troubleshooting.",
     "Added living-documentation revision metadata and a release-state review requirement.",

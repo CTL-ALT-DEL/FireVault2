@@ -1,3 +1,3 @@
-# FireVault Build 0.69.6
+# FireVault Build 0.69.7
 
-Focused Nearby Accounts refinement. Map details remain hidden until a marker is tapped, account-list momentum settles on the row where scrolling stops without jumping back to the first row, and the map sits closer to the top under a simplified header.
+Deep Nearby Accounts interaction audit: corrected scroll-coordinate math, stable wheel scrolling in both directions, no forced jump to the first or last account, and high-contrast gold selected markers and rows.
