@@ -8,7 +8,7 @@
   "orientation": "any",
   "background_color": "#0b0d10",
   "theme_color": "#101216",
-  "description": "Field knowledge system for fire alarm technicians. Build 0.69.0 redesigns Account View, consolidates Settings into five folders, and simplifies FireVault Academy.",
+  "description": "Field knowledge system for fire alarm technicians. Build 0.69.1 repairs Nearby map rendering, GPS refresh, static map controls, and scroll-linked account selection.",
   "icons": [
     {
       "src": "assets/icon-192.png",
@@ -49,5 +49,5 @@
       "description": "Open FireVault settings"
     }
   ],
-  "version": "0.69.0"
+  "version": "0.69.1"
 }

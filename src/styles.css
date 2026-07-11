@@ -13316,3 +13316,16 @@ nav button.active{background:color-mix(in srgb,var(--accent) 17%,rgba(30,41,59,.
 .nearbyBottomNav069{position:absolute;left:0;right:0;bottom:0;z-index:900;display:grid;grid-template-columns:repeat(4,1fr);gap:4px;padding:7px 10px calc(8px + env(safe-area-inset-bottom));border-top:1px solid #29323d;background:rgba(9,13,18,.97);backdrop-filter:blur(18px)}.nearbyBottomNav069 button{display:flex;flex-direction:column;align-items:center;gap:2px;min-height:48px;padding:5px;border:0;border-radius:10px;background:transparent;color:#98a3b0;font-size:.95rem}.nearbyBottomNav069 button span{font-size:.58rem}.nearbyBottomNav069 button.active{background:linear-gradient(145deg,#651117,#a71c24);color:#fff}
 @media(max-width:500px){.nearbyHome069{gap:6px;padding-left:8px!important;padding-right:8px!important}.nearbyTop069{min-height:44px}.nearbyLogo069 img{width:36px;height:36px}.nearbyLogo069 strong{font-size:1.05rem}.nearbyTitleRow069 h1{font-size:1.15rem}.nearbyTitleRow069>div:last-child button{padding:6px 8px;font-size:.65rem}.nearbyStats069>div,.nearbyStats069>button{min-height:52px}.nearbyMapShell069{height:clamp(180px,28vh,260px)}.nearbyAccount069{grid-template-columns:24px 16px minmax(0,1fr) auto auto;gap:5px;min-height:54px;padding:6px}.nearbyNumber069{width:24px;height:28px;font-size:.64rem}.nearbyPin069{font-size:.85rem}.nearbyInfo069>strong{font-size:.7rem}.nearbyInfo069>div{font-size:.56rem}.nearbyDistance069{font-size:.59rem}.nearbyActions069 button{height:31px;min-width:31px;padding:0 6px}.nearbyActions069 button span{display:none}}
 @media(min-width:760px){.nearbyHome069{padding-left:max(18px,calc((100vw - 1100px)/2))!important;padding-right:max(18px,calc((100vw - 1100px)/2))!important}.nearbyMapShell069{height:clamp(250px,36vh,420px)}.nearbyAccount069{grid-template-columns:34px 22px minmax(0,1fr) 70px 180px}.nearbyActions069 button{min-width:42px}.nearbyActions069 button:first-child{min-width:82px}}
+
+/* Build 0.69.1 Nearby map and list interaction repair */
+.nearbyViewBar069{display:flex;justify-content:flex-end;align-items:center;min-height:34px}
+.nearbyViewToggle069{display:flex;align-items:center;justify-content:center;gap:7px;width:auto;min-width:104px;height:34px;padding:0 12px;border:1px solid #394451;border-radius:999px;background:#161d25;color:#fff;font-weight:800;box-shadow:none}
+.nearbyViewToggle069 span{color:#f13a43}.nearbyViewToggle069 i{color:#7f8a98;font-style:normal;font-size:.72rem}
+.nearbyCards069{scroll-snap-type:y mandatory;scroll-padding-top:1px}
+.nearbyAccount069{scroll-snap-align:start;scroll-snap-stop:always}
+.nearbyMap069,.nearbyMap069 .leaflet-container{touch-action:none!important}
+.nearbyMap069 .leaflet-marker-pane,.nearbyMap069 .leaflet-popup-pane{z-index:650!important}
+.nearbyMap069 .leaflet-control-zoom{border:1px solid #3d4855!important;border-radius:10px!important;overflow:hidden;box-shadow:0 4px 14px rgba(0,0,0,.32)!important}
+.nearbyMap069 .leaflet-control-zoom a{background:#111821!important;color:#fff!important;border-color:#303a46!important}
+.nearbyMap069 .leaflet-control-attribution{display:none!important}
+@media(max-width:500px){.nearbyViewBar069{min-height:30px}.nearbyViewToggle069{min-width:92px;height:30px;padding:0 10px;font-size:.68rem}.nearbyWorkspace069{gap:5px!important}.nearbyMapShell069{height:clamp(190px,30vh,270px)}}

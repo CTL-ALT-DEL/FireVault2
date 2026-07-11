@@ -2206,6 +2206,8 @@ let homeNearbySelected069="";
 let nearbyMap069=null;
 let nearbyMarkers069=new Map();
 let nearbyScrollLock069=false;
+let nearbySnapTimer069=null;
+let nearbyLeafletPromise069=null;
 
 function accountId069(s){ return String(s?.externalAccountId||s?.accountId||"").trim(); }
 function phone069(s){ const c=primaryContact477(s); return String(s?.sitePhone||c?.phone||"").trim(); }
@@ -2243,7 +2245,7 @@ function home(){
   html(`<div class="screen nearbyHome069">
     <section class="nearbyTop069"><div class="nearbyLogo069"><img src="assets/favicon.png?v=${BUILD}" alt=""><strong>${fireVaultBrand575()}</strong></div><div class="nearbyTopActions069"><button class="homeBuild069" id="homeBuild069"><i></i>${BUILD}</button><button class="homeSettings069" id="homeSettings069">⚙</button></div></section>
     <section class="nearbyTitleRow069"><div><span><i></i>Live GPS ${nearbyState?'• Updated '+new Date(nearbyState.at).toLocaleTimeString([], {hour:'numeric',minute:'2-digit'}):'• Not scanned'}</span><h1>Nearby Accounts</h1></div><div><button class="ghost" id="openDashboard069">▦ Tools</button><button class="primary" id="scanHome069" ${status==='scanning'?'disabled':''}>↻ ${status==='scanning'?'Scanning…':'Refresh'}</button></div></section>
-    <div class="nearbyToggle069"><button class="${homeNearbyView069==='map'?'active':''}" data-nearby-view069="map">⌖ Map</button><button class="${homeNearbyView069==='list'?'active':''}" data-nearby-view069="list">☷ List</button></div>
+    <div class="nearbyViewBar069"><button class="nearbyViewToggle069" id="nearbyViewToggle069" aria-label="Switch between map and list"><span>${homeNearbyView069==='map'?'⌖':'☷'}</span><b>${homeNearbyView069==='map'?'Map':'List'}</b><i>⇄</i></button></div>
     <section class="nearbyStats069"><div><b>${nearby}</b><span>Nearby</span></div><div><b>${inv.ready}</b><span>GPS Ready</span></div><div><b>${inv.missing}</b><span>Missing GPS</span></div><button id="radiusHome069"><b>${nearbyRadiusMiles()}</b><span>mi Radius</span></button></section>
     ${status==='error'?`<div class="nearbyNotice069"><strong>Location problem:</strong> ${esc(nearbyScanStatus0652.message)}</div>`:''}
     <section class="nearbyWorkspace069 ${homeNearbyView069}">
@@ -2261,28 +2263,55 @@ function home(){
   document.getElementById('openDashboard069').onclick=()=>route('dashboard068');
   document.getElementById('scanHome069').onclick=()=>runNearbyScan0652('home');
   document.getElementById('radiusHome069').onclick=()=>{settingsTab='gps';mode='settingsDetail';route('settings');};
-  document.querySelectorAll('[data-nearby-view069]').forEach(b=>b.onclick=()=>{homeNearbyView069=b.dataset.nearbyView069;localStorage.setItem(HOME_NEARBY_VIEW_KEY_069,homeNearbyView069);home();});
+  document.getElementById('nearbyViewToggle069').onclick=()=>{homeNearbyView069=homeNearbyView069==='map'?'list':'map';localStorage.setItem(HOME_NEARBY_VIEW_KEY_069,homeNearbyView069);home();};
   document.querySelectorAll('[data-nearby-open069]').forEach(b=>b.onclick=e=>{e.stopPropagation();selectedSiteId=b.dataset.nearbyOpen069;route('siteDetail');});
   document.querySelectorAll('[data-nearby-route069]').forEach(b=>b.onclick=e=>{e.stopPropagation();const s=(data.sites||[]).find(x=>x.id===b.dataset.nearbyRoute069);if(s) window.open(mapUrl(s,data.settings.gps?.mapProvider||'apple'),'_blank');});
   document.querySelectorAll('[data-nearby-call069]').forEach(b=>b.onclick=e=>{e.stopPropagation();const s=(data.sites||[]).find(x=>x.id===b.dataset.nearbyCall069);const ph=phone069(s);if(ph) location.href=`tel:${ph.replace(/[^+\\d]/g,'')}`;});
   document.querySelectorAll('[data-nearby-card069]').forEach(c=>c.onclick=e=>{if(e.target.closest('button'))return;selectNearby069(c.dataset.nearbyCard069,true);});
-  const list=document.getElementById('nearbyCards069'); if(list) list.addEventListener('scroll',()=>syncNearbyScroll069(list),{passive:true});
-  if(homeNearbyView069==='map') setTimeout(initNearbyMap069,80);
+  const list=document.getElementById('nearbyCards069'); if(list){ list.addEventListener('scroll',()=>syncNearbyScroll069(list),{passive:true}); list.addEventListener('scrollend',()=>snapNearbyList069(list),{passive:true}); }
+  if(homeNearbyView069==='map') setTimeout(()=>ensureLeaflet069().then(initNearbyMap069).catch(()=>document.getElementById('nearbyMapFallback069')?.classList.add('show')),80);
   if(rows[0]&&!homeNearbySelected069) homeNearbySelected069=rows[0].s.id;
 }
 function selectNearby069(siteId,fromList=false){
   homeNearbySelected069=siteId;
   document.querySelectorAll('[data-nearby-card069]').forEach(c=>c.classList.toggle('selected',c.dataset.nearbyCard069===siteId));
-  const marker=nearbyMarkers069.get(siteId);
-  if(marker&&nearbyMap069){ marker.openPopup(); if(!fromList) nearbyMap069.panTo(marker.getLatLng(),{animate:true}); }
+  nearbyMarkers069.forEach((entry,id)=>{ try{ entry.marker.setIcon(markerIcon069(entry.index,id===siteId)); }catch{} });
+  const entry=nearbyMarkers069.get(siteId);
+  if(entry&&nearbyMap069){ entry.marker.openPopup(); }
 }
 function syncNearbyScroll069(list){
   if(nearbyScrollLock069) return;
   const cards=[...list.querySelectorAll('[data-nearby-card069]')]; if(!cards.length)return;
-  const top=list.getBoundingClientRect().top+4;
+  const top=list.getBoundingClientRect().top+1;
   let best=cards[0],dist=Infinity;
   for(const c of cards){const d=Math.abs(c.getBoundingClientRect().top-top);if(d<dist){dist=d;best=c;}}
   if(best.dataset.nearbyCard069!==homeNearbySelected069) selectNearby069(best.dataset.nearbyCard069,true);
+  clearTimeout(nearbySnapTimer069);
+  nearbySnapTimer069=setTimeout(()=>snapNearbyList069(list),120);
+}
+function snapNearbyList069(list){
+  if(nearbyScrollLock069) return;
+  const cards=[...list.querySelectorAll('[data-nearby-card069]')]; if(!cards.length)return;
+  const top=list.getBoundingClientRect().top;
+  let best=cards[0],dist=Infinity;
+  for(const c of cards){const d=Math.abs(c.getBoundingClientRect().top-top);if(d<dist){dist=d;best=c;}}
+  nearbyScrollLock069=true;
+  list.scrollTo({top:best.offsetTop-list.offsetTop,behavior:'smooth'});
+  selectNearby069(best.dataset.nearbyCard069,true);
+  setTimeout(()=>nearbyScrollLock069=false,260);
+}
+function ensureLeaflet069(){
+  if(window.L) return Promise.resolve(window.L);
+  if(nearbyLeafletPromise069) return nearbyLeafletPromise069;
+  nearbyLeafletPromise069=new Promise((resolve,reject)=>{
+    if(!document.querySelector('link[data-leaflet069]')){
+      const css=document.createElement('link');css.rel='stylesheet';css.href='https://unpkg.com/leaflet@1.9.4/dist/leaflet.css';css.dataset.leaflet069='1';document.head.appendChild(css);
+    }
+    const existing=document.querySelector('script[data-leaflet069]');
+    if(existing){existing.addEventListener('load',()=>window.L?resolve(window.L):reject(new Error('Leaflet unavailable')), {once:true});existing.addEventListener('error',reject,{once:true});return;}
+    const script=document.createElement('script');script.src='https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';script.dataset.leaflet069='1';script.onload=()=>window.L?resolve(window.L):reject(new Error('Leaflet unavailable'));script.onerror=reject;document.head.appendChild(script);
+  });
+  return nearbyLeafletPromise069;
 }
 function markerIcon069(index,selected=false){
   return L.divIcon({className:'nearbyMarkerWrap069',html:`<span class="nearbyMarker069 ${selected?'selected':''}" data-label="${index+1}"></span>`,iconSize:[34,42],iconAnchor:[17,40],popupAnchor:[0,-38]});
@@ -2293,7 +2322,7 @@ function initNearbyMap069(){
   if(!window.L || !nearbyState){ document.getElementById('nearbyMapFallback069')?.classList.add('show'); return; }
   try{
     if(nearbyMap069){nearbyMap069.remove();nearbyMap069=null;}
-    nearbyMap069=L.map(el,{zoomControl:true,attributionControl:false,scrollWheelZoom:false}).setView([nearbyState.lat,nearbyState.lng],13);
+    nearbyMap069=L.map(el,{zoomControl:true,attributionControl:false,scrollWheelZoom:false,dragging:false,touchZoom:false,doubleClickZoom:false,boxZoom:false,keyboard:false,tap:false}).setView([nearbyState.lat,nearbyState.lng],13);
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19}).addTo(nearbyMap069);
     L.circle([nearbyState.lat,nearbyState.lng],{radius:nearbyRadiusMiles()*1609.344,color:'#2389ff',fillColor:'#2389ff',fillOpacity:.1,weight:2}).addTo(nearbyMap069);
     L.circleMarker([nearbyState.lat,nearbyState.lng],{radius:9,color:'#fff',weight:3,fillColor:'#2389ff',fillOpacity:1}).addTo(nearbyMap069).bindTooltip('You are here');
@@ -2304,7 +2333,7 @@ function initNearbyMap069(){
       const id=accountId069(r.s);
       const marker=L.marker([g.lat,g.lng],{icon:markerIcon069(index,r.s.id===homeNearbySelected069)}).addTo(nearbyMap069).bindPopup(`<div class="mapPopup069"><strong>${esc(r.s.name||'Unnamed Account')}</strong>${id?`<b>${esc(id)}</b>`:''}<span>${esc(distanceLabel(r.meters))}</span><small>${esc(fullAddress(r.s))}</small></div>`);
       marker.on('click',()=>{selectNearby069(r.s.id,false);const card=document.querySelector(`[data-nearby-card069="${CSS.escape(r.s.id)}"]`);if(card){nearbyScrollLock069=true;card.scrollIntoView({block:'start',behavior:'smooth'});setTimeout(()=>nearbyScrollLock069=false,500);}});
-      nearbyMarkers069.set(r.s.id,marker);
+      nearbyMarkers069.set(r.s.id,{marker,index});
     });
     if(bounds.length>1) nearbyMap069.fitBounds(bounds,{padding:[35,35],maxZoom:14});
     document.getElementById('mapCenter069').onclick=()=>nearbyMap069.setView([nearbyState.lat,nearbyState.lng],13);
@@ -7170,7 +7199,7 @@ function diagnostics(){
 }
 function showChangelog(){
   const notes = [
-    "Build 0.69.0 repairs the Nearby Accounts workspace with a fixed map, compact scrolling account rows, numbered map markers, bare Account IDs, and automatic list-to-map highlighting.",
+    "Build 0.69.1 repairs Nearby map rendering, refreshes GPS on launch, locks map panning, adds a compact Map/List toggle, and snaps account rows into place while synchronizing map selection.",
     "Manual chapters document installation, Today, Sites, Site Detail, field workflow, notes, tasks, deficiencies, photos, GPS, route tracking, reports, email, settings, backups, updates, and troubleshooting.",
     "Added living-documentation revision metadata and a release-state review requirement.",
     "Added Quick Capture for timestamped site notes, follow-up tasks, and deficiencies without leaving Today.",
@@ -7198,6 +7227,11 @@ function bootFireVault518(){
     document.body.classList.remove("app-loading533");
     document.body.classList.add("app-booted533");
     render();
+    const autoGpsKey069="firevault_auto_gps_refresh_0691";
+    if((view||"home")==="home" && navigator.geolocation && data.settings.gps?.enabled!==false && sessionStorage.getItem(autoGpsKey069)!=="1"){
+      sessionStorage.setItem(autoGpsKey069,"1");
+      setTimeout(()=>runNearbyScan0652("home"),350);
+    }
     document.body.classList.add("app-chrome-ready536");
     showGlobalChrome537();
     document.getElementById("appHeader")?.removeAttribute("style");
