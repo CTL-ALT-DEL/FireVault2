@@ -1,4 +1,4 @@
-export const BUILD = "0.62.0";
+export const BUILD = "0.63.0";
 export const KEY = "firevault_vault_build_030";
 export const ACTIVE_JOB_KEY = "firevault_active_job_modular";
 export const DEVICE_KEY = "firevault_device_identity_062";
@@ -50,6 +50,79 @@ export function syncSummary(data){
   return {total:rows.length,pending:rows.filter(x=>x?.sync?.status==="pending").length,synced:rows.filter(x=>x?.sync?.status==="synced").length,conflicts:rows.filter(x=>x?.sync?.status==="conflict"||x?.sync?.conflict).length,localOnly:rows.filter(x=>x?.sync?.status==="local").length};
 }
 
+
+function trackedRows(data){
+  const rows=[];
+  (data.sites||[]).forEach(site=>{
+    rows.push({type:"site",siteId:site.id,siteName:site.name||"Unnamed site",record:site});
+    CHILD_ARRAYS.forEach(key=>(site[key]||[]).forEach(record=>rows.push({type:key,siteId:site.id,siteName:site.name||"Unnamed site",record})));
+  });
+  (data.resources||[]).forEach(record=>rows.push({type:"resource",siteId:"",siteName:"Library",record}));
+  return rows;
+}
+export function syncQueue(data){
+  return trackedRows(data).filter(row=>["pending","conflict","local"].includes(row.record?.sync?.status||"pending")).map(row=>({
+    type:row.type,siteId:row.siteId,siteName:row.siteName,id:row.record.id,title:row.record.name||row.record.title||row.record.summary||row.record.note||row.type,
+    modifiedAt:row.record.modifiedAt||row.record.createdAt||"",modifiedBy:row.record.modifiedBy||row.record.createdBy||"Unassigned technician",
+    version:Number(row.record.recordVersion||1),status:row.record.sync?.status||"pending"
+  })).sort((a,b)=>String(b.modifiedAt).localeCompare(String(a.modifiedAt)));
+}
+function packageRecord(record){ return JSON.parse(JSON.stringify(record)); }
+export function createSyncPackage(data){
+  return {
+    format:"firevault-shared-vault-package",formatVersion:1,appBuild:BUILD,exportedAt:nowIso(),deviceId:deviceIdentity(),
+    technician:techIdentity(data),organization:data.settings?.sync?.organization||"",workspace:data.settings?.sync?.workspace||"FireVault Shared Vault",
+    sites:(data.sites||[]).map(packageRecord),resources:(data.resources||[]).map(packageRecord)
+  };
+}
+function contentKey(record){
+  if(!record || typeof record!=="object") return "";
+  const clone=JSON.parse(JSON.stringify(record));
+  delete clone.sync; delete clone.modifiedAt; delete clone.modifiedBy; delete clone.recordVersion;
+  CHILD_ARRAYS.forEach(k=>delete clone[k]);
+  return JSON.stringify(clone);
+}
+function markSynced(record,when){
+  record.sync={...(record.sync||{}),status:"synced",conflict:false,lastSyncedAt:when,remoteVersion:Number(record.recordVersion||1)};
+}
+function mergeArray(localArr,incomingArr,data,when,stats){
+  const map=new Map((localArr||[]).map(x=>[x.id,x]));
+  (incomingArr||[]).forEach(remote=>{
+    const local=map.get(remote.id);
+    if(!local){ const added=packageRecord(remote); markSynced(added,when); localArr.push(added); stats.added++; return; }
+    mergeOne(local,remote,data,when,stats);
+  });
+}
+function mergeOne(local,remote,data,when,stats){
+  const lv=Number(local.recordVersion||1), rv=Number(remote.recordVersion||1);
+  if(rv>lv){
+    const preserved={}; CHILD_ARRAYS.forEach(k=>{ if(Array.isArray(local[k])) preserved[k]=local[k]; });
+    Object.keys(local).forEach(k=>delete local[k]); Object.assign(local,packageRecord(remote));
+    CHILD_ARRAYS.forEach(k=>{ if(preserved[k] && !Array.isArray(remote[k])) local[k]=preserved[k]; });
+    markSynced(local,when); stats.updated++;
+  } else if(rv===lv && contentKey(local)!==contentKey(remote)){
+    local.sync={...(local.sync||{}),status:"conflict",conflict:true,conflictDetectedAt:when,remoteVersion:rv,remoteSnapshot:packageRecord(remote)};
+    stats.conflicts++;
+  } else if(rv===lv){ markSynced(local,when); stats.matched++; }
+  else { stats.localNewer++; }
+  CHILD_ARRAYS.forEach(k=>{ if(Array.isArray(remote[k])){ local[k]=Array.isArray(local[k])?local[k]:[]; mergeArray(local[k],remote[k],data,when,stats); } });
+}
+export function importSyncPackage(data,pkg){
+  if(!pkg || pkg.format!=="firevault-shared-vault-package" || !Array.isArray(pkg.sites)) throw new Error("Not a valid FireVault Shared Vault package.");
+  const when=nowIso(), stats={added:0,updated:0,matched:0,conflicts:0,localNewer:0};
+  const siteMap=new Map((data.sites||[]).map(x=>[x.id,x]));
+  pkg.sites.forEach(remote=>{
+    const local=siteMap.get(remote.id);
+    if(!local){ const added=packageRecord(remote); markSynced(added,when); data.sites.push(added); stats.added++; }
+    else mergeOne(local,remote,data,when,stats);
+  });
+  data.resources=Array.isArray(data.resources)?data.resources:[];
+  mergeArray(data.resources,pkg.resources||[],data,when,stats);
+  data.syncState={...(data.syncState||{}),schemaVersion:2,lastSuccessfulSync:when,lastImportedPackage:{exportedAt:pkg.exportedAt||"",deviceId:pkg.deviceId||"",technician:pkg.technician||"",workspace:pkg.workspace||""}};
+  saveData(data);
+  return stats;
+}
+
 export function uid(){ return Date.now().toString(36)+Math.random().toString(36).slice(2,7); }
 export function esc(s){ return String(s ?? "").replace(/[&<>"']/g, m => ({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#039;"}[m])); }
 export function loadData(){
@@ -65,7 +138,7 @@ export function saveData(data){
   data.sites.forEach(site=>migrateRecordTree(site,data,prevSites.get(site.id)));
   const prevResources=new Map((previous?.resources||[]).map(x=>[x?.id,x]));
   data.resources.forEach(item=>migrateRecordTree(item,data,prevResources.get(item.id)));
-  data.syncState={...(data.syncState||{}),schemaVersion:1,deviceId:deviceIdentity(),provider:data.settings?.sync?.provider||"onedrive",lastLocalSave:nowIso(),lastSuccessfulSync:data.syncState?.lastSuccessfulSync||""};
+  data.syncState={...(data.syncState||{}),schemaVersion:2,deviceId:deviceIdentity(),provider:data.settings?.sync?.provider||"onedrive",lastLocalSave:nowIso(),lastSuccessfulSync:data.syncState?.lastSuccessfulSync||""};
   localStorage.setItem(KEY, JSON.stringify(data));
 }
 export function normalize(data){
@@ -102,7 +175,7 @@ export function normalize(data){
   data.settings.advanced = data.settings.advanced || {aiTechnician:false, reverseAddressLookup:false, cloudBackup:false, voiceTranscription:false, ocrReader:false, emailGateway:false, weather:false, traffic:false};
   data.settings.gps = {enabled:true, mapProvider:"apple", highAccuracy:true, includeInReports:true, nearbyRadiusMiles:1, ...(data.settings.gps || {})};
   data.settings.sync = {provider:"onedrive",enabled:false,organization:"",workspace:"FireVault Shared Vault",autoSync:true,wifiOnly:false,conflictPolicy:"review",...(data.settings.sync||{})};
-  data.syncState = {...(data.syncState||{}),schemaVersion:1,deviceId:deviceIdentity(),provider:data.settings.sync.provider,lastLocalSave:data.syncState?.lastLocalSave||"",lastSuccessfulSync:data.syncState?.lastSuccessfulSync||""};
+  data.syncState = {...(data.syncState||{}),schemaVersion:2,deviceId:deviceIdentity(),provider:data.settings.sync.provider,lastLocalSave:data.syncState?.lastLocalSave||"",lastSuccessfulSync:data.syncState?.lastSuccessfulSync||""};
   const homeCardDefaults = {pinnedSites:{visible:true,behavior:"remember"},fieldFocus:{visible:true,behavior:"remember"},nearbyAccounts:{visible:true,behavior:"remember"},recentAccounts:{visible:true,behavior:"remember"}};
   data.settings.homeLayout = data.settings.homeLayout || {preset:"custom",cards:{}};
   data.settings.homeLayout.preset = data.settings.homeLayout.preset || "custom";

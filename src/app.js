@@ -1,4 +1,4 @@
-import { BUILD, KEY, ACTIVE_JOB_KEY, loadData, saveData, ensureSite, fullAddress, esc, uid, downloadBlob, syncSummary, deviceIdentity } from "./storage.js";
+import { BUILD, KEY, ACTIVE_JOB_KEY, loadData, saveData, ensureSite, fullAddress, esc, uid, downloadBlob, syncSummary, syncQueue, createSyncPackage, importSyncPackage, deviceIdentity } from "./storage.js";
 window.__FIREVAULT_MODULE_READY = true;
 
 let data = loadData();
@@ -5256,7 +5256,7 @@ const FIREVAULT_MANUAL_058 = [
     ["Home Layout","Shows or hides optional Home cards and chooses whether each remembers, opens, or collapses by default."],
     ["Modules","Simple, Advanced, and Power modes determine which optional FireVault tools are visible. Disabling a module does not delete its data."],
     ["Advanced","Contains future capabilities that may require cloud services, APIs, permissions, subscriptions, or backend infrastructure."],
-    ["Team Sync","Shows technician identity, device identity, pending record changes, conflict policy, and the planned OneDrive workspace. Build 0.62.0 prepares records but does not upload them."],
+    ["Team Sync","Shows technician identity, device identity, pending record changes, conflict policy, and the planned OneDrive workspace. Build 0.63.0 prepares records but does not upload them."],
     ["Backup","Exports and imports the local vault, previews restore files, and provides repair and safety tools."],
     ["About and Diagnostics","Confirm the installed build, storage key, startup health, data counts, and app stability information."]
   ]},
@@ -5276,7 +5276,7 @@ const FIREVAULT_MANUAL_058 = [
     ["Restore fails","Use an unmodified FireVault JSON backup, verify the file is readable, and compare its preview details before confirming restore."]
   ]},
   {id:"release",title:"Release & Manual Status",icon:"ⓘ",status:"Living document",summary:"Understand how this documentation will be maintained through Version 1.0.",topics:[
-    ["Manual revision","This manual revision matches FireVault Build 0.62.0 and was last reviewed in July 2026."],
+    ["Manual revision","This manual revision matches FireVault Build 0.63.0 and was last reviewed in July 2026."],
     ["Living documentation","Every feature release should include a documentation review. New controls must be documented and changed workflows must be rechecked."],
     ["Pre-release warning","FireVault is still under active development. Labels, layouts, and workflows may change before Version 1.0."],
     ["Screenshot policy","Annotated screenshots should be added after major screens reach release-candidate stability."],
@@ -5318,12 +5318,12 @@ function manualTile058(icon,title,note,view,tone="blue",badge=""){ return `<butt
 function manualHome058(){
   const bookmarked=FIREVAULT_MANUAL_058.filter(ch=>manualBookmarks058.includes(ch.id));
   return `<div class="academyHome058">
-    <section class="academyHero058"><div><span class="academyEyebrow058">FireVault Academy</span><h2>${fireVaultBrand575()} Knowledge Center</h2><p>Manuals, quick-start guidance, field tips, release notes, and troubleshooting for Build ${BUILD}.</p></div><div class="academyMeta058"><span><b>${BUILD}</b>App build</span><span><b>0.62.0</b>Manual revision</span><span><b>July 2026</b>Last reviewed</span></div></section>
+    <section class="academyHero058"><div><span class="academyEyebrow058">FireVault Academy</span><h2>${fireVaultBrand575()} Knowledge Center</h2><p>Manuals, quick-start guidance, field tips, release notes, and troubleshooting for Build ${BUILD}.</p></div><div class="academyMeta058"><span><b>${BUILD}</b>App build</span><span><b>0.63.0</b>Manual revision</span><span><b>July 2026</b>Last reviewed</span></div></section>
     <div class="academySearch058"><span>⌕</span><input id="manualSearch058" type="search" value="${esc(manualQuery058)}" placeholder="Search FireVault Academy…"><button class="ghost" id="manualSearchGo058">Search</button></div>
     <section class="academyTileGrid058">
       ${manualTile058("📘","User Manual","Browse all chapters and step-by-step instructions.","manual","blue")}
       ${manualTile058("🚀","Quick Start Guide","Set up FireVault and complete a basic field workflow.","quick","green")}
-      ${manualTile058("🆕","What’s New","Review changes included in the current release.","new","red","0.62.0")}
+      ${manualTile058("🆕","What’s New","Review changes included in the current release.","new","red","0.63.0")}
       ${manualTile058("🧰","Field Tips","Practical documentation and reporting advice.","tips","amber")}
       ${manualTile058("❓","Troubleshooting","Resolve common GPS, storage, photo, and update issues.","trouble","violet")}
       ${manualTile058("📋","Revision History","Track app and manual revision checkpoints.","revisions","slate")}
@@ -5347,10 +5347,10 @@ function manualChapterView058(){
 }
 function manualSimplePage058(type){
  const pages={
-  quick:["🚀","Quick Start Guide","Get FireVault ready for a normal field day.",[["1. Verify the build","Confirm the green build badge shows 0.62.0 before entering production information."],["2. Complete Technician Profile","Enter your name, company, phone, email, and license or employee identification."],["3. Review permissions","Allow location and photo access only when FireVault requests them and the feature is needed."],["4. Create or open a site","Add the customer name, full address, panel details, contacts, access notes, and GPS location."],["5. Document the visit","Record notes, photos, tasks, deficiencies, equipment changes, and a service visit."],["6. Finish and protect the data","Review the report, send or copy the required summary, then export a current backup."]]],
-  new:["🆕","What’s New in 0.62.0","Multi-user and OneDrive-ready data foundation.",[["Timed service visits","Start or resume a visit directly from Site Detail and keep a live elapsed-time record."],["Autosaved work summary","The running service narrative is saved on the device while the visit remains active."],["Timestamped timeline","Add customer updates, testing notes, and other important events to a chronological visit record."],["Field actions","Create parts follow-ups, deficiencies, photos, and reports without losing the active visit."],["End and save","Closing the visit creates a complete Visit History entry with duration, summary, and timeline."]]],
+  quick:["🚀","Quick Start Guide","Get FireVault ready for a normal field day.",[["1. Verify the build","Confirm the green build badge shows 0.63.0 before entering production information."],["2. Complete Technician Profile","Enter your name, company, phone, email, and license or employee identification."],["3. Review permissions","Allow location and photo access only when FireVault requests them and the feature is needed."],["4. Create or open a site","Add the customer name, full address, panel details, contacts, access notes, and GPS location."],["5. Document the visit","Record notes, photos, tasks, deficiencies, equipment changes, and a service visit."],["6. Finish and protect the data","Review the report, send or copy the required summary, then export a current backup."]]],
+  new:["🆕","What’s New in 0.63.0","Multi-user and OneDrive-ready data foundation.",[["Timed service visits","Start or resume a visit directly from Site Detail and keep a live elapsed-time record."],["Autosaved work summary","The running service narrative is saved on the device while the visit remains active."],["Timestamped timeline","Add customer updates, testing notes, and other important events to a chronological visit record."],["Field actions","Create parts follow-ups, deficiencies, photos, and reports without losing the active visit."],["End and save","Closing the visit creates a complete Visit History entry with duration, summary, and timeline."]]],
   tips:["🧰","Field Tips","Short practices that improve the usefulness of FireVault records.",[["Write for the next technician","Include the exact panel, circuit, device, location, symptom, test result, and next action instead of relying on memory."],["Photograph context first","Take one wide photo showing the equipment location before close-up terminal, label, or damage photos."],["Separate facts from follow-up","Use notes for what occurred, deficiencies for code or system problems, and tasks for work that still needs completion."],["Confirm the account","Before using Quick Capture, verify the selected customer site to prevent records from being stored under the wrong account."],["Back up before updates","Export a backup before installing every development build and after completing a significant amount of field documentation."]]],
-  revisions:["📋","Revision History","Application and documentation checkpoints.",[["0.62.0","Added permanent record IDs, audit metadata, local version tracking, pending-sync states, conflict readiness, device identity, and a Team Sync settings workspace."],["0.60.0","Connected major screens and Settings areas directly to matching Academy chapters with return-to-screen navigation."],["0.59.0","Added interactive tutorials, guided orientation, pinned learning, field tips, and documentation tracking."],["0.58.0","Expanded Help & Manual into FireVault Academy with bookmarks, smart search, Quick Start, and reader navigation."],["0.57.0","Added the first complete searchable in-app FireVault User Manual."],["Ongoing review rule","Any change to navigation, labels, storage, workflows, permissions, or supported layouts requires the related manual chapter to be checked."]]],
+  revisions:["📋","Revision History","Application and documentation checkpoints.",[["0.63.0","Added permanent record IDs, audit metadata, local version tracking, pending-sync states, conflict readiness, device identity, and a Team Sync settings workspace."],["0.60.0","Connected major screens and Settings areas directly to matching Academy chapters with return-to-screen navigation."],["0.59.0","Added interactive tutorials, guided orientation, pinned learning, field tips, and documentation tracking."],["0.58.0","Expanded Help & Manual into FireVault Academy with bookmarks, smart search, Quick Start, and reader navigation."],["0.57.0","Added the first complete searchable in-app FireVault User Manual."],["Ongoing review rule","Any change to navigation, labels, storage, workflows, permissions, or supported layouts requires the related manual chapter to be checked."]]],
   trouble:["❓","Troubleshooting","Common problems and safe first checks.",FIREVAULT_MANUAL_058.find(x=>x.id==="trouble")?.topics||[]]
  };
  const [icon,title,note,items]=pages[type]||["🚧","Coming Soon","This Academy area is reserved for a future milestone.",[["Development status","The feature is not active yet. No outside service has been connected or purchased."]]];
@@ -5487,10 +5487,17 @@ function settingsPanel(){
         </div>
         <div class="settingsList twoCol">${checkBlock('syncAuto','Automatically sync when connected',cfg.autoSync!==false)}${checkBlock('syncWifi','Sync large files only on Wi-Fi',!!cfg.wifiOnly)}</div>
       `,"cyan",saveButton())}
+      ${settingsSection540("Pending work","Synchronization Queue","Review records waiting to be shared. The queue is created from permanent IDs, record versions, and modified timestamps.",`
+        <div class="syncQueue063">${syncQueue(data).slice(0,12).map(item=>`<div class="syncQueueRow063"><span class="syncQueueState063 ${esc(item.status)}">${esc(item.status)}</span><div><strong>${esc(item.siteName)} · ${esc(item.title)}</strong><small>${esc(item.modifiedBy)} · v${item.version}${item.modifiedAt?` · ${esc(new Date(item.modifiedAt).toLocaleString())}`:""}</small></div></div>`).join("")||`<div class="syncEmpty063"><strong>Queue is clear</strong><span>No local records are waiting to be shared.</span></div>`}</div>
+      `,"amber")}
+      ${settingsSection540("Controlled handoff","Shared Vault Package","Until Microsoft sign-in is configured, use a Shared Vault Package to test multi-device merging safely. Export the package to OneDrive, then import it on another FireVault device.",`
+        <div class="syncPackageActions063"><button class="primary" id="exportSyncPackage063">Export Shared Vault Package</button><label class="ghost fileAction063">Import Shared Vault Package<input id="importSyncPackage063" type="file" accept="application/json,.json" hidden></label></div>
+        <div class="settingsInfo540"><strong>Conflict protection is active</strong><span>Newer record versions are merged. Competing edits with the same version are flagged as conflicts instead of silently overwritten.</span></div>
+      `,"cyan")}
       ${settingsSection540("Record protection","How edits are prepared","Every site and supported child record now receives permanent identity and audit fields.",`
-        <div class="syncFeatureList062"><div><b>Unique IDs</b><span>Records can be matched across phones without relying on names.</span></div><div><b>Version tracking</b><span>Edited records advance their local version and return to Pending status.</span></div><div><b>Audit identity</b><span>Created-by, modified-by, timestamps, and originating device are stored.</span></div><div><b>Conflict readiness</b><span>The data model can flag competing edits for technician review.</span></div><div><b>Offline first</b><span>Field work continues locally when cellular service is unavailable.</span></div></div>
+        <div class="syncFeatureList062"><div><b>Unique IDs</b><span>Records can be matched across phones without relying on names.</span></div><div><b>Version tracking</b><span>Edited records advance their local version and return to Pending status.</span></div><div><b>Audit identity</b><span>Created-by, modified-by, timestamps, and originating device are stored.</span></div><div><b>Conflict detection</b><span>Competing equal-version edits are preserved for technician review.</span></div><div><b>Offline first</b><span>Field work continues locally when cellular service is unavailable.</span></div></div>
       `,"green")}
-      <div class="settingsInfo540 warning"><strong>OneDrive is not connected in Build ${BUILD}</strong><span>This release prepares the database. Do not assume changes are shared with another phone until a later build shows an actual successful synchronization time.</span></div>
+      <div class="settingsInfo540 warning"><strong>Automatic OneDrive synchronization is not connected in Build ${BUILD}</strong><span>Shared Vault Packages provide a controlled bridge for testing. A future build will replace manual package transfer with Microsoft sign-in and Microsoft Graph synchronization.</span></div>
     </div>`;
   }
 
@@ -5522,6 +5529,12 @@ function wireSettingsPanel(){
   }
   if(settingsTab==="visibility"){
     document.querySelectorAll(".featureCheck472 input[type=checkbox], #viewMode").forEach(el=>el.addEventListener("change",captureSettingsScroll576));
+  }
+  if(settingsTab==="sync"){
+    const exportPackage=document.getElementById("exportSyncPackage063");
+    if(exportPackage) exportPackage.onclick=()=>{ const pkg=createSyncPackage(data); const stamp=new Date().toISOString().slice(0,10); downloadBlob(`firevault-shared-vault-${stamp}.json`,JSON.stringify(pkg,null,2),"application/json"); toast("Shared Vault package exported."); };
+    const importPackage=document.getElementById("importSyncPackage063");
+    if(importPackage) importPackage.onchange=e=>{ const file=e.target.files?.[0]; if(!file)return; const reader=new FileReader(); reader.onload=()=>{ try{ const stats=importSyncPackage(data,JSON.parse(reader.result)); data=loadData(); settings(); alert(`Shared Vault package imported.\n\nAdded: ${stats.added}\nUpdated: ${stats.updated}\nMatched: ${stats.matched}\nConflicts: ${stats.conflicts}\nLocal newer: ${stats.localNewer}`); }catch(err){ alert(err?.message||"Shared Vault import failed."); } }; reader.readAsText(file); };
   }
   const exportBtn=document.getElementById("exportBtn"); if(exportBtn) exportBtn.onclick=()=>{ const stamp=new Date().toISOString().slice(0,10); localStorage.setItem("firevault_last_backup_export", new Date().toLocaleString()); downloadBlob(`firevault-backup-${stamp}-build-${BUILD}.json`, JSON.stringify(data,null,2), "application/json"); toast("Backup exported."); settings(); };
   const copyBackupSummaryBtn=document.getElementById("copyBackupSummaryBtn"); if(copyBackupSummaryBtn) copyBackupSummaryBtn.onclick=async()=>{ try{ await navigator.clipboard.writeText(backupSummaryText()); toast("Backup summary copied."); }catch{ toast("Clipboard unavailable."); } };
@@ -6414,7 +6427,7 @@ function diagnostics(){
 }
 function showChangelog(){
   const notes = [
-    "Build 0.62.0 adds a timed Service Visit workspace with autosaved notes, timeline events, follow-up actions, and visit closeout.",
+    "Build 0.63.0 adds a timed Service Visit workspace with autosaved notes, timeline events, follow-up actions, and visit closeout.",
     "Manual chapters document installation, Today, Sites, Site Detail, field workflow, notes, tasks, deficiencies, photos, GPS, route tracking, reports, email, settings, backups, updates, and troubleshooting.",
     "Added living-documentation revision metadata and a release-state review requirement.",
     "Added Quick Capture for timestamped site notes, follow-up tasks, and deficiencies without leaving Today.",
