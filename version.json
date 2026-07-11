@@ -1,5 +1,6 @@
 {
-  "build": "0.73.1",
+  "build": "0.73.2",
   "released": "2026-07-11",
-  "note": "Customer import keeps same-address buildings separate using the complete Account ID, including CLSS dash suffixes."
+  "note": "Customer import keeps same-address buildings separate using the complete Account ID, including CLSS dash suffixes.",
+  "notes": "Brighter selected-account green and old-school terminal typing for database and latest-version checks."
 }

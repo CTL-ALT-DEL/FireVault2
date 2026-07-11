@@ -2,8 +2,7 @@ import { BUILD, KEY, ACTIVE_JOB_KEY, loadData, saveData, ensureSite, fullAddress
 window.__FIREVAULT_MODULE_READY = true;
 
 let data = loadData();
-const splashStatus0723=document.getElementById("splashStatus072");
-if(splashStatus0723) splashStatus0723.textContent=`Database verified • ${Array.isArray(data?.sites)?data.sites.length:0} accounts loaded`;
+if(typeof window.fireVaultSplashDatabaseReady0732 === "function") window.fireVaultSplashDatabaseReady0732(Array.isArray(data?.sites)?data.sites.length:0);
 let view = new URLSearchParams(location.search).get("route") || data.settings.app?.defaultScreen || "home";
 let selectedSiteId = null;
 let mode = null;
@@ -7632,6 +7631,7 @@ function diagnostics(){
 }
 function showChangelog(){
   const notes = [
+    "Build 0.73.2 restores the brighter selected-account green and adds an old-school terminal typing sequence for database and latest-version checks on the splash screen.",
     "Build 0.73.1 keeps different buildings at the same address as separate customer records by matching the complete Account ID, including CLSS dash suffixes such as G7C1234-01 and G7C1234-02.",
     "Build 0.73.0 introduced the unified FireVault design system and consistent dynamic navigation controls.",
     "Build 0.71.6 fixes a Nearby startup crash by making the selected-account phone/contact lookup safe when no account is selected yet.",
@@ -7653,7 +7653,7 @@ function showChangelog(){
   overlay.className="releaseOverlay";
   overlay.innerHTML=`<div class="releaseSheet" role="dialog" aria-modal="true" aria-label="FireVault release notes">
     <div class="releaseHead"><div><strong>${fireVaultBrand575()}</strong><span>Build ${BUILD}</span></div><button class="ghost iconBtn" id="closeRelease" aria-label="Close release notes">×</button></div>
-    <div class="releaseBody"><h2>Release Notes</h2><p class="releaseIntro">Customer import identity protection and FireVault interface improvements.</p><ul>${notes.map(n=>`<li>${esc(n)}</li>`).join("")}</ul></div>
+    <div class="releaseBody"><h2>Release Notes</h2><p class="releaseIntro">Brighter Nearby selection and terminal-style startup checks.</p><ul>${notes.map(n=>`<li>${esc(n)}</li>`).join("")}</ul></div>
   </div>`;
   document.body.appendChild(overlay);
   const close=()=>overlay.remove();

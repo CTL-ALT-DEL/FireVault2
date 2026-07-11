@@ -8,14 +8,14 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black" />
   <meta name="apple-mobile-web-app-title" content="FireVault" />
   <title>FireVault</title>
-  <link rel="manifest" href="manifest.json?v=0.73.1" />
-  <link rel="apple-touch-icon" href="assets/apple-touch-icon.png?v=0.73.1" />
-  <link rel="icon" type="image/png" href="assets/favicon.png?v=0.73.1" />
-  <link rel="stylesheet" href="src/styles.css?v=0.73.1" />
+  <link rel="manifest" href="manifest.json?v=0.73.2" />
+  <link rel="apple-touch-icon" href="assets/apple-touch-icon.png?v=0.73.2" />
+  <link rel="icon" type="image/png" href="assets/favicon.png?v=0.73.2" />
+  <link rel="stylesheet" href="src/styles.css?v=0.73.2" />
 </head>
 <body class="app-loading533">
   <header id="appHeader" class="appHeader537" style="display:none">
-    <div class="brand"><img class="brandMark" src="assets/favicon.png?v=0.73.1" alt=""><div><div class="fireVaultWordmark575"><span>FIRE</span><b>VAULT</b></div><small>Field Vault System</small></div></div>
+    <div class="brand"><img class="brandMark" src="assets/favicon.png?v=0.73.2" alt=""><div><div class="fireVaultWordmark575"><span>FIRE</span><b>VAULT</b></div><small>Field Vault System</small></div></div>
     <div class="globalToday071" id="globalToday071" aria-label="Today"></div>
   </header>
 
@@ -24,14 +24,21 @@
       <div class="splashAura492"></div>
       <div class="splashOrb457 splashOrb492">
         <span class="splashRing492"></span>
-        <img src="assets/favicon.png?v=0.73.1" alt="FireVault">
+        <img src="assets/favicon.png?v=0.73.2" alt="FireVault">
       </div>
       <div class="splashText457 splashText492">
         <h1 class="fireVaultWordmark575"><span>FIRE</span><b>VAULT</b></h1>
-        <p id="splashStatus072">Checking database…</p>
+        <div id="splashTerminal0732" class="splashTerminal0732" role="status" aria-live="polite" aria-label="FireVault startup checks">
+          <div class="splashTerminalLine0732 isVisible" id="splashDbLine0732">
+            <span class="splashPrompt0732" aria-hidden="true">&gt;</span><span id="splashDbText0732"></span><span class="splashCursor0732" aria-hidden="true"></span>
+          </div>
+          <div class="splashTerminalLine0732 isWaiting" id="splashVersionLine0732">
+            <span class="splashPrompt0732" aria-hidden="true">&gt;</span><span id="splashVersionText0732"></span><span class="splashCursor0732" aria-hidden="true"></span>
+          </div>
+        </div>
       </div>
       <div class="splashMeter457 splashMeter492"><span></span></div>
-      <small class="splashBuild492">0.73.1</small>
+      <small class="splashBuild492">0.73.2</small>
     </div>
   </main>
 
@@ -48,6 +55,70 @@
     window.__FIREVAULT_MODULE_READY = false;
     window.__FIREVAULT_SPLASH_STARTED = Date.now();
     window.__FIREVAULT_MIN_SPLASH_MS = 5000;
+    window.__FIREVAULT_TERMINAL_0732 = { databaseCount:null, versionState:null, started:false };
+    window.fireVaultSplashDatabaseReady0732 = function(count){
+      window.__FIREVAULT_TERMINAL_0732.databaseCount = Number.isFinite(Number(count)) ? Number(count) : 0;
+    };
+    window.fireVaultSplashVersionReady0732 = function(state){
+      window.__FIREVAULT_TERMINAL_0732.versionState = String(state || "CURRENT").toUpperCase();
+    };
+    window.fireVaultTypeText0732 = function(element,text,speed){
+      return new Promise(function(resolve){
+        if(!element){ resolve(); return; }
+        const value=String(text || "").toUpperCase();
+        element.textContent="";
+        let index=0;
+        function step(){
+          if(index<value.length){
+            element.textContent += value.charAt(index++);
+            window.setTimeout(step, Math.max(12,Number(speed)||44));
+          }else resolve();
+        }
+        step();
+      });
+    };
+    window.fireVaultAppendText0732 = function(element,text,speed){
+      return new Promise(function(resolve){
+        if(!element){ resolve(); return; }
+        const value=String(text || "").toUpperCase();
+        let index=0;
+        function step(){
+          if(index<value.length){
+            element.textContent += value.charAt(index++);
+            window.setTimeout(step, Math.max(10,Number(speed)||24));
+          }else resolve();
+        }
+        step();
+      });
+    };
+    window.fireVaultWaitFor0732 = function(test,timeout){
+      return new Promise(function(resolve){
+        const started=Date.now();
+        (function check(){
+          if(test() || Date.now()-started >= timeout){ resolve(); return; }
+          window.setTimeout(check,25);
+        })();
+      });
+    };
+    window.fireVaultRunSplashTerminal0732 = async function(){
+      const state=window.__FIREVAULT_TERMINAL_0732;
+      if(state.started) return;
+      state.started=true;
+      const dbLine=document.getElementById("splashDbLine0732");
+      const dbText=document.getElementById("splashDbText0732");
+      const versionLine=document.getElementById("splashVersionLine0732");
+      const versionText=document.getElementById("splashVersionText0732");
+      await window.fireVaultTypeText0732(dbText,"CHECKING DATABASE",46);
+      await window.fireVaultWaitFor0732(function(){ return state.databaseCount !== null; },1600);
+      await window.fireVaultAppendText0732(dbText," ... OK • "+(state.databaseCount === null ? 0 : state.databaseCount)+" ACCOUNTS",18);
+      dbLine && dbLine.classList.add("isComplete");
+      if(versionLine){ versionLine.classList.remove("isWaiting"); versionLine.classList.add("isVisible"); }
+      await window.fireVaultTypeText0732(versionText,"CHECKING LATEST VERSION",42);
+      await window.fireVaultWaitFor0732(function(){ return state.versionState !== null; },2600);
+      await window.fireVaultAppendText0732(versionText," ... "+(state.versionState || "OFFLINE READY"),18);
+      versionLine && versionLine.classList.add("isComplete");
+    };
+    window.setTimeout(window.fireVaultRunSplashTerminal0732,90);
     window.addEventListener('error', function(e){ window.__FIREVAULT_LAST_ERROR = e.message || String(e.error || e); });
     window.addEventListener('unhandledrejection', function(e){ window.__FIREVAULT_LAST_ERROR = String(e.reason || e); });
     setTimeout(function(){
@@ -67,7 +138,7 @@
   </script>
 
   <script>
-    window.FIREVAULT_BUILD = "0.73.1";
+    window.FIREVAULT_BUILD = "0.73.2";
     window.FIREVAULT_UPDATE = { registration:null, waiting:null, checking:false };
     window.fireVaultCheckForUpdates = async function(options){
       options = options || {};
@@ -120,13 +191,11 @@
         if (refreshing) return; refreshing=true; location.reload();
       });
       window.addEventListener("load", async function(){
-        const status=document.getElementById("splashStatus072");
-        if(status) status.textContent="Database checked • Getting latest version…";
         try {
           await window.fireVaultLockPortrait0723();
-          const reg=await navigator.serviceWorker.register("sw.js?v=0.73.1", {scope:"./", updateViaCache:"none"});
+          const reg=await navigator.serviceWorker.register("sw.js?v=0.73.2", {scope:"./", updateViaCache:"none"});
           window.FIREVAULT_UPDATE.registration=reg;
-          if (reg.waiting) window.fireVaultShowUpdate(reg.waiting,"0.73.1");
+          if (reg.waiting) window.fireVaultShowUpdate(reg.waiting,"0.73.2");
           reg.addEventListener("updatefound", function(){
             const worker=reg.installing; if(!worker)return;
             worker.addEventListener("statechange", function(){
@@ -134,15 +203,17 @@
             });
           });
           try {
-            await window.fireVaultCheckForUpdates({reloadWhenNew:false});
-            if(status) status.textContent="Database ready • Latest version checked";
+            const updateResult=await window.fireVaultCheckForUpdates({reloadWhenNew:false});
+            window.fireVaultSplashVersionReady0732(updateResult && updateResult.newer ? "UPDATE READY" : "CURRENT");
           } catch(updateError) {
-            if(status) status.textContent="Database ready • Offline-ready mode";
+            window.fireVaultSplashVersionReady0732("OFFLINE READY");
           }
-        } catch(e) { if(status) status.textContent="Database ready • Offline-ready mode"; }
+        } catch(e) { window.fireVaultSplashVersionReady0732("OFFLINE READY"); }
       });
+    } else {
+      window.addEventListener("load",function(){ window.fireVaultSplashVersionReady0732("BROWSER MODE"); });
     }
   </script>
-  <script type="module" src="src/app.js?v=0.73.1"></script>
+  <script type="module" src="src/app.js?v=0.73.2"></script>
 </body>
 </html>
