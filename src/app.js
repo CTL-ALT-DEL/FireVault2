@@ -1567,13 +1567,8 @@ function returnFromContextualHelp060(){
   view=back.view; mode=back.mode; settingsTab=back.settingsTab; selectedSiteId=back.selectedSiteId; render();
 }
 function injectContextualHelp060(){
+  /* Build 0.70.0: the floating blue Help circle is retired. Help remains available in Settings → Data, Sync & Support → FireVault Academy. */
   document.getElementById("contextHelp060")?.remove();
-  const info=contextualHelpInfo060();
-  if(!info) return;
-  const button=document.createElement("button");
-  button.id="contextHelp060"; button.className="contextHelp060"; button.type="button";
-  button.setAttribute("aria-label",`Help for ${info.label}`); button.innerHTML=`<span>?</span><b>Help</b>`;
-  button.onclick=()=>openContextualHelp060(info.chapter,info.label); document.body.appendChild(button);
 }
 function render(){
   try{
@@ -2202,7 +2197,15 @@ function dashboard068(){
 
 const HOME_NEARBY_VIEW_KEY_069="firevault_home_nearby_view_069";
 const NEARBY_LIST_MAX_MILES_069=25;
+const NEARBY_CATEGORY_META_070={
+  all:{label:"All",color:"#e5e7eb"},
+  basic:{label:"Basic",color:"#94a3b8"},
+  clss:{label:"CLSS",color:"#38bdf8"},
+  alarmnet:{label:"AlarmNet",color:"#f59e0b"},
+  ipdact:{label:"IPDACT",color:"#a78bfa"}
+};
 let homeNearbyView069=localStorage.getItem(HOME_NEARBY_VIEW_KEY_069)||"map";
+let nearbyCategoryFilter070="all";
 let homeNearbySelected069="";
 let nearbyScrollLock069=false;
 let nearbySnapTimer069=null;
@@ -2218,24 +2221,46 @@ let nearbyTouchStartScroll069=0;
 let nearbyTouchMoved069=false;
 
 function accountId069(s){ return String(s?.externalAccountId||s?.accountId||"").trim(); }
+function accountCategory070(s){
+  const id=accountId069(s).toUpperCase();
+  if(id.startsWith("G7C")) return "clss";
+  if(id.startsWith("AN")) return "alarmnet";
+  if(id.startsWith("VA1")) return "ipdact";
+  return "basic";
+}
 function phone069(s){ const c=primaryContact477(s); return String(s?.sitePhone||c?.phone||"").trim(); }
+function todayHeader070(){
+  const now=new Date();
+  const day=now.toLocaleDateString(undefined,{weekday:"long"});
+  const date=now.toLocaleDateString(undefined,{month:"short",day:"numeric"});
+  return `<div class="nearbyToday070"><strong>TODAY</strong><span>${esc(day)}</span><b>${esc(date)}</b></div>`;
+}
 function cssEscape069(value){
   const raw=String(value??"");
   if(window.CSS&&typeof CSS.escape==="function") return CSS.escape(raw);
   return raw.replace(/[^a-zA-Z0-9_-]/g,ch=>`\\${ch}`);
 }
-function nearbyRows069(){
+function nearbyAllRows069(){
   const rows=nearbyState?gpsSiteDistances(nearbyState.lat,nearbyState.lng):[];
   const maxMeters=NEARBY_LIST_MAX_MILES_069*1609.344;
   return rows.filter(r=>Number.isFinite(Number(r.meters))&&Number(r.meters)<=maxMeters);
 }
+function nearbyRows069(){
+  const rows=nearbyAllRows069();
+  return nearbyCategoryFilter070==="all"?rows:rows.filter(r=>accountCategory070(r.s)===nearbyCategoryFilter070);
+}
+function nearbyCategoryCounts070(rows=nearbyAllRows069()){
+  const counts={all:rows.length,basic:0,clss:0,alarmnet:0,ipdact:0};
+  rows.forEach(r=>{const key=accountCategory070(r.s);counts[key]=(counts[key]||0)+1;});
+  return counts;
+}
 function nearbySummary069(){
-  const inv=gpsInventory0652(), rows=nearbyRows069();
-  return {inv,rows,nearby:rows.length};
+  const inv=gpsInventory0652(), allRows=nearbyAllRows069(), rows=nearbyRows069();
+  return {inv,allRows,rows,nearby:rows.length};
 }
 function nearbyAccountCard069(r,index){
-  const s=r.s,id=accountId069(s),phone=phone069(s);
-  return `<article class="nearbyAccount069 ${homeNearbySelected069===s.id?'selected':''}" data-nearby-card069="${esc(s.id)}" data-nearby-index069="${index}">
+  const s=r.s,id=accountId069(s),phone=phone069(s),category=accountCategory070(s);
+  return `<article class="nearbyAccount069 category-${category} ${homeNearbySelected069===s.id?'selected':''}" data-nearby-card069="${esc(s.id)}" data-nearby-index069="${index}" data-nearby-category070="${category}">
     <span class="nearbyNumber069">${index+1}</span>
     <span class="nearbyPin069">●</span>
     <div class="nearbyInfo069"><strong>${esc(s.name||'Unnamed Account')}</strong><div>${id?`<b>${esc(id)}</b><i>•</i>`:''}<span>${esc(fullAddress(s)||'No address saved')}</span></div></div>
@@ -2249,8 +2274,6 @@ function homeNearbyMapShell069(){
     <div id="nearbyStaticOverlay069" class="nearbyStaticOverlay069"></div>
     <div id="nearbyStaticPopup069" class="nearbyStaticPopup069" hidden></div>
     <div id="nearbyMapCount069" class="nearbyMapCount069" hidden></div>
-    <div class="staticMapControls069"><button id="mapZoomIn069" aria-label="Zoom in">+</button><button id="mapZoomOut069" aria-label="Zoom out">−</button></div>
-    <button class="mapCenter069" id="mapCenter069" aria-label="Reset map zoom">◎</button>
   </div>`;
 }
 function setHomeChrome069(hidden){
@@ -2260,33 +2283,43 @@ function setHomeChrome069(hidden){
 }
 function home(){
   setHomeChrome069(true);
-  const {inv,rows,nearby}=nearbySummary069(), status=nearbyScanStatus0652.state;
+  const {inv,allRows,rows,nearby}=nearbySummary069(), status=nearbyScanStatus0652.state;
   if(rows.length&&!rows.some(r=>r.s.id===homeNearbySelected069)) homeNearbySelected069=rows[0].s.id;
+  if(!rows.length) homeNearbySelected069="";
   const selectedRow069=rows.find(r=>r.s.id===homeNearbySelected069)||rows[0]||null;
   if(selectedRow069&&!Number.isFinite(nearbyAdaptiveRadiusMiles069)) nearbyAdaptiveRadiusMiles069=adaptiveRadiusForRow069(selectedRow069);
   const gpsText=nearbyState?`Updated ${new Date(nearbyState.at).toLocaleTimeString([], {hour:'numeric',minute:'2-digit'})}`:'GPS not refreshed';
+  const categoryCounts070=nearbyCategoryCounts070(allRows);
+  const categoryOptions070=Object.entries(NEARBY_CATEGORY_META_070).map(([key,item])=>`<option value="${key}" ${nearbyCategoryFilter070===key?'selected':''}>${esc(item.label)} (${categoryCounts070[key]||0})</option>`).join('');
   html(`<div class="screen nearbyHome069">
-    <section class="nearbyTop069"><div class="nearbyLogo069"><img src="assets/favicon.png?v=${BUILD}" alt=""><strong>${fireVaultBrand575()}</strong></div><div class="nearbyTopActions069"><button class="homeBuild069" id="homeBuild069"><i></i>${BUILD}</button><button class="homeSettings069" id="homeSettings069">⚙</button></div></section>
+    <section class="nearbyTop069"><div class="nearbyLogo069"><img src="assets/favicon.png?v=${BUILD}" alt=""><strong>${fireVaultBrand575()}</strong></div>${todayHeader070()}</section>
     <section class="nearbyCompactHead069">
-      <div class="nearbyCompactTitle069"><h1>Nearby Accounts</h1><span><i></i>${esc(gpsText)} <b>• ${nearby} within ${NEARBY_LIST_MAX_MILES_069} mi • ${inv.ready} GPS</b></span></div>
-      <div class="nearbyCompactActions069"><button class="nearbyViewToggle069" id="nearbyViewToggle069" aria-label="Switch between map and list"><span>${homeNearbyView069==='map'?'⌖':'☷'}</span><b>${homeNearbyView069==='map'?'Map':'List'}</b></button><button class="iconCompact069" id="scanHome069" aria-label="Refresh GPS" ${status==='scanning'?'disabled':''}>↻</button><button class="iconCompact069" id="radiusHome069" aria-label="Nearby radius settings">◎</button></div>
+      <div class="nearbyCompactTitle069"><h1>Nearby Accounts</h1><span><i></i>${esc(gpsText)} <b>• ${nearby} shown • ${inv.ready} GPS • ${NEARBY_LIST_MAX_MILES_069} mi</b></span></div>
+      <div class="nearbyCompactActions069"><button class="nearbyViewToggle069" id="nearbyViewToggle069" aria-label="Switch between map and list"><span>${homeNearbyView069==='map'?'⌖':'☷'}</span><b>${homeNearbyView069==='map'?'Map':'List'}</b></button><label class="nearbyCategoryFilter070 category-${nearbyCategoryFilter070}" aria-label="Filter nearby accounts by communicator category"><i></i><select id="nearbyCategoryFilter070">${categoryOptions070}</select></label><button class="iconCompact069" id="scanHome069" aria-label="Refresh GPS" ${status==='scanning'?'disabled':''}>↻</button></div>
     </section>
     ${status==='error'?`<div class="nearbyNotice069"><strong>Location problem:</strong> ${esc(nearbyScanStatus0652.message)}</div>`:''}
     <section class="nearbyWorkspace069 ${homeNearbyView069}">
       ${homeNearbyView069==='map'?homeNearbyMapShell069():''}
-      <div class="nearbyListHead069"><strong>${rows.length} account${rows.length===1?'':'s'} within ${NEARBY_LIST_MAX_MILES_069} miles</strong><span>Sorted by distance</span></div>
+      <div class="nearbyListHead069"><strong>${rows.length} ${nearbyCategoryFilter070==='all'?'account':NEARBY_CATEGORY_META_070[nearbyCategoryFilter070].label+' account'}${rows.length===1?'':'s'} within ${NEARBY_LIST_MAX_MILES_069} miles</strong><span>Sorted by distance</span></div>
       <div class="nearbyCards069" id="nearbyCards069">${rows.length?rows.map(nearbyAccountCard069).join(''):`<div class="nearbyEmpty069">${nearbyState?'No nearby accounts found.':'Refreshing GPS…'}</div>`}</div>
     </section>
     <nav class="nearbyBottomNav069"><button class="active">⌖<span>Nearby</span></button><button id="homeAccounts069">▦<span>Accounts</span></button><button id="homeToolsNav069">⚒<span>Tools</span></button><button id="homeSettingsNav069">⚙<span>Settings</span></button></nav>
   </div>`);
-  document.getElementById('homeBuild069').onclick=showChangelog;
-  document.getElementById('homeSettings069').onclick=()=>route('settings');
   document.getElementById('homeAccounts069').onclick=()=>route('sites');
   document.getElementById('homeToolsNav069').onclick=()=>route('dashboard068');
   document.getElementById('homeSettingsNav069').onclick=()=>route('settings');
   document.getElementById('scanHome069').onclick=()=>{resetNearbyMapOverview069(false);runNearbyScan0652('home');};
-  document.getElementById('radiusHome069').onclick=()=>{settingsTab='gps';mode='settingsDetail';route('settings');};
   document.getElementById('nearbyViewToggle069').onclick=()=>{homeNearbyView069=homeNearbyView069==='map'?'list':'map';localStorage.setItem(HOME_NEARBY_VIEW_KEY_069,homeNearbyView069);home();};
+  document.getElementById('nearbyCategoryFilter070').onchange=e=>{
+    nearbyCategoryFilter070=e.target.value in NEARBY_CATEGORY_META_070?e.target.value:"all";
+    homeNearbySelected069="";
+    nearbyMapPopupSite069="";
+    nearbyStaticVisibleMiles069=null;
+    nearbyAdaptiveRadiusMiles069=null;
+    nearbyStreetFocusSite069="";
+    nearbyStaticCenter069=null;
+    home();
+  };
   document.querySelectorAll('[data-nearby-open069]').forEach(b=>b.onclick=e=>{e.stopPropagation();selectedSiteId=b.dataset.nearbyOpen069;route('siteDetail');});
   document.querySelectorAll('[data-nearby-route069]').forEach(b=>b.onclick=e=>{e.stopPropagation();const s=(data.sites||[]).find(x=>x.id===b.dataset.nearbyRoute069);if(s) window.open(mapUrl(s,data.settings.gps?.mapProvider||'apple'),'_blank');});
   document.querySelectorAll('[data-nearby-call069]').forEach(b=>b.onclick=e=>{e.stopPropagation();const s=(data.sites||[]).find(x=>x.id===b.dataset.nearbyCall069);const ph=phone069(s);if(ph) location.href=`tel:${ph.replace(/[^+\\d]/g,'')}`;});
@@ -2525,7 +2558,8 @@ function drawStaticNearbyMap069(){
       if(!g||!Number.isFinite(g.lat)||!Number.isFinite(g.lng))return;
       const p=staticPoint069(g.lat,g.lng,b); if(!p||p.x<1||p.x>99||p.y<1||p.y>99)return;
       rendered++;
-      html+=`<button class="staticMarker069 ${r.s.id===homeNearbySelected069?'selected':''}" style="left:${p.x}%;top:${p.y}%" data-static-marker069="${esc(r.s.id)}" aria-label="${esc(r.s.name||'Account')}"><span>${index+1}</span></button>`;
+      const category=accountCategory070(r.s);
+      html+=`<button class="staticMarker069 category-${category} ${r.s.id===homeNearbySelected069?'selected':''}" style="left:${p.x}%;top:${p.y}%" data-static-marker069="${esc(r.s.id)}" data-marker-category070="${category}" aria-label="${esc(r.s.name||'Account')}"><span>${index+1}</span></button>`;
     });
     overlay.innerHTML=html||'<div class="staticMapMessage069">No mapped accounts are inside the current view.</div>';
     if(count){count.textContent=`${rendered} mapped • ${nearbyAdaptiveRadiusMiles069.toFixed(1)} mi radius`;count.hidden=false;}
@@ -2545,10 +2579,6 @@ function drawStaticNearbyMap069(){
 function initNearbyMap069(){
   if(!nearbyState)return;
   drawStaticNearbyMap069();
-  const zin=document.getElementById('mapZoomIn069'),zout=document.getElementById('mapZoomOut069'),center=document.getElementById('mapCenter069');
-  if(zin)zin.onclick=()=>{nearbyStaticVisibleMiles069=Math.max(.06,(nearbyStaticVisibleMiles069||initialVisibleMiles069(nearbyRows069()))/1.35);drawStaticNearbyMap069();};
-  if(zout)zout.onclick=()=>{nearbyStaticVisibleMiles069=Math.min(maxVisibleMiles069(nearbyRows069()),(nearbyStaticVisibleMiles069||initialVisibleMiles069(nearbyRows069()))*1.35);drawStaticNearbyMap069();};
-  if(center)center.onclick=()=>resetNearbyMapOverview069(true);
   const shell=document.querySelector('.staticMapShell069');
   if(shell)shell.onclick=e=>{if(!e.target.closest('[data-static-marker069]')){nearbyMapPopupSite069="";updateNearbyMapSelection069();}};
 }
@@ -7411,6 +7441,7 @@ function diagnostics(){
 }
 function showChangelog(){
   const notes = [
+    "Build 0.70.0 simplifies the Nearby header, replaces the build/settings controls with today’s day and date, removes floating Help and map controls, and adds color-coded Basic, CLSS, AlarmNet, and IPDACT filtering based on Account ID.",
     "Build 0.69.9 enlarges Nearby Open, Route, and Call controls, changes selected accounts to a glowing green treatment, extends the account list to 25 miles, and adapts the overview radius to the selected account distance.",
     "Build 0.69.8 makes Nearby list taps select the tapped account reliably, zooms the map to street level around that account, and forces all account markers to render as true circles.",
     "Build 0.69.6 hides map details until a marker is tapped, stabilizes momentum list settling, and moves the map closer to the top with a simpler header.",

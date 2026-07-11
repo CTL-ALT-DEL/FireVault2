@@ -13564,3 +13564,52 @@ nav button.active{background:color-mix(in srgb,var(--accent) 17%,rgba(30,41,59,.
   .nearbyActions069 button:first-child{width:39px!important;min-width:39px!important}
   .nearbyAccount069{grid-template-columns:22px 12px minmax(0,1fr) auto auto!important;gap:4px!important}
 }
+
+/* Build 0.70.0 — Nearby category filtering and simplified chrome */
+.contextHelp060{display:none!important}
+.nearbyTop069{min-height:38px!important;padding:0 0 4px!important}
+.nearbyToday070{display:grid;grid-template-columns:auto auto;grid-template-areas:"today today" "day date";justify-content:end;column-gap:7px;row-gap:1px;min-width:112px;text-align:right;line-height:1}
+.nearbyToday070 strong{grid-area:today;color:#ef4444;font-size:.55rem;letter-spacing:.14em}
+.nearbyToday070 span{grid-area:day;color:#fff;font-size:.68rem;font-weight:800}
+.nearbyToday070 b{grid-area:date;color:#9ca7b5;font-size:.68rem;font-weight:700}
+.nearbyCompactHead069{min-height:34px!important}
+.nearbyCompactActions069{max-width:58%;gap:4px!important}
+.nearbyViewToggle069{flex:0 0 auto;min-width:58px!important;height:29px!important;padding:0 7px!important}
+.iconCompact069{flex:0 0 auto;width:29px!important;height:29px!important;min-height:29px!important}
+.nearbyCategoryFilter070{--category:#e5e7eb;display:flex;align-items:center;gap:5px;min-width:0;height:29px;padding:0 7px;border:1px solid #475569;border-radius:9px;background:#151c24;color:#fff;overflow:hidden}
+.nearbyCategoryFilter070 i{flex:0 0 auto;width:7px;height:7px;border-radius:50%;background:var(--category);box-shadow:0 0 8px var(--category)}
+.nearbyCategoryFilter070 select{min-width:0;width:88px;height:27px;min-height:27px;padding:0 16px 0 0;border:0!important;background:transparent!important;color:#fff!important;font-size:.58rem!important;font-weight:800;box-shadow:none!important;outline:0}
+.nearbyCategoryFilter070 select option{background:#111827;color:#fff}
+.nearbyCategoryFilter070.category-all{--category:#e5e7eb;border-color:#64748b}
+.nearbyCategoryFilter070.category-basic{--category:#94a3b8;border-color:#64748b}
+.nearbyCategoryFilter070.category-clss{--category:#38bdf8;border-color:#0284c7}
+.nearbyCategoryFilter070.category-alarmnet{--category:#f59e0b;border-color:#b45309}
+.nearbyCategoryFilter070.category-ipdact{--category:#a78bfa;border-color:#7c3aed}
+.staticMapControls069,.mapCenter069{display:none!important}
+
+/* Category color language: Basic slate, CLSS blue, AlarmNet amber, IPDACT violet. */
+.nearbyAccount069{--category:#94a3b8;border-left:3px solid var(--category)!important}
+.nearbyAccount069.category-basic{--category:#94a3b8}
+.nearbyAccount069.category-clss{--category:#38bdf8}
+.nearbyAccount069.category-alarmnet{--category:#f59e0b}
+.nearbyAccount069.category-ipdact{--category:#a78bfa}
+.nearbyAccount069:not(.selected) .nearbyNumber069{background:color-mix(in srgb,var(--category) 72%,#10151c)!important;color:#fff!important}
+.nearbyAccount069:not(.selected) .nearbyPin069,.nearbyAccount069:not(.selected) .nearbyInfo069 b{color:var(--category)!important}
+.nearbyAccount069.selected{border-left-color:#32ef76!important}
+
+.staticMarker069{--category:#94a3b8;background:var(--category)!important}
+.staticMarker069.category-basic{--category:#64748b}
+.staticMarker069.category-clss{--category:#0284c7}
+.staticMarker069.category-alarmnet{--category:#d97706}
+.staticMarker069.category-ipdact{--category:#7c3aed}
+.staticMarker069.selected{background:#32ef76!important}
+
+@media(max-width:390px){
+  .nearbyToday070{min-width:96px;column-gap:5px}.nearbyToday070 span,.nearbyToday070 b{font-size:.61rem}.nearbyToday070 strong{font-size:.5rem}
+  .nearbyCompactActions069{max-width:62%}.nearbyCategoryFilter070{padding:0 5px}.nearbyCategoryFilter070 select{width:74px;font-size:.53rem!important}
+  .nearbyViewToggle069 b{display:none}.nearbyViewToggle069{min-width:30px!important;width:30px!important;padding:0!important}
+}
+@media(min-width:760px){
+  .nearbyToday070{min-width:150px}.nearbyToday070 span,.nearbyToday070 b{font-size:.82rem}.nearbyToday070 strong{font-size:.62rem}
+  .nearbyCategoryFilter070 select{width:118px;font-size:.67rem!important}
+}
