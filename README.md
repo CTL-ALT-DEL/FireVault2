@@ -1,18 +1,14 @@
-# FireVault Build 0.57.0
+# FireVault Build 0.58.0
 
-Build 0.57.0 adds the first complete in-app FireVault User Manual while preserving the repaired Site Detail layout, Quick Capture workflow, Home Layout controls, and scoped Settings design.
+Build 0.58.0 expands the in-app documentation into the FireVault Academy foundation while preserving the repaired Site Detail layout, Quick Capture workflow, Home Layout controls, and scoped Settings design.
 
-## New in this build
+## Added
+- Academy home with Manual, Quick Start, What’s New, Field Tips, Troubleshooting, Revision History, and future Training / AI tiles
+- Chapter bookmarks stored locally
+- Smarter search with common synonyms
+- Chapter reading time, review status, build compatibility, progress, and previous / next navigation
+- Improved responsive reading layout for iPhone and iPad
 
-- Added **Settings → Help & Manual**.
-- Added a searchable, expandable manual designed for phone and iPad layouts.
-- Added chapters for Getting Started, Today, Customer Database, Site Detail, Daily Field Workflow, Notes, Tasks, Deficiencies, Photos, GPS, Daily Route, Reports, Email, Settings, Backup, Restore, Updates, and Troubleshooting.
-- Added app-build, manual-revision, and last-reviewed metadata.
-- Added a visible documentation checkpoint explaining that the manual must be reviewed whenever features or navigation change.
-- Added pre-release and Version 1.0 verification guidance.
-- Preserved Build 0.56.0 Quick Capture and Field Dashboard controls.
-- Preserved the Site Detail natural-height and scrolling repair.
+Suggested commit message:
 
-## Suggested commit message
-
-`Build 0.57.0 add searchable in-app FireVault user manual`
+`Build 0.58.0 expand User Manual into FireVault Academy`
