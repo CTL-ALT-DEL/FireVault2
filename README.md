@@ -1,15 +1,22 @@
-# FireVault Build 0.60.0
+# FireVault Build 0.61.0
 
-Build 0.60.0 connects major FireVault screens directly to the matching FireVault Academy chapter.
+Build 0.61.0 adds a dedicated timed Service Visit workspace.
 
-## Included
-- Floating contextual Help control on major field screens
-- Direct links to matching manual chapters
-- Screen-specific suggested topics
-- Return-to-screen navigation that preserves the active account and workflow
-- Contextual Help inside Settings submenus, including Email, GPS, Reports, Photo Overlay, Modules, and Backup
-- FireVault Academy manual revision updated to 0.60.0
+## New
+- Start or resume a service visit directly from Site Detail
+- Live elapsed-time display
+- Autosaved work-summary draft
+- Timestamped visit timeline
+- Quick actions for customer updates, testing notes, parts tasks, deficiencies, photos, and reports
+- End-and-save closeout creates a complete Visit History record
+- Active visit can be resumed from Home
+
+## Preserved
+- Site Detail clipping repair
+- FireVault Academy and contextual help
+- Email Settings formatting and Home Layout controls
+- Existing local data and backups
 
 Suggested commit message:
 
-`Build 0.60.0 add contextual help and screen-linked Academy guidance`
+`Build 0.61.0 add active Service Visit workspace and closeout workflow`

@@ -1430,7 +1430,7 @@ function addServiceFollowUp(kind="Follow-up"){
 }
 function startJobTimer(){ stopJobTimer(); jobTimer=setInterval(()=>{ const el=document.getElementById("jobElapsed"); if(el && activeJob) el.textContent=elapsedText(activeJob.startedAt); },1000); }
 function stopJobTimer(){ if(jobTimer){ clearInterval(jobTimer); jobTimer=null; } }
-function setActiveNav(){ document.querySelectorAll("nav button").forEach(b=>b.classList.remove("active")); const section=["routeLog","dailySummary","actionCenter","pinnedSites"].includes(view)?"home":(["siteDetail","visits","visitDetail","checklist","siteForm","contactsList","contactForm","siteDocs","siteDocForm","equipmentList","equipmentForm","tasks","taskForm","deficiencies","deficiencyForm","report","jobMode","nearbySites","attention"].includes(view)?"sites":view); document.getElementById("nav-"+section)?.classList.add("active"); }
+function setActiveNav(){ document.querySelectorAll("nav button").forEach(b=>b.classList.remove("active")); const section=["routeLog","dailySummary","actionCenter","pinnedSites"].includes(view)?"home":(["siteDetail","visits","visitDetail","checklist","siteForm","contactsList","contactForm","siteDocs","siteDocForm","equipmentList","equipmentForm","tasks","taskForm","deficiencies","deficiencyForm","report","jobMode","serviceVisit","nearbySites","attention"].includes(view)?"sites":view); document.getElementById("nav-"+section)?.classList.add("active"); }
 function wireGlobalHeader537(){ const b=document.getElementById("headerSettingsBtn537"); if(b) b.onclick=openSettingsHome572; }
 function showGlobalChrome537(){ const h=document.getElementById("appHeader"); const n=document.getElementById("appNav"); if(h){ h.style.display="flex"; h.style.visibility="visible"; h.style.opacity="1"; } if(n){ n.style.display="grid"; n.style.visibility="visible"; n.style.opacity="1"; } wireGlobalHeader537(); }
 
@@ -1462,7 +1462,7 @@ function injectContextualHelp060(){
 function render(){
   try{
     if(view!=="home") restoreAppChrome572();
-    const routes = {home, dailySummary, routeLog, actionCenter, pinnedSites:pinnedSitesManager567, sites, nearbySites, attention:attentionQueue, siteDetail, visits, visitDetail, checklist, siteForm, contactsList, contactForm, siteDocs, siteDocForm, equipmentList, equipmentForm, tasks, taskForm, deficiencies, deficiencyForm, report, library, resourceForm, jobMode, settings, diagnostics, dataTools};
+    const routes = {home, dailySummary, routeLog, actionCenter, pinnedSites:pinnedSitesManager567, sites, nearbySites, attention:attentionQueue, siteDetail, visits, visitDetail, checklist, siteForm, contactsList, contactForm, siteDocs, siteDocForm, equipmentList, equipmentForm, tasks, taskForm, deficiencies, deficiencyForm, report, library, resourceForm, jobMode, serviceVisit, settings, diagnostics, dataTools};
     (routes[view] || home)();
     document.body.classList.toggle("homeFullscreen480", view === "home");
     document.body.classList.toggle("homeLayoutFixed570", view === "home");
@@ -2078,7 +2078,7 @@ function home(){
   const homeRouteNearest=document.getElementById('homeRouteNearestBtn'); if(homeRouteNearest) homeRouteNearest.onclick=checkRouteNearestSite;
   const homeRoutePause=document.getElementById('homeRoutePauseBtn'); if(homeRoutePause) homeRoutePause.onclick=()=> activeRoute?.paused ? resumeRouteDay() : pauseRouteDay();
   const homeRouteEnd=document.getElementById('homeRouteEndBtn'); if(homeRouteEnd) homeRouteEnd.onclick=()=>{ if(confirm('End and save today’s route?')) endRouteDay(); };
-  const rb=document.getElementById('resumeJobBtn'); if(rb) rb.onclick=()=>{selectedSiteId=activeJob.siteId; route('jobMode');};
+  const rb=document.getElementById('resumeJobBtn'); if(rb) rb.onclick=()=>{selectedSiteId=activeJob.siteId; route('serviceVisit');};
 }
 
 
@@ -2913,7 +2913,8 @@ function siteDetail(){
     ${featureOn("siteTimeline")?siteActivityTimelineMarkup557(s):""}
 
     <div class="card siteQuickActions544"><div class="siteCardHead477"><div><h2>Site Quick Actions</h2><p>Fast access to the field tasks used most on this account.</p></div><span class="quickActionBadge544">${open+def+photoDocs.length}</span></div><div class="quickActionGrid544">
-      <button class="primary quickAction544" id="qaAddNote544"><strong>＋ Site Note</strong><span>Timestamped note</span></button>
+      <button class="primary quickAction544" id="qaStartVisit610"><strong>${activeJob&&activeJob.siteId===s.id?"Resume Visit":"Start Visit"}</strong><span>${activeJob&&activeJob.siteId===s.id?elapsedText(activeJob.startedAt):"Timed service workspace"}</span></button>
+      <button class="ghost quickAction544" id="qaAddNote544"><strong>＋ Site Note</strong><span>Timestamped note</span></button>
       <button class="ghost quickAction544" id="qaAddPhoto544"><strong>＋ Photo</strong><span>Panel, device, deficiency</span></button>
       <button class="ghost quickAction544" id="qaAddDef544"><strong>＋ Deficiency</strong><span>Document a problem</span></button>
       <button class="ghost quickAction544" id="qaAddTask544"><strong>＋ Task</strong><span>Follow-up item</span></button>
@@ -2972,6 +2973,7 @@ function siteDetail(){
   wireImportantSiteInfo568();
   wireSiteBrief556();
   wireSiteActivity557();
+  const qaVisit610=document.getElementById('qaStartVisit610'); if(qaVisit610) qaVisit610.onclick=startServiceVisit610;
   const qaNote544=document.getElementById('qaAddNote544'); if(qaNote544) qaNote544.onclick=()=>addSiteNotePrompt();
   const qaPhoto544=document.getElementById('qaAddPhoto544'); if(qaPhoto544) qaPhoto544.onclick=()=>{mode='newPhoto'; route('siteDocForm');};
   const qaDef544=document.getElementById('qaAddDef544'); if(qaDef544) qaDef544.onclick=()=>{mode=null; route('deficiencyForm');};
@@ -3883,7 +3885,7 @@ function visits(){
     <div class="list grow">${siteVisits.length?siteVisits.map(v=>`<button class="card visitLogItem" data-visit="${esc(v.id)}"><div class="row"><div><h2>${esc(visitDateLabel(v))}</h2><p>${esc(visitTimeRange(v))} • ${esc(durationText(v.startedAt,v.endedAt))}</p></div><span class="pill">${esc(v.type||"Visit")}</span></div><p>${esc(visitNotesPreview(v,3))}</p></button>`).join(""):`<div class="empty">Use Add Note on the customer screen to create site notes for this account.</div>`}</div>
   </div>`);
   document.getElementById("backBtn").onclick=()=>route("siteDetail");
-  document.getElementById("startVisitBtn").onclick=startJob;
+  document.getElementById("startVisitBtn").onclick=startServiceVisit610;
   document.querySelectorAll(".visitLogItem").forEach(b=>b.onclick=()=>{mode=b.dataset.visit; route("visitDetail");});
 }
 
@@ -4533,6 +4535,104 @@ function addSiteNotePrompt(defaultText=""){
 }
 function startJob(){ addSiteNotePrompt(); }
 
+
+function startServiceVisit610(){
+  const s=site();
+  if(!s){ route("sites"); return; }
+  if(activeJob && activeJob.siteId!==s.id){
+    const other=data.sites.find(x=>x.id===activeJob.siteId);
+    if(!confirm(`A service visit is already active for ${other?.name||activeJob.siteName||"another site"}. End or discard that visit before starting a new one?`)) return;
+    activeJob=null; saveActiveJob();
+  }
+  if(!activeJob){
+    const now=new Date().toISOString();
+    activeJob={siteId:s.id,siteName:s.name||"Customer Account",startedAt:now,events:[{time:now,note:"Service visit started"}],draft:""};
+    saveActiveJob();
+    toast("Service visit started.");
+  }
+  selectedSiteId=s.id;
+  route("serviceVisit");
+}
+function serviceVisitEventRows610(){
+  return (activeJob?.events||[]).slice().reverse().map(e=>`<div class="serviceVisitEvent610"><span>${esc(eventTime(e.time))}</span><p>${esc(e.note||"Visit event")}</p></div>`).join("");
+}
+function saveServiceVisitDraft610(value){
+  if(!activeJob) return;
+  activeJob.draft=value||"";
+  saveActiveJob();
+}
+function addServiceVisitEvent610(defaultText=""){
+  if(!activeJob) return;
+  const note=prompt("Visit timeline note:",defaultText);
+  if(!note?.trim()) return;
+  addJobEvent(note.trim());
+  toast("Timeline note added.");
+  serviceVisit();
+}
+function endServiceVisit610(){
+  const s=site();
+  if(!s || !activeJob) return;
+  const draft=(document.getElementById("serviceVisitNotes610")?.value||activeJob.draft||"").trim();
+  const defaultSummary=draft || "Service visit completed. Site status and follow-up items documented in FireVault.";
+  const summary=prompt("Final visit summary:",defaultSummary);
+  if(summary===null) return;
+  const endedAt=new Date().toISOString();
+  const events=(activeJob.events||[]).slice();
+  events.push({time:endedAt,note:"Service visit completed"});
+  const timeline=events.map(e=>`${eventTime(e.time)} — ${e.note}`).join("\n");
+  const notes=[summary.trim()||defaultSummary, timeline?`\nService Timeline\n${timeline}`:""].filter(Boolean).join("\n");
+  s.visits=Array.isArray(s.visits)?s.visits:[];
+  const visit={id:uid(),type:"Service Visit",startedAt:activeJob.startedAt,endedAt,notes,events,createdAt:endedAt};
+  s.visits.unshift(visit);
+  mode=visit.id;
+  activeJob=null;
+  saveActiveJob();
+  save();
+  stopJobTimer();
+  toast("Service visit saved.");
+  route("visitDetail");
+}
+function discardServiceVisit610(){
+  if(!activeJob) return;
+  if(!confirm("Discard this active service visit? Unsaved timer and timeline information will be removed.")) return;
+  activeJob=null; saveActiveJob(); stopJobTimer(); toast("Active visit discarded."); route("siteDetail");
+}
+function serviceVisit(){
+  if(!activeJob){ route("siteDetail"); return; }
+  selectedSiteId=activeJob.siteId;
+  const s=site();
+  if(!s){ activeJob=null; saveActiveJob(); route("sites"); return; }
+  html(`<div class="screen serviceVisitScreen610">
+    <div class="row serviceVisitTop610"><button class="back ghost" id="backBtn">←</button><div><h1>Service Visit</h1><p>${esc(s.name||"Customer Account")}</p></div><button class="ghost smallBtn contextHelp537" data-help="workflow">Help</button></div>
+    <div class="card serviceVisitHero610"><div><span>ACTIVE VISIT</span><strong id="jobElapsed">${elapsedText(activeJob.startedAt)}</strong><p>Started ${esc(eventTime(activeJob.startedAt))} • ${esc(fullAddress(s)||"No address entered")}</p></div><button class="primary" id="endVisit610">End & Save</button></div>
+    <div class="card serviceVisitComposer610"><div class="row"><div><h2>Work Summary</h2><p>Keep a running description of testing, repairs, customer updates, and site status.</p></div><button class="ghost smallBtn" id="addTimeline610">＋ Timeline</button></div><textarea id="serviceVisitNotes610" rows="7" placeholder="Work performed, findings, devices tested, repairs, system status, parts needed...">${esc(activeJob.draft||"")}</textarea><div class="serviceVisitSaveState610">Draft saves automatically on this device.</div></div>
+    <div class="serviceVisitActionGrid610">
+      <button class="card" id="visitCustomer610"><strong>Customer Update</strong><span>Add timeline note</span></button>
+      <button class="card" id="visitTesting610"><strong>Testing</strong><span>Add testing note</span></button>
+      <button class="card" id="visitParts610"><strong>Parts Needed</strong><span>Create follow-up task</span></button>
+      <button class="card" id="visitDef610"><strong>Deficiency</strong><span>Document problem</span></button>
+      <button class="card" id="visitPhoto610"><strong>Photo</strong><span>Add site photo</span></button>
+      <button class="card" id="visitReport610"><strong>Report</strong><span>Review account report</span></button>
+    </div>
+    <div class="card serviceVisitTimeline610"><div class="row"><div><h2>Visit Timeline</h2><p>${(activeJob.events||[]).length} saved event${(activeJob.events||[]).length===1?"":"s"}</p></div></div><div>${serviceVisitEventRows610()||'<div class="empty">No timeline entries yet.</div>'}</div></div>
+    <button class="danger" id="discardVisit610">Discard Active Visit</button>
+  </div>`);
+  document.getElementById("backBtn").onclick=()=>route("siteDetail");
+  document.getElementById("endVisit610").onclick=endServiceVisit610;
+  document.getElementById("discardVisit610").onclick=discardServiceVisit610;
+  document.getElementById("addTimeline610").onclick=()=>addServiceVisitEvent610();
+  document.getElementById("visitCustomer610").onclick=()=>addServiceVisitEvent610("Customer update: ");
+  document.getElementById("visitTesting610").onclick=()=>addServiceVisitEvent610("Testing performed: ");
+  document.getElementById("visitParts610").onclick=()=>addServiceFollowUp("Parts Needed");
+  document.getElementById("visitDef610").onclick=()=>{mode=null; route("deficiencyForm");};
+  document.getElementById("visitPhoto610").onclick=()=>{mode="newPhoto"; route("siteDocForm");};
+  document.getElementById("visitReport610").onclick=()=>route("report");
+  const notes=document.getElementById("serviceVisitNotes610");
+  if(notes) notes.addEventListener("input",()=>saveServiceVisitDraft610(notes.value));
+  wireContextHelp537();
+  startJobTimer();
+}
+
 function jobMode(){
   const s=site();
   if(!s){ route("sites"); return; }
@@ -5174,7 +5274,7 @@ const FIREVAULT_MANUAL_058 = [
     ["Restore fails","Use an unmodified FireVault JSON backup, verify the file is readable, and compare its preview details before confirming restore."]
   ]},
   {id:"release",title:"Release & Manual Status",icon:"ⓘ",status:"Living document",summary:"Understand how this documentation will be maintained through Version 1.0.",topics:[
-    ["Manual revision","This manual revision matches FireVault Build 0.60.0 and was last reviewed in July 2026."],
+    ["Manual revision","This manual revision matches FireVault Build 0.61.0 and was last reviewed in July 2026."],
     ["Living documentation","Every feature release should include a documentation review. New controls must be documented and changed workflows must be rechecked."],
     ["Pre-release warning","FireVault is still under active development. Labels, layouts, and workflows may change before Version 1.0."],
     ["Screenshot policy","Annotated screenshots should be added after major screens reach release-candidate stability."],
@@ -5216,12 +5316,12 @@ function manualTile058(icon,title,note,view,tone="blue",badge=""){ return `<butt
 function manualHome058(){
   const bookmarked=FIREVAULT_MANUAL_058.filter(ch=>manualBookmarks058.includes(ch.id));
   return `<div class="academyHome058">
-    <section class="academyHero058"><div><span class="academyEyebrow058">FireVault Academy</span><h2>${fireVaultBrand575()} Knowledge Center</h2><p>Manuals, quick-start guidance, field tips, release notes, and troubleshooting for Build ${BUILD}.</p></div><div class="academyMeta058"><span><b>${BUILD}</b>App build</span><span><b>0.60.0</b>Manual revision</span><span><b>July 2026</b>Last reviewed</span></div></section>
+    <section class="academyHero058"><div><span class="academyEyebrow058">FireVault Academy</span><h2>${fireVaultBrand575()} Knowledge Center</h2><p>Manuals, quick-start guidance, field tips, release notes, and troubleshooting for Build ${BUILD}.</p></div><div class="academyMeta058"><span><b>${BUILD}</b>App build</span><span><b>0.61.0</b>Manual revision</span><span><b>July 2026</b>Last reviewed</span></div></section>
     <div class="academySearch058"><span>⌕</span><input id="manualSearch058" type="search" value="${esc(manualQuery058)}" placeholder="Search FireVault Academy…"><button class="ghost" id="manualSearchGo058">Search</button></div>
     <section class="academyTileGrid058">
       ${manualTile058("📘","User Manual","Browse all chapters and step-by-step instructions.","manual","blue")}
       ${manualTile058("🚀","Quick Start Guide","Set up FireVault and complete a basic field workflow.","quick","green")}
-      ${manualTile058("🆕","What’s New","Review changes included in the current release.","new","red","0.60.0")}
+      ${manualTile058("🆕","What’s New","Review changes included in the current release.","new","red","0.61.0")}
       ${manualTile058("🧰","Field Tips","Practical documentation and reporting advice.","tips","amber")}
       ${manualTile058("❓","Troubleshooting","Resolve common GPS, storage, photo, and update issues.","trouble","violet")}
       ${manualTile058("📋","Revision History","Track app and manual revision checkpoints.","revisions","slate")}
@@ -5245,10 +5345,10 @@ function manualChapterView058(){
 }
 function manualSimplePage058(type){
  const pages={
-  quick:["🚀","Quick Start Guide","Get FireVault ready for a normal field day.",[["1. Verify the build","Confirm the green build badge shows 0.60.0 before entering production information."],["2. Complete Technician Profile","Enter your name, company, phone, email, and license or employee identification."],["3. Review permissions","Allow location and photo access only when FireVault requests them and the feature is needed."],["4. Create or open a site","Add the customer name, full address, panel details, contacts, access notes, and GPS location."],["5. Document the visit","Record notes, photos, tasks, deficiencies, equipment changes, and a service visit."],["6. Finish and protect the data","Review the report, send or copy the required summary, then export a current backup."]]],
-  new:["🆕","What’s New in 0.60.0","Contextual help and screen-linked Academy guidance.",[["Help where you work","Major field screens now include a compact Help control that opens the exact matching manual chapter."],["Screen-linked guidance","Today, Sites, Site Detail, Photos, Notes, Tasks, Deficiencies, Reports, GPS, Daily Route, and Settings are connected to relevant Academy guidance."],["Return to screen","The Academy remembers the previous workflow and active account so the technician can return directly to the same screen."],["Suggested topics","Contextual chapters display practical topic suggestions based on the screen that opened Help."],["Settings guidance","Email, Reports, GPS, Photo Overlay, Modules, Backup, Home Layout, and other Settings areas open the most relevant documentation."]]],
+  quick:["🚀","Quick Start Guide","Get FireVault ready for a normal field day.",[["1. Verify the build","Confirm the green build badge shows 0.61.0 before entering production information."],["2. Complete Technician Profile","Enter your name, company, phone, email, and license or employee identification."],["3. Review permissions","Allow location and photo access only when FireVault requests them and the feature is needed."],["4. Create or open a site","Add the customer name, full address, panel details, contacts, access notes, and GPS location."],["5. Document the visit","Record notes, photos, tasks, deficiencies, equipment changes, and a service visit."],["6. Finish and protect the data","Review the report, send or copy the required summary, then export a current backup."]]],
+  new:["🆕","What’s New in 0.61.0","Active service visit workspace and field closeout workflow.",[["Timed service visits","Start or resume a visit directly from Site Detail and keep a live elapsed-time record."],["Autosaved work summary","The running service narrative is saved on the device while the visit remains active."],["Timestamped timeline","Add customer updates, testing notes, and other important events to a chronological visit record."],["Field actions","Create parts follow-ups, deficiencies, photos, and reports without losing the active visit."],["End and save","Closing the visit creates a complete Visit History entry with duration, summary, and timeline."]]],
   tips:["🧰","Field Tips","Short practices that improve the usefulness of FireVault records.",[["Write for the next technician","Include the exact panel, circuit, device, location, symptom, test result, and next action instead of relying on memory."],["Photograph context first","Take one wide photo showing the equipment location before close-up terminal, label, or damage photos."],["Separate facts from follow-up","Use notes for what occurred, deficiencies for code or system problems, and tasks for work that still needs completion."],["Confirm the account","Before using Quick Capture, verify the selected customer site to prevent records from being stored under the wrong account."],["Back up before updates","Export a backup before installing every development build and after completing a significant amount of field documentation."]]],
-  revisions:["📋","Revision History","Application and documentation checkpoints.",[["0.60.0","Connected major screens and Settings areas directly to matching Academy chapters with return-to-screen navigation."],["0.59.0","Added interactive tutorials, guided orientation, pinned learning, field tips, and documentation tracking."],["0.58.0","Expanded Help & Manual into FireVault Academy with bookmarks, smart search, Quick Start, and reader navigation."],["0.57.0","Added the first complete searchable in-app FireVault User Manual."],["Ongoing review rule","Any change to navigation, labels, storage, workflows, permissions, or supported layouts requires the related manual chapter to be checked."]]],
+  revisions:["📋","Revision History","Application and documentation checkpoints.",[["0.61.0","Added a timed Service Visit workspace with autosaved notes, timeline events, field actions, and saved visit closeout."],["0.60.0","Connected major screens and Settings areas directly to matching Academy chapters with return-to-screen navigation."],["0.59.0","Added interactive tutorials, guided orientation, pinned learning, field tips, and documentation tracking."],["0.58.0","Expanded Help & Manual into FireVault Academy with bookmarks, smart search, Quick Start, and reader navigation."],["0.57.0","Added the first complete searchable in-app FireVault User Manual."],["Ongoing review rule","Any change to navigation, labels, storage, workflows, permissions, or supported layouts requires the related manual chapter to be checked."]]],
   trouble:["❓","Troubleshooting","Common problems and safe first checks.",FIREVAULT_MANUAL_058.find(x=>x.id==="trouble")?.topics||[]]
  };
  const [icon,title,note,items]=pages[type]||["🚧","Coming Soon","This Academy area is reserved for a future milestone.",[["Development status","The feature is not active yet. No outside service has been connected or purchased."]]];
@@ -5415,7 +5515,7 @@ function saveSettings(){
 function stabilityReport(){
   const issues=[];
   const pass=[];
-  const routeNames=["home","dailySummary","routeLog","actionCenter","pinnedSites","sites","nearbySites","attention","siteDetail","visits","visitDetail","checklist","siteForm","contactsList","contactForm","siteDocs","siteDocForm","equipmentList","equipmentForm","tasks","taskForm","deficiencies","deficiencyForm","report","library","resourceForm","jobMode","settings","diagnostics","dataTools"];
+  const routeNames=["home","dailySummary","routeLog","actionCenter","pinnedSites","sites","nearbySites","attention","siteDetail","visits","visitDetail","checklist","siteForm","contactsList","contactForm","siteDocs","siteDocForm","equipmentList","equipmentForm","tasks","taskForm","deficiencies","deficiencyForm","report","library","resourceForm","jobMode","serviceVisit","settings","diagnostics","dataTools"];
   pass.push(`${routeNames.length} app routes registered`);
   if(Array.isArray(data.sites)) pass.push("Sites database is an array"); else issues.push("Sites database is not an array");
   if(Array.isArray(data.resources)) pass.push("Library resources database is an array"); else issues.push("Library resources database is not an array");
@@ -6278,7 +6378,7 @@ function diagnostics(){
 }
 function showChangelog(){
   const notes = [
-    "Build 0.60.0 connects major FireVault screens directly to the matching Academy guidance and preserves the technician's return location.",
+    "Build 0.61.0 adds a timed Service Visit workspace with autosaved notes, timeline events, follow-up actions, and visit closeout.",
     "Manual chapters document installation, Today, Sites, Site Detail, field workflow, notes, tasks, deficiencies, photos, GPS, route tracking, reports, email, settings, backups, updates, and troubleshooting.",
     "Added living-documentation revision metadata and a release-state review requirement.",
     "Added Quick Capture for timestamped site notes, follow-up tasks, and deficiencies without leaving Today.",

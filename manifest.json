@@ -8,7 +8,7 @@
   "orientation": "any",
   "background_color": "#0b0d10",
   "theme_color": "#101216",
-  "description": "Field knowledge system for fire alarm technicians. Build 0.60.0 adds contextual screen-linked FireVault Academy help.",
+  "description": "Field knowledge system for fire alarm technicians. Build 0.61.0 adds an active timed Service Visit workspace and field closeout workflow.",
   "icons": [
     {
       "src": "assets/icon-192.png",
