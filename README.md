@@ -1,4 +1,4 @@
-# FireVault Build 0.71.1
+# FireVault Build 0.71.2
 
 Nearby Accounts category and header redesign.
 
@@ -12,7 +12,15 @@ Nearby Accounts category and header redesign.
 - Preserves the 25-mile list, adaptive radius, street-level account focus, glowing green selection, and Open / Route / Call actions.
 
 
-## Build 0.71.1 — Plus Codes and exact site locations
+## Build 0.71.2 — Nearby readability refinement
+
+- Moves the imported Account ID to the bottom metadata line, directly before the category badge.
+- Keeps account name, address, ID, category, and Plus Code left aligned.
+- Shows the selected account name and address in a left-aligned map overlay during street-level focus.
+- Adds breathing room between the FireVault logo header, Nearby heading, and map workspace.
+
+
+## Inherited from Build 0.71.0 — Plus Codes and exact site locations
 - Permanently removes the top Build and Settings controls and replaces them with the right-aligned current day/date.
 - Automatically generates a full Plus Code for every account that has latitude/longitude.
 - Adds account location points for entrances, parking, exterior doors, riser rooms, panels, FDCs, and other field locations.

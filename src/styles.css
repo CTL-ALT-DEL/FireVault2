@@ -13672,3 +13672,147 @@ nav button.active{background:color-mix(in srgb,var(--accent) 17%,rgba(30,41,59,.
   .nearbyInfo069>div{font-size:.62rem!important}
   .nearbyMapActions0711 button{width:64px;height:64px}
 }
+
+
+/* Build 0.71.2 — Nearby account metadata, selected map label, and top spacing */
+.nearbyHome069{
+  gap:9px!important;
+}
+.nearbyTop069{
+  min-height:38px!important;
+  padding-bottom:7px!important;
+  margin-bottom:2px!important;
+}
+.nearbyCompactHead069{
+  min-height:35px!important;
+  margin-top:2px!important;
+  margin-bottom:5px!important;
+}
+.nearbyWorkspace069{
+  gap:7px!important;
+}
+.nearbyMapShell069{
+  margin-top:2px!important;
+}
+.nearbyAccount069{
+  min-height:84px!important;
+  align-items:center!important;
+}
+.nearbyInfo069{
+  display:flex!important;
+  min-width:0!important;
+  flex-direction:column!important;
+  align-items:flex-start!important;
+  justify-content:center!important;
+  text-align:left!important;
+}
+.nearbyAddress0712{
+  display:block!important;
+  width:100%!important;
+  min-width:0!important;
+  margin-top:4px!important;
+  color:#aeb7c3!important;
+  font-size:.68rem!important;
+  line-height:1.25!important;
+  text-align:left!important;
+}
+.nearbyAddress0712 span{
+  display:block!important;
+  overflow:hidden!important;
+  text-overflow:ellipsis!important;
+  white-space:nowrap!important;
+}
+.nearbyMeta0712{
+  display:flex!important;
+  width:100%!important;
+  min-width:0!important;
+  align-items:center!important;
+  justify-content:flex-start!important;
+  flex-wrap:wrap!important;
+  gap:6px!important;
+  margin-top:6px!important;
+  color:#94a3b8!important;
+  font-size:.61rem!important;
+  line-height:1.15!important;
+  text-align:left!important;
+  white-space:normal!important;
+  overflow:visible!important;
+}
+.nearbyMeta0712 b{
+  flex:0 0 auto!important;
+  color:var(--category)!important;
+  font-size:.66rem!important;
+  line-height:1!important;
+}
+.nearbyMeta0712 span{
+  min-width:0!important;
+  overflow:hidden!important;
+  text-overflow:ellipsis!important;
+  white-space:nowrap!important;
+}
+.nearbyCategoryBadge0712{
+  flex:0 0 auto!important;
+  padding:3px 6px!important;
+  border:1px solid color-mix(in srgb,var(--category) 55%,transparent)!important;
+  border-radius:6px!important;
+  background:color-mix(in srgb,var(--category) 22%,#111820)!important;
+  color:color-mix(in srgb,var(--category) 80%,white)!important;
+  font-size:.54rem!important;
+  font-style:normal!important;
+  font-weight:900!important;
+  letter-spacing:.04em!important;
+  line-height:1!important;
+  text-transform:uppercase!important;
+}
+.nearbySelectedOverlay0712{
+  position:absolute!important;
+  left:12px!important;
+  right:174px!important;
+  bottom:12px!important;
+  z-index:535!important;
+  display:flex!important;
+  min-height:58px!important;
+  flex-direction:column!important;
+  justify-content:center!important;
+  padding:10px 12px!important;
+  border:1px solid rgba(50,239,118,.52)!important;
+  border-radius:14px!important;
+  background:rgba(8,15,20,.9)!important;
+  box-shadow:0 0 0 1px rgba(50,239,118,.14),0 8px 24px rgba(0,0,0,.38)!important;
+  text-align:left!important;
+  backdrop-filter:blur(9px)!important;
+  -webkit-backdrop-filter:blur(9px)!important;
+  pointer-events:none!important;
+}
+.nearbySelectedOverlay0712[hidden]{display:none!important}
+.nearbySelectedOverlay0712 strong{
+  display:block!important;
+  overflow:hidden!important;
+  color:#fff!important;
+  font-size:.82rem!important;
+  line-height:1.18!important;
+  text-overflow:ellipsis!important;
+  white-space:nowrap!important;
+}
+.nearbySelectedOverlay0712 span{
+  display:block!important;
+  overflow:hidden!important;
+  margin-top:5px!important;
+  color:#b9c4d0!important;
+  font-size:.64rem!important;
+  line-height:1.25!important;
+  text-overflow:ellipsis!important;
+  white-space:nowrap!important;
+}
+@media(max-width:390px){
+  .nearbyHome069{gap:8px!important}
+  .nearbyTop069{padding-bottom:6px!important}
+  .nearbyCompactHead069{margin-bottom:4px!important}
+  .nearbyAccount069{min-height:80px!important}
+  .nearbyAddress0712{font-size:.62rem!important}
+  .nearbyMeta0712{gap:5px!important;font-size:.56rem!important}
+  .nearbyMeta0712 b{font-size:.61rem!important}
+  .nearbySelectedOverlay0712{right:151px!important;min-height:54px!important;padding:8px 10px!important}
+  .nearbySelectedOverlay0712 strong{font-size:.75rem!important}
+  .nearbySelectedOverlay0712 span{font-size:.58rem!important}
+}

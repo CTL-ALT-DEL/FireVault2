@@ -2353,9 +2353,14 @@ function nearbySummary069(){
 }
 function nearbyAccountCard069(r,index){
   const s=r.s,id=accountId069(s),category=accountCategory070(s),plus=sitePlusCode071(s);
+  const categoryLabel=NEARBY_CATEGORY_META_070[category]?.label||'Basic';
   return `<article class="nearbyAccount069 category-${category} ${homeNearbySelected069===s.id?'selected':''}" data-nearby-card069="${esc(s.id)}" data-nearby-index069="${index}" data-nearby-category070="${category}">
     <span class="nearbyNumber069">${index+1}</span>
-    <div class="nearbyInfo069"><strong>${esc(s.name||'Unnamed Account')}</strong><div>${id?`<b>${esc(id)}</b><i>•</i>`:''}<span>${esc(fullAddress(s)||'No address saved')}</span></div>${plus?`<small>${esc(NEARBY_CATEGORY_META_070[category]?.label||'Basic')} · ${esc(plus)}</small>`:''}</div>
+    <div class="nearbyInfo069">
+      <strong>${esc(s.name||'Unnamed Account')}</strong>
+      <div class="nearbyAddress0712"><span>${esc(fullAddress(s)||'No address saved')}</span></div>
+      <small class="nearbyMeta0712">${id?`<b>${esc(id)}</b>`:''}<em class="nearbyCategoryBadge0712 category-${category}">${esc(categoryLabel)}</em>${plus?`<span>Plus Code: ${esc(plus)}</span>`:''}</small>
+    </div>
     <span class="nearbyDistance069">${esc(distanceLabel(r.meters))}<i class="gpsDot069"></i></span>
   </article>`;
 }
@@ -2365,6 +2370,7 @@ function homeNearbyMapShell069(){
     <div id="nearbyStaticOverlay069" class="nearbyStaticOverlay069"></div>
     <div id="nearbyStaticPopup069" class="nearbyStaticPopup069" hidden></div>
     <div id="nearbyMapCount069" class="nearbyMapCount069" hidden></div>
+    <div id="nearbySelectedOverlay0712" class="nearbySelectedOverlay0712" hidden></div>
     <div id="nearbyMapActions0711" class="nearbyMapActions0711" hidden>
       <button id="nearbyMapRoute0711" aria-label="Route to selected account"><span>➤</span><b>Route</b></button>
       <button id="nearbyMapCall0711" aria-label="Call selected account"><span>☎</span><b>Call</b></button>
@@ -2525,13 +2531,23 @@ function ensureSelectedVisible069(row){
 }
 function updateNearbyMapSelection069(){
   const siteId=homeNearbySelected069;
+  const row=mapRow069(siteId);
+  const streetFocused=Boolean(row&&nearbyStreetFocusSite069===siteId);
   const actions=document.getElementById('nearbyMapActions0711');
   if(actions){
-    const row=mapRow069(siteId),ph=phone069(row?.s);
-    const active=Boolean(row&&nearbyStreetFocusSite069===siteId);
-    actions.hidden=!active;
+    const ph=phone069(row?.s);
+    actions.hidden=!streetFocused;
     const call=document.getElementById('nearbyMapCall0711');
     if(call)call.disabled=!ph;
+  }
+  const selectedOverlay0712=document.getElementById('nearbySelectedOverlay0712');
+  if(selectedOverlay0712){
+    selectedOverlay0712.hidden=!streetFocused;
+    if(streetFocused){
+      selectedOverlay0712.innerHTML=`<strong>${esc(row.s.name||'Unnamed Account')}</strong><span>${esc(fullAddress(row.s)||'No address saved')}</span>`;
+    }else{
+      selectedOverlay0712.innerHTML='';
+    }
   }
   document.querySelectorAll('[data-static-marker069]').forEach(m=>m.classList.toggle('selected',m.dataset.staticMarker069===siteId));
   const popup=document.getElementById('nearbyStaticPopup069');
@@ -7554,7 +7570,7 @@ function diagnostics(){
 }
 function showChangelog(){
   const notes = [
-    "Build 0.71.1 simplifies the Nearby header, replaces the build/settings controls with today’s day and date, removes floating Help and map controls, and adds color-coded Basic, CLSS, AlarmNet, and IPDACT filtering based on Account ID.",
+    "Build 0.71.2 improves Nearby account readability, moves Account ID beside the category on the bottom line, adds a selected-account name and address overlay to the map, and restores breathing room around the header and map.",
     "Build 0.69.9 enlarges Nearby Open, Route, and Call controls, changes selected accounts to a glowing green treatment, extends the account list to 25 miles, and adapts the overview radius to the selected account distance.",
     "Build 0.69.8 makes Nearby list taps select the tapped account reliably, zooms the map to street level around that account, and forces all account markers to render as true circles.",
     "Build 0.69.6 hides map details until a marker is tapped, stabilizes momentum list settling, and moves the map closer to the top with a simpler header.",
