@@ -1,4 +1,4 @@
-export const BUILD = "0.63.1";
+export const BUILD = "0.64.0";
 export const KEY = "firevault_vault_build_030";
 export const ACTIVE_JOB_KEY = "firevault_active_job_modular";
 export const DEVICE_KEY = "firevault_device_identity_062";
@@ -47,7 +47,7 @@ export function syncSummary(data){
   const rows=[];
   (data.sites||[]).forEach(site=>{ rows.push(site); CHILD_ARRAYS.forEach(k=>(site[k]||[]).forEach(x=>rows.push(x))); });
   (data.resources||[]).forEach(x=>rows.push(x));
-  return {total:rows.length,pending:rows.filter(x=>x?.sync?.status==="pending").length,synced:rows.filter(x=>x?.sync?.status==="synced").length,conflicts:rows.filter(x=>x?.sync?.status==="conflict"||x?.sync?.conflict).length,localOnly:rows.filter(x=>x?.sync?.status==="local").length};
+  return {total:rows.length,pending:rows.filter(x=>x?.sync?.status==="pending").length,synced:rows.filter(x=>x?.sync?.status==="synced").length,conflicts:rows.filter(x=>x?.sync?.status==="conflict"||x?.sync?.conflict).length,localOnly:rows.filter(x=>x?.sync?.status==="local").length,packaged:rows.filter(x=>x?.sync?.status==="packaged").length};
 }
 
 
@@ -61,12 +61,60 @@ function trackedRows(data){
   return rows;
 }
 export function syncQueue(data){
-  return trackedRows(data).filter(row=>["pending","conflict","local"].includes(row.record?.sync?.status||"pending")).map(row=>({
+  return trackedRows(data).filter(row=>["pending","conflict","local","packaged"].includes(row.record?.sync?.status||"pending")).map(row=>({
     type:row.type,siteId:row.siteId,siteName:row.siteName,id:row.record.id,title:row.record.name||row.record.title||row.record.summary||row.record.note||row.type,
     modifiedAt:row.record.modifiedAt||row.record.createdAt||"",modifiedBy:row.record.modifiedBy||row.record.createdBy||"Unassigned technician",
     version:Number(row.record.recordVersion||1),status:row.record.sync?.status||"pending"
   })).sort((a,b)=>String(b.modifiedAt).localeCompare(String(a.modifiedAt)));
 }
+
+export function syncConflicts(data){
+  return trackedRows(data).filter(row=>row.record?.sync?.status==="conflict"||row.record?.sync?.conflict).map(row=>({
+    type:row.type,siteId:row.siteId,siteName:row.siteName,id:row.record.id,title:row.record.name||row.record.title||row.record.summary||row.record.note||row.type,
+    modifiedAt:row.record.modifiedAt||row.record.createdAt||"",modifiedBy:row.record.modifiedBy||row.record.createdBy||"Unassigned technician",
+    version:Number(row.record.recordVersion||1),remoteVersion:Number(row.record.sync?.remoteVersion||1),remoteSnapshot:row.record.sync?.remoteSnapshot||null
+  })).sort((a,b)=>String(b.modifiedAt).localeCompare(String(a.modifiedAt)));
+}
+function findTrackedRecord(data,id){
+  let found=null;
+  trackedRows(data).some(row=>{ if(row.record?.id===id){ found=row.record; return true; } return false; });
+  return found;
+}
+export function recordSyncActivity(data,type,details={}){
+  data.syncState=data.syncState||{};
+  data.syncState.activity=Array.isArray(data.syncState.activity)?data.syncState.activity:[];
+  data.syncState.activity.unshift({id:uid(),type,at:nowIso(),deviceId:deviceIdentity(),technician:techIdentity(data),...details});
+  data.syncState.activity=data.syncState.activity.slice(0,100);
+}
+export function syncActivity(data){
+  return Array.isArray(data?.syncState?.activity)?data.syncState.activity:[];
+}
+export function resolveSyncConflict(data,id,choice){
+  const record=findTrackedRecord(data,id);
+  if(!record || !record.sync?.remoteSnapshot) throw new Error("Conflict record was not found.");
+  const when=nowIso();
+  if(choice==="remote"){
+    const remote=packageRecord(record.sync.remoteSnapshot);
+    const children={}; CHILD_ARRAYS.forEach(k=>{ if(Array.isArray(remote[k])) children[k]=remote[k]; });
+    Object.keys(record).forEach(k=>delete record[k]); Object.assign(record,remote);
+    CHILD_ARRAYS.forEach(k=>{ if(children[k]) record[k]=children[k]; });
+    markSynced(record,when);
+  } else {
+    record.recordVersion=Math.max(Number(record.recordVersion||1),Number(record.sync.remoteVersion||1))+1;
+    record.modifiedAt=when; record.modifiedBy=techIdentity(data);
+    record.sync={...(record.sync||{}),status:"pending",conflict:false,deviceId:deviceIdentity(),remoteSnapshot:null,conflictDetectedAt:""};
+  }
+  recordSyncActivity(data,"conflict-resolved",{recordId:id,choice,siteName:"",recordType:"record"});
+  saveData(data);
+  return record;
+}
+export function notePackageExport(data,pkg){
+  data.syncState=data.syncState||{};
+  data.syncState.lastExportedPackage={exportedAt:pkg.exportedAt,deviceId:pkg.deviceId,technician:pkg.technician,workspace:pkg.workspace};
+  recordSyncActivity(data,"package-export",{workspace:pkg.workspace,recordCount:(pkg.sites||[]).length+(pkg.resources||[]).length});
+  saveData(data);
+}
+
 function packageRecord(record){ return JSON.parse(JSON.stringify(record)); }
 export function createSyncPackage(data){
   return {
@@ -118,7 +166,8 @@ export function importSyncPackage(data,pkg){
   });
   data.resources=Array.isArray(data.resources)?data.resources:[];
   mergeArray(data.resources,pkg.resources||[],data,when,stats);
-  data.syncState={...(data.syncState||{}),schemaVersion:2,lastSuccessfulSync:when,lastImportedPackage:{exportedAt:pkg.exportedAt||"",deviceId:pkg.deviceId||"",technician:pkg.technician||"",workspace:pkg.workspace||""}};
+  data.syncState={...(data.syncState||{}),schemaVersion:3,lastSuccessfulSync:when,lastImportedPackage:{exportedAt:pkg.exportedAt||"",deviceId:pkg.deviceId||"",technician:pkg.technician||"",workspace:pkg.workspace||""}};
+  recordSyncActivity(data,"package-import",{workspace:pkg.workspace||"",fromDevice:pkg.deviceId||"",fromTechnician:pkg.technician||"",stats:{...stats}});
   saveData(data);
   return stats;
 }
@@ -138,7 +187,7 @@ export function saveData(data){
   data.sites.forEach(site=>migrateRecordTree(site,data,prevSites.get(site.id)));
   const prevResources=new Map((previous?.resources||[]).map(x=>[x?.id,x]));
   data.resources.forEach(item=>migrateRecordTree(item,data,prevResources.get(item.id)));
-  data.syncState={...(data.syncState||{}),schemaVersion:2,deviceId:deviceIdentity(),provider:data.settings?.sync?.provider||"onedrive",lastLocalSave:nowIso(),lastSuccessfulSync:data.syncState?.lastSuccessfulSync||""};
+  data.syncState={...(data.syncState||{}),schemaVersion:3,deviceId:deviceIdentity(),provider:data.settings?.sync?.provider||"onedrive",lastLocalSave:nowIso(),lastSuccessfulSync:data.syncState?.lastSuccessfulSync||""};
   localStorage.setItem(KEY, JSON.stringify(data));
 }
 export function normalize(data){
@@ -175,7 +224,7 @@ export function normalize(data){
   data.settings.advanced = data.settings.advanced || {aiTechnician:false, reverseAddressLookup:false, cloudBackup:false, voiceTranscription:false, ocrReader:false, emailGateway:false, weather:false, traffic:false};
   data.settings.gps = {enabled:true, mapProvider:"apple", highAccuracy:true, includeInReports:true, nearbyRadiusMiles:1, ...(data.settings.gps || {})};
   data.settings.sync = {provider:"onedrive",enabled:false,organization:"",workspace:"FireVault Shared Vault",autoSync:true,wifiOnly:false,conflictPolicy:"review",...(data.settings.sync||{})};
-  data.syncState = {...(data.syncState||{}),schemaVersion:2,deviceId:deviceIdentity(),provider:data.settings.sync.provider,lastLocalSave:data.syncState?.lastLocalSave||"",lastSuccessfulSync:data.syncState?.lastSuccessfulSync||""};
+  data.syncState = {...(data.syncState||{}),schemaVersion:3,deviceId:deviceIdentity(),provider:data.settings.sync.provider,lastLocalSave:data.syncState?.lastLocalSave||"",lastSuccessfulSync:data.syncState?.lastSuccessfulSync||""};
   const homeCardDefaults = {pinnedSites:{visible:true,behavior:"remember"},fieldFocus:{visible:true,behavior:"remember"},nearbyAccounts:{visible:true,behavior:"remember"},recentAccounts:{visible:true,behavior:"remember"}};
   data.settings.homeLayout = data.settings.homeLayout || {preset:"custom",cards:{}};
   data.settings.homeLayout.preset = data.settings.homeLayout.preset || "custom";

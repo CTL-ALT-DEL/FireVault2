@@ -8,7 +8,7 @@
   "orientation": "any",
   "background_color": "#0b0d10",
   "theme_color": "#101216",
-  "description": "Field knowledge system for fire alarm technicians. Build 0.63.1 adds a multi-user, offline-first sync-ready data foundation for future OneDrive integration.",
+  "description": "Field knowledge system for fire alarm technicians. Build 0.64.0 adds conflict review, sync activity history, and OneDrive connection-readiness checks.",
   "icons": [
     {
       "src": "assets/icon-192.png",
