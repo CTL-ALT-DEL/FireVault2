@@ -1,7 +1,17 @@
-# FireVault Build 0.72.1
+# FireVault Build 0.72.2
 
+## Automatic Backup Safety
 
-## Build 0.72.1 — Compact map label and component foundation
+- Creates rolling safety snapshots automatically before and after vault changes.
+- Keeps up to three recent snapshots to reduce local-storage pressure on iPhone.
+- Preserves the live vault first if storage space becomes limited.
+- Adds Download Latest and Restore Latest controls in Settings → Data, Sync & Support → Backup.
+- Accepts both traditional FireVault backups and wrapped automatic-snapshot files during import.
+- Keeps the existing FireVault storage key and account database format.
+
+Important: automatic snapshots live inside the installed PWA. Download a backup before deleting or reinstalling the Home Screen app.
+
+## Build 0.72.2 — Compact map label and component foundation
 
 - Replaces the unrelated grey map-control cover with a compact translucent badge that sizes itself only to the selected site name and address.
 - Keeps white text and strong black shadow for map readability.
@@ -11,7 +21,7 @@
 Nearby Accounts category and header redesign.
 
 
-## Build 0.72.1 — Nearby control and navigation refinement
+## Build 0.72.2 — Nearby control and navigation refinement
 
 - Removes the black background box, border, blur, and panel shadow from the selected-account overlay.
 - Displays the selected account name and address as white text with a strong black outline/shadow for map readability.
@@ -56,7 +66,7 @@ Nearby Accounts category and header redesign.
 - Preserved the 0.71.2 Nearby layout changes.
 
 
-## Build 0.72.1
+## Build 0.72.2
 - Added versioned service-worker caching and automatic old-cache cleanup.
 - HTML, manifest, and version checks use network-first/no-store behavior.
 - New service workers activate immediately and notify open app windows.
@@ -65,7 +75,7 @@ Nearby Accounts category and header redesign.
 - FireVault local vault storage remains unchanged.
 
 
-## Build 0.72.1 vault protection
+## Build 0.72.2 vault protection
 - Scans FireVault local-storage records and restores the populated vault with the highest account count.
 - Maintains a recovery copy of the last populated vault.
 - Blocks automatic startup migrations from replacing a populated vault with an empty database.

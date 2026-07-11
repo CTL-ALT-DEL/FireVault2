@@ -1,4 +1,4 @@
-import { BUILD, KEY, ACTIVE_JOB_KEY, loadData, saveData, ensureSite, fullAddress, esc, uid, downloadBlob, syncSummary, syncQueue, syncConflicts, syncActivity, createSyncPackage, importSyncPackage, resolveSyncConflict, notePackageExport, deviceIdentity, recordSyncActivity } from "./storage.js";
+import { BUILD, KEY, ACTIVE_JOB_KEY, loadData, saveData, ensureSite, fullAddress, esc, uid, downloadBlob, syncSummary, syncQueue, syncConflicts, syncActivity, createSyncPackage, importSyncPackage, resolveSyncConflict, notePackageExport, deviceIdentity, recordSyncActivity, autoBackupInfo, latestAutoBackup, restoreAutoBackup } from "./storage.js";
 window.__FIREVAULT_MODULE_READY = true;
 
 let data = loadData();
@@ -5965,6 +5965,8 @@ function backupSummaryText(){
 }
 function backupSettingsPanel(){
   const b=backupStats();
+  const auto=autoBackupInfo();
+  const autoLast=auto.last?.createdAt ? new Date(auto.last.createdAt).toLocaleString() : "No automatic snapshot yet";
   const last=localStorage.getItem("firevault_last_backup_export") || "Not exported from this browser yet";
   const totalVaultItems=b.sites+b.visits+b.tasks+b.deficiencies+b.equipment+b.contacts+b.docs+b.checklist+b.deliveries;
   const health=totalVaultItems ? "Ready" : "Empty";
@@ -5982,6 +5984,15 @@ function backupSettingsPanel(){
         <button class="ghost" id="copyBackupSummaryBtn">Copy Summary</button>
       </div>
       <p class="fieldNote">Last export: ${esc(last)}</p>
+    </div>
+    <div class="card compactPane autoBackupPane0722">
+      <div class="paneHead"><div><h2>Automatic Safety Snapshots</h2><p class="paneNote">FireVault keeps up to 3 rolling snapshots before and after vault changes.</p></div><span class="pill">${auto.count} saved</span></div>
+      <div class="settingsInfo540"><strong>Latest snapshot</strong><span>${esc(autoLast)}</span></div>
+      <div class="backupActionGrid449">
+        <button class="primary" id="downloadAutoBackup0722" ${auto.count?'':'disabled'}>Download Latest</button>
+        <button class="ghost" id="restoreAutoBackup0722" ${auto.count?'':'disabled'}>Restore Latest</button>
+      </div>
+      <p class="fieldNote">Snapshots protect against accidental edits and failed migrations on this installation. A downloaded backup is still required before deleting or reinstalling the Home Screen app.</p>
     </div>
     <div class="card compactPane backupImport449">
       <div class="paneHead"><h2>Import / Restore</h2></div>
@@ -6695,8 +6706,10 @@ function wireSettingsPanel(){
     document.querySelectorAll("[data-resolve-conflict]").forEach(btn=>btn.onclick=()=>{ const choice=btn.dataset.resolveConflict; const id=btn.dataset.recordId; const label=choice==="remote"?"use the imported copy":"keep this device copy"; if(!confirm(`Resolve this conflict and ${label}?`)) return; try{ resolveSyncConflict(data,id,choice); data=loadData(); settings(); toast("Conflict resolved."); }catch(err){ alert(err?.message||"Conflict resolution failed."); } });
   }
   const exportBtn=document.getElementById("exportBtn"); if(exportBtn) exportBtn.onclick=()=>{ const stamp=new Date().toISOString().slice(0,10); localStorage.setItem("firevault_last_backup_export", new Date().toLocaleString()); downloadBlob(`firevault-backup-${stamp}-build-${BUILD}.json`, JSON.stringify(data,null,2), "application/json"); toast("Backup exported."); settings(); };
+  const downloadAuto=document.getElementById("downloadAutoBackup0722"); if(downloadAuto) downloadAuto.onclick=()=>{ const snapshot=latestAutoBackup(); if(!snapshot){toast("No automatic snapshot available.");return;} const stamp=new Date(snapshot.createdAt||Date.now()).toISOString().slice(0,19).replace(/[:T]/g,"-"); downloadBlob(`firevault-auto-backup-${stamp}-build-${snapshot.build||BUILD}.json`,JSON.stringify(snapshot,null,2),"application/json"); toast("Automatic snapshot downloaded."); };
+  const restoreAuto=document.getElementById("restoreAutoBackup0722"); if(restoreAuto) restoreAuto.onclick=()=>{ const info=autoBackupInfo(); const latest=info.last; if(!latest){toast("No automatic snapshot available.");return;} if(!confirm(`Restore the latest automatic snapshot from ${new Date(latest.createdAt).toLocaleString()}? FireVault will preserve the current vault as another safety snapshot first.`)) return; try{ data=restoreAutoBackup(latest.key); applyTheme(); toast("Automatic snapshot restored."); route("home"); }catch(err){alert(err?.message||"Snapshot restore failed.");} };
   const copyBackupSummaryBtn=document.getElementById("copyBackupSummaryBtn"); if(copyBackupSummaryBtn) copyBackupSummaryBtn.onclick=async()=>{ try{ await navigator.clipboard.writeText(backupSummaryText()); toast("Backup summary copied."); }catch{ toast("Clipboard unavailable."); } };
-  const importFile=document.getElementById("importFile"); if(importFile) importFile.onchange=e=>{ const f=e.target.files[0]; if(!f)return; const r=new FileReader(); r.onload=()=>{try{data=loadData(); Object.assign(data, JSON.parse(r.result)); saveData(data); data=loadData(); applyTheme(); toast("Backup imported."); route("home");}catch{alert("Import failed.");}}; r.readAsText(f); };
+  const importFile=document.getElementById("importFile"); if(importFile) importFile.onchange=e=>{ const f=e.target.files[0]; if(!f)return; const r=new FileReader(); r.onload=()=>{try{const parsed=JSON.parse(r.result); const incoming=parsed?.data && Array.isArray(parsed.data.sites) ? parsed.data : parsed; if(!incoming || !Array.isArray(incoming.sites)) throw new Error("Invalid FireVault backup."); data=loadData(); Object.assign(data,incoming); saveData(data); data=loadData(); applyTheme(); toast("Backup imported."); route("home");}catch(err){alert(err?.message||"Import failed.");}}; r.readAsText(f); };
   const resetBtn=document.getElementById("resetBtn"); if(resetBtn) resetBtn.onclick=()=>{ if(confirm("Clear FireVault local data on this browser? Export a backup first if you need this vault later.")){localStorage.removeItem(KEY); data=loadData(); applyTheme(); route("home");} };
 }
 function saveSettings(){

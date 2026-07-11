@@ -1,5 +1,5 @@
 {
-  "build": "0.72.1",
+  "build": "0.72.2",
   "released": "2026-07-11",
   "note": "Protect and recover locally stored account vaults during PWA updates."
 }

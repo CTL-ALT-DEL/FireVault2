@@ -1,7 +1,63 @@
-export const BUILD = "0.72.1";
+export const BUILD = "0.72.2";
 export const KEY = "firevault_vault_build_030";
 export const ACTIVE_JOB_KEY = "firevault_active_job_modular";
 export const DEVICE_KEY = "firevault_device_identity_062";
+
+const AUTO_BACKUP_INDEX_KEY = `${KEY}_auto_backup_index`;
+const AUTO_BACKUP_PREFIX = `${KEY}_auto_backup_`;
+const AUTO_BACKUP_LIMIT = 3;
+const AUTO_BACKUP_MIN_INTERVAL = 5 * 60 * 1000;
+
+function vaultCount(value){ return Array.isArray(value?.sites) ? value.sites.length : 0; }
+function readAutoBackupIndex(){
+  try{
+    const rows=JSON.parse(localStorage.getItem(AUTO_BACKUP_INDEX_KEY)||"[]");
+    return Array.isArray(rows)?rows.filter(x=>x&&x.key):[];
+  }catch{return [];}
+}
+function writeAutoBackupIndex(rows){
+  try{localStorage.setItem(AUTO_BACKUP_INDEX_KEY,JSON.stringify(rows));}catch{}
+}
+function createAutoBackupSnapshot(value,reason="automatic"){
+  if(!value || typeof value!=="object" || !Array.isArray(value.sites)) return null;
+  const now=Date.now();
+  let index=readAutoBackupIndex();
+  const latest=index[0];
+  if(latest && !["before-restore","restored"].includes(reason) && now-Number(latest.timestamp||0)<AUTO_BACKUP_MIN_INTERVAL && Number(latest.siteCount||0)===vaultCount(value)) return latest;
+  const stamp=new Date(now).toISOString();
+  const key=`${AUTO_BACKUP_PREFIX}${now}`;
+  const payload={format:"firevault-auto-backup",formatVersion:1,build:BUILD,createdAt:stamp,reason,siteCount:vaultCount(value),data:value};
+  try{
+    localStorage.setItem(key,JSON.stringify(payload));
+    index=[{key,timestamp:now,createdAt:stamp,reason,siteCount:payload.siteCount,build:BUILD},...index.filter(x=>x.key!==key)];
+    while(index.length>AUTO_BACKUP_LIMIT){ const old=index.pop(); try{localStorage.removeItem(old.key);}catch{} }
+    writeAutoBackupIndex(index);
+    localStorage.setItem("firevault_last_auto_backup",stamp);
+    return index[0];
+  }catch(err){ console.error("Automatic backup failed",err); return null; }
+}
+export function autoBackupInfo(){
+  const index=readAutoBackupIndex();
+  return {count:index.length,last:index[0]||null,items:index};
+}
+export function latestAutoBackup(){
+  const item=readAutoBackupIndex()[0];
+  if(!item) return null;
+  try{return JSON.parse(localStorage.getItem(item.key)||"null");}catch{return null;}
+}
+export function restoreAutoBackup(key){
+  try{
+    const payload=JSON.parse(localStorage.getItem(key)||"null");
+    const value=payload?.data;
+    if(!value || !Array.isArray(value.sites)) throw new Error("Backup snapshot is invalid.");
+    const current=parseVaultCandidate(localStorage.getItem(KEY),KEY)?.value;
+    if(current) createAutoBackupSnapshot(current,"before-restore");
+    localStorage.setItem(KEY,JSON.stringify(value));
+    localStorage.setItem(RECOVERY_KEY,JSON.stringify(value));
+    createAutoBackupSnapshot(value,"restored");
+    return normalize(value);
+  }catch(err){ throw err; }
+}
 
 export function deviceIdentity(){
   let id = localStorage.getItem(DEVICE_KEY);
@@ -206,7 +262,9 @@ export function loadData(){
         localStorage.setItem("firevault_last_recovery_source",best.key);
       }
     }catch{}
-    return normalize(best.value);
+    const loaded=normalize(best.value);
+    createAutoBackupSnapshot(loaded,"startup");
+    return loaded;
   }
   return normalize({sites:[], resources:[], breadcrumbs:[]});
 }
@@ -221,13 +279,26 @@ export function saveData(data){
     try{localStorage.setItem(RECOVERY_KEY,JSON.stringify(previous));}catch{}
     return previous;
   }
-  if(previousCount>0){try{localStorage.setItem(RECOVERY_KEY,JSON.stringify(previous));}catch{}}
+  if(previousCount>0){
+    try{localStorage.setItem(RECOVERY_KEY,JSON.stringify(previous));}catch{}
+    createAutoBackupSnapshot(previous,"before-save");
+  }
   const prevSites=new Map((previous?.sites||[]).map(x=>[x?.id,x]));
   data.sites.forEach(site=>migrateRecordTree(site,data,prevSites.get(site.id)));
   const prevResources=new Map((previous?.resources||[]).map(x=>[x?.id,x]));
   data.resources.forEach(item=>migrateRecordTree(item,data,prevResources.get(item.id)));
   data.syncState={...(data.syncState||{}),schemaVersion:3,deviceId:deviceIdentity(),provider:data.settings?.sync?.provider||"onedrive",lastLocalSave:nowIso(),lastSuccessfulSync:data.syncState?.lastSuccessfulSync||""};
-  localStorage.setItem(KEY, JSON.stringify(data));
+  const serialized=JSON.stringify(data);
+  try{
+    localStorage.setItem(KEY,serialized);
+  }catch(err){
+    // Preserve the live vault first: remove rolling snapshots if storage is full, then retry.
+    const index=readAutoBackupIndex();
+    index.slice().reverse().forEach(item=>{try{localStorage.removeItem(item.key);}catch{}});
+    writeAutoBackupIndex([]);
+    localStorage.setItem(KEY,serialized);
+  }
+  createAutoBackupSnapshot(data,"automatic");
 }
 export function normalize(data){
   data.sites = Array.isArray(data.sites) ? data.sites : [];
