@@ -2200,107 +2200,116 @@ function dashboard068(){
 
 
 
-const HOME_NEARBY_VIEW_KEY_068="firevault_home_nearby_view_068";
-let homeNearbyView068=localStorage.getItem(HOME_NEARBY_VIEW_KEY_068)||"map";
-let homeNearbySelected068="";
-let nearbyMap068=null;
-let nearbyMarkers068=[];
+const HOME_NEARBY_VIEW_KEY_069="firevault_home_nearby_view_069";
+let homeNearbyView069=localStorage.getItem(HOME_NEARBY_VIEW_KEY_069)||"map";
+let homeNearbySelected069="";
+let nearbyMap069=null;
+let nearbyMarkers069=new Map();
+let nearbyScrollLock069=false;
 
-function accountId068(s){ return String(s?.externalAccountId||s?.accountId||"").trim(); }
-function phone068(s){
-  const c=primaryContact477(s);
-  return String(s?.sitePhone||c?.phone||"").trim();
-}
-function nearbyRows068(){
+function accountId069(s){ return String(s?.externalAccountId||s?.accountId||"").trim(); }
+function phone069(s){ const c=primaryContact477(s); return String(s?.sitePhone||c?.phone||"").trim(); }
+function nearbyRows069(){
   const rows=nearbyState?gpsSiteDistances(nearbyState.lat,nearbyState.lng):[];
   const radius=nearbyRadiusMiles()*1609.344;
   const inRadius=rows.filter(r=>r.meters<=radius);
-  return (inRadius.length?inRadius:rows.slice(0,18));
+  return (inRadius.length?inRadius:rows.slice(0,65));
 }
-function nearbySummary068(){
-  const inv=gpsInventory0652();
-  const rows=nearbyRows068();
+function nearbySummary069(){
+  const inv=gpsInventory0652(), rows=nearbyRows069();
   return {inv,rows,nearby:nearbyState?rows.filter(r=>r.meters<=nearbyRadiusMiles()*1609.344).length:0};
 }
-function nearbyAccountCard068(r){
-  const s=r.s,id=accountId068(s),phone=phone068(s);
-  return `<article class="nearbyAccount068 ${homeNearbySelected068===s.id?'selected':''}" data-nearby-card068="${esc(s.id)}">
-    <div class="nearbyIcon068">⌂</div>
-    <div class="nearbyAccountBody068">
-      <div class="nearbyAccountTitle068"><strong>${esc(s.name||'Unnamed Account')}</strong><span>${esc(distanceLabel(r.meters))}</span></div>
-      ${id?`<div class="accountId068">Account ID: <b>${esc(id)}</b></div>`:`<div class="accountId068 muted">Account ID: Not assigned</div>`}
-      <p>${esc(fullAddress(s)||'No address saved')}</p>
-      <small><i></i>${hasGps(s)?'GPS Ready':'Missing GPS'}</small>
-      <div class="nearbyActions068">
-        <button class="ghost" data-nearby-open068="${esc(s.id)}">▣ Open</button>
-        <button class="ghost" data-nearby-route068="${esc(s.id)}">➤ Directions</button>
-        <button class="ghost" data-nearby-call068="${esc(s.id)}" ${phone?'':'disabled'}>☎ Call</button>
-      </div>
-    </div>
+function nearbyAccountCard069(r,index){
+  const s=r.s,id=accountId069(s),phone=phone069(s);
+  return `<article class="nearbyAccount069 ${homeNearbySelected069===s.id?'selected':''}" data-nearby-card069="${esc(s.id)}" data-nearby-index069="${index}">
+    <span class="nearbyNumber069">${index+1}</span>
+    <span class="nearbyPin069">●</span>
+    <div class="nearbyInfo069"><strong>${esc(s.name||'Unnamed Account')}</strong><div>${id?`<b>${esc(id)}</b><i>•</i>`:''}<span>${esc(fullAddress(s)||'No address saved')}</span></div></div>
+    <span class="nearbyDistance069">${esc(distanceLabel(r.meters))}<i class="gpsDot069"></i></span>
+    <div class="nearbyActions069"><button data-nearby-open069="${esc(s.id)}">▣ <span>Open</span></button><button aria-label="Directions" data-nearby-route069="${esc(s.id)}">➤</button><button aria-label="Call" data-nearby-call069="${esc(s.id)}" ${phone?'':'disabled'}>☎</button></div>
   </article>`;
 }
-function homeNearbyMapShell068(){
-  return `<div class="nearbyMapShell068"><div id="nearbyMap068" class="nearbyMap068"></div><div class="nearbyMapFallback068" id="nearbyMapFallback068"><span>Map loads when an internet connection is available.</span></div><button class="mapCenter068" id="mapCenter068">◎ Center</button></div>`;
+function homeNearbyMapShell069(){
+  return `<div class="nearbyMapShell069"><div id="nearbyMap069" class="nearbyMap069"></div><div class="nearbyMapFallback069" id="nearbyMapFallback069"><span>Map requires an internet connection. The account list and distance calculations remain available.</span></div><button class="mapCenter069" id="mapCenter069">◎</button></div>`;
+}
+function setHomeChrome069(hidden){
+  const h=document.getElementById('appHeader'),n=document.getElementById('appNav');
+  if(h) h.style.display=hidden?'none':'flex';
+  if(n) n.style.display=hidden?'none':'grid';
 }
 function home(){
-  const {inv,rows,nearby}=nearbySummary068();
-  const status=nearbyScanStatus0652.state;
-  html(`<div class="screen nearbyHome068">
-    <section class="nearbyBrand068"><div><img src="assets/favicon.png?v=${BUILD}" alt=""><div><strong>${fireVaultBrand575()}</strong><span>Field Vault System</span></div></div><button class="homeBuild068" id="homeBuild068">${BUILD}</button><button class="homeSettings068" id="homeSettings068">⚙</button></section>
-    <section class="nearbyHomeHead068">
-      <div><span>Live GPS ${nearbyState?'• Updated '+new Date(nearbyState.at).toLocaleTimeString([], {hour:'numeric',minute:'2-digit'}):'• Not scanned'}</span><h1>Nearby Accounts</h1></div>
-      <div class="nearbyHeadActions068"><button class="ghost" id="openDashboard068">Tools</button><button class="primary" id="scanHome068" ${status==='scanning'?'disabled':''}>${status==='scanning'?'Scanning…':nearbyState?'Refresh':'Scan'}</button></div>
+  setHomeChrome069(true);
+  const {inv,rows,nearby}=nearbySummary069(), status=nearbyScanStatus0652.state;
+  html(`<div class="screen nearbyHome069">
+    <section class="nearbyTop069"><div class="nearbyLogo069"><img src="assets/favicon.png?v=${BUILD}" alt=""><strong>${fireVaultBrand575()}</strong></div><div class="nearbyTopActions069"><button class="homeBuild069" id="homeBuild069"><i></i>${BUILD}</button><button class="homeSettings069" id="homeSettings069">⚙</button></div></section>
+    <section class="nearbyTitleRow069"><div><span><i></i>Live GPS ${nearbyState?'• Updated '+new Date(nearbyState.at).toLocaleTimeString([], {hour:'numeric',minute:'2-digit'}):'• Not scanned'}</span><h1>Nearby Accounts</h1></div><div><button class="ghost" id="openDashboard069">▦ Tools</button><button class="primary" id="scanHome069" ${status==='scanning'?'disabled':''}>↻ ${status==='scanning'?'Scanning…':'Refresh'}</button></div></section>
+    <div class="nearbyToggle069"><button class="${homeNearbyView069==='map'?'active':''}" data-nearby-view069="map">⌖ Map</button><button class="${homeNearbyView069==='list'?'active':''}" data-nearby-view069="list">☷ List</button></div>
+    <section class="nearbyStats069"><div><b>${nearby}</b><span>Nearby</span></div><div><b>${inv.ready}</b><span>GPS Ready</span></div><div><b>${inv.missing}</b><span>Missing GPS</span></div><button id="radiusHome069"><b>${nearbyRadiusMiles()}</b><span>mi Radius</span></button></section>
+    ${status==='error'?`<div class="nearbyNotice069"><strong>Location problem:</strong> ${esc(nearbyScanStatus0652.message)}</div>`:''}
+    <section class="nearbyWorkspace069 ${homeNearbyView069}">
+      ${homeNearbyView069==='map'?homeNearbyMapShell069():''}
+      <div class="nearbyListHead069"><strong>${rows.length} accounts near your location</strong><span>Sorted by distance</span></div>
+      <div class="nearbyCards069" id="nearbyCards069">${rows.length?rows.map(nearbyAccountCard069).join(''):`<div class="nearbyEmpty069">${nearbyState?'No nearby accounts found.':'Tap Refresh to locate nearby accounts.'}</div>`}</div>
     </section>
-    <div class="nearbyToggle068" role="tablist"><button class="${homeNearbyView068==='map'?'active':''}" data-nearby-view068="map">⌖ Map</button><button class="${homeNearbyView068==='list'?'active':''}" data-nearby-view068="list">☷ List</button></div>
-    <section class="nearbyStats068">
-      <div><b>${nearby}</b><span>Nearby</span></div><div><b>${inv.ready}</b><span>GPS Ready</span></div><div><b>${inv.missing}</b><span>Missing GPS</span></div><button id="radiusHome068"><b>${nearbyRadiusMiles()}</b><span>mi Radius</span></button>
-    </section>
-    ${status==='error'?`<div class="nearbyHomeNotice068 error"><strong>Location needs attention</strong><span>${esc(nearbyScanStatus0652.message)}</span></div>`:''}
-    ${!inv.ready?`<div class="nearbyHomeNotice068"><strong>No GPS-ready accounts</strong><span>Open Customer Import to calculate or add coordinates.</span><button class="ghost" id="homeImport068">Customer Import</button></div>`:''}
-    <section class="nearbyWorkspace068 ${homeNearbyView068}">
-      ${homeNearbyView068==='map'?homeNearbyMapShell068():''}
-      <div class="nearbyListHead068"><strong>${rows.length} account${rows.length===1?'':'s'} ${nearbyState?'near your location':'available'}</strong><span>Sorted by distance</span></div>
-      <div class="nearbyCards068">${rows.length?rows.map(nearbyAccountCard068).join(''):`<div class="nearbyEmpty068"><strong>${nearbyState?'No accounts found':'Run a scan to locate nearby accounts'}</strong><span>${inv.ready?`${inv.ready} accounts already have coordinates.`:'Import or add GPS coordinates first.'}</span></div>`}</div>
-    </section>
-    <nav class="nearbyBottomNav068"><button class="active">⌖<span>Nearby</span></button><button id="homeAccounts068">▦<span>Accounts</span></button><button id="homeToolsNav068">◫<span>Tools</span></button><button id="homeSettingsNav068">⚙<span>Settings</span></button></nav>
+    <nav class="nearbyBottomNav069"><button class="active">⌖<span>Nearby</span></button><button id="homeAccounts069">▦<span>Accounts</span></button><button id="homeToolsNav069">⚒<span>Tools</span></button><button id="homeSettingsNav069">⚙<span>Settings</span></button></nav>
   </div>`);
-  document.getElementById('homeBuild068').onclick=showChangelog;
-  document.getElementById('homeSettings068').onclick=()=>route('settings');
-  document.getElementById('homeAccounts068').onclick=()=>route('sites');
-  document.getElementById('homeToolsNav068').onclick=()=>route('dashboard068');
-  document.getElementById('homeSettingsNav068').onclick=()=>route('settings');
-  document.getElementById('openDashboard068').onclick=()=>route('dashboard068');
-  document.getElementById('scanHome068').onclick=()=>runNearbyScan0652('home');
-  document.getElementById('radiusHome068').onclick=()=>{settingsTab='gps';mode='settingsDetail';route('settings');};
-  const imp=document.getElementById('homeImport068'); if(imp) imp.onclick=()=>{settingsTab='customerImport';mode='settingsDetail';route('settings');};
-  document.querySelectorAll('[data-nearby-view068]').forEach(b=>b.onclick=()=>{homeNearbyView068=b.dataset.nearbyView068;localStorage.setItem(HOME_NEARBY_VIEW_KEY_068,homeNearbyView068);home();});
-  document.querySelectorAll('[data-nearby-open068]').forEach(b=>b.onclick=e=>{e.stopPropagation();selectedSiteId=b.dataset.nearbyOpen068;route('siteDetail');});
-  document.querySelectorAll('[data-nearby-route068]').forEach(b=>b.onclick=e=>{e.stopPropagation();const s=(data.sites||[]).find(x=>x.id===b.dataset.nearbyRoute068);if(s) window.open(mapUrl(s,data.settings.gps?.mapProvider||'apple'),'_blank');});
-  document.querySelectorAll('[data-nearby-call068]').forEach(b=>b.onclick=e=>{e.stopPropagation();const s=(data.sites||[]).find(x=>x.id===b.dataset.nearbyCall068);const ph=phone068(s);if(ph) location.href=`tel:${ph.replace(/[^+\\d]/g,'')}`;});
-  document.querySelectorAll('[data-nearby-card068]').forEach(c=>c.onclick=()=>{homeNearbySelected068=c.dataset.nearbyCard068;home();});
-  if(homeNearbyView068==='map') setTimeout(initNearbyMap068,60);
+  document.getElementById('homeBuild069').onclick=showChangelog;
+  document.getElementById('homeSettings069').onclick=()=>route('settings');
+  document.getElementById('homeAccounts069').onclick=()=>route('sites');
+  document.getElementById('homeToolsNav069').onclick=()=>route('dashboard068');
+  document.getElementById('homeSettingsNav069').onclick=()=>route('settings');
+  document.getElementById('openDashboard069').onclick=()=>route('dashboard068');
+  document.getElementById('scanHome069').onclick=()=>runNearbyScan0652('home');
+  document.getElementById('radiusHome069').onclick=()=>{settingsTab='gps';mode='settingsDetail';route('settings');};
+  document.querySelectorAll('[data-nearby-view069]').forEach(b=>b.onclick=()=>{homeNearbyView069=b.dataset.nearbyView069;localStorage.setItem(HOME_NEARBY_VIEW_KEY_069,homeNearbyView069);home();});
+  document.querySelectorAll('[data-nearby-open069]').forEach(b=>b.onclick=e=>{e.stopPropagation();selectedSiteId=b.dataset.nearbyOpen069;route('siteDetail');});
+  document.querySelectorAll('[data-nearby-route069]').forEach(b=>b.onclick=e=>{e.stopPropagation();const s=(data.sites||[]).find(x=>x.id===b.dataset.nearbyRoute069);if(s) window.open(mapUrl(s,data.settings.gps?.mapProvider||'apple'),'_blank');});
+  document.querySelectorAll('[data-nearby-call069]').forEach(b=>b.onclick=e=>{e.stopPropagation();const s=(data.sites||[]).find(x=>x.id===b.dataset.nearbyCall069);const ph=phone069(s);if(ph) location.href=`tel:${ph.replace(/[^+\\d]/g,'')}`;});
+  document.querySelectorAll('[data-nearby-card069]').forEach(c=>c.onclick=e=>{if(e.target.closest('button'))return;selectNearby069(c.dataset.nearbyCard069,true);});
+  const list=document.getElementById('nearbyCards069'); if(list) list.addEventListener('scroll',()=>syncNearbyScroll069(list),{passive:true});
+  if(homeNearbyView069==='map') setTimeout(initNearbyMap069,80);
+  if(rows[0]&&!homeNearbySelected069) homeNearbySelected069=rows[0].s.id;
 }
-function initNearbyMap068(){
-  const el=document.getElementById('nearbyMap068'); if(!el) return;
-  const rows=nearbyRows068();
-  if(!window.L || !nearbyState){ document.getElementById('nearbyMapFallback068')?.classList.add('show'); return; }
+function selectNearby069(siteId,fromList=false){
+  homeNearbySelected069=siteId;
+  document.querySelectorAll('[data-nearby-card069]').forEach(c=>c.classList.toggle('selected',c.dataset.nearbyCard069===siteId));
+  const marker=nearbyMarkers069.get(siteId);
+  if(marker&&nearbyMap069){ marker.openPopup(); if(!fromList) nearbyMap069.panTo(marker.getLatLng(),{animate:true}); }
+}
+function syncNearbyScroll069(list){
+  if(nearbyScrollLock069) return;
+  const cards=[...list.querySelectorAll('[data-nearby-card069]')]; if(!cards.length)return;
+  const top=list.getBoundingClientRect().top+4;
+  let best=cards[0],dist=Infinity;
+  for(const c of cards){const d=Math.abs(c.getBoundingClientRect().top-top);if(d<dist){dist=d;best=c;}}
+  if(best.dataset.nearbyCard069!==homeNearbySelected069) selectNearby069(best.dataset.nearbyCard069,true);
+}
+function markerIcon069(index,selected=false){
+  return L.divIcon({className:'nearbyMarkerWrap069',html:`<span class="nearbyMarker069 ${selected?'selected':''}" data-label="${index+1}"></span>`,iconSize:[34,42],iconAnchor:[17,40],popupAnchor:[0,-38]});
+}
+function initNearbyMap069(){
+  const el=document.getElementById('nearbyMap069'); if(!el) return;
+  const rows=nearbyRows069();
+  if(!window.L || !nearbyState){ document.getElementById('nearbyMapFallback069')?.classList.add('show'); return; }
   try{
-    if(nearbyMap068){nearbyMap068.remove();nearbyMap068=null;}
-    nearbyMap068=L.map(el,{zoomControl:true,attributionControl:false}).setView([nearbyState.lat,nearbyState.lng],12);
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19}).addTo(nearbyMap068);
-    L.circle([nearbyState.lat,nearbyState.lng],{radius:nearbyRadiusMiles()*1609.344,color:'#2d8cff',fillColor:'#2d8cff',fillOpacity:.09,weight:2}).addTo(nearbyMap068);
-    L.circleMarker([nearbyState.lat,nearbyState.lng],{radius:9,color:'#fff',weight:3,fillColor:'#2d8cff',fillOpacity:1}).addTo(nearbyMap068).bindTooltip('You are here');
-    nearbyMarkers068=[];
-    rows.filter(r=>hasGps(r.s)).forEach(r=>{
-      const g=gpsPair0652(r.s); if(!g) return;
-      const id=accountId068(r.s);
-      const marker=L.marker([g.lat,g.lng]).addTo(nearbyMap068).bindPopup(`<div class="mapPopup068"><strong>${esc(r.s.name||'Unnamed Account')}</strong>${id?`<span>Account ID: <b>${esc(id)}</b></span>`:''}<small>${esc(fullAddress(r.s))}</small><em>${esc(distanceLabel(r.meters))}</em><button data-popup-open068="${esc(r.s.id)}">Open Account</button></div>`);
-      marker.on('click',()=>{homeNearbySelected068=r.s.id;});
-      nearbyMarkers068.push(marker);
+    if(nearbyMap069){nearbyMap069.remove();nearbyMap069=null;}
+    nearbyMap069=L.map(el,{zoomControl:true,attributionControl:false,scrollWheelZoom:false}).setView([nearbyState.lat,nearbyState.lng],13);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19}).addTo(nearbyMap069);
+    L.circle([nearbyState.lat,nearbyState.lng],{radius:nearbyRadiusMiles()*1609.344,color:'#2389ff',fillColor:'#2389ff',fillOpacity:.1,weight:2}).addTo(nearbyMap069);
+    L.circleMarker([nearbyState.lat,nearbyState.lng],{radius:9,color:'#fff',weight:3,fillColor:'#2389ff',fillOpacity:1}).addTo(nearbyMap069).bindTooltip('You are here');
+    nearbyMarkers069=new Map();
+    const bounds=[[nearbyState.lat,nearbyState.lng]];
+    rows.filter(r=>hasGps(r.s)).forEach((r,index)=>{
+      const g=gpsPair0652(r.s); if(!g)return; bounds.push([g.lat,g.lng]);
+      const id=accountId069(r.s);
+      const marker=L.marker([g.lat,g.lng],{icon:markerIcon069(index,r.s.id===homeNearbySelected069)}).addTo(nearbyMap069).bindPopup(`<div class="mapPopup069"><strong>${esc(r.s.name||'Unnamed Account')}</strong>${id?`<b>${esc(id)}</b>`:''}<span>${esc(distanceLabel(r.meters))}</span><small>${esc(fullAddress(r.s))}</small></div>`);
+      marker.on('click',()=>{selectNearby069(r.s.id,false);const card=document.querySelector(`[data-nearby-card069="${CSS.escape(r.s.id)}"]`);if(card){nearbyScrollLock069=true;card.scrollIntoView({block:'start',behavior:'smooth'});setTimeout(()=>nearbyScrollLock069=false,500);}});
+      nearbyMarkers069.set(r.s.id,marker);
     });
-    document.getElementById('mapCenter068').onclick=()=>nearbyMap068.setView([nearbyState.lat,nearbyState.lng],12);
-    setTimeout(()=>document.querySelectorAll('[data-popup-open068]').forEach(b=>b.onclick=()=>{selectedSiteId=b.dataset.popupOpen068;route('siteDetail');}),100);
-  }catch(err){document.getElementById('nearbyMapFallback068')?.classList.add('show');}
+    if(bounds.length>1) nearbyMap069.fitBounds(bounds,{padding:[35,35],maxZoom:14});
+    document.getElementById('mapCenter069').onclick=()=>nearbyMap069.setView([nearbyState.lat,nearbyState.lng],13);
+    setTimeout(()=>{nearbyMap069.invalidateSize();if(homeNearbySelected069)selectNearby069(homeNearbySelected069,true);},120);
+  }catch(err){ console.error(err); document.getElementById('nearbyMapFallback069')?.classList.add('show'); }
 }
 
 function sameLocalDay499(iso, day=localDateString()){
@@ -7161,7 +7170,7 @@ function diagnostics(){
 }
 function showChangelog(){
   const notes = [
-    "Build 0.68.0 makes Nearby Accounts the main FireVault workspace with Map and List views, Account ID display, scan-radius status, and quick account actions. Previous Home modules remain available under Tools.",
+    "Build 0.69.0 repairs the Nearby Accounts workspace with a fixed map, compact scrolling account rows, numbered map markers, bare Account IDs, and automatic list-to-map highlighting.",
     "Manual chapters document installation, Today, Sites, Site Detail, field workflow, notes, tasks, deficiencies, photos, GPS, route tracking, reports, email, settings, backups, updates, and troubleshooting.",
     "Added living-documentation revision metadata and a release-state review requirement.",
     "Added Quick Capture for timestamped site notes, follow-up tasks, and deficiencies without leaving Today.",
