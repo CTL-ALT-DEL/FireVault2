@@ -1,5 +1,5 @@
 {
-  "build": "0.73.0",
+  "build": "0.73.1",
   "released": "2026-07-11",
-  "note": "Unified design system, consistent navigation, cleaner controls, and improved Nearby Accounts readability."
+  "note": "Customer import keeps same-address buildings separate using the complete Account ID, including CLSS dash suffixes."
 }

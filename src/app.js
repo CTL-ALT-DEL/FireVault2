@@ -5383,6 +5383,16 @@ const CUSTOMER_IMPORT_HEADERS_065 = ["Account Id","Account Name","SiteID1","Site
 const CUSTOMER_GEOCODE_CACHE_KEY_0651 = "firevault_customer_geocode_cache_0651";
 let customerGeocodeRunToken0651 = 0;
 function cleanImportValue065(value){ return String(value??"").replace(/^\uFEFF/,"").trim(); }
+/* Build 0.73.1: account identity is the only customer-import deduplication key.
+   Normalize formatting without removing meaningful building suffixes such as G7C1234-01. */
+function canonicalAccountId0731(value){
+  return cleanImportValue065(value)
+    .replace(/^'+/,"")
+    .toUpperCase()
+    .replace(/[\u2010-\u2015\u2212\uFE58\uFE63\uFF0D]/g,"-")
+    .replace(/\s+/g,"");
+}
+function isClssBuildingAccount0731(value){ return /^G7C[A-Z0-9]+-[A-Z0-9]+$/.test(canonicalAccountId0731(value)); }
 function normalizeImportHeader065(value){ return cleanImportValue065(value).toLowerCase().replace(/[^a-z0-9]/g,""); }
 function optionalImportIndex065(normalized,labels){
   for(const label of labels){ const index=normalized.get(normalizeImportHeader065(label)); if(index!==undefined) return index; }
@@ -5417,7 +5427,7 @@ function parseCsvText065(text){
     const getOptional=index=>index>=0?cleanImportValue065(cells[index]??""):"";
     return {
       sourceRow:index+2,
-      accountId:get("Account Id"), name:get("Account Name"), siteId1:get("SiteID1"), siteId2:get("SiteID2"),
+      accountId:canonicalAccountId0731(get("Account Id")), name:get("Account Name"), siteId1:get("SiteID1"), siteId2:get("SiteID2"),
       siteLanguage:get("SiteLanguage"), deviceType:get("DeviceType"), sitePhone:get("Site Phone"), devicePhone:get("Device Phone"),
       devicePhoneComment:get("Device Phone Comment"), street:get("Address"), city:get("City"), state:get("State").toUpperCase(),
       zip:get("ZipCode"), sourceGroupNumber:get("SiteGroupNum"), latitude:getOptional(latIndex), longitude:getOptional(lngIndex),
@@ -5446,7 +5456,7 @@ function loadGeocodeCache0651(){ try{return JSON.parse(sessionStorage.getItem(CU
 function saveGeocodeCache0651(cache){ try{sessionStorage.setItem(CUSTOMER_GEOCODE_CACHE_KEY_0651,JSON.stringify(cache));}catch{} }
 function customerManagedFields065(row,existing=null){
   const fields={
-    externalAccountId:row.accountId,
+    externalAccountId:canonicalAccountId0731(row.accountId),
     name:row.name||"Unnamed Site",
     street:row.street,
     city:row.city,
@@ -5495,20 +5505,21 @@ function managedFieldsChanged065(site,row){
 function analyzeCustomerImport065(parsed,fileName="Customers.csv"){
   const idCounts=new Map(), nameCounts=new Map(), addressCounts=new Map();
   parsed.rows.forEach(r=>{
-    const id=r.accountId.toUpperCase(), name=r.name.toLowerCase(), addr=normalizedAddressKey065(r).toLowerCase();
+    const id=canonicalAccountId0731(r.accountId), name=r.name.toLowerCase(), addr=normalizedAddressKey065(r).toLowerCase();
     if(id) idCounts.set(id,(idCounts.get(id)||0)+1);
     if(name) nameCounts.set(name,(nameCounts.get(name)||0)+1);
     if(addr.replace(/\|/g,"")) addressCounts.set(addr,(addressCounts.get(addr)||0)+1);
   });
   const existingById=new Map();
   (data.sites||[]).forEach(site=>{
-    const key=cleanImportValue065(site.externalAccountId).toUpperCase();
+    const key=canonicalAccountId0731(site.externalAccountId);
     if(!key) return;
     const list=existingById.get(key)||[]; list.push(site); existingById.set(key,list);
   });
   const rows=parsed.rows.map(row=>{
     const issues=[], notices=[];
-    const id=row.accountId.toUpperCase();
+    const id=canonicalAccountId0731(row.accountId);
+    row.accountId=id;
     const addrKey=normalizedAddressKey065(row).toLowerCase();
     if(!row.accountId) issues.push("Missing Account Id");
     if(!row.name) issues.push("Missing Account Name");
@@ -5517,8 +5528,12 @@ function analyzeCustomerImport065(parsed,fileName="Customers.csv"){
     if(row.devicePhone && (/e\+?/i.test(row.devicePhone) || ![7,10,11].includes(phoneDigits.length))) issues.push("Device Phone has an unusual value");
     if((idCounts.get(id)||0)>1) issues.push(`Duplicate Account Id in file (${idCounts.get(id)})`);
     if((existingById.get(id)||[]).length>1) issues.push("Multiple FireVault sites already use this Account Id");
-    if((addressCounts.get(addrKey)||0)>1) notices.push(`Shared address (${addressCounts.get(addrKey)} records)`);
-    if((nameCounts.get(row.name.toLowerCase())||0)>1) notices.push(`Repeated account name (${nameCounts.get(row.name.toLowerCase())} records)`);
+    const sameAddressCount=addressCounts.get(addrKey)||0;
+    if(sameAddressCount>1){
+      notices.push(`Multiple building accounts at this address (${sameAddressCount}) — each unique Account ID imports separately`);
+      if(isClssBuildingAccount0731(id)) notices.push(`CLSS building suffix preserved: ${id}`);
+    }
+    if((nameCounts.get(row.name.toLowerCase())||0)>1) notices.push(`Repeated account name (${nameCounts.get(row.name.toLowerCase())} records) — Account ID remains the identity key`);
     const existing=(existingById.get(id)||[])[0]||null;
     const rowPair=rowCoordinatePair065(row),existingPair=siteCoordinatePair065(existing);
     const coordinateStatus=rowPair?(row.coordinateSource==="Customer CSV"?"provided":"matched"):(existingPair?"existing":(row.geocodeStatus==="no-match"?"no-match":row.geocodeStatus==="error"?"error":addressCanGeocode065(row)?"needed":"unavailable"));
@@ -5528,7 +5543,7 @@ function analyzeCustomerImport065(parsed,fileName="Customers.csv"){
     let action="new";
     if(!row.accountId || !row.name || (idCounts.get(id)||0)>1 || (existingById.get(id)||[]).length>1) action="skip";
     else if(existing) action=managedFieldsChanged065(existing,row)?"update":"unchanged";
-    return {...row,issues,notices,flagged:issues.length>0,action,existingId:existing?.id||"",existingCoordinates:existingPair,coordinateStatus};
+    return {...row,issues,notices,flagged:issues.length>0,action,existingId:existing?.id||"",existingCoordinates:existingPair,coordinateStatus,sameAddressCount};
   });
   const summary={total:rows.length,new:0,update:0,unchanged:0,review:0,skip:0,ready:0,coordinatesReady:0,needsCoordinates:0,geocodeFailed:0,coordinatesUnavailable:0,sharedAddressGroups:[...addressCounts.values()].filter(n=>n>1).length,repeatedNameGroups:[...nameCounts.values()].filter(n=>n>1).length};
   rows.forEach(r=>{
@@ -5625,7 +5640,7 @@ function customerImportPanel065(){
         <div><strong>${(data.sites||[]).length}</strong><span>sites currently in FireVault</span></div>
         <label class="primary customerFileButton065">Choose Customer CSV<input id="customerCsvFile065" type="file" accept=".csv,text/csv" hidden></label>
       </div>
-      <div class="settingsInfo540"><strong>Duplicate-safe import key</strong><span>FireVault matches records by Account Id. Reimporting an updated file changes the matching site instead of creating a second copy.</span></div>
+      <div class="settingsInfo540"><strong>Building-safe Account ID matching</strong><span>FireVault never merges customer records because they share an address or name. The complete Account ID is the identity key, so IDs such as G7C1234-01 and G7C1234-02 import as separate buildings.</span></div>
       ${last?`<div class="customerLastImport065"><strong>Last import</strong><span>${esc(new Date(last.at).toLocaleString())} · ${esc(last.fileName||"Customer CSV")}</span><em>${Number(last.added||0)} added · ${Number(last.updated||0)} updated · ${Number(last.geocoded||0)} with calculated coordinates</em></div>`:""}
     `,"blue")}
     ${state.error?settingsSection540("File problem","CSV could not be prepared","Correct the file and choose it again.",`<div class="customerImportError065">${esc(state.error)}</div>`,"red"):""}
@@ -5641,9 +5656,10 @@ function customerImportPanel065(){
       <div class="customerImportMetrics065">
         <div><strong>${summary.total}</strong><span>Rows</span></div><div class="new"><strong>${summary.new}</strong><span>New</span></div><div class="update"><strong>${summary.update}</strong><span>Updates</span></div><div class="review"><strong>${summary.review}</strong><span>Review</span></div><div><strong>${summary.unchanged}</strong><span>No change</span></div>
       </div>
+      ${summary.sharedAddressGroups?`<div class="settingsInfo540"><strong>${summary.sharedAddressGroups} multi-building address group${summary.sharedAddressGroups===1?"":"s"} detected</strong><span>These rows will remain separate. FireVault matches only the complete Account ID and does not combine records by street address, name, or shared GPS coordinates.</span></div>`:""}
       <div class="customerImportChecks065"><label><input id="requireCoordinates0651" type="checkbox" ${state.requireCoordinates!==false?"checked":""}><span><strong>Require coordinates before import</strong><small>Recommended. Records without calculated or existing GPS coordinates remain in the preview instead of being imported.</small></span></label><label><input id="includeFlagged065" type="checkbox" ${state.includeFlagged?"checked":""}><span><strong>Include flagged records</strong><small>Leave off to import only records that passed validation. Flagged rows remain available for a later corrected import.</small></span></label></div>
       <div class="customerImportActions065"><button class="primary" id="runCustomerImport065" ${selectedCount||geo.active?geo.active?"disabled":"":"disabled"}>Import ${selectedCount} Record${selectedCount===1?"":"s"}</button><button class="ghost" id="clearCustomerImport065" ${geo.active?"disabled":""}>Clear Preview</button></div>
-      <p class="fieldNote">The importer preserves FireVault-created history and adds changed records to the pending synchronization queue.</p>
+      <p class="fieldNote">The importer preserves FireVault-created history and adds changed records to the pending synchronization queue. Same-address buildings remain separate as long as their complete Account IDs are different.</p>
     `,"green"):""}
     ${state.lastResult?settingsSection540("Import complete","Customer records saved","The local database and synchronization queue were updated.",`<div class="customerImportResult065"><div><strong>${state.lastResult.added}</strong><span>Added</span></div><div><strong>${state.lastResult.updated}</strong><span>Updated</span></div><div><strong>${state.lastResult.geocoded||0}</strong><span>Coordinates</span></div><div><strong>${state.lastResult.skipped}</strong><span>Skipped</span></div></div><button class="ghost" id="openImportedSites065">Open Customer Database</button>`,"violet"):""}
     ${summary?settingsSection540("Row review","Customer records","Use the filters to inspect new, changed, unchanged, questionable, or ungeocoded rows before importing.",`
@@ -5732,12 +5748,13 @@ function stopCustomerCoordinates0651(){
 function performCustomerImport065(){
   const selected=selectedCustomerImportRows065();
   if(!selected.length){ toast(customerImportState065.requireCoordinates?"No new or changed records with coordinates are selected.":"No new or changed records are selected."); return; }
-  if(!confirm(`Import ${selected.length} customer record${selected.length===1?"":"s"}? Existing FireVault notes, photos, visits, tasks, and deficiencies will be preserved.`)) return;
-  const existingById=new Map((data.sites||[]).filter(s=>s.externalAccountId).map(s=>[cleanImportValue065(s.externalAccountId).toUpperCase(),s]));
+  if(!confirm(`Import ${selected.length} customer record${selected.length===1?"":"s"}? Existing FireVault notes, photos, visits, tasks, and deficiencies will be preserved. Same-address buildings will remain separate by complete Account ID.`)) return;
+  const existingById=new Map((data.sites||[]).filter(s=>s.externalAccountId).map(s=>[canonicalAccountId0731(s.externalAccountId),s]));
   const now=new Date().toISOString();
   const stats={added:0,updated:0,unchanged:customerImportState065.summary?.unchanged||0,skipped:(customerImportState065.rows||[]).filter(r=>r.action==="skip" || (r.flagged&&!customerImportState065.includeFlagged) || (customerImportState065.requireCoordinates&&!rowCoordinatesReady065(r))).length,flagged:selected.filter(r=>r.flagged).length,geocoded:selected.filter(r=>!!rowCoordinatePair065(r)).length};
   selected.forEach(row=>{
-    const key=row.accountId.toUpperCase();
+    const key=canonicalAccountId0731(row.accountId);
+    row.accountId=key;
     const existing=existingById.get(key);
     const fields=customerManagedFields065(row,existing);
     if(existing){
@@ -6353,8 +6370,8 @@ const FIREVAULT_MANUAL_058 = [
     ["Contacts","Store customer contacts, roles, phone numbers, email addresses, and access notes under the account."],
     ["GPS","Capture GPS while physically at the site for the best nearby-account results. Location permission and HTTPS are required."],
     ["Search and recent use","FireVault searches multiple account fields, including imported Account Id and monitoring information, and tracks recently opened sites for faster daily access."],
-    ["Customer CSV Import","Open Settings → Customer Import, choose a compatible CSV file, review New, Update, Review, and No Change counts, then import ready records. Account Id is the duplicate-safe update key. Flagged rows can be left out until corrected."],
-    ["Repeat imports","Reimporting the same source file does not duplicate matching sites. Changed source fields are updated while visits, photos, notes, tasks, deficiencies, contacts, documents, and other FireVault-created history are preserved."]
+    ["Customer CSV Import","Open Settings → Customer Import, choose a compatible CSV file, review New, Update, Review, and No Change counts, then import ready records. The complete Account Id is the duplicate-safe update key. Shared addresses and repeated names do not merge separate buildings. Flagged rows can be left out until corrected."],
+    ["Repeat imports","Reimporting the same source file does not duplicate an exact Account ID. Different Account IDs at the same address—including CLSS IDs with different dash suffixes—remain separate buildings. Changed source fields are updated while visits, photos, notes, tasks, deficiencies, contacts, documents, and other FireVault-created history are preserved."]
   ]},
   {id:"detail",title:"Site Detail",icon:"▤",status:"Current",summary:"Understand every card and action on an individual customer account.",topics:[
     ["Important Site Info","Provides fast access to contact, access, panel, and GPS information. Use it before beginning work."],
@@ -7615,6 +7632,8 @@ function diagnostics(){
 }
 function showChangelog(){
   const notes = [
+    "Build 0.73.1 keeps different buildings at the same address as separate customer records by matching the complete Account ID, including CLSS dash suffixes such as G7C1234-01 and G7C1234-02.",
+    "Build 0.73.0 introduced the unified FireVault design system and consistent dynamic navigation controls.",
     "Build 0.71.6 fixes a Nearby startup crash by making the selected-account phone/contact lookup safe when no account is selected yet.",
     "Build 0.71.5 removes the selected-account map box and displays the account name and address as clean white text with a strong black shadow.",
     "Build 0.71.4 keeps MAP / LIST visible on narrow screens, replaces the category dropdown with a compact filter icon, moves the selected account overlay to the map’s top-left, and refreshes GPS/map from the bottom Nearby button.",
@@ -7634,7 +7653,7 @@ function showChangelog(){
   overlay.className="releaseOverlay";
   overlay.innerHTML=`<div class="releaseSheet" role="dialog" aria-modal="true" aria-label="FireVault release notes">
     <div class="releaseHead"><div><strong>${fireVaultBrand575()}</strong><span>Build ${BUILD}</span></div><button class="ghost iconBtn" id="closeRelease" aria-label="Close release notes">×</button></div>
-    <div class="releaseBody"><h2>Release Notes</h2><p class="releaseIntro">Nearby Accounts Map/List Home redesign.</p><ul>${notes.map(n=>`<li>${esc(n)}</li>`).join("")}</ul></div>
+    <div class="releaseBody"><h2>Release Notes</h2><p class="releaseIntro">Customer import identity protection and FireVault interface improvements.</p><ul>${notes.map(n=>`<li>${esc(n)}</li>`).join("")}</ul></div>
   </div>`;
   document.body.appendChild(overlay);
   const close=()=>overlay.remove();
