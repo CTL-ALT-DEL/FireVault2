@@ -2201,6 +2201,7 @@ function dashboard068(){
 
 
 const HOME_NEARBY_VIEW_KEY_069="firevault_home_nearby_view_069";
+const NEARBY_LIST_MAX_MILES_069=25;
 let homeNearbyView069=localStorage.getItem(HOME_NEARBY_VIEW_KEY_069)||"map";
 let homeNearbySelected069="";
 let nearbyScrollLock069=false;
@@ -2211,6 +2212,7 @@ let nearbyStaticCurrentBounds069=null;
 let nearbyMapPopupSite069="";
 let nearbyScrollActivated069=false;
 let nearbyStaticCenter069=null;
+let nearbyAdaptiveRadiusMiles069=null;
 let nearbyStreetFocusSite069="";
 let nearbyTouchStartScroll069=0;
 let nearbyTouchMoved069=false;
@@ -2224,13 +2226,12 @@ function cssEscape069(value){
 }
 function nearbyRows069(){
   const rows=nearbyState?gpsSiteDistances(nearbyState.lat,nearbyState.lng):[];
-  const radius=nearbyRadiusMiles()*1609.344;
-  const inRadius=rows.filter(r=>r.meters<=radius);
-  return (inRadius.length?inRadius:rows.slice(0,65));
+  const maxMeters=NEARBY_LIST_MAX_MILES_069*1609.344;
+  return rows.filter(r=>Number.isFinite(Number(r.meters))&&Number(r.meters)<=maxMeters);
 }
 function nearbySummary069(){
   const inv=gpsInventory0652(), rows=nearbyRows069();
-  return {inv,rows,nearby:nearbyState?rows.filter(r=>r.meters<=nearbyRadiusMiles()*1609.344).length:0};
+  return {inv,rows,nearby:rows.length};
 }
 function nearbyAccountCard069(r,index){
   const s=r.s,id=accountId069(s),phone=phone069(s);
@@ -2239,7 +2240,7 @@ function nearbyAccountCard069(r,index){
     <span class="nearbyPin069">●</span>
     <div class="nearbyInfo069"><strong>${esc(s.name||'Unnamed Account')}</strong><div>${id?`<b>${esc(id)}</b><i>•</i>`:''}<span>${esc(fullAddress(s)||'No address saved')}</span></div></div>
     <span class="nearbyDistance069">${esc(distanceLabel(r.meters))}<i class="gpsDot069"></i></span>
-    <div class="nearbyActions069"><button data-nearby-open069="${esc(s.id)}">▣ <span>Open</span></button><button aria-label="Directions" data-nearby-route069="${esc(s.id)}">➤</button><button aria-label="Call" data-nearby-call069="${esc(s.id)}" ${phone?'':'disabled'}>☎</button></div>
+    <div class="nearbyActions069"><button aria-label="Open account" title="Open" data-nearby-open069="${esc(s.id)}">▣ <span>Open</span></button><button aria-label="Route to account" title="Route" data-nearby-route069="${esc(s.id)}">➤</button><button aria-label="Call account" title="Call" data-nearby-call069="${esc(s.id)}" ${phone?'':'disabled'}>☎</button></div>
   </article>`;
 }
 function homeNearbyMapShell069(){
@@ -2260,17 +2261,20 @@ function setHomeChrome069(hidden){
 function home(){
   setHomeChrome069(true);
   const {inv,rows,nearby}=nearbySummary069(), status=nearbyScanStatus0652.state;
+  if(rows.length&&!rows.some(r=>r.s.id===homeNearbySelected069)) homeNearbySelected069=rows[0].s.id;
+  const selectedRow069=rows.find(r=>r.s.id===homeNearbySelected069)||rows[0]||null;
+  if(selectedRow069&&!Number.isFinite(nearbyAdaptiveRadiusMiles069)) nearbyAdaptiveRadiusMiles069=adaptiveRadiusForRow069(selectedRow069);
   const gpsText=nearbyState?`Updated ${new Date(nearbyState.at).toLocaleTimeString([], {hour:'numeric',minute:'2-digit'})}`:'GPS not refreshed';
   html(`<div class="screen nearbyHome069">
     <section class="nearbyTop069"><div class="nearbyLogo069"><img src="assets/favicon.png?v=${BUILD}" alt=""><strong>${fireVaultBrand575()}</strong></div><div class="nearbyTopActions069"><button class="homeBuild069" id="homeBuild069"><i></i>${BUILD}</button><button class="homeSettings069" id="homeSettings069">⚙</button></div></section>
     <section class="nearbyCompactHead069">
-      <div class="nearbyCompactTitle069"><h1>Nearby Accounts</h1><span><i></i>${esc(gpsText)} <b>• ${nearby} nearby • ${inv.ready} GPS • ${nearbyRadiusMiles()} mi</b></span></div>
+      <div class="nearbyCompactTitle069"><h1>Nearby Accounts</h1><span><i></i>${esc(gpsText)} <b>• ${nearby} within ${NEARBY_LIST_MAX_MILES_069} mi • ${inv.ready} GPS</b></span></div>
       <div class="nearbyCompactActions069"><button class="nearbyViewToggle069" id="nearbyViewToggle069" aria-label="Switch between map and list"><span>${homeNearbyView069==='map'?'⌖':'☷'}</span><b>${homeNearbyView069==='map'?'Map':'List'}</b></button><button class="iconCompact069" id="scanHome069" aria-label="Refresh GPS" ${status==='scanning'?'disabled':''}>↻</button><button class="iconCompact069" id="radiusHome069" aria-label="Nearby radius settings">◎</button></div>
     </section>
     ${status==='error'?`<div class="nearbyNotice069"><strong>Location problem:</strong> ${esc(nearbyScanStatus0652.message)}</div>`:''}
     <section class="nearbyWorkspace069 ${homeNearbyView069}">
       ${homeNearbyView069==='map'?homeNearbyMapShell069():''}
-      <div class="nearbyListHead069"><strong>${rows.length} accounts near your location</strong><span>Sorted by distance</span></div>
+      <div class="nearbyListHead069"><strong>${rows.length} account${rows.length===1?'':'s'} within ${NEARBY_LIST_MAX_MILES_069} miles</strong><span>Sorted by distance</span></div>
       <div class="nearbyCards069" id="nearbyCards069">${rows.length?rows.map(nearbyAccountCard069).join(''):`<div class="nearbyEmpty069">${nearbyState?'No nearby accounts found.':'Refreshing GPS…'}</div>`}</div>
     </section>
     <nav class="nearbyBottomNav069"><button class="active">⌖<span>Nearby</span></button><button id="homeAccounts069">▦<span>Accounts</span></button><button id="homeToolsNav069">⚒<span>Tools</span></button><button id="homeSettingsNav069">⚙<span>Settings</span></button></nav>
@@ -2335,16 +2339,31 @@ function nearbyGps069(site){
   return Number.isFinite(lat)&&Number.isFinite(lng)?{lat,lng}:null;
 }
 function streetVisibleMiles069(){ return .14; }
+function distanceMiles069(row){
+  const miles=Number(row?.meters||0)/1609.344;
+  return Number.isFinite(miles)?Math.max(0,miles):0;
+}
+function adaptiveRadiusForRow069(row){
+  const miles=distanceMiles069(row);
+  return Math.max(.25,Math.min(NEARBY_LIST_MAX_MILES_069,miles?miles*1.08:.25));
+}
+function adaptiveVisibleMiles069(row){
+  return Math.max(.32,Math.min(NEARBY_LIST_MAX_MILES_069*1.1,adaptiveRadiusForRow069(row)*1.1));
+}
 function resetNearbyMapOverview069(redraw=true){
+  const rows=nearbyRows069();
+  const row=rows.find(r=>r.s.id===homeNearbySelected069)||rows[0]||null;
   nearbyStreetFocusSite069="";
   nearbyStaticCenter069=null;
   nearbyMapPopupSite069="";
-  nearbyStaticVisibleMiles069=initialVisibleMiles069(nearbyRows069());
+  nearbyAdaptiveRadiusMiles069=row?adaptiveRadiusForRow069(row):Math.max(.25,Math.min(NEARBY_LIST_MAX_MILES_069,Number(nearbyRadiusMiles())||1));
+  nearbyStaticVisibleMiles069=row?adaptiveVisibleMiles069(row):Math.max(.55,nearbyAdaptiveRadiusMiles069*1.1);
   if(redraw&&homeNearbyView069==="map"&&document.getElementById('nearbyStaticOverlay069')) drawStaticNearbyMap069();
 }
 function focusNearbyAccountMap069(row,showPopup=false){
   const g=nearbyGps069(row?.s);
   if(!g)return false;
+  nearbyAdaptiveRadiusMiles069=adaptiveRadiusForRow069(row);
   nearbyStreetFocusSite069=row.s.id;
   nearbyStaticCenter069={lat:g.lat,lng:g.lng};
   nearbyStaticVisibleMiles069=streetVisibleMiles069();
@@ -2354,23 +2373,25 @@ function focusNearbyAccountMap069(row,showPopup=false){
   return true;
 }
 function initialVisibleMiles069(rows){
-  const configured=Math.max(.5,Number(nearbyRadiusMiles())||1);
-  if(!rows.length) return Math.min(configured,1.25);
-  const target=rows[Math.min(rows.length-1,11)];
-  const targetMiles=Math.max(.25,Number(target?.meters||0)/1609.344);
-  return Math.max(.55,Math.min(configured,Math.max(.8,targetMiles*1.18)));
+  if(!rows.length) return .75;
+  const selected=rows.find(r=>r.s.id===homeNearbySelected069)||rows[0];
+  nearbyAdaptiveRadiusMiles069=adaptiveRadiusForRow069(selected);
+  return adaptiveVisibleMiles069(selected);
 }
 function maxVisibleMiles069(rows){
-  const farthest=rows.length?Number(rows[rows.length-1].meters||0)/1609.344:0;
-  return Math.max(Number(nearbyRadiusMiles())||1,farthest*1.12,1);
+  const farthest=Math.min(NEARBY_LIST_MAX_MILES_069,rows.length?distanceMiles069(rows[rows.length-1]):0);
+  return Math.max(1,Math.min(NEARBY_LIST_MAX_MILES_069*1.1,farthest*1.12));
 }
 function ensureSelectedVisible069(row){
   if(!row||homeNearbyView069!=="map") return false;
-  if(!Number.isFinite(nearbyStaticVisibleMiles069)) nearbyStaticVisibleMiles069=initialVisibleMiles069(nearbyRows069());
-  const miles=Number(row.meters||0)/1609.344;
-  if(miles<=nearbyStaticVisibleMiles069*.86) return false;
-  nearbyStaticVisibleMiles069=Math.min(maxVisibleMiles069(nearbyRows069()),Math.max(nearbyStaticVisibleMiles069,miles*1.2));
-  return true;
+  const nextRadius=adaptiveRadiusForRow069(row);
+  const nextVisible=adaptiveVisibleMiles069(row);
+  const changed=nearbyStreetFocusSite069!==""||nearbyStaticCenter069!==null||!Number.isFinite(nearbyStaticVisibleMiles069)||Math.abs(nearbyStaticVisibleMiles069-nextVisible)>.015||Math.abs((nearbyAdaptiveRadiusMiles069||0)-nextRadius)>.015;
+  nearbyStreetFocusSite069="";
+  nearbyStaticCenter069=null;
+  nearbyAdaptiveRadiusMiles069=nextRadius;
+  nearbyStaticVisibleMiles069=nextVisible;
+  return changed;
 }
 function updateNearbyMapSelection069(){
   const siteId=homeNearbySelected069;
@@ -2491,8 +2512,10 @@ function drawStaticNearbyMap069(){
     if(base.dataset.mapSrc!==nextSrc){base.dataset.mapSrc=nextSrc;base.src=nextSrc;}
     const userPoint=staticPoint069(userLat,userLng,b);
     const userVisible=userPoint&&userPoint.x>=0&&userPoint.x<=100&&userPoint.y>=0&&userPoint.y<=100;
-    const configuredRadius=Math.max(.1,Number(nearbyRadiusMiles())||1);
-    const radiusPx=Math.max(8,Math.min(shell.clientWidth,shell.clientHeight)*(configuredRadius/Math.max(.01,b.verticalMiles))/2);
+    const selectedRow=rows.find(r=>r.s.id===homeNearbySelected069)||rows[0]||null;
+    const activeRadius=Math.max(.1,Math.min(NEARBY_LIST_MAX_MILES_069,Number(nearbyAdaptiveRadiusMiles069)||adaptiveRadiusForRow069(selectedRow)));
+    nearbyAdaptiveRadiusMiles069=activeRadius;
+    const radiusPx=Math.max(8,Math.min(shell.clientWidth,shell.clientHeight)*(activeRadius/Math.max(.01,b.verticalMiles))/2);
     let html='';
     if(userVisible&&!nearbyStreetFocusSite069) html+=`<span class="staticRadius069" style="left:${userPoint.x}%;top:${userPoint.y}%;width:${radiusPx*2}px;height:${radiusPx*2}px"></span>`;
     if(userVisible) html+=`<span class="staticUser069" style="left:${userPoint.x}%;top:${userPoint.y}%"></span>`;
@@ -2505,7 +2528,7 @@ function drawStaticNearbyMap069(){
       html+=`<button class="staticMarker069 ${r.s.id===homeNearbySelected069?'selected':''}" style="left:${p.x}%;top:${p.y}%" data-static-marker069="${esc(r.s.id)}" aria-label="${esc(r.s.name||'Account')}"><span>${index+1}</span></button>`;
     });
     overlay.innerHTML=html||'<div class="staticMapMessage069">No mapped accounts are inside the current view.</div>';
-    if(count){count.textContent=`${rendered} mapped • ${nearbyStaticVisibleMiles069.toFixed(1)} mi`;count.hidden=false;}
+    if(count){count.textContent=`${rendered} mapped • ${nearbyAdaptiveRadiusMiles069.toFixed(1)} mi radius`;count.hidden=false;}
     overlay.querySelectorAll('[data-static-marker069]').forEach(m=>m.onclick=e=>{
       e.stopPropagation();
       const id=m.dataset.staticMarker069; selectNearby069(id,false,true,true);
@@ -7388,6 +7411,7 @@ function diagnostics(){
 }
 function showChangelog(){
   const notes = [
+    "Build 0.69.9 enlarges Nearby Open, Route, and Call controls, changes selected accounts to a glowing green treatment, extends the account list to 25 miles, and adapts the overview radius to the selected account distance.",
     "Build 0.69.8 makes Nearby list taps select the tapped account reliably, zooms the map to street level around that account, and forces all account markers to render as true circles.",
     "Build 0.69.6 hides map details until a marker is tapped, stabilizes momentum list settling, and moves the map closer to the top with a simpler header.",
     "Manual chapters document installation, Today, Sites, Site Detail, field workflow, notes, tasks, deficiencies, photos, GPS, route tracking, reports, email, settings, backups, updates, and troubleshooting.",

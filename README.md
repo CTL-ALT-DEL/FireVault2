@@ -1,3 +1,3 @@
-# FireVault Build 0.69.8
+# FireVault Build 0.69.9
 
-Nearby account selection repair: true circular map markers, reliable row-tap selection, and street-level map focus centered on the selected account without moving the account list.
+Nearby Accounts field-use refinement: larger Open, Route, and Call controls; glowing green selected accounts; a distance-sorted list extending to 25 miles; and an adaptive map radius that expands or contracts with the selected account while preserving street-level focus on direct taps.
