@@ -1,18 +1,17 @@
-# FireVault Build 0.65.2
+# FireVault Build 0.66.0
 
-Build 0.65.2 repairs Nearby Sites scanning and adds visible GPS diagnostics.
+Build 0.66.0 is an application-wide visual cleanup milestone based on Build 0.65.2.
 
 ## Included
 
-- GPS-ready and missing-coordinate counts
-- Recovery of valid coordinates stored in compatible imported or legacy fields
-- Persistent location permission, unavailable, and timeout messages
-- Automatic retry with standard accuracy after a high-accuracy timeout or unavailable response
-- Nearest-site fallback when no account is inside the selected radius
-- Direct links to Customer Import and GPS Settings when action is required
-- Session-preserved last successful nearby location
-- All Build 0.65.1 customer CSV import and coordinate calculation features
+- Consolidated typography, spacing, card surfaces, borders, buttons, and form controls
+- Improved Home, Site Detail, Nearby Sites, Settings, Email Settings, Help/Academy, Customer Import, Team Sync, and Conflict Center layouts
+- Reinforced natural-height Site Detail cards and safe vertical scrolling
+- Removed floating or sticky Help content that could cover articles
+- Improved bottom-navigation clearance and overflow protection
+- Improved phone, narrow-phone, iPad, and desktop-responsive behavior
+- Preserved all 0.65.2 importing, coordinate calculation, sync, and Nearby Sites functionality
 
-## Suggested commit message
+Suggested commit message:
 
-`Build 0.65.2 repair Nearby Sites scanning and GPS diagnostics`
+`Build 0.66.0 complete application-wide visual cleanup and layout consolidation`

@@ -8,7 +8,7 @@
   "orientation": "any",
   "background_color": "#0b0d10",
   "theme_color": "#101216",
-  "description": "Field knowledge system for fire alarm technicians. Build 0.65.2 repairs Nearby Sites scanning with GPS readiness counts, coordinate recovery, and clear location diagnostics.",
+  "description": "Field knowledge system for fire alarm technicians. Build 0.66.0 consolidates FireVault typography, spacing, contrast, cards, scrolling, Settings, Help, Site Detail, import, sync, and Nearby layouts.",
   "icons": [
     {
       "src": "assets/icon-192.png",

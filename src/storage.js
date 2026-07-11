@@ -1,4 +1,4 @@
-export const BUILD = "0.65.2";
+export const BUILD = "0.66.0";
 export const KEY = "firevault_vault_build_030";
 export const ACTIVE_JOB_KEY = "firevault_active_job_modular";
 export const DEVICE_KEY = "firevault_device_identity_062";

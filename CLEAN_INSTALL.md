@@ -1,11 +1,10 @@
-# FireVault Build 0.65.2 — Clean Install
+# FireVault Build 0.66.0 — Clean Install
 
-1. Extract the ZIP.
-2. Copy the contents of the extracted root into the repository root.
-3. Commit and push the changed files.
-4. Wait for GitHub Pages deployment to complete.
-5. Open FireVault and confirm the build badge reads `0.65.2`.
-6. Open Sites → Nearby and confirm the GPS Ready count is greater than zero.
-7. Tap Scan and allow location access when prompted.
+1. Back up FireVault data before deployment.
+2. Replace the prior application files with the contents of this ZIP.
+3. Commit and push the files to the GitHub Pages branch.
+4. Wait for deployment to complete.
+5. Open FireVault and confirm the build badge reads `0.66.0`.
+6. Existing browser-stored FireVault data should remain available.
 
-Existing browser data is retained when the application files are updated normally. Export a backup before major deployments.
+This build preserves the 0.65.2 data model and adds no destructive migration.
