@@ -1,14 +1,7 @@
-# FireVault Build 0.73.2
+# FireVault Build 0.73.3
 
-Build 0.73.2 restores the brighter green selected-account treatment in Nearby Accounts and adds an old-school computer-terminal startup sequence.
+Build 0.73.3 rebuilds the global bottom navigation used on Accounts, Library, Settings, Site Detail, reports, and other non-Nearby screens. The dock now uses equal-width controls, consistent icon and label alignment, safe-area-aware spacing, and a reliable three-button layout when Library is hidden.
 
-## Changes
+This build also removes user-facing roadmap, pre-release, future-build, and app-development-goal language. Settings, Help, Team Sync, and About now describe only current controls, current limitations, data location, and safe operating procedures.
 
-- Selected Nearby account card now uses a brighter green border and surface.
-- Selected map marker uses the matching bright green.
-- Splash screen types `CHECKING DATABASE` one character at a time.
-- The database result displays the number of loaded accounts.
-- Splash screen then types `CHECKING LATEST VERSION` and reports `CURRENT`, `UPDATE READY`, or `OFFLINE READY`.
-- Uses a green phosphor-style monospace display with a blinking block cursor.
-- Preserves Build 0.73.1 multi-building import behavior.
-- Preserves the existing `firevault_vault_build_030` storage key, automatic backups, and PWA update system.
+The existing `firevault_vault_build_030` storage key, automatic snapshots, update system, multi-building import behavior, bright selected-account treatment, and terminal splash checks remain unchanged.

@@ -14618,3 +14618,140 @@ input:focus,textarea:focus,select:focus{
   box-shadow:0 0 0 4px rgba(50,239,118,.3),0 5px 14px rgba(0,0,0,.55)!important;
 }
 .staticMarker069.selected span{color:#062412!important}
+
+/* Build 0.73.3 — rebuilt global bottom navigation and cleaner user-facing pages */
+body.app-booted533:not(.homeFullscreen480){
+  --navH:calc(74px + env(safe-area-inset-bottom,0px));
+}
+#appNav{
+  box-sizing:border-box!important;
+  position:fixed!important;
+  left:0!important;
+  right:0!important;
+  bottom:0!important;
+  width:100%!important;
+  height:var(--navH)!important;
+  min-height:var(--navH)!important;
+  display:grid!important;
+  grid-template-columns:repeat(4,minmax(0,1fr))!important;
+  align-items:start!important;
+  justify-items:stretch!important;
+  gap:8px!important;
+  padding:8px 10px calc(8px + env(safe-area-inset-bottom,0px))!important;
+  border-top:1px solid rgba(148,163,184,.18)!important;
+  background:linear-gradient(180deg,rgba(12,17,24,.985),rgba(5,8,12,.995))!important;
+  box-shadow:0 -12px 28px rgba(0,0,0,.32)!important;
+  overflow:hidden!important;
+  isolation:isolate!important;
+}
+#appNav::before{
+  display:none!important;
+  content:none!important;
+}
+#appNav.fvNavThree0733{
+  grid-template-columns:repeat(3,minmax(0,1fr))!important;
+}
+#appNav button{
+  box-sizing:border-box!important;
+  width:100%!important;
+  max-width:none!important;
+  height:56px!important;
+  min-height:56px!important;
+  max-height:56px!important;
+  margin:0!important;
+  padding:6px 5px!important;
+  align-self:start!important;
+  justify-self:stretch!important;
+  display:flex!important;
+  flex-direction:column!important;
+  align-items:center!important;
+  justify-content:center!important;
+  gap:4px!important;
+  border:1px solid #2f3a48!important;
+  border-radius:11px!important;
+  background:linear-gradient(155deg,#17212b,#0d131a)!important;
+  color:#aeb8c4!important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.045),0 3px 9px rgba(0,0,0,.22)!important;
+  transform:none!important;
+  overflow:hidden!important;
+}
+#appNav button:hover{
+  border-color:#465466!important;
+  color:#eef3f8!important;
+}
+#appNav button:active{
+  transform:translateY(1px) scale(.985)!important;
+  box-shadow:inset 0 1px 3px rgba(0,0,0,.46),0 1px 4px rgba(0,0,0,.25)!important;
+}
+#appNav button.active,
+#appNav button[aria-current="page"]{
+  border-color:color-mix(in srgb,var(--accent) 72%,#ffffff 6%)!important;
+  background:linear-gradient(155deg,color-mix(in srgb,var(--accent) 73%,#17212b),color-mix(in srgb,var(--accent2) 70%,#0d131a))!important;
+  color:#fff!important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.1),0 4px 13px color-mix(in srgb,var(--accent) 20%,transparent)!important;
+}
+#appNav .fvNavIcon073{
+  display:block!important;
+  width:21px!important;
+  height:21px!important;
+  min-width:21px!important;
+  min-height:21px!important;
+  margin:0!important;
+  stroke-width:1.9!important;
+}
+#appNav button > span,
+#appNav button span:first-child,
+#appNav button span:last-child{
+  display:block!important;
+  width:100%!important;
+  margin:0!important;
+  padding:0!important;
+  font-size:10.5px!important;
+  line-height:1!important;
+  font-weight:850!important;
+  letter-spacing:.025em!important;
+  text-align:center!important;
+  white-space:nowrap!important;
+  overflow:hidden!important;
+  text-overflow:ellipsis!important;
+}
+#appNav button:focus-visible{
+  outline:2px solid color-mix(in srgb,var(--accent) 74%,white)!important;
+  outline-offset:-2px!important;
+}
+
+/* Keep screen content and the rebuilt dock from competing for the same pixels. */
+body.app-booted533:not(.homeFullscreen480) main{
+  height:calc(100dvh - var(--headerH) - var(--navH))!important;
+  min-height:0!important;
+  padding-bottom:0!important;
+}
+@supports(height:100svh){
+  body.app-booted533:not(.homeFullscreen480) main{height:calc(100svh - var(--headerH) - var(--navH))!important}
+}
+@media(min-width:700px){
+  #appNav{
+    grid-template-columns:repeat(4,minmax(96px,118px))!important;
+    justify-content:center!important;
+    padding-left:max(18px,env(safe-area-inset-left,0px))!important;
+    padding-right:max(18px,env(safe-area-inset-right,0px))!important;
+  }
+  #appNav.fvNavThree0733{grid-template-columns:repeat(3,minmax(104px,128px))!important}
+}
+@media(max-width:390px){
+  #appNav{gap:6px!important;padding-left:7px!important;padding-right:7px!important}
+  #appNav button{height:55px!important;min-height:55px!important;max-height:55px!important;padding-left:3px!important;padding-right:3px!important}
+  #appNav button > span{font-size:9.8px!important}
+}
+/* Final global-dock resets for older tablet and feature-visibility rules. */
+#appNav{
+  transform:none!important;
+  max-width:none!important;
+  border-left:0!important;
+  border-right:0!important;
+  border-top-left-radius:0!important;
+  border-top-right-radius:0!important;
+}
+#appNav.fvNavThree0733 #nav-library{display:none!important}
+body.homeFullscreen480 > #appNav,
+body.app-booted533.homeFullscreen480 > #appNav{display:none!important}

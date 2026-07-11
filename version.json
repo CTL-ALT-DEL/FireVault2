@@ -1,6 +1,6 @@
 {
-  "build": "0.73.2",
+  "build": "0.73.3",
   "released": "2026-07-11",
-  "note": "Customer import keeps same-address buildings separate using the complete Account ID, including CLSS dash suffixes.",
-  "notes": "Brighter selected-account green and old-school terminal typing for database and latest-version checks."
+  "note": "Rebuilds the global bottom navigation for consistent alignment across non-Nearby pages.",
+  "notes": "Matches the Nearby control language, improves safe-area spacing, and removes user-facing roadmap and app-development-goal text."
 }

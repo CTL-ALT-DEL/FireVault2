@@ -1,10 +1,10 @@
-# Deploy FireVault 0.73.2
+# Deploy FireVault 0.73.3
 
-1. Replace the existing GitHub Pages files with the contents of this package.
-2. Commit and wait for GitHub Pages deployment to complete.
-3. Open FireVault from the existing Home Screen icon. Do not delete or reinstall the icon.
-4. Allow the built-in update system to load Build 0.73.2.
-5. Confirm the splash types `CHECKING DATABASE` and `CHECKING LATEST VERSION`.
-6. Confirm the displayed build is 0.73.2 and existing accounts are present.
+1. Download an external FireVault backup before changing or reinstalling the Home Screen app.
+2. Replace the repository root with the contents of this package.
+3. Commit and allow GitHub Pages to finish deploying.
+4. Open the existing FireVault Home Screen app and use Settings → App Updates → Check for Updates.
+5. Reload FireVault if prompted.
+6. Confirm Build 0.73.3 is installed and the expected account count is present.
 
-The storage key is unchanged. Existing accounts and backups should remain available.
+Do not delete the existing Home Screen app merely to install an update. Deleting it can remove its device-local data container.

@@ -326,7 +326,10 @@ function applyFeatureVisibility(){
   document.body.classList.toggle("view-advanced472", mode === "advanced");
   document.body.classList.toggle("view-power472", mode === "power");
   const navLibrary=document.getElementById("nav-library");
-  if(navLibrary) navLibrary.style.display = featureOn("library") ? "" : "none";
+  const appNav=document.getElementById("appNav");
+  const libraryVisible=featureOn("library");
+  if(navLibrary) navLibrary.style.display = libraryVisible ? "" : "none";
+  if(appNav) appNav.classList.toggle("fvNavThree0733", !libraryVisible);
 }
 function setViewMode(mode){ data.settings.app={...(data.settings.app||{}),viewMode:mode}; save(); toast(`${mode === "power" ? "Technician Power Mode" : mode === "advanced" ? "Advanced View" : "Simple View"} enabled.`); route("home"); }
 
@@ -1655,7 +1658,12 @@ function addServiceFollowUp(kind="Follow-up"){
 }
 function startJobTimer(){ stopJobTimer(); jobTimer=setInterval(()=>{ const el=document.getElementById("jobElapsed"); if(el && activeJob) el.textContent=elapsedText(activeJob.startedAt); },1000); }
 function stopJobTimer(){ if(jobTimer){ clearInterval(jobTimer); jobTimer=null; } }
-function setActiveNav(){ document.querySelectorAll("nav button").forEach(b=>b.classList.remove("active")); const section=["routeLog","dailySummary","actionCenter","pinnedSites","dashboard068"].includes(view)?"home":(["siteDetail","visits","visitDetail","checklist","siteForm","contactsList","contactForm","siteDocs","siteDocForm","equipmentList","equipmentForm","tasks","taskForm","deficiencies","deficiencyForm","report","jobMode","serviceVisit","nearbySites","attention"].includes(view)?"sites":view); document.getElementById("nav-"+section)?.classList.add("active"); }
+function setActiveNav(){
+  document.querySelectorAll("#appNav button").forEach(b=>{b.classList.remove("active");b.removeAttribute("aria-current");});
+  const section=["routeLog","dailySummary","actionCenter","pinnedSites","dashboard068"].includes(view)?"home":(["siteDetail","visits","visitDetail","checklist","siteForm","contactsList","contactForm","siteDocs","siteDocForm","equipmentList","equipmentForm","tasks","taskForm","deficiencies","deficiencyForm","report","jobMode","serviceVisit","nearbySites","attention"].includes(view)?"sites":view);
+  const active=document.getElementById("nav-"+section);
+  if(active){active.classList.add("active");active.setAttribute("aria-current","page");}
+}
 function wireGlobalHeader537(){ updateGlobalToday071(); }
 function showGlobalChrome537(){ const h=document.getElementById("appHeader"); const n=document.getElementById("appNav"); if(h){ h.style.display="flex"; h.style.visibility="visible"; h.style.opacity="1"; } if(n){ n.style.display="grid"; n.style.visibility="visible"; n.style.opacity="1"; } wireGlobalHeader537(); }
 
@@ -5819,13 +5827,13 @@ function settingsTabs(){
     ["themes","Theme","Theme presets, accent color, 3D controls, text size, and haptics."],
     ["homeLayout","Home Layout","Choose which optional Home cards appear and how they open."],
     ["visibility","Modules","Enable or disable FireVault modules for a cleaner field interface."],
-    ["advanced","Advanced","Optional future modules marked with an asterisk when services are required."],
-    ["sync","Team Sync","Multi-technician identity, pending changes, conflict policy, and OneDrive readiness."],
+    ["advanced","Advanced","Optional integrations and field services. An asterisk marks controls that require an outside service."],
+    ["sync","Team Sync","Technician identity, shared-vault packages, pending changes, and conflict review."],
     ["customerImport","Customer Import","Preview and safely import customer records from a CSV export using Account Id."],
     ["backup","Backup","Export, import, data safety snapshot, restore tools, and danger zone."],
     ["updates","App Updates","Check for a new build, clear cached app files, and reload FireVault."],
     ["manual","Help & Manual","Searchable instructions for using FireVault, field workflows, settings, reports, photos, GPS, and troubleshooting."],
-    ["about","About","Build information, storage key, and FireVault roadmap notes."]
+    ["about","About","Installed version, local storage details, and application information."]
   ];
 }
 
@@ -5879,12 +5887,12 @@ function settings(){
     html(`<div class="screen settingsHome067 settingsStable573">
       <header class="settingsLandingHead067">
         <button class="ghost settingsHomeBtn572" id="settingsHomeBtn572" aria-label="Return to Home">⌂</button>
-        <div><span>FireVault configuration</span><h1>Settings</h1><p>Five organized areas replace the long list of individual menus.</p></div>
+        <div><span>Preferences and data tools</span><h1>Settings</h1><p>Choose a section to adjust FireVault for your field workflow.</p></div>
         <button class="ghost settingsModulesQuick488" id="modulesQuickBtn">Modules</button>
       </header>
       <section class="settingsLandingIntro067">
-        <div><strong>Everything is still here.</strong><p>Features were grouped by purpose so they are faster to find and easier to maintain.</p></div>
-        <span>${SETTINGS_GROUPS_067.length} folders</span>
+        <div><strong>Set up your workflow.</strong><p>Manage field tools, reports, appearance, backups, and account data from one place.</p></div>
+        <span>${SETTINGS_GROUPS_067.length} sections</span>
       </section>
       <div class="settingsGroupGrid067" aria-label="Settings folders">
         ${SETTINGS_GROUPS_067.map(g=>`<button class="settingsGroupCard067 tone-${g.tone}" data-settings-group067="${g.key}"><span class="settingsGroupIcon067">${g.icon}</span><span class="settingsGroupCopy067"><strong>${esc(g.title)}</strong><small>${esc(g.note)}</small><em>${esc(settingsGroupSummary067(g,tabs))}</em></span><b>›</b></button>`).join("")}
@@ -6400,7 +6408,7 @@ const FIREVAULT_MANUAL_058 = [
     ["Useful photo notes","Describe the device, room, floor, circuit, condition, and reason the photo matters. Avoid relying on an image alone."],
     ["Overlay settings","Settings → Photo Overlay controls the template fields, alignment, font size, colors, background, opacity, logo, and tagline."],
     ["Storage caution","Photos can increase local browser storage quickly. Export backups and remove unnecessary duplicates."],
-    ["Release-state note","Screenshot-based manual illustrations will be added after the interface stabilizes to avoid documenting temporary layouts."]
+    ["Photo review","Confirm the saved photo, caption, and overlay are readable before leaving the account."]
   ]},
   {id:"route",title:"GPS, Nearby Sites & Daily Route",icon:"⌖",status:"Current",summary:"Capture site coordinates and document the technician's daily route.",topics:[
     ["GPS permission","Allow location access when prompted. GPS features require a secure HTTPS deployment and may be limited by device privacy settings."],
@@ -6425,17 +6433,17 @@ const FIREVAULT_MANUAL_058 = [
     ["Theme","Controls the theme preset, accent, card and button appearance, contrast, text size, compact layout, and haptics."],
     ["Home Layout","Shows or hides optional Home cards and chooses whether each remembers, opens, or collapses by default."],
     ["Modules","Simple, Advanced, and Power modes determine which optional FireVault tools are visible. Disabling a module does not delete its data."],
-    ["Advanced","Contains future capabilities that may require cloud services, APIs, permissions, subscriptions, or backend infrastructure."],
-    ["Team Sync","Shows technician identity, device identity, pending record changes, conflict policy, and the planned OneDrive workspace. Build 0.65.2 preserves the sync-ready records and adds duplicate-safe customer imports with coordinate calculation, but does not upload automatically."],
+    ["Advanced","Controls optional integrations that may require permissions, APIs, subscriptions, or external services."],
+    ["Team Sync","Shows technician identity, device identity, shared-vault package activity, pending record changes, and conflict policy. Automatic cloud synchronization is not currently connected."],
     ["Customer Import","Previews supported CSV files, calculates missing latitude and longitude from U.S. addresses, flags questionable or unmatched rows, matches repeat imports by Account Id, preserves FireVault-created history, and records changes in Sync Activity."],
     ["Backup","Exports and imports the local vault, previews restore files, and provides repair and safety tools."],
     ["About and Diagnostics","Confirm the installed build, storage key, startup health, data counts, and app stability information."]
   ]},
   {id:"backup",title:"Backup, Restore & Updates",icon:"⇅",status:"Current",summary:"Protect the local vault before upgrades or device changes.",topics:[
     ["Export regularly","Go to Settings → Backup and export a JSON backup. Store copies outside the browser, preferably in more than one safe location."],
-    ["Before every update","Export a fresh backup, confirm the current build, install the new root files, confirm deployment, then verify the new build badge before entering new data."],
+    ["Before an update","FireVault creates local safety snapshots automatically. Download an external backup before major updates or device changes, then verify the installed build and account count afterward."],
     ["Restore safely","Import a recognized FireVault JSON backup, review the preview counts and build information, then confirm restore. Restore overwrites the current local vault."],
-    ["Clean installation","When an old PWA is cached, remove the Home Screen app, clear the site data for the deployed address, reopen in Safari, verify the build badge, and add it again."],
+    ["Update safely","Use Settings → App Updates → Check for Updates or Reload FireVault. Do not delete the Home Screen app unless a current external backup has been downloaded and verified."],
     ["Do not assume cloud sync","Until cloud synchronization is explicitly released, each browser/device has its own local copy of the vault."]
   ]},
   {id:"trouble",title:"Troubleshooting",icon:"!",status:"Current",summary:"Resolve common loading, saving, GPS, layout, and deployment problems.",topics:[
@@ -6446,12 +6454,11 @@ const FIREVAULT_MANUAL_058 = [
     ["Layout is clipped or compressed","Confirm the correct build is installed. Capture a screenshot with the build badge and identify the exact page, card, and action that produced the issue."],
     ["Restore fails","Use an unmodified FireVault JSON backup, verify the file is readable, and compare its preview details before confirming restore."]
   ]},
-  {id:"release",title:"Release & Manual Status",icon:"ⓘ",status:"Living document",summary:"Understand how this documentation will be maintained through Version 1.0.",topics:[
-    ["Manual revision","This manual revision matches FireVault Build 0.67.0 and was last reviewed in July 2026."],
-    ["Living documentation","Every feature release should include a documentation review. New controls must be documented and changed workflows must be rechecked."],
-    ["Pre-release warning","FireVault is still under active development. Labels, layouts, and workflows may change before Version 1.0."],
-    ["Screenshot policy","Annotated screenshots should be added after major screens reach release-candidate stability."],
-    ["Verification requirement","Before public release, every chapter should be tested against a clean installation on supported iPhone and iPad layouts."]
+  {id:"release",title:"App Information",icon:"ⓘ",status:"Current",summary:"Find version details, documentation notes, and information needed when reporting a problem.",topics:[
+    ["Installed version","Open Settings → App Updates or About to confirm the build currently installed on the device."],
+    ["Documentation","Help chapters describe the controls and workflows available in the installed app."],
+    ["Release notes","Tap the build number where available to review recent changes."],
+    ["Problem reports","Include the build number, page name, device, screenshot, exact action, and what happened instead."]
   ]}
 ];
 
@@ -6524,11 +6531,11 @@ function manualSimplePage058(type){
  const pages={
   quick:["🚀","Quick Start Guide","Get FireVault ready for a normal field day.",[["1. Verify the build","Confirm the green build badge shows 0.67.0 before entering production information."],["2. Complete Technician Profile","Enter your name, company, phone, email, and license or employee identification."],["3. Review permissions","Allow location and photo access only when FireVault requests them and the feature is needed."],["4. Create or open a site","Add the customer name, full address, panel details, contacts, access notes, and GPS location."],["5. Document the visit","Record notes, photos, tasks, deficiencies, equipment changes, and a service visit."],["6. Finish and protect the data","Review the report, send or copy the required summary, then export a current backup."]]],
   new:["🆕","What’s New in 0.67.0","Account View, Settings navigation, and FireVault Academy redesign.",[["Unified visual system","Standardized typography, spacing, card surfaces, borders, controls, and responsive behavior across FireVault."],["Settings cleanup","Improved Settings home cards and every submenu while preserving the preferred Email setup workflow."],["Help readability","Converted contextual Help and Academy articles into one uninterrupted scrolling reading column with no floating metadata."],["Site Detail stability","Reinforced natural-height cards, readable text, and scroll-safe account sections."],["Operational screens","Simplified Customer Import, Team Sync, Conflict Center, and Nearby Sites presentation without changing their workflows."],["Phone and iPad layouts","Added consistent narrow-phone and tablet behavior, bottom-navigation clearance, and overflow protection."],["Nearby scan diagnostics","Nearby Sites now shows total sites, GPS-ready records, missing coordinates, phone-location progress, and persistent error messages."],["Coordinate recovery","FireVault recovers valid latitude and longitude stored in compatible legacy or imported fields and normalizes them into the site GPS record."],["Location retry","If high-accuracy location times out or is unavailable, FireVault retries once using standard accuracy."],["Nearest-site fallback","When no site is inside the selected radius, the nearest GPS-ready sites remain visible instead of presenting an empty result."],["Latitude and longitude","Customer Import can calculate missing coordinates from each usable U.S. street address before saving records."],["Coordinate requirement","The importer requires calculated, supplied, or existing GPS coordinates by default. Unmatched addresses remain in review."],["Census address matching","Only address fields are sent to the U.S. Census Geocoder. The returned point is an address-range calculation, not a guaranteed building entrance."],["Account Id matching","Repeat imports update the matching FireVault site instead of creating duplicates or deleting field history."],["CSV coordinate columns","Files that already contain Latitude and Longitude columns use those values directly."],["Sync-ready changes","Added and updated customer records enter the pending synchronization queue and create a Sync Activity entry."]]],
-  tips:["🧰","Field Tips","Short practices that improve the usefulness of FireVault records.",[["Write for the next technician","Include the exact panel, circuit, device, location, symptom, test result, and next action instead of relying on memory."],["Photograph context first","Take one wide photo showing the equipment location before close-up terminal, label, or damage photos."],["Separate facts from follow-up","Use notes for what occurred, deficiencies for code or system problems, and tasks for work that still needs completion."],["Confirm the account","Before using Quick Capture, verify the selected customer site to prevent records from being stored under the wrong account."],["Back up before updates","Export a backup before installing every development build and after completing a significant amount of field documentation."]]],
+  tips:["🧰","Field Tips","Short practices that improve the usefulness of FireVault records.",[["Write for the next technician","Include the exact panel, circuit, device, location, symptom, test result, and next action instead of relying on memory."],["Photograph context first","Take one wide photo showing the equipment location before close-up terminal, label, or damage photos."],["Separate facts from follow-up","Use notes for what occurred, deficiencies for code or system problems, and tasks for work that still needs completion."],["Confirm the account","Before using Quick Capture, verify the selected customer site to prevent records from being stored under the wrong account."],["Back up before updates","Download an external backup before a major update or device change and after completing significant field documentation."]]],
   revisions:["📋","Revision History","Application and documentation checkpoints.",[["0.67.0","Redesigned Account View around service actions and grouped information, consolidated Settings into five folders, and simplified FireVault Academy and contextual Help for continuous reading."],["0.65.2","Repaired Nearby Sites with GPS inventory counts, imported-coordinate recovery, persistent permission and timeout messages, a standard-accuracy retry, and nearest-site fallback results."],["0.65.1","Added online latitude/longitude calculation, coordinate validation, geocoding progress, unmatched-address review, optional CSV coordinates, and coordinate-safe repeat importing."],["0.65.0","Added preview-first customer CSV importing, Account Id update matching, validation warnings, imported monitoring details, and sync activity tracking."],["0.64.1","Simplified Academy article headers, removed floating metadata badges, and improved continuous scrolling and readability."],["0.64.0","Added Sync Activity, a conflict review center, export/import audit entries, and an automatic OneDrive connection-readiness checklist."],["0.63.1","Overhauled contextual Help and Academy reader formatting, removed overlapping sticky article headers, and restored full scrolling on phones and tablets."],["0.63.0","Added permanent record IDs, audit metadata, local version tracking, pending-sync states, conflict readiness, device identity, and a Team Sync settings workspace."],["0.60.0","Connected major screens and Settings areas directly to matching Academy chapters with return-to-screen navigation."],["0.59.0","Added interactive tutorials, guided orientation, pinned learning, field tips, and documentation tracking."],["0.58.0","Expanded Help & Manual into FireVault Academy with bookmarks, smart search, Quick Start, and reader navigation."],["0.57.0","Added the first complete searchable in-app FireVault User Manual."],["Ongoing review rule","Any change to navigation, labels, storage, workflows, permissions, or supported layouts requires the related manual chapter to be checked."]]],
   trouble:["❓","Troubleshooting","Common problems and safe first checks.",FIREVAULT_MANUAL_058.find(x=>x.id==="trouble")?.topics||[]]
  };
- const [icon,title,note,items]=pages[type]||["🚧","Coming Soon","This Academy area is reserved for a future milestone.",[["Development status","The feature is not active yet. No outside service has been connected or purchased."]]];
+ const [icon,title,note,items]=pages[type]||["ⓘ","Unavailable","This Help section is not available in the installed version.",[["Current status","Return to Help and choose an available chapter or tutorial."]]];
  return `<div class="academySimple058"><div class="academyReaderTop058"><button class="ghost" data-manual-view="home">‹ Academy</button><div><span>${icon} FireVault Academy</span><h2>${esc(title)}</h2><p>${esc(note)}</p></div></div><div class="academySimpleCards058">${items.map(([a,b],i)=>`<article><span>${String(i+1).padStart(2,'0')}</span><div><h3>${esc(a)}</h3><p>${esc(b)}</p></div></article>`).join("")}</div></div>`;
 }
 
@@ -6550,7 +6557,7 @@ const ACADEMY_TUTORIALS_059=[
 const ACADEMY_TOUR_059=[
  ["Today Dashboard","Your daily starting point for Field Focus, Quick Capture, nearby sites, recent accounts, and route activity."],
  ["Global Search","Find accounts using customer name, address, panel details, contacts, equipment, or notes."],
- ["Bottom Navigation","Move between Today, Sites, Library, and Settings without losing stored data."],
+ ["Bottom Navigation","Move between Nearby, Accounts, Library, and Settings without losing stored data."],
  ["Sites","Create, search, and open customer accounts. Each account contains its own field history and documentation."],
  ["Site Detail","Review important information, recent activity, photos, visits, tasks, deficiencies, contacts, equipment, and reports."],
  ["Settings","Control technician information, GPS, reports, email, photo overlays, appearance, Home layout, modules, backups, and the Academy."],
@@ -6570,7 +6577,7 @@ function tutorialList059(){return `<div class="academyReader058 academyTutorials
 function tutorialView059(){const t=ACADEMY_TUTORIALS_059.find(x=>x.id===activeTutorial059)||ACADEMY_TUTORIALS_059[0];const done=academyProgress059[t.id]||[];const p=tutorialProgress059(t);return `<div class="academyArticle058 academyTutorialView059"><header class="academyArticleHead058"><button class="ghost" data-manual-view="tutorials">‹ Tutorials</button><div><span>${t.icon} ${t.level} · ${t.time}</span><h2>${esc(t.title)}</h2><p>${esc(t.summary)}</p><p class="academyArticleInfo0641">${p}% complete · Build ${BUILD}</p></div><button class="academyPin059 ${academyPins059.includes('tutorial:'+t.id)?'active':''}" data-academy-pin="tutorial:${t.id}">★</button></header><div class="academyProgress058"><span style="width:${p}%"></span></div><main class="tutorialSteps059">${t.steps.map((step,i)=>`<label class="tutorialStep059 ${done.includes(i)?'complete':''}"><input type="checkbox" data-tutorial-step="${i}" ${done.includes(i)?'checked':''}><span>${i+1}</span><div><h3>Step ${i+1}</h3><p>${esc(step)}</p></div></label>`).join("")}</main><div class="tutorialFinish059"><strong>${p===100?'✓ Tutorial complete':'Continue when ready'}</strong><p>${p===100?'Your completion is saved on this device. You may repeat any step at any time.':'Check each step as you complete it. FireVault saves your progress automatically.'}</p><button class="ghost" id="resetTutorial059">Reset tutorial</button></div></div>`}
 function tourView059(){const [title,body]=ACADEMY_TOUR_059[activeTourStep059];const pct=Math.round(((activeTourStep059+1)/ACADEMY_TOUR_059.length)*100);return `<div class="academyArticle058 academyTour059"><div class="academyReaderTop058"><button class="ghost" data-manual-view="home">‹ Academy</button><div><span>🧭 New User Orientation</span><h2>Show Me Around FireVault</h2><p>A short guided overview of the primary work areas.</p></div></div><div class="tourStage059"><div class="tourNumber059">${activeTourStep059+1}</div><span>Tour stop ${activeTourStep059+1} of ${ACADEMY_TOUR_059.length}</span><h2>${esc(title)}</h2><p>${esc(body)}</p><div class="academyProgress058"><span style="width:${pct}%"></span></div><div class="tourNav059"><button class="ghost" id="tourPrev059" ${activeTourStep059===0?'disabled':''}>‹ Previous</button><button class="primary" id="tourNext059">${activeTourStep059===ACADEMY_TOUR_059.length-1?'Finish Tour':'Next ›'}</button></div></div></div>`}
 function tipsView059(){return `<div class="academySimple058"><div class="academyReaderTop058"><button class="ghost" data-manual-view="home">‹ Academy</button><div><span>🧰 Practical Guidance</span><h2>Field Tips Library</h2><p>Short reminders that improve documentation quality and consistency.</p></div></div><div class="tipGrid059">${ACADEMY_TIPS_059.map((t,i)=>`<article class="tipCard059"><span>${t[0]}</span><div><h3>${esc(t[1])}</h3><p>${esc(t[2])}</p></div><button class="academyPin059 ${academyPins059.includes('tip:'+i)?'active':''}" data-academy-pin="tip:${i}">★</button></article>`).join("")}</div></div>`}
-function trackerView059(){const rows=[...FIREVAULT_MANUAL_058.map(ch=>[ch.title,manualStatus058(ch),"Manual chapter"]),...ACADEMY_TUTORIALS_059.map(t=>[t.title,tutorialProgress059(t)===100?"Complete":"In Development","Tutorial"])];return `<div class="academyReader058"><div class="academyReaderTop058"><button class="ghost" data-manual-view="home">‹ Academy</button><div><span>📋 Maintenance Control</span><h2>Documentation Tracker</h2><p>Use this list during every feature release to identify material that requires review.</p></div></div><div class="docTracker059">${rows.map(r=>`<div><strong>${esc(r[0])}</strong><small>${r[2]}</small><em class="status-${r[1].toLowerCase().replace(/\s+/g,'-')}">${r[1]}</em></div>`).join("")}</div></div>`}
+function trackerView059(){const rows=[...FIREVAULT_MANUAL_058.map(ch=>[ch.title,manualStatus058(ch),"Manual chapter"]),...ACADEMY_TUTORIALS_059.map(t=>[t.title,tutorialProgress059(t)===100?"Complete":"Not completed","Tutorial"])];return `<div class="academyReader058"><div class="academyReaderTop058"><button class="ghost" data-manual-view="home">‹ Academy</button><div><span>📋 Learning Progress</span><h2>Documentation & Tutorials</h2><p>Review available Help chapters and your saved tutorial progress.</p></div></div><div class="docTracker059">${rows.map(r=>`<div><strong>${esc(r[0])}</strong><small>${r[2]}</small><em class="status-${r[1].toLowerCase().replace(/\s+/g,'-')}">${r[1]}</em></div>`).join("")}</div></div>`}
 function pinnedLearning059(){if(!academyPins059.length)return "";const cards=academyPins059.map(key=>{if(key.startsWith('tutorial:')){const t=ACADEMY_TUTORIALS_059.find(x=>x.id===key.slice(9));return t?`<button data-tutorial-open="${t.id}"><span>${t.icon}</span><strong>${esc(t.title)}</strong><small>Tutorial · ${tutorialProgress059(t)}%</small></button>`:""}if(key.startsWith('tip:')){const i=Number(key.slice(4)),t=ACADEMY_TIPS_059[i];return t?`<button data-manual-view="tips"><span>${t[0]}</span><strong>${esc(t[1])}</strong><small>Field tip</small></button>`:""}return ""}).join("");return cards?`<section class="academyBookmarks058"><div class="academySectionHead058"><div><span>Saved learning</span><h3>Pinned Tutorials & Tips</h3></div></div><div class="academyBookmarkGrid058">${cards}</div></section>`:""}
 function manualPanel058(){ if(manualView058==="home")return manualHome058(); if(manualView058==="manual")return manualList058(); if(manualView058==="chapter")return manualChapterView058(); if(manualView058==="tutorials")return tutorialList059(); if(manualView058==="tutorial")return tutorialView059(); if(manualView058==="tour")return tourView059(); if(manualView058==="tips")return tipsView059(); if(manualView058==="tracker")return trackerView059(); return manualSimplePage058(manualView058); }
 function wireManual058(){
@@ -6631,7 +6638,7 @@ function settingsPanel(){
   }
 
   if(settingsTab==="advanced") return `<div class="settingsStack settingsStack540">
-    ${settingsSection540("Optional services","Advanced Features","These controls prepare FireVault for features that may require permissions, APIs, cloud services, or future backend modules.",`<div class="settingsInfo540 warning"><strong><span class="featureStar">*</span> External service required</strong><span>Turning on a future module does not automatically connect or purchase an outside service.</span></div><div class="settingsList twoCol advancedGrid540">${[["advAi","aiTechnician","AI Technician"],["advReverse","reverseAddressLookup","Reverse Address Lookup *"],["advCloud","cloudBackup","Cloud Backup *"],["advVoice","voiceTranscription","Voice Transcription *"],["advOcr","ocrReader","OCR Reader *"],["advEmail","emailGateway","Email Gateway *"],["advWeather","weather","Weather Context *"],["advTraffic","traffic","Traffic / Routing *"]].map(x=>checkBlock(x[0],x[2],a[x[1]])).join("")}</div>`,"amber",saveButton())}
+    ${settingsSection540("Optional services","Advanced Features","Enable only the integrations used in your workflow. Some require permissions, APIs, subscriptions, or external services.",`<div class="settingsInfo540 warning"><strong><span class="featureStar">*</span> External service required</strong><span>Enabling a control does not connect or purchase an outside service.</span></div><div class="settingsList twoCol advancedGrid540">${[["advAi","aiTechnician","AI Technician"],["advReverse","reverseAddressLookup","Reverse Address Lookup *"],["advCloud","cloudBackup","Cloud Backup *"],["advVoice","voiceTranscription","Voice Transcription *"],["advOcr","ocrReader","OCR Reader *"],["advEmail","emailGateway","Email Gateway *"],["advWeather","weather","Weather Context *"],["advTraffic","traffic","Traffic / Routing *"]].map(x=>checkBlock(x[0],x[2],a[x[1]])).join("")}</div>`,"amber",saveButton())}
   </div>`;
 
   if(settingsTab==="sync") {
@@ -6641,39 +6648,31 @@ function settingsPanel(){
     const conflicts=syncConflicts(data);
     const activity=syncActivity(data).slice(0,12);
     const connected=!!data.syncState?.lastSuccessfulSync;
-    const techReady=!!(data.settings.technician?.name&&data.settings.technician?.email);
-    const workspaceReady=!!(cfg.organization&&cfg.workspace);
-    const conflictReady=cfg.conflictPolicy==="review";
-    const checklist=[[techReady,"Technician identity","Name and email are available for audit history."],[workspaceReady,"Workspace identity","Organization and shared workspace names are configured."],[conflictReady,"Safe conflict policy","Manual review is selected for competing edits."],[sum.total>0,"Sync-ready records",`${sum.total} records have permanent IDs and version metadata.`],[false,"Microsoft connection","Azure app registration and Microsoft sign-in are still required.`"]];
     const activityLabel={"package-export":"Package exported","package-import":"Package imported","conflict-resolved":"Conflict resolved","customer-csv-import":"Customer CSV imported"};
     return `<div class="settingsStack settingsStack540 syncStack062">
-      ${settingsSection540("Multi-user foundation","Team & Sync Status","FireVault is tracking edits as sync-ready records and preparing for controlled OneDrive synchronization.",`
+      ${settingsSection540("Shared-vault activity","Team & Sync Status","FireVault tracks technician identity, record changes, package transfers, and conflicts on this device.",`
         <div class="syncStatusGrid062">
           <div class="syncMetric062 red"><strong>${sum.pending}</strong><span>Pending changes</span></div>
           <div class="syncMetric062 green"><strong>${sum.synced}</strong><span>Synchronized</span></div>
           <div class="syncMetric062 amber"><strong>${sum.conflicts}</strong><span>Conflicts</span></div>
           <div class="syncMetric062 blue"><strong>${sum.total}</strong><span>Tracked records</span></div>
         </div>
-        <div class="syncReadiness062"><span class="syncDot062 ${connected?'online':'local'}"></span><div><strong>${connected?'Package exchange active':'Local sync foundation active'}</strong><small>${connected?`Last package import ${esc(data.syncState.lastSuccessfulSync)}`:'No Microsoft account is connected. Data remains safely local on this device.'}</small></div></div>
+        <div class="syncReadiness062"><span class="syncDot062 ${connected?'online':'local'}"></span><div><strong>${connected?'Package exchange active':'Local package mode'}</strong><small>${connected?`Last package import ${esc(data.syncState.lastSuccessfulSync)}`:'No Microsoft account is connected. Data remains safely local on this device.'}</small></div></div>
       `,"blue")}
-      ${settingsSection540("Required before cloud sync","OneDrive Connection Readiness","These checks prevent FireVault from enabling automatic cloud synchronization before identity and conflict rules are ready.",`
-        <div class="syncChecklist064">${checklist.map(([ok,title,note])=>`<div class="${ok?'ready':'waiting'}"><span>${ok?'✓':'○'}</span><div><strong>${esc(title)}</strong><small>${esc(note)}</small></div></div>`).join("")}</div>
-      `,"violet")}
       ${settingsSection540("Technician identity","Who is making changes","Record history uses the Technician Profile. Complete the profile before multiple technicians begin sharing a vault.",`
         <div class="syncIdentity062"><div><span>Technician</span><strong>${esc(data.settings.technician?.name||'Not assigned')}</strong></div><div><span>Email / identity</span><strong>${esc(data.settings.technician?.email||'Not assigned')}</strong></div><div class="wide"><span>Device ID</span><code>${esc(deviceIdentity())}</code></div></div>
       `,"slate")}
-      ${settingsSection540("Cloud plan","OneDrive workspace","Configure the intended shared workspace now. This build does not request Microsoft credentials or upload automatically.",`
+      ${settingsSection540("Package identity","Shared Vault Settings","These names are written into exported packages and the local transfer history.",`
         <div class="settingsGrid settingsGrid540">
-          ${fieldBlock("Storage provider",`<select id="syncProvider"><option value="onedrive" selected>Microsoft OneDrive / SharePoint</option></select>`,`Microsoft Graph will be used when sign-in is added.`)}
+          ${fieldBlock("Storage location",`<select id="syncProvider"><option value="onedrive" selected>Microsoft OneDrive / SharePoint</option></select>`,`Choose where Shared Vault Package files are stored manually.`)}
           ${fieldBlock("Organization or team",`<input id="syncOrganization" value="${esc(cfg.organization||'')}" placeholder="Company or department">`)}
-          ${fieldBlock("Shared workspace name",`<input id="syncWorkspace" value="${esc(cfg.workspace||'FireVault Shared Vault')}" placeholder="FireVault Shared Vault">`)}
-          ${fieldBlock("Conflict handling",`<select id="syncConflict"><option value="review" ${cfg.conflictPolicy==='review'?'selected':''}>Require review</option><option value="newest" ${cfg.conflictPolicy==='newest'?'selected':''}>Newest change wins</option><option value="server" ${cfg.conflictPolicy==='server'?'selected':''}>Cloud copy wins</option></select>`,`Require review is safest for site information and service records.`)}
+          ${fieldBlock("Shared vault name",`<input id="syncWorkspace" value="${esc(cfg.workspace||'FireVault Shared Vault')}" placeholder="FireVault Shared Vault">`)}
+          ${fieldBlock("Conflict handling",`<select id="syncConflict"><option value="review" ${cfg.conflictPolicy==='review'?'selected':''}>Require review</option><option value="newest" ${cfg.conflictPolicy==='newest'?'selected':''}>Newest change wins</option><option value="server" ${cfg.conflictPolicy==='server'?'selected':''}>Imported copy wins</option></select>`,`Require review is safest for site information and service records.`)}
         </div>
-        <div class="settingsList twoCol">${checkBlock('syncAuto','Automatically synchronize when connected',cfg.autoSync!==false)}${checkBlock('syncWifi','Use Wi-Fi only for large files',!!cfg.wifiOnly)}</div>
       `,"blue",saveButton())}
-      ${settingsSection540("Controlled handoff","Shared Vault Package","Until Microsoft sign-in is configured, export a package to OneDrive and import it on another FireVault device.",`
+      ${settingsSection540("Controlled handoff","Shared Vault Package","Export a package to your selected storage location, then import it on another FireVault device.",`
         <div class="syncPackageActions063"><button class="primary" id="exportSyncPackage063">Export Shared Vault Package</button><label class="ghost fileAction063">Import Shared Vault Package<input id="importSyncPackage063" type="file" accept="application/json,.json" hidden></label></div>
-        <div class="settingsInfo540"><strong>Package handoff is recorded</strong><span>Build 0.64.0 adds export and import entries to Sync Activity for better accountability during testing.</span></div>
+        <div class="settingsInfo540"><strong>Package handoff is recorded</strong><span>Exports and imports are added to Sync Activity for accountability between devices.</span></div>
       `,"green")}
       ${settingsSection540("Review required","Conflict Center",conflicts.length?`${conflicts.length} competing edit${conflicts.length===1?'':'s'} need a decision.`:"No unresolved conflicts are currently stored.",`
         <div class="conflictCenter064">${conflicts.length?conflicts.map(c=>`<article><div class="conflictHead064"><span>Conflict</span><div><strong>${esc(c.title)}</strong><small>${esc(c.siteName)} · Local v${c.version} / Imported v${c.remoteVersion}</small></div></div><p>Choose which copy FireVault should keep. Keeping this device creates a new pending version; using the imported copy marks it synchronized.</p><div class="conflictActions064"><button class="ghost" data-resolve-conflict="local" data-record-id="${esc(c.id)}">Keep this device</button><button class="primary" data-resolve-conflict="remote" data-record-id="${esc(c.id)}">Use imported copy</button></div></article>`).join(""):`<div class="syncEmpty063"><strong>No conflicts</strong><span>Competing equal-version edits will appear here instead of being silently overwritten.</span></div>`}</div>
@@ -6681,10 +6680,10 @@ function settingsPanel(){
       ${settingsSection540("Recent handoffs","Sync Activity","A local audit timeline of package transfers and conflict decisions on this device.",`
         <div class="syncActivity064">${activity.length?activity.map(a=>`<div><span class="activityIcon064">${a.type==='package-import'||a.type==='customer-csv-import'?'↓':a.type==='package-export'?'↑':'✓'}</span><div><strong>${esc(activityLabel[a.type]||a.type)}</strong><small>${esc(new Date(a.at).toLocaleString())} · ${esc(a.technician||'Unassigned technician')}</small>${a.type==='customer-csv-import'?`<em>${esc(a.fileName||'Customer CSV')} · ${Number(a.stats?.added||0)} added · ${Number(a.stats?.updated||0)} updated · ${Number(a.stats?.geocoded||0)} coordinates</em>`:a.workspace?`<em>${esc(a.workspace)}</em>`:''}</div></div>`).join(""):`<div class="syncEmpty063"><strong>No activity yet</strong><span>Exports, imports, and conflict decisions will be recorded here.</span></div>`}</div>
       `,"amber")}
-      ${settingsSection540("Pending work","Synchronization Queue",queue.length?`${queue.length} recent record changes are waiting for package transfer or future cloud sync.`:"No pending changes are waiting.",`
+      ${settingsSection540("Pending work","Synchronization Queue",queue.length?`${queue.length} recent record changes are waiting for shared-vault package transfer.`:"No pending changes are waiting.",`
         <div class="syncQueue063">${queue.length?queue.map(q=>`<div class="syncQueueRow063"><span class="syncQueueState063 ${esc(q.status)}">${esc(q.status)}</span><div><strong>${esc(q.title)}</strong><small>${esc(q.siteName)} · v${q.version} · ${esc(q.modifiedBy)}${q.modifiedAt?` · ${esc(new Date(q.modifiedAt).toLocaleString())}`:''}</small></div></div>`).join(""):`<div class="syncEmpty063"><strong>Queue is clear</strong><span>New edits will appear here automatically.</span></div>`}</div>
       `,"slate")}
-      <div class="settingsInfo540 warning"><strong>Automatic OneDrive synchronization is not connected in Build ${BUILD}</strong><span>The next connection build will require a Microsoft Azure application registration and tenant-approved permissions. No credentials should be hard-coded into FireVault.</span></div>
+      <div class="settingsInfo540 warning"><strong>Automatic OneDrive synchronization is not connected</strong><span>Use Shared Vault Package export and import for controlled handoff. FireVault does not store Microsoft credentials.</span></div>
     </div>`;
   }
 
@@ -6699,7 +6698,7 @@ function settingsPanel(){
 
   return `<div class="settingsStack settingsStack540">
     ${settingsSection540("Fire alarm field system",`About FireVault`,`A modular field knowledge system built to keep account history, service notes, and technician tools together.`,`<div class="aboutBrand540">${fireVaultBrand575()}<span>Field Vault System</span></div><p class="aboutCopy540">FireVault is designed for fast field reference, local-first reliability, and a simple interface that can reveal advanced tools only when they are needed.</p>`,"red")}
-    ${settingsSection540("Application details","Build Information","Use these details when reporting a problem or confirming which release is installed.",`<div class="aboutGrid aboutGrid540"><div><strong>Build</strong><span>${BUILD}</span></div><div><strong>Storage key</strong><span>${KEY}</span></div><div class="wide"><strong>Roadmap lane</strong><span>Stable modular foundation, refined settings, responsive iPhone and iPad layouts, and deeper service-call tools.</span></div></div>`,"slate")}
+    ${settingsSection540("Application details","Build Information","Use these details when reporting a problem or confirming which version is installed.",`<div class="aboutGrid aboutGrid540"><div><strong>Build</strong><span>${BUILD}</span></div><div><strong>Storage key</strong><span>${KEY}</span></div><div class="wide"><strong>Data location</strong><span>Local vault on this device with rolling safety snapshots. Download an external backup before deleting or reinstalling the Home Screen app.</span></div></div>`,"slate")}
   </div>`;
 }
 function wireSettingsPanel(){
@@ -6760,7 +6759,7 @@ function saveSettings(){
   }
   if(settingsTab==="visibility") { s.app={...(s.app||{}),viewMode:val("viewMode")||"simple",activeFeaturePreset575:"",activeLayoutPreset575:""}; const next={...visibility()}; FEATURE_LABELS.forEach(([key])=>next[key]=checked("vis_"+key)); s.visibility=next; }
   if(settingsTab==="advanced") s.advanced={aiTechnician:checked("advAi"),reverseAddressLookup:checked("advReverse"),cloudBackup:checked("advCloud"),voiceTranscription:checked("advVoice"),ocrReader:checked("advOcr"),emailGateway:checked("advEmail"),weather:checked("advWeather"),traffic:checked("advTraffic")};
-  if(settingsTab==="sync") s.sync={...(s.sync||{}),provider:val("syncProvider")||"onedrive",organization:val("syncOrganization"),workspace:val("syncWorkspace")||"FireVault Shared Vault",conflictPolicy:val("syncConflict")||"review",autoSync:checked("syncAuto"),wifiOnly:checked("syncWifi"),enabled:false};
+  if(settingsTab==="sync") s.sync={...(s.sync||{}),provider:val("syncProvider")||"onedrive",organization:val("syncOrganization"),workspace:val("syncWorkspace")||"FireVault Shared Vault",conflictPolicy:val("syncConflict")||"review",enabled:false};
   save(); toast("Settings saved."); view="settings"; mode="settingsDetail"; render();
 }
 
@@ -7631,6 +7630,7 @@ function diagnostics(){
 }
 function showChangelog(){
   const notes = [
+    "Build 0.73.3 rebuilds the bottom navigation used outside Nearby Accounts, aligns every button in equal-width safe-area-aware cells, and replaces internal planning language with clear descriptions of current controls and limitations.",
     "Build 0.73.2 restores the brighter selected-account green and adds an old-school terminal typing sequence for database and latest-version checks on the splash screen.",
     "Build 0.73.1 keeps different buildings at the same address as separate customer records by matching the complete Account ID, including CLSS dash suffixes such as G7C1234-01 and G7C1234-02.",
     "Build 0.73.0 introduced the unified FireVault design system and consistent dynamic navigation controls.",
