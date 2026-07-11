@@ -8,7 +8,7 @@
   "orientation": "any",
   "background_color": "#0b0d10",
   "theme_color": "#101216",
-  "description": "Field knowledge system for fire alarm technicians. Build 0.65.1 adds customer address coordinate calculation to duplicate-safe CSV importing.",
+  "description": "Field knowledge system for fire alarm technicians. Build 0.65.2 repairs Nearby Sites scanning with GPS readiness counts, coordinate recovery, and clear location diagnostics.",
   "icons": [
     {
       "src": "assets/icon-192.png",

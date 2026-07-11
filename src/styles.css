@@ -13039,7 +13039,7 @@ body.app-booted533.settingsChrome572 > #appNav{
 }
 
 
-/* Build 0.65.1 — Customer CSV importer */
+/* Build 0.65.2 — Customer CSV importer */
 .settingsChoice-customerImport .settingsChoiceIcon451{background:linear-gradient(145deg,#075985,#0e7490)!important;color:#cffafe!important}
 .customerImportStack065{padding-bottom:calc(130px + env(safe-area-inset-bottom))!important}
 .customerImportHero065{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:14px;align-items:center}
@@ -13068,7 +13068,7 @@ body.app-booted533.settingsChrome572 > #appNav{
 .importedAccountGrid065{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;margin-top:10px}.importedAccountGrid065>div{display:grid;gap:4px;padding:11px 12px;border-radius:12px;border:1px solid rgba(34,211,238,.15);background:rgba(8,47,73,.25)}.importedAccountGrid065 strong{color:#67e8f9;font-size:.68rem;text-transform:uppercase;letter-spacing:.04em}.importedAccountGrid065 span{color:#e2e8f0;font-size:.9rem;overflow-wrap:anywhere}
 @media(max-width:620px){.customerImportHero065{grid-template-columns:1fr}.customerFileButton065{width:100%}.customerImportMetrics065{grid-template-columns:repeat(2,minmax(0,1fr))}.customerImportMetrics065>div:first-child{grid-column:1/-1}.customerImportActions065{grid-template-columns:1fr}.customerImportResult065{grid-template-columns:repeat(2,minmax(0,1fr))}.customerImportRow065{grid-template-columns:1fr}.customerImportRow065>b{grid-row:1;justify-self:end}.customerImportState065{grid-row:1;justify-self:start}.customerImportRow065>div{grid-column:1/-1}.importedAccountGrid065{grid-template-columns:1fr}}
 
-/* Build 0.65.1 — Customer coordinate calculation */
+/* Build 0.65.2 — Customer coordinate calculation */
 .geocodeMetrics0651{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
 .geocodeMetrics0651>div{display:grid;gap:5px;padding:14px 10px;border-radius:14px;border:1px solid rgba(148,163,184,.16);background:#0b1220;text-align:center}
 .geocodeMetrics0651 strong{font-size:1.45rem;line-height:1;color:#f8fafc}.geocodeMetrics0651 span{font-size:.68rem;line-height:1.25;color:#94a3b8;text-transform:uppercase;letter-spacing:.05em}
@@ -13084,3 +13084,29 @@ body.app-booted533.settingsChrome572 > #appNav{
 .coordinateState0651.ready{background:rgba(22,101,52,.4);color:#bbf7d0}.coordinateState0651.existing{background:rgba(30,64,175,.35);color:#bfdbfe}.coordinateState0651.needed{background:rgba(14,116,144,.34);color:#cffafe}.coordinateState0651.failed{background:rgba(146,64,14,.38);color:#fde68a}
 .coordinateMatch0651{color:#a5f3fc!important}
 @media(max-width:620px){.geocodeMetrics0651{grid-template-columns:1fr}.geocodeMetrics0651>div{grid-template-columns:auto 1fr;align-items:center;text-align:left}.geocodeMetrics0651 strong{font-size:1.25rem}.geocodeActions0651{grid-template-columns:1fr}.coordinateState0651{width:100%;border-radius:10px}}
+
+
+/* Build 0.65.2 — Nearby Sites scan diagnostics and recovery */
+.nearbyScreen0652{padding-bottom:calc(var(--navH) + 30px)}
+.nearbyTop0652{position:relative;z-index:2}
+.nearbyInventory0652{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:12px}
+.nearbyInventory0652 span{display:grid;gap:2px;padding:9px 8px;border-radius:12px;background:rgba(255,255,255,.045);border:1px solid rgba(255,255,255,.08);font-size:11px;color:var(--muted);text-align:center}
+.nearbyInventory0652 b{font-size:18px;color:var(--text);line-height:1}
+.nearbyScanMessage0652{position:relative!important;display:grid;gap:6px;min-height:0!important;padding:14px!important;overflow:visible!important;border-left:4px solid var(--cyan)}
+.nearbyScanMessage0652 strong{font-size:15px;line-height:1.25}
+.nearbyScanMessage0652 p{margin:0;font-size:13px;line-height:1.45;color:#d4deec;overflow-wrap:anywhere}
+.nearbyScanMessage0652.scanning{border-left-color:var(--cyan);background:rgba(34,211,238,.07)}
+.nearbyScanMessage0652.success{border-left-color:var(--green);background:rgba(34,197,94,.07)}
+.nearbyScanMessage0652.warning{border-left-color:var(--amber);background:rgba(245,158,11,.07)}
+.nearbyScanMessage0652.error{border-left-color:var(--red);background:rgba(239,68,68,.08)}
+.nearbyMessageActions0652{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:6px}
+.nearbySpinner0652{position:absolute;right:16px;top:16px;width:20px;height:20px;border:3px solid rgba(255,255,255,.18);border-top-color:var(--cyan);border-radius:50%;animation:nearbySpin0652 .85s linear infinite}
+@keyframes nearbySpin0652{to{transform:rotate(360deg)}}
+.nearbyResults0652{overflow:visible;min-height:0;padding-bottom:32px}
+.nearbyFallbackNote0652{padding:10px 12px;border-radius:12px;background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.2);font-size:12px;line-height:1.4;color:#fbd38d}
+.nearbyHomeMessage0652 button{margin-top:8px}
+.homeCollapsible5100 .nearbyScanMessage0652{margin:0;background:rgba(255,255,255,.025)}
+@media(max-width:430px){
+  .nearbyInventory0652{gap:6px}.nearbyInventory0652 span{padding:8px 5px;font-size:10px}.nearbyInventory0652 b{font-size:16px}
+  .nearbyMessageActions0652{grid-template-columns:1fr}.nearbyScanMessage0652{padding:12px!important}.nearbyScanMessage0652 p{font-size:12.5px}
+}

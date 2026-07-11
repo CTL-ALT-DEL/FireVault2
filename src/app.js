@@ -22,7 +22,9 @@ let taskFilter = "open";
 let deficiencyFilter = "open";
 let actionCenterFilter562 = "all";
 let activeJob = loadActiveJob();
-let nearbyState = null;
+const NEARBY_STATE_KEY_0652 = "firevault_nearby_state_0652";
+let nearbyState = loadNearbyState0652();
+let nearbyScanStatus0652 = {state:"idle",message:"",attempt:"",at:""};
 let siteSearch = "";
 let dailySummaryDate569 = localStorage.getItem("firevault_daily_summary_date") || "";
 let dailyPickerMonth571 = localDateString().slice(0,7);
@@ -477,6 +479,123 @@ document.addEventListener("pointerup", e=>{
   if(target) haptic(target.classList?.contains("primary") ? 18 : 10);
 }, {passive:true});
 
+queueMicrotask(()=>{ try{ normalizeAllSiteGps0652(); }catch{} });
+
+function finiteGpsNumber0652(value,min,max){
+  if(value===null || value===undefined || value==="") return null;
+  const n=Number(value);
+  return Number.isFinite(n) && n>=min && n<=max ? n : null;
+}
+function alternateGpsPair0652(s){
+  if(!s || typeof s!=="object") return null;
+  const candidates=[
+    [s.gps?.lat,s.gps?.lng],
+    [s.latitude,s.longitude],
+    [s.lat,s.lng],
+    [s.location?.latitude,s.location?.longitude],
+    [s.location?.lat,s.location?.lng],
+    [s.coordinates?.latitude,s.coordinates?.longitude],
+    [s.coordinates?.lat,s.coordinates?.lng],
+    [s.importMetadata?.latitude,s.importMetadata?.longitude]
+  ];
+  for(const [latRaw,lngRaw] of candidates){
+    const lat=finiteGpsNumber0652(latRaw,-90,90),lng=finiteGpsNumber0652(lngRaw,-180,180);
+    if(lat!==null && lng!==null) return {lat:Number(lat.toFixed(6)),lng:Number(lng.toFixed(6))};
+  }
+  return null;
+}
+function normalizeSiteGps0652(s){
+  const pair=alternateGpsPair0652(s);
+  if(!pair) return false;
+  const currentLat=finiteGpsNumber0652(s?.gps?.lat,-90,90),currentLng=finiteGpsNumber0652(s?.gps?.lng,-180,180);
+  if(currentLat!==null && currentLng!==null) return false;
+  s.gps={
+    ...(s.gps&&typeof s.gps==="object"?s.gps:{}),
+    lat:pair.lat,lng:pair.lng,
+    accuracy:Number(s?.gps?.accuracy||0),
+    capturedAt:s?.gps?.capturedAt||s?.geocodedAt||s?.modifiedAt||new Date().toISOString(),
+    source:s?.gps?.source||s?.geocodeSource||"Recovered imported coordinates"
+  };
+  return true;
+}
+function normalizeAllSiteGps0652(){
+  let changed=0;
+  (data.sites||[]).forEach(s=>{if(normalizeSiteGps0652(s)) changed++;});
+  if(changed){ saveData(data); data=loadData(); }
+  return changed;
+}
+function loadNearbyState0652(){
+  try{
+    const parsed=JSON.parse(sessionStorage.getItem(NEARBY_STATE_KEY_0652)||"null");
+    if(parsed && finiteGpsNumber0652(parsed.lat,-90,90)!==null && finiteGpsNumber0652(parsed.lng,-180,180)!==null) return parsed;
+  }catch{}
+  return null;
+}
+function saveNearbyState0652(state){
+  nearbyState=state;
+  try{ state?sessionStorage.setItem(NEARBY_STATE_KEY_0652,JSON.stringify(state)):sessionStorage.removeItem(NEARBY_STATE_KEY_0652); }catch{}
+}
+function gpsInventory0652(){
+  normalizeAllSiteGps0652();
+  const total=(data.sites||[]).length;
+  const ready=(data.sites||[]).filter(hasGps).length;
+  const imported=(data.sites||[]).filter(s=>s.importSource==="Customer CSV"||s.externalAccountId).length;
+  return {total,ready,missing:Math.max(0,total-ready),imported};
+}
+function geolocationErrorMessage0652(err){
+  const code=Number(err?.code||0);
+  if(code===1) return "Location permission is blocked. Allow location access for FireVault/Safari, then scan again.";
+  if(code===2) return "The phone could not determine its location. Move where GPS or cellular service is available and retry.";
+  if(code===3) return "The location request timed out. FireVault will retry once using standard accuracy.";
+  return `Location check failed${err?.message?`: ${err.message}`:"."}`;
+}
+function setNearbyScanStatus0652(state,message,attempt=""){
+  nearbyScanStatus0652={state,message,attempt,at:new Date().toISOString()};
+}
+function requestCurrentLocation0652(onSuccess,onFailure,options){
+  navigator.geolocation.getCurrentPosition(pos=>{
+    const lat=finiteGpsNumber0652(pos?.coords?.latitude,-90,90),lng=finiteGpsNumber0652(pos?.coords?.longitude,-180,180);
+    if(lat===null || lng===null){ onFailure({code:2,message:"Invalid coordinates were returned."}); return; }
+    onSuccess({lat:Number(lat.toFixed(6)),lng:Number(lng.toFixed(6)),accuracy:Math.round(Number(pos.coords.accuracy||0)),at:new Date().toISOString()});
+  },onFailure,options);
+}
+function runNearbyScan0652(destination="nearbySites"){
+  if(data.settings.gps?.enabled===false){
+    setNearbyScanStatus0652("error","GPS tools are disabled in Settings → GPS / Maps.");
+    destination==="home"?home():nearbySites(); return;
+  }
+  if(!navigator.geolocation){
+    setNearbyScanStatus0652("error","GPS is not available in this browser or app session.");
+    destination==="home"?home():nearbySites(); return;
+  }
+  const inventory=gpsInventory0652();
+  if(!inventory.ready){
+    setNearbyScanStatus0652("no-sites",`${inventory.total} sites are saved, but none currently contain usable latitude and longitude.`);
+    destination==="home"?home():nearbySites(); return;
+  }
+  setNearbyScanStatus0652("scanning","Requesting your current location…","high");
+  destination==="home"?home():nearbySites();
+  const success=state=>{
+    saveNearbyState0652(state);
+    setNearbyScanStatus0652("success",`Location updated with ±${state.accuracy||0} m accuracy.`);
+    destination==="home"?home():nearbySites();
+  };
+  const firstFailure=err=>{
+    if(Number(err?.code)===2 || Number(err?.code)===3){
+      setNearbyScanStatus0652("scanning","High-accuracy GPS did not respond. Retrying with standard accuracy…","standard");
+      destination==="home"?home():nearbySites();
+      requestCurrentLocation0652(success,finalErr=>{
+        setNearbyScanStatus0652("error",geolocationErrorMessage0652(finalErr),"standard");
+        destination==="home"?home():nearbySites();
+      },{enableHighAccuracy:false,timeout:20000,maximumAge:300000});
+      return;
+    }
+    setNearbyScanStatus0652("error",geolocationErrorMessage0652(err),"high");
+    destination==="home"?home():nearbySites();
+  };
+  requestCurrentLocation0652(success,firstFailure,gpsOptions());
+}
+
 function hasGps(s){
   return !!(s && s.gps && Number.isFinite(Number(s.gps.lat)) && Number.isFinite(Number(s.gps.lng)));
 }
@@ -798,14 +917,9 @@ function siteSearchBlob(s){
   return parts.filter(Boolean).join(" ").toLowerCase();
 }
 function detectNearbySites(){
-  if(data.settings.gps?.enabled===false){ toast("GPS tools are hidden in Settings."); return; }
-  if(!navigator.geolocation){ toast("GPS is not available in this browser."); return; }
-  if(!data.sites.some(hasGps)){ route("sites"); setTimeout(()=>toast("No saved GPS sites yet. Open a site and capture GPS first."),50); return; }
-  toast("Checking for nearby sites...");
-  navigator.geolocation.getCurrentPosition(pos=>{
-    nearbyState={lat:Number(pos.coords.latitude.toFixed(6)),lng:Number(pos.coords.longitude.toFixed(6)),accuracy:Math.round(pos.coords.accuracy||0),at:new Date().toISOString()};
-    route("nearbySites");
-  },err=>toast("Nearby check failed: " + (err.message || "permission denied")),gpsOptions());
+  if(!featureOn("advancedGps")){ toast("Advanced GPS is hidden in Simple View."); return; }
+  route("nearbySites");
+  setTimeout(()=>runNearbyScan0652("nearbySites"),30);
 }
 
 function applyTheme(){
@@ -1530,16 +1644,22 @@ function homeRecentRowsOnly486(){
 }
 function homeNearbyTitle486(){
   if(!featureOn('advancedGps')) return 'GPS module disabled';
-  if(!data.sites.some(hasGps)) return 'No GPS accounts saved';
-  if(nearbyState) return `Last check ${new Date(nearbyState.at).toLocaleTimeString([], {hour:"numeric",minute:"2-digit"})} • GPS ±${nearbyState.accuracy||0}m`;
-  return `${data.sites.filter(hasGps).length} GPS-ready account${data.sites.filter(hasGps).length===1?'':'s'}`;
+  const inv=gpsInventory0652();
+  if(!inv.ready) return `${inv.total} saved • ${inv.missing} missing coordinates`;
+  if(nearbyScanStatus0652.state==="scanning") return nearbyScanStatus0652.message;
+  if(nearbyScanStatus0652.state==="error") return "Location check needs attention";
+  if(nearbyState) return `${inv.ready} GPS-ready • checked ${new Date(nearbyState.at).toLocaleTimeString([], {hour:"numeric",minute:"2-digit"})}`;
+  return `${inv.ready} GPS-ready account${inv.ready===1?'':'s'} • ${inv.missing} missing`;
 }
 function homeNearbyMarkup476(){
   if(!featureOn('advancedGps')) return '';
-  if(!data.sites.some(hasGps)) return `<div class="homeNearbyEmpty476"><p>No GPS-saved accounts yet. Open a customer account and capture GPS first.</p></div>`;
-  if(!nearbyState) return `<div class="homeNearbyEmpty476"><p>Check your current location and FireVault will surface nearby customer accounts.</p></div>`;
+  const inv=gpsInventory0652();
+  if(!inv.ready) return `<div class="homeNearbyEmpty476 nearbyHomeMessage0652"><p>${esc(inv.total?`${inv.total} sites are saved, but none have usable latitude and longitude yet.`:"No customer sites are saved yet.")}</p><button class="ghost smallBtn" id="nearbyOpenImportHome0652">Open Customer Import</button></div>`;
+  if(nearbyScanStatus0652.state==="scanning") return `<div class="nearbyScanMessage0652 scanning"><strong>Locating phone…</strong><p>${esc(nearbyScanStatus0652.message)}</p></div>`;
+  if(nearbyScanStatus0652.state==="error") return `<div class="nearbyScanMessage0652 error"><strong>Nearby scan stopped</strong><p>${esc(nearbyScanStatus0652.message)}</p><button class="ghost smallBtn" id="nearbyRetryHome0652">Try Again</button></div>`;
+  if(!nearbyState) return `<div class="homeNearbyEmpty476"><p>Tap Check to compare your phone location with ${inv.ready} GPS-ready customer account${inv.ready===1?'':'s'}.</p></div>`;
   const rows=gpsSiteDistances(nearbyState.lat, nearbyState.lng).slice(0,4);
-  return rows.length?rows.map(r=>`<button class="nearbyAccountCard476" data-home-site="${esc(r.s.id)}"><span>⌖</span><strong>${esc(r.s.name||'Unnamed Site')}</strong><small>${esc(distanceLabel(r.meters))} away • ${esc(fullAddress(r.s))}</small></button>`).join(''):`<div class="homeNearbyEmpty476"><p>No saved GPS accounts found near this location.</p></div>`;
+  return rows.length?rows.map(r=>`<button class="nearbyAccountCard476" data-home-site="${esc(r.s.id)}"><span>⌖</span><strong>${esc(r.s.name||'Unnamed Site')}</strong><small>${esc(distanceLabel(r.meters))} away • ${esc(fullAddress(r.s))}</small></button>`).join(''):`<div class="homeNearbyEmpty476"><p>No GPS-ready customer accounts could be compared.</p></div>`;
 }
 function renderHomeSearch476(){
   const box=document.getElementById('homeSearchResults476');
@@ -1552,14 +1672,7 @@ function renderHomeSearch476(){
   box.innerHTML=q?homeAccountRowsMarkup476():'';
 }
 function checkNearbyHome476(){
-  if(data.settings.gps?.enabled===false){ toast('GPS tools are hidden in Settings.'); return; }
-  if(!navigator.geolocation){ toast('GPS is not available in this browser.'); return; }
-  if(!data.sites.some(hasGps)){ toast('No GPS-saved accounts yet.'); return; }
-  toast('Checking nearby accounts...');
-  navigator.geolocation.getCurrentPosition(pos=>{
-    nearbyState={lat:Number(pos.coords.latitude.toFixed(6)),lng:Number(pos.coords.longitude.toFixed(6)),accuracy:Math.round(pos.coords.accuracy||0),at:new Date().toISOString()};
-    home();
-  },err=>toast('Nearby check failed: ' + (err.message || 'permission denied')),gpsOptions());
+  runNearbyScan0652("home");
 }
 function moduleStatus476(){
   const visible=FEATURE_LABELS.filter(([k])=>featureOn(k)).length;
@@ -2056,6 +2169,8 @@ function home(){
   if(search){ search.oninput=()=>{ siteSearch=search.value; renderHomeSearch476(); }; }
   const clear=document.getElementById('clearHomeSearch476'); if(clear) clear.onclick=()=>{ siteSearch=''; const search=document.getElementById('homeCustomerSearch476'); if(search){ search.value=''; search.focus({preventScroll:true}); } renderHomeSearch476(); };
   const checkNearby=document.getElementById('checkNearbyHomeBtn476'); if(checkNearby) checkNearby.onclick=checkNearbyHome476;
+  const nearbyRetryHome0652=document.getElementById("nearbyRetryHome0652"); if(nearbyRetryHome0652) nearbyRetryHome0652.onclick=checkNearbyHome476;
+  const nearbyOpenImportHome0652=document.getElementById("nearbyOpenImportHome0652"); if(nearbyOpenImportHome0652) nearbyOpenImportHome0652.onclick=()=>{settingsTab="customerImport";mode="settingsDetail";route("settings");};
   document.getElementById('modulesTopBtn476').onclick=()=>{mode=null; route('settings');};
   const bell=document.getElementById('homeBell478'); if(bell) bell.onclick=showChangelog;
   const installHow=document.getElementById('homeInstallHow482'); if(installHow) installHow.onclick=()=>alert('To get the clean full-screen FireVault view on iPhone: tap Share, choose Add to Home Screen, then open FireVault from the new Home Screen icon.');
@@ -2472,17 +2587,33 @@ function sites(){
 
 function nearbySites(){
   const radius=nearbyRadiusMiles();
-  const gpsCount=data.sites.filter(hasGps).length;
+  const inv=gpsInventory0652();
   const rows=nearbyState ? gpsSiteDistances(nearbyState.lat, nearbyState.lng) : [];
   const nearby=rows.filter(r=>r.meters <= radius*1609.344);
-  const shown=nearby.length ? nearby : rows.slice(0,5);
-  const status=nearbyState ? `${nearby.length} within ${radius} mi • Accuracy ±${nearbyState.accuracy||0} m` : `${gpsCount} saved site${gpsCount===1?"":"s"} with GPS`;
-  html(`<div class="screen nearbyScreen"><div class="row"><button class="back ghost" id="backBtn">←</button><button class="primary smallBtn" id="scanNearbyBtn">Scan</button></div>
-    <div class="card nearbyHero"><h1>Nearby Sites</h1><p>${esc(status)}</p><p class="fieldNote">This uses your current phone GPS and compares it to saved site coordinates.</p></div>
-    <div class="list grow">${nearbyState ? (shown.length ? shown.map(r=>`<div class="card siteItem nearbyItem ${r.meters <= radius*1609.344 ? "nearMatch" : "nearFallback"}" data-id="${r.s.id}"><div class="row"><div><h2>${esc(r.s.name||"Unnamed Site")}</h2><p>${esc(fullAddress(r.s))}</p><p>${esc(gpsLine(r.s))}</p></div><span class="pill gpsPill">${distanceLabel(r.meters)}</span></div></div>`).join("") : `<div class="empty">No saved GPS sites found. Open a site and capture GPS first.</div>`) : `<div class="empty">Tap Scan to detect saved sites near your current location.</div>`}</div>
+  const shown=nearby.length ? nearby : rows.slice(0,8);
+  const isScanning=nearbyScanStatus0652.state==="scanning";
+  const hasError=nearbyScanStatus0652.state==="error";
+  const noSites=!inv.ready;
+  const status=nearbyState ? `${nearby.length} within ${radius} mi • nearest ${rows[0]?distanceLabel(rows[0].meters):"unavailable"} • phone accuracy ±${nearbyState.accuracy||0} m` : `${inv.ready} GPS-ready • ${inv.missing} missing coordinates • radius ${radius} mi`;
+  const message=noSites
+    ? `<div class="card nearbyScanMessage0652 warning"><strong>No GPS-ready sites</strong><p>${esc(nearbyScanStatus0652.message||`${inv.total} sites are saved, but none contain usable latitude and longitude.`)}</p><button class="primary" id="nearbyOpenImport0652">Open Customer Import</button></div>`
+    : isScanning
+      ? `<div class="card nearbyScanMessage0652 scanning"><strong>Locating your phone</strong><p>${esc(nearbyScanStatus0652.message)}</p><span class="nearbySpinner0652" aria-hidden="true"></span></div>`
+      : hasError
+        ? `<div class="card nearbyScanMessage0652 error"><strong>Nearby scan could not finish</strong><p>${esc(nearbyScanStatus0652.message)}</p><div class="nearbyMessageActions0652"><button class="primary" id="nearbyRetry0652">Try Again</button><button class="ghost" id="nearbyGpsSettings0652">GPS Settings</button></div></div>`
+        : nearbyState
+          ? `<div class="card nearbyScanMessage0652 success"><strong>Location comparison complete</strong><p>${esc(nearbyScanStatus0652.message||"The nearest GPS-ready customer accounts are shown below.")}</p></div>`
+          : `<div class="card nearbyScanMessage0652"><strong>Ready to scan</strong><p>Tap Scan to compare your current phone location with ${inv.ready} GPS-ready customer account${inv.ready===1?"":"s"}.</p></div>`;
+  html(`<div class="screen nearbyScreen nearbyScreen0652"><div class="row nearbyTop0652"><button class="back ghost" id="backBtn">←</button><button class="primary smallBtn" id="scanNearbyBtn" ${isScanning||noSites?'disabled':''}>${isScanning?"Scanning…":nearbyState?"Refresh":"Scan"}</button></div>
+    <div class="card nearbyHero"><h1>Nearby Sites</h1><p>${esc(status)}</p><div class="nearbyInventory0652"><span><b>${inv.total}</b>Total</span><span><b>${inv.ready}</b>GPS Ready</span><span><b>${inv.missing}</b>Missing GPS</span></div></div>
+    ${message}
+    <div class="list grow nearbyResults0652">${nearbyState && shown.length ? `${nearby.length?"":`<div class="nearbyFallbackNote0652">No account is inside the ${radius}-mile radius. Showing the nearest saved sites instead.</div>`}${shown.map(r=>`<div class="card siteItem nearbyItem ${r.meters <= radius*1609.344 ? "nearMatch" : "nearFallback"}" data-id="${r.s.id}"><div class="row"><div><h2>${esc(r.s.name||"Unnamed Site")}</h2><p>${esc(fullAddress(r.s))}</p><p>${esc(gpsLine(r.s))}</p></div><span class="pill gpsPill">${distanceLabel(r.meters)}</span></div></div>`).join("")}` : !nearbyState?`<div class="empty">Run a scan to display nearest sites.</div>`:""}</div>
   </div>`);
   document.getElementById("backBtn").onclick=()=>route("home");
-  document.getElementById("scanNearbyBtn").onclick=detectNearbySites;
+  const scan=document.getElementById("scanNearbyBtn"); if(scan) scan.onclick=()=>runNearbyScan0652("nearbySites");
+  const retry=document.getElementById("nearbyRetry0652"); if(retry) retry.onclick=()=>runNearbyScan0652("nearbySites");
+  const gpsSettings=document.getElementById("nearbyGpsSettings0652"); if(gpsSettings) gpsSettings.onclick=()=>{settingsTab="gps";mode="settingsDetail";route("settings");};
+  const openImport=document.getElementById("nearbyOpenImport0652"); if(openImport) openImport.onclick=()=>{settingsTab="customerImport";mode="settingsDetail";route("settings");};
   document.querySelectorAll(".nearbyItem").forEach(el=>el.onclick=()=>{selectedSiteId=el.dataset.id; route("siteDetail");});
 }
 
@@ -4708,7 +4839,7 @@ function jobMode(){
 }
 
 
-/* Build 0.65.1 Customer CSV Importer + coordinate calculation */
+/* Build 0.65.2 Customer CSV Importer + coordinate calculation */
 const CUSTOMER_IMPORT_HEADERS_065 = ["Account Id","Account Name","SiteID1","SiteID2","SiteLanguage","DeviceType","Site Phone","Device Phone","Device Phone Comment","Address","City","State","ZipCode","SiteGroupNum"];
 const CUSTOMER_GEOCODE_CACHE_KEY_0651 = "firevault_customer_geocode_cache_0651";
 let customerGeocodeRunToken0651 = 0;
@@ -5665,7 +5796,7 @@ const FIREVAULT_MANUAL_058 = [
     ["Home Layout","Shows or hides optional Home cards and chooses whether each remembers, opens, or collapses by default."],
     ["Modules","Simple, Advanced, and Power modes determine which optional FireVault tools are visible. Disabling a module does not delete its data."],
     ["Advanced","Contains future capabilities that may require cloud services, APIs, permissions, subscriptions, or backend infrastructure."],
-    ["Team Sync","Shows technician identity, device identity, pending record changes, conflict policy, and the planned OneDrive workspace. Build 0.65.1 preserves the sync-ready records and adds duplicate-safe customer imports with coordinate calculation, but does not upload automatically."],
+    ["Team Sync","Shows technician identity, device identity, pending record changes, conflict policy, and the planned OneDrive workspace. Build 0.65.2 preserves the sync-ready records and adds duplicate-safe customer imports with coordinate calculation, but does not upload automatically."],
     ["Customer Import","Previews supported CSV files, calculates missing latitude and longitude from U.S. addresses, flags questionable or unmatched rows, matches repeat imports by Account Id, preserves FireVault-created history, and records changes in Sync Activity."],
     ["Backup","Exports and imports the local vault, previews restore files, and provides repair and safety tools."],
     ["About and Diagnostics","Confirm the installed build, storage key, startup health, data counts, and app stability information."]
@@ -5686,7 +5817,7 @@ const FIREVAULT_MANUAL_058 = [
     ["Restore fails","Use an unmodified FireVault JSON backup, verify the file is readable, and compare its preview details before confirming restore."]
   ]},
   {id:"release",title:"Release & Manual Status",icon:"ⓘ",status:"Living document",summary:"Understand how this documentation will be maintained through Version 1.0.",topics:[
-    ["Manual revision","This manual revision matches FireVault Build 0.65.1 and was last reviewed in July 2026."],
+    ["Manual revision","This manual revision matches FireVault Build 0.65.2 and was last reviewed in July 2026."],
     ["Living documentation","Every feature release should include a documentation review. New controls must be documented and changed workflows must be rechecked."],
     ["Pre-release warning","FireVault is still under active development. Labels, layouts, and workflows may change before Version 1.0."],
     ["Screenshot policy","Annotated screenshots should be added after major screens reach release-candidate stability."],
@@ -5728,12 +5859,12 @@ function manualTile058(icon,title,note,view,tone="blue",badge=""){ return `<butt
 function manualHome058(){
   const bookmarked=FIREVAULT_MANUAL_058.filter(ch=>manualBookmarks058.includes(ch.id));
   return `<div class="academyHome058">
-    <section class="academyHero058"><div><span class="academyEyebrow058">FireVault Academy</span><h2>${fireVaultBrand575()} Knowledge Center</h2><p>Manuals, quick-start guidance, field tips, release notes, and troubleshooting for Build ${BUILD}.</p></div><div class="academyMeta058"><span><b>${BUILD}</b>App build</span><span><b>0.65.1</b>Manual revision</span><span><b>July 2026</b>Last reviewed</span></div></section>
+    <section class="academyHero058"><div><span class="academyEyebrow058">FireVault Academy</span><h2>${fireVaultBrand575()} Knowledge Center</h2><p>Manuals, quick-start guidance, field tips, release notes, and troubleshooting for Build ${BUILD}.</p></div><div class="academyMeta058"><span><b>${BUILD}</b>App build</span><span><b>0.65.2</b>Manual revision</span><span><b>July 2026</b>Last reviewed</span></div></section>
     <div class="academySearch058"><span>⌕</span><input id="manualSearch058" type="search" value="${esc(manualQuery058)}" placeholder="Search FireVault Academy…"><button class="ghost" id="manualSearchGo058">Search</button></div>
     <section class="academyTileGrid058">
       ${manualTile058("📘","User Manual","Browse all chapters and step-by-step instructions.","manual","blue")}
       ${manualTile058("🚀","Quick Start Guide","Set up FireVault and complete a basic field workflow.","quick","green")}
-      ${manualTile058("🆕","What’s New","Review changes included in the current release.","new","red","0.65.1")}
+      ${manualTile058("🆕","What’s New","Review changes included in the current release.","new","red","0.65.2")}
       ${manualTile058("🧰","Field Tips","Practical documentation and reporting advice.","tips","amber")}
       ${manualTile058("❓","Troubleshooting","Resolve common GPS, storage, photo, and update issues.","trouble","violet")}
       ${manualTile058("📋","Revision History","Track app and manual revision checkpoints.","revisions","slate")}
@@ -5757,10 +5888,10 @@ function manualChapterView058(){
 }
 function manualSimplePage058(type){
  const pages={
-  quick:["🚀","Quick Start Guide","Get FireVault ready for a normal field day.",[["1. Verify the build","Confirm the green build badge shows 0.65.1 before entering production information."],["2. Complete Technician Profile","Enter your name, company, phone, email, and license or employee identification."],["3. Review permissions","Allow location and photo access only when FireVault requests them and the feature is needed."],["4. Create or open a site","Add the customer name, full address, panel details, contacts, access notes, and GPS location."],["5. Document the visit","Record notes, photos, tasks, deficiencies, equipment changes, and a service visit."],["6. Finish and protect the data","Review the report, send or copy the required summary, then export a current backup."]]],
-  new:["🆕","What’s New in 0.65.1","Customer coordinate calculation and duplicate-safe importing.",[["Latitude and longitude","Customer Import can calculate missing coordinates from each usable U.S. street address before saving records."],["Coordinate requirement","The importer requires calculated, supplied, or existing GPS coordinates by default. Unmatched addresses remain in review."],["Census address matching","Only address fields are sent to the U.S. Census Geocoder. The returned point is an address-range calculation, not a guaranteed building entrance."],["Account Id matching","Repeat imports update the matching FireVault site instead of creating duplicates or deleting field history."],["CSV coordinate columns","Files that already contain Latitude and Longitude columns use those values directly."],["Sync-ready changes","Added and updated customer records enter the pending synchronization queue and create a Sync Activity entry."]]],
+  quick:["🚀","Quick Start Guide","Get FireVault ready for a normal field day.",[["1. Verify the build","Confirm the green build badge shows 0.65.2 before entering production information."],["2. Complete Technician Profile","Enter your name, company, phone, email, and license or employee identification."],["3. Review permissions","Allow location and photo access only when FireVault requests them and the feature is needed."],["4. Create or open a site","Add the customer name, full address, panel details, contacts, access notes, and GPS location."],["5. Document the visit","Record notes, photos, tasks, deficiencies, equipment changes, and a service visit."],["6. Finish and protect the data","Review the report, send or copy the required summary, then export a current backup."]]],
+  new:["🆕","What’s New in 0.65.2","Nearby Sites reliability and GPS diagnostics.",[["Nearby scan diagnostics","Nearby Sites now shows total sites, GPS-ready records, missing coordinates, phone-location progress, and persistent error messages."],["Coordinate recovery","FireVault recovers valid latitude and longitude stored in compatible legacy or imported fields and normalizes them into the site GPS record."],["Location retry","If high-accuracy location times out or is unavailable, FireVault retries once using standard accuracy."],["Nearest-site fallback","When no site is inside the selected radius, the nearest GPS-ready sites remain visible instead of presenting an empty result."],["Latitude and longitude","Customer Import can calculate missing coordinates from each usable U.S. street address before saving records."],["Coordinate requirement","The importer requires calculated, supplied, or existing GPS coordinates by default. Unmatched addresses remain in review."],["Census address matching","Only address fields are sent to the U.S. Census Geocoder. The returned point is an address-range calculation, not a guaranteed building entrance."],["Account Id matching","Repeat imports update the matching FireVault site instead of creating duplicates or deleting field history."],["CSV coordinate columns","Files that already contain Latitude and Longitude columns use those values directly."],["Sync-ready changes","Added and updated customer records enter the pending synchronization queue and create a Sync Activity entry."]]],
   tips:["🧰","Field Tips","Short practices that improve the usefulness of FireVault records.",[["Write for the next technician","Include the exact panel, circuit, device, location, symptom, test result, and next action instead of relying on memory."],["Photograph context first","Take one wide photo showing the equipment location before close-up terminal, label, or damage photos."],["Separate facts from follow-up","Use notes for what occurred, deficiencies for code or system problems, and tasks for work that still needs completion."],["Confirm the account","Before using Quick Capture, verify the selected customer site to prevent records from being stored under the wrong account."],["Back up before updates","Export a backup before installing every development build and after completing a significant amount of field documentation."]]],
-  revisions:["📋","Revision History","Application and documentation checkpoints.",[["0.65.1","Added online latitude/longitude calculation, coordinate validation, geocoding progress, unmatched-address review, optional CSV coordinates, and coordinate-safe repeat importing."],["0.65.0","Added preview-first customer CSV importing, Account Id update matching, validation warnings, imported monitoring details, and sync activity tracking."],["0.64.1","Simplified Academy article headers, removed floating metadata badges, and improved continuous scrolling and readability."],["0.64.0","Added Sync Activity, a conflict review center, export/import audit entries, and an automatic OneDrive connection-readiness checklist."],["0.63.1","Overhauled contextual Help and Academy reader formatting, removed overlapping sticky article headers, and restored full scrolling on phones and tablets."],["0.63.0","Added permanent record IDs, audit metadata, local version tracking, pending-sync states, conflict readiness, device identity, and a Team Sync settings workspace."],["0.60.0","Connected major screens and Settings areas directly to matching Academy chapters with return-to-screen navigation."],["0.59.0","Added interactive tutorials, guided orientation, pinned learning, field tips, and documentation tracking."],["0.58.0","Expanded Help & Manual into FireVault Academy with bookmarks, smart search, Quick Start, and reader navigation."],["0.57.0","Added the first complete searchable in-app FireVault User Manual."],["Ongoing review rule","Any change to navigation, labels, storage, workflows, permissions, or supported layouts requires the related manual chapter to be checked."]]],
+  revisions:["📋","Revision History","Application and documentation checkpoints.",[["0.65.2","Repaired Nearby Sites with GPS inventory counts, imported-coordinate recovery, persistent permission and timeout messages, a standard-accuracy retry, and nearest-site fallback results."],["0.65.1","Added online latitude/longitude calculation, coordinate validation, geocoding progress, unmatched-address review, optional CSV coordinates, and coordinate-safe repeat importing."],["0.65.0","Added preview-first customer CSV importing, Account Id update matching, validation warnings, imported monitoring details, and sync activity tracking."],["0.64.1","Simplified Academy article headers, removed floating metadata badges, and improved continuous scrolling and readability."],["0.64.0","Added Sync Activity, a conflict review center, export/import audit entries, and an automatic OneDrive connection-readiness checklist."],["0.63.1","Overhauled contextual Help and Academy reader formatting, removed overlapping sticky article headers, and restored full scrolling on phones and tablets."],["0.63.0","Added permanent record IDs, audit metadata, local version tracking, pending-sync states, conflict readiness, device identity, and a Team Sync settings workspace."],["0.60.0","Connected major screens and Settings areas directly to matching Academy chapters with return-to-screen navigation."],["0.59.0","Added interactive tutorials, guided orientation, pinned learning, field tips, and documentation tracking."],["0.58.0","Expanded Help & Manual into FireVault Academy with bookmarks, smart search, Quick Start, and reader navigation."],["0.57.0","Added the first complete searchable in-app FireVault User Manual."],["Ongoing review rule","Any change to navigation, labels, storage, workflows, permissions, or supported layouts requires the related manual chapter to be checked."]]],
   trouble:["❓","Troubleshooting","Common problems and safe first checks.",FIREVAULT_MANUAL_058.find(x=>x.id==="trouble")?.topics||[]]
  };
  const [icon,title,note,items]=pages[type]||["🚧","Coming Soon","This Academy area is reserved for a future milestone.",[["Development status","The feature is not active yet. No outside service has been connected or purchased."]]];
@@ -6854,7 +6985,7 @@ function diagnostics(){
 }
 function showChangelog(){
   const notes = [
-    "Build 0.65.1 calculates missing customer latitude and longitude before duplicate-safe CSV importing.",
+    "Build 0.65.2 repairs Nearby Sites scanning and makes GPS readiness and location errors visible.",
     "Manual chapters document installation, Today, Sites, Site Detail, field workflow, notes, tasks, deficiencies, photos, GPS, route tracking, reports, email, settings, backups, updates, and troubleshooting.",
     "Added living-documentation revision metadata and a release-state review requirement.",
     "Added Quick Capture for timestamped site notes, follow-up tasks, and deficiencies without leaving Today.",
