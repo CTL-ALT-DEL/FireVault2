@@ -1,14 +1,15 @@
-# FireVault Build 0.58.0
+# FireVault Build 0.59.0
 
-Build 0.58.0 expands the in-app documentation into the FireVault Academy foundation while preserving the repaired Site Detail layout, Quick Capture workflow, Home Layout controls, and scoped Settings design.
+Build 0.59.0 expands FireVault Academy with interactive tutorials, a guided new-user orientation, pinned learning, practical field tips, and a documentation tracker.
 
-## Added
-- Academy home with Manual, Quick Start, What’s New, Field Tips, Troubleshooting, Revision History, and future Training / AI tiles
-- Chapter bookmarks stored locally
-- Smarter search with common synonyms
-- Chapter reading time, review status, build compatibility, progress, and previous / next navigation
-- Improved responsive reading layout for iPhone and iPad
+## Highlights
+- Seven interactive tutorials with saved step progress
+- Restartable “Show Me Around FireVault” orientation
+- Pinned tutorials and field tips on the Academy home screen
+- Expanded practical Field Tips library
+- Documentation Tracker for manual and tutorial review status
+- Manual revision and build references updated to 0.59.0
+- Existing Site Detail repair, Quick Capture, Settings, Email, Home Layout, and local data preserved
 
-Suggested commit message:
-
-`Build 0.58.0 expand User Manual into FireVault Academy`
+## Commit
+`Build 0.59.0 expand FireVault Academy with interactive tutorials and guided learning`
