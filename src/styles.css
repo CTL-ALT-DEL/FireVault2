@@ -13816,3 +13816,119 @@ nav button.active{background:color-mix(in srgb,var(--accent) 17%,rgba(30,41,59,.
   .nearbySelectedOverlay0712 strong{font-size:.75rem!important}
   .nearbySelectedOverlay0712 span{font-size:.58rem!important}
 }
+
+
+/* Build 0.71.4 — Nearby top-row fit, icon filter, GPS-nav refresh, and top-left selected account */
+.nearbyCompactHead069{
+  display:grid!important;
+  grid-template-columns:minmax(0,1fr) auto!important;
+  align-items:center!important;
+  gap:7px!important;
+  width:100%!important;
+}
+.nearbyCompactTitle069{
+  min-width:0!important;
+  overflow:hidden!important;
+}
+.nearbyCompactTitle069 h1,
+.nearbyCompactTitle069 span{
+  max-width:100%!important;
+  overflow:hidden!important;
+  text-overflow:ellipsis!important;
+}
+.nearbyCompactActions069{
+  display:grid!important;
+  grid-template-columns:64px 30px 30px!important;
+  align-items:center!important;
+  gap:4px!important;
+  flex:0 0 auto!important;
+  max-width:none!important;
+}
+.nearbyViewToggle069{
+  display:flex!important;
+  width:64px!important;
+  min-width:64px!important;
+  height:30px!important;
+  min-height:30px!important;
+  justify-content:center!important;
+  padding:0 6px!important;
+  color:#fff!important;
+  opacity:1!important;
+  visibility:visible!important;
+  overflow:visible!important;
+}
+.nearbyViewToggle069 span{
+  display:inline!important;
+  flex:0 0 auto!important;
+  color:#f43f4a!important;
+  font-size:.76rem!important;
+  line-height:1!important;
+}
+.nearbyViewToggle069 b{
+  display:inline!important;
+  flex:0 0 auto!important;
+  color:#fff!important;
+  font-size:.58rem!important;
+  line-height:1!important;
+  letter-spacing:.035em!important;
+}
+.nearbyCategoryFilter070{
+  position:relative!important;
+  display:grid!important;
+  place-items:center!important;
+  width:30px!important;
+  min-width:30px!important;
+  height:30px!important;
+  min-height:30px!important;
+  padding:0!important;
+  overflow:hidden!important;
+  cursor:pointer!important;
+}
+.nearbyFilterGlyph0714{
+  position:relative!important;
+  display:block!important;
+  width:16px!important;
+  height:15px!important;
+  pointer-events:none!important;
+}
+.nearbyFilterGlyph0714::before{
+  content:""!important;
+  position:absolute!important;
+  inset:1px 1px auto!important;
+  width:14px!important;
+  height:13px!important;
+  background:var(--category)!important;
+  clip-path:polygon(0 0,100% 0,63% 48%,63% 100%,37% 100%,37% 48%)!important;
+  filter:drop-shadow(0 0 4px color-mix(in srgb,var(--category) 65%,transparent))!important;
+}
+.nearbyCategoryFilter070 select{
+  position:absolute!important;
+  inset:0!important;
+  z-index:3!important;
+  width:100%!important;
+  min-width:100%!important;
+  height:100%!important;
+  min-height:100%!important;
+  margin:0!important;
+  padding:0!important;
+  opacity:0!important;
+  cursor:pointer!important;
+  -webkit-appearance:none!important;
+  appearance:none!important;
+}
+.nearbySelectedOverlay0712{
+  top:12px!important;
+  right:auto!important;
+  bottom:auto!important;
+  left:12px!important;
+  box-sizing:border-box!important;
+  width:min(420px,calc(100% - 24px))!important;
+  max-width:calc(100% - 24px)!important;
+}
+@media(max-width:390px){
+  .nearbyCompactHead069{gap:5px!important}
+  .nearbyCompactActions069{grid-template-columns:60px 29px 29px!important;gap:3px!important}
+  .nearbyViewToggle069{width:60px!important;min-width:60px!important;padding:0 5px!important}
+  .nearbyCategoryFilter070{width:29px!important;min-width:29px!important;height:29px!important;min-height:29px!important}
+  .nearbySelectedOverlay0712{top:9px!important;left:9px!important;width:calc(100% - 18px)!important;max-width:calc(100% - 18px)!important}
+}

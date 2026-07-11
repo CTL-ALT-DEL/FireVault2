@@ -8,7 +8,7 @@
   "orientation": "any",
   "background_color": "#0b0d10",
   "theme_color": "#101216",
-  "description": "Field knowledge system for fire alarm technicians. Build 0.71.3 improves Nearby account metadata layout, adds a selected-account map overlay, and restores spacing around the header and map.",
+  "description": "Field knowledge system for fire alarm technicians. Build 0.71.4 repairs the Nearby header, adds an icon-only category filter, moves the selected account overlay to the map’s top-left, and refreshes GPS from the bottom Nearby button.",
   "icons": [
     {
       "src": "assets/icon-192.png",
@@ -49,5 +49,5 @@
       "description": "Open FireVault settings"
     }
   ],
-  "version": "0.71.3"
+  "version": "0.71.4"
 }

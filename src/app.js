@@ -2396,7 +2396,7 @@ function home(){
     <section class="nearbyTop069"><div class="nearbyLogo069"><img src="assets/favicon.png?v=${BUILD}" alt=""><strong>${fireVaultBrand575()}</strong></div>${todayHeader070()}</section>
     <section class="nearbyCompactHead069">
       <div class="nearbyCompactTitle069"><h1>Nearby Accounts</h1><span><i></i>${esc(gpsText)} <b>• ${nearby} shown • ${inv.ready} GPS • ${NEARBY_LIST_MAX_MILES_069} mi</b></span></div>
-      <div class="nearbyCompactActions069"><button class="nearbyViewToggle069" id="nearbyViewToggle069" aria-label="Switch between map and list"><span>${homeNearbyView069==='map'?'⌖':'☷'}</span><b>${homeNearbyView069==='map'?'Map':'List'}</b></button><label class="nearbyCategoryFilter070 category-${nearbyCategoryFilter070}" aria-label="Filter nearby accounts by communicator category"><i></i><select id="nearbyCategoryFilter070">${categoryOptions070}</select></label><button class="iconCompact069" id="scanHome069" aria-label="Refresh GPS" ${status==='scanning'?'disabled':''}>↻</button></div>
+      <div class="nearbyCompactActions069"><button class="nearbyViewToggle069" id="nearbyViewToggle069" aria-label="Switch between map and list"><span aria-hidden="true">${homeNearbyView069==='map'?'⌖':'☷'}</span><b>${homeNearbyView069==='map'?'MAP':'LIST'}</b></button><label class="nearbyCategoryFilter070 category-${nearbyCategoryFilter070}" aria-label="Filter nearby accounts by communicator category" title="Filter: ${esc(NEARBY_CATEGORY_META_070[nearbyCategoryFilter070]?.label||'All')}"><span class="nearbyFilterGlyph0714" aria-hidden="true"></span><select id="nearbyCategoryFilter070" aria-label="Nearby account category filter">${categoryOptions070}</select></label><button class="iconCompact069" id="scanHome069" aria-label="Refresh GPS and map" ${status==='scanning'?'disabled':''}>↻</button></div>
     </section>
     ${status==='error'?`<div class="nearbyNotice069"><strong>Location problem:</strong> ${esc(nearbyScanStatus0652.message)}</div>`:''}
     <section class="nearbyWorkspace069 ${homeNearbyView069}">
@@ -2404,12 +2404,14 @@ function home(){
       <div class="nearbyListHead069"><strong>${rows.length} ${nearbyCategoryFilter070==='all'?'account':NEARBY_CATEGORY_META_070[nearbyCategoryFilter070].label+' account'}${rows.length===1?'':'s'} within ${NEARBY_LIST_MAX_MILES_069} miles</strong><span>Sorted by distance</span></div>
       <div class="nearbyCards069" id="nearbyCards069">${rows.length?rows.map(nearbyAccountCard069).join(''):`<div class="nearbyEmpty069">${nearbyState?'No nearby accounts found.':'Refreshing GPS…'}</div>`}</div>
     </section>
-    <nav class="nearbyBottomNav069"><button class="active">⌖<span>Nearby</span></button><button id="homeAccounts069">▦<span>Accounts</span></button><button id="homeToolsNav069">⚒<span>Tools</span></button><button id="homeSettingsNav069">⚙<span>Settings</span></button></nav>
+    <nav class="nearbyBottomNav069"><button class="active" id="homeNearbyNav069" aria-label="Refresh nearby accounts using current GPS">⌖<span>Nearby</span></button><button id="homeAccounts069">▦<span>Accounts</span></button><button id="homeToolsNav069">⚒<span>Tools</span></button><button id="homeSettingsNav069">⚙<span>Settings</span></button></nav>
   </div>`);
   document.getElementById('homeAccounts069').onclick=()=>route('sites');
   document.getElementById('homeToolsNav069').onclick=()=>route('dashboard068');
   document.getElementById('homeSettingsNav069').onclick=()=>route('settings');
-  document.getElementById('scanHome069').onclick=()=>{resetNearbyMapOverview069(false);runNearbyScan0652('home');};
+  const refreshNearbyHome0714=()=>{resetNearbyMapOverview069(false);runNearbyScan0652('home');};
+  document.getElementById('scanHome069').onclick=refreshNearbyHome0714;
+  document.getElementById('homeNearbyNav069').onclick=refreshNearbyHome0714;
   document.getElementById('nearbyViewToggle069').onclick=()=>{homeNearbyView069=homeNearbyView069==='map'?'list':'map';localStorage.setItem(HOME_NEARBY_VIEW_KEY_069,homeNearbyView069);home();};
   document.getElementById('nearbyCategoryFilter070').onchange=e=>{
     nearbyCategoryFilter070=e.target.value in NEARBY_CATEGORY_META_070?e.target.value:"all";
@@ -7570,6 +7572,7 @@ function diagnostics(){
 }
 function showChangelog(){
   const notes = [
+    "Build 0.71.4 keeps MAP / LIST visible on narrow screens, replaces the category dropdown with a compact filter icon, moves the selected account overlay to the map’s top-left, and refreshes GPS/map from the bottom Nearby button.",
     "Build 0.71.3 repairs the Nearby module startup error while preserving the improved account metadata layout, selected-account map overlay, and header spacing.",
     "Build 0.69.9 enlarges Nearby Open, Route, and Call controls, changes selected accounts to a glowing green treatment, extends the account list to 25 miles, and adapts the overview radius to the selected account distance.",
     "Build 0.69.8 makes Nearby list taps select the tapped account reliably, zooms the map to street level around that account, and forces all account markers to render as true circles.",

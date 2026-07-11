@@ -1,4 +1,4 @@
-# FireVault Build 0.71.3
+# FireVault Build 0.71.4
 
 Nearby Accounts category and header redesign.
 
@@ -11,6 +11,14 @@ Nearby Accounts category and header redesign.
 - Uses category colors consistently on account rows, Account IDs, and map markers.
 - Preserves the 25-mile list, adaptive radius, street-level account focus, glowing green selection, and Open / Route / Call actions.
 
+
+
+## Build 0.71.4 — Nearby header and refresh controls
+
+- Moves the selected account name/address overlay to the top-left of the street-level map, giving it more usable width.
+- Repairs the Nearby Accounts top row so the MAP / LIST selector remains visible on narrow phones.
+- Replaces the visible selected-category dropdown with a compact filter icon while preserving All, Basic, CLSS, AlarmNet, and IPDACT choices.
+- Makes the bottom Nearby navigation button request a fresh GPS position and redraw the map, matching the top refresh button.
 
 ## Build 0.71.3 — Nearby startup repair
 
