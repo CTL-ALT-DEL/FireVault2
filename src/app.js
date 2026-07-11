@@ -102,6 +102,21 @@ const appEl = document.getElementById("app");
 function fireVaultBrand575(extraClass=""){
   return `<span class="fireVaultWordmark575 ${esc(extraClass)}"><span>FIRE</span><b>VAULT</b></span>`;
 }
+function fvIcon073(name, extraClass=""){
+  const icons={
+    home:'<path d="M3 11.5 12 4l9 7.5"/><path d="M5.5 10.5V20h13v-9.5"/><path d="M9.5 20v-6h5v6"/>',
+    nearby:'<circle cx="12" cy="12" r="6"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/><circle cx="12" cy="12" r="1.4"/>',
+    accounts:'<rect x="4" y="4" width="6" height="6" rx="1"/><rect x="14" y="4" width="6" height="6" rx="1"/><rect x="4" y="14" width="6" height="6" rx="1"/><rect x="14" y="14" width="6" height="6" rx="1"/>',
+    library:'<path d="M5 4h11a3 3 0 0 1 3 3v13H8a3 3 0 0 1-3-3z"/><path d="M8 4v16M8 17h11"/>',
+    tools:'<path d="M4 9h16v10H4z"/><path d="M9 9V6h6v3M4 13h16M10 13v2h4v-2"/>',
+    settings:'<path d="M4 6h10M18 6h2M4 12h3M11 12h9M4 18h8M16 18h4"/><circle cx="16" cy="6" r="2"/><circle cx="9" cy="12" r="2"/><circle cx="14" cy="18" r="2"/>',
+    map:'<path d="m3 6 6-3 6 3 6-3v15l-6 3-6-3-6 3z"/><path d="M9 3v15M15 6v15"/>',
+    list:'<path d="M8 6h13M8 12h13M8 18h13"/><circle cx="4" cy="6" r="1"/><circle cx="4" cy="12" r="1"/><circle cx="4" cy="18" r="1"/>',
+    route:'<path d="M5 19 19 5M10 5h9v9"/><path d="M5 8v11h11"/>',
+    call:'<path d="M7 4 4.8 6.2c-.8.8-.9 2-.4 3 2 4.2 5.4 7.6 9.6 9.6 1 .5 2.2.4 3-.4L19.2 16l-4-3-1.7 1.7a13.5 13.5 0 0 1-4.2-4.2L11 8.8z"/>'
+  };
+  return `<svg class="fvIcon073 ${esc(extraClass)}" viewBox="0 0 24 24" aria-hidden="true" focusable="false">${icons[name]||icons.home}</svg>`;
+}
 
 const HOME_LAYOUT_CARDS_550 = [
   {key:"pinnedSites", label:"Pinned Sites", note:"Fast shortcuts to high-use customer accounts.", tone:"violet", module:"pinnedSites"},
@@ -2375,8 +2390,8 @@ function homeNearbyMapShell069(){
     <div class="nearbyMapControlMask0717" aria-hidden="true"></div>
     <div id="nearbySelectedOverlay0712" class="nearbySelectedOverlay0712" hidden></div>
     <div id="nearbyMapActions0711" class="nearbyMapActions0711" hidden>
-      <button id="nearbyMapRoute0711" aria-label="Route to selected account"><span>➤</span><b>Route</b></button>
-      <button id="nearbyMapCall0711" aria-label="Call selected account"><span>☎</span><b>Call</b></button>
+      <button id="nearbyMapRoute0711" aria-label="Route to selected account">${fvIcon073("route","fvMapActionIcon073")}<b>Route</b></button>
+      <button id="nearbyMapCall0711" aria-label="Call selected account">${fvIcon073("call","fvMapActionIcon073")}<b>Call</b></button>
     </div>
   </div>`;
 }
@@ -2398,8 +2413,8 @@ function home(){
   html(`<div class="screen nearbyHome069">
     <section class="nearbyTop069"><div class="nearbyLogo069"><img src="assets/favicon.png?v=${BUILD}" alt=""><strong>${fireVaultBrand575()}</strong></div>${todayHeader070()}</section>
     <section class="nearbyCompactHead069">
-      <div class="nearbyCompactTitle069"><h1>Nearby Accounts</h1><span><i></i>${esc(gpsText)} <b>• ${nearby} shown • ${inv.ready} GPS • ${NEARBY_LIST_MAX_MILES_069} mi</b></span></div>
-      <div class="nearbyCompactActions069"><button class="nearbyViewToggle069" id="nearbyViewToggle069" aria-label="Switch between map and list"><span aria-hidden="true">${homeNearbyView069==='map'?'⌖':'☷'}</span><b>${homeNearbyView069==='map'?'MAP':'LIST'}</b></button><label class="nearbyCategoryFilter070 category-${nearbyCategoryFilter070}" aria-label="Filter nearby accounts by communicator category" title="Filter: ${esc(NEARBY_CATEGORY_META_070[nearbyCategoryFilter070]?.label||'All')}"><span class="nearbyFilterGlyph0714" aria-hidden="true"></span><select id="nearbyCategoryFilter070" aria-label="Nearby account category filter">${categoryOptions070}</select></label></div>
+      <div class="nearbyCompactTitle069"><h1>Nearby Accounts</h1><span><i></i>${esc(gpsText)}</span></div>
+      <div class="nearbyCompactActions069"><button class="nearbyViewToggle069" id="nearbyViewToggle069" aria-label="Switch between map and list">${fvIcon073(homeNearbyView069==='map'?'map':'list','fvToggleIcon073')}<b>${homeNearbyView069==='map'?'MAP':'LIST'}</b></button><label class="nearbyCategoryFilter070 category-${nearbyCategoryFilter070}" aria-label="Filter nearby accounts by communicator category" title="Filter: ${esc(NEARBY_CATEGORY_META_070[nearbyCategoryFilter070]?.label||'All')}"><span class="nearbyFilterGlyph0714" aria-hidden="true"></span><select id="nearbyCategoryFilter070" aria-label="Nearby account category filter">${categoryOptions070}</select></label></div>
     </section>
     ${status==='error'?`<div class="nearbyNotice069"><strong>Location problem:</strong> ${esc(nearbyScanStatus0652.message)}</div>`:''}
     <section class="nearbyWorkspace069 ${homeNearbyView069}">
@@ -2407,7 +2422,7 @@ function home(){
       <div class="nearbyListHead069"><strong>${rows.length} ${nearbyCategoryFilter070==='all'?'account':NEARBY_CATEGORY_META_070[nearbyCategoryFilter070].label+' account'}${rows.length===1?'':'s'} within ${NEARBY_LIST_MAX_MILES_069} miles</strong><span>Sorted by distance</span></div>
       <div class="nearbyCards069" id="nearbyCards069">${rows.length?rows.map(nearbyAccountCard069).join(''):`<div class="nearbyEmpty069">${nearbyState?'No nearby accounts found.':'Refreshing GPS…'}</div>`}</div>
     </section>
-    <nav class="nearbyBottomNav069"><button class="active" id="homeNearbyNav069" aria-label="Refresh nearby accounts using current GPS">⌖<span>Nearby</span></button><button id="homeAccounts069">▦<span>Accounts</span></button><button id="homeToolsNav069">⚒<span>Tools</span></button><button id="homeSettingsNav069">⚙<span>Settings</span></button></nav>
+    <nav class="nearbyBottomNav069"><button class="active" id="homeNearbyNav069" aria-label="Refresh nearby accounts using current GPS">${fvIcon073("nearby","fvNavIcon073")}<span>Nearby</span></button><button id="homeAccounts069">${fvIcon073("accounts","fvNavIcon073")}<span>Accounts</span></button><button id="homeToolsNav069">${fvIcon073("tools","fvNavIcon073")}<span>Tools</span></button><button id="homeSettingsNav069">${fvIcon073("settings","fvNavIcon073")}<span>Settings</span></button></nav>
   </div>`);
   document.getElementById('homeAccounts069').onclick=()=>route('sites');
   document.getElementById('homeToolsNav069').onclick=()=>route('dashboard068');

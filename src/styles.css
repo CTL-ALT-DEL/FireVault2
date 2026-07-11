@@ -14155,3 +14155,391 @@ nav button.active{background:color-mix(in srgb,var(--accent) 17%,rgba(30,41,59,.
   box-shadow:0 0 0 4px rgba(22,101,52,.34),0 5px 14px rgba(0,0,0,.55)!important;
 }
 .staticMarker069.selected span{color:#fff!important}
+
+/* Build 0.73.0 — FireVault visual polish and unified component system */
+:root{
+  --fv-bg:#090d12;
+  --fv-surface:#111821;
+  --fv-surface-raised:#17212c;
+  --fv-surface-soft:#0e151d;
+  --fv-line:#2e3946;
+  --fv-line-strong:#425063;
+  --fv-text:#f5f7fa;
+  --fv-muted:#9da9b7;
+  --fv-control-h:44px;
+  --fv-control-radius:9px;
+  --fv-card-radius:14px;
+  --fv-control-shadow:inset 0 1px 0 rgba(255,255,255,.045),0 4px 12px rgba(0,0,0,.18);
+  --fv-card-shadow:0 10px 26px rgba(0,0,0,.2);
+}
+body{
+  background:linear-gradient(180deg,#0c1118 0%,#080b10 100%)!important;
+  color:var(--fv-text);
+}
+.fvIcon073{
+  display:block;
+  width:22px;
+  height:22px;
+  flex:0 0 auto;
+  fill:none;
+  stroke:currentColor;
+  stroke-width:1.8;
+  stroke-linecap:round;
+  stroke-linejoin:round;
+  pointer-events:none;
+}
+button,.btn{
+  border-radius:var(--fv-control-radius)!important;
+  border-color:var(--fv-line)!important;
+  min-height:var(--fv-control-h);
+  font-weight:800;
+  letter-spacing:.005em;
+  transition:transform .12s ease,border-color .12s ease,background .12s ease,box-shadow .12s ease,opacity .12s ease;
+  -webkit-tap-highlight-color:transparent;
+}
+button:active,.btn:active{
+  transform:translateY(1px) scale(.99)!important;
+}
+button:disabled,.btn:disabled{
+  opacity:.42!important;
+  filter:saturate(.65);
+}
+.primary{
+  border-color:color-mix(in srgb,var(--accent) 65%,#fff 8%)!important;
+  background:linear-gradient(180deg,color-mix(in srgb,var(--accent) 88%,#fff 6%),color-mix(in srgb,var(--accent2) 86%,#000 8%))!important;
+  box-shadow:var(--fv-control-shadow)!important;
+}
+.ghost{
+  background:linear-gradient(180deg,#18222d,#111820)!important;
+  border-color:var(--fv-line)!important;
+  color:#eef2f7!important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.035)!important;
+}
+.danger{
+  background:linear-gradient(180deg,rgba(127,29,29,.66),rgba(69,10,10,.76))!important;
+  border-color:rgba(248,113,113,.38)!important;
+  color:#fee2e2!important;
+}
+.card{
+  border-radius:var(--fv-card-radius)!important;
+  border-color:rgba(148,163,184,.15)!important;
+  background:linear-gradient(155deg,rgba(24,34,46,.96),rgba(14,20,29,.98))!important;
+  box-shadow:var(--fv-card-shadow)!important;
+}
+input,textarea,select{
+  border-radius:10px!important;
+  border-color:var(--fv-line)!important;
+  background:#0b1118!important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.02)!important;
+}
+input:focus,textarea:focus,select:focus{
+  border-color:color-mix(in srgb,var(--accent) 62%,#8ea0b4)!important;
+  box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 15%,transparent)!important;
+}
+
+/* One bottom-navigation language everywhere, while labels remain route-specific. */
+#appNav,.nearbyBottomNav069{
+  gap:6px!important;
+  padding-left:7px!important;
+  padding-right:7px!important;
+  border-top:1px solid rgba(148,163,184,.16)!important;
+  background:rgba(7,11,16,.97)!important;
+  -webkit-backdrop-filter:blur(18px)!important;
+  backdrop-filter:blur(18px)!important;
+}
+#appNav button,.nearbyBottomNav069 button{
+  display:flex!important;
+  flex-direction:column!important;
+  align-items:center!important;
+  justify-content:center!important;
+  gap:3px!important;
+  min-height:54px!important;
+  padding:6px 4px!important;
+  border:1px solid var(--fv-line)!important;
+  border-radius:var(--fv-control-radius)!important;
+  background:linear-gradient(150deg,#151d26,#0f151c)!important;
+  color:#a9b4c1!important;
+  box-shadow:var(--fv-control-shadow)!important;
+}
+#appNav button.active,.nearbyBottomNav069 button.active{
+  border-color:color-mix(in srgb,var(--accent) 72%,#fff 5%)!important;
+  background:linear-gradient(150deg,color-mix(in srgb,var(--accent2) 88%,#1a2029),color-mix(in srgb,var(--accent) 72%,#111821))!important;
+  color:#fff!important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.08),0 5px 14px color-mix(in srgb,var(--accent) 18%,transparent)!important;
+}
+#appNav .fvNavIcon073,.nearbyBottomNav069 .fvNavIcon073{
+  width:22px!important;
+  height:22px!important;
+  stroke-width:1.9;
+}
+#appNav button span,.nearbyBottomNav069 button span{
+  font-size:10px!important;
+  line-height:1!important;
+  font-weight:800!important;
+  letter-spacing:.025em!important;
+}
+
+/* Cleaner Nearby hierarchy, improved legibility, and restrained visual noise. */
+.nearbyHome069{
+  gap:8px!important;
+}
+.nearbyTop069{
+  min-height:40px!important;
+  padding:0 2px 6px!important;
+  border-bottom-color:rgba(148,163,184,.17)!important;
+}
+.nearbyLogo069{
+  gap:8px!important;
+}
+.nearbyLogo069 img{
+  width:34px!important;
+  height:34px!important;
+  border-radius:9px!important;
+  box-shadow:0 5px 14px rgba(0,0,0,.28)!important;
+}
+.nearbyLogo069 strong{
+  font-size:1.02rem!important;
+  letter-spacing:.035em!important;
+}
+.globalToday071 span{
+  color:#f3f6fa!important;
+  font-size:.76rem!important;
+}
+.globalToday071 b{
+  color:#8e9baa!important;
+  font-size:.67rem!important;
+}
+.nearbyCompactHead069{
+  min-height:42px!important;
+  gap:8px!important;
+  padding:0 1px!important;
+  margin:0!important;
+}
+.nearbyCompactTitle069 h1{
+  color:#f7f8fa!important;
+  font-size:1.06rem!important;
+  line-height:1.1!important;
+  letter-spacing:.035em!important;
+  text-transform:uppercase!important;
+}
+.nearbyCompactTitle069 span{
+  gap:5px!important;
+  margin-top:4px!important;
+  color:#96a2b0!important;
+  font-size:.65rem!important;
+  line-height:1.25!important;
+}
+.nearbyCompactTitle069 span b{
+  color:#b4beca!important;
+  font-weight:700!important;
+}
+.nearbyCompactActions069{
+  grid-template-columns:92px 44px!important;
+  gap:7px!important;
+}
+.nearbyViewToggle069,.nearbyCategoryFilter070{
+  height:42px!important;
+  min-height:42px!important;
+  border:1px solid var(--fv-line-strong)!important;
+  border-radius:var(--fv-control-radius)!important;
+  background:linear-gradient(150deg,#18222d,#10161e)!important;
+  box-shadow:var(--fv-control-shadow)!important;
+}
+.nearbyViewToggle069{
+  width:92px!important;
+  min-width:92px!important;
+  gap:8px!important;
+  padding:0 12px!important;
+}
+.nearbyViewToggle069 b{
+  color:#f4f6f9!important;
+  font-size:.69rem!important;
+  letter-spacing:.06em!important;
+}
+.fvToggleIcon073{
+  width:19px!important;
+  height:19px!important;
+  color:#ef4444!important;
+  stroke-width:1.9!important;
+}
+.nearbyCategoryFilter070{
+  width:44px!important;
+  min-width:44px!important;
+}
+.nearbyCategoryFilter070:focus-within{
+  border-color:var(--category)!important;
+  box-shadow:0 0 0 3px color-mix(in srgb,var(--category) 18%,transparent),var(--fv-control-shadow)!important;
+}
+.nearbyFilterGlyph0714{
+  width:19px!important;
+  height:18px!important;
+}
+.nearbyFilterGlyph0714::before{
+  width:17px!important;
+  height:16px!important;
+  filter:none!important;
+}
+.nearbyWorkspace069{
+  gap:7px!important;
+}
+.nearbyMapShell069{
+  border:1px solid #354252!important;
+  border-radius:var(--fv-card-radius)!important;
+  background:#0d151e!important;
+  box-shadow:0 8px 22px rgba(0,0,0,.22)!important;
+}
+.nearbySelectedOverlay0712{
+  padding:7px 9px!important;
+  border:1px solid rgba(255,255,255,.18)!important;
+  border-radius:9px!important;
+  background:rgba(6,10,14,.74)!important;
+  box-shadow:0 4px 14px rgba(0,0,0,.38)!important;
+  -webkit-backdrop-filter:blur(7px) saturate(.85)!important;
+  backdrop-filter:blur(7px) saturate(.85)!important;
+}
+.nearbySelectedOverlay0712 strong{
+  font-size:.88rem!important;
+  line-height:1.17!important;
+}
+.nearbySelectedOverlay0712 span{
+  font-size:.66rem!important;
+  line-height:1.25!important;
+}
+.nearbyMapActions0711{
+  right:10px!important;
+  bottom:10px!important;
+  gap:7px!important;
+}
+.nearbyMapActions0711 button{
+  width:62px!important;
+  height:60px!important;
+  min-height:60px!important;
+  gap:4px!important;
+  padding:6px!important;
+  border:1px solid #356347!important;
+  border-radius:10px!important;
+  background:rgba(10,24,17,.94)!important;
+  color:#dff7e8!important;
+  box-shadow:var(--fv-control-shadow)!important;
+}
+.nearbyMapActions0711 button b{
+  font-size:.64rem!important;
+  letter-spacing:.045em!important;
+}
+.fvMapActionIcon073{
+  width:21px!important;
+  height:21px!important;
+  color:#86efac!important;
+  stroke-width:1.9!important;
+}
+.nearbyListHead069{
+  padding:2px 3px!important;
+}
+.nearbyListHead069 strong{
+  color:#e9edf2!important;
+  font-size:.72rem!important;
+}
+.nearbyListHead069 span{
+  color:#8996a5!important;
+  font-size:.65rem!important;
+}
+.nearbyCards069{
+  gap:6px!important;
+  padding:1px 1px 10px!important;
+}
+.nearbyAccount069{
+  grid-template-columns:38px minmax(0,1fr) auto!important;
+  gap:10px!important;
+  min-height:80px!important;
+  padding:9px 11px!important;
+  border:1px solid #2d3845!important;
+  border-left:3px solid #394654!important;
+  border-radius:12px!important;
+  background:linear-gradient(150deg,#151d26,#0f151c)!important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.025)!important;
+}
+.nearbyAccount069:not(.selected):active{
+  border-color:#536273!important;
+  background:linear-gradient(150deg,#19232e,#111820)!important;
+}
+.nearbyNumber069{
+  width:38px!important;
+  height:38px!important;
+  border-radius:9px!important;
+  font-size:.82rem!important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.08)!important;
+}
+.nearbyInfo069>strong{
+  color:#f7f8fa!important;
+  font-size:.87rem!important;
+  line-height:1.2!important;
+}
+.nearbyAddress0712{
+  margin-top:4px!important;
+  color:#b0bac6!important;
+  font-size:.68rem!important;
+  line-height:1.25!important;
+}
+.nearbyMeta0712{
+  gap:6px!important;
+  margin-top:6px!important;
+  color:#8f9dac!important;
+  font-size:.62rem!important;
+  line-height:1.2!important;
+}
+.nearbyMeta0712 b{
+  font-size:.67rem!important;
+}
+.nearbyCategoryBadge0712{
+  padding:3px 6px!important;
+  border-radius:6px!important;
+  font-size:.55rem!important;
+}
+.nearbyDistance069{
+  color:#e6ebf1!important;
+  font-size:.74rem!important;
+  font-weight:800!important;
+}
+.nearbyAccount069.selected{
+  border-color:#1f7a46!important;
+  border-left-color:#1f7a46!important;
+  background:linear-gradient(150deg,#0c3b24,#0a2117 64%)!important;
+  box-shadow:0 0 0 1px rgba(31,122,70,.55),0 7px 20px rgba(0,0,0,.3)!important;
+}
+.nearbyAccount069.selected .nearbyNumber069{
+  background:#14532d!important;
+  color:#effdf5!important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.1),0 0 0 1px rgba(134,239,172,.28)!important;
+}
+.nearbyAccount069.selected .nearbyDistance069{
+  color:#a7f3d0!important;
+}
+
+/* Bring older screen controls into the same family without changing their function. */
+.smallBtn,.miniBtn,.back,.tabBtn,.presetBtn,.saveMini,.settingsPill,
+.accountQuickGrid067 button,.accountToolGrid067 button,.academyPrimary067>button,
+.academyChapterList067>button,.academySaved067>button,.academyMore067 button{
+  border-radius:var(--fv-control-radius)!important;
+}
+.settingsChoice456,.settingsGroupCard067,.accountHero067,.accountSection067,
+.compactPane,.settingsSection540,.settingsSection530{
+  border-radius:var(--fv-card-radius)!important;
+}
+
+@media(max-width:390px){
+  .nearbyHome069{gap:7px!important}
+  .nearbyCompactHead069{gap:6px!important}
+  .nearbyCompactActions069{grid-template-columns:84px 42px!important;gap:5px!important}
+  .nearbyViewToggle069{width:84px!important;min-width:84px!important;padding:0 9px!important}
+  .nearbyCategoryFilter070{width:42px!important;min-width:42px!important}
+  .nearbyCompactTitle069 h1{font-size:1rem!important}
+  .nearbyCompactTitle069 span{font-size:.61rem!important}
+  .nearbyAccount069{grid-template-columns:35px minmax(0,1fr) auto!important;gap:8px!important;min-height:76px!important;padding:8px 9px!important}
+  .nearbyNumber069{width:35px!important;height:35px!important}
+  .nearbyInfo069>strong{font-size:.82rem!important}
+  .nearbyAddress0712{font-size:.64rem!important}
+  .nearbyMeta0712{font-size:.58rem!important}
+  .nearbyDistance069{font-size:.69rem!important}
+  #appNav,.nearbyBottomNav069{gap:5px!important;padding-left:6px!important;padding-right:6px!important}
+  #appNav button,.nearbyBottomNav069 button{min-height:52px!important}
+}
