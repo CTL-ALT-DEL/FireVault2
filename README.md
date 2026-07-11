@@ -1,9 +1,17 @@
-# FireVault Build 0.71.7
+# FireVault Build 0.71.8
+
+
+## Build 0.71.8 — Compact map label and component foundation
+
+- Replaces the unrelated grey map-control cover with a compact translucent badge that sizes itself only to the selected site name and address.
+- Keeps white text and strong black shadow for map readability.
+- Introduces shared FireVault control variables for height, radius, border, background, active state, and shadow.
+- Applies the first shared control treatment to Nearby Map/List, Filter, and dynamic bottom navigation buttons.
 
 Nearby Accounts category and header redesign.
 
 
-## Build 0.71.7 — Nearby control and navigation refinement
+## Build 0.71.8 — Nearby control and navigation refinement
 
 - Removes the black background box, border, blur, and panel shadow from the selected-account overlay.
 - Displays the selected account name and address as white text with a strong black outline/shadow for map readability.
