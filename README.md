@@ -1,19 +1,18 @@
-# FireVault Build 0.56.0
+# FireVault Build 0.57.0
 
-Build 0.56.0 adds a working Home Field Dashboard Quick Capture workflow while preserving the dedicated Site Detail repair from Build 0.55.1.
+Build 0.57.0 adds the first complete in-app FireVault User Manual while preserving the repaired Site Detail layout, Quick Capture workflow, Home Layout controls, and scoped Settings design.
 
-## Highlights
+## New in this build
 
-- Added Quick Capture from Home → Site Note.
-- Capture a timestamped site note, open follow-up task, or open deficiency.
-- Deficiencies can automatically create matching follow-up tasks.
-- Quick Capture selects the active, recently used, or most recently opened account by default.
-- Activated Notes Today, Note Sites, Route Points, Daily Route, Copy Summary, and All Sites dashboard controls.
-- Saved entries immediately update Home counters and Daily Reports.
-- Preserved the Site Detail natural-height and scrolling repair from Build 0.55.1.
-- Preserved Home Layout controls, Email Settings formatting, Settings scroll recovery, and stored data.
-- Preserved FIRE in red and VAULT in white.
+- Added **Settings → Help & Manual**.
+- Added a searchable, expandable manual designed for phone and iPad layouts.
+- Added chapters for Getting Started, Today, Customer Database, Site Detail, Daily Field Workflow, Notes, Tasks, Deficiencies, Photos, GPS, Daily Route, Reports, Email, Settings, Backup, Restore, Updates, and Troubleshooting.
+- Added app-build, manual-revision, and last-reviewed metadata.
+- Added a visible documentation checkpoint explaining that the manual must be reviewed whenever features or navigation change.
+- Added pre-release and Version 1.0 verification guidance.
+- Preserved Build 0.56.0 Quick Capture and Field Dashboard controls.
+- Preserved the Site Detail natural-height and scrolling repair.
 
 ## Suggested commit message
 
-`Build 0.56.0 add Quick Capture and preserve Site Detail repair`
+`Build 0.57.0 add searchable in-app FireVault user manual`

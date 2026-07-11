@@ -4587,6 +4587,7 @@ function settingsTabs(){
     ["visibility","Modules","Enable or disable FireVault modules for a cleaner field interface."],
     ["advanced","Advanced","Optional future modules marked with an asterisk when services are required."],
     ["backup","Backup","Export, import, data safety snapshot, restore tools, and danger zone."],
+    ["manual","Help & Manual","Searchable instructions for using FireVault, field workflows, settings, reports, photos, GPS, and troubleshooting."],
     ["about","About","Build information, storage key, and FireVault roadmap notes."]
   ];
 }
@@ -4625,7 +4626,7 @@ function leaveSettingsHome572(){
 }
 
 function settingsIcon550(tab){
-  return ({tech:"👤",gps:"⌖",reports:"▤",email:"✉",overlay:"▧",themes:"◐",homeLayout:"⌂",visibility:"☰",advanced:"⚡",backup:"⇅",about:"ⓘ"})[tab]||"•";
+  return ({tech:"👤",gps:"⌖",reports:"▤",email:"✉",overlay:"▧",themes:"◐",homeLayout:"⌂",visibility:"☰",advanced:"⚡",backup:"⇅",manual:"?",about:"ⓘ"})[tab]||"•";
 }
 function settings(){
   captureSettingsScroll576();
@@ -4653,7 +4654,7 @@ function settings(){
     restoreSettingsScroll576(false);
     return;
   }
-  const saveable=!['backup','about'].includes(settingsTab);
+  const saveable=!['backup','manual','about'].includes(settingsTab);
   html(`<div class="screen settingsDetailScreen451 settingsScreen settingsScreen448 settingsScreen449 settingsDetailScreen488 settingsStable573 settingsTab-${settingsTab}" data-settings-tab="${settingsTab}">
     <div class="settingsDetailTop451 settingsDetailTop488 settingsDetailTop572">
       <button class="ghost settingsBack451 settingsBack488" id="settingsBackBtn" aria-label="Back to Settings">←</button>
@@ -5052,6 +5053,127 @@ function updateHomeLayoutPreview550(){
   });
 }
 
+
+const FIREVAULT_MANUAL_057 = [
+  {id:"start",title:"Getting Started",icon:"▶",status:"Current",summary:"Install FireVault, understand local storage, and learn the main navigation.",topics:[
+    ["What FireVault does","FireVault keeps customer sites, contacts, equipment, notes, tasks, deficiencies, photos, documents, visits, routes, and reports together in one field-focused application."],
+    ["Installing on iPhone or iPad","Open the deployed FireVault address in Safari, confirm the build number, tap Share, then choose Add to Home Screen. Open the new Home Screen icon for the full-screen app experience."],
+    ["Local-first storage","Your working vault is stored locally in the browser on the current device. Export a backup regularly—especially before installing a new build, clearing browser data, or changing devices."],
+    ["Main navigation","Today opens the field dashboard. Sites opens the customer database. Library holds manuals, forms, links, and codes when enabled. Settings controls the app layout, modules, reports, email, GPS, backups, and appearance."],
+    ["Recommended first setup","Enter your Technician Profile, review GPS permissions, set Report and Email defaults, choose a Home Layout, and export a test backup before entering production data."]
+  ]},
+  {id:"home",title:"Today / Home Screen",icon:"⌂",status:"Current",summary:"Use the daily dashboard, account cards, Field Focus, Quick Capture, and route controls.",topics:[
+    ["Home cards","Pinned Sites, Field Focus, Nearby Accounts, and Recent Accounts can be shown, hidden, expanded, or collapsed. Their behavior is controlled in Settings → Home Layout."],
+    ["Search","Use the Home search field to locate an account by site name, address, panel information, contacts, notes, or equipment."],
+    ["Quick Capture","Tap Site Note to create a timestamped note, follow-up task, or deficiency without leaving Today. Confirm the selected account before saving."],
+    ["Field Dashboard","Notes Today opens the Daily Report, Route Points opens Daily Route, Copy Summary copies the day summary, and All Sites opens the full customer list."],
+    ["Pinned Sites","Pin frequently used or high-priority customer accounts for one-tap access from Today."]
+  ]},
+  {id:"sites",title:"Customer Database",icon:"▦",status:"Current",summary:"Create, find, edit, and organize customer accounts.",topics:[
+    ["Create a site","Open Sites and tap the add control. Enter the customer name, complete address, panel information, notes, and any available GPS coordinates, then save."],
+    ["Open and edit","Tap an account to open Site Detail. Use Edit for core customer information. Changes are saved to the local vault."],
+    ["Contacts","Store customer contacts, roles, phone numbers, email addresses, and access notes under the account."],
+    ["GPS","Capture GPS while physically at the site for the best nearby-account results. Location permission and HTTPS are required."],
+    ["Search and recent use","FireVault searches multiple account fields and tracks recently opened sites for faster daily access."]
+  ]},
+  {id:"detail",title:"Site Detail",icon:"▤",status:"Current",summary:"Understand every card and action on an individual customer account.",topics:[
+    ["Important Site Info","Provides fast access to contact, access, panel, and GPS information. Use it before beginning work."],
+    ["Site Brief","Summarizes open tasks, deficiencies, photos, visits, panel information, contact data, access notes, and last activity."],
+    ["Activity Timeline","Shows recent visits, photos, documents, tasks, and deficiencies in chronological order."],
+    ["Field Card","Use the Field Card for important condensed site information needed during testing or service."],
+    ["Quick Actions","Open notes, visits, tasks, deficiencies, contacts, equipment, documents, reports, maps, and service-call tools from the account."],
+    ["Collapsible sections","Site Detail cards keep their natural height and may be opened or closed without compressing their contents."]
+  ]},
+  {id:"workflow",title:"Daily Field Workflow",icon:"✓",status:"Current",summary:"A recommended start-to-finish process for a normal service day.",topics:[
+    ["1. Start the day","Open Today, review Field Focus, open tasks, deficiencies, and the Daily Route status."],
+    ["2. Select the customer","Use Nearby Accounts, Recent Accounts, Pinned Sites, or Search to open the correct site."],
+    ["3. Review history","Read Important Site Info, Site Brief, recent activity, open tasks, previous visits, and access notes before beginning work."],
+    ["4. Document work","Add a service visit, notes, photos, tasks, deficiencies, equipment updates, and documents as work is performed."],
+    ["5. Complete reporting","Generate or review the site report, confirm recipients and email formatting, then record delivery or follow-up work."],
+    ["6. End the day","Review the Daily Report and route, copy or export required information, then make a current backup."]
+  ]},
+  {id:"notes",title:"Notes, Tasks & Deficiencies",icon:"✎",status:"Current",summary:"Document observations and track work that remains open.",topics:[
+    ["Site notes","Use notes for permanent account information or timestamped field observations. Write enough context for another technician to understand the situation later."],
+    ["Tasks","Create follow-up tasks with a clear title, status, notes, and due information when applicable. Mark tasks done only after verification."],
+    ["Deficiencies","Record the condition, location, impact, and recommended correction. A deficiency can also create a matching follow-up task."],
+    ["Quick Capture","For fast field entry, use Site Note on Today and choose Note, Task, or Deficiency."],
+    ["Daily Report connection","New entries can appear in the day summary and account history, providing a chronological record of field activity."]
+  ]},
+  {id:"photos",title:"Photos & Photo Overlay",icon:"▧",status:"Current",summary:"Capture, label, organize, and preserve site photographs.",topics:[
+    ["Add a photo","Open the account photo or document area and choose the camera or photo library. Confirm the correct account before saving."],
+    ["Useful photo notes","Describe the device, room, floor, circuit, condition, and reason the photo matters. Avoid relying on an image alone."],
+    ["Overlay settings","Settings → Photo Overlay controls the template fields, alignment, font size, colors, background, opacity, logo, and tagline."],
+    ["Storage caution","Photos can increase local browser storage quickly. Export backups and remove unnecessary duplicates."],
+    ["Release-state note","Screenshot-based manual illustrations will be added after the interface stabilizes to avoid documenting temporary layouts."]
+  ]},
+  {id:"route",title:"GPS, Nearby Sites & Daily Route",icon:"⌖",status:"Current",summary:"Capture site coordinates and document the technician's daily route.",topics:[
+    ["GPS permission","Allow location access when prompted. GPS features require a secure HTTPS deployment and may be limited by device privacy settings."],
+    ["Save site coordinates","Capture GPS while at the customer site. FireVault stores latitude, longitude, accuracy, and capture time."],
+    ["Nearby Accounts","FireVault compares the current location to saved site coordinates using the radius selected in Settings → GPS / Maps."],
+    ["Daily Route","Start route logging at the beginning of the workday, add or review waypoints, pause when appropriate, and finish the route at day end."],
+    ["Background limitation","Browser and PWA location tracking can be paused by iOS when the app is closed, suspended, or the phone sleeps. Route records should be reviewed for completeness."]
+  ]},
+  {id:"reports",title:"Reports & Email",icon:"✉",status:"Current",summary:"Configure report content, preview email formatting, and document delivery.",topics:[
+    ["Report defaults","Settings → Reports controls the default report title, format, technician profile, tasks, and deficiencies."],
+    ["Generate a site report","Open a customer account and use Report when the Reports module is enabled. Review the report before sharing."],
+    ["Email Setup","Settings → Email separates recipients, subject, signature, information tags, and a live message preview."],
+    ["Template tags","Insert supported tags such as site name, date, technician, company, phone, and email. The values are filled when the report is prepared."],
+    ["Final verification","Always verify customer recipients, CC addresses, subject, attachment/report content, signature, and sensitive site information before sending."]
+  ]},
+  {id:"settings",title:"Settings Reference",icon:"⚙",status:"Current",summary:"Understand each Settings area and the effect it has on FireVault.",topics:[
+    ["Technician","Stores the technician name, company, phone, email, and license or employee identifier reused in reports and templates."],
+    ["GPS / Maps","Controls the map provider, accuracy preference, nearby radius, GPS capture buttons, and report coordinates."],
+    ["Reports and Email","Sets report defaults, recipients, subject templates, signature templates, and email preview behavior."],
+    ["Photo Overlay","Controls the information and branding stamped onto exported or saved field photos."],
+    ["Theme","Controls the theme preset, accent, card and button appearance, contrast, text size, compact layout, and haptics."],
+    ["Home Layout","Shows or hides optional Home cards and chooses whether each remembers, opens, or collapses by default."],
+    ["Modules","Simple, Advanced, and Power modes determine which optional FireVault tools are visible. Disabling a module does not delete its data."],
+    ["Advanced","Contains future capabilities that may require cloud services, APIs, permissions, subscriptions, or backend infrastructure."],
+    ["Backup","Exports and imports the local vault, previews restore files, and provides repair and safety tools."],
+    ["About and Diagnostics","Confirm the installed build, storage key, startup health, data counts, and app stability information."]
+  ]},
+  {id:"backup",title:"Backup, Restore & Updates",icon:"⇅",status:"Current",summary:"Protect the local vault before upgrades or device changes.",topics:[
+    ["Export regularly","Go to Settings → Backup and export a JSON backup. Store copies outside the browser, preferably in more than one safe location."],
+    ["Before every update","Export a fresh backup, confirm the current build, install the new root files, confirm deployment, then verify the new build badge before entering new data."],
+    ["Restore safely","Import a recognized FireVault JSON backup, review the preview counts and build information, then confirm restore. Restore overwrites the current local vault."],
+    ["Clean installation","When an old PWA is cached, remove the Home Screen app, clear the site data for the deployed address, reopen in Safari, verify the build badge, and add it again."],
+    ["Do not assume cloud sync","Until cloud synchronization is explicitly released, each browser/device has its own local copy of the vault."]
+  ]},
+  {id:"trouble",title:"Troubleshooting",icon:"!",status:"Current",summary:"Resolve common loading, saving, GPS, layout, and deployment problems.",topics:[
+    ["Wrong build number","The deployed repository or browser cache is still serving an older release. Verify the root index files, GitHub Pages deployment, and the build badge."],
+    ["App does not load","Reload once, confirm network access for the initial deployment, inspect the startup error message, then clear only the FireVault site data if necessary."],
+    ["Changes do not save","Confirm browser storage is available, the device is not in private browsing, and storage has not been cleared or exhausted."],
+    ["GPS does not work","Confirm HTTPS, iOS location permission, FireVault GPS settings, and that precise location is enabled when accurate nearby results are needed."],
+    ["Layout is clipped or compressed","Confirm the correct build is installed. Capture a screenshot with the build badge and identify the exact page, card, and action that produced the issue."],
+    ["Restore fails","Use an unmodified FireVault JSON backup, verify the file is readable, and compare its preview details before confirming restore."]
+  ]},
+  {id:"release",title:"Release & Manual Status",icon:"ⓘ",status:"Living document",summary:"Understand how this documentation will be maintained through Version 1.0.",topics:[
+    ["Manual revision","This manual revision matches FireVault Build 0.57.0 and was last reviewed in July 2026."],
+    ["Living documentation","Every feature release should include a documentation review. New controls must be documented and changed workflows must be rechecked."],
+    ["Pre-release warning","FireVault is still under active development. Labels, layouts, and workflows may change before Version 1.0."],
+    ["Screenshot policy","Annotated screenshots should be added after major screens reach release-candidate stability."],
+    ["Verification requirement","Before public release, every chapter should be tested against a clean installation on supported iPhone and iPad layouts."]
+  ]}
+];
+let manualQuery057="";
+function manualSearchText057(ch){ return [ch.title,ch.summary,...ch.topics.flat()].join(" ").toLowerCase(); }
+function manualPanel057(){
+  const q=manualQuery057.trim().toLowerCase();
+  const chapters=FIREVAULT_MANUAL_057.filter(ch=>!q || manualSearchText057(ch).includes(q));
+  return `<div class="manual057">
+    <section class="manualHero057"><div><span class="manualEyebrow057">Living documentation</span><h2>${fireVaultBrand575()} User Manual</h2><p>Complete field guide for Build ${BUILD}. Review this manual again before Version 1.0 because features and labels may change during development.</p></div><div class="manualMeta057"><span><b>${BUILD}</b>App build</span><span><b>0.57.0</b>Manual revision</span><span><b>July 2026</b>Last reviewed</span></div></section>
+    <div class="manualSearchWrap057"><span>⌕</span><input id="manualSearch057" type="search" value="${esc(manualQuery057)}" placeholder="Search the FireVault manual…" autocomplete="off"><button class="ghost" id="manualClear057" ${manualQuery057?"":"disabled"}>Clear</button></div>
+    <div class="manualNotice057"><strong>Documentation checkpoint</strong><p>This manual is part of the application and must be reviewed whenever a feature, label, navigation path, storage behavior, or supported device layout changes.</p></div>
+    <div class="manualChapterGrid057">${chapters.length?chapters.map((ch,i)=>`<details class="manualChapter057" ${q||i===0?"open":""}><summary><span class="manualIcon057">${esc(ch.icon)}</span><span><strong>${esc(ch.title)}</strong><small>${esc(ch.summary)}</small></span><em>${esc(ch.status)}</em><b>⌄</b></summary><div class="manualTopics057">${ch.topics.map(([title,body])=>`<article><h3>${esc(title)}</h3><p>${esc(body)}</p></article>`).join("")}</div></details>`).join(""):`<div class="manualEmpty057"><strong>No manual topics found</strong><p>Try a broader term such as email, GPS, photos, reports, backup, tasks, or site detail.</p></div>`}</div>
+  </div>`;
+}
+function wireManual057(){
+  const input=document.getElementById("manualSearch057");
+  if(input){ input.oninput=()=>{ manualQuery057=input.value; settings(); requestAnimationFrame(()=>{ const next=document.getElementById("manualSearch057"); if(next){ next.focus(); next.setSelectionRange(next.value.length,next.value.length); } }); }; }
+  const clear=document.getElementById("manualClear057");
+  if(clear) clear.onclick=()=>{ manualQuery057=""; settings(); };
+}
+
 function settingsPanel(){
   const s=data.settings, t=s.theme, tech=s.technician, email=s.email, r=s.reports, o=s.overlay, a=s.advanced, gps=s.gps||{};
   const saveButton=(label="Save")=>`<button class="primary saveMini" id="saveSettings">${esc(label)}</button>`;
@@ -5097,6 +5219,7 @@ function settingsPanel(){
   </div>`;
 
   if(settingsTab==="backup") return backupSettingsPanel();
+  if(settingsTab==="manual") return manualPanel057();
 
   return `<div class="settingsStack settingsStack540">
     ${settingsSection540("Fire alarm field system",`About FireVault`,`A modular field knowledge system built to keep account history, service notes, and technician tools together.`,`<div class="aboutBrand540">${fireVaultBrand575()}<span>Field Vault System</span></div><p class="aboutCopy540">FireVault is designed for fast field reference, local-first reliability, and a simple interface that can reveal advanced tools only when they are needed.</p>`,"red")}
@@ -5106,6 +5229,7 @@ function settingsPanel(){
 function wireSettingsPanel(){
   const saveBtn=document.getElementById("saveSettings"); if(saveBtn) saveBtn.onclick=saveSettings;
   if(settingsTab==="overlay") wireOverlaySettings510();
+  if(settingsTab==="manual") wireManual057();
   ["emailSubject","emailSig"].forEach(id=>{ const el=document.getElementById(id); if(el){ el.addEventListener("focus",()=>lastEmailTemplateField=id); el.addEventListener("input",updateEmailPreview); } });
   [["emailTo","emailPreviewTo530","Customer email added when sending"],["emailCc","emailPreviewCc530","None"]].forEach(([inputId,previewId,fallback])=>{ const input=document.getElementById(inputId); const preview=document.getElementById(previewId); if(input&&preview) input.addEventListener("input",()=>preview.textContent=input.value.trim()||fallback); });
   document.querySelectorAll(".emailTagChip").forEach(b=>b.onclick=()=>{ const target=document.getElementById(lastEmailTemplateField) || document.getElementById("emailSubject"); insertAtCursor(target, b.dataset.emailTag || ""); });
@@ -6013,7 +6137,9 @@ function diagnostics(){
 }
 function showChangelog(){
   const notes = [
-    "Build 0.56.0 activates the complete Field Dashboard workflow on Home.",
+    "Build 0.57.0 adds the complete searchable FireVault User Manual inside Settings.",
+    "Manual chapters document installation, Today, Sites, Site Detail, field workflow, notes, tasks, deficiencies, photos, GPS, route tracking, reports, email, settings, backups, updates, and troubleshooting.",
+    "Added living-documentation revision metadata and a release-state review requirement.",
     "Added Quick Capture for timestamped site notes, follow-up tasks, and deficiencies without leaving Today.",
     "Quick Capture defaults to the active or most recently used account and can create a matching task from a deficiency.",
     "Field Dashboard counters now open the correct Daily Report and Daily Route workspaces.",
