@@ -325,11 +325,8 @@ function applyFeatureVisibility(){
   document.body.classList.toggle("view-simple472", mode === "simple");
   document.body.classList.toggle("view-advanced472", mode === "advanced");
   document.body.classList.toggle("view-power472", mode === "power");
-  const navLibrary=document.getElementById("nav-library");
   const appNav=document.getElementById("appNav");
-  const libraryVisible=featureOn("library");
-  if(navLibrary) navLibrary.style.display = libraryVisible ? "" : "none";
-  if(appNav) appNav.classList.toggle("fvNavThree0733", !libraryVisible);
+  if(appNav) appNav.classList.remove("fvNavThree0733");
 }
 function setViewMode(mode){ data.settings.app={...(data.settings.app||{}),viewMode:mode}; save(); toast(`${mode === "power" ? "Technician Power Mode" : mode === "advanced" ? "Advanced View" : "Simple View"} enabled.`); route("home"); }
 
@@ -1690,7 +1687,7 @@ function injectContextualHelp060(){
 function render(){
   try{
     if(view!=="home") restoreAppChrome572();
-    const routes = {home, dashboard068, dailySummary, routeLog, actionCenter, pinnedSites:pinnedSitesManager567, sites, nearbySites, attention:attentionQueue, siteDetail, visits, visitDetail, checklist, siteForm, contactsList, contactForm, siteDocs, siteDocForm, equipmentList, equipmentForm, tasks, taskForm, deficiencies, deficiencyForm, report, library, resourceForm, jobMode, serviceVisit, settings, diagnostics, dataTools};
+    const routes = {home, tools:tools0734, dashboard068, dailySummary, routeLog, actionCenter, pinnedSites:pinnedSitesManager567, sites, nearbySites, attention:attentionQueue, siteDetail, visits, visitDetail, checklist, siteForm, contactsList, contactForm, siteDocs, siteDocForm, equipmentList, equipmentForm, tasks, taskForm, deficiencies, deficiencyForm, report, library, resourceForm, jobMode, serviceVisit, settings, diagnostics, dataTools};
     (routes[view] || home)();
     document.body.classList.toggle("homeFullscreen480", view === "home");
     document.body.classList.toggle("homeLayoutFixed570", view === "home");
@@ -2197,6 +2194,85 @@ function pinnedSitesManager567(){
 }
 
 
+
+const CELLULAR_COVERAGE_LINKS_0734={
+  att:"https://www.att.com/maps/wireless-coverage.html",
+  verizon:"https://www.verizon.com/coverage-map/",
+  tmobile:"https://www.t-mobile.com/coverage/coverage-map",
+  fcc:"https://broadbandmap.fcc.gov/"
+};
+let coverageLocation0734=null;
+
+function openCoverageMap0734(carrier){
+  const url=CELLULAR_COVERAGE_LINKS_0734[carrier];
+  if(!url){ toast("Coverage map is unavailable."); return; }
+  const opened=window.open(url,"_blank","noopener,noreferrer");
+  if(!opened) location.href=url;
+}
+function coverageCoordinateLine0734(){
+  if(!coverageLocation0734) return "Use your current GPS position, then paste the coordinates into a carrier map when needed.";
+  return `${coverageLocation0734.lat.toFixed(6)}, ${coverageLocation0734.lng.toFixed(6)} • ${new Date(coverageLocation0734.at).toLocaleTimeString([], {hour:"numeric",minute:"2-digit"})}`;
+}
+function refreshCoverageLocation0734(){
+  const line=document.getElementById("coverageLocationLine0734");
+  const copy=document.getElementById("copyCoverageLocation0734");
+  if(!navigator.geolocation){ if(line) line.textContent="GPS is unavailable in this browser."; return; }
+  if(line) line.textContent="Getting current GPS position…";
+  navigator.geolocation.getCurrentPosition(pos=>{
+    coverageLocation0734={lat:Number(pos.coords.latitude),lng:Number(pos.coords.longitude),at:Date.now()};
+    if(line) line.textContent=coverageCoordinateLine0734();
+    if(copy) copy.disabled=false;
+  },err=>{
+    if(line) line.textContent=err?.message||"Current location could not be retrieved.";
+  },{enableHighAccuracy:true,timeout:12000,maximumAge:30000});
+}
+function copyCoverageLocation0734(){
+  if(!coverageLocation0734){ refreshCoverageLocation0734(); return; }
+  const text=`${coverageLocation0734.lat.toFixed(6)}, ${coverageLocation0734.lng.toFixed(6)}`;
+  if(navigator.clipboard?.writeText) navigator.clipboard.writeText(text).then(()=>toast("Coordinates copied."),()=>toast("Clipboard unavailable."));
+  else toast("Clipboard unavailable.");
+}
+function tools0734(){
+  html(`<div class="screen toolsScreen0734">
+    <div class="toolsHero0734">
+      <div><span>FIELD UTILITIES</span><h1>Tools</h1><p>Live reference tools for service calls and travel.</p></div>
+      <button class="homeBuildPill481 toolsBuild0734" id="toolsRelease0734" aria-label="Release notes">${BUILD}</button>
+    </div>
+
+    <section class="card coverageTool0734">
+      <div class="coverageHead0734"><div><span class="coverageEyebrow0734">CELLULAR COVERAGE</span><h2>Carrier Coverage Maps</h2><p>Open the latest official coverage map for each nationwide carrier.</p></div><div class="coverageSignal0734" aria-hidden="true"><i></i><i></i><i></i><i></i></div></div>
+      <div class="carrierGrid0734">
+        <button class="carrierBtn0734 att0734" data-coverage-carrier="att"><strong>AT&amp;T</strong><span>Official wireless map</span><em>Open Map →</em></button>
+        <button class="carrierBtn0734 verizon0734" data-coverage-carrier="verizon"><strong>Verizon</strong><span>Official coverage map</span><em>Open Map →</em></button>
+        <button class="carrierBtn0734 tmobile0734" data-coverage-carrier="tmobile"><strong>T-Mobile</strong><span>Official 5G &amp; LTE map</span><em>Open Map →</em></button>
+      </div>
+      <button class="fccCompare0734" data-coverage-carrier="fcc"><span><strong>FCC National Broadband Map</strong><small>Independent mobile-coverage comparison</small></span><em>Compare →</em></button>
+      <div class="coverageLocation0734">
+        <div><strong>Current job location</strong><span id="coverageLocationLine0734">${esc(coverageCoordinateLine0734())}</span></div>
+        <div><button class="ghost" id="getCoverageLocation0734">Use GPS</button><button class="ghost" id="copyCoverageLocation0734" ${coverageLocation0734?"":"disabled"}>Copy</button></div>
+      </div>
+      <p class="coverageNote0734">Coverage maps show estimated outdoor service. Buildings, terrain, weather, network load, antennas, and device bands can change actual field performance.</p>
+    </section>
+
+    <div class="toolsSectionTitle0734"><strong>FireVault Utilities</strong><span>Quick access</span></div>
+    <div class="toolsGrid0734">
+      <button class="card toolTile0734" id="toolsRoute0734">${fvIcon073("nearby","toolIcon0734")}<span><strong>Daily Route</strong><small>Waypoints and travel history</small></span></button>
+      <button class="card toolTile0734" id="toolsData0734">${fvIcon073("settings","toolIcon0734")}<span><strong>Backup &amp; Data</strong><small>Snapshots, restore, and updates</small></span></button>
+      ${featureOn("library")?`<button class="card toolTile0734" id="toolsLibrary0734">${fvIcon073("library","toolIcon0734")}<span><strong>Library</strong><small>Manuals and reference files</small></span></button>`:""}
+      ${featureOn("diagnostics")?`<button class="card toolTile0734" id="toolsDiagnostics0734">${fvIcon073("tools","toolIcon0734")}<span><strong>Diagnostics</strong><small>Startup and vault health</small></span></button>`:""}
+    </div>
+    <div class="buildRevisionSpacer475" aria-hidden="true"></div>
+  </div>`);
+  document.querySelectorAll("[data-coverage-carrier]").forEach(btn=>btn.onclick=()=>openCoverageMap0734(btn.dataset.coverageCarrier));
+  document.getElementById("getCoverageLocation0734")?.addEventListener("click",refreshCoverageLocation0734);
+  document.getElementById("copyCoverageLocation0734")?.addEventListener("click",copyCoverageLocation0734);
+  document.getElementById("toolsRoute0734")?.addEventListener("click",()=>route("routeLog"));
+  document.getElementById("toolsData0734")?.addEventListener("click",()=>route("dataTools"));
+  document.getElementById("toolsLibrary0734")?.addEventListener("click",()=>route("library"));
+  document.getElementById("toolsDiagnostics0734")?.addEventListener("click",()=>route("diagnostics"));
+  document.getElementById("toolsRelease0734")?.addEventListener("click",showChangelog);
+}
+
 function dashboard068(){
   const taskRows = allTaskRows();
   const taskCounts = taskFilterCounts(taskRows);
@@ -2432,7 +2508,7 @@ function home(){
     <nav class="nearbyBottomNav069"><button class="active" id="homeNearbyNav069" aria-label="Refresh nearby accounts using current GPS">${fvIcon073("nearby","fvNavIcon073")}<span>Nearby</span></button><button id="homeAccounts069">${fvIcon073("accounts","fvNavIcon073")}<span>Accounts</span></button><button id="homeToolsNav069">${fvIcon073("tools","fvNavIcon073")}<span>Tools</span></button><button id="homeSettingsNav069">${fvIcon073("settings","fvNavIcon073")}<span>Settings</span></button></nav>
   </div>`);
   document.getElementById('homeAccounts069').onclick=()=>route('sites');
-  document.getElementById('homeToolsNav069').onclick=()=>route('dashboard068');
+  document.getElementById('homeToolsNav069').onclick=()=>route('tools');
   document.getElementById('homeSettingsNav069').onclick=()=>route('settings');
   const refreshNearbyHome0714=()=>{resetNearbyMapOverview069(false);runNearbyScan0652('home');};
   document.getElementById('homeNearbyNav069').onclick=refreshNearbyHome0714;
@@ -7630,7 +7706,7 @@ function diagnostics(){
 }
 function showChangelog(){
   const notes = [
-    "Build 0.73.3 rebuilds the bottom navigation used outside Nearby Accounts, aligns every button in equal-width safe-area-aware cells, and replaces internal planning language with clear descriptions of current controls and limitations.",
+    "Build 0.73.4 rebuilds the bottom navigation used outside Nearby Accounts, aligns every button in equal-width safe-area-aware cells, and replaces internal planning language with clear descriptions of current controls and limitations.",
     "Build 0.73.2 restores the brighter selected-account green and adds an old-school terminal typing sequence for database and latest-version checks on the splash screen.",
     "Build 0.73.1 keeps different buildings at the same address as separate customer records by matching the complete Account ID, including CLSS dash suffixes such as G7C1234-01 and G7C1234-02.",
     "Build 0.73.0 introduced the unified FireVault design system and consistent dynamic navigation controls.",

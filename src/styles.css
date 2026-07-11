@@ -14619,7 +14619,7 @@ input:focus,textarea:focus,select:focus{
 }
 .staticMarker069.selected span{color:#062412!important}
 
-/* Build 0.73.3 — rebuilt global bottom navigation and cleaner user-facing pages */
+/* Build 0.73.4 — rebuilt global bottom navigation and cleaner user-facing pages */
 body.app-booted533:not(.homeFullscreen480){
   --navH:calc(74px + env(safe-area-inset-bottom,0px));
 }
@@ -14755,3 +14755,37 @@ body.app-booted533:not(.homeFullscreen480) main{
 #appNav.fvNavThree0733 #nav-library{display:none!important}
 body.homeFullscreen480 > #appNav,
 body.app-booted533.homeFullscreen480 > #appNav{display:none!important}
+
+
+/* Build 0.73.4 — Tools hub and live cellular coverage maps */
+.toolsScreen0734{padding:14px 12px 30px;display:flex;flex-direction:column;gap:14px}
+.toolsHero0734{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;padding:4px 2px 2px}
+.toolsHero0734>div>span,.coverageEyebrow0734{display:block;color:#7dd3fc;font-size:10px;font-weight:900;letter-spacing:.16em;text-transform:uppercase}
+.toolsHero0734 h1{margin:3px 0 2px;font-size:30px;line-height:1;color:#f8fafc}
+.toolsHero0734 p{margin:0;color:#94a3b8;font-size:13px}
+.toolsBuild0734{position:static!important;flex:0 0 auto}
+.coverageTool0734{padding:16px!important;background:linear-gradient(155deg,rgba(18,27,38,.98),rgba(7,11,16,.99))!important;border-color:#334155!important;overflow:hidden}
+.coverageHead0734{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:14px}
+.coverageHead0734 h2{margin:3px 0 5px;font-size:20px;color:#f8fafc}
+.coverageHead0734 p{margin:0;max-width:270px;color:#94a3b8;font-size:12px;line-height:1.42}
+.coverageSignal0734{display:flex;align-items:flex-end;gap:3px;height:28px;padding:4px 2px}
+.coverageSignal0734 i{display:block;width:5px;border-radius:2px 2px 0 0;background:#22c55e;box-shadow:0 0 8px rgba(34,197,94,.24)}
+.coverageSignal0734 i:nth-child(1){height:7px}.coverageSignal0734 i:nth-child(2){height:12px}.coverageSignal0734 i:nth-child(3){height:18px}.coverageSignal0734 i:nth-child(4){height:25px}
+.carrierGrid0734{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.carrierBtn0734{min-width:0;min-height:104px;padding:12px 9px;border:1px solid #334155;border-radius:12px;display:flex;flex-direction:column;align-items:flex-start;justify-content:flex-start;text-align:left;color:#fff;box-shadow:inset 0 1px 0 rgba(255,255,255,.08),0 5px 14px rgba(0,0,0,.24)}
+.carrierBtn0734 strong{font-size:17px;line-height:1.05}.carrierBtn0734 span{margin-top:6px;color:rgba(255,255,255,.72);font-size:10.5px;line-height:1.25}.carrierBtn0734 em{margin-top:auto;color:#fff;font-size:10px;font-style:normal;font-weight:900;letter-spacing:.04em}
+.carrierBtn0734.att0734{background:linear-gradient(145deg,#0c5f91,#063c5d)}
+.carrierBtn0734.verizon0734{background:linear-gradient(145deg,#3a1f27,#180d12);border-color:#6b3443}
+.carrierBtn0734.tmobile0734{background:linear-gradient(145deg,#8d0757,#520333);border-color:#bd267d}
+.carrierBtn0734:active,.fccCompare0734:active{transform:translateY(1px) scale(.985)}
+.fccCompare0734{width:100%;margin-top:9px;padding:12px 13px;border:1px solid #3b4b61;border-radius:11px;background:#111a25;color:#e2e8f0;display:flex;align-items:center;justify-content:space-between;gap:12px;text-align:left}
+.fccCompare0734 span{display:flex;flex-direction:column;gap:3px}.fccCompare0734 strong{font-size:13px}.fccCompare0734 small{font-size:10.5px;color:#94a3b8}.fccCompare0734 em{font-size:11px;color:#7dd3fc;font-style:normal;font-weight:900;white-space:nowrap}
+.coverageLocation0734{margin-top:10px;padding:12px;border:1px solid #29384a;border-radius:11px;background:rgba(3,8,13,.55);display:flex;align-items:center;justify-content:space-between;gap:10px}
+.coverageLocation0734>div:first-child{min-width:0;display:flex;flex-direction:column;gap:4px}.coverageLocation0734 strong{font-size:12px;color:#e2e8f0}.coverageLocation0734 span{font-size:10.5px;color:#94a3b8;line-height:1.35;overflow-wrap:anywhere}.coverageLocation0734>div:last-child{display:flex;gap:6px;flex:0 0 auto}.coverageLocation0734 button{min-height:36px;padding:7px 10px;font-size:10.5px}
+.coverageNote0734{margin:10px 1px 0;color:#64748b;font-size:10px;line-height:1.45}
+.toolsSectionTitle0734{display:flex;align-items:center;justify-content:space-between;padding:0 2px}.toolsSectionTitle0734 strong{font-size:13px;color:#e2e8f0}.toolsSectionTitle0734 span{font-size:10px;color:#64748b;text-transform:uppercase;letter-spacing:.12em}
+.toolsGrid0734{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
+.toolTile0734{min-height:82px!important;padding:13px!important;display:flex!important;align-items:center!important;justify-content:flex-start!important;gap:11px!important;text-align:left!important;background:linear-gradient(150deg,#141d27,#0b1017)!important;border-color:#2f3d4d!important}
+.toolTile0734 .toolIcon0734{width:23px;height:23px;flex:0 0 23px;color:#7dd3fc;stroke:currentColor;fill:none;stroke-width:1.8}
+.toolTile0734>span{display:flex;flex-direction:column;gap:4px;min-width:0}.toolTile0734 strong{font-size:12px;color:#f1f5f9}.toolTile0734 small{font-size:10px;line-height:1.3;color:#8492a3}
+@media(max-width:370px){.carrierGrid0734{gap:6px}.carrierBtn0734{padding:10px 7px;min-height:100px}.carrierBtn0734 strong{font-size:15px}.coverageLocation0734{align-items:flex-start;flex-direction:column}.coverageLocation0734>div:last-child{width:100%}.coverageLocation0734 button{flex:1}}

@@ -1,6 +1,6 @@
 {
-  "build": "0.73.3",
+  "build": "0.73.4",
   "released": "2026-07-11",
-  "note": "Rebuilds the global bottom navigation for consistent alignment across non-Nearby pages.",
-  "notes": "Matches the Nearby control language, improves safe-area spacing, and removes user-facing roadmap and app-development-goal text."
+  "note": "Adds a Tools hub with live cellular coverage references for AT&T, Verizon, and T-Mobile.",
+  "notes": "Uses official carrier maps, adds an FCC comparison map, current-location coordinate capture, and makes Tools a consistent global navigation destination."
 }
