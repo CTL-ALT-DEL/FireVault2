@@ -13037,3 +13037,50 @@ body.app-booted533.settingsChrome572 > #appNav{
   .settingsTab-manual .academyArticleInfo0641{font-size:.72rem!important}
   .settingsTab-manual .academyArticleBody058 section{padding:14px!important}
 }
+
+
+/* Build 0.65.1 — Customer CSV importer */
+.settingsChoice-customerImport .settingsChoiceIcon451{background:linear-gradient(145deg,#075985,#0e7490)!important;color:#cffafe!important}
+.customerImportStack065{padding-bottom:calc(130px + env(safe-area-inset-bottom))!important}
+.customerImportHero065{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:14px;align-items:center}
+.customerImportHero065>div{display:flex;align-items:baseline;gap:10px;min-width:0}
+.customerImportHero065>div strong{font-size:2rem;line-height:1;color:#67e8f9}
+.customerImportHero065>div span{color:#cbd5e1;font-size:.88rem}
+.customerFileButton065{display:inline-flex!important;align-items:center;justify-content:center;min-height:46px!important;padding:0 16px!important;white-space:nowrap;cursor:pointer}
+.customerLastImport065{display:grid;gap:4px;margin-top:14px;padding:13px 14px;border:1px solid rgba(34,211,238,.18);border-radius:14px;background:rgba(8,47,73,.34)}
+.customerLastImport065 strong{color:#cffafe}.customerLastImport065 span,.customerLastImport065 em{color:#94a3b8;font-style:normal;font-size:.78rem;line-height:1.45}
+.customerImportError065{padding:14px;border-radius:12px;background:rgba(127,29,29,.36);border:1px solid rgba(248,113,113,.36);color:#fecaca;line-height:1.5}
+.customerImportMetrics065{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:9px}
+.customerImportMetrics065>div{display:grid;gap:4px;padding:13px 8px;border:1px solid rgba(148,163,184,.16);border-radius:13px;background:#0b1220;text-align:center}
+.customerImportMetrics065 strong{font-size:1.35rem;color:#f8fafc}.customerImportMetrics065 span{font-size:.68rem;color:#94a3b8;text-transform:uppercase;letter-spacing:.05em}
+.customerImportMetrics065 .new strong{color:#86efac}.customerImportMetrics065 .update strong{color:#7dd3fc}.customerImportMetrics065 .review strong{color:#fbbf24}
+.customerImportChecks065{margin-top:12px}.customerImportChecks065 label{display:flex;gap:12px;align-items:flex-start;padding:13px 14px;border:1px solid rgba(251,191,36,.22);border-radius:14px;background:rgba(120,53,15,.16)}
+.customerImportChecks065 input{width:20px!important;height:20px!important;min-height:20px!important;margin-top:1px}.customerImportChecks065 span{display:grid;gap:4px}.customerImportChecks065 strong{color:#fde68a}.customerImportChecks065 small{color:#cbd5e1;line-height:1.45}
+.customerImportActions065{display:grid;grid-template-columns:1fr auto;gap:10px;margin-top:12px}
+.customerImportResult065{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:9px;margin-bottom:12px}.customerImportResult065>div{display:grid;gap:4px;padding:12px;border-radius:12px;background:rgba(76,29,149,.22);border:1px solid rgba(167,139,250,.2);text-align:center}.customerImportResult065 strong{font-size:1.25rem;color:#ddd6fe}.customerImportResult065 span{font-size:.68rem;color:#a5b4fc;text-transform:uppercase}
+.customerImportFilters065{display:flex;gap:8px;overflow-x:auto;padding:2px 0 10px;scrollbar-width:none}.customerImportFilters065::-webkit-scrollbar{display:none}.customerImportFilters065 button{flex:0 0 auto;min-height:38px!important;padding:0 12px!important}.customerImportFilters065 button.active{border-color:#22d3ee!important;background:rgba(8,145,178,.2)!important;color:#cffafe!important}
+.customerImportRows065{display:grid;gap:9px;max-height:560px;overflow:auto;padding-right:3px;overscroll-behavior:contain}
+.customerImportRow065{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:11px;align-items:start;padding:12px;border:1px solid rgba(148,163,184,.15);border-radius:13px;background:#0b1220}
+.customerImportRow065>div{display:grid;gap:3px;min-width:0}.customerImportRow065>div strong{color:#f8fafc;font-size:.92rem;line-height:1.3;overflow-wrap:anywhere}.customerImportRow065 small,.customerImportRow065 em,.customerImportRow065 p{color:#94a3b8;font-size:.73rem;line-height:1.45;font-style:normal;overflow-wrap:anywhere}.customerImportRow065 p{margin:3px 0 0;color:#fca5a5}.customerImportRow065 p.notice{color:#93c5fd}.customerImportRow065>b{color:#64748b;font-size:.67rem;white-space:nowrap}
+.customerImportState065{display:inline-flex;align-items:center;justify-content:center;min-width:62px;padding:4px 7px;border-radius:999px;background:#1e293b;color:#cbd5e1;font-size:.65rem;font-weight:800;text-transform:uppercase;letter-spacing:.04em}
+.customerImportRow065.new .customerImportState065{background:rgba(22,101,52,.45);color:#bbf7d0}.customerImportRow065.update .customerImportState065{background:rgba(3,105,161,.4);color:#bae6fd}.customerImportRow065.review .customerImportState065{background:rgba(146,64,14,.42);color:#fde68a}.customerImportRow065.skip .customerImportState065{background:rgba(127,29,29,.4);color:#fecaca}
+.importedAccountCard065{flex:none!important;min-height:max-content!important;overflow:visible!important}
+.importedAccountGrid065{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;margin-top:10px}.importedAccountGrid065>div{display:grid;gap:4px;padding:11px 12px;border-radius:12px;border:1px solid rgba(34,211,238,.15);background:rgba(8,47,73,.25)}.importedAccountGrid065 strong{color:#67e8f9;font-size:.68rem;text-transform:uppercase;letter-spacing:.04em}.importedAccountGrid065 span{color:#e2e8f0;font-size:.9rem;overflow-wrap:anywhere}
+@media(max-width:620px){.customerImportHero065{grid-template-columns:1fr}.customerFileButton065{width:100%}.customerImportMetrics065{grid-template-columns:repeat(2,minmax(0,1fr))}.customerImportMetrics065>div:first-child{grid-column:1/-1}.customerImportActions065{grid-template-columns:1fr}.customerImportResult065{grid-template-columns:repeat(2,minmax(0,1fr))}.customerImportRow065{grid-template-columns:1fr}.customerImportRow065>b{grid-row:1;justify-self:end}.customerImportState065{grid-row:1;justify-self:start}.customerImportRow065>div{grid-column:1/-1}.importedAccountGrid065{grid-template-columns:1fr}}
+
+/* Build 0.65.1 — Customer coordinate calculation */
+.geocodeMetrics0651{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.geocodeMetrics0651>div{display:grid;gap:5px;padding:14px 10px;border-radius:14px;border:1px solid rgba(148,163,184,.16);background:#0b1220;text-align:center}
+.geocodeMetrics0651 strong{font-size:1.45rem;line-height:1;color:#f8fafc}.geocodeMetrics0651 span{font-size:.68rem;line-height:1.25;color:#94a3b8;text-transform:uppercase;letter-spacing:.05em}
+.geocodeMetrics0651 .ready{border-color:rgba(34,197,94,.25);background:rgba(20,83,45,.2)}.geocodeMetrics0651 .ready strong{color:#86efac}
+.geocodeMetrics0651 .needed{border-color:rgba(34,211,238,.25);background:rgba(8,47,73,.26)}.geocodeMetrics0651 .needed strong{color:#67e8f9}
+.geocodeMetrics0651 .failed{border-color:rgba(251,191,36,.22);background:rgba(120,53,15,.18)}.geocodeMetrics0651 .failed strong{color:#fbbf24}
+.geocodeNotice0651{display:grid;gap:5px;margin-top:12px;padding:13px 14px;border:1px solid rgba(34,211,238,.2);border-radius:14px;background:linear-gradient(145deg,rgba(8,47,73,.36),rgba(15,23,42,.78))}
+.geocodeNotice0651 strong{color:#cffafe;font-size:.86rem}.geocodeNotice0651 span{color:#cbd5e1;font-size:.78rem;line-height:1.5}
+.geocodeProgress0651{display:grid;gap:7px;margin-top:12px}.geocodeProgress0651>div{height:9px;overflow:hidden;border-radius:999px;background:#020617;border:1px solid rgba(148,163,184,.16)}.geocodeProgress0651>div>span{display:block;height:100%;width:0;border-radius:inherit;background:linear-gradient(90deg,#0891b2,#22c55e);transition:width .25s ease}.geocodeProgress0651 p{margin:0;color:#cbd5e1;font-size:.75rem;line-height:1.45}
+.geocodeActions0651{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;margin-top:12px}
+.customerImportChecks065{display:grid;gap:9px}.customerImportChecks065 label+label{border-color:rgba(34,211,238,.18);background:rgba(8,47,73,.16)}.customerImportChecks065 label+label strong{color:#cffafe}
+.coordinateState0651{display:inline-flex;width:max-content;max-width:100%;align-items:center;margin-top:4px;padding:4px 8px;border-radius:999px;font-size:.66rem;font-weight:800;line-height:1.2;overflow-wrap:anywhere}
+.coordinateState0651.ready{background:rgba(22,101,52,.4);color:#bbf7d0}.coordinateState0651.existing{background:rgba(30,64,175,.35);color:#bfdbfe}.coordinateState0651.needed{background:rgba(14,116,144,.34);color:#cffafe}.coordinateState0651.failed{background:rgba(146,64,14,.38);color:#fde68a}
+.coordinateMatch0651{color:#a5f3fc!important}
+@media(max-width:620px){.geocodeMetrics0651{grid-template-columns:1fr}.geocodeMetrics0651>div{grid-template-columns:auto 1fr;align-items:center;text-align:left}.geocodeMetrics0651 strong{font-size:1.25rem}.geocodeActions0651{grid-template-columns:1fr}.coordinateState0651{width:100%;border-radius:10px}}

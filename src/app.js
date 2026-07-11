@@ -1,4 +1,4 @@
-import { BUILD, KEY, ACTIVE_JOB_KEY, loadData, saveData, ensureSite, fullAddress, esc, uid, downloadBlob, syncSummary, syncQueue, syncConflicts, syncActivity, createSyncPackage, importSyncPackage, resolveSyncConflict, notePackageExport, deviceIdentity } from "./storage.js";
+import { BUILD, KEY, ACTIVE_JOB_KEY, loadData, saveData, ensureSite, fullAddress, esc, uid, downloadBlob, syncSummary, syncQueue, syncConflicts, syncActivity, createSyncPackage, importSyncPackage, resolveSyncConflict, notePackageExport, deviceIdentity, recordSyncActivity } from "./storage.js";
 window.__FIREVAULT_MODULE_READY = true;
 
 let data = loadData();
@@ -9,6 +9,7 @@ let settingsTab = "tech";
 let settingsRailScroll = 0;
 const SETTINGS_SCROLL_KEY_576 = "firevault_settings_scroll_05076";
 let settingsSubmenuReturn576 = false;
+let customerImportState065 = {fileName:"",headers:[],rows:[],summary:null,error:"",includeFlagged:false,requireCoordinates:true,filter:"all",lastResult:null,geocoding:{active:false,total:0,complete:0,matched:0,noMatch:0,error:0},geocodeError:""};
 let settingsScrollState576 = loadSettingsScrollState576();
 const HOME_CARD_STATE_KEY_5100 = "firevault_home_card_state_05100";
 let homeCardState5100 = loadHomeCardState5100();
@@ -787,7 +788,7 @@ function checklist(){
 
 function siteSearchBlob(s){
   ensureSite(s);
-  const parts=[s.name, fullAddress(s), s.panelManufacturer, s.panelModel, s.notes];
+  const parts=[s.name, fullAddress(s), s.panelManufacturer, s.panelModel, s.notes, s.externalAccountId, s.sitePhone, s.devicePhone, s.deviceType, s.siteId1, s.siteId2, s.siteLanguage, s.devicePhoneComment, s.sourceGroupNumber];
   (s.contacts||[]).forEach(c=>parts.push(c.name,c.company,c.role,c.phone,c.email,c.type,c.accessNotes,c.notes));
   (s.equipment||[]).forEach(e=>parts.push(e.type,e.status,e.location,e.make,e.model,e.serial,e.notes));
   (s.docs||[]).forEach(d=>parts.push(d.type,d.title,d.ref,d.url,d.notes));
@@ -1437,7 +1438,7 @@ function showGlobalChrome537(){ const h=document.getElementById("appHeader"); co
 function contextualHelpInfo060(){
   if(view!=="settings") return CONTEXT_HELP_060[view]||null;
   if(settingsTab==="manual") return null;
-  const tabMap={tech:["settings","Technician Profile"],gps:["route","GPS / Maps"],reports:["reports","Report Settings"],email:["reports","Email Settings"],overlay:["photos","Photo Overlay"],themes:["settings","Theme Settings"],homeLayout:["home","Home Layout"],visibility:["settings","Modules / Simple View"],advanced:["settings","Advanced Settings"],backup:["backup","Backup & Restore"],about:["release","About FireVault"]};
+  const tabMap={tech:["settings","Technician Profile"],gps:["route","GPS / Maps"],reports:["reports","Report Settings"],email:["reports","Email Settings"],overlay:["photos","Photo Overlay"],themes:["settings","Theme Settings"],homeLayout:["home","Home Layout"],visibility:["settings","Modules / Simple View"],advanced:["settings","Advanced Settings"],customerImport:["sites","Customer Import"],backup:["backup","Backup & Restore"],about:["release","About FireVault"]};
   const item=tabMap[settingsTab]||["settings","Settings"];
   return {chapter:item[0],label:item[1],suggestions:settingsTab==="email"?["Recipients","Subject tags","Signature preview"]:settingsTab==="backup"?["Export backup","Restore safely","Clean update"]:["What this controls","Recommended setup","Related features"]};
 }
@@ -1491,7 +1492,7 @@ function recentSiteTime476(s){
 }
 function siteSearchText476(s){
   ensureSite(s);
-  return [s.name,fullAddress(s),s.panelManufacturer,s.panelModel,s.notes,(s.contacts||[]).map(c=>[c.name,c.role,c.phone,c.email,c.accessNotes].join(' ')).join(' '),(s.equipment||[]).map(e=>[e.type,e.model,e.location,e.notes].join(' ')).join(' ')].join(' ').toLowerCase();
+  return [s.name,fullAddress(s),s.panelManufacturer,s.panelModel,s.notes,s.externalAccountId,s.sitePhone,s.devicePhone,s.deviceType,s.siteId1,s.siteId2,s.siteLanguage,s.devicePhoneComment,s.sourceGroupNumber,(s.contacts||[]).map(c=>[c.name,c.role,c.phone,c.email,c.accessNotes].join(' ')).join(' '),(s.equipment||[]).map(e=>[e.type,e.model,e.location,e.notes].join(' ')).join(' ')].join(' ').toLowerCase();
 }
 function homeSearchMatches476(){
   const q=(siteSearch||'').trim().toLowerCase();
@@ -2844,8 +2845,11 @@ function importantSiteInfoText568(s={}){
     `Email: ${c.email||"No email saved"}`,
     `Access: ${accessLine568(s)||"No access notes saved"}`,
     `Panel: ${panelLine568(s)||"No panel info saved"}`,
-    `GPS: ${gpsLine(s)}`
-  ];
+    `GPS: ${gpsLine(s)}`,
+    s.externalAccountId?`External Account ID: ${s.externalAccountId}`:"",
+    s.deviceType?`Device Type: ${s.deviceType}`:"",
+    s.devicePhone?`Device Phone: ${s.devicePhone}`:""
+  ].filter(Boolean);
   return lines.join("\n");
 }
 async function copyImportantSiteInfo568(){
@@ -2931,6 +2935,8 @@ function siteDetail(){
       ${fieldValue477('Access', access)}
       ${fieldValue477('Last Visit', lastVisit ? `${visitDateLabel(lastVisit)} • ${durationText(lastVisit.startedAt,lastVisit.endedAt)}` : 'No completed visits')}
     </div></div>
+
+    ${importedAccountCard065(s)}
 
     <div class="grid3 siteQuickStats477 siteQuickStats489"><button class="card tile" id="taskBtn"><strong>${open}</strong><span>Open Tasks</span></button><button class="card tile" id="defBtn"><strong>${def}</strong><span>Deficiencies</span></button><button class="card tile" id="visitsMini477"><strong>${siteVisits.length}</strong><span>Visits</span></button></div>
 
@@ -4701,6 +4707,405 @@ function jobMode(){
   };
 }
 
+
+/* Build 0.65.1 Customer CSV Importer + coordinate calculation */
+const CUSTOMER_IMPORT_HEADERS_065 = ["Account Id","Account Name","SiteID1","SiteID2","SiteLanguage","DeviceType","Site Phone","Device Phone","Device Phone Comment","Address","City","State","ZipCode","SiteGroupNum"];
+const CUSTOMER_GEOCODE_CACHE_KEY_0651 = "firevault_customer_geocode_cache_0651";
+let customerGeocodeRunToken0651 = 0;
+function cleanImportValue065(value){ return String(value??"").replace(/^\uFEFF/,"").trim(); }
+function normalizeImportHeader065(value){ return cleanImportValue065(value).toLowerCase().replace(/[^a-z0-9]/g,""); }
+function optionalImportIndex065(normalized,labels){
+  for(const label of labels){ const index=normalized.get(normalizeImportHeader065(label)); if(index!==undefined) return index; }
+  return -1;
+}
+function parseCsvText065(text){
+  const matrix=[]; let row=[], field="", quoted=false;
+  const source=String(text??"").replace(/^\uFEFF/,"");
+  for(let i=0;i<source.length;i++){
+    const ch=source[i];
+    if(ch==='"'){
+      if(quoted && source[i+1]==='"'){ field+='"'; i++; }
+      else quoted=!quoted;
+    }else if(ch===',' && !quoted){ row.push(field); field=""; }
+    else if((ch==='\n' || ch==='\r') && !quoted){
+      if(ch==='\r' && source[i+1]==='\n') i++;
+      row.push(field); field="";
+      if(row.some(x=>String(x).trim()!=="")) matrix.push(row);
+      row=[];
+    }else field+=ch;
+  }
+  row.push(field); if(row.some(x=>String(x).trim()!=="")) matrix.push(row);
+  if(!matrix.length) throw new Error("The CSV file is empty.");
+  const headers=matrix.shift().map(cleanImportValue065);
+  const normalized=new Map(headers.map((h,i)=>[normalizeImportHeader065(h),i]));
+  const missing=CUSTOMER_IMPORT_HEADERS_065.filter(h=>!normalized.has(normalizeImportHeader065(h)));
+  if(missing.length) throw new Error(`Missing required columns: ${missing.join(", ")}`);
+  const latIndex=optionalImportIndex065(normalized,["Latitude","Lat"]);
+  const lngIndex=optionalImportIndex065(normalized,["Longitude","Lng","Lon","Long"]);
+  const rows=matrix.map((cells,index)=>{
+    const get=label=>cleanImportValue065(cells[normalized.get(normalizeImportHeader065(label))]??"");
+    const getOptional=index=>index>=0?cleanImportValue065(cells[index]??""):"";
+    return {
+      sourceRow:index+2,
+      accountId:get("Account Id"), name:get("Account Name"), siteId1:get("SiteID1"), siteId2:get("SiteID2"),
+      siteLanguage:get("SiteLanguage"), deviceType:get("DeviceType"), sitePhone:get("Site Phone"), devicePhone:get("Device Phone"),
+      devicePhoneComment:get("Device Phone Comment"), street:get("Address"), city:get("City"), state:get("State").toUpperCase(),
+      zip:get("ZipCode"), sourceGroupNumber:get("SiteGroupNum"), latitude:getOptional(latIndex), longitude:getOptional(lngIndex),
+      coordinateSource:(latIndex>=0&&lngIndex>=0)?"Customer CSV":"", geocodeStatus:(latIndex>=0&&lngIndex>=0)?"provided":"",
+      geocodedAt:"", matchedAddress:"", geocodeBenchmark:""
+    };
+  });
+  return {headers,rows};
+}
+function importDigits065(value){ return cleanImportValue065(value).replace(/\D/g,""); }
+function finiteCoordinate065(value,min,max){ const raw=cleanImportValue065(value); if(raw==="") return null; const number=Number(raw); return Number.isFinite(number)&&number>=min&&number<=max?number:null; }
+function rowCoordinatePair065(row){
+  const lat=finiteCoordinate065(row?.latitude,-90,90),lng=finiteCoordinate065(row?.longitude,-180,180);
+  return lat===null||lng===null?null:{lat:Number(lat.toFixed(6)),lng:Number(lng.toFixed(6))};
+}
+function siteCoordinatePair065(site){
+  const lat=finiteCoordinate065(site?.gps?.lat,-90,90),lng=finiteCoordinate065(site?.gps?.lng,-180,180);
+  return lat===null||lng===null?null:{lat:Number(lat.toFixed(6)),lng:Number(lng.toFixed(6))};
+}
+function normalizedAddressKey065(row){ return [row.street,row.city,row.state,row.zip].map(v=>cleanImportValue065(v).toUpperCase()).join("|"); }
+function addressCanGeocode065(row){
+  const street=cleanImportValue065(row.street);
+  return !!(street && street.toLowerCase()!=="new" && row.state && (row.zip || row.city));
+}
+function loadGeocodeCache0651(){ try{return JSON.parse(sessionStorage.getItem(CUSTOMER_GEOCODE_CACHE_KEY_0651)||"{}")||{};}catch{return{};} }
+function saveGeocodeCache0651(cache){ try{sessionStorage.setItem(CUSTOMER_GEOCODE_CACHE_KEY_0651,JSON.stringify(cache));}catch{} }
+function customerManagedFields065(row,existing=null){
+  const fields={
+    externalAccountId:row.accountId,
+    name:row.name||"Unnamed Site",
+    street:row.street,
+    city:row.city,
+    state:row.state,
+    zip:row.zip,
+    sitePhone:row.sitePhone,
+    devicePhone:row.devicePhone,
+    deviceType:row.deviceType,
+    siteId1:row.siteId1,
+    siteId2:row.siteId2,
+    siteLanguage:row.siteLanguage,
+    devicePhoneComment:row.devicePhoneComment,
+    sourceGroupNumber:row.sourceGroupNumber,
+    importSource:"Customer CSV"
+  };
+  const pair=rowCoordinatePair065(row);
+  if(pair){
+    const existingPair=siteCoordinatePair065(existing);
+    const sameExisting=existingPair && existingPair.lat===pair.lat && existingPair.lng===pair.lng;
+    fields.gps={
+      ...(sameExisting&&existing?.gps?existing.gps:{}),lat:pair.lat,lng:pair.lng,
+      accuracy:Number(existing?.gps?.accuracy||0),
+      capturedAt:(sameExisting&&existing?.gps?.capturedAt)||row.geocodedAt||new Date().toISOString(),
+      source:row.coordinateSource||"US Census Geocoder",
+      matchedAddress:row.matchedAddress||"",
+      benchmark:row.geocodeBenchmark||""
+    };
+    fields.geocodeStatus=row.geocodeStatus||"matched";
+    fields.geocodeSource=row.coordinateSource||"US Census Geocoder";
+    fields.geocodeMatchedAddress=row.matchedAddress||"";
+    fields.geocodedAt=row.geocodedAt||fields.gps.capturedAt;
+  }
+  return fields;
+}
+function gpsManagedChanged065(existingGps,nextGps){
+  const a=siteCoordinatePair065({gps:existingGps}),b=siteCoordinatePair065({gps:nextGps});
+  if(!a&&!b) return false;
+  if(!a||!b) return true;
+  return a.lat!==b.lat || a.lng!==b.lng || cleanImportValue065(existingGps?.source)!==cleanImportValue065(nextGps?.source) || cleanImportValue065(existingGps?.matchedAddress)!==cleanImportValue065(nextGps?.matchedAddress);
+}
+function managedFieldsChanged065(site,row){
+  const next=customerManagedFields065(row,site);
+  const metadataOnly=new Set(["geocodedAt","geocodeStatus","geocodeSource","geocodeMatchedAddress"]);
+  return Object.keys(next).some(key=>metadataOnly.has(key)?false:key==="gps"?gpsManagedChanged065(site?.gps,next.gps):cleanImportValue065(site?.[key])!==cleanImportValue065(next[key]));
+}
+function analyzeCustomerImport065(parsed,fileName="Customers.csv"){
+  const idCounts=new Map(), nameCounts=new Map(), addressCounts=new Map();
+  parsed.rows.forEach(r=>{
+    const id=r.accountId.toUpperCase(), name=r.name.toLowerCase(), addr=normalizedAddressKey065(r).toLowerCase();
+    if(id) idCounts.set(id,(idCounts.get(id)||0)+1);
+    if(name) nameCounts.set(name,(nameCounts.get(name)||0)+1);
+    if(addr.replace(/\|/g,"")) addressCounts.set(addr,(addressCounts.get(addr)||0)+1);
+  });
+  const existingById=new Map();
+  (data.sites||[]).forEach(site=>{
+    const key=cleanImportValue065(site.externalAccountId).toUpperCase();
+    if(!key) return;
+    const list=existingById.get(key)||[]; list.push(site); existingById.set(key,list);
+  });
+  const rows=parsed.rows.map(row=>{
+    const issues=[], notices=[];
+    const id=row.accountId.toUpperCase();
+    const addrKey=normalizedAddressKey065(row).toLowerCase();
+    if(!row.accountId) issues.push("Missing Account Id");
+    if(!row.name) issues.push("Missing Account Name");
+    if(!row.street || row.street.toLowerCase()==="new" || !row.city || !row.state || !row.zip) issues.push("Incomplete or placeholder address");
+    const phoneDigits=importDigits065(row.devicePhone);
+    if(row.devicePhone && (/e\+?/i.test(row.devicePhone) || ![7,10,11].includes(phoneDigits.length))) issues.push("Device Phone has an unusual value");
+    if((idCounts.get(id)||0)>1) issues.push(`Duplicate Account Id in file (${idCounts.get(id)})`);
+    if((existingById.get(id)||[]).length>1) issues.push("Multiple FireVault sites already use this Account Id");
+    if((addressCounts.get(addrKey)||0)>1) notices.push(`Shared address (${addressCounts.get(addrKey)} records)`);
+    if((nameCounts.get(row.name.toLowerCase())||0)>1) notices.push(`Repeated account name (${nameCounts.get(row.name.toLowerCase())} records)`);
+    const existing=(existingById.get(id)||[])[0]||null;
+    const rowPair=rowCoordinatePair065(row),existingPair=siteCoordinatePair065(existing);
+    const coordinateStatus=rowPair?(row.coordinateSource==="Customer CSV"?"provided":"matched"):(existingPair?"existing":(row.geocodeStatus==="no-match"?"no-match":row.geocodeStatus==="error"?"error":addressCanGeocode065(row)?"needed":"unavailable"));
+    if(!rowPair&&!existingPair&&addressCanGeocode065(row)) notices.push("Coordinates not calculated yet");
+    if(row.geocodeStatus==="no-match") notices.push("No Census address match");
+    if(row.geocodeStatus==="error") notices.push("Coordinate lookup error");
+    let action="new";
+    if(!row.accountId || !row.name || (idCounts.get(id)||0)>1 || (existingById.get(id)||[]).length>1) action="skip";
+    else if(existing) action=managedFieldsChanged065(existing,row)?"update":"unchanged";
+    return {...row,issues,notices,flagged:issues.length>0,action,existingId:existing?.id||"",existingCoordinates:existingPair,coordinateStatus};
+  });
+  const summary={total:rows.length,new:0,update:0,unchanged:0,review:0,skip:0,ready:0,coordinatesReady:0,needsCoordinates:0,geocodeFailed:0,coordinatesUnavailable:0,sharedAddressGroups:[...addressCounts.values()].filter(n=>n>1).length,repeatedNameGroups:[...nameCounts.values()].filter(n=>n>1).length};
+  rows.forEach(r=>{
+    summary[r.action]=(summary[r.action]||0)+1;
+    if(r.flagged) summary.review++; else if(r.action!=="skip") summary.ready++;
+    if(["provided","matched","existing"].includes(r.coordinateStatus)) summary.coordinatesReady++;
+    else if(r.coordinateStatus==="needed") summary.needsCoordinates++;
+    else if(["no-match","error"].includes(r.coordinateStatus)) summary.geocodeFailed++;
+    else summary.coordinatesUnavailable++;
+  });
+  return {fileName,headers:parsed.headers,rows,summary,parsedAt:new Date().toISOString()};
+}
+function importRowsForReanalysis065(){
+  return (customerImportState065.rows||[]).map(r=>({
+    accountId:r.accountId,name:r.name,siteId1:r.siteId1,siteId2:r.siteId2,siteLanguage:r.siteLanguage,deviceType:r.deviceType,sitePhone:r.sitePhone,devicePhone:r.devicePhone,devicePhoneComment:r.devicePhoneComment,street:r.street,city:r.city,state:r.state,zip:r.zip,sourceGroupNumber:r.sourceGroupNumber,sourceRow:r.sourceRow,
+    latitude:r.latitude,longitude:r.longitude,coordinateSource:r.coordinateSource,geocodeStatus:r.geocodeStatus,geocodedAt:r.geocodedAt,matchedAddress:r.matchedAddress,geocodeBenchmark:r.geocodeBenchmark
+  }));
+}
+function reanalyzeCustomerImport065(extra={}){
+  const parsed={headers:customerImportState065.headers,rows:importRowsForReanalysis065()};
+  const refreshed=analyzeCustomerImport065(parsed,customerImportState065.fileName||"Customers.csv");
+  customerImportState065={...customerImportState065,...refreshed,...extra};
+}
+function loadCustomerCsv065(file){
+  if(!file) return;
+  customerGeocodeRunToken0651++;
+  const reader=new FileReader();
+  reader.onload=()=>{
+    try{
+      const parsed=parseCsvText065(reader.result);
+      const cache=loadGeocodeCache0651();
+      parsed.rows.forEach(row=>{
+        if(rowCoordinatePair065(row)) return;
+        const cached=cache[normalizedAddressKey065(row)];
+        if(cached?.lat!==undefined&&cached?.lng!==undefined){
+          row.latitude=cached.lat; row.longitude=cached.lng; row.coordinateSource=cached.source||"US Census Geocoder"; row.geocodeStatus="matched"; row.geocodedAt=cached.at||""; row.matchedAddress=cached.matchedAddress||""; row.geocodeBenchmark=cached.benchmark||"Public_AR_Current";
+        }
+      });
+      const analysis=analyzeCustomerImport065(parsed,file.name||"Customers.csv");
+      customerImportState065={...customerImportState065,...analysis,error:"",includeFlagged:false,requireCoordinates:true,filter:"all",lastResult:null,geocoding:{active:false,total:0,complete:0,matched:0,noMatch:0,error:0},geocodeError:""};
+      settings(); toast(`${analysis.summary.total} customer records ready for review.`);
+    }catch(err){ customerImportState065={fileName:file.name||"",headers:[],rows:[],summary:null,error:err?.message||"CSV parsing failed.",includeFlagged:false,requireCoordinates:true,filter:"all",lastResult:null,geocoding:{active:false,total:0,complete:0,matched:0,noMatch:0,error:0},geocodeError:""}; settings(); }
+  };
+  reader.onerror=()=>{ customerImportState065.error="The CSV file could not be read."; settings(); };
+  reader.readAsText(file);
+}
+function rowCoordinatesReady065(row){ return !!(rowCoordinatePair065(row)||row.existingCoordinates); }
+function selectedCustomerImportRows065(){
+  return (customerImportState065.rows||[]).filter(r=>r.action!=="skip" && r.action!=="unchanged" && (!r.flagged || customerImportState065.includeFlagged) && (!customerImportState065.requireCoordinates || rowCoordinatesReady065(r)));
+}
+function customerImportFilterRows065(){
+  const filter=customerImportState065.filter||"all";
+  const rows=customerImportState065.rows||[];
+  if(filter==="review") return rows.filter(r=>r.flagged);
+  if(filter==="new") return rows.filter(r=>r.action==="new");
+  if(filter==="update") return rows.filter(r=>r.action==="update");
+  if(filter==="unchanged") return rows.filter(r=>r.action==="unchanged");
+  if(filter==="coordinates") return rows.filter(r=>!rowCoordinatesReady065(r));
+  return rows;
+}
+function customerImportStatus065(row){
+  if(row.action==="skip") return ["Skipped","skip"];
+  if(row.flagged) return ["Review","review"];
+  if(row.action==="update") return ["Update","update"];
+  if(row.action==="unchanged") return ["No change","same"];
+  return ["New","new"];
+}
+function coordinateLabel065(row){
+  if(row.coordinateStatus==="provided") return ["CSV coordinates","ready"];
+  if(row.coordinateStatus==="matched") return ["Coordinates ready","ready"];
+  if(row.coordinateStatus==="existing") return ["Existing GPS","existing"];
+  if(row.coordinateStatus==="no-match") return ["No match","failed"];
+  if(row.coordinateStatus==="error") return ["Lookup error","failed"];
+  if(row.coordinateStatus==="unavailable") return ["Address required","failed"];
+  return ["Needs coordinates","needed"];
+}
+function geocodeProgressText065(){
+  const geo=customerImportState065.geocoding||{};
+  if(!geo.total) return "";
+  return `${Number(geo.complete||0)} of ${Number(geo.total||0)} unique addresses checked · ${Number(geo.matched||0)} matched · ${Number(geo.noMatch||0)} no match · ${Number(geo.error||0)} errors`;
+}
+function customerImportPanel065(){
+  const state=customerImportState065, summary=state.summary;
+  const filtered=customerImportFilterRows065();
+  const shown=filtered.slice(0,120);
+  const selectedCount=selectedCustomerImportRows065().length;
+  const last=data.syncState?.lastCustomerCsvImport;
+  const geo=state.geocoding||{};
+  const geocodeEligible=summary?state.rows.filter(r=>!rowCoordinatesReady065(r)&&addressCanGeocode065(r)&&r.action!=="skip").length:0;
+  const progress=geo.total?Math.round((Number(geo.complete||0)/Math.max(1,Number(geo.total||0)))*100):0;
+  return `<div class="settingsStack settingsStack540 customerImportStack065">
+    ${settingsSection540("Customer database","Customer CSV Import","Import customer and monitoring-account information without replacing visits, photos, notes, tasks, or deficiencies.",`
+      <div class="customerImportHero065">
+        <div><strong>${(data.sites||[]).length}</strong><span>sites currently in FireVault</span></div>
+        <label class="primary customerFileButton065">Choose Customer CSV<input id="customerCsvFile065" type="file" accept=".csv,text/csv" hidden></label>
+      </div>
+      <div class="settingsInfo540"><strong>Duplicate-safe import key</strong><span>FireVault matches records by Account Id. Reimporting an updated file changes the matching site instead of creating a second copy.</span></div>
+      ${last?`<div class="customerLastImport065"><strong>Last import</strong><span>${esc(new Date(last.at).toLocaleString())} · ${esc(last.fileName||"Customer CSV")}</span><em>${Number(last.added||0)} added · ${Number(last.updated||0)} updated · ${Number(last.geocoded||0)} with calculated coordinates</em></div>`:""}
+    `,"blue")}
+    ${state.error?settingsSection540("File problem","CSV could not be prepared","Correct the file and choose it again.",`<div class="customerImportError065">${esc(state.error)}</div>`,"red"):""}
+    ${summary?settingsSection540("Address coordinates","Calculate Latitude and Longitude",`${summary.coordinatesReady} of ${summary.total} records already have usable coordinates.`,`
+      <div class="geocodeMetrics0651"><div class="ready"><strong>${summary.coordinatesReady}</strong><span>Coordinates ready</span></div><div class="needed"><strong>${summary.needsCoordinates}</strong><span>Need lookup</span></div><div class="failed"><strong>${summary.geocodeFailed+summary.coordinatesUnavailable}</strong><span>Need review</span></div></div>
+      <div class="geocodeNotice0651"><strong>Online address calculation</strong><span>FireVault sends only the street address, city, state, and ZIP to the U.S. Census Geocoder. Results are calculated along an address range and may not represent the exact building entrance.</span></div>
+      ${geo.active||geo.total?`<div class="geocodeProgress0651"><div><span style="width:${progress}%"></span></div><p id="customerGeocodeProgressText0651">${esc(geocodeProgressText065())}</p></div>`:""}
+      ${state.geocodeError?`<div class="customerImportError065">${esc(state.geocodeError)}</div>`:""}
+      <div class="geocodeActions0651"><button class="primary" id="calculateCoordinates0651" ${geo.active||!geocodeEligible?"disabled":""}>${geo.active?"Calculating…":`Calculate ${geocodeEligible} Address${geocodeEligible===1?"":"es"}`}</button>${geo.active?`<button class="danger" id="stopCoordinates0651">Stop</button>`:""}</div>
+      <p class="fieldNote">Coordinates already present in a CSV are used directly. Existing manually captured site GPS is preserved. Failed matches stay visible for correction or manual GPS capture.</p>
+    `,"cyan"):""}
+    ${summary?settingsSection540("Import preview",state.fileName||"Customer CSV",`${summary.total} rows were read. Calculate coordinates and review flagged records before importing them.`,`
+      <div class="customerImportMetrics065">
+        <div><strong>${summary.total}</strong><span>Rows</span></div><div class="new"><strong>${summary.new}</strong><span>New</span></div><div class="update"><strong>${summary.update}</strong><span>Updates</span></div><div class="review"><strong>${summary.review}</strong><span>Review</span></div><div><strong>${summary.unchanged}</strong><span>No change</span></div>
+      </div>
+      <div class="customerImportChecks065"><label><input id="requireCoordinates0651" type="checkbox" ${state.requireCoordinates!==false?"checked":""}><span><strong>Require coordinates before import</strong><small>Recommended. Records without calculated or existing GPS coordinates remain in the preview instead of being imported.</small></span></label><label><input id="includeFlagged065" type="checkbox" ${state.includeFlagged?"checked":""}><span><strong>Include flagged records</strong><small>Leave off to import only records that passed validation. Flagged rows remain available for a later corrected import.</small></span></label></div>
+      <div class="customerImportActions065"><button class="primary" id="runCustomerImport065" ${selectedCount||geo.active?geo.active?"disabled":"":"disabled"}>Import ${selectedCount} Record${selectedCount===1?"":"s"}</button><button class="ghost" id="clearCustomerImport065" ${geo.active?"disabled":""}>Clear Preview</button></div>
+      <p class="fieldNote">The importer preserves FireVault-created history and adds changed records to the pending synchronization queue.</p>
+    `,"green"):""}
+    ${state.lastResult?settingsSection540("Import complete","Customer records saved","The local database and synchronization queue were updated.",`<div class="customerImportResult065"><div><strong>${state.lastResult.added}</strong><span>Added</span></div><div><strong>${state.lastResult.updated}</strong><span>Updated</span></div><div><strong>${state.lastResult.geocoded||0}</strong><span>Coordinates</span></div><div><strong>${state.lastResult.skipped}</strong><span>Skipped</span></div></div><button class="ghost" id="openImportedSites065">Open Customer Database</button>`,"violet"):""}
+    ${summary?settingsSection540("Row review","Customer records","Use the filters to inspect new, changed, unchanged, questionable, or ungeocoded rows before importing.",`
+      <div class="customerImportFilters065">${[["all",`All ${summary.total}`],["new",`New ${summary.new}`],["update",`Updates ${summary.update}`],["review",`Review ${summary.review}`],["coordinates",`No GPS ${summary.total-summary.coordinatesReady}`],["unchanged",`No change ${summary.unchanged}`]].map(([key,label])=>`<button class="ghost ${state.filter===key?"active":""}" data-customer-import-filter="${key}">${label}</button>`).join("")}</div>
+      <div class="customerImportRows065">${shown.length?shown.map(row=>{const [label,cls]=customerImportStatus065(row);const [geoLabel,geoClass]=coordinateLabel065(row);const pair=rowCoordinatePair065(row)||row.existingCoordinates;return `<article class="customerImportRow065 ${cls}"><span class="customerImportState065">${label}</span><div><strong>${esc(row.name||"Unnamed account")}</strong><small>${esc(row.accountId||"No Account Id")} · ${esc([row.street,row.city,row.state,row.zip].filter(Boolean).join(", ")||"No complete address")}</small><span class="coordinateState0651 ${geoClass}">${esc(geoLabel)}${pair?` · ${pair.lat.toFixed(6)}, ${pair.lng.toFixed(6)}`:""}</span>${row.matchedAddress?`<small class="coordinateMatch0651">Matched: ${esc(row.matchedAddress)}</small>`:""}${row.deviceType||row.devicePhone?`<em>${esc([row.deviceType,row.devicePhone].filter(Boolean).join(" · "))}</em>`:""}${row.issues.length?`<p>${row.issues.map(esc).join(" · ")}</p>`:""}${row.notices.length?`<p class="notice">${row.notices.map(esc).join(" · ")}</p>`:""}</div><b>Row ${row.sourceRow}</b></article>`}).join(""):`<div class="syncEmpty063"><strong>No matching rows</strong><span>Choose another preview filter.</span></div>`}</div>
+      ${filtered.length>shown.length?`<p class="fieldNote">Showing the first ${shown.length} of ${filtered.length} matching rows.</p>`:""}
+    `,"slate"):""}
+  </div>`;
+}
+function censusGeocodeJsonp0651(row){
+  return new Promise((resolve,reject)=>{
+    const callback=`__firevaultCensus_${Date.now()}_${Math.random().toString(36).slice(2)}`;
+    const script=document.createElement("script");
+    let finished=false;
+    const cleanup=()=>{ if(finished) return; finished=true; clearTimeout(timer); try{delete window[callback];}catch{window[callback]=undefined;} script.remove(); };
+    const timer=setTimeout(()=>{cleanup(); reject(new Error("Coordinate lookup timed out."));},25000);
+    window[callback]=payload=>{
+      const match=payload?.result?.addressMatches?.[0];
+      if(match?.coordinates && Number.isFinite(Number(match.coordinates.y)) && Number.isFinite(Number(match.coordinates.x))){
+        const result={lat:Number(Number(match.coordinates.y).toFixed(6)),lng:Number(Number(match.coordinates.x).toFixed(6)),matchedAddress:match.matchedAddress||"",source:"US Census Geocoder",benchmark:payload?.result?.input?.benchmark?.benchmarkName||"Public_AR_Current",at:new Date().toISOString()};
+        cleanup(); resolve(result);
+      }else{ cleanup(); resolve(null); }
+    };
+    script.onerror=()=>{cleanup(); reject(new Error("The coordinate service could not be reached."));};
+    const params=new URLSearchParams({street:row.street,city:row.city,state:row.state,zip:row.zip,benchmark:"Public_AR_Current",format:"jsonp",callback});
+    script.src=`https://geocoding.geo.census.gov/geocoder/locations/address?${params.toString()}`;
+    script.async=true;
+    document.head.appendChild(script);
+  });
+}
+function updateCustomerGeocodeProgressDom0651(){
+  const text=document.getElementById("customerGeocodeProgressText0651"); if(text) text.textContent=geocodeProgressText065();
+  const bar=document.querySelector(".geocodeProgress0651>div>span"); const geo=customerImportState065.geocoding||{}; if(bar) bar.style.width=`${Math.round((Number(geo.complete||0)/Math.max(1,Number(geo.total||0)))*100)}%`;
+}
+async function calculateCustomerCoordinates0651(){
+  if(customerImportState065.geocoding?.active) return;
+  const candidates=(customerImportState065.rows||[]).filter(r=>!rowCoordinatesReady065(r)&&addressCanGeocode065(r)&&r.action!=="skip");
+  if(!candidates.length){toast("No addresses need coordinate calculation.");return;}
+  const groups=new Map();
+  candidates.forEach(row=>{const key=normalizedAddressKey065(row);const rows=groups.get(key)||[];rows.push(row);groups.set(key,rows);});
+  const tasks=[...groups.entries()].map(([key,rows])=>({key,rows,representative:rows[0]}));
+  const token=++customerGeocodeRunToken0651;
+  customerImportState065.geocoding={active:true,total:tasks.length,complete:0,matched:0,noMatch:0,error:0,startedAt:new Date().toISOString()};
+  customerImportState065.geocodeError="";
+  settings();
+  const cache=loadGeocodeCache0651();
+  let cursor=0;
+  const worker=async()=>{
+    while(token===customerGeocodeRunToken0651){
+      const index=cursor++; if(index>=tasks.length) return;
+      const task=tasks[index]; let result=cache[task.key]||null; let status="matched";
+      try{
+        if(!result) result=await censusGeocodeJsonp0651(task.representative);
+        if(token!==customerGeocodeRunToken0651) return;
+        if(result){
+          cache[task.key]=result;
+          task.rows.forEach(row=>{row.latitude=result.lat;row.longitude=result.lng;row.coordinateSource=result.source;row.geocodeStatus="matched";row.geocodedAt=result.at;row.matchedAddress=result.matchedAddress;row.geocodeBenchmark=result.benchmark;});
+          customerImportState065.geocoding.matched++;
+        }else{
+          status="no-match"; task.rows.forEach(row=>{row.geocodeStatus="no-match";}); customerImportState065.geocoding.noMatch++;
+        }
+      }catch(err){
+        status="error"; task.rows.forEach(row=>{row.geocodeStatus="error";}); customerImportState065.geocoding.error++;
+        customerImportState065.geocodeError="Some addresses could not be checked. You can run coordinate calculation again to retry them.";
+      }
+      customerImportState065.geocoding.complete++;
+      if(status==="matched" && customerImportState065.geocoding.complete%10===0) saveGeocodeCache0651(cache);
+      updateCustomerGeocodeProgressDom0651();
+      await new Promise(resolve=>setTimeout(resolve,120));
+    }
+  };
+  await Promise.all([worker(),worker(),worker()]);
+  saveGeocodeCache0651(cache);
+  if(token!==customerGeocodeRunToken0651) return;
+  const finalGeo={...customerImportState065.geocoding,active:false,finishedAt:new Date().toISOString()};
+  reanalyzeCustomerImport065({geocoding:finalGeo});
+  settings();
+  toast(`${finalGeo.matched} addresses matched. ${finalGeo.noMatch+finalGeo.error} need review.`);
+}
+function stopCustomerCoordinates0651(){
+  customerGeocodeRunToken0651++;
+  customerImportState065.geocoding={...(customerImportState065.geocoding||{}),active:false,stopped:true};
+  reanalyzeCustomerImport065({geocoding:customerImportState065.geocoding});
+  settings(); toast("Coordinate calculation stopped. Completed matches were kept.");
+}
+function performCustomerImport065(){
+  const selected=selectedCustomerImportRows065();
+  if(!selected.length){ toast(customerImportState065.requireCoordinates?"No new or changed records with coordinates are selected.":"No new or changed records are selected."); return; }
+  if(!confirm(`Import ${selected.length} customer record${selected.length===1?"":"s"}? Existing FireVault notes, photos, visits, tasks, and deficiencies will be preserved.`)) return;
+  const existingById=new Map((data.sites||[]).filter(s=>s.externalAccountId).map(s=>[cleanImportValue065(s.externalAccountId).toUpperCase(),s]));
+  const now=new Date().toISOString();
+  const stats={added:0,updated:0,unchanged:customerImportState065.summary?.unchanged||0,skipped:(customerImportState065.rows||[]).filter(r=>r.action==="skip" || (r.flagged&&!customerImportState065.includeFlagged) || (customerImportState065.requireCoordinates&&!rowCoordinatesReady065(r))).length,flagged:selected.filter(r=>r.flagged).length,geocoded:selected.filter(r=>!!rowCoordinatePair065(r)).length};
+  selected.forEach(row=>{
+    const key=row.accountId.toUpperCase();
+    const existing=existingById.get(key);
+    const fields=customerManagedFields065(row,existing);
+    if(existing){
+      if(managedFieldsChanged065(existing,row)){
+        Object.assign(existing,fields);
+        existing.importMetadata={source:"Customer CSV",fileName:customerImportState065.fileName||"Customers.csv",sourceRow:row.sourceRow,lastImportedAt:now};
+        stats.updated++;
+      }else stats.unchanged++;
+    }else{
+      const created=ensureSite({...fields,id:uid(),createdAt:now,importMetadata:{source:"Customer CSV",fileName:customerImportState065.fileName||"Customers.csv",sourceRow:row.sourceRow,lastImportedAt:now}});
+      data.sites.push(created); existingById.set(key,created); stats.added++;
+    }
+  });
+  recordSyncActivity(data,"customer-csv-import",{fileName:customerImportState065.fileName||"Customers.csv",workspace:data.settings?.sync?.workspace||"FireVault Shared Vault",stats:{...stats}});
+  data.syncState={...(data.syncState||{}),lastCustomerCsvImport:{at:now,fileName:customerImportState065.fileName||"Customers.csv",...stats}};
+  saveData(data); data=loadData();
+  reanalyzeCustomerImport065({lastResult:stats,error:""});
+  settings(); toast(`${stats.added} added and ${stats.updated} updated with ${stats.geocoded} calculated coordinate records.`);
+}
+function wireCustomerImport065(){
+  const file=document.getElementById("customerCsvFile065"); if(file) file.onchange=e=>loadCustomerCsv065(e.target.files?.[0]);
+  const requireCoordinates=document.getElementById("requireCoordinates0651"); if(requireCoordinates) requireCoordinates.onchange=()=>{customerImportState065.requireCoordinates=requireCoordinates.checked; settings();};
+  const include=document.getElementById("includeFlagged065"); if(include) include.onchange=()=>{customerImportState065.includeFlagged=include.checked; settings();};
+  const calculate=document.getElementById("calculateCoordinates0651"); if(calculate) calculate.onclick=calculateCustomerCoordinates0651;
+  const stop=document.getElementById("stopCoordinates0651"); if(stop) stop.onclick=stopCustomerCoordinates0651;
+  const run=document.getElementById("runCustomerImport065"); if(run) run.onclick=performCustomerImport065;
+  const clear=document.getElementById("clearCustomerImport065"); if(clear) clear.onclick=()=>{customerGeocodeRunToken0651++;customerImportState065={fileName:"",headers:[],rows:[],summary:null,error:"",includeFlagged:false,requireCoordinates:true,filter:"all",lastResult:null,geocoding:{active:false,total:0,complete:0,matched:0,noMatch:0,error:0},geocodeError:""}; settings();};
+  document.querySelectorAll("[data-customer-import-filter]").forEach(btn=>btn.onclick=()=>{customerImportState065.filter=btn.dataset.customerImportFilter; settings();});
+  const open=document.getElementById("openImportedSites065"); if(open) open.onclick=()=>{mode=null;route("sites");};
+}
+function importedAccountCard065(s={}){
+  if(!s.externalAccountId && !s.deviceType && !s.sitePhone && !s.devicePhone) return "";
+  const gps=siteCoordinatePair065(s);
+  const items=[["Account ID",s.externalAccountId],["Site Phone",s.sitePhone],["Device Type",s.deviceType],["Device Phone",s.devicePhone],["Site ID 1",s.siteId1],["Site ID 2",s.siteId2],["Language",s.siteLanguage],["Source Group",s.sourceGroupNumber],["Latitude",gps?.lat?.toFixed(6)],["Longitude",gps?.lng?.toFixed(6)],["Coordinate Source",s.geocodeSource||s.gps?.source]].filter(x=>x[1]!==undefined&&x[1]!==null&&x[1]!=="");
+  return `<div class="card importedAccountCard065"><div class="siteCardHead477"><div><h2>Monitoring Account</h2><p>Imported customer, communicator, and coordinate information.</p></div><span class="pill">CSV</span></div><div class="importedAccountGrid065">${items.map(([label,value])=>`<div><strong>${esc(label)}</strong><span>${esc(value)}</span></div>`).join("")}</div>${s.geocodeMatchedAddress?`<p class="fieldNote">Matched address: ${esc(s.geocodeMatchedAddress)}</p>`:""}${s.devicePhoneComment?`<p class="fieldNote">${esc(s.devicePhoneComment)}</p>`:""}</div>`;
+}
+
+
 function settingsTabs(){
   return [
     ["tech","Technician","Name, company, phone, email, and license information used in reports."],
@@ -4713,6 +5118,7 @@ function settingsTabs(){
     ["visibility","Modules","Enable or disable FireVault modules for a cleaner field interface."],
     ["advanced","Advanced","Optional future modules marked with an asterisk when services are required."],
     ["sync","Team Sync","Multi-technician identity, pending changes, conflict policy, and OneDrive readiness."],
+    ["customerImport","Customer Import","Preview and safely import customer records from a CSV export using Account Id."],
     ["backup","Backup","Export, import, data safety snapshot, restore tools, and danger zone."],
     ["manual","Help & Manual","Searchable instructions for using FireVault, field workflows, settings, reports, photos, GPS, and troubleshooting."],
     ["about","About","Build information, storage key, and FireVault roadmap notes."]
@@ -4753,7 +5159,7 @@ function leaveSettingsHome572(){
 }
 
 function settingsIcon550(tab){
-  return ({tech:"👤",gps:"⌖",reports:"▤",email:"✉",overlay:"▧",themes:"◐",homeLayout:"⌂",visibility:"☰",advanced:"⚡",sync:"☁",backup:"⇅",manual:"?",about:"ⓘ"})[tab]||"•";
+  return ({tech:"👤",gps:"⌖",reports:"▤",email:"✉",overlay:"▧",themes:"◐",homeLayout:"⌂",visibility:"☰",advanced:"⚡",sync:"☁",customerImport:"⇩",backup:"⇅",manual:"?",about:"ⓘ"})[tab]||"•";
 }
 function settings(){
   captureSettingsScroll576();
@@ -4781,7 +5187,7 @@ function settings(){
     restoreSettingsScroll576(false);
     return;
   }
-  const saveable=!['backup','manual','about'].includes(settingsTab);
+  const saveable=!['customerImport','backup','manual','about'].includes(settingsTab);
   html(`<div class="screen settingsDetailScreen451 settingsScreen settingsScreen448 settingsScreen449 settingsDetailScreen488 settingsStable573 settingsTab-${settingsTab}" data-settings-tab="${settingsTab}">
     <div class="settingsDetailTop451 settingsDetailTop488 settingsDetailTop572">
       <button class="ghost settingsBack451 settingsBack488" id="settingsBackBtn" aria-label="Back to Settings">←</button>
@@ -5201,7 +5607,9 @@ const FIREVAULT_MANUAL_058 = [
     ["Open and edit","Tap an account to open Site Detail. Use Edit for core customer information. Changes are saved to the local vault."],
     ["Contacts","Store customer contacts, roles, phone numbers, email addresses, and access notes under the account."],
     ["GPS","Capture GPS while physically at the site for the best nearby-account results. Location permission and HTTPS are required."],
-    ["Search and recent use","FireVault searches multiple account fields and tracks recently opened sites for faster daily access."]
+    ["Search and recent use","FireVault searches multiple account fields, including imported Account Id and monitoring information, and tracks recently opened sites for faster daily access."],
+    ["Customer CSV Import","Open Settings → Customer Import, choose a compatible CSV file, review New, Update, Review, and No Change counts, then import ready records. Account Id is the duplicate-safe update key. Flagged rows can be left out until corrected."],
+    ["Repeat imports","Reimporting the same source file does not duplicate matching sites. Changed source fields are updated while visits, photos, notes, tasks, deficiencies, contacts, documents, and other FireVault-created history are preserved."]
   ]},
   {id:"detail",title:"Site Detail",icon:"▤",status:"Current",summary:"Understand every card and action on an individual customer account.",topics:[
     ["Important Site Info","Provides fast access to contact, access, panel, and GPS information. Use it before beginning work."],
@@ -5236,6 +5644,7 @@ const FIREVAULT_MANUAL_058 = [
   {id:"route",title:"GPS, Nearby Sites & Daily Route",icon:"⌖",status:"Current",summary:"Capture site coordinates and document the technician's daily route.",topics:[
     ["GPS permission","Allow location access when prompted. GPS features require a secure HTTPS deployment and may be limited by device privacy settings."],
     ["Save site coordinates","Capture GPS while at the customer site. FireVault stores latitude, longitude, accuracy, and capture time."],
+    ["Imported address coordinates","Settings → Customer Import can calculate latitude and longitude from a usable U.S. street address. Review unmatched addresses and verify critical sites on the map or while on location."],
     ["Nearby Accounts","FireVault compares the current location to saved site coordinates using the radius selected in Settings → GPS / Maps."],
     ["Daily Route","Start route logging at the beginning of the workday, add or review waypoints, pause when appropriate, and finish the route at day end."],
     ["Background limitation","Browser and PWA location tracking can be paused by iOS when the app is closed, suspended, or the phone sleeps. Route records should be reviewed for completeness."]
@@ -5256,7 +5665,8 @@ const FIREVAULT_MANUAL_058 = [
     ["Home Layout","Shows or hides optional Home cards and chooses whether each remembers, opens, or collapses by default."],
     ["Modules","Simple, Advanced, and Power modes determine which optional FireVault tools are visible. Disabling a module does not delete its data."],
     ["Advanced","Contains future capabilities that may require cloud services, APIs, permissions, subscriptions, or backend infrastructure."],
-    ["Team Sync","Shows technician identity, device identity, pending record changes, conflict policy, and the planned OneDrive workspace. Build 0.64.1 preserves the sync-ready records but does not upload them."],
+    ["Team Sync","Shows technician identity, device identity, pending record changes, conflict policy, and the planned OneDrive workspace. Build 0.65.1 preserves the sync-ready records and adds duplicate-safe customer imports with coordinate calculation, but does not upload automatically."],
+    ["Customer Import","Previews supported CSV files, calculates missing latitude and longitude from U.S. addresses, flags questionable or unmatched rows, matches repeat imports by Account Id, preserves FireVault-created history, and records changes in Sync Activity."],
     ["Backup","Exports and imports the local vault, previews restore files, and provides repair and safety tools."],
     ["About and Diagnostics","Confirm the installed build, storage key, startup health, data counts, and app stability information."]
   ]},
@@ -5276,7 +5686,7 @@ const FIREVAULT_MANUAL_058 = [
     ["Restore fails","Use an unmodified FireVault JSON backup, verify the file is readable, and compare its preview details before confirming restore."]
   ]},
   {id:"release",title:"Release & Manual Status",icon:"ⓘ",status:"Living document",summary:"Understand how this documentation will be maintained through Version 1.0.",topics:[
-    ["Manual revision","This manual revision matches FireVault Build 0.64.1 and was last reviewed in July 2026."],
+    ["Manual revision","This manual revision matches FireVault Build 0.65.1 and was last reviewed in July 2026."],
     ["Living documentation","Every feature release should include a documentation review. New controls must be documented and changed workflows must be rechecked."],
     ["Pre-release warning","FireVault is still under active development. Labels, layouts, and workflows may change before Version 1.0."],
     ["Screenshot policy","Annotated screenshots should be added after major screens reach release-candidate stability."],
@@ -5284,7 +5694,7 @@ const FIREVAULT_MANUAL_058 = [
   ]}
 ];
 
-const MANUAL_SYNONYMS_058={pictures:"photos",picture:"photos",mail:"email",location:"gps",map:"gps route",customer:"site account",client:"site account",backup:"export restore",problem:"troubleshooting",reporting:"reports email"};
+const MANUAL_SYNONYMS_058={pictures:"photos",picture:"photos",mail:"email",location:"gps latitude longitude coordinates geocode",map:"gps route coordinates",customer:"site account import csv",client:"site account",spreadsheet:"csv customer import",excel:"csv customer import",import:"customer csv account id coordinates",latitude:"gps coordinates customer import",longitude:"gps coordinates customer import",geocode:"address coordinates customer import",backup:"export restore",problem:"troubleshooting",reporting:"reports email"};
 const MANUAL_BOOKMARKS_KEY_058="firevault_manual_bookmarks_058";
 let manualQuery058="";
 let manualView058="home";
@@ -5318,12 +5728,12 @@ function manualTile058(icon,title,note,view,tone="blue",badge=""){ return `<butt
 function manualHome058(){
   const bookmarked=FIREVAULT_MANUAL_058.filter(ch=>manualBookmarks058.includes(ch.id));
   return `<div class="academyHome058">
-    <section class="academyHero058"><div><span class="academyEyebrow058">FireVault Academy</span><h2>${fireVaultBrand575()} Knowledge Center</h2><p>Manuals, quick-start guidance, field tips, release notes, and troubleshooting for Build ${BUILD}.</p></div><div class="academyMeta058"><span><b>${BUILD}</b>App build</span><span><b>0.64.1</b>Manual revision</span><span><b>July 2026</b>Last reviewed</span></div></section>
+    <section class="academyHero058"><div><span class="academyEyebrow058">FireVault Academy</span><h2>${fireVaultBrand575()} Knowledge Center</h2><p>Manuals, quick-start guidance, field tips, release notes, and troubleshooting for Build ${BUILD}.</p></div><div class="academyMeta058"><span><b>${BUILD}</b>App build</span><span><b>0.65.1</b>Manual revision</span><span><b>July 2026</b>Last reviewed</span></div></section>
     <div class="academySearch058"><span>⌕</span><input id="manualSearch058" type="search" value="${esc(manualQuery058)}" placeholder="Search FireVault Academy…"><button class="ghost" id="manualSearchGo058">Search</button></div>
     <section class="academyTileGrid058">
       ${manualTile058("📘","User Manual","Browse all chapters and step-by-step instructions.","manual","blue")}
       ${manualTile058("🚀","Quick Start Guide","Set up FireVault and complete a basic field workflow.","quick","green")}
-      ${manualTile058("🆕","What’s New","Review changes included in the current release.","new","red","0.64.1")}
+      ${manualTile058("🆕","What’s New","Review changes included in the current release.","new","red","0.65.1")}
       ${manualTile058("🧰","Field Tips","Practical documentation and reporting advice.","tips","amber")}
       ${manualTile058("❓","Troubleshooting","Resolve common GPS, storage, photo, and update issues.","trouble","violet")}
       ${manualTile058("📋","Revision History","Track app and manual revision checkpoints.","revisions","slate")}
@@ -5347,10 +5757,10 @@ function manualChapterView058(){
 }
 function manualSimplePage058(type){
  const pages={
-  quick:["🚀","Quick Start Guide","Get FireVault ready for a normal field day.",[["1. Verify the build","Confirm the green build badge shows 0.64.1 before entering production information."],["2. Complete Technician Profile","Enter your name, company, phone, email, and license or employee identification."],["3. Review permissions","Allow location and photo access only when FireVault requests them and the feature is needed."],["4. Create or open a site","Add the customer name, full address, panel details, contacts, access notes, and GPS location."],["5. Document the visit","Record notes, photos, tasks, deficiencies, equipment changes, and a service visit."],["6. Finish and protect the data","Review the report, send or copy the required summary, then export a current backup."]]],
-  new:["🆕","What’s New in 0.64.1","Simplified Help reader layout.",[["Help reader cleanup","Removed floating completion and reading-time badges so article information stays in the normal document flow."],["Conflict Center","Review competing edits and choose the local or imported version without silently overwriting site data."],["Sync Activity","See package exports, imports, conflict resolutions, technician identity, and device identity in one timeline."],["Connection readiness","A clear checklist shows what must be completed before automatic OneDrive synchronization is enabled."],["Safer handoff","Shared Vault packages now record export and import activity for audit visibility."],["Preserved Help repair","The 0.63.1 Academy scrolling and formatting overhaul remains intact."]]],
+  quick:["🚀","Quick Start Guide","Get FireVault ready for a normal field day.",[["1. Verify the build","Confirm the green build badge shows 0.65.1 before entering production information."],["2. Complete Technician Profile","Enter your name, company, phone, email, and license or employee identification."],["3. Review permissions","Allow location and photo access only when FireVault requests them and the feature is needed."],["4. Create or open a site","Add the customer name, full address, panel details, contacts, access notes, and GPS location."],["5. Document the visit","Record notes, photos, tasks, deficiencies, equipment changes, and a service visit."],["6. Finish and protect the data","Review the report, send or copy the required summary, then export a current backup."]]],
+  new:["🆕","What’s New in 0.65.1","Customer coordinate calculation and duplicate-safe importing.",[["Latitude and longitude","Customer Import can calculate missing coordinates from each usable U.S. street address before saving records."],["Coordinate requirement","The importer requires calculated, supplied, or existing GPS coordinates by default. Unmatched addresses remain in review."],["Census address matching","Only address fields are sent to the U.S. Census Geocoder. The returned point is an address-range calculation, not a guaranteed building entrance."],["Account Id matching","Repeat imports update the matching FireVault site instead of creating duplicates or deleting field history."],["CSV coordinate columns","Files that already contain Latitude and Longitude columns use those values directly."],["Sync-ready changes","Added and updated customer records enter the pending synchronization queue and create a Sync Activity entry."]]],
   tips:["🧰","Field Tips","Short practices that improve the usefulness of FireVault records.",[["Write for the next technician","Include the exact panel, circuit, device, location, symptom, test result, and next action instead of relying on memory."],["Photograph context first","Take one wide photo showing the equipment location before close-up terminal, label, or damage photos."],["Separate facts from follow-up","Use notes for what occurred, deficiencies for code or system problems, and tasks for work that still needs completion."],["Confirm the account","Before using Quick Capture, verify the selected customer site to prevent records from being stored under the wrong account."],["Back up before updates","Export a backup before installing every development build and after completing a significant amount of field documentation."]]],
-  revisions:["📋","Revision History","Application and documentation checkpoints.",[["0.64.1","Simplified Academy article headers, removed floating metadata badges, and improved continuous scrolling and readability."],["0.64.0","Added Sync Activity, a conflict review center, export/import audit entries, and an automatic OneDrive connection-readiness checklist."],["0.63.1","Overhauled contextual Help and Academy reader formatting, removed overlapping sticky article headers, and restored full scrolling on phones and tablets."],["0.63.0","Added permanent record IDs, audit metadata, local version tracking, pending-sync states, conflict readiness, device identity, and a Team Sync settings workspace."],["0.60.0","Connected major screens and Settings areas directly to matching Academy chapters with return-to-screen navigation."],["0.59.0","Added interactive tutorials, guided orientation, pinned learning, field tips, and documentation tracking."],["0.58.0","Expanded Help & Manual into FireVault Academy with bookmarks, smart search, Quick Start, and reader navigation."],["0.57.0","Added the first complete searchable in-app FireVault User Manual."],["Ongoing review rule","Any change to navigation, labels, storage, workflows, permissions, or supported layouts requires the related manual chapter to be checked."]]],
+  revisions:["📋","Revision History","Application and documentation checkpoints.",[["0.65.1","Added online latitude/longitude calculation, coordinate validation, geocoding progress, unmatched-address review, optional CSV coordinates, and coordinate-safe repeat importing."],["0.65.0","Added preview-first customer CSV importing, Account Id update matching, validation warnings, imported monitoring details, and sync activity tracking."],["0.64.1","Simplified Academy article headers, removed floating metadata badges, and improved continuous scrolling and readability."],["0.64.0","Added Sync Activity, a conflict review center, export/import audit entries, and an automatic OneDrive connection-readiness checklist."],["0.63.1","Overhauled contextual Help and Academy reader formatting, removed overlapping sticky article headers, and restored full scrolling on phones and tablets."],["0.63.0","Added permanent record IDs, audit metadata, local version tracking, pending-sync states, conflict readiness, device identity, and a Team Sync settings workspace."],["0.60.0","Connected major screens and Settings areas directly to matching Academy chapters with return-to-screen navigation."],["0.59.0","Added interactive tutorials, guided orientation, pinned learning, field tips, and documentation tracking."],["0.58.0","Expanded Help & Manual into FireVault Academy with bookmarks, smart search, Quick Start, and reader navigation."],["0.57.0","Added the first complete searchable in-app FireVault User Manual."],["Ongoing review rule","Any change to navigation, labels, storage, workflows, permissions, or supported layouts requires the related manual chapter to be checked."]]],
   trouble:["❓","Troubleshooting","Common problems and safe first checks.",FIREVAULT_MANUAL_058.find(x=>x.id==="trouble")?.topics||[]]
  };
  const [icon,title,note,items]=pages[type]||["🚧","Coming Soon","This Academy area is reserved for a future milestone.",[["Development status","The feature is not active yet. No outside service has been connected or purchased."]]];
@@ -5472,7 +5882,7 @@ function settingsPanel(){
     const workspaceReady=!!(cfg.organization&&cfg.workspace);
     const conflictReady=cfg.conflictPolicy==="review";
     const checklist=[[techReady,"Technician identity","Name and email are available for audit history."],[workspaceReady,"Workspace identity","Organization and shared workspace names are configured."],[conflictReady,"Safe conflict policy","Manual review is selected for competing edits."],[sum.total>0,"Sync-ready records",`${sum.total} records have permanent IDs and version metadata.`],[false,"Microsoft connection","Azure app registration and Microsoft sign-in are still required.`"]];
-    const activityLabel={"package-export":"Package exported","package-import":"Package imported","conflict-resolved":"Conflict resolved"};
+    const activityLabel={"package-export":"Package exported","package-import":"Package imported","conflict-resolved":"Conflict resolved","customer-csv-import":"Customer CSV imported"};
     return `<div class="settingsStack settingsStack540 syncStack062">
       ${settingsSection540("Multi-user foundation","Team & Sync Status","FireVault is tracking edits as sync-ready records and preparing for controlled OneDrive synchronization.",`
         <div class="syncStatusGrid062">
@@ -5506,7 +5916,7 @@ function settingsPanel(){
         <div class="conflictCenter064">${conflicts.length?conflicts.map(c=>`<article><div class="conflictHead064"><span>Conflict</span><div><strong>${esc(c.title)}</strong><small>${esc(c.siteName)} · Local v${c.version} / Imported v${c.remoteVersion}</small></div></div><p>Choose which copy FireVault should keep. Keeping this device creates a new pending version; using the imported copy marks it synchronized.</p><div class="conflictActions064"><button class="ghost" data-resolve-conflict="local" data-record-id="${esc(c.id)}">Keep this device</button><button class="primary" data-resolve-conflict="remote" data-record-id="${esc(c.id)}">Use imported copy</button></div></article>`).join(""):`<div class="syncEmpty063"><strong>No conflicts</strong><span>Competing equal-version edits will appear here instead of being silently overwritten.</span></div>`}</div>
       `,"red")}
       ${settingsSection540("Recent handoffs","Sync Activity","A local audit timeline of package transfers and conflict decisions on this device.",`
-        <div class="syncActivity064">${activity.length?activity.map(a=>`<div><span class="activityIcon064">${a.type==='package-import'?'↓':a.type==='package-export'?'↑':'✓'}</span><div><strong>${esc(activityLabel[a.type]||a.type)}</strong><small>${esc(new Date(a.at).toLocaleString())} · ${esc(a.technician||'Unassigned technician')}</small>${a.workspace?`<em>${esc(a.workspace)}</em>`:''}</div></div>`).join(""):`<div class="syncEmpty063"><strong>No activity yet</strong><span>Exports, imports, and conflict decisions will be recorded here.</span></div>`}</div>
+        <div class="syncActivity064">${activity.length?activity.map(a=>`<div><span class="activityIcon064">${a.type==='package-import'||a.type==='customer-csv-import'?'↓':a.type==='package-export'?'↑':'✓'}</span><div><strong>${esc(activityLabel[a.type]||a.type)}</strong><small>${esc(new Date(a.at).toLocaleString())} · ${esc(a.technician||'Unassigned technician')}</small>${a.type==='customer-csv-import'?`<em>${esc(a.fileName||'Customer CSV')} · ${Number(a.stats?.added||0)} added · ${Number(a.stats?.updated||0)} updated · ${Number(a.stats?.geocoded||0)} coordinates</em>`:a.workspace?`<em>${esc(a.workspace)}</em>`:''}</div></div>`).join(""):`<div class="syncEmpty063"><strong>No activity yet</strong><span>Exports, imports, and conflict decisions will be recorded here.</span></div>`}</div>
       `,"amber")}
       ${settingsSection540("Pending work","Synchronization Queue",queue.length?`${queue.length} recent record changes are waiting for package transfer or future cloud sync.`:"No pending changes are waiting.",`
         <div class="syncQueue063">${queue.length?queue.map(q=>`<div class="syncQueueRow063"><span class="syncQueueState063 ${esc(q.status)}">${esc(q.status)}</span><div><strong>${esc(q.title)}</strong><small>${esc(q.siteName)} · v${q.version} · ${esc(q.modifiedBy)}${q.modifiedAt?` · ${esc(new Date(q.modifiedAt).toLocaleString())}`:''}</small></div></div>`).join(""):`<div class="syncEmpty063"><strong>Queue is clear</strong><span>New edits will appear here automatically.</span></div>`}</div>
@@ -5515,6 +5925,7 @@ function settingsPanel(){
     </div>`;
   }
 
+  if(settingsTab==="customerImport") return customerImportPanel065();
   if(settingsTab==="backup") return backupSettingsPanel();
   if(settingsTab==="manual") return manualPanel058();
 
@@ -5527,6 +5938,7 @@ function wireSettingsPanel(){
   const saveBtn=document.getElementById("saveSettings"); if(saveBtn) saveBtn.onclick=saveSettings;
   if(settingsTab==="overlay") wireOverlaySettings510();
   if(settingsTab==="manual") wireManual058();
+  if(settingsTab==="customerImport") wireCustomerImport065();
   ["emailSubject","emailSig"].forEach(id=>{ const el=document.getElementById(id); if(el){ el.addEventListener("focus",()=>lastEmailTemplateField=id); el.addEventListener("input",updateEmailPreview); } });
   [["emailTo","emailPreviewTo530","Customer email added when sending"],["emailCc","emailPreviewCc530","None"]].forEach(([inputId,previewId,fallback])=>{ const input=document.getElementById(inputId); const preview=document.getElementById(previewId); if(input&&preview) input.addEventListener("input",()=>preview.textContent=input.value.trim()||fallback); });
   document.querySelectorAll(".emailTagChip").forEach(b=>b.onclick=()=>{ const target=document.getElementById(lastEmailTemplateField) || document.getElementById("emailSubject"); insertAtCursor(target, b.dataset.emailTag || ""); });
@@ -6442,7 +6854,7 @@ function diagnostics(){
 }
 function showChangelog(){
   const notes = [
-    "Build 0.64.1 simplifies contextual Help and the FireVault Academy reader while preserving the multi-user sync foundation.",
+    "Build 0.65.1 calculates missing customer latitude and longitude before duplicate-safe CSV importing.",
     "Manual chapters document installation, Today, Sites, Site Detail, field workflow, notes, tasks, deficiencies, photos, GPS, route tracking, reports, email, settings, backups, updates, and troubleshooting.",
     "Added living-documentation revision metadata and a release-state review requirement.",
     "Added Quick Capture for timestamped site notes, follow-up tasks, and deficiencies without leaving Today.",
@@ -6455,7 +6867,7 @@ function showChangelog(){
   overlay.className="releaseOverlay";
   overlay.innerHTML=`<div class="releaseSheet" role="dialog" aria-modal="true" aria-label="FireVault release notes">
     <div class="releaseHead"><div><strong>${fireVaultBrand575()}</strong><span>Build ${BUILD}</span></div><button class="ghost iconBtn" id="closeRelease" aria-label="Close release notes">×</button></div>
-    <div class="releaseBody"><h2>Release Notes</h2><p class="releaseIntro">Faster field capture directly from Today.</p><ul>${notes.map(n=>`<li>${esc(n)}</li>`).join("")}</ul></div>
+    <div class="releaseBody"><h2>Release Notes</h2><p class="releaseIntro">Address coordinate calculation with duplicate-safe customer importing.</p><ul>${notes.map(n=>`<li>${esc(n)}</li>`).join("")}</ul></div>
   </div>`;
   document.body.appendChild(overlay);
   const close=()=>overlay.remove();
