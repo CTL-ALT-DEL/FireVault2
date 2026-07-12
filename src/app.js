@@ -1,4 +1,4 @@
-import { BUILD, KEY, ACTIVE_JOB_KEY, loadData, saveData, ensureSite, fullAddress, esc, uid, downloadBlob, syncSummary, syncQueue, syncConflicts, syncActivity, createSyncPackage, importSyncPackage, resolveSyncConflict, notePackageExport, deviceIdentity, recordSyncActivity, autoBackupInfo, latestAutoBackup, restoreAutoBackup, isDemoMode, setDemoMode, resetDemoData } from "./storage.js?v=0.74.1";
+import { BUILD, KEY, ACTIVE_JOB_KEY, loadData, saveData, ensureSite, fullAddress, esc, uid, downloadBlob, syncSummary, syncQueue, syncConflicts, syncActivity, createSyncPackage, importSyncPackage, resolveSyncConflict, notePackageExport, deviceIdentity, recordSyncActivity, autoBackupInfo, latestAutoBackup, restoreAutoBackup, isDemoMode, setDemoMode, resetDemoData } from "./storage.js?v=0.75.0";
 window.__FIREVAULT_MODULE_READY = true;
 
 function fvPreferenceStore0739(){
@@ -146,7 +146,10 @@ function fvIcon073(name, extraClass=""){
     map:'<path d="m3 6 6-3 6 3 6-3v15l-6 3-6-3-6 3z"/><path d="M9 3v15M15 6v15"/>',
     list:'<path d="M8 6h13M8 12h13M8 18h13"/><circle cx="4" cy="6" r="1"/><circle cx="4" cy="12" r="1"/><circle cx="4" cy="18" r="1"/>',
     route:'<path d="M5 19 19 5M10 5h9v9"/><path d="M5 8v11h11"/>',
-    call:'<path d="M7 4 4.8 6.2c-.8.8-.9 2-.4 3 2 4.2 5.4 7.6 9.6 9.6 1 .5 2.2.4 3-.4L19.2 16l-4-3-1.7 1.7a13.5 13.5 0 0 1-4.2-4.2L11 8.8z"/>'
+    call:'<path d="M7 4 4.8 6.2c-.8.8-.9 2-.4 3 2 4.2 5.4 7.6 9.6 9.6 1 .5 2.2.4 3-.4L19.2 16l-4-3-1.7 1.7a13.5 13.5 0 0 1-4.2-4.2L11 8.8z"/>',
+    note:'<path d="M5 4h14v16H5z"/><path d="M8 8h8M8 12h8M8 16h5"/>',
+    visit:'<circle cx="12" cy="8" r="3"/><path d="M6 21v-2a6 6 0 0 1 12 0v2"/><path d="M19 4v4M17 6h4"/>',
+    photo:'<rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="9" cy="10" r="2"/><path d="m21 15-5-5L5 19"/>'
   };
   return `<svg class="fvIcon073 ${esc(extraClass)}" viewBox="0 0 24 24" aria-hidden="true" focusable="false">${icons[name]||icons.home}</svg>`;
 }
@@ -3821,11 +3824,11 @@ function accountOverviewTab0735(s,ctx){
       <button id="defBtn" class="metricDanger0735"><span>DEFICIENCIES</span><strong>${def} Open</strong></button>
       <button id="taskBtn" class="metricBlue0735"><span>NEXT DUE</span><strong>${esc(accountNextDue0735(s))}</strong><small>${open} open task${open===1?"":"s"}</small></button>
     </section>
-    <section class="accountQuickBar0735">
-      <button id="callPrimary477" ${contactPhone?"":"disabled"}><span>☎</span><strong>Call</strong></button>
-      <button id="navigateBtn477" ${hasGps(s)?"":"disabled"}><span>➤</span><strong>Route</strong></button>
-      <button id="qaAddNote544"><span>✎</span><strong>Note</strong></button>
-      <button id="qaStartVisit610"><span>${ctx.activeHere?"▶":"＋"}</span><strong>${ctx.activeHere?"Resume":"Visit"}</strong></button>
+    <section class="accountQuickBar0735 technicianActionBar075" aria-label="Primary account actions">
+      <button id="callPrimary477" ${contactPhone?"":"disabled"}>${fvIcon073("call","technicianActionIcon075")}<strong>Call</strong><small>${contactPhone?"Primary contact":"No phone"}</small></button>
+      <button id="navigateBtn477" ${hasGps(s)?"":"disabled"}>${fvIcon073("route","technicianActionIcon075")}<strong>Route</strong><small>${hasGps(s)?"Open directions":"No GPS"}</small></button>
+      <button id="qaAddNote544">${fvIcon073("note","technicianActionIcon075")}<strong>Note</strong><small>Add site note</small></button>
+      <button id="qaStartVisit610">${fvIcon073("visit","technicianActionIcon075")}<strong>${ctx.activeHere?"Resume":"Visit"}</strong><small>${ctx.activeHere?"Continue work":"Start service"}</small></button>
     </section>
     <section class="accountPanel0735"><div class="accountPanelHead0735"><div><span>RECENT ACTIVITY</span><h2>Account Timeline</h2></div><button class="ghost" id="allVisitsBtn">View All</button></div>${accountRecentMarkup0735(s)}</section>
   </div>`;
@@ -3904,7 +3907,8 @@ function siteDetail(){
   const panelMarkup=accountDetailTab0735==="details"?accountDetailsTab0735(s,ctx):accountDetailTab0735==="equipment"?accountEquipmentTab0735(s):accountDetailTab0735==="docs"?accountDocsTab0735(s):accountDetailTab0735==="notes"?accountNotesTab0735(s,ctx):accountOverviewTab0735(s,ctx);
 
   html(`<div class="screen siteDetail0735">
-    <header class="accountHeader0735"><button class="accountBack0735" id="backBtn" aria-label="Back to Accounts">‹</button><div><strong>${esc(s.name||"Unnamed Account")}</strong><span>${esc(accountId)}</span></div><button class="accountPin0735 ${isPinnedSite566(s)?"pinned":""}" id="pinSiteBtn566" aria-label="Pin account">${isPinnedSite566(s)?"★":"☆"}</button><button class="accountEdit0735" id="editBtn">Edit</button></header>
+    <header class="accountHeader0735 technicianHeader075"><button class="accountBack0735" id="backBtn" aria-label="Back to Accounts">‹</button><div class="technicianIdentity075"><span class="technicianEyebrow075">ACCOUNT</span><strong>${esc(s.name||"Unnamed Account")}</strong><span>${esc(accountId)}${fullAddress(s)?` • ${esc(fullAddress(s))}`:""}</span></div><button class="accountPin0735 ${isPinnedSite566(s)?"pinned":""}" id="pinSiteBtn566" aria-label="Pin account">${isPinnedSite566(s)?"★":"☆"}</button><button class="accountEdit0735" id="editBtn">Edit</button></header>
+    <section class="technicianStatus075"><span class="status-${esc(health.cls)}">${esc(health.label)}</span><span>${esc(accountCategoryLabel0735(s))}</span>${open?`<span>${open} task${open===1?"":"s"}</span>`:""}${def?`<span class="hasDef075">${def} deficienc${def===1?"y":"ies"}</span>`:""}</section>
     ${accountTagChips0737(s,8)?`<div class="accountTagRail0737">${accountTagChips0737(s,8)}</div>`:""}
     <nav class="accountTabs0735" aria-label="Account sections">${tabs.map(([key,label])=>`<button class="${accountDetailTab0735===key?"active":""}" data-account-tab0735="${key}">${label}</button>`).join("")}</nav>
     <div class="accountTabScroll0735">${panelMarkup}</div>

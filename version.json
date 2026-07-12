@@ -1,6 +1,6 @@
 {
-  "build": "0.74.1",
+  "build": "0.75.0",
   "released": "2026-07-11",
-  "note": "Adds a protected default Demo Mode workspace when no real customer vault exists.",
-  "notes": "The fictional Boise demo master is generated in the app, cannot be deleted, and uses a temporary editable working copy. Exiting Demo Mode discards demonstration changes and restores the real vault. The Demo Mode indicator now appears as a small blinking label in the top header."
+  "note": "Technician UX Refresh",
+  "notes": "Unifies page spacing, navigation, touch targets, account actions, information hierarchy, and responsive behavior for faster field use while preserving the existing FireVault data model."
 }
