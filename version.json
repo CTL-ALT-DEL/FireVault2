@@ -1,5 +1,5 @@
 {
-  "build": "0.75.4",
+  "build": "0.75.5",
   "released": "2026-07-11",
   "note": "Structural Header Repair",
   "notes": "Replaces fixed overlay offsets on non-home screens with a real header/content/navigation grid so Accounts controls cannot be covered by the global logo and date header."

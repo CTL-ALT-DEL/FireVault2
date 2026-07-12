@@ -15400,7 +15400,51 @@ main{
   .settingsTopTabs0736{overflow-x:auto!important;justify-content:flex-start!important}
   .settingsTopTabs0736 button{flex:0 0 72px!important}
 }
-\n\n/* Build 0.75.1 — Account workflow polish */\n.accountTabsSticky0751{\n  position:sticky!important;\n  top:0!important;\n  z-index:8!important;\n  flex:0 0 auto!important;\n  backdrop-filter:blur(14px);\n  -webkit-backdrop-filter:blur(14px);\n}\n.accountTabsSticky0751 button{display:flex!important;align-items:center!important;justify-content:center!important;gap:5px!important}\n.accountTabsSticky0751 button b{\n  min-width:18px;height:18px;padding:0 5px;border-radius:999px;\n  display:inline-flex;align-items:center;justify-content:center;\n  background:#283544;color:#dbe7f3;font-size:.55rem;line-height:1;font-weight:900;\n}\n.accountTabsSticky0751 button.active b{background:#ef4444;color:#fff}\n.accountPersistentActions0751{\n  display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:7px;\n  flex:0 0 auto;padding:1px 0 2px;\n}\n.accountPersistentActions0751 button{\n  min-width:0;min-height:64px;padding:7px 4px;\n  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;\n  border:1px solid #3a4756;border-radius:12px;\n  background:linear-gradient(155deg,#1a2531,#111922);color:#f8fafc;\n  box-shadow:inset 0 1px 0 rgba(255,255,255,.05),0 5px 14px rgba(0,0,0,.18);\n  transition:transform .12s ease,border-color .12s ease,background .12s ease;\n}\n.accountPersistentActions0751 button:active{transform:scale(.96);border-color:#ef4444}\n.accountPersistentActions0751 button:disabled{opacity:.38;filter:saturate(.35)}\n.accountPersistentActions0751 button.activeVisit0751{border-color:#16a34a;background:linear-gradient(155deg,#12351f,#0d2417)}\n.accountPersistentIcon0751{width:25px!important;height:25px!important;color:#f87171!important;stroke-width:1.9!important}\n.accountPersistentActions0751 .activeVisit0751 .accountPersistentIcon0751{color:#4ade80!important}\n.accountPersistentActions0751 strong{font-size:.74rem;line-height:1;font-weight:900;letter-spacing:.015em}\n.accountTabScroll0751{min-height:0!important;overflow-y:auto!important;overscroll-behavior:contain;padding-bottom:18px!important}\n@media(max-width:390px){\n  .accountTabsSticky0751 button{min-width:70px!important}\n  .accountPersistentActions0751{gap:6px}\n  .accountPersistentActions0751 button{min-height:60px;border-radius:11px}\n  .accountPersistentIcon0751{width:23px!important;height:23px!important}\n  .accountPersistentActions0751 strong{font-size:.69rem}\n}\n
+
+
+/* Build 0.75.1 — Account workflow polish */
+.accountTabsSticky0751{
+  position:sticky!important;
+  top:0!important;
+  z-index:8!important;
+  flex:0 0 auto!important;
+  backdrop-filter:blur(14px);
+  -webkit-backdrop-filter:blur(14px);
+}
+.accountTabsSticky0751 button{display:flex!important;align-items:center!important;justify-content:center!important;gap:5px!important}
+.accountTabsSticky0751 button b{
+  min-width:18px;height:18px;padding:0 5px;border-radius:999px;
+  display:inline-flex;align-items:center;justify-content:center;
+  background:#283544;color:#dbe7f3;font-size:.55rem;line-height:1;font-weight:900;
+}
+.accountTabsSticky0751 button.active b{background:#ef4444;color:#fff}
+.accountPersistentActions0751{
+  display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:7px;
+  flex:0 0 auto;padding:1px 0 2px;
+}
+.accountPersistentActions0751 button{
+  min-width:0;min-height:64px;padding:7px 4px;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;
+  border:1px solid #3a4756;border-radius:12px;
+  background:linear-gradient(155deg,#1a2531,#111922);color:#f8fafc;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.05),0 5px 14px rgba(0,0,0,.18);
+  transition:transform .12s ease,border-color .12s ease,background .12s ease;
+}
+.accountPersistentActions0751 button:active{transform:scale(.96);border-color:#ef4444}
+.accountPersistentActions0751 button:disabled{opacity:.38;filter:saturate(.35)}
+.accountPersistentActions0751 button.activeVisit0751{border-color:#16a34a;background:linear-gradient(155deg,#12351f,#0d2417)}
+.accountPersistentIcon0751{width:25px!important;height:25px!important;color:#f87171!important;stroke-width:1.9!important}
+.accountPersistentActions0751 .activeVisit0751 .accountPersistentIcon0751{color:#4ade80!important}
+.accountPersistentActions0751 strong{font-size:.74rem;line-height:1;font-weight:900;letter-spacing:.015em}
+.accountTabScroll0751{min-height:0!important;overflow-y:auto!important;overscroll-behavior:contain;padding-bottom:18px!important}
+@media(max-width:390px){
+  .accountTabsSticky0751 button{min-width:70px!important}
+  .accountPersistentActions0751{gap:6px}
+  .accountPersistentActions0751 button{min-height:60px;border-radius:11px}
+  .accountPersistentIcon0751{width:23px!important;height:23px!important}
+  .accountPersistentActions0751 strong{font-size:.69rem}
+}
+
 /* Build 0.75.3 — definitive fixed-header clearance repair */
 :root{--fv-measured-header-h:var(--headerH)}
 body.app-booted533:not(.homeFullscreen480) main{
@@ -15614,4 +15658,69 @@ body.app-booted533:not(.homeFullscreen480) .accountsHeader0736{
   .accountPersistentActions0751 button{min-height:68px!important;padding:7px 3px!important;display:flex!important;flex-direction:column!important;justify-content:center!important;text-align:center!important}
   .accountPersistentIcon0751{width:25px!important;height:25px!important;grid-row:auto!important}
   .accountPersistentActions0751 strong{font-size:.67rem!important;justify-self:auto!important}
+}
+
+
+/* Build 0.75.5 — Account Detail action-grid structural repair */
+.siteDetail0735{
+  display:grid!important;
+  grid-template-columns:minmax(0,1fr)!important;
+  grid-template-rows:auto auto auto auto minmax(0,1fr)!important;
+  align-items:stretch!important;
+  gap:8px!important;
+  width:100%!important;
+  min-width:0!important;
+  padding:0!important;
+}
+.siteDetail0735 > .technicianHeader075,
+.siteDetail0735 > .technicianStatus075,
+.siteDetail0735 > .accountTagRail0737,
+.siteDetail0735 > .accountPersistentActions0751,
+.siteDetail0735 > .accountTabs0735,
+.siteDetail0735 > .accountTabScroll0735{
+  grid-column:1!important;
+  width:100%!important;
+  min-width:0!important;
+  max-width:none!important;
+  margin-left:0!important;
+  margin-right:0!important;
+  align-self:stretch!important;
+}
+.accountPersistentActions0751{
+  display:grid!important;
+  grid-template-columns:repeat(4,minmax(0,1fr))!important;
+  grid-auto-flow:column!important;
+  gap:8px!important;
+  padding:0 2px 2px!important;
+  flex:none!important;
+}
+.accountPersistentActions0751 button{
+  width:100%!important;
+  min-width:0!important;
+  max-width:none!important;
+  min-height:74px!important;
+  padding:8px 4px!important;
+  display:flex!important;
+  flex-direction:column!important;
+  align-items:center!important;
+  justify-content:center!important;
+  gap:5px!important;
+  writing-mode:horizontal-tb!important;
+}
+.accountTabs0735{
+  width:100%!important;
+  min-width:0!important;
+  margin:0!important;
+  position:relative!important;
+  top:auto!important;
+}
+.accountTabScroll0735{
+  min-height:0!important;
+  overflow-y:auto!important;
+  margin:0!important;
+  padding-top:10px!important;
+}
+@media(max-width:350px){
+  .accountPersistentActions0751{grid-template-columns:repeat(2,minmax(0,1fr))!important;grid-auto-flow:row!important}
+  .accountPersistentActions0751 button{min-height:66px!important}
 }
