@@ -1,34 +1,21 @@
-# FireVault Build 0.79.10 — Accounts Card Hierarchy Polish
+# FireVault Build 0.79.11 — Smart Account Intelligence
 
 ## Changes
 
-- Moved the Favorite star to the far-right side of each Accounts card title row.
-- Moved the built-in account category badge into the lower status row.
-- Moved automatic custom category tags into the same row as GPS Ready / Needs GPS.
-- Preserved account opening, Favorites, Call, Route, search, sorting, and locked-list scrolling.
-- No vault or storage-key changes.
-
-
-This release removes unnecessary summary controls from the Accounts and Nearby GPS workflows.
-
-## Accounts directory
-
-- Removes the four filter tiles: All, Attention, Open Work, and No GPS.
-- Keeps search, Jump To, Sort By, Favorites, Call, Route, and locked list scrolling.
-- Clears any older saved filter selection so all accounts appear automatically.
-- Expands the account list into the space previously used by the filter tiles.
-
-## Nearby GPS comparison
-
-- Removes the Total Accounts, GPS Ready, and Missing GPS counters.
-- Removes the Location Comparison Complete message after a successful scan.
-- Keeps Scan/Refresh, permission and error guidance, distance results, radius behavior, and nearest-account fallback.
+- Adds a configurable Account Health / Data Quality score from 0–100.
+- Evaluates address, Account ID, GPS, Plus Code, contacts, phone, panel information, photos, documents, notes, and visit history.
+- Applies limited operational deductions for overdue tasks and open or critical deficiencies.
+- Shows optional Health controls on Accounts cards and Account Detail.
+- Tapping a Health score opens a missing-information checklist with direct navigation to the appropriate workspace.
+- Adds **Settings → Data → Data Quality** with display controls, minimum acceptable score, optional-field handling, and a downloadable Data Quality report.
+- Preserves the 0.79.10 map-marker hierarchy and deeper selected-account zoom.
 
 ## Preserved
 
 - Existing `firevault_vault_build_030` storage key
-- Security schema 4 and all account data
+- Security schema 4 and all account records
 - Demo Mode, automatic snapshots, Privacy Lock, and Security Center
-- WebDAV, Microsoft storage profiles, Plus Codes, and backend adapters
+- WebDAV and Microsoft storage profiles
+- Google Plus Codes and backend adapters
 
 Deploy over the existing FireVault installation. Do not delete or reinstall the Home Screen PWA.

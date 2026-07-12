@@ -1,6 +1,6 @@
 {
-  "build": "0.79.10",
+  "build": "0.79.11",
   "released": "2026-07-12",
-  "note": "Nearby map marker hierarchy",
-  "label": "Single-account dots, same-address counts, area clusters, and deeper tap zoom"
+  "note": "Smart Account Intelligence",
+  "label": "Account health scoring, missing-data guidance, and Data Quality reporting"
 }

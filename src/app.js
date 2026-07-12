@@ -1,6 +1,6 @@
-import { BUILD, KEY, ACTIVE_JOB_KEY, loadData, saveData, ensureSite, fullAddress, esc, uid, downloadBlob, syncSummary, syncQueue, syncConflicts, syncActivity, createSyncPackage, importSyncPackage, resolveSyncConflict, notePackageExport, deviceIdentity, recordSyncActivity, autoBackupInfo, latestAutoBackup, restoreAutoBackup, isDemoMode, setDemoMode, resetDemoData, securityFoundationSummary, securityAudit, recycleBinInfo, restoreRecycleRecord, purgeRecycleBin, recordSecurityEvent, validateVaultIntegrity } from "./storage.js?v=0.79.10";
-import { backendAdapterSummary, runBackendAdapterDiagnostics, backendAdapterManifest, PROVIDER_CONTRACT_VERSION, FILE_STORAGE_CATALOG, fileStoragePlanSummary, cloudFileStorageManifest, MICROSOFT_STORAGE_TYPES, microsoftStorageAccounts, saveMicrosoftStorageAccounts, createMicrosoftStorageAccount, microsoftStorageAccountById, microsoftAppRegistration, saveMicrosoftAppRegistration, microsoftStorageSummary, microsoftStorageManifest } from "./providers.js?v=0.79.10";
-import { encodePlusCode, isValidFullPlusCode, normalizePlusCode, plusCodePrecisionLabel } from "./open-location-code.js?v=0.79.10";
+import { BUILD, KEY, ACTIVE_JOB_KEY, loadData, saveData, ensureSite, fullAddress, esc, uid, downloadBlob, syncSummary, syncQueue, syncConflicts, syncActivity, createSyncPackage, importSyncPackage, resolveSyncConflict, notePackageExport, deviceIdentity, recordSyncActivity, autoBackupInfo, latestAutoBackup, restoreAutoBackup, isDemoMode, setDemoMode, resetDemoData, securityFoundationSummary, securityAudit, recycleBinInfo, restoreRecycleRecord, purgeRecycleBin, recordSecurityEvent, validateVaultIntegrity } from "./storage.js?v=0.79.11";
+import { backendAdapterSummary, runBackendAdapterDiagnostics, backendAdapterManifest, PROVIDER_CONTRACT_VERSION, FILE_STORAGE_CATALOG, fileStoragePlanSummary, cloudFileStorageManifest, MICROSOFT_STORAGE_TYPES, microsoftStorageAccounts, saveMicrosoftStorageAccounts, createMicrosoftStorageAccount, microsoftStorageAccountById, microsoftAppRegistration, saveMicrosoftAppRegistration, microsoftStorageSummary, microsoftStorageManifest } from "./providers.js?v=0.79.11";
+import { encodePlusCode, isValidFullPlusCode, normalizePlusCode, plusCodePrecisionLabel } from "./open-location-code.js?v=0.79.11";
 window.__FIREVAULT_MODULE_READY = true;
 
 function fvPreferenceStore0739(){
@@ -1244,6 +1244,147 @@ function siteHealthLine(s){
   const h=siteHealth(s);
   return `${h.label} • ${h.score}% • ${h.details.slice(0,2).join(" • ")}`;
 }
+
+/* Build 0.79.11 — Smart Account Intelligence / data-quality scoring. */
+function dataQualitySettings07911(){
+  const raw=data.settings?.dataQuality||{};
+  return {
+    enabled:raw.enabled!==false,
+    showOnCards:raw.showOnCards!==false,
+    showOnAccount:raw.showOnAccount!==false,
+    includeInReports:raw.includeInReports!==false,
+    minimumAcceptable:[60,70,80,90].includes(Number(raw.minimumAcceptable))?Number(raw.minimumAcceptable):80,
+    ignoreOptional:!!raw.ignoreOptional
+  };
+}
+function accountDataQuality07911(s={}){
+  ensureSite(s);
+  const cfg=dataQualitySettings07911();
+  const docs=Array.isArray(s.docs)?s.docs:[];
+  const hasPhoto=docs.some(d=>docHasPhoto512(d));
+  const hasDocument=docs.some(d=>!docHasPhoto512(d));
+  const contact=primaryContact477(s)||(s.contacts||[])[0];
+  const phone=formatPhone0758(contact?.phone||s.sitePhone||s.devicePhone)||"";
+  const checks=[
+    {key:"address",label:"Complete street address",ok:!!String(fullAddress(s)||"").trim(),weight:7,action:"edit"},
+    {key:"accountId",label:"Account ID",ok:!!String(accountId069(s)||"").trim(),weight:5,action:"edit"},
+    {key:"gps",label:"GPS coordinates",ok:hasGps(s),weight:12,action:"edit"},
+    {key:"plusCode",label:"Google Plus Code",ok:!!String(sitePlusCode071(s)||"").trim(),weight:8,action:"details"},
+    {key:"contact",label:"Primary contact",ok:!!contact,weight:10,action:"contacts"},
+    {key:"phone",label:"Callable phone number",ok:!!phone,weight:8,action:"contacts"},
+    {key:"panelMaker",label:"Panel manufacturer",ok:!!String(s.panelManufacturer||"").trim(),weight:8,action:"edit"},
+    {key:"panelModel",label:"Panel model",ok:!!String(s.panelModel||"").trim(),weight:8,action:"edit"},
+    {key:"photo",label:"Account or panel photo",ok:hasPhoto,weight:10,optional:true,action:"photos"},
+    {key:"document",label:"Manual or site document",ok:hasDocument,weight:8,optional:true,action:"docs"},
+    {key:"notes",label:"Technician notes",ok:!!String(s.notes||"").trim()||(s.noteEntries||[]).length>0,weight:6,optional:true,action:"notes"},
+    {key:"visit",label:"Completed visit history",ok:(s.visits||[]).length>0,weight:10,optional:true,action:"visits"}
+  ];
+  const scored=checks.filter(c=>!(cfg.ignoreOptional&&c.optional));
+  const possible=scored.reduce((n,c)=>n+c.weight,0)||1;
+  const earned=scored.reduce((n,c)=>n+(c.ok?c.weight:0),0);
+  const openDef=(s.deficiencies||[]).filter(d=>String(d.status||"Open").toLowerCase()!=="closed");
+  const overdue=(s.tasks||[]).filter(t=>!taskIsDone(t)&&taskDueState(t)==="overdue");
+  const critical=openDef.filter(d=>String(d.priority||"").toLowerCase()==="critical");
+  const issuePenalty=Math.min(12,openDef.length*2)+Math.min(8,overdue.length*3)+Math.min(8,critical.length*4);
+  const score=Math.max(0,Math.min(100,Math.round((earned/possible)*100)-issuePenalty));
+  let label="Excellent",cls="excellent";
+  if(score<40){label="Critical";cls="critical";}
+  else if(score<60){label="Incomplete";cls="incomplete";}
+  else if(score<80){label="Needs attention";cls="attention";}
+  else if(score<95){label="Good";cls="good";}
+  const missing=scored.filter(c=>!c.ok);
+  const issues=[];
+  if(critical.length)issues.push(`${critical.length} critical deficienc${critical.length===1?"y":"ies"}`);
+  if(overdue.length)issues.push(`${overdue.length} overdue task${overdue.length===1?"":"s"}`);
+  if(openDef.length&&!critical.length)issues.push(`${openDef.length} open deficienc${openDef.length===1?"y":"ies"}`);
+  return {score,label,cls,checks,missing,issues,acceptable:score>=cfg.minimumAcceptable,minimum:cfg.minimumAcceptable};
+}
+function accountQualitySummary07911(){
+  const rows=(data.sites||[]).map(s=>({s,q:accountDataQuality07911(s)}));
+  const average=rows.length?Math.round(rows.reduce((n,r)=>n+r.q.score,0)/rows.length):0;
+  const cfg=dataQualitySettings07911();
+  return {rows,average,acceptable:rows.filter(r=>r.q.score>=cfg.minimumAcceptable).length,below:rows.filter(r=>r.q.score<cfg.minimumAcceptable).length,minimum:cfg.minimumAcceptable};
+}
+function accountQualityActionLabel07911(action){
+  return ({edit:"Edit account",details:"Open location details",contacts:"Add contact",photos:"Add photo",docs:"Add document",notes:"Add notes",visits:"Add visit"})[action]||"Open account";
+}
+function openAccountQuality07911(siteId){
+  const target=(data.sites||[]).find(s=>s.id===siteId);
+  if(!target){toast("Account is no longer available.","error");return;}
+  const q=accountDataQuality07911(target);
+  const overlay=document.createElement("div");
+  overlay.className="accountQualityOverlay07911";
+  const missing=q.missing.length?q.missing.map(item=>`<button type="button" data-quality-action07911="${esc(item.action)}"><span class="qualityCheck07911 missing">!</span><div><strong>${esc(item.label)}</strong><small>${esc(accountQualityActionLabel07911(item.action))}</small></div><b>›</b></button>`).join(""):`<div class="accountQualityComplete07911"><span>✓</span><strong>Core account information is complete.</strong><small>Continue verifying details during service visits.</small></div>`;
+  overlay.innerHTML=`<section class="accountQualitySheet07911" role="dialog" aria-modal="true" aria-label="Account Health for ${esc(target.name||"account")}">
+    <header><div><span>SMART ACCOUNT INTELLIGENCE</span><h2>${esc(target.name||"Unnamed Account")}</h2><p>${esc(accountId069(target)||fullAddress(target)||"Account details")}</p></div><button type="button" class="ghost accountQualityClose07911" aria-label="Close">×</button></header>
+    <div class="accountQualityHero07911 quality-${esc(q.cls)}"><strong>${q.score}</strong><div><span>${esc(q.label)}</span><small>Target ${q.minimum} or higher</small></div></div>
+    ${q.issues.length?`<div class="accountQualityIssues07911">${q.issues.map(x=>`<span>${esc(x)}</span>`).join("")}</div>`:""}
+    <div class="accountQualityList07911"><h3>${q.missing.length?"Improve this account":"Account ready"}</h3>${missing}</div>
+    <footer><button type="button" class="ghost accountQualityOpen07911">Open Account</button><button type="button" class="primary accountQualityEdit07911">Edit Account</button></footer>
+  </section>`;
+  document.body.appendChild(overlay);
+  const close=()=>overlay.remove();
+  overlay.addEventListener("click",event=>{if(event.target===overlay||event.target.closest(".accountQualityClose07911"))close();});
+  overlay.querySelector(".accountQualityOpen07911")?.addEventListener("click",()=>{close();selectedSiteId=target.id;route("siteDetail");});
+  overlay.querySelector(".accountQualityEdit07911")?.addEventListener("click",()=>{close();selectedSiteId=target.id;mode="edit";route("siteForm");});
+  overlay.querySelectorAll("[data-quality-action07911]").forEach(btn=>btn.addEventListener("click",()=>{
+    const action=btn.dataset.qualityAction07911;close();selectedSiteId=target.id;
+    if(action==="edit"){mode="edit";route("siteForm");return;}
+    if(action==="contacts"){route("contactsList");return;}
+    if(action==="photos"){mode="newPhoto";route("siteDocForm");return;}
+    if(action==="docs"){route("siteDocs");return;}
+    if(action==="notes"){accountDetailTab0735="notes";rememberAccountTab0751("notes");route("siteDetail");return;}
+    if(action==="visits"){route("visits");return;}
+    if(action==="details"){accountDetailTab0735="details";rememberAccountTab0751("details");route("siteDetail");return;}
+    route("siteDetail");
+  }));
+}
+function dataQualityReportText07911(){
+  const summary=accountQualitySummary07911();
+  const rows=[...summary.rows].sort((a,b)=>a.q.score-b.q.score);
+  const missingCounts=new Map();
+  rows.forEach(({q})=>q.missing.forEach(item=>missingCounts.set(item.label,(missingCounts.get(item.label)||0)+1)));
+  const lines=[
+    "FIREVAULT DATA QUALITY REPORT",
+    `Build: ${BUILD}`,
+    `Generated: ${new Date().toLocaleString()}`,
+    `Accounts: ${rows.length}`,
+    `Average score: ${summary.average}`,
+    `Meeting target (${summary.minimum}+): ${summary.acceptable}`,
+    `Below target: ${summary.below}`,
+    "",
+    "MOST COMMON MISSING INFORMATION",
+    ...([...missingCounts.entries()].sort((a,b)=>b[1]-a[1]).map(([label,count])=>`- ${label}: ${count}`)),
+    "",
+    "LOWEST-SCORING ACCOUNTS",
+    ...(rows.slice(0,50).map(({s,q},index)=>`${index+1}. ${s.name||"Unnamed Account"} — ${q.score} ${q.label}\n   ${accountId069(s)||fullAddress(s)||"No account ID or address"}\n   Missing: ${q.missing.map(x=>x.label).join(", ")||"None"}${q.issues.length?`\n   Issues: ${q.issues.join(", ")}`:""}`))
+  ];
+  return lines.join("\n");
+}
+function dataQualityPanel07911(){
+  const cfg=dataQualitySettings07911();
+  const summary=accountQualitySummary07911();
+  const lowest=[...summary.rows].sort((a,b)=>a.q.score-b.q.score).slice(0,5);
+  return `<div class="settingsStack settingsStack540 dataQualitySettings07911">
+    ${settingsSection540("Account intelligence","Data Quality & Health","Score account completeness and show technicians exactly what information is missing.",`
+      <div class="dataQualityStats07911"><div><strong>${summary.average}</strong><span>Average</span></div><div><strong>${summary.acceptable}</strong><span>At target</span></div><div><strong>${summary.below}</strong><span>Below target</span></div></div>
+      <div class="settingsList settingsToggleList540">${checkBlock("dqEnabled07911","Enable Account Health scores",cfg.enabled)}${checkBlock("dqCards07911","Show scores on Accounts cards",cfg.showOnCards)}${checkBlock("dqAccount07911","Show score in Account Detail",cfg.showOnAccount)}${checkBlock("dqReports07911","Include quality status in snapshots and reports",cfg.includeInReports)}${checkBlock("dqIgnoreOptional07911","Ignore optional photos, documents, notes, and visits",cfg.ignoreOptional)}</div>
+      <div class="settingsGrid settingsGrid540">${fieldBlock("Minimum acceptable score",`<select id="dqMinimum07911">${[60,70,80,90].map(n=>`<option value="${n}" ${cfg.minimumAcceptable===n?"selected":""}>${n}</option>`).join("")}</select>`,`Scores below this target are flagged for improvement.`)}</div>
+    `,"green",`<button class="primary saveMini" id="saveSettings">Save</button>`)}
+    ${settingsSection540("Priority list","Lowest-scoring accounts",lowest.length?"Start with these accounts to improve database quality.":"No accounts are available yet.",`
+      <div class="dataQualityLowList07911">${lowest.length?lowest.map(({s,q})=>`<button type="button" data-quality-account07911="${esc(s.id)}"><span class="qualityMini07911 quality-${esc(q.cls)}">${q.score}</span><div><strong>${esc(s.name||"Unnamed Account")}</strong><small>${esc(q.missing.slice(0,2).map(x=>x.label).join(" • ")||"Core information complete")}</small></div><b>›</b></button>`).join(""):`<div class="empty">No accounts to score.</div>`}</div>
+      <div class="dataQualityActions07911"><button class="ghost" id="downloadDataQuality07911">Download Data Quality Report</button></div>
+    `,"cyan")}
+  </div>`;
+}
+function wireDataQuality07911(){
+  document.querySelectorAll("[data-quality-account07911]").forEach(btn=>btn.addEventListener("click",()=>openAccountQuality07911(btn.dataset.qualityAccount07911)));
+  document.getElementById("downloadDataQuality07911")?.addEventListener("click",()=>{
+    const stamp=new Date().toISOString().slice(0,10);
+    downloadBlob(`firevault-data-quality-${stamp}.txt`,dataQualityReportText07911(),"text/plain");
+    toast("Data Quality report downloaded.","success");
+  });
+}
 function reportPlusCodeLine0794(s){
   const cfg=plusCodeSettings0794();
   if(!cfg.enabled||!cfg.includeInReports)return "";
@@ -1264,6 +1405,7 @@ function siteSnapshotText(s){
     `Address: ${fullAddress(s)}`,
     `Panel: ${[s.panelManufacturer,s.panelModel].filter(Boolean).join(" ")||"Not entered"}`,
     `Health: ${h.label} ${h.score}% - ${h.details.join("; ")}`,
+    ...(dataQualitySettings07911().enabled&&dataQualitySettings07911().includeInReports?[`Data Quality: ${accountDataQuality07911(s).score} ${accountDataQuality07911(s).label}`]:[]),
     `GPS: ${gpsLine(s)}`,
     ...(reportPlusCodeLine0794(s)?[reportPlusCodeLine0794(s)]:[]),
     `Maps: ${mapUrl(s, data.settings.gps?.mapProvider==="google" ? "google" : "apple")}`,
@@ -3796,6 +3938,8 @@ function accountDirectoryRow0759(s,addressCount=1){
   const categoryLabel=NEARBY_CATEGORY_META_070[category]?.label||"Basic";
   const health=siteHealth(s);
   const healthBadge=accountHealthBadge0762(health);
+  const qualityCfg07911=dataQualitySettings07911();
+  const quality07911=qualityCfg07911.enabled?accountDataQuality07911(s):null;
   const work=accountDirectoryWork0759(s);
   const panel=[s.panelManufacturer,s.panelModel].filter(Boolean).join(" ");
   const contact=primaryContact477(s);
@@ -3824,6 +3968,7 @@ function accountDirectoryRow0759(s,addressCount=1){
         ${addressCount>1?`<span class="accountSharedAddress0762">${addressCount} accounts here</span>`:""}
         <span class="accountWork0759 ${work.cls}">${esc(work.label)}</span>
         <span class="accountGps0759 ${gpsReady?'ready':'missing'}">${gpsReady?'GPS ready':'Needs GPS'}</span>
+        ${quality07911&&qualityCfg07911.showOnCards?`<button type="button" class="accountQualityBadge07911 quality-${quality07911.cls}" data-account-quality07911="${esc(s.id)}" aria-label="Account Health ${quality07911.score}, ${esc(quality07911.label)}"><strong>${quality07911.score}</strong><span>Health</span></button>`:""}
         ${customTagBadges0799}
       </span>
       ${recency?`<span class="accountRecency0761">${esc(recency)}</span>`:""}
@@ -3930,7 +4075,7 @@ function sites(){
   const addressCounts0762=accountAddressCounts0762(allAccounts);
   const accounts=accountDirectorySort0760(allAccounts);
   const accountInitialsList0763=accountInitials0763(accounts);
-  // Build 0.79.10: the Accounts directory no longer exposes category filter tiles.
+  // Build 0.79.11: the Accounts directory no longer exposes category filter tiles.
   // Clear any older session filter so every saved account is shown.
   sitesFilter0736="all";
   const accountsViewDirty0761=!!String(siteSearch||"").trim() || accountsSort0760!=="az";
@@ -4086,6 +4231,8 @@ function sites(){
     persistAccountsViewState0761();
   },{passive:true});
   list?.addEventListener("click",event=>{
+    const qualityButton=event.target.closest("[data-account-quality07911]");
+    if(qualityButton){event.preventDefault();event.stopPropagation();openAccountQuality07911(qualityButton.dataset.accountQuality07911);return;}
     const callButton=event.target.closest("[data-account-call0762]");
     if(callButton){
       event.preventDefault();event.stopPropagation();
@@ -4134,7 +4281,7 @@ function sites(){
     if(card) openAccount0761(card.dataset.id);
   });
   list?.addEventListener("keydown",event=>{
-    if(event.target.closest("[data-account-favorite0761], [data-account-call0762], [data-account-route0762]")) return;
+    if(event.target.closest("[data-account-favorite0761], [data-account-call0762], [data-account-route0762], [data-account-quality07911]")) return;
     const card=event.target.closest("[data-account-card0759]");
     if(card && (event.key==="Enter"||event.key===" ")){event.preventDefault();openAccount0761(card.dataset.id);}
   });
@@ -4750,6 +4897,8 @@ function siteDetail(){
   const equipment=Array.isArray(s.equipment)?s.equipment:[];
   const docs=Array.isArray(s.docs)?s.docs:[];
   const health=siteHealth(s);
+  const qualityCfg07911=dataQualitySettings07911();
+  const quality07911=qualityCfg07911.enabled?accountDataQuality07911(s):null;
   const lastVisit=siteVisits[0];
   const panel=[s.panelManufacturer,s.panelModel].filter(Boolean).join(" ")||"Panel not entered";
   const primary=primaryContact477(s);
@@ -4762,7 +4911,7 @@ function siteDetail(){
 
   html(`<div class="screen siteDetail0735">
     <div class="accountHeader0735 technicianHeader075 accountHeaderRewrite0757 accountHeader0786" role="banner"><button class="accountBack0735" id="backBtn" aria-label="Back to Accounts">‹</button><div class="technicianIdentity075 accountIdentity0786"><strong>${esc(s.name||"Unnamed Account")}</strong><span class="accountIdLine0757">${esc(accountId)}</span>${fullAddress(s)?`<span class="accountAddressLine0757">${esc(fullAddress(s))}</span>`:""}</div><button class="accountPin0735 ${isPinnedSite566(s)?"pinned":""}" id="pinSiteBtn566" aria-label="${isPinnedSite566(s)?"Remove account from favorites":"Add account to favorites"}" aria-pressed="${isPinnedSite566(s)?"true":"false"}">${isPinnedSite566(s)?"★":"☆"}</button><button class="accountEdit0735" id="editBtn" aria-label="Edit account">✎</button></div>
-    <section class="technicianStatus075"><span class="status-${esc(health.cls)}">${esc(health.label)}</span><span>${esc(accountCategoryLabel0735(s))}</span>${open?`<span>${open} task${open===1?"":"s"}</span>`:""}${def?`<span class="hasDef075">${def} deficienc${def===1?"y":"ies"}</span>`:""}</section>
+    <section class="technicianStatus075"><span class="status-${esc(health.cls)}">${esc(health.label)}</span>${quality07911&&qualityCfg07911.showOnAccount?`<button type="button" class="accountDetailQuality07911 quality-${quality07911.cls}" id="accountDetailQuality07911"><strong>${quality07911.score}</strong><span>Account Health</span></button>`:""}<span>${esc(accountCategoryLabel0735(s))}</span>${open?`<span>${open} task${open===1?"":"s"}</span>`:""}${def?`<span class="hasDef075">${def} deficienc${def===1?"y":"ies"}</span>`:""}</section>
     ${accountTagChips0737(s,8)?`<div class="accountTagRail0737">${accountTagChips0737(s,8)}</div>`:""}
     ${accountPersistentActions0751(s,ctx)}
     <nav class="accountTabs0735 accountTabsSticky0751 accountTabs0786" aria-label="Account sections">${tabs.map(([key,label,count,aria])=>`<button class="${accountDetailTab0735===key?"active":""}" data-account-tab0735="${key}" aria-label="${esc(aria)}" aria-current="${accountDetailTab0735===key?"page":"false"}"><span>${label}</span>${Number.isFinite(count)&&count>0?`<b>${count}</b>`:""}</button>`).join("")}</nav>
@@ -4772,6 +4921,7 @@ function siteDetail(){
   document.getElementById("backBtn")?.addEventListener("click",()=>route("sites"));
   document.getElementById("editBtn")?.addEventListener("click",()=>{mode="edit";route("siteForm");});
   document.getElementById("pinSiteBtn566")?.addEventListener("click",toggleSitePinned566);
+  document.getElementById("accountDetailQuality07911")?.addEventListener("click",()=>openAccountQuality07911(s.id));
   document.querySelectorAll("[data-account-tab0735]").forEach(b=>b.onclick=()=>{captureRouteScroll0782();accountDetailTab0735=b.dataset.accountTab0735;rememberAccountTab0751(accountDetailTab0735);render();});
   document.getElementById("editDetails0735")?.addEventListener("click",()=>{mode="edit";route("siteForm");});
   document.getElementById("qaStartVisit610")?.addEventListener("click",startServiceVisit610);
@@ -7010,7 +7160,7 @@ const SETTINGS_GROUPS_067 = [
   {key:"appearance",icon:"◐",title:"App & Home",note:"Theme, Demo Mode, Home, and modules.",tone:"violet",tabs:["demo","themes","homeLayout","visibility"]},
   {key:"field",icon:"🧰",title:"Field Tools",note:"GPS, Plus Codes, overlays, and services.",tone:"cyan",tabs:["gps","plusCodes","overlay","advanced"]},
   {key:"reports",icon:"▤",title:"Reports & Communication",note:"Report defaults and email.",tone:"amber",tabs:["reports","email"]},
-  {key:"data",icon:"☁",title:"Data, Sync & Support",note:"Security, storage, sync, backups, and support.",tone:"red",tabs:["privacy","security","cloudFiles","microsoftStorage","backend","sync","webdav","customerImport","categories","backup","updates","manual","about","diagnostics"]}
+  {key:"data",icon:"☁",title:"Data, Sync & Support",note:"Security, storage, sync, backups, and support.",tone:"red",tabs:["privacy","security","dataQuality","cloudFiles","microsoftStorage","backend","sync","webdav","customerImport","categories","backup","updates","manual","about","diagnostics"]}
 ];
 function settingsGroupForTab067(tab){ return SETTINGS_GROUPS_067.find(g=>g.tabs.includes(tab))?.key || "data"; }
 function settingsGroup067ByKey(key){ return SETTINGS_GROUPS_067.find(g=>g.key===key) || SETTINGS_GROUPS_067[0]; }
@@ -7036,6 +7186,7 @@ function settingsTabs(){
     ["advanced","Advanced","Optional services and integrations."],
     ["privacy","Privacy Lock","PIN, timeout, and recovery."],
     ["security","Security Center","Vault health, audit, and recovery."],
+    ["dataQuality","Data Quality","Score completeness and missing information."],
     ["cloudFiles","Photo & Document Storage","Choose storage for photos and files."],
     ["microsoftStorage","Microsoft Storage Accounts","Manage OneDrive and SharePoint profiles."],
     ["backend","Backend Foundation","Review backend-ready providers."],
@@ -7099,7 +7250,7 @@ function leaveSettingsHome572(){
 }
 
 function settingsIcon550(tab){
-  return ({tech:"👤",gps:"⌖",plusCodes:"＋",reports:"▤",email:"✉",overlay:"▧",demo:"D",themes:"◐",homeLayout:"⌂",visibility:"☰",advanced:"⚡",privacy:"▣",security:"⌾",cloudFiles:"☁",microsoftStorage:"M",sync:"☁",customerImport:"⇩",categories:"◇",backup:"⇅",updates:"↻",manual:"?",about:"ⓘ"})[tab]||"•";
+  return ({tech:"👤",gps:"⌖",plusCodes:"＋",reports:"▤",email:"✉",overlay:"▧",demo:"D",themes:"◐",homeLayout:"⌂",visibility:"☰",advanced:"⚡",privacy:"▣",security:"⌾",dataQuality:"◎",cloudFiles:"☁",microsoftStorage:"M",sync:"☁",customerImport:"⇩",categories:"◇",backup:"⇅",updates:"↻",manual:"?",about:"ⓘ"})[tab]||"•";
 }
 function settings(){
   captureSettingsScroll576();
@@ -7742,7 +7893,7 @@ function manualSimplePage058(type){
   quick:["🚀","Quick Start Guide","Get FireVault ready for a normal field day.",[["1. Verify the build","Confirm the green build badge shows 0.67.0 before entering production information."],["2. Complete Technician Profile","Enter your name, company, phone, email, and license or employee identification."],["3. Review permissions","Allow location and photo access only when FireVault requests them and the feature is needed."],["4. Create or open a site","Add the customer name, full address, panel details, contacts, access notes, and GPS location."],["5. Document the visit","Record notes, photos, tasks, deficiencies, equipment changes, and a service visit."],["6. Finish and protect the data","Review the report, send or copy the required summary, then export a current backup."]]],
   new:["🆕","What’s New in 0.67.0","Account View, Settings navigation, and FireVault Academy redesign.",[["Unified visual system","Standardized typography, spacing, card surfaces, borders, controls, and responsive behavior across FireVault."],["Settings cleanup","Improved Settings home cards and every submenu while preserving the preferred Email setup workflow."],["Help readability","Converted contextual Help and Academy articles into one uninterrupted scrolling reading column with no floating metadata."],["Site Detail stability","Reinforced natural-height cards, readable text, and scroll-safe account sections."],["Operational screens","Simplified Customer Import, Team Sync, Conflict Center, and Nearby Sites presentation without changing their workflows."],["Phone and iPad layouts","Added consistent narrow-phone and tablet behavior, bottom-navigation clearance, and overflow protection."],["Nearby scan diagnostics","Nearby Sites now shows total sites, GPS-ready records, missing coordinates, phone-location progress, and persistent error messages."],["Coordinate recovery","FireVault recovers valid latitude and longitude stored in compatible legacy or imported fields and normalizes them into the site GPS record."],["Location retry","If high-accuracy location times out or is unavailable, FireVault retries once using standard accuracy."],["Nearest-site fallback","When no site is inside the selected radius, the nearest GPS-ready sites remain visible instead of presenting an empty result."],["Latitude and longitude","Customer Import can calculate missing coordinates from each usable U.S. street address before saving records."],["Coordinate requirement","The importer requires calculated, supplied, or existing GPS coordinates by default. Unmatched addresses remain in review."],["Census address matching","Only address fields are sent to the U.S. Census Geocoder. The returned point is an address-range calculation, not a guaranteed building entrance."],["Account Id matching","Repeat imports update the matching FireVault site instead of creating duplicates or deleting field history."],["CSV coordinate columns","Files that already contain Latitude and Longitude columns use those values directly."],["Sync-ready changes","Added and updated customer records enter the pending synchronization queue and create a Sync Activity entry."]]],
   tips:["🧰","Field Tips","Short practices that improve the usefulness of FireVault records.",[["Write for the next technician","Include the exact panel, circuit, device, location, symptom, test result, and next action instead of relying on memory."],["Photograph context first","Take one wide photo showing the equipment location before close-up terminal, label, or damage photos."],["Separate facts from follow-up","Use notes for what occurred, deficiencies for code or system problems, and tasks for work that still needs completion."],["Confirm the account","Before using Quick Capture, verify the selected customer site to prevent records from being stored under the wrong account."],["Back up before updates","Download an external backup before a major update or device change and after completing significant field documentation."]]],
-  revisions:["📋","Revision History","Application and documentation checkpoints.",[["0.79.10","Removed the Accounts filter tiles and simplified the Nearby GPS comparison screen."],["0.79.7","Shortened every Settings summary and removed the colored bar from each Section Overview."],["0.79.6","Added Nearby-style account-list scroll locking so cards settle cleanly at the top while the Accounts controls remain fixed."],["0.79.5","Added separate Personal OneDrive, Work OneDrive, and SharePoint connection profiles with exact photo/document assignments and no-personal-fallback protection."],["0.79.4","Added independent photo and document storage destinations, cloud-provider integration targets, and offline Google Plus Codes for accounts and exact field locations."],["0.79.3","Added backend-neutral provider interfaces for authentication, database, file storage, synchronization, and audit while keeping FireVault fully local."],["0.79.2","Added a unified Security Center with vault integrity validation, backup health, audit filters, device naming, session clearing, and PIN confirmation for sensitive exports, restores, and deletion."],["0.79.1","Added an optional local six-digit privacy lock with PBKDF2 hashing, inactivity/background locking, app-switcher privacy screen, recovery code, cooldown protection, and local lock events."],["0.79.0","Added security-ready schema 4 metadata, stable workspace/user/device identities, local audit history, pending change queue, recoverable deletion, credential-safe exports, and protected restore/reset actions."],["0.67.0","Redesigned Account View around service actions and grouped information, consolidated Settings into five folders, and simplified FireVault Academy and contextual Help for continuous reading."],["0.65.2","Repaired Nearby Sites with GPS inventory counts, imported-coordinate recovery, persistent permission and timeout messages, a standard-accuracy retry, and nearest-site fallback results."],["0.65.1","Added online latitude/longitude calculation, coordinate validation, geocoding progress, unmatched-address review, optional CSV coordinates, and coordinate-safe repeat importing."],["0.65.0","Added preview-first customer CSV importing, Account Id update matching, validation warnings, imported monitoring details, and sync activity tracking."],["0.64.1","Simplified Academy article headers, removed floating metadata badges, and improved continuous scrolling and readability."],["0.64.0","Added Sync Activity, a conflict review center, export/import audit entries, and an automatic OneDrive connection-readiness checklist."],["0.63.1","Overhauled contextual Help and Academy reader formatting, removed overlapping sticky article headers, and restored full scrolling on phones and tablets."],["0.63.0","Added permanent record IDs, audit metadata, local version tracking, pending-sync states, conflict readiness, device identity, and a Team Sync settings workspace."],["0.60.0","Connected major screens and Settings areas directly to matching Academy chapters with return-to-screen navigation."],["0.59.0","Added interactive tutorials, guided orientation, pinned learning, field tips, and documentation tracking."],["0.58.0","Expanded Help & Manual into FireVault Academy with bookmarks, smart search, Quick Start, and reader navigation."],["0.57.0","Added the first complete searchable in-app FireVault User Manual."],["Ongoing review rule","Any change to navigation, labels, storage, workflows, permissions, or supported layouts requires the related manual chapter to be checked."]]],
+  revisions:["📋","Revision History","Application and documentation checkpoints.",["0.79.11","Added Smart Account Intelligence with configurable data-quality scores, missing-information guidance, account indicators, and downloadable reporting."],["0.79.10","Added single-account dots, same-address account counts, area clusters, and deeper selected-account map zoom."],["0.79.7","Shortened every Settings summary and removed the colored bar from each Section Overview."],["0.79.6","Added Nearby-style account-list scroll locking so cards settle cleanly at the top while the Accounts controls remain fixed."],["0.79.5","Added separate Personal OneDrive, Work OneDrive, and SharePoint connection profiles with exact photo/document assignments and no-personal-fallback protection."],["0.79.4","Added independent photo and document storage destinations, cloud-provider integration targets, and offline Google Plus Codes for accounts and exact field locations."],["0.79.3","Added backend-neutral provider interfaces for authentication, database, file storage, synchronization, and audit while keeping FireVault fully local."],["0.79.2","Added a unified Security Center with vault integrity validation, backup health, audit filters, device naming, session clearing, and PIN confirmation for sensitive exports, restores, and deletion."],["0.79.1","Added an optional local six-digit privacy lock with PBKDF2 hashing, inactivity/background locking, app-switcher privacy screen, recovery code, cooldown protection, and local lock events."],["0.79.0","Added security-ready schema 4 metadata, stable workspace/user/device identities, local audit history, pending change queue, recoverable deletion, credential-safe exports, and protected restore/reset actions."],["0.67.0","Redesigned Account View around service actions and grouped information, consolidated Settings into five folders, and simplified FireVault Academy and contextual Help for continuous reading."],["0.65.2","Repaired Nearby Sites with GPS inventory counts, imported-coordinate recovery, persistent permission and timeout messages, a standard-accuracy retry, and nearest-site fallback results."],["0.65.1","Added online latitude/longitude calculation, coordinate validation, geocoding progress, unmatched-address review, optional CSV coordinates, and coordinate-safe repeat importing."],["0.65.0","Added preview-first customer CSV importing, Account Id update matching, validation warnings, imported monitoring details, and sync activity tracking."],["0.64.1","Simplified Academy article headers, removed floating metadata badges, and improved continuous scrolling and readability."],["0.64.0","Added Sync Activity, a conflict review center, export/import audit entries, and an automatic OneDrive connection-readiness checklist."],["0.63.1","Overhauled contextual Help and Academy reader formatting, removed overlapping sticky article headers, and restored full scrolling on phones and tablets."],["0.63.0","Added permanent record IDs, audit metadata, local version tracking, pending-sync states, conflict readiness, device identity, and a Team Sync settings workspace."],["0.60.0","Connected major screens and Settings areas directly to matching Academy chapters with return-to-screen navigation."],["0.59.0","Added interactive tutorials, guided orientation, pinned learning, field tips, and documentation tracking."],["0.58.0","Expanded Help & Manual into FireVault Academy with bookmarks, smart search, Quick Start, and reader navigation."],["0.57.0","Added the first complete searchable in-app FireVault User Manual."],["Ongoing review rule","Any change to navigation, labels, storage, workflows, permissions, or supported layouts requires the related manual chapter to be checked."]]],
   trouble:["❓","Troubleshooting","Common problems and safe first checks.",FIREVAULT_MANUAL_058.find(x=>x.id==="trouble")?.topics||[]]
  };
  const [icon,title,note,items]=pages[type]||["ⓘ","Unavailable","This Help section is not available in the installed version.",[["Current status","Return to Help and choose an available chapter or tutorial."]]];
@@ -8498,6 +8649,7 @@ function settingsPanel(){
   if(settingsTab==="privacy") return privacyLockPanel0791();
 
   if(settingsTab==="security") return securityFoundationPanel0790();
+  if(settingsTab==="dataQuality") return dataQualityPanel07911();
   if(settingsTab==="cloudFiles") return cloudFileStoragePanel0794();
   if(settingsTab==="microsoftStorage") return microsoftStoragePanel0795();
   if(settingsTab==="backend") return backendFoundationPanel0793();
@@ -8566,6 +8718,7 @@ function settingsPanel(){
 function wireSettingsPanel(){
   if(settingsTab==="privacy"){wirePrivacyLock0791();return;}
   if(settingsTab==="security"){wireSecurityFoundation0790();return;}
+  if(settingsTab==="dataQuality"){wireDataQuality07911();const saveBtn=document.getElementById("saveSettings");if(saveBtn)saveBtn.onclick=saveSettings;return;}
   if(settingsTab==="cloudFiles"){wireCloudFileStorage0794();return;}
   if(settingsTab==="microsoftStorage"){wireMicrosoftStorage0795();return;}
   if(settingsTab==="plusCodes"){wirePlusCodes0794();return;}
@@ -8630,6 +8783,7 @@ function saveSettings(){
   }
   if(settingsTab==="visibility") { s.app={...(s.app||{}),viewMode:val("viewMode")||"simple",activeFeaturePreset575:"",activeLayoutPreset575:""}; const next={...visibility()}; FEATURE_LABELS.forEach(([key])=>next[key]=checked("vis_"+key)); s.visibility=next; }
   if(settingsTab==="advanced") s.advanced={aiTechnician:checked("advAi"),reverseAddressLookup:checked("advReverse"),cloudBackup:checked("advCloud"),voiceTranscription:checked("advVoice"),ocrReader:checked("advOcr"),emailGateway:checked("advEmail"),weather:checked("advWeather"),traffic:checked("advTraffic")};
+  if(settingsTab==="dataQuality") s.dataQuality={enabled:checked("dqEnabled07911"),showOnCards:checked("dqCards07911"),showOnAccount:checked("dqAccount07911"),includeInReports:checked("dqReports07911"),ignoreOptional:checked("dqIgnoreOptional07911"),minimumAcceptable:Number(val("dqMinimum07911"))||80};
   if(settingsTab==="sync") s.sync={...(s.sync||{}),provider:val("syncProvider")||"onedrive",organization:val("syncOrganization"),workspace:val("syncWorkspace")||"FireVault Shared Vault",conflictPolicy:val("syncConflict")||"review",enabled:false};
   save(); toast("Settings saved."); view="settings"; mode="settingsDetail"; render();
 }
@@ -8650,6 +8804,8 @@ function stabilityReport(){
   if(microsoftPlan0795.noPersonalFallback) pass.push("Microsoft storage no-personal-fallback protection is enabled"); else issues.push("Microsoft storage could fall back to a personal account");
   const plusCfg=plusCodeSettings0794();
   if(data.settings?.plusCodes && [10,11].includes(Number(plusCfg.accountLength)) && [10,11].includes(Number(plusCfg.locationLength))) pass.push("Google Plus Code settings are valid"); else issues.push("Google Plus Code settings are invalid");
+  const dqCfg07911=dataQualitySettings07911();
+  if(data.settings?.dataQuality && [60,70,80,90].includes(Number(dqCfg07911.minimumAcceptable))) pass.push("Smart Account Intelligence settings are valid"); else issues.push("Data Quality settings are invalid");
   const security=securityFoundationSummary(data);
   if(Number(security.schemaVersion)===4) pass.push("Security schema 4 is active"); else issues.push(`Security schema is ${security.schemaVersion||"missing"}`);
   if(security.workspaceId && security.user?.id && security.device?.id) pass.push("Workspace, user, and device identities are present"); else issues.push("Security identity metadata is incomplete");
@@ -9518,7 +9674,8 @@ function diagnostics(){
 }
 function showChangelog(){
   const notes = [
-    "Build 0.79.10 refines Accounts cards by moving Favorites to the far right and grouping category tags with GPS status.",
+    "Build 0.79.11 adds Smart Account Intelligence with configurable data-quality scores, missing-information guidance, Account card/detail indicators, and a downloadable report.",
+    "Build 0.79.10 adds single-account dots, same-address counts, area clusters, and deeper selected-account map zoom.",
     "Build 0.79.5 adds separate Personal OneDrive, Work OneDrive, and SharePoint profiles with exact destination assignments and strict no-personal-fallback protection.",
     "Build 0.79.4 adds independent photo/document storage destinations and full offline Google Plus Codes while keeping FireVault local-first.",
     "Build 0.79.3 adds backend-neutral provider interfaces for authentication, database, file storage, synchronization, and audit while keeping FireVault fully local.",

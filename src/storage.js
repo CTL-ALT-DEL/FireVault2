@@ -1,4 +1,4 @@
-export const BUILD = "0.79.10";
+export const BUILD = "0.79.11";
 export const SECURITY_SCHEMA_VERSION = 4;
 export const KEY = "firevault_vault_build_030";
 export const ACTIVE_JOB_KEY = "firevault_active_job_modular";
@@ -894,6 +894,21 @@ export function normalize(data){
   };
   data.settings.plusCodes.accountLength=[10,11].includes(Number(data.settings.plusCodes.accountLength))?Number(data.settings.plusCodes.accountLength):10;
   data.settings.plusCodes.locationLength=[10,11].includes(Number(data.settings.plusCodes.locationLength))?Number(data.settings.plusCodes.locationLength):11;
+  data.settings.dataQuality={
+    enabled:true,
+    showOnCards:true,
+    showOnAccount:true,
+    includeInReports:true,
+    minimumAcceptable:80,
+    ignoreOptional:false,
+    ...(data.settings.dataQuality||{})
+  };
+  data.settings.dataQuality.minimumAcceptable=[60,70,80,90].includes(Number(data.settings.dataQuality.minimumAcceptable))?Number(data.settings.dataQuality.minimumAcceptable):80;
+  data.settings.dataQuality.enabled=data.settings.dataQuality.enabled!==false;
+  data.settings.dataQuality.showOnCards=data.settings.dataQuality.showOnCards!==false;
+  data.settings.dataQuality.showOnAccount=data.settings.dataQuality.showOnAccount!==false;
+  data.settings.dataQuality.includeInReports=data.settings.dataQuality.includeInReports!==false;
+  data.settings.dataQuality.ignoreOptional=!!data.settings.dataQuality.ignoreOptional;
   const defaultCategories0737 = [];
   const rawCategories0737 = data.settings.accountCategories;
   const sourceCategories0737 = rawCategories0737 && Array.isArray(rawCategories0737.definitions) ? rawCategories0737.definitions : defaultCategories0737;
