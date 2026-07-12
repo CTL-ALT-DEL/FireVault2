@@ -16681,7 +16681,7 @@ input[data-fv-phone0758="1"]{font-variant-numeric:tabular-nums;letter-spacing:.0
 }
 
 
-/* Build 0.76.5 — emergency Accounts list stability repair */
+/* Build 0.76.6 — emergency Accounts list stability repair */
 .accountsListHead0759.accountsListHead0764{
   display:flex!important;
   flex-direction:column!important;
@@ -16774,4 +16774,82 @@ input[data-fv-phone0758="1"]{font-variant-numeric:tabular-nums;letter-spacing:.0
 @media(max-width:380px){
   .accountsListTools0764{grid-template-columns:34px 70px minmax(92px,1fr)!important;gap:5px!important}
   .accountCard0764 .accountCardBody0759{min-height:146px!important}
+}
+
+/* Build 0.76.6 — compact Accounts utility strip and stable list start */
+.accountsListHead0759.accountsListHead0764{
+  display:grid!important;
+  grid-template-columns:minmax(0,1fr) auto!important;
+  align-items:center!important;
+  gap:8px!important;
+  min-height:44px!important;
+  padding:3px 4px 7px!important;
+}
+.accountsListHead0764 .accountsResultSummary0761{
+  min-width:0!important;
+  display:block!important;
+  overflow:hidden!important;
+}
+.accountsListHead0764 .accountsResultSummary0761 strong{
+  display:block!important;
+  white-space:nowrap!important;
+  overflow:hidden!important;
+  text-overflow:ellipsis!important;
+}
+.accountsListHead0764 .accountsResultSummary0761 span{
+  display:block!important;
+  margin-top:2px!important;
+  max-width:180px!important;
+  white-space:nowrap!important;
+  overflow:hidden!important;
+  text-overflow:ellipsis!important;
+  text-align:left!important;
+}
+.accountsListTools0764{
+  width:auto!important;
+  max-width:none!important;
+  display:flex!important;
+  align-items:center!important;
+  justify-content:flex-end!important;
+  gap:6px!important;
+}
+.accountsListTools0764 .accountsReset0761[hidden]{display:none!important}
+.accountsListTools0764 .accountsReset0761{
+  flex:0 0 34px!important;
+}
+.accountsCompactControl0764{
+  display:block!important;
+  flex:0 0 auto!important;
+  min-width:0!important;
+  font-size:0!important;
+}
+.accountsCompactControl0764 > span{display:none!important}
+.accountsJumpWrap0763.accountsCompactControl0764 select{
+  width:64px!important;
+  min-width:64px!important;
+}
+.accountsSortWrap0764 select{
+  width:92px!important;
+  min-width:92px!important;
+}
+.accountsCompactControl0764 select,
+.accountsListHead0764 .accountsListTools0764 > label:last-child select{
+  height:34px!important;
+  min-height:34px!important;
+  padding:4px 24px 4px 9px!important;
+  border-radius:10px!important;
+}
+.accountsList0759.accountsList0764{
+  padding-top:2px!important;
+}
+@media(max-width:430px){
+  .accountsListHead0759.accountsListHead0764{gap:6px!important;padding-left:3px!important;padding-right:3px!important}
+  .accountsListHead0764 .accountsResultSummary0761 span{display:none!important}
+  .accountsJumpWrap0763.accountsCompactControl0764 select{width:60px!important;min-width:60px!important}
+  .accountsSortWrap0764 select{width:86px!important;min-width:86px!important}
+}
+@media(max-width:370px){
+  .accountsJumpWrap0763.accountsCompactControl0764 select{width:56px!important;min-width:56px!important}
+  .accountsSortWrap0764 select{width:78px!important;min-width:78px!important}
+  .accountsListTools0764{gap:4px!important}
 }

@@ -1,4 +1,4 @@
-import { BUILD, KEY, ACTIVE_JOB_KEY, loadData, saveData, ensureSite, fullAddress, esc, uid, downloadBlob, syncSummary, syncQueue, syncConflicts, syncActivity, createSyncPackage, importSyncPackage, resolveSyncConflict, notePackageExport, deviceIdentity, recordSyncActivity, autoBackupInfo, latestAutoBackup, restoreAutoBackup, isDemoMode, setDemoMode, resetDemoData } from "./storage.js?v=0.76.5";
+import { BUILD, KEY, ACTIVE_JOB_KEY, loadData, saveData, ensureSite, fullAddress, esc, uid, downloadBlob, syncSummary, syncQueue, syncConflicts, syncActivity, createSyncPackage, importSyncPackage, resolveSyncConflict, notePackageExport, deviceIdentity, recordSyncActivity, autoBackupInfo, latestAutoBackup, restoreAutoBackup, isDemoMode, setDemoMode, resetDemoData } from "./storage.js?v=0.76.6";
 window.__FIREVAULT_MODULE_READY = true;
 
 function fvPreferenceStore0739(){
@@ -3642,7 +3642,18 @@ function sites(){
   applySiteSearch();
   requestAnimationFrame(()=>{
     if(list){
-      list.scrollTop=Math.max(0,accountsScroll0759||0);
+      const requested=Math.max(0,accountsScroll0759||0);
+      list.scrollTop=requested;
+      if(requested>0){
+        const cards=[...list.querySelectorAll("[data-account-card0759]")].filter(el=>!el.hidden);
+        let nearest=null;
+        for(const card of cards){
+          if(card.offsetTop-list.offsetTop<=requested+8) nearest=card;
+          else break;
+        }
+        if(nearest) list.scrollTop=Math.max(0,nearest.offsetTop-list.offsetTop-2);
+      }
+      accountsScroll0759=list.scrollTop;
       if(scrollTopButton0763)scrollTopButton0763.hidden=list.scrollTop<420;
     }
     showGlobalChrome537();
@@ -8511,7 +8522,7 @@ function diagnostics(){
 }
 function showChangelog(){
   const notes = [
-    "Build 0.76.5 compacts the Jump and Sort controls, prevents account-card actions from clipping, and snaps scrolled accounts cleanly to the top of the list area.",
+    "Build 0.76.6 replaces the oversized Accounts controls with one compact utility strip and restores stable list positioning.",
     "Build 0.76.2 adds one-tap Call and Route controls to every account card, identifies multi-account addresses, clarifies account health, and prevents accidental double-opening while preserving the Accounts view state.",
     "Build 0.76.1 hardens the Accounts directory with persistent view state, inline Favorites, recent-opened context, keyboard shortcuts, and a permanent app-chrome repair so the bottom navigation remains visible after saves and Favorite changes.",
     "Build 0.76.0 completes the Accounts workflow with sorting, safer manual account creation, duplicate Account ID protection, and improved empty states.",
