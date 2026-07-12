@@ -1,6 +1,6 @@
 {
-  "build": "0.79.1",
+  "build": "0.79.2",
   "released": "2026-07-12",
-  "note": "Local privacy lock",
-  "label": "Optional six-digit PIN, inactivity/background locking, recovery code, cooldown protection, and privacy screen"
+  "note": "Security Center and recovery hardening",
+  "label": "Vault integrity checks, backup health, audit viewer, device controls, and PIN-gated sensitive operations"
 }

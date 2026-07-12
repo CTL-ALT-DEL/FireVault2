@@ -1,7 +1,23 @@
-# FireVault Build 0.79.1 — Local Privacy Lock
+# FireVault Build 0.79.2 — Security Center & Recovery Hardening
 
-This release adds an optional device-level privacy lock without pretending to be cloud authentication. Under Settings → Data → Privacy Lock, the user can create a six-digit PIN, choose an inactivity timeout, lock whenever FireVault leaves the foreground, and request a privacy cover for the iOS app switcher.
+This release consolidates FireVault’s local security and recovery tools under **Settings → Data → Security Center**.
 
-The PIN and one-time recovery code are stored only as PBKDF2-SHA-256 hashes in a small local configuration record outside the FireVault vault. The raw PIN and recovery code are never included in FireVault backups, WebDAV exports, or the account database. Five failed attempts trigger a short cooldown. A recovery code is shown once when the lock is enabled or changed and can be copied or downloaded.
+## Added
 
-This is a local privacy control, not vault encryption, signup, passkeys, 2FA, roles, or server authorization. The existing `firevault_vault_build_030` storage key and security schema 4 remain unchanged.
+- Unified Security Center dashboard
+- Privacy Lock status and direct access
+- Vault integrity validation for record IDs, collections, security metadata, GPS values, audit storage, and recycle-bin structure
+- Downloadable integrity reports
+- Backup-health summary for rolling snapshots, downloaded exports, and WebDAV uploads
+- Latest automatic snapshot verification and download
+- Device naming and stable workspace/user/device identity display
+- Clear Session & Lock control for temporary navigation state, WebDAV session password, and unlocked privacy state
+- Filterable and searchable audit viewer
+- PIN confirmation for full backup export, automatic snapshot download/restore, WebDAV upload/restore, full backup import, recycle-bin purge, audit export, integrity export, and local-vault deletion when Privacy Lock is enabled
+
+## Data compatibility
+
+- Existing storage key remains `firevault_vault_build_030`
+- Security schema remains version 4
+- Existing accounts, Demo Mode, categories, imports, backups, WebDAV settings, and update behavior are preserved
+- No signup, cloud login, passkeys, 2FA, roles enforcement, or backend is included yet

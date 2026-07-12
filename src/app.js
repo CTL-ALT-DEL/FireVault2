@@ -1,4 +1,4 @@
-import { BUILD, KEY, ACTIVE_JOB_KEY, loadData, saveData, ensureSite, fullAddress, esc, uid, downloadBlob, syncSummary, syncQueue, syncConflicts, syncActivity, createSyncPackage, importSyncPackage, resolveSyncConflict, notePackageExport, deviceIdentity, recordSyncActivity, autoBackupInfo, latestAutoBackup, restoreAutoBackup, isDemoMode, setDemoMode, resetDemoData, securityFoundationSummary, securityAudit, recycleBinInfo, restoreRecycleRecord, purgeRecycleBin, recordSecurityEvent } from "./storage.js?v=0.79.1";
+import { BUILD, KEY, ACTIVE_JOB_KEY, loadData, saveData, ensureSite, fullAddress, esc, uid, downloadBlob, syncSummary, syncQueue, syncConflicts, syncActivity, createSyncPackage, importSyncPackage, resolveSyncConflict, notePackageExport, deviceIdentity, recordSyncActivity, autoBackupInfo, latestAutoBackup, restoreAutoBackup, isDemoMode, setDemoMode, resetDemoData, securityFoundationSummary, securityAudit, recycleBinInfo, restoreRecycleRecord, purgeRecycleBin, recordSecurityEvent, validateVaultIntegrity } from "./storage.js?v=0.79.2";
 window.__FIREVAULT_MODULE_READY = true;
 
 function fvPreferenceStore0739(){
@@ -95,7 +95,7 @@ function privacyEvents0791(){try{const rows=JSON.parse(localStorage.getItem(PRIV
 function privacyLog0791(type,detail=""){
   try{const rows=[{id:`privacy-${Date.now()}-${Math.random().toString(16).slice(2)}`,type,detail:String(detail||""),at:new Date().toISOString()},...privacyEvents0791()].slice(0,50);localStorage.setItem(PRIVACY_EVENTS_KEY_0791,JSON.stringify(rows));}catch{}
 }
-function privacyEventLabel0791(type){return ({enabled:"Local lock enabled",disabled:"Local lock disabled",changed:"PIN changed",recovery:"Recovery code used",recoveryRegenerated:"Recovery code regenerated",locked:"App locked",unlocked:"App unlocked",failed:"Unlock attempt failed",cooldown:"Too many failed attempts"})[type]||type;}
+function privacyEventLabel0791(type){return ({enabled:"Local lock enabled",disabled:"Local lock disabled",changed:"PIN changed",recovery:"Recovery code used",recoveryRegenerated:"Recovery code regenerated",locked:"App locked",unlocked:"App unlocked",failed:"Unlock attempt failed",cooldown:"Too many failed attempts",authorized:"Sensitive action authorized"})[type]||type;}
 function privacyClearCooldown0791(){try{sessionStorage.removeItem(PRIVACY_FAILED_KEY_0791);sessionStorage.removeItem(PRIVACY_COOLDOWN_KEY_0791);}catch{}}
 function privacyCooldownState0791(){
   try{return {failed:Number(sessionStorage.getItem(PRIVACY_FAILED_KEY_0791)||0),until:Number(sessionStorage.getItem(PRIVACY_COOLDOWN_KEY_0791)||0)};}catch{return {failed:0,until:0};}
@@ -234,6 +234,8 @@ const SETTINGS_SCROLL_KEY_576 = "firevault_settings_scroll_05076";
 let settingsSubmenuReturn576 = false;
 let customerImportState065 = {fileName:"",headers:[],rows:[],summary:null,error:"",includeFlagged:false,requireCoordinates:true,filter:"all",lastResult:null,geocoding:{active:false,total:0,complete:0,matched:0,noMatch:0,error:0},geocodeError:""};
 let settingsScrollState576 = loadSettingsScrollState576();
+let securityAuditFilter0792 = "all";
+let securityAuditSearch0792 = "";
 const HOME_CARD_STATE_KEY_5100 = "firevault_home_card_state_05100";
 let homeCardState5100 = loadHomeCardState5100();
 let lastEmailTemplateField = "emailSubject";
@@ -2099,7 +2101,7 @@ window.addEventListener("orientationchange",()=>setTimeout(syncGlobalHeaderClear
 function contextualHelpInfo060(){
   if(view!=="settings") return CONTEXT_HELP_060[view]||null;
   if(settingsTab==="manual") return null;
-  const tabMap={tech:["settings","Technician Profile"],gps:["route","GPS / Maps"],reports:["reports","Report Settings"],email:["reports","Email Settings"],overlay:["photos","Photo Overlay"],themes:["settings","Theme Settings"],homeLayout:["home","Home Layout"],visibility:["settings","Modules / Simple View"],advanced:["settings","Advanced Settings"],privacy:["settings","Privacy Lock"],security:["settings","Security Foundation"],customerImport:["sites","Customer Import"],categories:["sites","Categories"],backup:["backup","Backup & Restore"],about:["release","About FireVault"]};
+  const tabMap={tech:["settings","Technician Profile"],gps:["route","GPS / Maps"],reports:["reports","Report Settings"],email:["reports","Email Settings"],overlay:["photos","Photo Overlay"],themes:["settings","Theme Settings"],homeLayout:["home","Home Layout"],visibility:["settings","Modules / Simple View"],advanced:["settings","Advanced Settings"],privacy:["settings","Privacy Lock"],security:["settings","Security Center"],customerImport:["sites","Customer Import"],categories:["sites","Categories"],backup:["backup","Backup & Restore"],about:["release","About FireVault"]};
   const item=tabMap[settingsTab]||["settings","Settings"];
   return {chapter:item[0],label:item[1],suggestions:settingsTab==="email"?["Recipients","Subject tags","Signature preview"]:settingsTab==="backup"?["Export backup","Restore safely","Clean update"]:["What this controls","Recommended setup","Related features"]};
 }
@@ -6828,7 +6830,7 @@ const SETTINGS_GROUPS_067 = [
   {key:"appearance",icon:"◐",title:"App & Home",note:"Demo Mode, theme, Home layout, and visible modules.",tone:"violet",tabs:["demo","themes","homeLayout","visibility"]},
   {key:"field",icon:"🧰",title:"Field Tools",note:"GPS, photo overlays, and optional field services.",tone:"cyan",tabs:["gps","overlay","advanced"]},
   {key:"reports",icon:"▤",title:"Reports & Communication",note:"Report content, email delivery, and customer closeout.",tone:"amber",tabs:["reports","email"]},
-  {key:"data",icon:"☁",title:"Data, Sync & Support",note:"Privacy lock, security foundation, categories, imports, backup, team sync, Help, About, and diagnostics.",tone:"red",tabs:["privacy","security","sync","webdav","customerImport","categories","backup","updates","manual","about","diagnostics"]}
+  {key:"data",icon:"☁",title:"Data, Sync & Support",note:"Privacy Lock, Security Center, categories, imports, backup, team sync, Help, About, and diagnostics.",tone:"red",tabs:["privacy","security","sync","webdav","customerImport","categories","backup","updates","manual","about","diagnostics"]}
 ];
 function settingsGroupForTab067(tab){ return SETTINGS_GROUPS_067.find(g=>g.tabs.includes(tab))?.key || "data"; }
 function settingsGroup067ByKey(key){ return SETTINGS_GROUPS_067.find(g=>g.key===key) || SETTINGS_GROUPS_067[0]; }
@@ -6852,7 +6854,7 @@ function settingsTabs(){
     ["visibility","Modules","Enable or disable FireVault modules for a cleaner field interface."],
     ["advanced","Advanced","Optional integrations and field services. An asterisk marks controls that require an outside service."],
     ["privacy","Privacy Lock","Optional local PIN, inactivity timeout, background lock, recovery code, and privacy screen."],
-    ["security","Security Foundation","Workspace identity, local user and device IDs, audit history, soft deletion, and future authentication readiness."],
+    ["security","Security Center","Privacy, vault integrity, backup health, device identity, audit history, and recovery controls."],
     ["sync","Team Sync","Technician identity, shared-vault packages, pending changes, and conflict review."],
     ["webdav","WebDAV","Optional encrypted-transport backup and restore using a compatible WebDAV server."],
     ["customerImport","Customer Import","Preview and safely import customer records from a CSV export using Account Id."],
@@ -7556,7 +7558,7 @@ function manualSimplePage058(type){
   quick:["🚀","Quick Start Guide","Get FireVault ready for a normal field day.",[["1. Verify the build","Confirm the green build badge shows 0.67.0 before entering production information."],["2. Complete Technician Profile","Enter your name, company, phone, email, and license or employee identification."],["3. Review permissions","Allow location and photo access only when FireVault requests them and the feature is needed."],["4. Create or open a site","Add the customer name, full address, panel details, contacts, access notes, and GPS location."],["5. Document the visit","Record notes, photos, tasks, deficiencies, equipment changes, and a service visit."],["6. Finish and protect the data","Review the report, send or copy the required summary, then export a current backup."]]],
   new:["🆕","What’s New in 0.67.0","Account View, Settings navigation, and FireVault Academy redesign.",[["Unified visual system","Standardized typography, spacing, card surfaces, borders, controls, and responsive behavior across FireVault."],["Settings cleanup","Improved Settings home cards and every submenu while preserving the preferred Email setup workflow."],["Help readability","Converted contextual Help and Academy articles into one uninterrupted scrolling reading column with no floating metadata."],["Site Detail stability","Reinforced natural-height cards, readable text, and scroll-safe account sections."],["Operational screens","Simplified Customer Import, Team Sync, Conflict Center, and Nearby Sites presentation without changing their workflows."],["Phone and iPad layouts","Added consistent narrow-phone and tablet behavior, bottom-navigation clearance, and overflow protection."],["Nearby scan diagnostics","Nearby Sites now shows total sites, GPS-ready records, missing coordinates, phone-location progress, and persistent error messages."],["Coordinate recovery","FireVault recovers valid latitude and longitude stored in compatible legacy or imported fields and normalizes them into the site GPS record."],["Location retry","If high-accuracy location times out or is unavailable, FireVault retries once using standard accuracy."],["Nearest-site fallback","When no site is inside the selected radius, the nearest GPS-ready sites remain visible instead of presenting an empty result."],["Latitude and longitude","Customer Import can calculate missing coordinates from each usable U.S. street address before saving records."],["Coordinate requirement","The importer requires calculated, supplied, or existing GPS coordinates by default. Unmatched addresses remain in review."],["Census address matching","Only address fields are sent to the U.S. Census Geocoder. The returned point is an address-range calculation, not a guaranteed building entrance."],["Account Id matching","Repeat imports update the matching FireVault site instead of creating duplicates or deleting field history."],["CSV coordinate columns","Files that already contain Latitude and Longitude columns use those values directly."],["Sync-ready changes","Added and updated customer records enter the pending synchronization queue and create a Sync Activity entry."]]],
   tips:["🧰","Field Tips","Short practices that improve the usefulness of FireVault records.",[["Write for the next technician","Include the exact panel, circuit, device, location, symptom, test result, and next action instead of relying on memory."],["Photograph context first","Take one wide photo showing the equipment location before close-up terminal, label, or damage photos."],["Separate facts from follow-up","Use notes for what occurred, deficiencies for code or system problems, and tasks for work that still needs completion."],["Confirm the account","Before using Quick Capture, verify the selected customer site to prevent records from being stored under the wrong account."],["Back up before updates","Download an external backup before a major update or device change and after completing significant field documentation."]]],
-  revisions:["📋","Revision History","Application and documentation checkpoints.",[["0.79.1","Added an optional local six-digit privacy lock with PBKDF2 hashing, inactivity/background locking, app-switcher privacy screen, recovery code, cooldown protection, and local lock events."],["0.79.0","Added security-ready schema 4 metadata, stable workspace/user/device identities, local audit history, pending change queue, recoverable deletion, credential-safe exports, and protected restore/reset actions."],["0.67.0","Redesigned Account View around service actions and grouped information, consolidated Settings into five folders, and simplified FireVault Academy and contextual Help for continuous reading."],["0.65.2","Repaired Nearby Sites with GPS inventory counts, imported-coordinate recovery, persistent permission and timeout messages, a standard-accuracy retry, and nearest-site fallback results."],["0.65.1","Added online latitude/longitude calculation, coordinate validation, geocoding progress, unmatched-address review, optional CSV coordinates, and coordinate-safe repeat importing."],["0.65.0","Added preview-first customer CSV importing, Account Id update matching, validation warnings, imported monitoring details, and sync activity tracking."],["0.64.1","Simplified Academy article headers, removed floating metadata badges, and improved continuous scrolling and readability."],["0.64.0","Added Sync Activity, a conflict review center, export/import audit entries, and an automatic OneDrive connection-readiness checklist."],["0.63.1","Overhauled contextual Help and Academy reader formatting, removed overlapping sticky article headers, and restored full scrolling on phones and tablets."],["0.63.0","Added permanent record IDs, audit metadata, local version tracking, pending-sync states, conflict readiness, device identity, and a Team Sync settings workspace."],["0.60.0","Connected major screens and Settings areas directly to matching Academy chapters with return-to-screen navigation."],["0.59.0","Added interactive tutorials, guided orientation, pinned learning, field tips, and documentation tracking."],["0.58.0","Expanded Help & Manual into FireVault Academy with bookmarks, smart search, Quick Start, and reader navigation."],["0.57.0","Added the first complete searchable in-app FireVault User Manual."],["Ongoing review rule","Any change to navigation, labels, storage, workflows, permissions, or supported layouts requires the related manual chapter to be checked."]]],
+  revisions:["📋","Revision History","Application and documentation checkpoints.",[["0.79.2","Added a unified Security Center with vault integrity validation, backup health, audit filters, device naming, session clearing, and PIN confirmation for sensitive exports, restores, and deletion."],["0.79.1","Added an optional local six-digit privacy lock with PBKDF2 hashing, inactivity/background locking, app-switcher privacy screen, recovery code, cooldown protection, and local lock events."],["0.79.0","Added security-ready schema 4 metadata, stable workspace/user/device identities, local audit history, pending change queue, recoverable deletion, credential-safe exports, and protected restore/reset actions."],["0.67.0","Redesigned Account View around service actions and grouped information, consolidated Settings into five folders, and simplified FireVault Academy and contextual Help for continuous reading."],["0.65.2","Repaired Nearby Sites with GPS inventory counts, imported-coordinate recovery, persistent permission and timeout messages, a standard-accuracy retry, and nearest-site fallback results."],["0.65.1","Added online latitude/longitude calculation, coordinate validation, geocoding progress, unmatched-address review, optional CSV coordinates, and coordinate-safe repeat importing."],["0.65.0","Added preview-first customer CSV importing, Account Id update matching, validation warnings, imported monitoring details, and sync activity tracking."],["0.64.1","Simplified Academy article headers, removed floating metadata badges, and improved continuous scrolling and readability."],["0.64.0","Added Sync Activity, a conflict review center, export/import audit entries, and an automatic OneDrive connection-readiness checklist."],["0.63.1","Overhauled contextual Help and Academy reader formatting, removed overlapping sticky article headers, and restored full scrolling on phones and tablets."],["0.63.0","Added permanent record IDs, audit metadata, local version tracking, pending-sync states, conflict readiness, device identity, and a Team Sync settings workspace."],["0.60.0","Connected major screens and Settings areas directly to matching Academy chapters with return-to-screen navigation."],["0.59.0","Added interactive tutorials, guided orientation, pinned learning, field tips, and documentation tracking."],["0.58.0","Expanded Help & Manual into FireVault Academy with bookmarks, smart search, Quick Start, and reader navigation."],["0.57.0","Added the first complete searchable in-app FireVault User Manual."],["Ongoing review rule","Any change to navigation, labels, storage, workflows, permissions, or supported layouts requires the related manual chapter to be checked."]]],
   trouble:["❓","Troubleshooting","Common problems and safe first checks.",FIREVAULT_MANUAL_058.find(x=>x.id==="trouble")?.topics||[]]
  };
  const [icon,title,note,items]=pages[type]||["ⓘ","Unavailable","This Help section is not available in the installed version.",[["Current status","Return to Help and choose an available chapter or tutorial."]]];
@@ -7806,12 +7808,14 @@ function collectWebdavInputs0757(){
   return cfg;
 }
 async function uploadWebdavBackup0757(){
+  if(!await securityAuthorizeSensitive0792("upload a full FireVault backup to WebDAV"))return;
   const cfg=collectWebdavInputs0757();const button=document.getElementById("uploadWebdav0757");setButtonBusy0781(button,true,"Uploading…");webdavStatus0757("Preparing secure backup…");
   try{await ensureWebdavFolders0757(cfg);const payload=JSON.stringify(webdavBackupPayload0757(),null,2);const url=normalizeWebdavUrl0757(cfg);await webdavRequest0757("PUT",url,webdavHeaders0757(cfg,{"Content-Type":"application/json"}),payload);data.settings.webdav={...cfg,lastUpload:new Date().toLocaleString(),lastStatus:"Upload successful"};saveData(data);webdavStatus0757("Backup uploaded successfully.");toast("WebDAV backup uploaded.","success");settings();}
   catch(err){webdavStatus0757(err.message);toast(err.message,"error");}
   finally{setButtonBusy0781(button,false);}
 }
 async function restoreWebdavBackup0757(){
+  if(!await securityAuthorizeSensitive0792("restore a full FireVault backup from WebDAV"))return;
   const cfg=collectWebdavInputs0757();if(!confirmSensitive0790("RESTORE","Download the WebDAV backup and replace the current FireVault vault? A local automatic snapshot will be created first."))return;const button=document.getElementById("restoreWebdav0757");setButtonBusy0781(button,true,"Restoring…");webdavStatus0757("Downloading backup…");
   try{const url=normalizeWebdavUrl0757(cfg);const response=await webdavRequest0757("GET",url,webdavHeaders0757(cfg));const parsed=JSON.parse(await response.text());const incoming=parsed?.data&&Array.isArray(parsed.data.sites)?parsed.data:parsed;if(!incoming||!Array.isArray(incoming.sites))throw new Error("The WebDAV file is not a valid FireVault backup.");Object.assign(data,incoming);data.settings=data.settings||{};data.settings.webdav={...cfg,lastDownload:new Date().toLocaleString(),lastStatus:"Restore successful"};recordSecurityEvent(data,"webdav-restored",{source:"WebDAV",fileName:cfg.fileName||"firevault-latest.json"});data=loadData();webdavStatus0757("Backup restored. Reloading…");toast("WebDAV backup restored.","success");setTimeout(()=>route("home"),400);}
   catch(err){webdavStatus0757(err.message);toast(err.message,"error");}
@@ -7909,77 +7913,156 @@ function securityDate0790(value){
   if(!value)return "Not recorded";
   try{return new Date(value).toLocaleString();}catch{return String(value);}
 }
+function securityAuditGroup0792(type=""){
+  if(/backup|webdav|package|export|import/i.test(type))return "backup";
+  if(/deleted|restored|recycle/i.test(type))return "deletion";
+  if(/privacy|security|integrity|device|session/i.test(type))return "security";
+  return "changes";
+}
+async function securityAuthorizeSensitive0792(action){
+  const config=privacyConfig0791();
+  if(!config)return true;
+  const entered=prompt(`Local Privacy Lock is enabled.\n\nEnter your 6-digit PIN to ${action}.`);
+  if(entered===null)return false;
+  try{
+    const ok=await privacyVerifyPin0791(privacyNormalizeDigits0791(entered,6));
+    if(!ok){privacyLog0791("failed",`Sensitive action denied: ${action}`);toast("PIN not recognized.","error");return false;}
+    privacyLog0791("authorized",action);
+    return true;
+  }catch(err){toast(err?.message||"PIN verification failed.","error");return false;}
+}
+function securityBackupState0792(){
+  const auto=autoBackupInfo();
+  const lastExport=fvSafeGet0739("firevault_last_backup_export","")||"";
+  const webdav=data.settings?.webdav||{};
+  const external=lastExport||webdav.lastUpload||"";
+  return {auto,lastExport,webdav,external,status:external?"external":auto.count?"local":"none"};
+}
 function securityFoundationPanel0790(){
   const summary=securityFoundationSummary(data);
-  const audit=securityAudit(data).slice(0,14);
+  const integrity=validateVaultIntegrity(data);
+  const storedIntegrity=summary?.lastIntegrityCheck0792||data.securityFoundation?.lastIntegrityCheck0792||null;
+  const shownIntegrity=storedIntegrity||integrity;
+  const backup=securityBackupState0792();
   const recycle=recycleBinInfo(data);
+  const privacy=privacyConfig0791();
+  const rawAudit=securityAudit(data);
+  const query=securityAuditSearch0792.trim().toLowerCase();
+  const audit=rawAudit.filter(row=>{
+    const group=securityAuditGroup0792(row.type);
+    const groupOk=securityAuditFilter0792==="all"||securityAuditFilter0792===group;
+    const text=[row.type,row.title,row.recordType,row.user,row.siteName,row.details].map(v=>typeof v==="object"?JSON.stringify(v):String(v||"")).join(" ").toLowerCase();
+    return groupOk&&(!query||text.includes(query));
+  }).slice(0,30);
   const auditLabels={
-    "security-foundation-migrated":"Security foundation created",
-    "record-created":"Record created",
-    "record-updated":"Record updated",
-    "record-deleted":"Record moved to recycle bin",
-    "record-restored":"Deleted record restored",
-    "recycle-bin-purged":"Recycle bin emptied",
-    "backup-exported":"External backup exported",
-    "backup-imported":"External backup restored",
-    "webdav-restored":"WebDAV backup restored",
-    "bulk-change-summary":"Bulk change recorded",
-    "privacy-lock-enabled":"Local privacy lock enabled",
-    "privacy-lock-disabled":"Local privacy lock disabled",
-    "privacy-lock-pin-changed":"Local privacy PIN changed"
+    "security-foundation-migrated":"Security foundation created","record-created":"Record created","record-updated":"Record updated","record-deleted":"Record moved to recycle bin","record-restored":"Deleted record restored","recycle-bin-purged":"Recycle bin emptied","backup-exported":"External backup exported","backup-imported":"External backup restored","webdav-restored":"WebDAV backup restored","bulk-change-summary":"Bulk change recorded","privacy-lock-enabled":"Local privacy lock enabled","privacy-lock-disabled":"Local privacy lock disabled","privacy-lock-pin-changed":"Local privacy PIN changed","vault-integrity-checked":"Vault integrity checked","backup-snapshot-verified":"Backup snapshot verified","device-renamed":"Device renamed","local-session-cleared":"Local session cleared"
   };
-  return `<div class="settingsStack securityFoundation0790">
-    ${settingsSection540("Identity layer","Security-Ready Foundation","FireVault now assigns stable workspace, user, device, record-version, and change identities. This prepares the vault for real login, roles, 2FA, and cloud authorization without adding a cosmetic login screen.",`
-      <div class="securityStatus0790"><span class="securityShield0790">✓</span><div><strong>Schema ${summary.schemaVersion} active</strong><span>Migration completed ${esc(securityDate0790(summary.migratedAt))}</span></div></div>
-      <div class="securityMetricGrid0790">
-        <div><strong>${Number(summary.pendingChanges||0)}</strong><span>Pending changes</span></div>
-        <div><strong>${Number(summary.auditCount||0)}</strong><span>Audit entries</span></div>
-        <div><strong>${Number(summary.recycleCount||0)}</strong><span>Deleted records</span></div>
-        <div><strong>${esc(summary.user.role||"owner")}</strong><span>Local role</span></div>
+  const protectionChecks=[
+    Number(summary.schemaVersion)===4,
+    shownIntegrity.status!=="critical",
+    backup.auto.count>0,
+    !!backup.external,
+    !!privacy
+  ];
+  const protectionScore=protectionChecks.filter(Boolean).length;
+  const centerStatus=shownIntegrity.status==="critical"?"Action required":protectionScore>=4?"Protected":"Review recommended";
+  const integrityTone=shownIntegrity.status==="healthy"?"green":shownIntegrity.status==="warning"?"amber":"red";
+  const backupLabel=backup.status==="external"?"External backup recorded":backup.status==="local"?"Local snapshots only":"No backup recorded";
+  const issueRows=[...(shownIntegrity.errors||[]).map(text=>({tone:"error",text})),...(shownIntegrity.warnings||[]).map(text=>({tone:"warning",text}))].slice(0,12);
+  return `<div class="settingsStack securityCenter0792">
+    ${settingsSection540("Protection overview","Security Center","One place to review local privacy, vault health, backup readiness, device identity, deleted records, and audit activity.",`
+      <div class="securityHero0792"><div><span class="securityHeroIcon0792">${shownIntegrity.status==="critical"?"!":"✓"}</span><div><strong>${esc(centerStatus)}</strong><small>${protectionScore} of 5 local protection checks are active</small></div></div><span class="securityHeroPill0792 ${shownIntegrity.status}">${esc(shownIntegrity.status)}</span></div>
+      <div class="securityDashboard0792">
+        <button type="button" class="securityDashCard0792 ${privacy?"good":"warn"}" data-open-security0792="privacy"><span>Privacy Lock</span><strong>${privacy?"Enabled":"Off"}</strong><small>${privacy?(Number(privacy.autoLockMinutes||0)?`Auto-lock ${Number(privacy.autoLockMinutes)} min`:`Inactivity lock off`):`Add a local PIN`}</small></button>
+        <button type="button" class="securityDashCard0792 ${integrityTone}" data-security-scroll0792="integrity"><span>Vault Integrity</span><strong>${esc(shownIntegrity.status)}</strong><small>${shownIntegrity.errorCount||0} errors · ${shownIntegrity.warningCount||0} warnings</small></button>
+        <button type="button" class="securityDashCard0792 ${backup.status==="external"?"good":backup.status==="local"?"warn":"bad"}" data-security-scroll0792="backup"><span>Backup Health</span><strong>${esc(backupLabel)}</strong><small>${backup.auto.count} local snapshot${backup.auto.count===1?"":"s"}</small></button>
+        <button type="button" class="securityDashCard0792" data-security-scroll0792="identity"><span>Device</span><strong>${esc(summary.device.label||"This device")}</strong><small>${Number(summary.pendingChanges||0)} pending change${Number(summary.pendingChanges||0)===1?"":"s"}</small></button>
       </div>
     `,"green")}
-    ${settingsSection540("Stable identities","Workspace, User & Device","These identifiers remain with records so future server permissions can verify who changed what and from which device.",`
-      <div class="securityIdentityGrid0790">
-        <div><span>Workspace ID</span><code>${esc(summary.workspaceId)}</code></div>
-        <div><span>Local user</span><strong>${esc(summary.user.displayName||"Local FireVault User")}</strong><code>${esc(summary.user.id)}</code></div>
-        <div><span>Device</span><strong>${esc(summary.device.label||"This FireVault device")}</strong><code>${esc(summary.device.id)}</code></div>
-        <div><span>Last validated</span><strong>${esc(securityDate0790(summary.device.lastSeenAt))}</strong></div>
-      </div>
-      <div class="securityActions0790"><button class="ghost" id="copySecurityIds0790">Copy Identity Summary</button><button class="ghost" id="validateSecurity0790">Validate Foundation</button></div>
+    <div id="securityIntegrity0792"></div>
+    ${settingsSection540("Database safety","Vault Integrity",`Last checked ${esc(securityDate0790(shownIntegrity.checkedAt))}. FireVault checks record IDs, account collections, security metadata, GPS values, audit storage, and recycle-bin structure.`,`
+      <div class="securityIntegrityStatus0792 ${shownIntegrity.status}"><div><strong>${shownIntegrity.status==="healthy"?"Vault checks passed":shownIntegrity.status==="warning"?"Vault is usable with warnings":"Vault needs attention"}</strong><span>${Number(shownIntegrity.siteCount||0)} accounts · ${Number(shownIntegrity.recordCount||0)} tracked records</span></div><b>${Number(shownIntegrity.errorCount||0)} / ${Number(shownIntegrity.warningCount||0)}</b></div>
+      <div class="securityIssueList0792">${issueRows.length?issueRows.map(item=>`<div class="${item.tone}"><span>${item.tone==="error"?"!":"•"}</span><p>${esc(item.text)}</p></div>`).join(""):`<div class="securityEmpty0790"><strong>No integrity issues found</strong><span>The current vault structure and security metadata are valid.</span></div>`}</div>
+      <div class="securityActions0790"><button class="primary" id="runIntegrity0792">Run Integrity Check</button><button class="ghost" id="downloadIntegrity0792">Download Report</button></div>
+    `,integrityTone)}
+    <div id="securityBackup0792"></div>
+    ${settingsSection540("Recovery readiness","Backup Health","Local snapshots help recover from edits, but an external downloaded or WebDAV copy is required before deleting or reinstalling the Home Screen app.",`
+      <div class="securityBackupGrid0792"><div><span>Automatic snapshots</span><strong>${backup.auto.count}</strong><small>${backup.auto.last?.createdAt?esc(securityDate0790(backup.auto.last.createdAt)):"None available"}</small></div><div><span>Last downloaded export</span><strong>${backup.lastExport?"Recorded":"Not recorded"}</strong><small>${esc(backup.lastExport||"Use Backup → Export Backup")}</small></div><div><span>Last WebDAV upload</span><strong>${backup.webdav.lastUpload?"Recorded":"Not recorded"}</strong><small>${esc(backup.webdav.lastUpload||"WebDAV upload has not completed")}</small></div></div>
+      <div class="securityActions0790"><button class="primary" id="verifySnapshot0792" ${backup.auto.count?"":"disabled"}>Verify Latest Snapshot</button><button class="ghost" id="downloadSnapshot0792" ${backup.auto.count?"":"disabled"}>Download Latest</button><button class="ghost" id="openBackup0792">Open Backup Center</button></div>
+    `,backup.status==="external"?"green":backup.status==="local"?"amber":"red")}
+    <div id="securityIdentity0792"></div>
+    ${settingsSection540("Local identity","Workspace & Device","These stable IDs will support future login, roles, device approval, and server-enforced permissions.",`
+      <div class="securityIdentityGrid0790"><div><span>Workspace ID</span><code>${esc(summary.workspaceId)}</code></div><div><span>Local user</span><strong>${esc(summary.user.displayName||"Local FireVault User")}</strong><code>${esc(summary.user.id)}</code></div><div><span>Device ID</span><code>${esc(summary.device.id)}</code></div><div><span>Last seen</span><strong>${esc(securityDate0790(summary.device.lastSeenAt))}</strong></div></div>
+      <div class="securityDeviceRename0792"><label><span>Device name</span><input id="securityDeviceName0792" maxlength="40" value="${esc(summary.device.label||"This FireVault device")}" placeholder="David's iPhone"></label><button class="primary" id="saveDeviceName0792">Save Name</button></div>
+      <div class="securityActions0790"><button class="ghost" id="copySecurityIds0790">Copy Identity Summary</button><button class="danger" id="clearLocalSession0792">Clear Session & Lock</button></div>
     `,"blue")}
     ${settingsSection540("Recoverable deletion","Recycle Bin",recycle.count?`${recycle.count} deleted record${recycle.count===1?" is":"s are"} retained locally for up to 30 days.`:"No deleted records are waiting for recovery.",`
       <div class="securityRecycle0790">${recycle.items.length?recycle.items.slice(0,10).map(item=>`<article><div><strong>${esc(item.title||item.recordType)}</strong><span>${esc(item.siteName||item.recordType)} · ${esc(securityDate0790(item.deletedAt))}</span>${item.attachmentsOmitted?`<small>Large attachment data was omitted to protect device storage.</small>`:""}</div><button class="ghost" data-restore-deleted0790="${esc(item.id)}">Restore</button></article>`).join(""):`<div class="securityEmpty0790"><strong>Recycle bin is empty</strong><span>Future deletions will be retained here before permanent removal.</span></div>`}</div>
       ${recycle.count?`<div class="securityActions0790"><button class="danger" id="purgeRecycle0790">Empty Recycle Bin</button></div>`:""}
     `,"amber")}
-    ${settingsSection540("Accountability","Recent Audit History","FireVault records local creation, edits, deletion, restore, migration, export, and recovery events. The audit is capped to protect iPhone storage.",`
-      <div class="securityAudit0790">${audit.length?audit.map(row=>`<div><span>${esc(auditLabels[row.type]||row.type)}</span><strong>${esc(row.title||row.recordType||row.user||"")}</strong><small>${esc(securityDate0790(row.at))} · ${esc(row.user||summary.user.displayName||"Local user")}</small></div>`).join(""):`<div class="securityEmpty0790"><strong>No audit events yet</strong><span>New changes will appear here automatically.</span></div>`}</div>
-      <div class="securityActions0790"><button class="primary" id="downloadSecurityAudit0790">Download Audit Log</button></div>
+    ${settingsSection540("Accountability","Audit Viewer","Filter local changes, security events, backup activity, and deletion history. The audit is capped to protect iPhone storage.",`
+      <div class="securityAuditControls0792"><select id="securityAuditFilter0792"><option value="all" ${securityAuditFilter0792==="all"?"selected":""}>All activity</option><option value="changes" ${securityAuditFilter0792==="changes"?"selected":""}>Record changes</option><option value="security" ${securityAuditFilter0792==="security"?"selected":""}>Security events</option><option value="backup" ${securityAuditFilter0792==="backup"?"selected":""}>Backup & transfer</option><option value="deletion" ${securityAuditFilter0792==="deletion"?"selected":""}>Deletion & restore</option></select><input id="securityAuditSearch0792" value="${esc(securityAuditSearch0792)}" placeholder="Search audit history"></div>
+      <div class="securityAudit0790">${audit.length?audit.map(row=>`<div><span>${esc(auditLabels[row.type]||row.type)}</span><strong>${esc(row.title||row.recordType||row.user||"")}</strong><small>${esc(securityDate0790(row.at))} · ${esc(row.user||summary.user.displayName||"Local user")}</small></div>`).join(""):`<div class="securityEmpty0790"><strong>No matching audit events</strong><span>Change the filter or search text to see more activity.</span></div>`}</div>
+      <div class="securityActions0790"><button class="primary" id="downloadSecurityAudit0790">Download Audit Log</button><button class="ghost" id="clearAuditFilters0792">Clear Filters</button></div>
     `,"slate")}
-    <div class="settingsInfo540 warning"><strong>Authentication is the next phase</strong><span>This build prepares the data safely. The optional Local Privacy Lock is available separately. Real signup, passkeys, 2FA, roles, and server-enforced access still require a secure backend.</span></div>
+    <div class="settingsInfo540 warning"><strong>Local security foundation</strong><span>This center protects and audits the device-local vault. Real signup, passkeys, 2FA, roles, encrypted cloud storage, and server authorization still require the future FireVault backend.</span></div>
   </div>`;
 }
 function wireSecurityFoundation0790(){
+  document.querySelectorAll("[data-open-security0792]").forEach(button=>button.addEventListener("click",()=>{settingsTab=button.dataset.openSecurity0792;mode="settingsDetail";settings();}));
+  document.querySelectorAll("[data-security-scroll0792]").forEach(button=>button.addEventListener("click",()=>document.getElementById(`security${button.dataset.securityScroll0792[0].toUpperCase()+button.dataset.securityScroll0792.slice(1)}0792`)?.scrollIntoView({behavior:"smooth",block:"start"})));
   document.getElementById("copySecurityIds0790")?.addEventListener("click",async()=>{
     const s=securityFoundationSummary(data);
-    const text=`FireVault Security Foundation\nWorkspace: ${s.workspaceId}\nUser: ${s.user.displayName} (${s.user.id})\nRole: ${s.user.role}\nDevice: ${s.device.id}\nSchema: ${s.schemaVersion}`;
+    const text=`FireVault Security Center\nWorkspace: ${s.workspaceId}\nUser: ${s.user.displayName} (${s.user.id})\nRole: ${s.user.role}\nDevice: ${s.device.label} (${s.device.id})\nSchema: ${s.schemaVersion}`;
     try{await navigator.clipboard.writeText(text);toast("Security identity copied.","success");}catch{toast("Clipboard unavailable.","error");}
   });
-  document.getElementById("validateSecurity0790")?.addEventListener("click",()=>{const s=securityFoundationSummary(data);toast(`Security schema ${s.schemaVersion} validated for ${data.sites.length} accounts.`,"success");});
-  document.getElementById("downloadSecurityAudit0790")?.addEventListener("click",()=>{
-    const payload={format:"firevault-security-audit",build:BUILD,exportedAt:new Date().toISOString(),foundation:securityFoundationSummary(data),audit:securityAudit(data)};
-    downloadBlob(`firevault-security-audit-${new Date().toISOString().slice(0,10)}.json`,JSON.stringify(payload,null,2),"application/json");
-    toast("Security audit downloaded.","success");
+  document.getElementById("runIntegrity0792")?.addEventListener("click",()=>{
+    const result=validateVaultIntegrity(data);
+    data.securityFoundation.lastIntegrityCheck0792=result;
+    recordSecurityEvent(data,"vault-integrity-checked",{status:result.status,errorCount:result.errorCount,warningCount:result.warningCount,recordCount:result.recordCount});
+    data=loadData();toast(result.status==="healthy"?"Vault integrity checks passed.":`Integrity check completed with ${result.errorCount} errors and ${result.warningCount} warnings.`,result.status==="critical"?"error":"success");settings();
   });
-  document.querySelectorAll("[data-restore-deleted0790]").forEach(button=>button.addEventListener("click",()=>{
-    if(!confirm("Restore this deleted record to FireVault?"))return;
+  document.getElementById("downloadIntegrity0792")?.addEventListener("click",async()=>{
+    if(!await securityAuthorizeSensitive0792("download the vault integrity report"))return;
+    const result=validateVaultIntegrity(data);
+    downloadBlob(`firevault-integrity-${new Date().toISOString().slice(0,10)}.json`,JSON.stringify({format:"firevault-integrity-report",build:BUILD,workspaceId:securityFoundationSummary(data).workspaceId,...result},null,2),"application/json");
+    toast("Integrity report downloaded.","success");
+  });
+  document.getElementById("verifySnapshot0792")?.addEventListener("click",()=>{
+    try{const snapshot=latestAutoBackup();if(!snapshot?.data||!Array.isArray(snapshot.data.sites))throw new Error("The latest snapshot is not readable.");const result=validateVaultIntegrity(snapshot.data);recordSecurityEvent(data,"backup-snapshot-verified",{createdAt:snapshot.createdAt||"",siteCount:snapshot.data.sites.length,status:result.status});data=loadData();toast(`Latest snapshot verified: ${snapshot.data.sites.length} accounts, ${result.status}.`,result.status==="critical"?"error":"success");settings();}catch(err){toast(err?.message||"Snapshot verification failed.","error");}
+  });
+  document.getElementById("downloadSnapshot0792")?.addEventListener("click",async()=>{
+    if(!await securityAuthorizeSensitive0792("download the latest full backup snapshot"))return;
+    const snapshot=latestAutoBackup();if(!snapshot){toast("No automatic snapshot available.","error");return;}const stamp=new Date(snapshot.createdAt||Date.now()).toISOString().slice(0,19).replace(/[:T]/g,"-");downloadBlob(`firevault-auto-backup-${stamp}-build-${snapshot.build||BUILD}.json`,JSON.stringify(snapshot,null,2),"application/json");toast("Latest snapshot downloaded.","success");
+  });
+  document.getElementById("openBackup0792")?.addEventListener("click",()=>{settingsTab="backup";mode="settingsDetail";settings();});
+  document.getElementById("saveDeviceName0792")?.addEventListener("click",()=>{
+    const name=String(document.getElementById("securityDeviceName0792")?.value||"").trim().slice(0,40);
+    if(!name){toast("Enter a device name.","error");return;}
+    const old=data.securityFoundation.device.label||"";data.securityFoundation.device.label=name;recordSecurityEvent(data,"device-renamed",{from:old,to:name});data=loadData();toast("Device name saved.","success");settings();
+  });
+  document.getElementById("clearLocalSession0792")?.addEventListener("click",async()=>{
+    if(!await securityAuthorizeSensitive0792("clear the current FireVault session"))return;
+    if(!confirm("Clear temporary navigation, WebDAV password, and unlocked-session state on this device? Account data and settings will remain."))return;
+    try{const keys=[];for(let i=0;i<sessionStorage.length;i++){const key=sessionStorage.key(i);if(key&&(/firevault|fv/i.test(key)))keys.push(key);}keys.forEach(key=>sessionStorage.removeItem(key));recordSecurityEvent(data,"local-session-cleared",{keysCleared:keys.length});data=loadData();toast("Local session cleared.","success");if(privacyConfig0791())privacyLockNow0791("manual");else setTimeout(()=>location.reload(),250);}catch(err){toast(err?.message||"Session could not be cleared.","error");}
+  });
+  document.getElementById("securityAuditFilter0792")?.addEventListener("change",event=>{securityAuditFilter0792=event.target.value||"all";settings();});
+  document.getElementById("securityAuditSearch0792")?.addEventListener("change",event=>{securityAuditSearch0792=event.target.value;settings();});
+  document.getElementById("clearAuditFilters0792")?.addEventListener("click",()=>{securityAuditFilter0792="all";securityAuditSearch0792="";settings();});
+  document.getElementById("downloadSecurityAudit0790")?.addEventListener("click",async()=>{
+    if(!await securityAuthorizeSensitive0792("download the security audit"))return;
+    const payload={format:"firevault-security-audit",build:BUILD,exportedAt:new Date().toISOString(),foundation:securityFoundationSummary(data),integrity:validateVaultIntegrity(data),audit:securityAudit(data)};
+    downloadBlob(`firevault-security-audit-${new Date().toISOString().slice(0,10)}.json`,JSON.stringify(payload,null,2),"application/json");toast("Security audit downloaded.","success");
+  });
+  document.querySelectorAll("[data-restore-deleted0790]").forEach(button=>button.addEventListener("click",async()=>{
+    if(!await securityAuthorizeSensitive0792("restore a deleted record"))return;if(!confirm("Restore this deleted record to FireVault?"))return;
     try{restoreRecycleRecord(data,button.dataset.restoreDeleted0790);data=loadData();toast("Deleted record restored.","success");settings();}catch(err){toast(err?.message||"Restore failed.","error");}
   }));
-  document.getElementById("purgeRecycle0790")?.addEventListener("click",()=>{
-    if(!confirmSensitive0790("EMPTY","Permanently remove every record in the FireVault recycle bin? This cannot be undone."))return;
+  document.getElementById("purgeRecycle0790")?.addEventListener("click",async()=>{
+    if(!await securityAuthorizeSensitive0792("permanently empty the recycle bin"))return;if(!confirmSensitive0790("EMPTY","Permanently remove every record in the FireVault recycle bin? This cannot be undone."))return;
     try{const count=purgeRecycleBin(data);data=loadData();toast(`${count} deleted record${count===1?"":"s"} permanently removed.`,"success");settings();}catch(err){toast(err?.message||"Recycle bin could not be emptied.","error");}
   });
 }
-
 function settingsPanel(){
   const s=data.settings, t=s.theme, tech=s.technician, email=s.email, r=s.reports, o=s.overlay, a=s.advanced, gps=s.gps||{};
   const saveButton=(label="Save")=>`<button class="primary saveMini" id="saveSettings">${esc(label)}</button>`;
@@ -8129,17 +8212,17 @@ function wireSettingsPanel(){
   }
   if(settingsTab==="sync"){
     const exportPackage=document.getElementById("exportSyncPackage063");
-    if(exportPackage) exportPackage.onclick=()=>{ const pkg=createSyncPackage(data); const stamp=new Date().toISOString().slice(0,10); downloadBlob(`firevault-shared-vault-${stamp}.json`,JSON.stringify(pkg,null,2),"application/json"); notePackageExport(data,pkg); data=loadData(); settings(); toast("Shared Vault package exported and recorded."); };
+    if(exportPackage) exportPackage.onclick=async()=>{ if(!await securityAuthorizeSensitive0792("export a Shared Vault package"))return; const pkg=createSyncPackage(data); const stamp=new Date().toISOString().slice(0,10); downloadBlob(`firevault-shared-vault-${stamp}.json`,JSON.stringify(pkg,null,2),"application/json"); notePackageExport(data,pkg); data=loadData(); settings(); toast("Shared Vault package exported and recorded."); };
     const importPackage=document.getElementById("importSyncPackage063");
-    if(importPackage) importPackage.onchange=e=>{ const file=e.target.files?.[0]; if(!file)return; const reader=new FileReader(); reader.onload=()=>{ try{ const stats=importSyncPackage(data,JSON.parse(reader.result)); data=loadData(); settings(); alert(`Shared Vault package imported.\n\nAdded: ${stats.added}\nUpdated: ${stats.updated}\nMatched: ${stats.matched}\nConflicts: ${stats.conflicts}\nLocal newer: ${stats.localNewer}`); }catch(err){ alert(err?.message||"Shared Vault import failed."); } }; reader.readAsText(file); };
+    if(importPackage) importPackage.onchange=async e=>{ const file=e.target.files?.[0]; if(!file)return; if(!await securityAuthorizeSensitive0792("import a Shared Vault package")){e.target.value="";return;} const reader=new FileReader(); reader.onload=()=>{ try{ const stats=importSyncPackage(data,JSON.parse(reader.result)); data=loadData(); settings(); alert(`Shared Vault package imported.\n\nAdded: ${stats.added}\nUpdated: ${stats.updated}\nMatched: ${stats.matched}\nConflicts: ${stats.conflicts}\nLocal newer: ${stats.localNewer}`); }catch(err){ alert(err?.message||"Shared Vault import failed."); } }; reader.readAsText(file); };
     document.querySelectorAll("[data-resolve-conflict]").forEach(btn=>btn.onclick=()=>{ const choice=btn.dataset.resolveConflict; const id=btn.dataset.recordId; const label=choice==="remote"?"use the imported copy":"keep this device copy"; if(!confirm(`Resolve this conflict and ${label}?`)) return; try{ resolveSyncConflict(data,id,choice); data=loadData(); settings(); toast("Conflict resolved."); }catch(err){ alert(err?.message||"Conflict resolution failed."); } });
   }
-  const exportBtn=document.getElementById("exportBtn"); if(exportBtn) exportBtn.onclick=()=>{ const stamp=new Date().toISOString().slice(0,10); fvSafeSet0739("firevault_last_backup_export",new Date().toLocaleString()); downloadBlob(`firevault-backup-${stamp}-build-${BUILD}.json`, JSON.stringify(securitySafeVault0790(),null,2), "application/json"); recordSecurityEvent(data,"backup-exported",{fileName:`firevault-backup-${stamp}-build-${BUILD}.json`}); data=loadData(); toast("Backup exported without credentials.","success"); settings(); };
-  const downloadAuto=document.getElementById("downloadAutoBackup0722"); if(downloadAuto) downloadAuto.onclick=()=>{ const snapshot=latestAutoBackup(); if(!snapshot){toast("No automatic snapshot available.");return;} const stamp=new Date(snapshot.createdAt||Date.now()).toISOString().slice(0,19).replace(/[:T]/g,"-"); downloadBlob(`firevault-auto-backup-${stamp}-build-${snapshot.build||BUILD}.json`,JSON.stringify(snapshot,null,2),"application/json"); toast("Automatic snapshot downloaded."); };
-  const restoreAuto=document.getElementById("restoreAutoBackup0722"); if(restoreAuto) restoreAuto.onclick=()=>{ const info=autoBackupInfo(); const latest=info.last; if(!latest){toast("No automatic snapshot available.");return;} if(!confirmSensitive0790("RESTORE",`Restore the latest automatic snapshot from ${new Date(latest.createdAt).toLocaleString()}? FireVault will preserve the current vault as another safety snapshot first.`)) return; try{ data=restoreAutoBackup(latest.key); applyTheme(); toast("Automatic snapshot restored."); route("home"); }catch(err){alert(err?.message||"Snapshot restore failed.");} };
+  const exportBtn=document.getElementById("exportBtn"); if(exportBtn) exportBtn.onclick=async()=>{ if(!await securityAuthorizeSensitive0792("export the full FireVault backup"))return; const stamp=new Date().toISOString().slice(0,10); fvSafeSet0739("firevault_last_backup_export",new Date().toLocaleString()); downloadBlob(`firevault-backup-${stamp}-build-${BUILD}.json`, JSON.stringify(securitySafeVault0790(),null,2), "application/json"); recordSecurityEvent(data,"backup-exported",{fileName:`firevault-backup-${stamp}-build-${BUILD}.json`}); data=loadData(); toast("Backup exported without credentials.","success"); settings(); };
+  const downloadAuto=document.getElementById("downloadAutoBackup0722"); if(downloadAuto) downloadAuto.onclick=async()=>{ if(!await securityAuthorizeSensitive0792("download the latest automatic snapshot"))return; const snapshot=latestAutoBackup(); if(!snapshot){toast("No automatic snapshot available.");return;} const stamp=new Date(snapshot.createdAt||Date.now()).toISOString().slice(0,19).replace(/[:T]/g,"-"); downloadBlob(`firevault-auto-backup-${stamp}-build-${snapshot.build||BUILD}.json`,JSON.stringify(snapshot,null,2),"application/json"); toast("Automatic snapshot downloaded."); };
+  const restoreAuto=document.getElementById("restoreAutoBackup0722"); if(restoreAuto) restoreAuto.onclick=async()=>{ if(!await securityAuthorizeSensitive0792("restore the latest automatic snapshot"))return; const info=autoBackupInfo(); const latest=info.last; if(!latest){toast("No automatic snapshot available.");return;} if(!confirmSensitive0790("RESTORE",`Restore the latest automatic snapshot from ${new Date(latest.createdAt).toLocaleString()}? FireVault will preserve the current vault as another safety snapshot first.`)) return; try{ data=restoreAutoBackup(latest.key); applyTheme(); toast("Automatic snapshot restored."); route("home"); }catch(err){alert(err?.message||"Snapshot restore failed.");} };
   const copyBackupSummaryBtn=document.getElementById("copyBackupSummaryBtn"); if(copyBackupSummaryBtn) copyBackupSummaryBtn.onclick=async()=>{ try{ await navigator.clipboard.writeText(backupSummaryText()); toast("Backup summary copied."); }catch{ toast("Clipboard unavailable."); } };
-  const importFile=document.getElementById("importFile"); if(importFile) importFile.onchange=e=>{ const f=e.target.files[0]; if(!f)return; if(!confirmSensitive0790("RESTORE",`Replace the current FireVault vault with ${f.name}? A safety snapshot will be created first.`)){e.target.value="";return;} const r=new FileReader(); r.onload=()=>{try{const parsed=JSON.parse(r.result); const incoming=parsed?.data && Array.isArray(parsed.data.sites) ? parsed.data : parsed; if(!incoming || !Array.isArray(incoming.sites)) throw new Error("Invalid FireVault backup."); data=loadData(); Object.assign(data,incoming); recordSecurityEvent(data,"backup-imported",{fileName:f.name}); data=loadData(); applyTheme(); toast("Backup restored and audited.","success"); route("home");}catch(err){alert(err?.message||"Import failed.");}}; r.readAsText(f); };
-  const resetBtn=document.getElementById("resetBtn"); if(resetBtn) resetBtn.onclick=()=>{ const demo=isDemoMode(); const promptText=demo?"Reset the fictional Demo Mode database to its original 20 Boise accounts?":"Clear the active FireVault vault on this browser? Export an external backup first."; const approved=demo?confirm(promptText):confirmSensitive0790("DELETE",promptText); if(approved){ if(demo) resetDemoData(); else localStorage.removeItem(KEY); data=loadData(); applyTheme(); route("home");} };
+  const importFile=document.getElementById("importFile"); if(importFile) importFile.onchange=async e=>{ const f=e.target.files[0]; if(!f)return; if(!await securityAuthorizeSensitive0792("restore a full FireVault backup file")){e.target.value="";return;} if(!confirmSensitive0790("RESTORE",`Replace the current FireVault vault with ${f.name}? A safety snapshot will be created first.`)){e.target.value="";return;} const r=new FileReader(); r.onload=()=>{try{const parsed=JSON.parse(r.result); const incoming=parsed?.data && Array.isArray(parsed.data.sites) ? parsed.data : parsed; if(!incoming || !Array.isArray(incoming.sites)) throw new Error("Invalid FireVault backup."); data=loadData(); Object.assign(data,incoming); recordSecurityEvent(data,"backup-imported",{fileName:f.name}); data=loadData(); applyTheme(); toast("Backup restored and audited.","success"); route("home");}catch(err){alert(err?.message||"Import failed.");}}; r.readAsText(f); };
+  const resetBtn=document.getElementById("resetBtn"); if(resetBtn) resetBtn.onclick=async()=>{ const demo=isDemoMode(); if(!demo && !await securityAuthorizeSensitive0792("clear the local FireVault vault"))return; const promptText=demo?"Reset the fictional Demo Mode database to its original 20 Boise accounts?":"Clear the active FireVault vault on this browser? Export an external backup first."; const approved=demo?confirm(promptText):confirmSensitive0790("DELETE",promptText); if(approved){ if(demo) resetDemoData(); else localStorage.removeItem(KEY); data=loadData(); applyTheme(); route("home");} };
 }
 function saveSettings(){
   const s=data.settings;
@@ -9037,7 +9120,7 @@ function diagnostics(){
 }
 function showChangelog(){
   const notes = [
-    "Build 0.79.1 adds an optional local privacy lock with PIN hashing, inactivity and background locking, recovery code support, and a privacy screen.",
+    "Build 0.79.2 adds a unified Security Center for vault integrity, backup health, audit review, device identity, recovery, and PIN-gated sensitive actions.",
     "Build 0.79.0 adds a security-ready data foundation with stable workspace, user, and device identities; record versioning; change queues; audit history; soft deletion; recycle recovery; and stronger restore/reset confirmation.",
     "Build 0.78.6 completed the Account Detail polish pass with a cleaner field workspace and improved service actions.",
     "Build 0.78.4 redesigns Settings section introductions so they no longer resemble buttons, repairs wrapping and overflow in Data and other Settings areas, and standardizes narrow-phone settings layouts.",

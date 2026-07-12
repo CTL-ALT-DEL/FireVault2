@@ -1,4 +1,4 @@
-export const BUILD = "0.79.1";
+export const BUILD = "0.79.2";
 export const SECURITY_SCHEMA_VERSION = 4;
 export const KEY = "firevault_vault_build_030";
 export const ACTIVE_JOB_KEY = "firevault_active_job_modular";
@@ -459,6 +459,61 @@ export function securityFoundationSummary(data){
   };
 }
 export function securityAudit(data){ return Array.isArray(data?.auditLog)?data.auditLog:[]; }
+export function validateVaultIntegrity(data){
+  const errors=[];
+  const warnings=[];
+  const ids=new Set();
+  const accountIds=new Map();
+  let records=0;
+  const addRecord=(record,label)=>{
+    records++;
+    if(!record || typeof record!=="object"){ errors.push(`${label} is not a valid record.`); return; }
+    if(!record.id) errors.push(`${label} is missing a record ID.`);
+    else if(ids.has(record.id)) errors.push(`Duplicate record ID: ${record.id}`);
+    else ids.add(record.id);
+    if(!record.workspaceId) warnings.push(`${label} is missing a workspace ID.`);
+    if(!record.createdByUserId || !record.modifiedByUserId) warnings.push(`${label} is missing user audit metadata.`);
+    if(!record.changeId || !Number(record.recordVersion||0)) warnings.push(`${label} is missing version metadata.`);
+  };
+  if(!data || typeof data!=="object") errors.push("Vault root is not a valid object.");
+  if(!Array.isArray(data?.sites)) errors.push("Accounts collection is not an array.");
+  (Array.isArray(data?.sites)?data.sites:[]).forEach((site,index)=>{
+    const label=site?.name||`Account ${index+1}`;
+    addRecord(site,label);
+    if(!String(site?.name||"").trim()) warnings.push(`Account ${index+1} has no site name.`);
+    const accountId=String(site?.externalAccountId||"").trim().toUpperCase();
+    if(accountId){
+      if(accountIds.has(accountId)) warnings.push(`Account ID ${accountId} is used by more than one account.`);
+      else accountIds.set(accountId,site?.id||label);
+    }
+    if(site?.gps && (site.gps.lat!==undefined || site.gps.lng!==undefined)){
+      const lat=Number(site.gps.lat), lng=Number(site.gps.lng);
+      if(!Number.isFinite(lat)||!Number.isFinite(lng)||Math.abs(lat)>90||Math.abs(lng)>180) warnings.push(`${label} has invalid GPS coordinates.`);
+    }
+    CHILD_ARRAYS.forEach(key=>{
+      if(!Array.isArray(site?.[key])){ errors.push(`${label} has invalid ${key} storage.`); return; }
+      site[key].forEach((record,i)=>addRecord(record,`${label} ${key} ${i+1}`));
+    });
+  });
+  if(!Array.isArray(data?.resources)) errors.push("Library resources collection is not an array.");
+  (Array.isArray(data?.resources)?data.resources:[]).forEach((record,i)=>addRecord(record,`Library item ${i+1}`));
+  if(!data?.settings || typeof data.settings!=="object") errors.push("Settings collection is missing or invalid.");
+  if(!Array.isArray(data?.auditLog)) errors.push("Security audit log is missing or invalid.");
+  if(!Array.isArray(data?.recycleBin)) errors.push("Recycle bin is missing or invalid.");
+  const foundation=data?.securityFoundation;
+  if(!foundation?.workspaceId || !foundation?.localUser?.id || !foundation?.device?.id) errors.push("Workspace, local user, or device identity is incomplete.");
+  if(Number(foundation?.schemaVersion||data?.syncState?.schemaVersion||0)!==SECURITY_SCHEMA_VERSION) errors.push(`Security schema does not match version ${SECURITY_SCHEMA_VERSION}.`);
+  return {
+    status:errors.length?"critical":warnings.length?"warning":"healthy",
+    checkedAt:nowIso(),
+    siteCount:Array.isArray(data?.sites)?data.sites.length:0,
+    recordCount:records,
+    errorCount:errors.length,
+    warningCount:warnings.length,
+    errors:errors.slice(0,50),
+    warnings:warnings.slice(0,50)
+  };
+}
 export function recordSecurityEvent(data,type,details={}){
   const row=auditEntry0790(data,type,details);
   saveData(data);

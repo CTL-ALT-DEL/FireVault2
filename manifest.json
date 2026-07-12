@@ -8,7 +8,7 @@
   "orientation": "portrait-primary",
   "background_color": "#0b0d10",
   "theme_color": "#101216",
-  "description": "Field knowledge system for fire alarm technicians. Build 0.79.1 adds an optional local privacy lock with a six-digit PIN, inactivity and background locking, app-switcher privacy cover, recovery code, cooldown protection, and local lock activity.",
+  "description": "Field knowledge system for fire alarm technicians. Build 0.79.2 adds a unified Security Center with vault integrity checks, backup health, audit filtering, device identity controls, recovery tools, and PIN protection for sensitive data operations.",
   "icons": [
     {
       "src": "assets/icon-192.png",
@@ -49,5 +49,5 @@
       "description": "Open FireVault settings"
     }
   ],
-  "version": "0.79.1"
+  "version": "0.79.2"
 }
