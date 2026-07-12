@@ -1,5 +1,8 @@
-import { BUILD, KEY, ACTIVE_JOB_KEY, loadData, saveData, ensureSite, fullAddress, esc, uid, downloadBlob, syncSummary, syncQueue, syncConflicts, syncActivity, createSyncPackage, importSyncPackage, resolveSyncConflict, notePackageExport, deviceIdentity, recordSyncActivity, autoBackupInfo, latestAutoBackup, restoreAutoBackup } from "./storage.js";
+import { BUILD, KEY, ACTIVE_JOB_KEY, loadData, saveData, ensureSite, fullAddress, esc, uid, downloadBlob, syncSummary, syncQueue, syncConflicts, syncActivity, createSyncPackage, importSyncPackage, resolveSyncConflict, notePackageExport, deviceIdentity, recordSyncActivity, autoBackupInfo, latestAutoBackup, restoreAutoBackup, isDemoMode, setDemoMode, resetDemoData, DEMO_VAULT_KEY } from "./storage.js?v=0.73.8";
 window.__FIREVAULT_MODULE_READY = true;
+
+const DEMO_ACTIVE_JOB_KEY_0738 = `${ACTIVE_JOB_KEY}_demo`;
+const DEMO_ACTIVE_ROUTE_KEY_0738 = "firevault_active_route_day_demo";
 
 let data = loadData();
 if(typeof window.fireVaultSplashDatabaseReady0732 === "function") window.fireVaultSplashDatabaseReady0732(Array.isArray(data?.sites)?data.sites.length:0);
@@ -545,16 +548,18 @@ function normalizeAllSiteGps0652(){
   if(changed){ saveData(data); data=loadData(); }
   return changed;
 }
+function nearbyStateStorageKey0738(){ return isDemoMode()?`${NEARBY_STATE_KEY_0652}_demo`:NEARBY_STATE_KEY_0652; }
 function loadNearbyState0652(){
+  if(isDemoMode()) return {lat:43.6150,lng:-116.2023,accuracy:25,at:new Date().toISOString(),source:"Demo Boise location"};
   try{
-    const parsed=JSON.parse(sessionStorage.getItem(NEARBY_STATE_KEY_0652)||"null");
+    const parsed=JSON.parse(sessionStorage.getItem(nearbyStateStorageKey0738())||"null");
     if(parsed && finiteGpsNumber0652(parsed.lat,-90,90)!==null && finiteGpsNumber0652(parsed.lng,-180,180)!==null) return parsed;
   }catch{}
   return null;
 }
 function saveNearbyState0652(state){
   nearbyState=state;
-  try{ state?sessionStorage.setItem(NEARBY_STATE_KEY_0652,JSON.stringify(state)):sessionStorage.removeItem(NEARBY_STATE_KEY_0652); }catch{}
+  try{ const key=nearbyStateStorageKey0738(); state?sessionStorage.setItem(key,JSON.stringify(state)):sessionStorage.removeItem(key); }catch{}
 }
 function gpsInventory0652(){
   normalizeAllSiteGps0652();
@@ -581,6 +586,13 @@ function requestCurrentLocation0652(onSuccess,onFailure,options){
   },onFailure,options);
 }
 function runNearbyScan0652(destination="nearbySites"){
+  if(isDemoMode()){
+    const state={lat:43.6150,lng:-116.2023,accuracy:25,at:new Date().toISOString(),source:"Demo Boise location"};
+    saveNearbyState0652(state);
+    setNearbyScanStatus0652("success","Demo Mode is using a simulated location in downtown Boise.","demo");
+    destination==="home"?home():nearbySites();
+    return;
+  }
   if(data.settings.gps?.enabled===false){
     setNearbyScanStatus0652("error","GPS tools are disabled in Settings → GPS / Maps.");
     destination==="home"?home():nearbySites(); return;
@@ -1040,6 +1052,7 @@ function applyTheme(){
   const t = data.settings.theme || {};
   const body = document.body;
   body.className = "";
+  if(isDemoMode()) body.classList.add("demoMode0738");
   const preset = t.name || "firevault-dark";
   body.classList.add("theme-" + preset);
   if(t.largeText) body.classList.add("large-text");
@@ -1052,11 +1065,13 @@ function applyTheme(){
   applyFeatureVisibility();
 }
 
-function loadActiveJob(){ try{ const raw = localStorage.getItem(ACTIVE_JOB_KEY); return raw ? JSON.parse(raw) : null; } catch{ return null; } }
-function saveActiveJob(){ activeJob ? localStorage.setItem(ACTIVE_JOB_KEY, JSON.stringify(activeJob)) : localStorage.removeItem(ACTIVE_JOB_KEY); }
+function activeJobStorageKey0738(){ return isDemoMode()?DEMO_ACTIVE_JOB_KEY_0738:ACTIVE_JOB_KEY; }
+function loadActiveJob(){ try{ const raw = localStorage.getItem(activeJobStorageKey0738()); return raw ? JSON.parse(raw) : null; } catch{ return null; } }
+function saveActiveJob(){ const key=activeJobStorageKey0738(); activeJob ? localStorage.setItem(key, JSON.stringify(activeJob)) : localStorage.removeItem(key); }
 
-function loadActiveRoute(){ try{ const raw = localStorage.getItem(ACTIVE_ROUTE_KEY); return raw ? JSON.parse(raw) : null; } catch{ return null; } }
-function saveActiveRoute(){ activeRoute ? localStorage.setItem(ACTIVE_ROUTE_KEY, JSON.stringify(activeRoute)) : localStorage.removeItem(ACTIVE_ROUTE_KEY); }
+function activeRouteStorageKey0738(){ return isDemoMode()?DEMO_ACTIVE_ROUTE_KEY_0738:ACTIVE_ROUTE_KEY; }
+function loadActiveRoute(){ try{ const raw = localStorage.getItem(activeRouteStorageKey0738()); return raw ? JSON.parse(raw) : null; } catch{ return null; } }
+function saveActiveRoute(){ const key=activeRouteStorageKey0738(); activeRoute ? localStorage.setItem(key, JSON.stringify(activeRoute)) : localStorage.removeItem(key); }
 function routeEventTime(iso){ try{return new Date(iso).toLocaleTimeString([], {hour:"numeric",minute:"2-digit"});}catch{return "";} }
 function routeDateLabel(iso){ try{return new Date(iso).toLocaleDateString([], {weekday:"short",month:"short",day:"numeric",year:"numeric"});}catch{return "";} }
 function routeDuration(start,end){
@@ -6030,7 +6045,7 @@ function importedAccountCard065(s={}){
 
 const SETTINGS_GROUPS_067 = [
   {key:"profile",icon:"👤",title:"Profile & Organization",note:"Technician identity and company details.",tone:"blue",tabs:["tech"]},
-  {key:"appearance",icon:"◐",title:"App & Home",note:"Theme, Home layout, and visible modules.",tone:"violet",tabs:["themes","homeLayout","visibility"]},
+  {key:"appearance",icon:"◐",title:"App & Home",note:"Demo Mode, theme, Home layout, and visible modules.",tone:"violet",tabs:["demo","themes","homeLayout","visibility"]},
   {key:"field",icon:"🧰",title:"Field Tools",note:"GPS, photo overlays, and optional field services.",tone:"cyan",tabs:["gps","overlay","advanced"]},
   {key:"reports",icon:"▤",title:"Reports & Communication",note:"Report content, email delivery, and customer closeout.",tone:"amber",tabs:["reports","email"]},
   {key:"data",icon:"☁",title:"Data, Sync & Support",note:"Categories, imports, backup, team sync, Help, About, and diagnostics.",tone:"red",tabs:["sync","customerImport","categories","backup","updates","manual","about","diagnostics"]}
@@ -6051,6 +6066,7 @@ function settingsTabs(){
     ["reports","Reports","Default report title, format, and included report sections."],
     ["email","Email","Default recipients, subject template, signature template, and tag tools."],
     ["overlay","Photo Overlay","Photo stamp preview, template fields, alignment, colors, and logo visibility."],
+    ["demo","Demo Mode","Use a separate fictional Boise account database to demonstrate FireVault without showing real customer information."],
     ["themes","Theme","Theme presets, accent color, 3D controls, text size, and haptics."],
     ["homeLayout","Home Layout","Choose which optional Home cards appear and how they open."],
     ["visibility","Modules","Enable or disable FireVault modules for a cleaner field interface."],
@@ -6114,7 +6130,7 @@ function leaveSettingsHome572(){
 }
 
 function settingsIcon550(tab){
-  return ({tech:"👤",gps:"⌖",reports:"▤",email:"✉",overlay:"▧",themes:"◐",homeLayout:"⌂",visibility:"☰",advanced:"⚡",sync:"☁",customerImport:"⇩",categories:"◇",backup:"⇅",updates:"↻",manual:"?",about:"ⓘ"})[tab]||"•";
+  return ({tech:"👤",gps:"⌖",reports:"▤",email:"✉",overlay:"▧",demo:"D",themes:"◐",homeLayout:"⌂",visibility:"☰",advanced:"⚡",sync:"☁",customerImport:"⇩",categories:"◇",backup:"⇅",updates:"↻",manual:"?",about:"ⓘ"})[tab]||"•";
 }
 function settings(){
   captureSettingsScroll576();
@@ -6148,7 +6164,7 @@ function settings(){
 
   settingsGroup067=settingsGroupForTab067(settingsTab);
   const detailGroup=settingsGroup067ByKey(settingsGroup067);
-  const saveable=!['customerImport','categories','backup','updates','manual','about'].includes(settingsTab);
+  const saveable=!['demo','customerImport','categories','backup','updates','manual','about'].includes(settingsTab);
 
   if(settingsTab==="manual"){
     html(`<div class="screen settingsTabbedDetail0736 settingsManualScreen067 settingsStable573">
@@ -6212,7 +6228,7 @@ function backupSummaryText(){
   return [
     `FireVault Backup Summary - Build ${BUILD}`,
     `Created: ${new Date().toLocaleString()}`,
-    `Storage key: ${KEY}`,
+    `Storage key: ${isDemoMode()?DEMO_VAULT_KEY:KEY}`,
     `Sites: ${b.sites}`,
     `GPS sites: ${b.gps}`,
     `Visits: ${b.visits}`,
@@ -6648,6 +6664,7 @@ const FIREVAULT_MANUAL_058 = [
   ]},
   {id:"settings",title:"Settings Reference",icon:"⚙",status:"Current",summary:"Understand each Settings area and the effect it has on FireVault.",topics:[
     ["Technician","Stores the technician name, company, phone, email, and license or employee identifier reused in reports and templates."],
+    ["Demo Mode","Settings → App → Demo Mode switches FireVault to a separate fictional Boise dataset with 20 accounts, simulated Nearby GPS, and sample field history. Exit Demo Mode to return to the untouched real vault."],
     ["GPS / Maps","Controls the map provider, accuracy preference, nearby radius, GPS capture buttons, and report coordinates."],
     ["Reports and Email","Sets report defaults, recipients, subject templates, signature templates, and email preview behavior."],
     ["Photo Overlay","Controls the information and branding stamped onto exported or saved field photos."],
@@ -6912,6 +6929,43 @@ function wireAccountCategories0737(){
   document.querySelectorAll("[data-category-rule-operator0737]").forEach(select=>select.onchange=()=>{const input=select.closest("[data-category-rule0737]")?.querySelector("[data-category-rule-value0737]");if(input)input.disabled=["present","empty"].includes(select.value);});
 }
 
+function demoModePanel0738(){
+  const active=isDemoMode();
+  const siteCount=Array.isArray(data?.sites)?data.sites.length:0;
+  return `<div class="settingsStack demoModeSettings0738">
+    <section class="card demoModeHero0738 ${active?'active':''}">
+      <div class="demoModeHeroHead0738"><span class="demoModeShield0738">D</span><div><span>SAFE PRESENTATION WORKSPACE</span><h2>${active?'Demo Mode is Active':'Demo Mode'}</h2><p>${active?'FireVault is showing only fictional Boise-area customer information. Your real vault is not loaded into this workspace.':'Switch to a completely separate fictional dataset before showing FireVault to customers, managers, or other technicians.'}</p></div></div>
+      <div class="demoModeStats0738"><div><strong>${active?siteCount:20}</strong><span>Demo Accounts</span></div><div><strong>Boise</strong><span>Simulated Area</span></div><div><strong>Separate</strong><span>Data Vault</span></div></div>
+      <div class="demoModeActions0738">${active?`<button class="primary" id="exitDemoMode0738">Exit Demo Mode</button><button class="ghost" id="resetDemoMode0738">Reset Demo Data</button>`:`<button class="primary" id="enterDemoMode0738">Enter Demo Mode</button>`}</div>
+    </section>
+    <section class="card demoModeInfo0738">
+      <h3>What Demo Mode includes</h3>
+      <div class="demoModeFeatureGrid0738">
+        <div><b>20 fictional accounts</b><span>Boise, Garden City, Eagle, Meridian, and Kuna locations within about 15 miles of downtown Boise.</span></div>
+        <div><b>Every communicator type</b><span>Sample CLSS, AlarmNet, IPDACT, and Basic account IDs.</span></div>
+        <div><b>Complete account records</b><span>Contacts, panels, communicators, batteries, notes, visits, tasks, deficiencies, documents, and checklists.</span></div>
+        <div><b>Map grouping</b><span>Two fictional campuses contain multiple accounts at one address.</span></div>
+        <div><b>Automatic tags</b><span>Healthcare, Education, Priority Service, Multi-Building Campus, and Boise Metro.</span></div>
+        <div><b>Simulated GPS</b><span>Nearby Accounts centers on downtown Boise so the demonstration works from any location.</span></div>
+      </div>
+    </section>
+    <div class="settingsInfo540 warning"><strong>Real data protection</strong><span>Demo edits are stored only in the separate Demo vault. Exiting Demo Mode reloads your original FireVault database exactly as it was. Deleting the Home Screen app can still remove both local vaults, so continue downloading external backups.</span></div>
+  </div>`;
+}
+function switchDemoMode0738(enabled,reset=false){
+  const message=enabled?"Enter Demo Mode and temporarily hide the real customer vault?":"Exit Demo Mode and return to the real customer vault?";
+  if(!confirm(message)) return;
+  if(reset) resetDemoData();
+  setDemoMode(enabled);
+  try{sessionStorage.removeItem(NEARBY_STATE_KEY_0652);sessionStorage.removeItem(`${NEARBY_STATE_KEY_0652}_demo`);}catch{}
+  location.reload();
+}
+function wireDemoMode0738(){
+  document.getElementById("enterDemoMode0738")?.addEventListener("click",()=>switchDemoMode0738(true,false));
+  document.getElementById("exitDemoMode0738")?.addEventListener("click",()=>switchDemoMode0738(false,false));
+  document.getElementById("resetDemoMode0738")?.addEventListener("click",()=>{if(!confirm("Reset all fictional Demo Mode edits and reload the original 20 Boise accounts?"))return;resetDemoData();location.reload();});
+}
+
 function settingsPanel(){
   const s=data.settings, t=s.theme, tech=s.technician, email=s.email, r=s.reports, o=s.overlay, a=s.advanced, gps=s.gps||{};
   const saveButton=(label="Save")=>`<button class="primary saveMini" id="saveSettings">${esc(label)}</button>`;
@@ -6933,6 +6987,8 @@ function settingsPanel(){
     ${settingsSection540("Navigation","Map Preferences","Set the map service, GPS accuracy, and distance used for nearby-account detection.",`<div class="settingsGrid settingsGrid540">${fieldBlock("Default map",`<select id="gpsMapProvider"><option value="apple" ${gps.mapProvider!=="google"?"selected":""}>Apple Maps</option><option value="google" ${gps.mapProvider==="google"?"selected":""}>Google Maps</option></select>`)}${fieldBlock("GPS accuracy",`<select id="gpsHighAccuracy"><option value="true" ${gps.highAccuracy!==false?"selected":""}>High accuracy</option><option value="false" ${gps.highAccuracy===false?"selected":""}>Standard</option></select>`)}${fieldBlock("Nearby radius",`<input id="gpsNearbyRadius" inputmode="decimal" value="${esc(gps.nearbyRadiusMiles||1)}">`,`Distance in miles used by Nearby Sites`)}</div>`,"green",saveButton())}
     ${settingsSection540("Availability","GPS Tools","Choose where location controls and saved coordinates are available.",`<div class="settingsList settingsToggleList540">${checkBlock("gpsEnabled","Show GPS capture buttons on site pages",gps.enabled!==false)}${checkBlock("gpsReports","Include GPS coordinates in reports",gps.includeInReports!==false)}</div><div class="settingsInfo540"><strong>Location permission required</strong><span>Browser GPS works only when FireVault is served over HTTPS and location access is allowed on the device.</span></div>`,"teal")}
   </div>`;
+
+  if(settingsTab==="demo") return demoModePanel0738();
 
   if(settingsTab==="themes") return `<div class="settingsStack settingsStack540">
     ${settingsSection540("One-tap styles","Quick Themes","Apply a coordinated accent and contrast preset without changing your stored field data.",`<div class="presetGrid settingsPresetGrid540">${Object.entries(themePresets).map(([key,p])=>`<button class="ghost presetBtn" data-preset="${key}"><span class="themeSwatch" style="background:${p.accentColor}"></span><span>${p.label}</span></button>`).join("")}</div>`,"violet",saveButton("Apply"))}
@@ -7014,12 +7070,13 @@ function settingsPanel(){
 
   return `<div class="settingsStack settingsStack540">
     ${settingsSection540("Fire alarm field system",`About FireVault`,`A modular field knowledge system built to keep account history, service notes, and technician tools together.`,`<div class="aboutBrand540">${fireVaultBrand575()}<span>Field Vault System</span></div><p class="aboutCopy540">FireVault is designed for fast field reference, local-first reliability, and a simple interface that can reveal advanced tools only when they are needed.</p>`,"red")}
-    ${settingsSection540("Application details","Build Information","Use these details when reporting a problem or confirming which version is installed.",`<div class="aboutGrid aboutGrid540"><div><strong>Build</strong><span>${BUILD}</span></div><div><strong>Storage key</strong><span>${KEY}</span></div><div class="wide"><strong>Data location</strong><span>Local vault on this device with rolling safety snapshots. Download an external backup before deleting or reinstalling the Home Screen app.</span></div></div>`,"slate")}
+    ${settingsSection540("Application details","Build Information","Use these details when reporting a problem or confirming which version is installed.",`<div class="aboutGrid aboutGrid540"><div><strong>Build</strong><span>${BUILD}</span></div><div><strong>Storage key</strong><span>${isDemoMode()?DEMO_VAULT_KEY:KEY}</span></div><div class="wide"><strong>Data location</strong><span>Local vault on this device with rolling safety snapshots. Download an external backup before deleting or reinstalling the Home Screen app.</span></div></div>`,"slate")}
   </div>`;
 }
 function wireSettingsPanel(){
   const saveBtn=document.getElementById("saveSettings"); if(saveBtn) saveBtn.onclick=saveSettings;
   if(settingsTab==="overlay") wireOverlaySettings510();
+  if(settingsTab==="demo") wireDemoMode0738();
   if(settingsTab==="manual") wireManual058();
   if(settingsTab==="customerImport") wireCustomerImport065();
   if(settingsTab==="categories") wireAccountCategories0737();
@@ -7059,7 +7116,7 @@ function wireSettingsPanel(){
   const restoreAuto=document.getElementById("restoreAutoBackup0722"); if(restoreAuto) restoreAuto.onclick=()=>{ const info=autoBackupInfo(); const latest=info.last; if(!latest){toast("No automatic snapshot available.");return;} if(!confirm(`Restore the latest automatic snapshot from ${new Date(latest.createdAt).toLocaleString()}? FireVault will preserve the current vault as another safety snapshot first.`)) return; try{ data=restoreAutoBackup(latest.key); applyTheme(); toast("Automatic snapshot restored."); route("home"); }catch(err){alert(err?.message||"Snapshot restore failed.");} };
   const copyBackupSummaryBtn=document.getElementById("copyBackupSummaryBtn"); if(copyBackupSummaryBtn) copyBackupSummaryBtn.onclick=async()=>{ try{ await navigator.clipboard.writeText(backupSummaryText()); toast("Backup summary copied."); }catch{ toast("Clipboard unavailable."); } };
   const importFile=document.getElementById("importFile"); if(importFile) importFile.onchange=e=>{ const f=e.target.files[0]; if(!f)return; const r=new FileReader(); r.onload=()=>{try{const parsed=JSON.parse(r.result); const incoming=parsed?.data && Array.isArray(parsed.data.sites) ? parsed.data : parsed; if(!incoming || !Array.isArray(incoming.sites)) throw new Error("Invalid FireVault backup."); data=loadData(); Object.assign(data,incoming); saveData(data); data=loadData(); applyTheme(); toast("Backup imported."); route("home");}catch(err){alert(err?.message||"Import failed.");}}; r.readAsText(f); };
-  const resetBtn=document.getElementById("resetBtn"); if(resetBtn) resetBtn.onclick=()=>{ if(confirm("Clear FireVault local data on this browser? Export a backup first if you need this vault later.")){localStorage.removeItem(KEY); data=loadData(); applyTheme(); route("home");} };
+  const resetBtn=document.getElementById("resetBtn"); if(resetBtn) resetBtn.onclick=()=>{ const demo=isDemoMode(); const promptText=demo?"Reset the fictional Demo Mode database to its original 20 Boise accounts?":"Clear FireVault local data on this browser? Export a backup first if you need this vault later."; if(confirm(promptText)){ if(demo) resetDemoData(); else localStorage.removeItem(KEY); data=loadData(); applyTheme(); route("home");} };
 }
 function saveSettings(){
   const s=data.settings;
@@ -7134,7 +7191,7 @@ function diagnosticsText(){
     `GPS Saved Sites: ${data.sites.filter(hasGps).length}`,
     `Route Days: ${(data.routeLogs||[]).length}`,
     `Old Job Record: ${activeJob ? activeJob.siteName : "None"}`,
-    `Storage Key: ${KEY}`,
+    `Storage Key: ${isDemoMode()?DEMO_VAULT_KEY:KEY}`,
     ``,
     `Stability Issues:`,
     ...(stability.issues.length ? stability.issues.map(i=>`- ${i}`) : ["- None"]),
@@ -7935,7 +7992,7 @@ function diagnostics(){
     <div class="list grow diagnosticsList460">
       <div class="card"><h2>Stability Issues</h2>${stability.issues.length?`<ul>${stability.issues.map(i=>`<li>${esc(i)}</li>`).join("")}</ul>`:`<p>No issues found.</p>`}</div>
       <div class="card"><h2>Checks Passed</h2><ul>${stability.pass.map(p=>`<li>${esc(p)}</li>`).join("")}</ul></div>
-      <div class="card errorBox"><p>Build: ${BUILD}</p><p>Total Tasks: ${totalTasks}</p><p>Due Today: ${taskCounts.today}</p><p>Site Follow-Ups: ${serviceTasks}</p><p>Total Deficiencies: ${totalDef}</p><p>Closed Deficiencies: ${closedDefTotal}</p><p>Total Contacts: ${totalContacts}</p><p>Total Documents: ${totalDocs}</p><p>Report Deliveries: ${totalReportDeliveries}</p><p>Report Follow-Ups: ${reportFollowUps}</p><p>Checklist Items: ${totalChecklist}</p><p>Checklist Issues: ${checklistIssues}</p><p>Completed Inspections: ${completedInspections}</p><p>Attention Sites: ${healthWarn}</p><p>Watch Sites: ${healthWatch}</p><p>Old Job Record: ${activeJob ? esc(activeJob.siteName) : "None"}</p><p>Current Theme: ${esc(data.settings.theme.name)}</p><p>Accent: ${esc(data.settings.theme.accentColor)}</p><p>Route Days: ${(data.routeLogs||[]).length}</p><p>GPS Tools: ${data.settings.gps?.enabled !== false ? "Enabled" : "Hidden"}</p><p>Nearby Radius: ${nearbyRadiusMiles()} mi</p><p>Haptics: ${data.settings.app?.haptics !== false ? "Enabled" : "Off"}</p><p>Last Stability Check: ${esc(lastCheck)}</p><p>Storage key: ${KEY}</p><p>Modules loaded successfully.</p></div>
+      <div class="card errorBox"><p>Build: ${BUILD}</p><p>Total Tasks: ${totalTasks}</p><p>Due Today: ${taskCounts.today}</p><p>Site Follow-Ups: ${serviceTasks}</p><p>Total Deficiencies: ${totalDef}</p><p>Closed Deficiencies: ${closedDefTotal}</p><p>Total Contacts: ${totalContacts}</p><p>Total Documents: ${totalDocs}</p><p>Report Deliveries: ${totalReportDeliveries}</p><p>Report Follow-Ups: ${reportFollowUps}</p><p>Checklist Items: ${totalChecklist}</p><p>Checklist Issues: ${checklistIssues}</p><p>Completed Inspections: ${completedInspections}</p><p>Attention Sites: ${healthWarn}</p><p>Watch Sites: ${healthWatch}</p><p>Old Job Record: ${activeJob ? esc(activeJob.siteName) : "None"}</p><p>Current Theme: ${esc(data.settings.theme.name)}</p><p>Accent: ${esc(data.settings.theme.accentColor)}</p><p>Route Days: ${(data.routeLogs||[]).length}</p><p>GPS Tools: ${data.settings.gps?.enabled !== false ? "Enabled" : "Hidden"}</p><p>Nearby Radius: ${nearbyRadiusMiles()} mi</p><p>Haptics: ${data.settings.app?.haptics !== false ? "Enabled" : "Off"}</p><p>Last Stability Check: ${esc(lastCheck)}</p><p>Storage key: ${isDemoMode()?DEMO_VAULT_KEY:KEY}</p><p>Modules loaded successfully.</p></div>
     </div>
   </div>`);
   document.getElementById("backHome").onclick=()=>returnFromSettingsSubmenu576("home");
@@ -7973,7 +8030,7 @@ function showChangelog(){
   overlay.className="releaseOverlay";
   overlay.innerHTML=`<div class="releaseSheet" role="dialog" aria-modal="true" aria-label="FireVault release notes">
     <div class="releaseHead"><div><strong>${fireVaultBrand575()}</strong><span>Build ${BUILD}</span></div><button class="ghost iconBtn" id="closeRelease" aria-label="Close release notes">×</button></div>
-    <div class="releaseBody"><h2>Release Notes</h2><p class="releaseIntro">Rule-driven account tags and Settings interface repairs.</p><ul>${notes.map(n=>`<li>${esc(n)}</li>`).join("")}</ul></div>
+    <div class="releaseBody"><h2>Release Notes</h2><p class="releaseIntro">Protected Demo Mode with 20 fictional Boise-area accounts.</p><ul>${notes.map(n=>`<li>${esc(n)}</li>`).join("")}</ul></div>
   </div>`;
   document.body.appendChild(overlay);
   const close=()=>overlay.remove();
@@ -7989,7 +8046,7 @@ function bootFireVault518(){
     document.body.classList.add("app-booted533");
     render();
     const autoGpsKey069="firevault_auto_gps_refresh_0691";
-    if((view||"home")==="home" && navigator.geolocation && data.settings.gps?.enabled!==false && sessionStorage.getItem(autoGpsKey069)!=="1"){
+    if((view||"home")==="home" && (isDemoMode() || navigator.geolocation) && data.settings.gps?.enabled!==false && sessionStorage.getItem(autoGpsKey069)!=="1"){
       sessionStorage.setItem(autoGpsKey069,"1");
       setTimeout(()=>runNearbyScan0652("home"),350);
     }

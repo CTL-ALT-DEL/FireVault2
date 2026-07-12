@@ -8,7 +8,7 @@
   "orientation": "portrait-primary",
   "background_color": "#0b0d10",
   "theme_color": "#101216",
-  "description": "Field knowledge system for fire alarm technicians. Build 0.73.7 adds rule-driven multi-category account tags and repairs the Settings interface.",
+  "description": "Field knowledge system for fire alarm technicians. Build 0.73.8 adds a protected Demo Mode with 20 fictional Boise-area accounts.",
   "icons": [
     {
       "src": "assets/icon-192.png",
@@ -49,5 +49,5 @@
       "description": "Open FireVault settings"
     }
   ],
-  "version": "0.73.7"
+  "version": "0.73.8"
 }

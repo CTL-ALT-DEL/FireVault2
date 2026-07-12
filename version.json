@@ -1,6 +1,6 @@
 {
-  "build": "0.73.7",
+  "build": "0.73.8",
   "released": "2026-07-11",
-  "note": "Adds rule-driven multi-category account tags, repairs Settings tabs, and blends the global header into page content.",
-  "notes": "Adds editable category rules under Settings → Data, supports multiple automatic tags per account, improves Settings tab spacing, and removes the faint global header separator."
+  "note": "Adds a protected Demo Mode with 20 fictional Boise-area customer accounts.",
+  "notes": "Demo Mode uses a separate local vault, simulated Boise GPS, fictional contacts and equipment, multi-account map locations, sample tasks, deficiencies, visits, documents, and automatic category tags without loading the real customer database."
 }

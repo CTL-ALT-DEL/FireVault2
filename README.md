@@ -1,15 +1,25 @@
-# FireVault Build 0.73.7
+# FireVault Build 0.73.8
 
-Build 0.73.7 adds a rule-driven **Categories** workspace under Settings → Data. Categories behave as automatic account tags, and a single account may match several categories at once. This build also repairs the Settings tab sizing and spacing and removes the faint separator under the global FireVault logo header.
+Build 0.73.8 adds a protected **Demo Mode** under **Settings → App → Demo Mode**. Demo Mode switches FireVault to a completely separate fictional customer vault so the app can be shown without exposing real account information.
 
-## Highlights
+## Demo Mode highlights
 
-- Create unlimited custom category tags.
-- Build each category from one or more rules.
-- Choose whether **all** rules or **any** rule must match.
-- Rule fields include Account ID, account name, address, city, state, ZIP, device type, source group, panel, and phone.
-- Matching tags appear in the Accounts directory and the individual Account Detail header.
-- Existing communicator categories and Nearby map colors remain unchanged.
-- Settings category tabs now have larger touch targets and better separation from the page heading.
-- The global logo header now blends directly into the page background without the faint gray divider.
-- The storage key remains `firevault_vault_build_030`, with existing automatic backup protections preserved.
+- 20 fictional customer accounts in the Boise, Idaho area.
+- Every demo location is within approximately 15 miles of downtown Boise.
+- Sample CLSS, AlarmNet, IPDACT, and Basic account numbers.
+- Two multi-building locations with separate account IDs at the same address.
+- Fictional contacts, panels, communicators, batteries, visits, notes, tasks, deficiencies, documents, and checklists.
+- Sample rule-driven tags for Healthcare, Education, Priority Service, Multi-Building Campus, and Boise Metro.
+- Simulated downtown Boise GPS so Nearby Accounts works regardless of the device's real location.
+- A persistent **DEMO • BOISE** badge while Demo Mode is active.
+- Demo changes are saved only to a separate demo vault.
+- Exiting Demo Mode reloads the untouched real FireVault vault.
+- Reset Demo Data restores the original 20 fictional accounts.
+
+## Data safety
+
+- The real vault continues to use `firevault_vault_build_030`.
+- The demo vault uses a separate key and is excluded from real-vault recovery scans.
+- Demo active jobs and route logs use separate storage keys.
+- Automatic real-vault snapshots are not exposed or modified while Demo Mode is active.
+- Continue downloading an external backup before deleting or reinstalling the Home Screen app.
