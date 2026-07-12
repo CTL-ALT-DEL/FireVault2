@@ -1,4 +1,4 @@
-import { BUILD, KEY, ACTIVE_JOB_KEY, loadData, saveData, ensureSite, fullAddress, esc, uid, downloadBlob, syncSummary, syncQueue, syncConflicts, syncActivity, createSyncPackage, importSyncPackage, resolveSyncConflict, notePackageExport, deviceIdentity, recordSyncActivity, autoBackupInfo, latestAutoBackup, restoreAutoBackup, isDemoMode, setDemoMode, resetDemoData } from "./storage.js?v=0.77.1";
+import { BUILD, KEY, ACTIVE_JOB_KEY, loadData, saveData, ensureSite, fullAddress, esc, uid, downloadBlob, syncSummary, syncQueue, syncConflicts, syncActivity, createSyncPackage, importSyncPackage, resolveSyncConflict, notePackageExport, deviceIdentity, recordSyncActivity, autoBackupInfo, latestAutoBackup, restoreAutoBackup, isDemoMode, setDemoMode, resetDemoData } from "./storage.js?v=0.78.0";
 window.__FIREVAULT_MODULE_READY = true;
 
 function fvPreferenceStore0739(){
@@ -1824,8 +1824,19 @@ function injectContextualHelp060(){
   /* Build 0.71.1: the floating blue Help circle is retired. Help remains available in Settings → Data, Sync & Support → FireVault Academy. */
   document.getElementById("contextHelp060")?.remove();
 }
+
+function applyRoutePolishClass0780(){
+  const safe=String(view||"home").replace(/[^a-zA-Z0-9_-]/g,"-");
+  [...document.body.classList].forEach(cls=>{if(cls.startsWith("fv-route-"))document.body.classList.remove(cls);});
+  document.body.classList.add(`fv-route-${safe}`);
+  document.body.dataset.fvRoute=safe;
+  const main=document.querySelector("main#app");
+  if(main) main.dataset.fvRoute=safe;
+}
+
 function render(){
   try{
+    applyRoutePolishClass0780();
     const isHomeView=view === "home";
     /* Set the structural page mode before drawing the route. This prevents a
        route from briefly inheriting the previous screen's chrome geometry. */
@@ -1843,6 +1854,7 @@ function render(){
     applyFeatureVisibility();
     setActiveNav();
     injectContextualHelp060();
+    applyRoutePolishClass0780();
   }catch(err){ showError(err); }
 }
 
@@ -4282,7 +4294,7 @@ function siteDetail(){
   const panelMarkup=accountDetailTab0735==="details"?accountDetailsTab0735(s,ctx):accountDetailTab0735==="equipment"?accountEquipmentTab0735(s):accountDetailTab0735==="docs"?accountDocsTab0735(s):accountDetailTab0735==="notes"?accountNotesTab0735(s,ctx):accountOverviewTab0735(s,ctx);
 
   html(`<div class="screen siteDetail0735">
-    <header class="accountHeader0735 technicianHeader075 accountHeaderRewrite0757"><button class="accountBack0735" id="backBtn" aria-label="Back to Accounts">‹</button><div class="technicianIdentity075"><strong>${esc(s.name||"Unnamed Account")}</strong><span class="accountIdLine0757">${esc(accountId)}</span>${fullAddress(s)?`<span class="accountAddressLine0757">${esc(fullAddress(s))}</span>`:""}</div><button class="accountPin0735 ${isPinnedSite566(s)?"pinned":""}" id="pinSiteBtn566" aria-label="Pin account">${isPinnedSite566(s)?"★":"☆"}</button><button class="accountEdit0735" id="editBtn" aria-label="Edit account">✎</button></header>
+    <div class="accountHeader0735 technicianHeader075 accountHeaderRewrite0757" role="banner"><button class="accountBack0735" id="backBtn" aria-label="Back to Accounts">‹</button><div class="technicianIdentity075"><strong>${esc(s.name||"Unnamed Account")}</strong><span class="accountIdLine0757">${esc(accountId)}</span>${fullAddress(s)?`<span class="accountAddressLine0757">${esc(fullAddress(s))}</span>`:""}</div><button class="accountPin0735 ${isPinnedSite566(s)?"pinned":""}" id="pinSiteBtn566" aria-label="Pin account">${isPinnedSite566(s)?"★":"☆"}</button><button class="accountEdit0735" id="editBtn" aria-label="Edit account">✎</button></div>
     <section class="technicianStatus075"><span class="status-${esc(health.cls)}">${esc(health.label)}</span><span>${esc(accountCategoryLabel0735(s))}</span>${open?`<span>${open} task${open===1?"":"s"}</span>`:""}${def?`<span class="hasDef075">${def} deficienc${def===1?"y":"ies"}</span>`:""}</section>
     ${accountTagChips0737(s,8)?`<div class="accountTagRail0737">${accountTagChips0737(s,8)}</div>`:""}
     ${accountPersistentActions0751(s,ctx)}
@@ -6607,10 +6619,10 @@ function settings(){
   if(!inDetail){
     const groupItems=settingsGroupItems0736(group,tabs);
     html(`<div class="screen settingsTabsPage0736 settingsStable573 tone-${group.tone}">
-      <header class="settingsTabsHeader0736">
+      <div class="settingsTabsHeader0736" role="banner">
         <div><span>FireVault preferences</span><h1>Settings</h1><p>Choose a tab, then open the setting you need.</p></div>
         <button class="ghost" id="settingsHomeBtn572">Done</button>
-      </header>
+      </div>
       ${settingsTopTabs0736(group.key)}
       <section class="settingsTabSummary0736"><span>${group.icon}</span><div><strong>${esc(group.title)}</strong><p>${esc(group.note)}</p></div></section>
       <div class="settingsTabItems0736 grow">
@@ -6631,11 +6643,11 @@ function settings(){
 
   if(settingsTab==="manual"){
     html(`<div class="screen settingsTabbedDetail0736 settingsManualScreen067 settingsStable573">
-      <header class="settingsDetailHeader0736">
+      <div class="settingsDetailHeader0736" role="banner">
         <button class="ghost" id="settingsManualBack067" aria-label="Back to Data settings">←</button>
         <div><span>${detailGroup.icon} ${esc(settingsTabLabel0736(detailGroup.key))}</span><h1>Help & Manual</h1></div>
         <button class="ghost" id="settingsManualHome067">Done</button>
-      </header>
+      </div>
       ${settingsTopTabs0736(detailGroup.key)}
       <div class="settingsManualBody067 settingsDetailBody488 settingsTabbedBody0736">${manualPanel058()}</div>
     </div>`);
@@ -6648,11 +6660,11 @@ function settings(){
   }
 
   html(`<div class="screen settingsTabbedDetail0736 settingsDetailScreen067 settingsScreen settingsStable573 settingsTab-${settingsTab}" data-settings-tab="${settingsTab}">
-    <header class="settingsDetailHeader0736 tone-${detailGroup.tone}">
+    <div class="settingsDetailHeader0736 tone-${detailGroup.tone}" role="banner">
       <button class="ghost" id="settingsBackBtn" aria-label="Back to ${esc(settingsTabLabel0736(detailGroup.key))} settings">←</button>
       <div><span>${detailGroup.icon} ${esc(settingsTabLabel0736(detailGroup.key))}</span><h1>${esc(active[1])}</h1></div>
       <div class="settingsDetailActions0736">${saveable?`<button class="primary" id="saveSettingsTop">Save</button>`:`<button class="ghost" id="settingsDoneBtn">Done</button>`}</div>
-    </header>
+    </div>
     ${settingsTopTabs0736(detailGroup.key)}
     <p class="settingsDetailNote0736">${esc(active[2])}</p>
     <div class="settingsDetailBody067 settingsDetailBody488 settingsContent448 settingsTabbedBody0736">${settingsPanel()}</div>
@@ -8548,7 +8560,7 @@ function diagnostics(){
 }
 function showChangelog(){
   const notes = [
-    "Build 0.77.1 replaces the Accounts toolbar with two fixed FireVault controls that keep Jump To and Sort By readable on narrow iPhones.",
+    "Build 0.78.0 scopes the fixed app header and bottom dock to the real global chrome, then polishes Tools, Settings, Account Detail, forms, dialogs, and touch states across FireVault.",
     "Build 0.76.2 adds one-tap Call and Route controls to every account card, identifies multi-account addresses, clarifies account health, and prevents accidental double-opening while preserving the Accounts view state.",
     "Build 0.76.1 hardens the Accounts directory with persistent view state, inline Favorites, recent-opened context, keyboard shortcuts, and a permanent app-chrome repair so the bottom navigation remains visible after saves and Favorite changes.",
     "Build 0.76.0 completes the Accounts workflow with sorting, safer manual account creation, duplicate Account ID protection, and improved empty states.",
@@ -8579,7 +8591,7 @@ function showChangelog(){
   overlay.className="releaseOverlay";
   overlay.innerHTML=`<div class="releaseSheet" role="dialog" aria-modal="true" aria-label="FireVault release notes">
     <div class="releaseHead"><div><strong>${fireVaultBrand575()}</strong><span>Build ${BUILD}</span></div><button class="ghost iconBtn" id="closeRelease" aria-label="Close release notes">×</button></div>
-    <div class="releaseBody"><h2>Release Notes</h2><p class="releaseIntro">Faster account finding with stable inline actions and preserved directory position.</p><ul>${notes.map(n=>`<li>${esc(n)}</li>`).join("")}</ul></div>
+    <div class="releaseBody"><h2>Release Notes</h2><p class="releaseIntro">App-wide structural cleanup with consistent page surfaces, navigation, controls, and field-ready spacing.</p><ul>${notes.map(n=>`<li>${esc(n)}</li>`).join("")}</ul></div>
   </div>`;
   document.body.appendChild(overlay);
   const close=()=>overlay.remove();

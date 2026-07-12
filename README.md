@@ -1,7 +1,3 @@
-# FireVault Build 0.77.1 — Accounts Toolbar Rebuild
+# FireVault Build 0.78.0 — App-Wide Polish
 
-- Replaces the accumulated Jump/Sort CSS with a new authoritative toolbar.
-- Keeps Jump To and Sort By on one row.
-- Uses stacked label/value text inside each button so Alphabetical remains readable on iPhone.
-- Moves Reset outside the two-button grid.
-- Preserves account data and the existing vault key.
+This release scopes legacy global `header` and `nav` CSS to the real FireVault app header and bottom dock, preventing nested page headers and tab navigation from inheriting fixed-position behavior. It also polishes Tools, Settings, Account Detail, Add/Edit Account, dialogs, empty states, focus states, and global navigation without changing the vault schema or storage key.

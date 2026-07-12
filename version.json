@@ -1,6 +1,6 @@
 {
-  "build": "0.77.1",
+  "build": "0.78.0",
   "released": "2026-07-12",
-  "note": "Fixed Accounts Jump and Sort controls",
-  "label": "Accounts toolbar rebuild"
+  "note": "App-wide structural and visual polish",
+  "label": "Global chrome and interface polish"
 }

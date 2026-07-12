@@ -8,7 +8,7 @@
   "orientation": "portrait-primary",
   "background_color": "#0b0d10",
   "theme_color": "#101216",
-  "description": "Field knowledge system for fire alarm technicians. Build 0.77.1 rebuilds Jump To and Sort By as two fixed, readable FireVault controls on one row.",
+  "description": "Field knowledge system for fire alarm technicians. Build 0.78.0 scopes global chrome correctly and delivers an app-wide polish pass for Tools, Settings, Account Detail, forms, dialogs, and navigation.",
   "icons": [
     {
       "src": "assets/icon-192.png",
@@ -49,5 +49,5 @@
       "description": "Open FireVault settings"
     }
   ],
-  "version": "0.77.1"
+  "version": "0.78.0"
 }
