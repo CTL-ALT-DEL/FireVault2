@@ -1,7 +1,7 @@
-# FireVault Build 0.76.9 — Custom Accounts Pickers
+# FireVault Build 0.77.0 — Accounts Toolbar Polish
 
-- Keeps Jump To and Sort By on one compact row.
-- Places readable high-contrast labels inside both controls.
-- Uses descriptive Sort choices including Alphabetical and Recently Opened.
-- Preserves the stable Accounts list repair from Build 0.76.6.
-- Does not change the FireVault data key or account database.
+- Makes the Sort control use the remaining toolbar width.
+- Shows the full default value, Alphabetical, on iPhone.
+- Keeps Jump compact and readable.
+- Docks the Top button above the bottom navigation instead of over account cards.
+- Preserves all account data and the existing storage key.
