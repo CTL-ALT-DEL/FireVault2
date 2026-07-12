@@ -1,6 +1,6 @@
 {
-  "build": "0.79.5",
+  "build": "0.79.6",
   "released": "2026-07-12",
-  "note": "Microsoft storage accounts foundation",
-  "label": "Separate Personal, Work, and SharePoint storage profiles"
+  "note": "Accounts scrolling lock",
+  "label": "Nearby-style account list settling"
 }

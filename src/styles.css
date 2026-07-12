@@ -18565,3 +18565,11 @@ body.fv-privacy-locked0791{overflow:hidden!important;background:#07090d!importan
 .microsoftOAuthStatus0795>.paneHead>b{padding:6px 8px;border-radius:999px;background:rgba(34,197,94,.15);border:1px solid rgba(74,222,128,.25);color:#bbf7d0;font-size:9px;letter-spacing:.06em;white-space:nowrap}
 @media(max-width:520px){.microsoftSummaryGrid0795{grid-template-columns:1fr}.microsoftProfileCard0795{grid-template-columns:38px minmax(0,1fr)}.microsoftProfileCard0795>b{grid-column:2;justify-self:start}.microsoftProfileActions0795{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:360px){.microsoftProfileActions0795{grid-template-columns:1fr}.microsoftOAuthStatus0795>.paneHead{align-items:flex-start;flex-direction:column}.microsoftOAuthStatus0795>.paneHead>b{align-self:flex-start}}
+
+
+/* Build 0.79.6 — Accounts scrolling lock */
+.accountsDirectory0759{overscroll-behavior:none!important}
+.accountsResults0759{min-height:0!important;overflow:hidden!important}
+.accountsList0759.accountsList0764{min-height:0!important;overflow-y:auto!important;overflow-x:hidden!important;overscroll-behavior-y:contain!important;touch-action:pan-y!important;scroll-snap-type:none!important;overflow-anchor:none!important;-webkit-overflow-scrolling:touch!important}
+.accountsList0759.accountsList0764 > [data-account-card0759]{flex:0 0 auto!important;scroll-margin-top:2px!important}
+.accountsScrollTail0796{display:block!important;flex:0 0 auto!important;width:100%!important;min-height:0!important;padding:0!important;margin:0!important;border:0!important;pointer-events:none!important;visibility:hidden!important}

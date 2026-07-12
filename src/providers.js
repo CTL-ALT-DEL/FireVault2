@@ -1,4 +1,4 @@
-/* FireVault Build 0.79.5 — Microsoft Storage Accounts Foundation */
+/* FireVault Build 0.79.6 — Microsoft Storage Accounts Foundation */
 export const PROVIDER_CONTRACT_VERSION = 3;
 export const PROVIDER_MODE = "local";
 
