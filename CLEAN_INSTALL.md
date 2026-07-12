@@ -1,11 +1,11 @@
-# FireVault Build 0.73.8 Deployment
+# FireVault Build 0.73.9 Deployment
 
-1. Download and extract the package.
-2. Replace the existing GitHub Pages files with the contents of this package.
-3. Commit the changes and wait for GitHub Pages deployment to complete.
-4. Open FireVault and confirm Build 0.73.8.
-5. Open **Settings → App → Demo Mode** to activate the fictional Boise demonstration vault.
+1. Deploy the contents of this package over the existing GitHub Pages files.
+2. Commit the update and wait for GitHub Pages to finish publishing.
+3. Open FireVault from the existing Home Screen icon. Do not delete or reinstall it.
+4. Confirm the splash screen or About page shows Build 0.73.9.
+5. Open **Settings → App → Demo Mode** and select **Enter Demo Mode**.
 
-Demo Mode does not replace or merge with the real account database. Exiting Demo Mode returns to the original vault.
+The Boise demonstration workspace now runs in temporary memory and does not create a second full local vault. Demo edits reset after a full app reload. Exiting Demo Mode returns to the original real vault.
 
-Do not delete and reinstall the Home Screen app unless a current external backup has been downloaded and verified. The live vault storage key remains `firevault_vault_build_030`.
+The live vault storage key remains `firevault_vault_build_030`. Download and verify an external backup before deleting the Home Screen app or clearing Safari website data.

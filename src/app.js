@@ -1,5 +1,32 @@
-import { BUILD, KEY, ACTIVE_JOB_KEY, loadData, saveData, ensureSite, fullAddress, esc, uid, downloadBlob, syncSummary, syncQueue, syncConflicts, syncActivity, createSyncPackage, importSyncPackage, resolveSyncConflict, notePackageExport, deviceIdentity, recordSyncActivity, autoBackupInfo, latestAutoBackup, restoreAutoBackup, isDemoMode, setDemoMode, resetDemoData, DEMO_VAULT_KEY } from "./storage.js?v=0.73.8";
+import { BUILD, KEY, ACTIVE_JOB_KEY, loadData, saveData, ensureSite, fullAddress, esc, uid, downloadBlob, syncSummary, syncQueue, syncConflicts, syncActivity, createSyncPackage, importSyncPackage, resolveSyncConflict, notePackageExport, deviceIdentity, recordSyncActivity, autoBackupInfo, latestAutoBackup, restoreAutoBackup, isDemoMode, setDemoMode, resetDemoData } from "./storage.js?v=0.73.9";
 window.__FIREVAULT_MODULE_READY = true;
+
+function fvPreferenceStore0739(){
+  if(isDemoMode()){
+    try{return sessionStorage;}catch{}
+  }
+  try{return localStorage;}catch{return null;}
+}
+function fvSafeSet0739(key,value){
+  const text=String(value);
+  const preferred=fvPreferenceStore0739();
+  try{preferred?.setItem(key,text);return true;}catch(err){
+    try{sessionStorage.setItem(key,text);return true;}catch{}
+    console.warn("FireVault preference could not be saved",key,err);
+    return false;
+  }
+}
+function fvSafeRemove0739(key){
+  try{localStorage.removeItem(key);}catch{}
+  try{sessionStorage.removeItem(key);}catch{}
+}
+function fvSafeGet0739(key,fallback=""){
+  if(isDemoMode()){
+    try{const v=sessionStorage.getItem(key);if(v!==null)return v;}catch{}
+  }
+  try{const v=localStorage.getItem(key);return v===null?fallback:v;}catch{return fallback;}
+}
+function demoStorageLabel0739(){return isDemoMode()?"Temporary in-memory demo workspace":KEY;}
 
 const DEMO_ACTIVE_JOB_KEY_0738 = `${ACTIVE_JOB_KEY}_demo`;
 const DEMO_ACTIVE_ROUTE_KEY_0738 = "firevault_active_route_day_demo";
@@ -32,7 +59,7 @@ let nearbyState = loadNearbyState0652();
 let nearbyScanStatus0652 = {state:"idle",message:"",attempt:"",at:""};
 let siteSearch = "";
 let sitesFilter0736 = "all";
-let dailySummaryDate569 = localStorage.getItem("firevault_daily_summary_date") || "";
+let dailySummaryDate569 = fvSafeGet0739("firevault_daily_summary_date","");
 let dailyPickerMonth571 = localDateString().slice(0,7);
 let libraryFolder = "all";
 let docVaultFilter516 = "all";
@@ -44,7 +71,7 @@ let simpleToolsOpen = false;
 let accountDetailTab0735 = "overview";
 let accountDetailSite0735 = "";
 let nearbyMapGroups0735 = [];
-let homeInstallTipHidden = localStorage.getItem("firevault_home_install_tip_hidden") === "1";
+let homeInstallTipHidden = fvSafeGet0739("firevault_home_install_tip_hidden","") === "1";
 let jobTimer = null;
 const ACTIVE_ROUTE_KEY = "firevault_active_route_day";
 let activeRoute = loadActiveRoute();
@@ -1066,12 +1093,12 @@ function applyTheme(){
 }
 
 function activeJobStorageKey0738(){ return isDemoMode()?DEMO_ACTIVE_JOB_KEY_0738:ACTIVE_JOB_KEY; }
-function loadActiveJob(){ try{ const raw = localStorage.getItem(activeJobStorageKey0738()); return raw ? JSON.parse(raw) : null; } catch{ return null; } }
-function saveActiveJob(){ const key=activeJobStorageKey0738(); activeJob ? localStorage.setItem(key, JSON.stringify(activeJob)) : localStorage.removeItem(key); }
+function loadActiveJob(){ try{ const raw=fvSafeGet0739(activeJobStorageKey0738(),""); return raw ? JSON.parse(raw) : null; } catch{ return null; } }
+function saveActiveJob(){ const key=activeJobStorageKey0738(); activeJob ? fvSafeSet0739(key,JSON.stringify(activeJob)) : fvSafeRemove0739(key); }
 
 function activeRouteStorageKey0738(){ return isDemoMode()?DEMO_ACTIVE_ROUTE_KEY_0738:ACTIVE_ROUTE_KEY; }
-function loadActiveRoute(){ try{ const raw = localStorage.getItem(activeRouteStorageKey0738()); return raw ? JSON.parse(raw) : null; } catch{ return null; } }
-function saveActiveRoute(){ const key=activeRouteStorageKey0738(); activeRoute ? localStorage.setItem(key, JSON.stringify(activeRoute)) : localStorage.removeItem(key); }
+function loadActiveRoute(){ try{ const raw=fvSafeGet0739(activeRouteStorageKey0738(),""); return raw ? JSON.parse(raw) : null; } catch{ return null; } }
+function saveActiveRoute(){ const key=activeRouteStorageKey0738(); activeRoute ? fvSafeSet0739(key,JSON.stringify(activeRoute)) : fvSafeRemove0739(key); }
 function routeEventTime(iso){ try{return new Date(iso).toLocaleTimeString([], {hour:"numeric",minute:"2-digit"});}catch{return "";} }
 function routeDateLabel(iso){ try{return new Date(iso).toLocaleDateString([], {weekday:"short",month:"short",day:"numeric",year:"numeric"});}catch{return "";} }
 function routeDuration(start,end){
@@ -1456,7 +1483,7 @@ function dailySummaryDateLabel569(day=selectedDailySummaryDay569(), opts={weekda
 }
 function setDailySummaryDay569(day){
   dailySummaryDate569 = day || localDateString();
-  localStorage.setItem("firevault_daily_summary_date", dailySummaryDate569);
+  fvSafeSet0739("firevault_daily_summary_date",dailySummaryDate569);
 }
 function shiftDailySummaryDay569(delta){
   const d=localDayDate569(selectedDailySummaryDay569());
@@ -2329,7 +2356,7 @@ function dashboard068(){
   document.getElementById('modulesTopBtn476').onclick=()=>{mode=null; route('settings');};
   const bell=document.getElementById('homeBell478'); if(bell) bell.onclick=showChangelog;
   const installHow=document.getElementById('homeInstallHow482'); if(installHow) installHow.onclick=()=>alert('To get the clean full-screen FireVault view on iPhone: tap Share, choose Add to Home Screen, then open FireVault from the new Home Screen icon.');
-  const installHide=document.getElementById('homeInstallHide482'); if(installHide) installHide.onclick=()=>{homeInstallTipHidden=true; localStorage.setItem('firevault_home_install_tip_hidden','1'); home();};
+  const installHide=document.getElementById('homeInstallHide482'); if(installHide) installHide.onclick=()=>{homeInstallTipHidden=true; fvSafeSet0739('firevault_home_install_tip_hidden','1'); home();};
   const todayDateBtn569=document.getElementById('todayDatePickerBtn569'); if(todayDateBtn569) todayDateBtn569.onclick=openHomeDailyDatePicker569;
   wireFieldDashboard560();
   requestAnimationFrame(()=>{ const hs=document.querySelector('.homeScreen476'); if(hs){ try{ hs.scrollTop=0; hs.scrollTo(0,0); }catch{} } try{ window.scrollTo(0,0); }catch{} });
@@ -2363,7 +2390,7 @@ const NEARBY_CATEGORY_META_070={
   alarmnet:{label:"AlarmNet",color:"#f59e0b"},
   ipdact:{label:"IPDACT",color:"#a78bfa"}
 };
-let homeNearbyView069=localStorage.getItem(HOME_NEARBY_VIEW_KEY_069)||"map";
+let homeNearbyView069=fvSafeGet0739(HOME_NEARBY_VIEW_KEY_069,"map")||"map";
 let nearbyCategoryFilter070="all";
 let homeNearbySelected069="";
 let nearbyScrollLock069=false;
@@ -2529,7 +2556,7 @@ function home(){
   document.getElementById('homeSettingsNav069').onclick=()=>route('settings');
   const refreshNearbyHome0714=()=>{resetNearbyMapOverview069(false);runNearbyScan0652('home');};
   document.getElementById('homeNearbyNav069').onclick=refreshNearbyHome0714;
-  document.getElementById('nearbyViewToggle069').onclick=()=>{homeNearbyView069=homeNearbyView069==='map'?'list':'map';localStorage.setItem(HOME_NEARBY_VIEW_KEY_069,homeNearbyView069);home();};
+  document.getElementById('nearbyViewToggle069').onclick=()=>{homeNearbyView069=homeNearbyView069==='map'?'list':'map';fvSafeSet0739(HOME_NEARBY_VIEW_KEY_069,homeNearbyView069);home();};
   document.getElementById('nearbyCategoryFilter070').onchange=e=>{
     nearbyCategoryFilter070=e.target.value in NEARBY_CATEGORY_META_070?e.target.value:"all";
     homeNearbySelected069="";
@@ -6228,7 +6255,7 @@ function backupSummaryText(){
   return [
     `FireVault Backup Summary - Build ${BUILD}`,
     `Created: ${new Date().toLocaleString()}`,
-    `Storage key: ${isDemoMode()?DEMO_VAULT_KEY:KEY}`,
+    `Storage key: ${demoStorageLabel0739()}`,
     `Sites: ${b.sites}`,
     `GPS sites: ${b.gps}`,
     `Visits: ${b.visits}`,
@@ -6725,7 +6752,7 @@ const CONTEXT_HELP_060={
 };
 function loadManualBookmarks058(){ try{return JSON.parse(localStorage.getItem(MANUAL_BOOKMARKS_KEY_058)||"[]")}catch{return []} }
 let manualBookmarks058=loadManualBookmarks058();
-function saveManualBookmarks058(){ localStorage.setItem(MANUAL_BOOKMARKS_KEY_058,JSON.stringify(manualBookmarks058)); }
+function saveManualBookmarks058(){ fvSafeSet0739(MANUAL_BOOKMARKS_KEY_058,JSON.stringify(manualBookmarks058)); }
 function manualSearchText058(ch){ return [ch.title,ch.summary,...ch.topics.flat()].join(" ").toLowerCase(); }
 function manualExpandedQuery058(q){ const parts=q.toLowerCase().trim().split(/\s+/).filter(Boolean); return [...parts,...parts.map(x=>MANUAL_SYNONYMS_058[x]||"")].join(" "); }
 function manualStatus058(ch){ if(["start","home","sites","detail","workflow","notes","photos","gps","reports","settings","backup","trouble"].includes(ch.id)) return "Complete"; return "Needs Review"; }
@@ -6808,7 +6835,7 @@ const ACADEMY_TIPS_059=[
  ["✓","Close the loop","When resolving a task, document the repair, verification test, date, and final system status."],
  ["⇅","Back up before updating","Export the vault before installing a new build or clearing browser storage."]
 ];
-function saveAcademy059(){localStorage.setItem(ACADEMY_PROGRESS_KEY_059,JSON.stringify(academyProgress059));localStorage.setItem(ACADEMY_PINS_KEY_059,JSON.stringify(academyPins059));}
+function saveAcademy059(){fvSafeSet0739(ACADEMY_PROGRESS_KEY_059,JSON.stringify(academyProgress059));fvSafeSet0739(ACADEMY_PINS_KEY_059,JSON.stringify(academyPins059));}
 function tutorialProgress059(t){const done=academyProgress059[t.id]||[];return Math.round((done.length/t.steps.length)*100)}
 function academyPinToggle059(key){academyPins059=academyPins059.includes(key)?academyPins059.filter(x=>x!==key):[...academyPins059,key];saveAcademy059();settings();}
 function tutorialList059(){return `<div class="academyReader058 academyTutorials059"><div class="academyReaderTop058"><button class="ghost" data-manual-view="home">‹ Academy</button><div><span>🎓 Guided Learning</span><h2>Interactive Tutorials</h2><p>Complete practical walkthroughs at your own pace. Progress is saved on this device.</p></div></div><div class="tutorialGrid059">${ACADEMY_TUTORIALS_059.map(t=>{const p=tutorialProgress059(t);return `<article class="tutorialCard059"><button class="tutorialOpen059" data-tutorial-open="${t.id}"><span>${t.icon}</span><div><div class="tutorialMeta059"><em>${t.level}</em><small>${t.time}</small></div><h3>${esc(t.title)}</h3><p>${esc(t.summary)}</p><div class="tutorialBar059"><i style="width:${p}%"></i></div><small>${p}% complete</small></div></button><button class="academyPin059 ${academyPins059.includes('tutorial:'+t.id)?'active':''}" data-academy-pin="tutorial:${t.id}" aria-label="Pin tutorial">★</button></article>`}).join("")}</div></div>`}
@@ -6935,7 +6962,7 @@ function demoModePanel0738(){
   return `<div class="settingsStack demoModeSettings0738">
     <section class="card demoModeHero0738 ${active?'active':''}">
       <div class="demoModeHeroHead0738"><span class="demoModeShield0738">D</span><div><span>SAFE PRESENTATION WORKSPACE</span><h2>${active?'Demo Mode is Active':'Demo Mode'}</h2><p>${active?'FireVault is showing only fictional Boise-area customer information. Your real vault is not loaded into this workspace.':'Switch to a completely separate fictional dataset before showing FireVault to customers, managers, or other technicians.'}</p></div></div>
-      <div class="demoModeStats0738"><div><strong>${active?siteCount:20}</strong><span>Demo Accounts</span></div><div><strong>Boise</strong><span>Simulated Area</span></div><div><strong>Separate</strong><span>Data Vault</span></div></div>
+      <div class="demoModeStats0738"><div><strong>${active?siteCount:20}</strong><span>Demo Accounts</span></div><div><strong>Boise</strong><span>Simulated Area</span></div><div><strong>Temporary</strong><span>Memory Workspace</span></div></div>
       <div class="demoModeActions0738">${active?`<button class="primary" id="exitDemoMode0738">Exit Demo Mode</button><button class="ghost" id="resetDemoMode0738">Reset Demo Data</button>`:`<button class="primary" id="enterDemoMode0738">Enter Demo Mode</button>`}</div>
     </section>
     <section class="card demoModeInfo0738">
@@ -6943,27 +6970,28 @@ function demoModePanel0738(){
       <div class="demoModeFeatureGrid0738">
         <div><b>20 fictional accounts</b><span>Boise, Garden City, Eagle, Meridian, and Kuna locations within about 15 miles of downtown Boise.</span></div>
         <div><b>Every communicator type</b><span>Sample CLSS, AlarmNet, IPDACT, and Basic account IDs.</span></div>
-        <div><b>Complete account records</b><span>Contacts, panels, communicators, batteries, notes, visits, tasks, deficiencies, documents, and checklists.</span></div>
+        <div><b>Complete account records</b><span>Contacts, panels, communicators, batteries, notes, visits, tasks, deficiencies, documents, and checklists without consuming vault storage.</span></div>
         <div><b>Map grouping</b><span>Two fictional campuses contain multiple accounts at one address.</span></div>
         <div><b>Automatic tags</b><span>Healthcare, Education, Priority Service, Multi-Building Campus, and Boise Metro.</span></div>
         <div><b>Simulated GPS</b><span>Nearby Accounts centers on downtown Boise so the demonstration works from any location.</span></div>
       </div>
     </section>
-    <div class="settingsInfo540 warning"><strong>Real data protection</strong><span>Demo edits are stored only in the separate Demo vault. Exiting Demo Mode reloads your original FireVault database exactly as it was. Deleting the Home Screen app can still remove both local vaults, so continue downloading external backups.</span></div>
+    <div class="settingsInfo540 warning"><strong>Real data protection</strong><span>Demo records run in temporary memory and do not create a second local vault. Demo edits last for the current app session and reset after a full reload. Exiting Demo Mode reloads your original FireVault database exactly as it was. Continue downloading external backups for the real vault.</span></div>
   </div>`;
 }
 function switchDemoMode0738(enabled,reset=false){
   const message=enabled?"Enter Demo Mode and temporarily hide the real customer vault?":"Exit Demo Mode and return to the real customer vault?";
   if(!confirm(message)) return;
   if(reset) resetDemoData();
-  setDemoMode(enabled);
-  try{sessionStorage.removeItem(NEARBY_STATE_KEY_0652);sessionStorage.removeItem(`${NEARBY_STATE_KEY_0652}_demo`);}catch{}
+  const changed=setDemoMode(enabled);
+  if(enabled && !changed){toast("Demo Mode could not be activated because browser storage is unavailable.");return;}
+  try{sessionStorage.removeItem(NEARBY_STATE_KEY_0652);sessionStorage.removeItem(`${NEARBY_STATE_KEY_0652}_demo`);sessionStorage.removeItem(DEMO_ACTIVE_JOB_KEY_0738);sessionStorage.removeItem(DEMO_ACTIVE_ROUTE_KEY_0738);}catch{}
   location.reload();
 }
 function wireDemoMode0738(){
   document.getElementById("enterDemoMode0738")?.addEventListener("click",()=>switchDemoMode0738(true,false));
   document.getElementById("exitDemoMode0738")?.addEventListener("click",()=>switchDemoMode0738(false,false));
-  document.getElementById("resetDemoMode0738")?.addEventListener("click",()=>{if(!confirm("Reset all fictional Demo Mode edits and reload the original 20 Boise accounts?"))return;resetDemoData();location.reload();});
+  document.getElementById("resetDemoMode0738")?.addEventListener("click",()=>{if(!confirm("Reset the temporary Demo Mode workspace and reload the original 20 Boise accounts?"))return;resetDemoData();location.reload();});
 }
 
 function settingsPanel(){
@@ -7070,7 +7098,7 @@ function settingsPanel(){
 
   return `<div class="settingsStack settingsStack540">
     ${settingsSection540("Fire alarm field system",`About FireVault`,`A modular field knowledge system built to keep account history, service notes, and technician tools together.`,`<div class="aboutBrand540">${fireVaultBrand575()}<span>Field Vault System</span></div><p class="aboutCopy540">FireVault is designed for fast field reference, local-first reliability, and a simple interface that can reveal advanced tools only when they are needed.</p>`,"red")}
-    ${settingsSection540("Application details","Build Information","Use these details when reporting a problem or confirming which version is installed.",`<div class="aboutGrid aboutGrid540"><div><strong>Build</strong><span>${BUILD}</span></div><div><strong>Storage key</strong><span>${isDemoMode()?DEMO_VAULT_KEY:KEY}</span></div><div class="wide"><strong>Data location</strong><span>Local vault on this device with rolling safety snapshots. Download an external backup before deleting or reinstalling the Home Screen app.</span></div></div>`,"slate")}
+    ${settingsSection540("Application details","Build Information","Use these details when reporting a problem or confirming which version is installed.",`<div class="aboutGrid aboutGrid540"><div><strong>Build</strong><span>${BUILD}</span></div><div><strong>Storage key</strong><span>${demoStorageLabel0739()}</span></div><div class="wide"><strong>Data location</strong><span>Local vault on this device with rolling safety snapshots. Download an external backup before deleting or reinstalling the Home Screen app.</span></div></div>`,"slate")}
   </div>`;
 }
 function wireSettingsPanel(){
@@ -7111,7 +7139,7 @@ function wireSettingsPanel(){
     if(importPackage) importPackage.onchange=e=>{ const file=e.target.files?.[0]; if(!file)return; const reader=new FileReader(); reader.onload=()=>{ try{ const stats=importSyncPackage(data,JSON.parse(reader.result)); data=loadData(); settings(); alert(`Shared Vault package imported.\n\nAdded: ${stats.added}\nUpdated: ${stats.updated}\nMatched: ${stats.matched}\nConflicts: ${stats.conflicts}\nLocal newer: ${stats.localNewer}`); }catch(err){ alert(err?.message||"Shared Vault import failed."); } }; reader.readAsText(file); };
     document.querySelectorAll("[data-resolve-conflict]").forEach(btn=>btn.onclick=()=>{ const choice=btn.dataset.resolveConflict; const id=btn.dataset.recordId; const label=choice==="remote"?"use the imported copy":"keep this device copy"; if(!confirm(`Resolve this conflict and ${label}?`)) return; try{ resolveSyncConflict(data,id,choice); data=loadData(); settings(); toast("Conflict resolved."); }catch(err){ alert(err?.message||"Conflict resolution failed."); } });
   }
-  const exportBtn=document.getElementById("exportBtn"); if(exportBtn) exportBtn.onclick=()=>{ const stamp=new Date().toISOString().slice(0,10); localStorage.setItem("firevault_last_backup_export", new Date().toLocaleString()); downloadBlob(`firevault-backup-${stamp}-build-${BUILD}.json`, JSON.stringify(data,null,2), "application/json"); toast("Backup exported."); settings(); };
+  const exportBtn=document.getElementById("exportBtn"); if(exportBtn) exportBtn.onclick=()=>{ const stamp=new Date().toISOString().slice(0,10); fvSafeSet0739("firevault_last_backup_export",new Date().toLocaleString()); downloadBlob(`firevault-backup-${stamp}-build-${BUILD}.json`, JSON.stringify(data,null,2), "application/json"); toast("Backup exported."); settings(); };
   const downloadAuto=document.getElementById("downloadAutoBackup0722"); if(downloadAuto) downloadAuto.onclick=()=>{ const snapshot=latestAutoBackup(); if(!snapshot){toast("No automatic snapshot available.");return;} const stamp=new Date(snapshot.createdAt||Date.now()).toISOString().slice(0,19).replace(/[:T]/g,"-"); downloadBlob(`firevault-auto-backup-${stamp}-build-${snapshot.build||BUILD}.json`,JSON.stringify(snapshot,null,2),"application/json"); toast("Automatic snapshot downloaded."); };
   const restoreAuto=document.getElementById("restoreAutoBackup0722"); if(restoreAuto) restoreAuto.onclick=()=>{ const info=autoBackupInfo(); const latest=info.last; if(!latest){toast("No automatic snapshot available.");return;} if(!confirm(`Restore the latest automatic snapshot from ${new Date(latest.createdAt).toLocaleString()}? FireVault will preserve the current vault as another safety snapshot first.`)) return; try{ data=restoreAutoBackup(latest.key); applyTheme(); toast("Automatic snapshot restored."); route("home"); }catch(err){alert(err?.message||"Snapshot restore failed.");} };
   const copyBackupSummaryBtn=document.getElementById("copyBackupSummaryBtn"); if(copyBackupSummaryBtn) copyBackupSummaryBtn.onclick=async()=>{ try{ await navigator.clipboard.writeText(backupSummaryText()); toast("Backup summary copied."); }catch{ toast("Clipboard unavailable."); } };
@@ -7191,7 +7219,7 @@ function diagnosticsText(){
     `GPS Saved Sites: ${data.sites.filter(hasGps).length}`,
     `Route Days: ${(data.routeLogs||[]).length}`,
     `Old Job Record: ${activeJob ? activeJob.siteName : "None"}`,
-    `Storage Key: ${isDemoMode()?DEMO_VAULT_KEY:KEY}`,
+    `Storage Key: ${demoStorageLabel0739()}`,
     ``,
     `Stability Issues:`,
     ...(stability.issues.length ? stability.issues.map(i=>`- ${i}`) : ["- None"]),
@@ -7282,7 +7310,7 @@ function repairVaultState(){
     activeJob=null;
     saveActiveJob();
   }
-  localStorage.setItem("firevault_last_stability_check", new Date().toLocaleString());
+  fvSafeSet0739("firevault_last_stability_check",new Date().toLocaleString());
   save();
   toast("Stability repair completed.");
   diagnostics();
@@ -7901,8 +7929,8 @@ function restorePendingBackup554(){
     Object.keys(data).forEach(k=>delete data[k]);
     Object.assign(data, p.data);
     save();
-    localStorage.setItem("firevault_last_restore_build", String(p.build || "Unknown"));
-    localStorage.setItem("firevault_last_restore_time", new Date().toISOString());
+    fvSafeSet0739("firevault_last_restore_build",String(p.build||"Unknown"));
+    fvSafeSet0739("firevault_last_restore_time",new Date().toISOString());
     pendingRestoreBackup554=null;
     toast("Backup restored.");
     route("home");
@@ -7992,7 +8020,7 @@ function diagnostics(){
     <div class="list grow diagnosticsList460">
       <div class="card"><h2>Stability Issues</h2>${stability.issues.length?`<ul>${stability.issues.map(i=>`<li>${esc(i)}</li>`).join("")}</ul>`:`<p>No issues found.</p>`}</div>
       <div class="card"><h2>Checks Passed</h2><ul>${stability.pass.map(p=>`<li>${esc(p)}</li>`).join("")}</ul></div>
-      <div class="card errorBox"><p>Build: ${BUILD}</p><p>Total Tasks: ${totalTasks}</p><p>Due Today: ${taskCounts.today}</p><p>Site Follow-Ups: ${serviceTasks}</p><p>Total Deficiencies: ${totalDef}</p><p>Closed Deficiencies: ${closedDefTotal}</p><p>Total Contacts: ${totalContacts}</p><p>Total Documents: ${totalDocs}</p><p>Report Deliveries: ${totalReportDeliveries}</p><p>Report Follow-Ups: ${reportFollowUps}</p><p>Checklist Items: ${totalChecklist}</p><p>Checklist Issues: ${checklistIssues}</p><p>Completed Inspections: ${completedInspections}</p><p>Attention Sites: ${healthWarn}</p><p>Watch Sites: ${healthWatch}</p><p>Old Job Record: ${activeJob ? esc(activeJob.siteName) : "None"}</p><p>Current Theme: ${esc(data.settings.theme.name)}</p><p>Accent: ${esc(data.settings.theme.accentColor)}</p><p>Route Days: ${(data.routeLogs||[]).length}</p><p>GPS Tools: ${data.settings.gps?.enabled !== false ? "Enabled" : "Hidden"}</p><p>Nearby Radius: ${nearbyRadiusMiles()} mi</p><p>Haptics: ${data.settings.app?.haptics !== false ? "Enabled" : "Off"}</p><p>Last Stability Check: ${esc(lastCheck)}</p><p>Storage key: ${isDemoMode()?DEMO_VAULT_KEY:KEY}</p><p>Modules loaded successfully.</p></div>
+      <div class="card errorBox"><p>Build: ${BUILD}</p><p>Total Tasks: ${totalTasks}</p><p>Due Today: ${taskCounts.today}</p><p>Site Follow-Ups: ${serviceTasks}</p><p>Total Deficiencies: ${totalDef}</p><p>Closed Deficiencies: ${closedDefTotal}</p><p>Total Contacts: ${totalContacts}</p><p>Total Documents: ${totalDocs}</p><p>Report Deliveries: ${totalReportDeliveries}</p><p>Report Follow-Ups: ${reportFollowUps}</p><p>Checklist Items: ${totalChecklist}</p><p>Checklist Issues: ${checklistIssues}</p><p>Completed Inspections: ${completedInspections}</p><p>Attention Sites: ${healthWarn}</p><p>Watch Sites: ${healthWatch}</p><p>Old Job Record: ${activeJob ? esc(activeJob.siteName) : "None"}</p><p>Current Theme: ${esc(data.settings.theme.name)}</p><p>Accent: ${esc(data.settings.theme.accentColor)}</p><p>Route Days: ${(data.routeLogs||[]).length}</p><p>GPS Tools: ${data.settings.gps?.enabled !== false ? "Enabled" : "Hidden"}</p><p>Nearby Radius: ${nearbyRadiusMiles()} mi</p><p>Haptics: ${data.settings.app?.haptics !== false ? "Enabled" : "Off"}</p><p>Last Stability Check: ${esc(lastCheck)}</p><p>Storage key: ${demoStorageLabel0739()}</p><p>Modules loaded successfully.</p></div>
     </div>
   </div>`);
   document.getElementById("backHome").onclick=()=>returnFromSettingsSubmenu576("home");
@@ -8004,6 +8032,7 @@ function diagnostics(){
 }
 function showChangelog(){
   const notes = [
+    "Build 0.73.9 repairs the Demo Mode QuotaExceededError by keeping the 20-account Boise workspace in temporary memory and making noncritical startup preference writes fail safely when device storage is full.",
     "Build 0.73.7 adds rule-driven multi-category account tags, repairs Settings tab spacing, and blends the global logo header into page content.",
     "Build 0.73.6 removes Plus Code text from Nearby cards, redesigns the Accounts directory, and replaces Settings folders with direct category tabs.",
     "Build 0.73.5 redesigns Account Detail with five information tabs, groups same-address accounts on the Nearby map, and removes the cellular coverage tool.",
@@ -8030,7 +8059,7 @@ function showChangelog(){
   overlay.className="releaseOverlay";
   overlay.innerHTML=`<div class="releaseSheet" role="dialog" aria-modal="true" aria-label="FireVault release notes">
     <div class="releaseHead"><div><strong>${fireVaultBrand575()}</strong><span>Build ${BUILD}</span></div><button class="ghost iconBtn" id="closeRelease" aria-label="Close release notes">×</button></div>
-    <div class="releaseBody"><h2>Release Notes</h2><p class="releaseIntro">Protected Demo Mode with 20 fictional Boise-area accounts.</p><ul>${notes.map(n=>`<li>${esc(n)}</li>`).join("")}</ul></div>
+    <div class="releaseBody"><h2>Release Notes</h2><p class="releaseIntro">Quota-safe Demo Mode with 20 fictional Boise-area accounts.</p><ul>${notes.map(n=>`<li>${esc(n)}</li>`).join("")}</ul></div>
   </div>`;
   document.body.appendChild(overlay);
   const close=()=>overlay.remove();
@@ -8046,8 +8075,10 @@ function bootFireVault518(){
     document.body.classList.add("app-booted533");
     render();
     const autoGpsKey069="firevault_auto_gps_refresh_0691";
-    if((view||"home")==="home" && (isDemoMode() || navigator.geolocation) && data.settings.gps?.enabled!==false && sessionStorage.getItem(autoGpsKey069)!=="1"){
-      sessionStorage.setItem(autoGpsKey069,"1");
+    let autoGpsAlready069=false;
+    try{autoGpsAlready069=sessionStorage.getItem(autoGpsKey069)==="1";}catch{}
+    if((view||"home")==="home" && (isDemoMode() || navigator.geolocation) && data.settings.gps?.enabled!==false && !autoGpsAlready069){
+      try{sessionStorage.setItem(autoGpsKey069,"1");}catch{}
       setTimeout(()=>runNearbyScan0652("home"),350);
     }
     document.body.classList.add("app-chrome-ready536");
@@ -8059,15 +8090,15 @@ function bootFireVault518(){
       document.getElementById("appNav")?.removeAttribute("style");
     }
     window.__FIREVAULT_BOOTED = true;
-    localStorage.setItem("firevault_last_boot_ok", new Date().toLocaleString());
-    localStorage.setItem("firevault_last_boot_build", BUILD);
-    localStorage.setItem("firevault_last_boot_route", view || "home");
-    localStorage.removeItem("firevault_last_boot_error");
+    fvSafeSet0739("firevault_last_boot_ok",new Date().toLocaleString());
+    fvSafeSet0739("firevault_last_boot_build",BUILD);
+    fvSafeSet0739("firevault_last_boot_route",view||"home");
+    fvSafeRemove0739("firevault_last_boot_error");
   }catch(err){
     window.__FIREVAULT_LAST_ERROR = err && err.message ? err.message : String(err);
     try{
-      localStorage.setItem("firevault_last_boot_error", window.__FIREVAULT_LAST_ERROR);
-      localStorage.setItem("firevault_last_boot_build", BUILD);
+      fvSafeSet0739("firevault_last_boot_error",window.__FIREVAULT_LAST_ERROR);
+      fvSafeSet0739("firevault_last_boot_build",BUILD);
     }catch{}
     const app=document.getElementById("app");
     document.body.classList.remove("app-loading533");

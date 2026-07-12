@@ -1,25 +1,29 @@
-# FireVault Build 0.73.8
+# FireVault Build 0.73.9 — Demo Mode Quota Repair
 
-Build 0.73.8 adds a protected **Demo Mode** under **Settings → App → Demo Mode**. Demo Mode switches FireVault to a completely separate fictional customer vault so the app can be shown without exposing real account information.
+Build 0.73.9 repairs the `QuotaExceededError` that could appear after entering **Settings → App → Demo Mode** on an iPhone or iPad with a large real vault, recovery copy, and automatic backups.
 
-## Demo Mode highlights
+## What changed
 
-- 20 fictional customer accounts in the Boise, Idaho area.
-- Every demo location is within approximately 15 miles of downtown Boise.
-- Sample CLSS, AlarmNet, IPDACT, and Basic account numbers.
-- Two multi-building locations with separate account IDs at the same address.
-- Fictional contacts, panels, communicators, batteries, visits, notes, tasks, deficiencies, documents, and checklists.
-- Sample rule-driven tags for Healthcare, Education, Priority Service, Multi-Building Campus, and Boise Metro.
-- Simulated downtown Boise GPS so Nearby Accounts works regardless of the device's real location.
-- A persistent **DEMO • BOISE** badge while Demo Mode is active.
-- Demo changes are saved only to a separate demo vault.
-- Exiting Demo Mode reloads the untouched real FireVault vault.
-- Reset Demo Data restores the original 20 fictional accounts.
+- The 20 fictional Boise-area accounts now run in a temporary in-memory workspace.
+- FireVault no longer writes a second full demo vault into `localStorage`.
+- Any legacy Build 0.73.8 demo-vault record is removed automatically to release space.
+- Demo changes remain available during the current app session and reset after a full reload.
+- Active demo jobs, routes, and small presentation preferences use temporary session storage when available.
+- Startup status records and other noncritical preferences can no longer crash the app when browser storage is full.
+- Demo Mode can fall back to a session-only activation flag if `localStorage` has no free space.
+
+## Demo content retained
+
+- 20 fictional Boise-area customer accounts.
+- CLSS, AlarmNet, IPDACT, and Basic examples.
+- Two multi-account locations sharing one address.
+- Fictional contacts, equipment, visits, notes, tasks, deficiencies, documents, and checklists.
+- Automatic demo tags and simulated downtown Boise GPS.
+- Persistent **DEMO • BOISE** identification while active.
 
 ## Data safety
 
-- The real vault continues to use `firevault_vault_build_030`.
-- The demo vault uses a separate key and is excluded from real-vault recovery scans.
-- Demo active jobs and route logs use separate storage keys.
-- Automatic real-vault snapshots are not exposed or modified while Demo Mode is active.
+- The real vault still uses `firevault_vault_build_030`.
+- The real vault, recovery copy, and automatic backups are not replaced by Demo Mode.
+- Exiting Demo Mode reloads the untouched real customer vault.
 - Continue downloading an external backup before deleting or reinstalling the Home Screen app.

@@ -1,23 +1,36 @@
-export const BUILD = "0.73.8";
+export const BUILD = "0.73.9";
 export const KEY = "firevault_vault_build_030";
 export const ACTIVE_JOB_KEY = "firevault_active_job_modular";
 export const DEVICE_KEY = "firevault_device_identity_062";
 
 export const DEMO_MODE_KEY = "firevault_demo_mode_0738";
-export const DEMO_VAULT_KEY = `${KEY}_demo_0738`;
+export const DEMO_VAULT_KEY = `${KEY}_demo_0738`; // legacy key; Build 0.73.9 no longer stores the demo vault here
+let demoRuntimeVault0739 = null;
+let runtimeDeviceIdentity0739 = "";
 
 export function isDemoMode(){
-  try{return localStorage.getItem(DEMO_MODE_KEY)==="1";}catch{return false;}
+  try{if(localStorage.getItem(DEMO_MODE_KEY)==="1") return true;}catch{}
+  try{return sessionStorage.getItem(DEMO_MODE_KEY)==="1";}catch{return false;}
 }
 export function setDemoMode(enabled){
-  try{
-    if(enabled) localStorage.setItem(DEMO_MODE_KEY,"1");
-    else localStorage.removeItem(DEMO_MODE_KEY);
-  }catch{}
-  return !!enabled;
+  // The old persistent demo vault could push an iPhone PWA over its localStorage quota.
+  // Remove it before changing modes; Build 0.73.9 keeps demo records in memory instead.
+  try{localStorage.removeItem(DEMO_VAULT_KEY);}catch{}
+  demoRuntimeVault0739 = null;
+  if(enabled){
+    let stored=false;
+    try{localStorage.setItem(DEMO_MODE_KEY,"1");stored=true;}catch{}
+    if(!stored){try{sessionStorage.setItem(DEMO_MODE_KEY,"1");stored=true;}catch{}}
+    return stored;
+  }
+  try{localStorage.removeItem(DEMO_MODE_KEY);}catch{}
+  try{sessionStorage.removeItem(DEMO_MODE_KEY);}catch{}
+  return false;
 }
 export function resetDemoData(){
+  demoRuntimeVault0739 = null;
   try{localStorage.removeItem(DEMO_VAULT_KEY);}catch{}
+  try{sessionStorage.removeItem(DEMO_VAULT_KEY);}catch{}
 }
 
 function demoIso(daysAgo=0,hour=9){
@@ -201,8 +214,11 @@ export function restoreAutoBackup(key){
 }
 
 export function deviceIdentity(){
-  let id = localStorage.getItem(DEVICE_KEY);
-  if(!id){ id = `device-${uid()}`; localStorage.setItem(DEVICE_KEY,id); }
+  let id="";
+  try{id=localStorage.getItem(DEVICE_KEY)||"";}catch{}
+  if(!id) id=runtimeDeviceIdentity0739 || `device-${uid()}`;
+  runtimeDeviceIdentity0739=id;
+  try{if(localStorage.getItem(DEVICE_KEY)!==id) localStorage.setItem(DEVICE_KEY,id);}catch{}
   return id;
 }
 function nowIso(){ return new Date().toISOString(); }
@@ -395,13 +411,13 @@ function recoverBestLocalVault(){
 }
 export function loadData(){
   if(isDemoMode()){
-    let demo=null;
-    try{ demo=JSON.parse(localStorage.getItem(DEMO_VAULT_KEY)||"null"); }catch{}
-    if(!demo || !Array.isArray(demo.sites) || demo.sites.length!==20){
-      demo=createDemoVault();
-      try{localStorage.setItem(DEMO_VAULT_KEY,JSON.stringify(demo));}catch{}
+    // Demo Mode is intentionally ephemeral. It demonstrates every feature without
+    // duplicating the real vault, recovery copy, and backups inside localStorage.
+    try{localStorage.removeItem(DEMO_VAULT_KEY);}catch{}
+    if(!demoRuntimeVault0739 || !Array.isArray(demoRuntimeVault0739.sites) || demoRuntimeVault0739.sites.length!==20){
+      demoRuntimeVault0739=createDemoVault();
     }
-    return normalize(demo);
+    return normalize(demoRuntimeVault0739);
   }
   const best=recoverBestLocalVault();
   if(best){
@@ -420,8 +436,7 @@ export function loadData(){
 }
 export function saveData(data){
   if(isDemoMode()){
-    let previous=null;
-    try{ previous=JSON.parse(localStorage.getItem(DEMO_VAULT_KEY)||"null"); }catch{}
+    const previous=demoRuntimeVault0739;
     normalize(data);
     const prevSites=new Map((previous?.sites||[]).map(x=>[x?.id,x]));
     data.sites.forEach(site=>migrateRecordTree(site,data,prevSites.get(site.id)));
@@ -429,7 +444,7 @@ export function saveData(data){
     data.resources.forEach(item=>migrateRecordTree(item,data,prevResources.get(item.id)));
     data.demoMode=true;
     data.syncState={...(data.syncState||{}),schemaVersion:3,deviceId:deviceIdentity(),provider:data.settings?.sync?.provider||"onedrive",lastLocalSave:nowIso(),lastSuccessfulSync:data.syncState?.lastSuccessfulSync||""};
-    localStorage.setItem(DEMO_VAULT_KEY,JSON.stringify(data));
+    demoRuntimeVault0739=data;
     return data;
   }
   let previous=null;
