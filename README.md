@@ -1,11 +1,12 @@
-# FireVault Build 0.76.3
+# FireVault Build 0.76.4
 
-Accounts Fast Find and Inline Favorites.
+Accounts layout repair and scroll polish.
 
-- Adds an A–Z Jump selector using only initials present in the current account list.
-- Jump options update automatically as search and filters change.
-- Adds a floating Top control after scrolling deep into the Accounts directory.
-- Updates Favorite stars inline without rebuilding the page or losing scroll position.
-- Removes an unfavorited card smoothly when viewing the Favorites sort.
-- Preserves search, filters, sort, scroll position, Call/Route actions, multi-building indicators, and bottom navigation.
-- Preserves the existing FireVault vault key and all account data.
+## Changes
+- Compresses Jump and Sort into one compact horizontal control row.
+- Keeps the account-result summary visible without creating a tall blank area.
+- Removes fixed-height clipping from account cards and quick-action buttons.
+- Adds card-by-card snap behavior so scrolling settles an account at the top of the list area.
+- Preserves search, filters, sorting, favorites, list position, quick actions, and all existing data.
+
+The FireVault storage key remains `firevault_vault_build_030`.

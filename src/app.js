@@ -1,4 +1,4 @@
-import { BUILD, KEY, ACTIVE_JOB_KEY, loadData, saveData, ensureSite, fullAddress, esc, uid, downloadBlob, syncSummary, syncQueue, syncConflicts, syncActivity, createSyncPackage, importSyncPackage, resolveSyncConflict, notePackageExport, deviceIdentity, recordSyncActivity, autoBackupInfo, latestAutoBackup, restoreAutoBackup, isDemoMode, setDemoMode, resetDemoData } from "./storage.js?v=0.76.3";
+import { BUILD, KEY, ACTIVE_JOB_KEY, loadData, saveData, ensureSite, fullAddress, esc, uid, downloadBlob, syncSummary, syncQueue, syncConflicts, syncActivity, createSyncPackage, importSyncPackage, resolveSyncConflict, notePackageExport, deviceIdentity, recordSyncActivity, autoBackupInfo, latestAutoBackup, restoreAutoBackup, isDemoMode, setDemoMode, resetDemoData } from "./storage.js?v=0.76.4";
 window.__FIREVAULT_MODULE_READY = true;
 
 function fvPreferenceStore0739(){
@@ -3402,7 +3402,7 @@ function accountDirectoryRow0759(s,addressCount=1){
   const recency=accountRecency0761(s);
   const phone=phone069(s);
   const gpsReady=hasGps(s);
-  return `<article class="accountCard0759 accountCard0761 accountCard0762 category-${category}" data-account-card0759 data-id="${esc(s.id)}" data-search="${esc(siteSearchBlob(s))}" data-letter0763="${esc(accountInitial0763(s))}" data-attention="${health.cls==='healthWarn'?'1':'0'}" data-open="${work.cls==='clear'?'0':'1'}" data-gps="${gpsReady?'1':'0'}" role="button" tabindex="0" aria-label="Open ${esc(s.name||'account')}, ${esc(address)}">
+  return `<article class="accountCard0759 accountCard0761 accountCard0762 accountCard0764 category-${category}" data-account-card0759 data-id="${esc(s.id)}" data-search="${esc(siteSearchBlob(s))}" data-letter0763="${esc(accountInitial0763(s))}" data-attention="${health.cls==='healthWarn'?'1':'0'}" data-open="${work.cls==='clear'?'0':'1'}" data-gps="${gpsReady?'1':'0'}" role="button" tabindex="0" aria-label="Open ${esc(s.name||'account')}, ${esc(address)}">
     <span class="accountTone0759" aria-hidden="true"></span>
     <span class="accountCardBody0759">
       <span class="accountCardTop0759">
@@ -3486,8 +3486,8 @@ function sites(){
       <button type="button" data-sites-filter0759="missingGps" class="${sitesFilter0736==='missingGps'?'active':''}"><strong>${missingGpsCount}</strong><span>No GPS</span></button>
     </section>
     <section class="accountsResults0759">
-      <div class="accountsListHead0759 accountsListHead0760 accountsListHead0761 accountsListHead0763"><div class="accountsResultSummary0761"><strong id="siteSearchCount0759" aria-live="polite">${accounts.length} account${accounts.length===1?"":"s"}</strong><span id="accountsViewSummary0761">${esc(filterLabel0761)} • ${esc(accountsSortLabel0760())}</span></div><div class="accountsListTools0761 accountsListTools0763"><button type="button" class="ghost accountsReset0761" id="resetAccountsView0761" ${accountsViewDirty0761?"":"hidden"}>Reset</button><label class="accountsJumpWrap0763" id="accountsJumpWrap0763" ${accountsSort0760==='az'&&accountInitialsList0763.length?'':'hidden'}>Jump<select id="accountsJump0763" aria-label="Jump to account name"><option value="">A–Z</option>${accountInitialsList0763.map(letter=>`<option value="${esc(letter)}">${esc(letter)}</option>`).join("")}</select></label><label>Sort<select id="accountsSort0760" aria-label="Sort accounts"><option value="az" ${accountsSort0760==='az'?'selected':''}>A–Z</option><option value="favorites" ${accountsSort0760==='favorites'?'selected':''}>Favorites</option><option value="recent" ${accountsSort0760==='recent'?'selected':''}>Recently Opened</option><option value="attention" ${accountsSort0760==='attention'?'selected':''}>Priority</option></select></label></div></div>
-      <div class="accountsList0759" id="accountsList0759">
+      <div class="accountsListHead0759 accountsListHead0760 accountsListHead0761 accountsListHead0763 accountsListHead0764"><div class="accountsResultSummary0761"><strong id="siteSearchCount0759" aria-live="polite">${accounts.length} account${accounts.length===1?"":"s"}</strong><span id="accountsViewSummary0761">${esc(filterLabel0761)} • ${esc(accountsSortLabel0760())}</span></div><div class="accountsListTools0761 accountsListTools0763 accountsListTools0764"><button type="button" class="ghost accountsReset0761" id="resetAccountsView0761" ${accountsViewDirty0761?"":"hidden"} aria-label="Reset account view" title="Reset view">Reset</button><label class="accountsJumpWrap0763 accountsCompactControl0764" id="accountsJumpWrap0763" ${accountsSort0760==='az'&&accountInitialsList0763.length?'':'hidden'}><span>Jump</span><select id="accountsJump0763" aria-label="Jump to account name"><option value="">A–Z</option>${accountInitialsList0763.map(letter=>`<option value="${esc(letter)}">${esc(letter)}</option>`).join("")}</select></label><label class="accountsSortWrap0764 accountsCompactControl0764"><span>Sort</span><select id="accountsSort0760" aria-label="Sort accounts"><option value="az" ${accountsSort0760==='az'?'selected':''}>A–Z</option><option value="favorites" ${accountsSort0760==='favorites'?'selected':''}>Favorites</option><option value="recent" ${accountsSort0760==='recent'?'selected':''}>Recently Opened</option><option value="attention" ${accountsSort0760==='attention'?'selected':''}>Priority</option></select></label></div></div>
+      <div class="accountsList0759 accountsList0764" id="accountsList0759">
         ${accounts.length?accounts.map(s=>accountDirectoryRow0759(s,addressCounts0762.get(accountAddressKey0762(s))||1)).join(""):`<div class="accountsEmpty0759 accountsEmpty0760"><span>＋</span><strong>No accounts yet</strong><p>Create an account manually or import your customer list under Settings → Data.</p><button class="primary" id="emptyAdd0759">Add First Account</button></div>`}
         <div class="accountsNoResults0759 accountsNoResults0760" id="accountsNoResults0759" hidden><strong>No matching accounts</strong><p>Clear the search or return to All accounts.</p><button type="button" class="ghost" id="resetAccountsView0760">Reset View</button></div>
       </div>
@@ -3574,6 +3574,26 @@ function sites(){
     window.setTimeout(()=>target.focus({preventScroll:true}),260);
   });
   scrollTopButton0763?.addEventListener("click",()=>{list?.scrollTo({top:0,behavior:"smooth"});});
+  let accountsSnapTimer0764=0;
+  let accountsSnapBusy0764=false;
+  const snapAccountsToCard0764=()=>{
+    if(!list||accountsSnapBusy0764)return;
+    const cards=[...list.querySelectorAll("[data-account-card0759]")].filter(el=>!el.hidden);
+    if(!cards.length)return;
+    const listTop=list.getBoundingClientRect().top;
+    const nearest=cards.reduce((best,card)=>{
+      const distance=Math.abs(card.getBoundingClientRect().top-listTop-4);
+      return !best||distance<best.distance?{card,distance}:best;
+    },null);
+    if(!nearest||nearest.distance<3)return;
+    accountsSnapBusy0764=true;
+    const top=Math.max(0,nearest.card.offsetTop-list.offsetTop-4);
+    list.scrollTo({top,behavior:"smooth"});
+    window.setTimeout(()=>{accountsSnapBusy0764=false;},240);
+  };
+  if("onscrollend" in window){
+    list?.addEventListener("scrollend",snapAccountsToCard0764,{passive:true});
+  }
   document.querySelectorAll("[data-sites-filter0759]").forEach(btn=>btn.addEventListener("click",()=>{
     sitesFilter0736=btn.dataset.sitesFilter0759||"all";
     document.querySelectorAll("[data-sites-filter0759]").forEach(x=>x.classList.toggle("active",x===btn));
@@ -3585,6 +3605,10 @@ function sites(){
     accountsScroll0759=list.scrollTop;
     if(scrollTopButton0763)scrollTopButton0763.hidden=list.scrollTop<420;
     persistAccountsViewState0761();
+    if(!("onscrollend" in window)&&!accountsSnapBusy0764){
+      window.clearTimeout(accountsSnapTimer0764);
+      accountsSnapTimer0764=window.setTimeout(snapAccountsToCard0764,180);
+    }
   },{passive:true});
   list?.addEventListener("click",event=>{
     const callButton=event.target.closest("[data-account-call0762]");
@@ -8511,7 +8535,7 @@ function diagnostics(){
 }
 function showChangelog(){
   const notes = [
-    "Build 0.76.3 adds A–Z fast jump, a floating Top control, and inline Favorite updates that preserve scroll position and app navigation.",
+    "Build 0.76.4 compacts the Jump and Sort controls, prevents account-card actions from clipping, and snaps scrolled accounts cleanly to the top of the list area.",
     "Build 0.76.2 adds one-tap Call and Route controls to every account card, identifies multi-account addresses, clarifies account health, and prevents accidental double-opening while preserving the Accounts view state.",
     "Build 0.76.1 hardens the Accounts directory with persistent view state, inline Favorites, recent-opened context, keyboard shortcuts, and a permanent app-chrome repair so the bottom navigation remains visible after saves and Favorite changes.",
     "Build 0.76.0 completes the Accounts workflow with sorting, safer manual account creation, duplicate Account ID protection, and improved empty states.",
