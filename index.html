@@ -15,14 +15,14 @@
       if(cfg&&cfg.enabled&&!unlocked) document.documentElement.classList.add("fv-lock-pending0791");
     } catch(e) {}
   </script>
-  <link rel="manifest" href="manifest.json?v=0.79.14" />
-  <link rel="apple-touch-icon" href="assets/apple-touch-icon.png?v=0.79.14" />
-  <link rel="icon" type="image/png" href="assets/favicon.png?v=0.79.14" />
-  <link rel="stylesheet" href="src/styles.css?v=0.79.14" />
+  <link rel="manifest" href="manifest.json?v=0.80.0" />
+  <link rel="apple-touch-icon" href="assets/apple-touch-icon.png?v=0.80.0" />
+  <link rel="icon" type="image/png" href="assets/favicon.png?v=0.80.0" />
+  <link rel="stylesheet" href="src/styles.css?v=0.80.0" />
 </head>
 <body class="app-loading533">
   <header id="appHeader" class="appHeader537" style="display:none">
-    <div class="brand"><img class="brandMark" src="assets/favicon.png?v=0.79.14" alt=""><div><div class="fireVaultWordmark575"><span>FIRE</span><b>VAULT</b></div><small>Field Vault System</small></div></div>
+    <div class="brand"><img class="brandMark" src="assets/favicon.png?v=0.80.0" alt=""><div><div class="fireVaultWordmark575"><span>FIRE</span><b>VAULT</b></div><small>Field Vault System</small></div></div>
     <div class="demoHeaderMode0740" id="demoHeaderMode0740" aria-label="Demo Mode">DEMO MODE</div>
     <div class="globalToday071" id="globalToday071" aria-label="Today"></div>
   </header>
@@ -32,7 +32,7 @@
       <div class="splashAura492"></div>
       <div class="splashOrb457 splashOrb492">
         <span class="splashRing492"></span>
-        <img src="assets/favicon.png?v=0.79.14" alt="FireVault">
+        <img src="assets/favicon.png?v=0.80.0" alt="FireVault">
       </div>
       <div class="splashText457 splashText492">
         <h1 class="fireVaultWordmark575"><span>FIRE</span><b>VAULT</b></h1>
@@ -46,7 +46,7 @@
         </div>
       </div>
       <div class="splashMeter457 splashMeter492"><span></span></div>
-      <small class="splashBuild492">0.79.14</small>
+      <small class="splashBuild492">0.80.0</small>
     </div>
   </main>
 
@@ -146,7 +146,7 @@
   </script>
 
   <script>
-    window.FIREVAULT_BUILD = "0.79.14";
+    window.FIREVAULT_BUILD = "0.80.0";
     window.FIREVAULT_UPDATE = { registration:null, waiting:null, checking:false };
     window.fireVaultCheckForUpdates = async function(options){
       options = options || {};
@@ -201,9 +201,9 @@
       window.addEventListener("load", async function(){
         try {
           await window.fireVaultLockPortrait0723();
-          const reg=await navigator.serviceWorker.register("sw.js?v=0.79.14", {scope:"./", updateViaCache:"none"});
+          const reg=await navigator.serviceWorker.register("sw.js?v=0.80.0", {scope:"./", updateViaCache:"none"});
           window.FIREVAULT_UPDATE.registration=reg;
-          if (reg.waiting) window.fireVaultShowUpdate(reg.waiting,"0.79.14");
+          if (reg.waiting) window.fireVaultShowUpdate(reg.waiting,"0.80.0");
           reg.addEventListener("updatefound", function(){
             const worker=reg.installing; if(!worker)return;
             worker.addEventListener("statechange", function(){
@@ -222,6 +222,6 @@
       window.addEventListener("load",function(){ window.fireVaultSplashVersionReady0732("BROWSER MODE"); });
     }
   </script>
-  <script type="module" src="src/app.js?v=0.79.14"></script>
+  <script type="module" src="src/app.js?v=0.80.0"></script>
 </body>
 </html>

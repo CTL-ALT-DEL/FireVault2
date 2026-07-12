@@ -1,8 +1,8 @@
 {
-  "build": "0.79.14",
+  "build": "0.80.0",
   "released": "2026-07-12",
-  "note": "Numbered Nearby Accounts restored; Smart Account Intelligence removed",
-  "label": "Restores numbered distance-matched map pins while preserving Building Navigator and the existing vault",
-  "version": "0.79.14",
-  "name": "Numbered Nearby Accounts"
+  "note": "Built-in multi-page account document scanner",
+  "label": "Camera capture, corner correction, cleanup modes, page ordering, and PDF export",
+  "version": "0.80.0",
+  "name": "Account Document Scanner"
 }

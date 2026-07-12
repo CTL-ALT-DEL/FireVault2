@@ -1,6 +1,6 @@
-import { BUILD, KEY, ACTIVE_JOB_KEY, loadData, saveData, ensureSite, fullAddress, esc, uid, downloadBlob, syncSummary, syncQueue, syncConflicts, syncActivity, createSyncPackage, importSyncPackage, resolveSyncConflict, notePackageExport, deviceIdentity, recordSyncActivity, autoBackupInfo, latestAutoBackup, restoreAutoBackup, isDemoMode, setDemoMode, resetDemoData, securityFoundationSummary, securityAudit, recycleBinInfo, restoreRecycleRecord, purgeRecycleBin, recordSecurityEvent, validateVaultIntegrity } from "./storage.js?v=0.79.14";
-import { backendAdapterSummary, runBackendAdapterDiagnostics, backendAdapterManifest, PROVIDER_CONTRACT_VERSION, FILE_STORAGE_CATALOG, fileStoragePlanSummary, cloudFileStorageManifest, MICROSOFT_STORAGE_TYPES, microsoftStorageAccounts, saveMicrosoftStorageAccounts, createMicrosoftStorageAccount, microsoftStorageAccountById, microsoftAppRegistration, saveMicrosoftAppRegistration, microsoftStorageSummary, microsoftStorageManifest } from "./providers.js?v=0.79.14";
-import { encodePlusCode, isValidFullPlusCode, normalizePlusCode, plusCodePrecisionLabel } from "./open-location-code.js?v=0.79.14";
+import { BUILD, KEY, ACTIVE_JOB_KEY, loadData, saveData, ensureSite, fullAddress, esc, uid, downloadBlob, syncSummary, syncQueue, syncConflicts, syncActivity, createSyncPackage, importSyncPackage, resolveSyncConflict, notePackageExport, deviceIdentity, recordSyncActivity, autoBackupInfo, latestAutoBackup, restoreAutoBackup, isDemoMode, setDemoMode, resetDemoData, securityFoundationSummary, securityAudit, recycleBinInfo, restoreRecycleRecord, purgeRecycleBin, recordSecurityEvent, validateVaultIntegrity } from "./storage.js?v=0.80.0";
+import { backendAdapterSummary, runBackendAdapterDiagnostics, backendAdapterManifest, PROVIDER_CONTRACT_VERSION, FILE_STORAGE_CATALOG, fileStoragePlanSummary, cloudFileStorageManifest, MICROSOFT_STORAGE_TYPES, microsoftStorageAccounts, saveMicrosoftStorageAccounts, createMicrosoftStorageAccount, microsoftStorageAccountById, microsoftAppRegistration, saveMicrosoftAppRegistration, microsoftStorageSummary, microsoftStorageManifest } from "./providers.js?v=0.80.0";
+import { encodePlusCode, isValidFullPlusCode, normalizePlusCode, plusCodePrecisionLabel } from "./open-location-code.js?v=0.80.0";
 window.__FIREVAULT_MODULE_READY = true;
 
 function fvPreferenceStore0739(){
@@ -268,6 +268,11 @@ let libraryFolder = "all";
 let docVaultFilter516 = "all";
 let docVaultSearch521 = "";
 let docVaultSort522 = "recent";
+let scannerDraft0800 = null;
+let scannerEditingDocId0800 = "";
+let scannerEditorIndex0800 = -1;
+let scannerReturnView0800 = "siteDocs";
+let scannerBusy0800 = false;
 let routeReviewId = "";
 let routeHistorySearch = "";
 let simpleToolsOpen = false;
@@ -2259,7 +2264,7 @@ function render(){
     document.body.classList.toggle("homeLayoutFixed570", isHomeView);
     document.body.classList.toggle("settingsChrome572", view === "settings");
     if(!isHomeView) restoreAppChrome572();
-    const routes = {home, tools:tools0734, dashboard068, dailySummary, routeLog, actionCenter, pinnedSites:pinnedSitesManager567, sites, nearbySites, attention:attentionQueue, siteDetail, visits, visitDetail, checklist, siteForm, contactsList, contactForm, siteDocs, siteDocForm, equipmentList, equipmentForm, tasks, taskForm, deficiencies, deficiencyForm, report, library, resourceForm, jobMode, serviceVisit, settings, diagnostics, dataTools};
+    const routes = {home, tools:tools0734, dashboard068, dailySummary, routeLog, actionCenter, pinnedSites:pinnedSitesManager567, sites, nearbySites, attention:attentionQueue, siteDetail, visits, visitDetail, checklist, siteForm, contactsList, contactForm, siteDocs, siteDocForm, documentScanner:documentScanner0800, equipmentList, equipmentForm, tasks, taskForm, deficiencies, deficiencyForm, report, library, resourceForm, jobMode, serviceVisit, settings, diagnostics, dataTools};
     (routes[view] || home)();
     document.body.classList.toggle("homeFullscreen480", isHomeView);
     document.body.classList.toggle("homeLayoutFixed570", isHomeView);
@@ -4635,7 +4640,7 @@ function accountRecentActivity0735(s={},limit=5){
   (s.visits||[]).forEach(v=>add(v.endedAt||v.startedAt||v.date,"visit","Service visit",visitNotesPreview(v,1),"visits"));
   (s.deficiencies||[]).forEach(d=>add(d.createdAt||d.updatedAt,"deficiency",d.title||"Deficiency",`${d.priority||"Normal"} • ${d.status||"Open"}`,"deficiencies"));
   (s.tasks||[]).forEach(t=>add(t.createdAt||t.updatedAt,"task",t.title||"Task",t.status||"Open","tasks"));
-  (s.docs||[]).forEach(d=>add(d.createdAt||d.updatedAt,"document",d.title||d.imageName||"Document",docHasPhoto512(d)?"Photo added":"Document added","siteDocs"));
+  (s.docs||[]).forEach(d=>add(d.createdAt||d.updatedAt,"document",d.title||d.imageName||"Document",docIsScan0800(d)?`${d.scanPageCount||d.scanPages.length}-page scan added`:docHasPhoto512(d)?"Photo added":"Document added","siteDocs"));
   (s.noteEntries||[]).filter(n=>n.type==="Building Location").forEach(n=>add(n.createdAt,"location","Building location",n.note||"Location updated","locations"));
   return rows.sort((a,b)=>b.t-a.t).slice(0,limit);
 }
@@ -4708,9 +4713,14 @@ function accountEquipmentTab0735(s){
 function accountDocsTab0735(s){
   const docs=Array.isArray(s.docs)?s.docs:[];
   const photos=docs.filter(docHasPhoto512);
+  const scans=docs.filter(docIsScan0800);
   return `<div class="accountTabPanel0735">
     <section class="accountPanel0735"><div class="accountPanelHead0735"><div><span>PHOTOS</span><h2>${photos.length} Account Photo${photos.length===1?"":"s"}</h2></div><div><button class="ghost" id="openPhotoVaultBtn523">Open Vault</button><button class="primary" id="addAccountPhotoBtn523">＋ Photo</button></div></div>
       ${photos.length?`<div class="accountPhotoGrid0735">${photos.slice(0,8).map(d=>`<button class="accountPhotoThumb523" data-doc="${esc(d.id)}">${docPhotoThumb512(d)}<span>${esc(d.title||d.imageName||"Photo")}</span></button>`).join("")}</div>`:`<div class="accountEmptyState0735"><strong>No photos saved</strong><span>Add panel, device, wiring, deficiency, or completed-work photos.</span></div>`}
+    </section>
+    <section class="accountPanel0735 accountScannerPanel0800"><div class="accountPanelHead0735"><div><span>DOCUMENT SCANNER</span><h2>${scans.length} Scanned Document${scans.length===1?"":"s"}</h2></div><button class="primary" id="accountScanDoc0800">▣ Scan</button></div>
+      <p>Use the camera to capture paperwork as a clean, cropped, multi-page PDF attached to this account.</p>
+      ${scans.length?`<div class="accountScanStrip0800">${scans.slice(0,4).map(d=>`<button data-account-scan0800="${esc(d.id)}">${scannerThumb0800(d)}<strong>${esc(d.title||"Scanned Document")}</strong></button>`).join("")}</div>`:""}
     </section>
     <section class="accountPanel0735"><div class="accountPanelHead0735"><div><span>DOCUMENTS</span><h2>${docs.length} Total File${docs.length===1?"":"s"}</h2></div><button class="ghost" id="manageDocsBtn">Manage</button></div>
       <div class="accountDocActions0735"><button id="reportBtn"><span>▤</span><strong>Report</strong><small>Customer closeout</small></button><button id="checklistBtn"><span>✓</span><strong>Checklist</strong><small>Inspection workflow</small></button><button id="qaCloseout544"><span>↗</span><strong>Copy Closeout</strong><small>Customer packet</small></button></div>
@@ -4720,7 +4730,7 @@ function accountDocsTab0735(s){
 function accountNotesTab0735(s,ctx){
   const {health,lastVisit,def,open}=ctx;
   return `<div class="accountTabPanel0735">
-    <section class="accountPanel0735"><div class="accountPanelHead0735"><div><span>SITE NOTES</span><h2>Technician Notes</h2></div><button class="primary" id="addSiteNoteBtn491">＋ Add Note</button></div><div class="accountNotesBody0735">${esc(s.notes||"No notes entered.")}</div><button class="ghost accountWideButton0735" id="openSiteNotesBtn494">Open Full Notes Workspace</button></section>
+    <section class="accountPanel0735"><div class="accountPanelHead0735"><div><span>SITE NOTES</span><h2>Technician Notes</h2></div><button class="primary" id="addSiteNoteBtn491">＋ Add Note</button></div><div class="accountNotesBody0735">${esc(s.notes||"No notes entered.")}</div><div class="accountNoteDocActions0800"><button class="ghost accountWideButton0735" id="openSiteNotesBtn494">Open Full Notes Workspace</button><button class="primary accountWideButton0735" id="scanDocNoteBtn0800">▣ Scan Document into This Account</button></div></section>
     <section class="accountMetricCards0735 accountWorkMetrics0735"><button id="taskBtn"><span>OPEN TASKS</span><strong>${open}</strong></button><button id="defBtn" class="metricDanger0735"><span>DEFICIENCIES</span><strong>${def}</strong></button><button id="visitsMini477"><span>LAST VISIT</span><strong>${esc(lastVisit?visitDateLabel(lastVisit):"None")}</strong></button></section>
     <section class="accountQuickBar0735 accountWorkActions0735"><button id="qaAddTask544"><span>□</span><strong>Task</strong></button><button id="qaAddDef544"><span>!</span><strong>Deficiency</strong></button><button id="qaAddPhoto544"><span>▣</span><strong>Photo</strong></button><button id="qaReport544"><span>▤</span><strong>Report</strong></button></section>
     <section class="accountPanel0735"><div class="accountPanelHead0735"><div><span>RECENT VISIT</span><h2>${esc(lastVisit?visitDateLabel(lastVisit):"No completed visits")}</h2></div>${lastVisit?`<button class="ghost" id="allVisitsBtn">History</button>`:""}</div>${lastVisit?`<p class="accountVisitPreview0735">${esc(visitNotesPreview(lastVisit,3))}</p>`:`<div class="accountEmptyState0735"><span>Start a service visit to create an account history.</span></div>`}</section>
@@ -4811,6 +4821,9 @@ function siteDetail(){
   document.querySelectorAll("[data-account-equipment0735]").forEach(b=>b.onclick=()=>{mode=b.dataset.accountEquipment0735;route("equipmentForm");});
   document.getElementById("openPhotoVaultBtn523")?.addEventListener("click",()=>{docVaultFilter516="photos";route("siteDocs");});
   document.getElementById("addAccountPhotoBtn523")?.addEventListener("click",()=>{mode="newPhoto";route("siteDocForm");});
+  document.getElementById("accountScanDoc0800")?.addEventListener("click",()=>scannerStart0800("","siteDetail"));
+  document.getElementById("scanDocNoteBtn0800")?.addEventListener("click",()=>scannerStart0800("","siteDetail"));
+  document.querySelectorAll("[data-account-scan0800]").forEach(b=>b.onclick=()=>{const d=(site()?.docs||[]).find(x=>x.id===b.dataset.accountScan0800);if(d)scannedDocumentModal0800(d);});
   document.querySelectorAll(".accountPhotoThumb523").forEach(b=>b.onclick=()=>{const d=(site()?.docs||[]).find(x=>x.id===b.dataset.doc);if(d)photoPreviewModal524(d);});
   document.getElementById("manageDocsBtn")?.addEventListener("click",()=>route("siteDocs"));
   document.getElementById("reportBtn")?.addEventListener("click",()=>route("report"));
@@ -5151,6 +5164,7 @@ function photoPreviewModal524(d){
 function docTitle(d){ return [d.type,d.title].filter(Boolean).join(" • ") || "Document / Link"; }
 function docMeta(d){
   const parts=[];
+  if(docIsScan0800(d)) parts.push(`${d.scanPageCount||d.scanPages.length} page scanned PDF`);
   if(docHasPhoto512(d) && photoCategory524(d)) parts.push(photoCategory524(d));
   if(d.ref) parts.push(d.ref);
   if(d.url) parts.push("Link saved");
@@ -5165,7 +5179,7 @@ function docReportLine(d){
   return main + caption + notes;
 }
 
-function docHasPhoto512(d){ return !!(d && d.imageData); }
+function docHasPhoto512(d){ return !!(d && d.imageData && !docIsScan0800(d)); }
 function docPhotoThumb512(d){
   return docHasPhoto512(d) ? `<div class="docPhotoThumb512"><img src="${esc(d.imageData)}" alt="Saved site photo thumbnail"></div>` : "";
 }
@@ -5434,14 +5448,14 @@ function docMatchesVaultFilter516(d){
 function docMatchesSearch521(d){
   const q=String(docVaultSearch521||"").trim().toLowerCase();
   if(!q) return true;
-  const hay=[d.type,d.title,d.ref,d.url,d.notes,d.customerCaption,d.imageName,d.imageStampedAt,d.linkedDeficiencyTitle,d.linkedDeficiencyId].filter(Boolean).join(" ").toLowerCase();
+  const hay=[d.type,d.title,d.ref,d.url,d.notes,d.customerCaption,d.imageName,d.imageStampedAt,d.linkedDeficiencyTitle,d.linkedDeficiencyId,d.scanPageCount,docIsScan0800(d)?"scanned document pdf":""].filter(Boolean).join(" ").toLowerCase();
   return hay.includes(q);
 }
 function docVaultSearchBar521(){
   return `<div class="docSearchBar521"><span>⌕</span><input id="docVaultSearch521" value="${esc(docVaultSearch521)}" placeholder="Search photos, documents, links, notes..." autocomplete="off"><button type="button" class="ghost smallBtn" id="clearDocSearch521">Clear</button></div>`;
 }
 function docSortTime522(d){
-  const ts=Date.parse(d.imageUpdatedAt || d.createdAt || d.date || 0);
+  const ts=Date.parse(d.scanCreatedAt || d.imageUpdatedAt || d.updatedAt || d.createdAt || d.date || 0);
   return Number.isFinite(ts) ? ts : 0;
 }
 function sortedDocs522(docs){
@@ -5469,14 +5483,15 @@ function docVaultFilterBar516(docs){
 }
 function siteDocCard519(d){
   const notesPreview = d.notes ? esc(String(d.notes).split(/\r?\n/).slice(0,2).join(" • ")) : "";
-  return `<div class="card docVaultItem docVaultItem512 docVaultItem516" data-doc="${esc(d.id)}">
-    ${docPhotoThumb512(d)}
+  return `<div class="card docVaultItem docVaultItem512 docVaultItem516 ${docIsScan0800(d)?"docVaultScan0800":""}" data-doc="${esc(d.id)}">
+    ${docIsScan0800(d)?scannerThumb0800(d):docPhotoThumb512(d)}
     <div class="docVaultText512">
-      <div class="row"><div><h2>${esc(docTitle(d))}</h2><p>${esc(docMeta(d))}</p>${docHasPhoto512(d)?`<p class="docPhotoMeta512"><span class="photoCategoryPill524">${esc(photoCategory524(d)||"Photo")}</span> ${d.linkedDeficiencyTitle?`<span class="photoDefLink525">Deficiency: ${esc(d.linkedDeficiencyTitle)}</span>`:esc(photoDocSummary512(d))}</p>`:""}</div><span class="pill">${esc(d.type||"Doc")}</span></div>
+      <div class="row"><div><h2>${esc(docTitle(d))}</h2><p>${esc(docMeta(d))}</p>${docHasPhoto512(d)?`<p class="docPhotoMeta512"><span class="photoCategoryPill524">${esc(photoCategory524(d)||"Photo")}</span> ${d.linkedDeficiencyTitle?`<span class="photoDefLink525">Deficiency: ${esc(d.linkedDeficiencyTitle)}</span>`:esc(photoDocSummary512(d))}</p>`:""}</div><span class="pill">${docIsScan0800(d)?"PDF":esc(d.type||"Doc")}</span></div>
       ${notesPreview?`<p class="docNotes">${notesPreview}</p>`:""}
       <div class="docQuickActions">
         ${d.url?`<button class="ghost smallBtn openDocLink" data-url="${esc(d.url)}">Open Link</button>`:""}
         ${docHasPhoto512(d)?`<button class="primary smallBtn previewDocPhotoBtn524" data-doc="${esc(d.id)}">Preview</button><button class="primary smallBtn overlayDocPhotoBtn512" data-doc="${esc(d.id)}">Overlay Photo</button><button class="ghost smallBtn originalDocPhotoBtn516" data-doc="${esc(d.id)}">Original</button>`:""}
+        ${docIsScan0800(d)?`<button class="primary smallBtn previewScan0800" data-doc="${esc(d.id)}">Open Scan</button><button class="primary smallBtn downloadScan0800" data-doc="${esc(d.id)}">PDF</button><button class="ghost smallBtn shareScan0800" data-doc="${esc(d.id)}">Share</button>`:""}
         <button class="ghost smallBtn copyDocRef" data-doc="${esc(d.id)}">Copy</button>
       </div>
     </div>
@@ -5488,14 +5503,16 @@ function siteDocs(){
   const docs=s.docs;
   const linked=docs.filter(d=>d.url).length;
   const photos=docs.filter(docHasPhoto512).length;
+  const scans=docs.filter(docIsScan0800).length;
   const filteredDocs=sortedDocs522(docs.filter(docMatchesVaultFilter516).filter(docMatchesSearch521));
   const docListHtml = filteredDocs.length ? filteredDocs.map(siteDocCard519).join("") : `<div class="empty">No ${esc(docVaultFilterLabel516(docVaultFilter516).toLowerCase())} records found${docVaultSearch521?` for “${esc(docVaultSearch521)}”`:""}. Tap + to add a document, link, or field photo.</div>`;
   html(`<div class="screen docsScreen docsScreen512 docsScreen516"><div class="row"><button class="back ghost" id="backBtn">←</button><div><h1>Documents / Photos</h1><p>${esc(s.name||"Site")}</p></div><button class="primary" id="addDocBtn">＋</button></div>
-    <div class="card docsHero docsHero516 docsHero521"><h2>Site Documents / Photo Vault</h2><p>Keep customer-specific references, links, and field photos. Use the buttons below for the common actions.</p><div class="docHeroActions523"><button class="primary" id="addPhotoBtn523">＋ Add Photo</button><button class="ghost" id="addRegularDocBtn523">＋ Add Document / Link</button></div><div class="docStats"><span><strong>${docs.length}</strong>Total</span><span><strong>${photos}</strong>Photos</span><span><strong>${linked}</strong>Links</span></div>${docVaultSearchBar521()}${docVaultSortControls522()}${docVaultFilterBar516(docs)}</div>
+    <div class="card docsHero docsHero516 docsHero521"><h2>Site Documents / Photo Vault</h2><p>Keep customer-specific references, links, field photos, and camera-scanned paperwork in this account.</p><div class="docHeroActions523 docHeroActions0800"><button class="primary" id="scanDocumentBtn0800">▣ Scan Document</button><button class="primary" id="addPhotoBtn523">＋ Add Photo</button><button class="ghost" id="addRegularDocBtn523">＋ Add Document / Link</button></div><div class="docStats docStats0800"><span><strong>${docs.length}</strong>Total</span><span><strong>${scans}</strong>Scans</span><span><strong>${photos}</strong>Photos</span><span><strong>${linked}</strong>Links</span></div>${docVaultSearchBar521()}${docVaultSortControls522()}${docVaultFilterBar516(docs)}</div>
     <div class="list grow docsList">${docListHtml}</div>
   </div>`);
   document.getElementById("backBtn").onclick=()=>route("siteDetail");
-  document.getElementById("addDocBtn").onclick=()=>{mode="newPhoto"; route("siteDocForm");};
+  document.getElementById("addDocBtn").onclick=()=>{mode="newPhoto";route("siteDocForm");};
+  document.getElementById("scanDocumentBtn0800")?.addEventListener("click",()=>scannerStart0800("","siteDocs"));
   const addPhotoBtn523=document.getElementById("addPhotoBtn523"); if(addPhotoBtn523) addPhotoBtn523.onclick=()=>{mode="newPhoto"; route("siteDocForm");};
   const addRegularDocBtn523=document.getElementById("addRegularDocBtn523"); if(addRegularDocBtn523) addRegularDocBtn523.onclick=()=>{mode=null; route("siteDocForm");};
   const docSearch=document.getElementById("docVaultSearch521"); if(docSearch) docSearch.oninput=()=>{docVaultSearch521=docSearch.value; siteDocs();};
@@ -5503,7 +5520,7 @@ function siteDocs(){
   const docSort=document.getElementById("docVaultSort522"); if(docSort) docSort.onchange=()=>{docVaultSort522=docSort.value||"recent"; siteDocs();};
   const copyDocList=document.getElementById("copyDocVaultList522"); if(copyDocList) copyDocList.onclick=async()=>{try{await navigator.clipboard.writeText(docVaultListText522(s, filteredDocs)); toast("Document list copied.");}catch{toast("Clipboard unavailable.");}};
   document.querySelectorAll(".docFilterBtn516").forEach(b=>b.onclick=e=>{e.stopPropagation(); docVaultFilter516=b.dataset.docFilter||"all"; siteDocs();});
-  document.querySelectorAll(".docVaultItem").forEach(b=>b.onclick=()=>{mode=b.dataset.doc; route("siteDocForm");});
+  document.querySelectorAll(".docVaultItem").forEach(b=>b.onclick=()=>{const d=docs.find(x=>x.id===b.dataset.doc);if(docIsScan0800(d))scannedDocumentModal0800(d);else{mode=b.dataset.doc;route("siteDocForm");}});
   document.querySelectorAll(".openDocLink").forEach(b=>b.onclick=e=>{e.stopPropagation(); window.open(b.dataset.url,"_blank");});
   document.querySelectorAll(".copyDocRef").forEach(b=>b.onclick=async e=>{e.stopPropagation(); const d=docs.find(x=>x.id===b.dataset.doc); if(d){ await navigator.clipboard.writeText(`${docTitle(d)}
 ${d.url||""}
@@ -5512,6 +5529,9 @@ ${d.notes||""}`.trim()); toast("Document reference copied."); }});
   document.querySelectorAll(".previewDocPhotoBtn524").forEach(b=>b.onclick=e=>{e.stopPropagation(); const d=docs.find(x=>x.id===b.dataset.doc); if(d) photoPreviewModal524(d);});
   document.querySelectorAll(".overlayDocPhotoBtn512").forEach(b=>b.onclick=e=>{e.stopPropagation(); const d=docs.find(x=>x.id===b.dataset.doc); if(d) downloadPhotoWithOverlay512(d);});
   document.querySelectorAll(".originalDocPhotoBtn516").forEach(b=>b.onclick=e=>{e.stopPropagation(); const d=docs.find(x=>x.id===b.dataset.doc); if(d) downloadOriginalPhoto513(d);});
+  document.querySelectorAll(".previewScan0800").forEach(b=>b.onclick=e=>{e.stopPropagation();const d=docs.find(x=>x.id===b.dataset.doc);if(d)scannedDocumentModal0800(d);});
+  document.querySelectorAll(".downloadScan0800").forEach(b=>b.onclick=e=>{e.stopPropagation();const d=docs.find(x=>x.id===b.dataset.doc);if(d)scannerDownloadPdf0800(d);});
+  document.querySelectorAll(".shareScan0800").forEach(b=>b.onclick=e=>{e.stopPropagation();const d=docs.find(x=>x.id===b.dataset.doc);if(d)scannerSharePdf0800(d);});
 }
 
 
@@ -5526,7 +5546,7 @@ function siteDocForm(){
   docPhotoDraftDataUrl512 = d?.imageData || "";
   docPhotoDraftName512 = d?.imageName || "";
   docPhotoClearRequested512 = false;
-  const types=["Panel Manual","Permit","Inspection Form","Monitoring Account","Contract","Photo Set","Map / Drawing","Code Reference","Other"];
+  const types=["Scanned Document","Panel Manual","Permit","Inspection Form","Monitoring Account","Contract","Photo Set","Map / Drawing","Code Reference","Other"];
   const formTitle523 = mode && !isNewPhoto523 ? "Edit Document / Photo" : isDefPhoto525 ? "Add Deficiency Photo" : isNewPhoto523 ? "Add Account Photo" : "Add Document / Link";
   const defaultType523 = isNewPhoto523 ? "Photo Set" : "Panel Manual";
   const defaultTitle523 = isDefPhoto525 ? `Deficiency Photo - ${linkedDef525?.title||"Issue"}` : isNewPhoto523 ? "Site Photo" : "";
@@ -5560,6 +5580,371 @@ function siteDocForm(){
     save(); toast(isDefPhoto525?"Deficiency photo saved.":"Document saved."); if(isDefPhoto525){ mode=linkedDefId525; route("deficiencyForm"); } else route("siteDocs");
   };
   const del=document.getElementById("deleteDocBtn"); if(del) del.onclick=()=>{ if(confirm("Delete this document reference?")){ s.docs=s.docs.filter(x=>x.id!==mode); save(); toast("Document deleted."); route("siteDocs"); } };
+}
+
+/* Build 0.80.0 — built-in multi-page account document scanner */
+function docIsScan0800(d={}){
+  return d.isScannedDocument===true && Array.isArray(d.scanPages) && d.scanPages.length>0;
+}
+function scannerFullCorners0800(){
+  return [{x:.025,y:.025},{x:.975,y:.025},{x:.975,y:.975},{x:.025,y:.975}];
+}
+function scannerCopyCorners0800(corners){
+  const source=Array.isArray(corners)&&corners.length===4?corners:scannerFullCorners0800();
+  return source.map(p=>({x:Math.max(0,Math.min(1,Number(p?.x)||0)),y:Math.max(0,Math.min(1,Number(p?.y)||0))}));
+}
+function scannerSyncFields0800(){
+  if(!scannerDraft0800)return;
+  const title=document.getElementById("scannerTitle0800");
+  const date=document.getElementById("scannerDate0800");
+  const notes=document.getElementById("scannerNotes0800");
+  const quality=document.getElementById("scannerQuality0800");
+  const cleanup=document.getElementById("scannerCleanup0800");
+  if(title)scannerDraft0800.title=title.value;
+  if(date)scannerDraft0800.date=date.value;
+  if(notes)scannerDraft0800.notes=notes.value;
+  if(quality)scannerDraft0800.quality=quality.value||"standard";
+  if(cleanup)scannerDraft0800.defaultEnhancement=cleanup.value||"color";
+}
+function scannerStart0800(docId="",returnView="siteDocs"){
+  const s=site(); if(!s){route("sites");return;}
+  const existing=docId?(s.docs||[]).find(d=>d.id===docId&&docIsScan0800(d)):null;
+  scannerEditingDocId0800=existing?.id||"";
+  scannerReturnView0800=returnView||"siteDocs";
+  scannerEditorIndex0800=-1;
+  scannerDraft0800={
+    title:existing?.title||`Scanned Document - ${new Date().toLocaleDateString()}`,
+    date:existing?.date||localDateString(),
+    notes:existing?.notes||"",
+    quality:existing?.scanQuality||"standard",
+    defaultEnhancement:existing?.scanDefaultEnhancement||"color",
+    pages:(existing?.scanPages||[]).map((p,index)=>({
+      id:p.id||uid(),
+      originalData:p.imageData,
+      processedData:p.imageData,
+      imageData:p.imageData,
+      width:Number(p.width)||0,
+      height:Number(p.height)||0,
+      corners:scannerFullCorners0800(),
+      enhancement:p.enhancement||"color",
+      rotation:Number(p.rotation)||0,
+      sourceName:p.sourceName||`Page ${index+1}`,
+      updatedAt:p.updatedAt||new Date().toISOString()
+    }))
+  };
+  route("documentScanner");
+}
+function scannerDiscard0800(){
+  if(scannerDraft0800?.pages?.length && !confirm("Discard this unsaved document scan?"))return;
+  scannerDraft0800=null; scannerEditingDocId0800=""; scannerEditorIndex0800=-1;
+  route(scannerReturnView0800||"siteDocs");
+}
+function scannerReadFile0800(file){
+  return new Promise((resolve,reject)=>{
+    const reader=new FileReader();
+    reader.onload=()=>resolve(String(reader.result||""));
+    reader.onerror=()=>reject(reader.error||new Error("Photo could not be read."));
+    reader.readAsDataURL(file);
+  });
+}
+function scannerLoadImage0800(src){
+  return new Promise((resolve,reject)=>{
+    const img=new Image();
+    img.onload=()=>resolve(img);
+    img.onerror=()=>reject(new Error("Document image could not be opened."));
+    img.src=src;
+  });
+}
+async function scannerNormalizeSource0800(src){
+  const img=await scannerLoadImage0800(src);
+  const max=2400;
+  const scale=Math.min(1,max/Math.max(img.naturalWidth||img.width,img.naturalHeight||img.height));
+  const canvas=document.createElement("canvas");
+  canvas.width=Math.max(1,Math.round((img.naturalWidth||img.width)*scale));
+  canvas.height=Math.max(1,Math.round((img.naturalHeight||img.height)*scale));
+  const ctx=canvas.getContext("2d",{alpha:false});
+  ctx.fillStyle="#fff";ctx.fillRect(0,0,canvas.width,canvas.height);
+  ctx.drawImage(img,0,0,canvas.width,canvas.height);
+  return canvas.toDataURL("image/jpeg",.88);
+}
+async function scannerDetectDocument0800(src){
+  try{
+    const img=await scannerLoadImage0800(src);
+    const max=460,scale=Math.min(1,max/Math.max(img.width,img.height));
+    const w=Math.max(40,Math.round(img.width*scale)),h=Math.max(40,Math.round(img.height*scale));
+    const canvas=document.createElement("canvas");canvas.width=w;canvas.height=h;
+    const ctx=canvas.getContext("2d",{willReadFrequently:true});ctx.drawImage(img,0,0,w,h);
+    const px=ctx.getImageData(0,0,w,h).data;
+    let br=0,bg=0,bb=0,count=0;
+    const border=Math.max(2,Math.round(Math.min(w,h)*.025));
+    for(let y=0;y<h;y+=2){for(let x=0;x<w;x+=2){if(x<border||x>=w-border||y<border||y>=h-border){const i=(y*w+x)*4;br+=px[i];bg+=px[i+1];bb+=px[i+2];count++;}}}
+    br/=count||1;bg/=count||1;bb/=count||1;
+    const bgLum=.2126*br+.7152*bg+.0722*bb;
+    const rows=new Uint32Array(h),cols=new Uint32Array(w);
+    for(let y=1;y<h-1;y++){
+      for(let x=1;x<w-1;x++){
+        const i=(y*w+x)*4,r=px[i],g=px[i+1],b=px[i+2],lum=.2126*r+.7152*g+.0722*b;
+        const diff=Math.hypot(r-br,g-bg,b-bb);
+        const il=(y*w+x-1)*4,iu=((y-1)*w+x)*4;
+        const edge=Math.abs(lum-(.2126*px[il]+.7152*px[il+1]+.0722*px[il+2]))+Math.abs(lum-(.2126*px[iu]+.7152*px[iu+1]+.0722*px[iu+2]));
+        const pageLike=diff>44 || (bgLum<145&&lum>bgLum+34) || (bgLum>185&&lum<bgLum-34) || edge>95;
+        if(pageLike){rows[y]++;cols[x]++;}
+      }
+    }
+    const rowThreshold=Math.max(5,Math.round(w*.12)),colThreshold=Math.max(5,Math.round(h*.12));
+    let top=Math.round(h*.02),bottom=Math.round(h*.98),left=Math.round(w*.02),right=Math.round(w*.98);
+    for(let y=Math.round(h*.015);y<h*.48;y++){if(rows[y]>=rowThreshold){top=y;break;}}
+    for(let y=Math.round(h*.985);y>h*.52;y--){if(rows[y]>=rowThreshold){bottom=y;break;}}
+    for(let x=Math.round(w*.015);x<w*.48;x++){if(cols[x]>=colThreshold){left=x;break;}}
+    for(let x=Math.round(w*.985);x>w*.52;x--){if(cols[x]>=colThreshold){right=x;break;}}
+    if(right-left<w*.42||bottom-top<h*.42)return scannerFullCorners0800();
+    const pad=Math.max(2,Math.round(Math.min(w,h)*.012));
+    left=Math.max(0,left-pad);right=Math.min(w-1,right+pad);top=Math.max(0,top-pad);bottom=Math.min(h-1,bottom+pad);
+    return [{x:left/w,y:top/h},{x:right/w,y:top/h},{x:right/w,y:bottom/h},{x:left/w,y:bottom/h}];
+  }catch(err){console.warn("Document edge detection failed",err);return scannerFullCorners0800();}
+}
+function scannerBilinearPoint0800(c,u,v){
+  const top={x:c[0].x+(c[1].x-c[0].x)*u,y:c[0].y+(c[1].y-c[0].y)*u};
+  const bottom={x:c[3].x+(c[2].x-c[3].x)*u,y:c[3].y+(c[2].y-c[3].y)*u};
+  return {x:top.x+(bottom.x-top.x)*v,y:top.y+(bottom.y-top.y)*v};
+}
+function scannerAffine0800(s0,s1,s2,d0,d1,d2){
+  const den=s0.x*(s1.y-s2.y)+s1.x*(s2.y-s0.y)+s2.x*(s0.y-s1.y);
+  if(Math.abs(den)<.000001)return null;
+  const a=(d0.x*(s1.y-s2.y)+d1.x*(s2.y-s0.y)+d2.x*(s0.y-s1.y))/den;
+  const c=(d0.x*(s2.x-s1.x)+d1.x*(s0.x-s2.x)+d2.x*(s1.x-s0.x))/den;
+  const e=(d0.x*(s1.x*s2.y-s2.x*s1.y)+d1.x*(s2.x*s0.y-s0.x*s2.y)+d2.x*(s0.x*s1.y-s1.x*s0.y))/den;
+  const b=(d0.y*(s1.y-s2.y)+d1.y*(s2.y-s0.y)+d2.y*(s0.y-s1.y))/den;
+  const d=(d0.y*(s2.x-s1.x)+d1.y*(s0.x-s2.x)+d2.y*(s1.x-s0.x))/den;
+  const f=(d0.y*(s1.x*s2.y-s2.x*s1.y)+d1.y*(s2.x*s0.y-s0.x*s2.y)+d2.y*(s0.x*s1.y-s1.x*s0.y))/den;
+  return {a,b,c,d,e,f};
+}
+function scannerDrawTriangle0800(ctx,img,s0,s1,s2,d0,d1,d2){
+  const m=scannerAffine0800(s0,s1,s2,d0,d1,d2);if(!m)return;
+  ctx.save();ctx.beginPath();ctx.moveTo(d0.x,d0.y);ctx.lineTo(d1.x,d1.y);ctx.lineTo(d2.x,d2.y);ctx.closePath();ctx.clip();
+  ctx.setTransform(m.a,m.b,m.c,m.d,m.e,m.f);ctx.drawImage(img,0,0);ctx.restore();
+}
+function scannerDistance0800(a,b){return Math.hypot(a.x-b.x,a.y-b.y);}
+function scannerOtsu0800(hist,total){
+  let sum=0;for(let i=0;i<256;i++)sum+=i*hist[i];
+  let sumB=0,wB=0,best=0,threshold=168;
+  for(let i=0;i<256;i++){
+    wB+=hist[i];if(!wB)continue;const wF=total-wB;if(!wF)break;
+    sumB+=i*hist[i];const mB=sumB/wB,mF=(sum-sumB)/wF,between=wB*wF*(mB-mF)*(mB-mF);
+    if(between>best){best=between;threshold=i;}
+  }
+  return threshold;
+}
+function scannerEnhanceCanvas0800(canvas,mode){
+  if(mode==="original")return;
+  const ctx=canvas.getContext("2d",{willReadFrequently:true});const image=ctx.getImageData(0,0,canvas.width,canvas.height),p=image.data;
+  const hist=new Uint32Array(256);let total=0;
+  for(let i=0;i<p.length;i+=4){const y=Math.max(0,Math.min(255,Math.round(.2126*p[i]+.7152*p[i+1]+.0722*p[i+2])));hist[y]++;total++;}
+  let low=0,high=255,acc=0;const cut=Math.max(1,total*.012);
+  for(let i=0;i<256;i++){acc+=hist[i];if(acc>=cut){low=i;break;}}
+  acc=0;for(let i=255;i>=0;i--){acc+=hist[i];if(acc>=cut){high=i;break;}}
+  if(high-low<65){low=Math.max(0,low-28);high=Math.min(255,high+28);}
+  const span=Math.max(1,high-low);const bwThreshold=scannerOtsu0800(hist,total);
+  for(let i=0;i<p.length;i+=4){
+    const r=p[i],g=p[i+1],b=p[i+2],lum=.2126*r+.7152*g+.0722*b;
+    const adjusted=Math.max(0,Math.min(255,(lum-low)*255/span));
+    if(mode==="bw"){
+      const threshold=Math.max(118,Math.min(210,(bwThreshold-low)*255/span));const v=adjusted>threshold?255:0;p[i]=p[i+1]=p[i+2]=v;
+    }else if(mode==="gray"){
+      const v=Math.max(0,Math.min(255,adjusted*1.03));p[i]=p[i+1]=p[i+2]=v;
+    }else{
+      const factor=lum>1?adjusted/lum:1;
+      p[i]=Math.max(0,Math.min(255,(r*factor-128)*1.04+128));
+      p[i+1]=Math.max(0,Math.min(255,(g*factor-128)*1.04+128));
+      p[i+2]=Math.max(0,Math.min(255,(b*factor-128)*1.04+128));
+    }
+  }
+  ctx.putImageData(image,0,0);
+}
+async function scannerProcessPage0800(page){
+  const img=await scannerLoadImage0800(page.originalData||page.processedData);
+  const c=scannerCopyCorners0800(page.corners);
+  const src=c.map(p=>({x:p.x*img.width,y:p.y*img.height}));
+  const width=(scannerDistance0800(src[0],src[1])+scannerDistance0800(src[3],src[2]))/2;
+  const height=(scannerDistance0800(src[0],src[3])+scannerDistance0800(src[1],src[2]))/2;
+  const quality=scannerDraft0800?.quality||"standard";
+  const max=quality==="high"?1800:quality==="compact"?1000:1400;
+  const scale=Math.min(1,max/Math.max(width,height));
+  const outW=Math.max(320,Math.round(width*scale)),outH=Math.max(320,Math.round(height*scale));
+  const canvas=document.createElement("canvas");canvas.width=outW;canvas.height=outH;
+  const ctx=canvas.getContext("2d",{alpha:false});ctx.fillStyle="#fff";ctx.fillRect(0,0,outW,outH);
+  const grid=10;
+  for(let gy=0;gy<grid;gy++)for(let gx=0;gx<grid;gx++){
+    const u0=gx/grid,u1=(gx+1)/grid,v0=gy/grid,v1=(gy+1)/grid;
+    const q00=scannerBilinearPoint0800(c,u0,v0),q10=scannerBilinearPoint0800(c,u1,v0),q11=scannerBilinearPoint0800(c,u1,v1),q01=scannerBilinearPoint0800(c,u0,v1);
+    const s00={x:q00.x*img.width,y:q00.y*img.height},s10={x:q10.x*img.width,y:q10.y*img.height},s11={x:q11.x*img.width,y:q11.y*img.height},s01={x:q01.x*img.width,y:q01.y*img.height};
+    const d00={x:u0*outW,y:v0*outH},d10={x:u1*outW,y:v0*outH},d11={x:u1*outW,y:v1*outH},d01={x:u0*outW,y:v1*outH};
+    scannerDrawTriangle0800(ctx,img,s00,s10,s11,d00,d10,d11);scannerDrawTriangle0800(ctx,img,s00,s11,s01,d00,d11,d01);
+  }
+  scannerEnhanceCanvas0800(canvas,page.enhancement||scannerDraft0800?.defaultEnhancement||"color");
+  const jpegQuality=quality==="high"?.9:quality==="compact"?.68:.8;
+  page.processedData=canvas.toDataURL("image/jpeg",jpegQuality);page.imageData=page.processedData;page.width=canvas.width;page.height=canvas.height;page.updatedAt=new Date().toISOString();
+  return page;
+}
+async function scannerRotatePage0800(page,direction){
+  const img=await scannerLoadImage0800(page.originalData||page.processedData);const canvas=document.createElement("canvas");canvas.width=img.height;canvas.height=img.width;
+  const ctx=canvas.getContext("2d",{alpha:false});ctx.fillStyle="#fff";ctx.fillRect(0,0,canvas.width,canvas.height);ctx.translate(canvas.width/2,canvas.height/2);ctx.rotate((direction>0?1:-1)*Math.PI/2);ctx.drawImage(img,-img.width/2,-img.height/2);
+  page.originalData=canvas.toDataURL("image/jpeg",.9);page.rotation=((Number(page.rotation)||0)+(direction>0?90:270))%360;page.corners=await scannerDetectDocument0800(page.originalData);await scannerProcessPage0800(page);
+}
+async function scannerImportFiles0800(fileList,openEditor=false){
+  scannerSyncFields0800();const files=[...(fileList||[])].filter(f=>f?.type?.startsWith("image/"));if(!files.length){toast("Choose a document photo.");return;}
+  if((scannerDraft0800?.pages?.length||0)+files.length>20){toast("A scan can contain up to 20 pages. Save this document and begin another scan.");return;}
+  scannerBusy0800=true;documentScanner0800();
+  try{
+    let firstIndex=-1;
+    for(const file of files){
+      const raw=await scannerReadFile0800(file),source=await scannerNormalizeSource0800(raw),corners=await scannerDetectDocument0800(source);
+      const page={id:uid(),originalData:source,processedData:"",imageData:"",width:0,height:0,corners,enhancement:scannerDraft0800.defaultEnhancement||"color",rotation:0,sourceName:file.name||`Page ${(scannerDraft0800.pages.length||0)+1}`,updatedAt:new Date().toISOString()};
+      await scannerProcessPage0800(page);scannerDraft0800.pages.push(page);if(firstIndex<0)firstIndex=scannerDraft0800.pages.length-1;
+    }
+    scannerEditorIndex0800=openEditor&&files.length===1?firstIndex:-1;toast(`${files.length} page${files.length===1?"":"s"} added.`);
+  }catch(err){console.error(err);toast(err?.message||"The document page could not be added.");}
+  finally{scannerBusy0800=false;documentScanner0800();}
+}
+function scannerBytes0800(){
+  return (scannerDraft0800?.pages||[]).reduce((sum,p)=>sum+Math.max(0,Math.round(String(p.processedData||"").length*.75)),0);
+}
+function scannerSizeLabel0800(bytes=scannerBytes0800()){
+  if(bytes<1024*1024)return `${Math.max(1,Math.round(bytes/1024))} KB`;
+  return `${(bytes/1024/1024).toFixed(1)} MB`;
+}
+function scannerPageCard0800(page,index){
+  return `<article class="scannerPageCard0800"><button class="scannerPagePreview0800" data-scan-edit0800="${index}"><img src="${esc(page.processedData||page.originalData)}" alt="Scanned page ${index+1}"><span>${index+1}</span></button><div><strong>Page ${index+1}</strong><small>${esc(({color:"Auto Color",gray:"Grayscale",bw:"Black & White",original:"Original"})[page.enhancement]||"Auto Color")} • ${page.width||"—"} × ${page.height||"—"}</small><div class="scannerPageActions0800"><button class="ghost" data-scan-edit0800="${index}">Adjust</button><button class="ghost" data-scan-up0800="${index}" ${index===0?"disabled":""}>↑</button><button class="ghost" data-scan-down0800="${index}" ${index===scannerDraft0800.pages.length-1?"disabled":""}>↓</button><button class="danger" data-scan-delete0800="${index}">Delete</button></div></div></article>`;
+}
+function documentScanner0800(){
+  const s=site();if(!s){route("sites");return;}if(!scannerDraft0800){scannerStart0800("",scannerReturnView0800||"siteDocs");return;}
+  if(scannerEditorIndex0800>=0){scannerPageEditorScreen0800();return;}
+  const pages=scannerDraft0800.pages||[],size=scannerSizeLabel0800();
+  html(`<div class="screen scannerScreen0800"><div class="row scannerTop0800"><button class="back ghost" id="scannerBack0800">←</button><div><h1>${scannerEditingDocId0800?"Edit Scan":"Document Scanner"}</h1><p>${esc(s.name||"Account")}</p></div><span class="scannerPageCount0800">${pages.length} PAGE${pages.length===1?"":"S"}</span></div>
+    <section class="card scannerHero0800"><div><span>BUILT-IN ACCOUNT SCANNER</span><h2>Photograph paperwork and save a clean multi-page document</h2><p>Capture each page, adjust the detected corners, straighten it, enhance readability, reorder the pages, then save it to this account.</p></div><div class="scannerHeroSteps0800"><span><b>1</b>Capture</span><span><b>2</b>Adjust</span><span><b>3</b>Save PDF</span></div></section>
+    <section class="card scannerFields0800"><label>Document Name<input id="scannerTitle0800" value="${esc(scannerDraft0800.title)}" placeholder="Inspection report, programming sheet, permit..."></label><div class="scannerFieldGrid0800"><label>Date<input id="scannerDate0800" type="date" value="${esc(scannerDraft0800.date||localDateString())}"></label><label>Scan Quality<select id="scannerQuality0800"><option value="compact" ${scannerDraft0800.quality==="compact"?"selected":""}>Compact — more pages</option><option value="standard" ${scannerDraft0800.quality==="standard"?"selected":""}>Standard — recommended</option><option value="high" ${scannerDraft0800.quality==="high"?"selected":""}>High — larger file</option></select></label><label>Default Cleanup<select id="scannerCleanup0800"><option value="color" ${scannerDraft0800.defaultEnhancement==="color"?"selected":""}>Auto Color</option><option value="gray" ${scannerDraft0800.defaultEnhancement==="gray"?"selected":""}>Grayscale</option><option value="bw" ${scannerDraft0800.defaultEnhancement==="bw"?"selected":""}>Black & White</option><option value="original" ${scannerDraft0800.defaultEnhancement==="original"?"selected":""}>Original</option></select></label></div><label>Account Notes for This Document<textarea id="scannerNotes0800" rows="3" placeholder="What this document is, where it came from, and why it matters...">${esc(scannerDraft0800.notes)}</textarea></label></section>
+    <section class="scannerCaptureBar0800"><button class="primary" id="scannerCamera0800" ${scannerBusy0800?"disabled":""}>▣ ${scannerBusy0800?"Processing…":"Scan Next Page"}</button><button class="ghost" id="scannerImport0800" ${scannerBusy0800?"disabled":""}>Import Photos</button><input id="scannerCameraInput0800" type="file" accept="image/*" capture="environment" hidden><input id="scannerImportInput0800" type="file" accept="image/*" multiple hidden></section>
+    <section class="scannerPages0800">${pages.length?pages.map(scannerPageCard0800).join(""):`<div class="scannerEmpty0800"><span>▤</span><strong>No pages captured</strong><p>Lay the document on a contrasting surface with good light. Keep all four corners visible, then tap Scan Next Page.</p><button class="primary" id="scannerEmptyCamera0800">Open Camera</button></div>`}</section>
+    <section class="card scannerSavePanel0800"><div><strong>${pages.length} page${pages.length===1?"":"s"} ready</strong><span>Estimated stored size: ${size}. A PDF is generated whenever you preview, download, or share the scan.</span></div><button class="primary" id="scannerSave0800" ${!pages.length||scannerBusy0800?"disabled":""}>Save Scanned Document</button></section>
+  </div>`);
+  document.getElementById("scannerBack0800").onclick=scannerDiscard0800;
+  const camera=document.getElementById("scannerCameraInput0800"),imports=document.getElementById("scannerImportInput0800");
+  const openCamera=()=>{scannerSyncFields0800();camera?.click();};
+  document.getElementById("scannerCamera0800")?.addEventListener("click",openCamera);document.getElementById("scannerEmptyCamera0800")?.addEventListener("click",openCamera);
+  document.getElementById("scannerImport0800")?.addEventListener("click",()=>{scannerSyncFields0800();imports?.click();});
+  if(camera)camera.onchange=e=>scannerImportFiles0800(e.target.files,true);if(imports)imports.onchange=e=>scannerImportFiles0800(e.target.files,false);
+  document.querySelectorAll("[data-scan-edit0800]").forEach(b=>b.onclick=e=>{e.stopPropagation();scannerSyncFields0800();scannerEditorIndex0800=Number(b.dataset.scanEdit0800);documentScanner0800();});
+  document.querySelectorAll("[data-scan-up0800]").forEach(b=>b.onclick=()=>{scannerSyncFields0800();const i=Number(b.dataset.scanUp0800);if(i>0){[pages[i-1],pages[i]]=[pages[i],pages[i-1]];documentScanner0800();}});
+  document.querySelectorAll("[data-scan-down0800]").forEach(b=>b.onclick=()=>{scannerSyncFields0800();const i=Number(b.dataset.scanDown0800);if(i<pages.length-1){[pages[i],pages[i+1]]=[pages[i+1],pages[i]];documentScanner0800();}});
+  document.querySelectorAll("[data-scan-delete0800]").forEach(b=>b.onclick=()=>{const i=Number(b.dataset.scanDelete0800);if(confirm(`Delete page ${i+1}?`)){scannerSyncFields0800();pages.splice(i,1);documentScanner0800();}});
+  document.getElementById("scannerSave0800")?.addEventListener("click",scannerSaveDocument0800);
+}
+function scannerClampCorner0800(c,index,x,y){
+  const gap=.045;x=Math.max(.005,Math.min(.995,x));y=Math.max(.005,Math.min(.995,y));
+  let point;
+  if(index===0)point={x:Math.min(x,c[1].x-gap),y:Math.min(y,c[3].y-gap)};
+  else if(index===1)point={x:Math.max(x,c[0].x+gap),y:Math.min(y,c[2].y-gap)};
+  else if(index===2)point={x:Math.max(x,c[3].x+gap),y:Math.max(y,c[1].y+gap)};
+  else point={x:Math.min(x,c[2].x-gap),y:Math.max(y,c[0].y+gap)};
+  return {x:Math.max(.005,Math.min(.995,point.x)),y:Math.max(.005,Math.min(.995,point.y))};
+}
+function scannerDrawCropCanvas0800(canvas,img,page){
+  const host=canvas.parentElement,width=Math.max(270,Math.min(760,host?.clientWidth||360)),maxH=Math.max(330,Math.min(620,(window.visualViewport?.height||window.innerHeight)*.57));
+  const cssScale=Math.min(width/img.width,maxH/img.height),cssW=Math.max(250,Math.round(img.width*cssScale)),cssH=Math.max(250,Math.round(img.height*cssScale)),dpr=Math.min(2,window.devicePixelRatio||1);
+  canvas.style.width=`${cssW}px`;canvas.style.height=`${cssH}px`;canvas.width=Math.round(cssW*dpr);canvas.height=Math.round(cssH*dpr);
+  const ctx=canvas.getContext("2d");ctx.setTransform(dpr,0,0,dpr,0,0);ctx.clearRect(0,0,cssW,cssH);
+  ctx.save();if(page.enhancement==="gray")ctx.filter="grayscale(1) contrast(1.12)";if(page.enhancement==="bw")ctx.filter="grayscale(1) contrast(1.85)";ctx.drawImage(img,0,0,cssW,cssH);ctx.restore();
+  const p=scannerCopyCorners0800(page.corners).map(q=>({x:q.x*cssW,y:q.y*cssH}));
+  ctx.fillStyle="rgba(0,0,0,.58)";ctx.beginPath();ctx.rect(0,0,cssW,cssH);ctx.moveTo(p[0].x,p[0].y);ctx.lineTo(p[3].x,p[3].y);ctx.lineTo(p[2].x,p[2].y);ctx.lineTo(p[1].x,p[1].y);ctx.closePath();ctx.fill("evenodd");
+  ctx.strokeStyle="#38d46a";ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(p[0].x,p[0].y);p.slice(1).forEach(q=>ctx.lineTo(q.x,q.y));ctx.closePath();ctx.stroke();
+  p.forEach((q,i)=>{ctx.fillStyle="#fff";ctx.strokeStyle="#13b94a";ctx.lineWidth=4;ctx.beginPath();ctx.arc(q.x,q.y,11,0,Math.PI*2);ctx.fill();ctx.stroke();ctx.fillStyle="#06170d";ctx.font="900 10px Arial";ctx.textAlign="center";ctx.textBaseline="middle";ctx.fillText(String(i+1),q.x,q.y);});
+  return {cssW,cssH,points:p};
+}
+async function wireScannerCropCanvas0800(page){
+  const canvas=document.getElementById("scannerCropCanvas0800");if(!canvas)return;const img=await scannerLoadImage0800(page.originalData||page.processedData);let geometry=scannerDrawCropCanvas0800(canvas,img,page),drag=-1;
+  const redraw=()=>{geometry=scannerDrawCropCanvas0800(canvas,img,page);};
+  canvas.onpointerdown=e=>{const r=canvas.getBoundingClientRect(),x=e.clientX-r.left,y=e.clientY-r.top;let best=Infinity;geometry.points.forEach((p,i)=>{const d=Math.hypot(x-p.x,y-p.y);if(d<best){best=d;drag=i;}});if(best>38)drag=-1;if(drag>=0){canvas.setPointerCapture(e.pointerId);e.preventDefault();}};
+  canvas.onpointermove=e=>{if(drag<0)return;const r=canvas.getBoundingClientRect(),x=(e.clientX-r.left)/r.width,y=(e.clientY-r.top)/r.height;const c=scannerCopyCorners0800(page.corners);c[drag]=scannerClampCorner0800(c,drag,x,y);page.corners=c;redraw();e.preventDefault();};
+  const stop=()=>{drag=-1;};canvas.onpointerup=stop;canvas.onpointercancel=stop;
+  window.__scannerCropRedraw0800=redraw;
+}
+function scannerPageEditorScreen0800(){
+  const page=scannerDraft0800?.pages?.[scannerEditorIndex0800];if(!page){scannerEditorIndex0800=-1;documentScanner0800();return;}
+  const modes=[["color","Auto Color"],["gray","Grayscale"],["bw","B&W"],["original","Original"]];
+  html(`<div class="screen scannerEditor0800"><div class="row scannerTop0800"><button class="back ghost" id="scannerEditorBack0800">←</button><div><h1>Adjust Page ${scannerEditorIndex0800+1}</h1><p>Drag the four numbered corners to the paper edges</p></div><span class="scannerPageCount0800">${scannerEditorIndex0800+1}/${scannerDraft0800.pages.length}</span></div>
+    <section class="scannerCropStage0800"><canvas id="scannerCropCanvas0800" aria-label="Document crop editor"></canvas></section>
+    <section class="card scannerEditorTools0800"><div class="scannerToolRow0800"><button class="ghost" id="scannerAutoCrop0800">Auto Detect</button><button class="ghost" id="scannerFullCrop0800">Use Full Page</button><button class="ghost" id="scannerRotateLeft0800">↶ Rotate</button><button class="ghost" id="scannerRotateRight0800">Rotate ↷</button></div><div class="scannerEnhance0800">${modes.map(([key,label])=>`<button class="${page.enhancement===key?"active":""}" data-scan-mode0800="${key}">${label}</button>`).join("")}</div><p>Auto Color improves contrast while preserving color. Black & White is best for forms, typed pages, and handwritten notes.</p></section>
+    <button class="primary scannerApply0800" id="scannerApplyPage0800">Apply Crop &amp; Cleanup</button>
+  </div>`);
+  document.getElementById("scannerEditorBack0800").onclick=()=>{scannerEditorIndex0800=-1;documentScanner0800();};
+  requestAnimationFrame(()=>wireScannerCropCanvas0800(page));
+  document.getElementById("scannerAutoCrop0800").onclick=async()=>{page.corners=await scannerDetectDocument0800(page.originalData);window.__scannerCropRedraw0800?.();toast("Page edges detected. Adjust any corner if needed.");};
+  document.getElementById("scannerFullCrop0800").onclick=()=>{page.corners=scannerFullCorners0800();window.__scannerCropRedraw0800?.();};
+  document.querySelectorAll("[data-scan-mode0800]").forEach(b=>b.onclick=()=>{page.enhancement=b.dataset.scanMode0800;document.querySelectorAll("[data-scan-mode0800]").forEach(x=>x.classList.toggle("active",x===b));window.__scannerCropRedraw0800?.();});
+  document.getElementById("scannerRotateLeft0800").onclick=async()=>{scannerBusy0800=true;toast("Rotating page…");await scannerRotatePage0800(page,-1);scannerBusy0800=false;scannerPageEditorScreen0800();};
+  document.getElementById("scannerRotateRight0800").onclick=async()=>{scannerBusy0800=true;toast("Rotating page…");await scannerRotatePage0800(page,1);scannerBusy0800=false;scannerPageEditorScreen0800();};
+  document.getElementById("scannerApplyPage0800").onclick=async()=>{const btn=document.getElementById("scannerApplyPage0800");btn.disabled=true;btn.textContent="Processing Page…";try{await scannerProcessPage0800(page);scannerEditorIndex0800=-1;toast("Page adjusted.");documentScanner0800();}catch(err){console.error(err);toast("Page processing failed.");btn.disabled=false;btn.textContent="Apply Crop & Cleanup";}};
+}
+async function scannerSaveDocument0800(){
+  scannerSyncFields0800();const s=site();if(!s||!scannerDraft0800?.pages?.length)return;
+  const title=String(scannerDraft0800.title||"").trim();if(!title){toast("Enter a document name.");document.getElementById("scannerTitle0800")?.focus();return;}
+  const btn=document.getElementById("scannerSave0800");if(btn){btn.disabled=true;btn.textContent="Preparing Pages…";}
+  try{
+    for(const page of scannerDraft0800.pages)await scannerProcessPage0800(page);
+    const bytes=scannerBytes0800();if(bytes>4.6*1024*1024){toast("This scan is too large for reliable local storage. Choose Compact quality or remove pages.");if(btn){btn.disabled=false;btn.textContent="Save Scanned Document";}return;}
+    const now=new Date().toISOString(),target=fileStorageTarget0794("document");
+    const scanPages=scannerDraft0800.pages.map((p,index)=>({id:p.id||uid(),imageData:p.processedData,width:p.width,height:p.height,enhancement:p.enhancement||"color",rotation:p.rotation||0,sourceName:p.sourceName||`Page ${index+1}`,updatedAt:p.updatedAt||now}));
+    const obj={type:"Scanned Document",title,date:scannerDraft0800.date||localDateString(),notes:scannerDraft0800.notes||"",ref:"",url:"",customerCaption:"",isScannedDocument:true,scanPages,scanPageCount:scanPages.length,scanQuality:scannerDraft0800.quality||"standard",scanDefaultEnhancement:scannerDraft0800.defaultEnhancement||"color",scanCreatedAt:scannerEditingDocId0800?((s.docs||[]).find(d=>d.id===scannerEditingDocId0800)?.scanCreatedAt||now):now,updatedAt:now,mimeType:"application/pdf",storageTargetId:`${target.provider||"local"}:document`,storageProvider:target.provider||"local",storageFolder:target.folder||"FireVault/Documents",storageStatus:(target.provider||"local")==="local"?"local":"pending",remoteFileId:scannerEditingDocId0800?((s.docs||[]).find(d=>d.id===scannerEditingDocId0800)?.remoteFileId||""):"",remoteRevision:scannerEditingDocId0800?((s.docs||[]).find(d=>d.id===scannerEditingDocId0800)?.remoteRevision||""):"",remoteUrl:scannerEditingDocId0800?((s.docs||[]).find(d=>d.id===scannerEditingDocId0800)?.remoteUrl||""):""};
+    let index=-1,backup=null;
+    if(scannerEditingDocId0800){index=s.docs.findIndex(d=>d.id===scannerEditingDocId0800);if(index>=0){backup=s.docs[index];s.docs[index]={...backup,...obj,id:backup.id,createdAt:backup.createdAt||now};}}
+    if(index<0){const created={...obj,id:uid(),createdAt:now};s.docs.unshift(created);index=0;}
+    try{
+      s.noteEntries=Array.isArray(s.noteEntries)?s.noteEntries:[];
+      s.noteEntries.unshift({id:uid(),type:"Scanned Document",note:`Saved ${scanPages.length}-page scan: ${title}`,createdAt:now,technician:data.settings?.technician?.name||""});
+      save();
+    }catch(err){
+      if(backup)s.docs[index]=backup;else s.docs.splice(index,1);
+      s.noteEntries=s.noteEntries.filter(n=>!(n.type==="Scanned Document"&&n.createdAt===now));
+      console.error(err);toast("The scan could not be saved because local storage is full. Use Compact quality, fewer pages, or export a backup and remove old photos.");if(btn){btn.disabled=false;btn.textContent="Save Scanned Document";}return;
+    }
+    const pagesSaved=scanPages.length;scannerDraft0800=null;scannerEditingDocId0800="";scannerEditorIndex0800=-1;toast(`${pagesSaved}-page document saved to this account.`);route(scannerReturnView0800||"siteDocs");
+  }catch(err){console.error(err);toast(err?.message||"The scanned document could not be saved.");if(btn){btn.disabled=false;btn.textContent="Save Scanned Document";}}
+}
+function scannerDataBytes0800(dataUrl){
+  const base64=String(dataUrl||"").split(",")[1]||"";const binary=atob(base64),bytes=new Uint8Array(binary.length);for(let i=0;i<binary.length;i++)bytes[i]=binary.charCodeAt(i);return bytes;
+}
+function scannerConcatBytes0800(chunks){
+  const length=chunks.reduce((sum,c)=>sum+c.length,0),out=new Uint8Array(length);let offset=0;chunks.forEach(c=>{out.set(c,offset);offset+=c.length;});return out;
+}
+async function scannerPdfBlob0800(d){
+  const pages=(d.scanPages||[]).filter(p=>p.imageData);if(!pages.length)throw new Error("No scanned pages are available.");
+  const enc=new TextEncoder(),chunks=[],offsets=[0];let length=0;
+  const push=value=>{const bytes=typeof value==="string"?enc.encode(value):value;chunks.push(bytes);length+=bytes.length;};
+  const objectCount=2+pages.length*3;
+  push("%PDF-1.4\n% FireVault scanned document\n");
+  const writeObject=(id,body)=>{offsets[id]=length;push(`${id} 0 obj\n`);if(Array.isArray(body))body.forEach(push);else push(body);push("\nendobj\n");};
+  writeObject(1,"<< /Type /Catalog /Pages 2 0 R >>");
+  const kids=pages.map((_,i)=>`${3+i*3} 0 R`).join(" ");writeObject(2,`<< /Type /Pages /Count ${pages.length} /Kids [ ${kids} ] >>`);
+  pages.forEach((p,i)=>{
+    const pageId=3+i*3,imageId=4+i*3,contentId=5+i*3,w=Number(p.width)||1200,h=Number(p.height)||1600,landscape=w>h*1.08,pageW=landscape?792:612,pageH=landscape?612:792,margin=18,scale=Math.min((pageW-margin*2)/w,(pageH-margin*2)/h),drawW=w*scale,drawH=h*scale,x=(pageW-drawW)/2,y=(pageH-drawH)/2;
+    writeObject(pageId,`<< /Type /Page /Parent 2 0 R /MediaBox [0 0 ${pageW} ${pageH}] /Resources << /XObject << /Im${i+1} ${imageId} 0 R >> >> /Contents ${contentId} 0 R >>`);
+    const imageBytes=scannerDataBytes0800(p.imageData);writeObject(imageId,[enc.encode(`<< /Type /XObject /Subtype /Image /Width ${w} /Height ${h} /ColorSpace /DeviceRGB /BitsPerComponent 8 /Filter /DCTDecode /Length ${imageBytes.length} >>\nstream\n`),imageBytes,enc.encode("\nendstream")]);
+    const stream=`q\n${drawW.toFixed(3)} 0 0 ${drawH.toFixed(3)} ${x.toFixed(3)} ${y.toFixed(3)} cm\n/Im${i+1} Do\nQ\n`;const streamBytes=enc.encode(stream);writeObject(contentId,[enc.encode(`<< /Length ${streamBytes.length} >>\nstream\n`),streamBytes,enc.encode("endstream")]);
+  });
+  const xref=length;push(`xref\n0 ${objectCount+1}\n0000000000 65535 f \n`);for(let i=1;i<=objectCount;i++)push(`${String(offsets[i]||0).padStart(10,"0")} 00000 n \n`);push(`trailer\n<< /Size ${objectCount+1} /Root 1 0 R >>\nstartxref\n${xref}\n%%EOF`);
+  return new Blob([scannerConcatBytes0800(chunks)],{type:"application/pdf"});
+}
+function scannerSafeName0800(d){return String(d.title||"scanned-document").toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/(^-|-$)/g,"").slice(0,70)||"scanned-document";}
+async function scannerDownloadPdf0800(d){
+  try{toast("Preparing PDF…");const blob=await scannerPdfBlob0800(d),url=URL.createObjectURL(blob),a=document.createElement("a");a.href=url;a.download=`${scannerSafeName0800(d)}.pdf`;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),2500);toast("PDF downloaded.");}catch(err){console.error(err);toast("PDF could not be created.");}
+}
+async function scannerSharePdf0800(d){
+  try{const blob=await scannerPdfBlob0800(d),file=new File([blob],`${scannerSafeName0800(d)}.pdf`,{type:"application/pdf"});if(navigator.share&&(!navigator.canShare||navigator.canShare({files:[file]}))){await navigator.share({title:d.title||"Scanned Document",text:`${d.scanPageCount||d.scanPages?.length||0}-page document from FireVault`,files:[file]});return;}await scannerDownloadPdf0800(d);}catch(err){if(err?.name!=="AbortError"){console.error(err);toast("Sharing is unavailable. Use Download PDF instead.");}}
+}
+function scannerThumb0800(d){const first=d.scanPages?.[0];return first?.imageData?`<div class="docScanThumb0800"><img src="${esc(first.imageData)}" alt="First page of scanned document"><span>${d.scanPageCount||d.scanPages.length} pages</span></div>`:"";}
+function scannedDocumentModal0800(d){
+  if(!docIsScan0800(d)){toast("Scanned document not found.");return;}const overlay=document.createElement("div");overlay.className="scanModalOverlay0800";overlay.innerHTML=`<div class="scanModalSheet0800"><div class="scanModalHead0800"><div><span>SCANNED DOCUMENT</span><strong>${esc(d.title||"Scanned Document")}</strong><small>${d.scanPageCount||d.scanPages.length} pages • ${esc(d.date||new Date(d.scanCreatedAt||Date.now()).toLocaleDateString())}</small></div><button class="ghost" id="scanModalClose0800">Close</button></div>${d.notes?`<p class="scanModalNotes0800">${esc(d.notes)}</p>`:""}<div class="scanModalPages0800">${d.scanPages.map((p,i)=>`<article><span>Page ${i+1}</span><img src="${esc(p.imageData)}" alt="Scanned document page ${i+1}"></article>`).join("")}</div><div class="scanModalActions0800"><button class="primary" id="scanModalPdf0800">Download PDF</button><button class="primary" id="scanModalShare0800">Share PDF</button><button class="ghost" id="scanModalEdit0800">Edit Scan</button><button class="danger" id="scanModalDelete0800">Delete</button></div></div>`;document.body.appendChild(overlay);
+  const close=()=>overlay.remove();overlay.onclick=e=>{if(e.target===overlay)close();};document.getElementById("scanModalClose0800").onclick=close;document.getElementById("scanModalPdf0800").onclick=()=>scannerDownloadPdf0800(d);document.getElementById("scanModalShare0800").onclick=()=>scannerSharePdf0800(d);document.getElementById("scanModalEdit0800").onclick=()=>{const returnView=view==="siteDetail"?"siteDetail":"siteDocs";close();scannerStart0800(d.id,returnView);};document.getElementById("scanModalDelete0800").onclick=()=>{if(confirm(`Delete “${d.title||"this scanned document"}”?`)){const s=site();s.docs=s.docs.filter(x=>x.id!==d.id);save();close();toast("Scanned document deleted.");if(view==="siteDetail")render();else siteDocs();}};
 }
 
 function contactTitle(c){ return [c.name,c.role].filter(Boolean).join(" • ") || c.type || "Contact"; }
@@ -7613,9 +7998,10 @@ const FIREVAULT_MANUAL_058 = [
   ]},
   {id:"photos",title:"Photos & Photo Overlay",icon:"▧",status:"Current",summary:"Capture, label, organize, and preserve site photographs.",topics:[
     ["Add a photo","Open the account photo or document area and choose the camera or photo library. Confirm the correct account before saving."],
+    ["Scan a document","Open an account and choose Scan Document from Files or Notes. Capture one page at a time, drag the four crop corners to the paper edges, rotate if needed, select Auto Color, Grayscale, Black & White, or Original, reorder pages, and save. FireVault stores the scan with the account and creates a PDF for preview, download, or sharing."],
     ["Useful photo notes","Describe the device, room, floor, circuit, condition, and reason the photo matters. Avoid relying on an image alone."],
     ["Overlay settings","Settings → Photo Overlay controls the template fields, alignment, font size, colors, background, opacity, logo, and tagline."],
-    ["Storage caution","Photos can increase local browser storage quickly. Export backups and remove unnecessary duplicates."],
+    ["Storage caution","Photos and scanned pages can increase local browser storage quickly. Standard quality is recommended; use Compact for long documents. Export backups and remove unnecessary duplicates."],
     ["Photo review","Confirm the saved photo, caption, and overlay are readable before leaving the account."]
   ]},
   {id:"route",title:"GPS, Nearby Sites & Daily Route",icon:"⌖",status:"Current",summary:"Capture site coordinates and document the technician's daily route.",topics:[
@@ -7684,6 +8070,7 @@ const CONTEXT_HELP_060={
   siteDetail:{chapter:"detail",label:"Site Detail",suggestions:["Important Site Info","Quick Actions","Activity Timeline"]},
   siteDocs:{chapter:"photos",label:"Photos & Documents",suggestions:["Add a photo","Photo notes","Storage caution"]},
   siteDocForm:{chapter:"photos",label:"Add Photo / Document",suggestions:["Photo categories","Overlay settings","Useful notes"]},
+  documentScanner:{chapter:"photos",label:"Document Scanner",suggestions:["Capture pages","Adjust corners","Save and share PDF"]},
   jobMode:{chapter:"notes",label:"Site Notes",suggestions:["Save notes","Templates","Daily Report"]},
   tasks:{chapter:"notes",label:"Task Center",suggestions:["Create tasks","Due dates","Mark complete"]},
   taskForm:{chapter:"notes",label:"Task Editor",suggestions:["Task title","Status","Follow-up notes"]},
@@ -7741,7 +8128,7 @@ function manualSimplePage058(type){
   quick:["🚀","Quick Start Guide","Get FireVault ready for a normal field day.",[["1. Verify the build","Confirm the green build badge shows 0.67.0 before entering production information."],["2. Complete Technician Profile","Enter your name, company, phone, email, and license or employee identification."],["3. Review permissions","Allow location and photo access only when FireVault requests them and the feature is needed."],["4. Create or open a site","Add the customer name, full address, panel details, contacts, access notes, and GPS location."],["5. Document the visit","Record notes, photos, tasks, deficiencies, equipment changes, and a service visit."],["6. Finish and protect the data","Review the report, send or copy the required summary, then export a current backup."]]],
   new:["🆕","What’s New in 0.67.0","Account View, Settings navigation, and FireVault Academy redesign.",[["Unified visual system","Standardized typography, spacing, card surfaces, borders, controls, and responsive behavior across FireVault."],["Settings cleanup","Improved Settings home cards and every submenu while preserving the preferred Email setup workflow."],["Help readability","Converted contextual Help and Academy articles into one uninterrupted scrolling reading column with no floating metadata."],["Site Detail stability","Reinforced natural-height cards, readable text, and scroll-safe account sections."],["Operational screens","Simplified Customer Import, Team Sync, Conflict Center, and Nearby Sites presentation without changing their workflows."],["Phone and iPad layouts","Added consistent narrow-phone and tablet behavior, bottom-navigation clearance, and overflow protection."],["Nearby scan diagnostics","Nearby Sites now shows total sites, GPS-ready records, missing coordinates, phone-location progress, and persistent error messages."],["Coordinate recovery","FireVault recovers valid latitude and longitude stored in compatible legacy or imported fields and normalizes them into the site GPS record."],["Location retry","If high-accuracy location times out or is unavailable, FireVault retries once using standard accuracy."],["Nearest-site fallback","When no site is inside the selected radius, the nearest GPS-ready sites remain visible instead of presenting an empty result."],["Latitude and longitude","Customer Import can calculate missing coordinates from each usable U.S. street address before saving records."],["Coordinate requirement","The importer requires calculated, supplied, or existing GPS coordinates by default. Unmatched addresses remain in review."],["Census address matching","Only address fields are sent to the U.S. Census Geocoder. The returned point is an address-range calculation, not a guaranteed building entrance."],["Account Id matching","Repeat imports update the matching FireVault site instead of creating duplicates or deleting field history."],["CSV coordinate columns","Files that already contain Latitude and Longitude columns use those values directly."],["Sync-ready changes","Added and updated customer records enter the pending synchronization queue and create a Sync Activity entry."]]],
   tips:["🧰","Field Tips","Short practices that improve the usefulness of FireVault records.",[["Write for the next technician","Include the exact panel, circuit, device, location, symptom, test result, and next action instead of relying on memory."],["Photograph context first","Take one wide photo showing the equipment location before close-up terminal, label, or damage photos."],["Separate facts from follow-up","Use notes for what occurred, deficiencies for code or system problems, and tasks for work that still needs completion."],["Confirm the account","Before using Quick Capture, verify the selected customer site to prevent records from being stored under the wrong account."],["Back up before updates","Download an external backup before a major update or device change and after completing significant field documentation."]]],
-  revisions:["📋","Revision History","Application and documentation checkpoints.",[["0.79.14","Restored numbered Nearby Accounts map pins matched to distance-sorted list rows and removed Smart Account Intelligence."],["0.79.13","Repaired startup parsing inherited from 0.79.11 and corrected Building Navigator location-copy syntax."],["0.79.12","Added Building Navigator with exact site locations, GPS/Plus Codes, verification, linked photos, route targets, and timeline events."],["0.79.7","Shortened every Settings summary and removed the colored bar from each Section Overview."],["0.79.6","Added Nearby-style account-list scroll locking so cards settle cleanly at the top while the Accounts controls remain fixed."],["0.79.5","Added separate Personal OneDrive, Work OneDrive, and SharePoint connection profiles with exact photo/document assignments and no-personal-fallback protection."],["0.79.4","Added independent photo and document storage destinations, cloud-provider integration targets, and offline Google Plus Codes for accounts and exact field locations."],["0.79.3","Added backend-neutral provider interfaces for authentication, database, file storage, synchronization, and audit while keeping FireVault fully local."],["0.79.2","Added a unified Security Center with vault integrity validation, backup health, audit filters, device naming, session clearing, and PIN confirmation for sensitive exports, restores, and deletion."],["0.79.1","Added an optional local six-digit privacy lock with PBKDF2 hashing, inactivity/background locking, app-switcher privacy screen, recovery code, cooldown protection, and local lock events."],["0.79.0","Added security-ready schema 4 metadata, stable workspace/user/device identities, local audit history, pending change queue, recoverable deletion, credential-safe exports, and protected restore/reset actions."],["0.67.0","Redesigned Account View around service actions and grouped information, consolidated Settings into five folders, and simplified FireVault Academy and contextual Help for continuous reading."],["0.65.2","Repaired Nearby Sites with GPS inventory counts, imported-coordinate recovery, persistent permission and timeout messages, a standard-accuracy retry, and nearest-site fallback results."],["0.65.1","Added online latitude/longitude calculation, coordinate validation, geocoding progress, unmatched-address review, optional CSV coordinates, and coordinate-safe repeat importing."],["0.65.0","Added preview-first customer CSV importing, Account Id update matching, validation warnings, imported monitoring details, and sync activity tracking."],["0.64.1","Simplified Academy article headers, removed floating metadata badges, and improved continuous scrolling and readability."],["0.64.0","Added Sync Activity, a conflict review center, export/import audit entries, and an automatic OneDrive connection-readiness checklist."],["0.63.1","Overhauled contextual Help and Academy reader formatting, removed overlapping sticky article headers, and restored full scrolling on phones and tablets."],["0.63.0","Added permanent record IDs, audit metadata, local version tracking, pending-sync states, conflict readiness, device identity, and a Team Sync settings workspace."],["0.60.0","Connected major screens and Settings areas directly to matching Academy chapters with return-to-screen navigation."],["0.59.0","Added interactive tutorials, guided orientation, pinned learning, field tips, and documentation tracking."],["0.58.0","Expanded Help & Manual into FireVault Academy with bookmarks, smart search, Quick Start, and reader navigation."],["0.57.0","Added the first complete searchable in-app FireVault User Manual."],["Ongoing review rule","Any change to navigation, labels, storage, workflows, permissions, or supported layouts requires the related manual chapter to be checked."]]],
+  revisions:["📋","Revision History","Application and documentation checkpoints.",[["0.80.0","Added an account-specific multi-page camera document scanner with automatic edge detection, manual corner correction, rotation, cleanup modes, page ordering, PDF preview/download/share, and account-note activity."],["0.79.14","Restored numbered Nearby Accounts map pins matched to distance-sorted list rows and removed Smart Account Intelligence."],["0.79.13","Repaired startup parsing inherited from 0.79.11 and corrected Building Navigator location-copy syntax."],["0.79.12","Added Building Navigator with exact site locations, GPS/Plus Codes, verification, linked photos, route targets, and timeline events."],["0.79.7","Shortened every Settings summary and removed the colored bar from each Section Overview."],["0.79.6","Added Nearby-style account-list scroll locking so cards settle cleanly at the top while the Accounts controls remain fixed."],["0.79.5","Added separate Personal OneDrive, Work OneDrive, and SharePoint connection profiles with exact photo/document assignments and no-personal-fallback protection."],["0.79.4","Added independent photo and document storage destinations, cloud-provider integration targets, and offline Google Plus Codes for accounts and exact field locations."],["0.79.3","Added backend-neutral provider interfaces for authentication, database, file storage, synchronization, and audit while keeping FireVault fully local."],["0.79.2","Added a unified Security Center with vault integrity validation, backup health, audit filters, device naming, session clearing, and PIN confirmation for sensitive exports, restores, and deletion."],["0.79.1","Added an optional local six-digit privacy lock with PBKDF2 hashing, inactivity/background locking, app-switcher privacy screen, recovery code, cooldown protection, and local lock events."],["0.79.0","Added security-ready schema 4 metadata, stable workspace/user/device identities, local audit history, pending change queue, recoverable deletion, credential-safe exports, and protected restore/reset actions."],["0.67.0","Redesigned Account View around service actions and grouped information, consolidated Settings into five folders, and simplified FireVault Academy and contextual Help for continuous reading."],["0.65.2","Repaired Nearby Sites with GPS inventory counts, imported-coordinate recovery, persistent permission and timeout messages, a standard-accuracy retry, and nearest-site fallback results."],["0.65.1","Added online latitude/longitude calculation, coordinate validation, geocoding progress, unmatched-address review, optional CSV coordinates, and coordinate-safe repeat importing."],["0.65.0","Added preview-first customer CSV importing, Account Id update matching, validation warnings, imported monitoring details, and sync activity tracking."],["0.64.1","Simplified Academy article headers, removed floating metadata badges, and improved continuous scrolling and readability."],["0.64.0","Added Sync Activity, a conflict review center, export/import audit entries, and an automatic OneDrive connection-readiness checklist."],["0.63.1","Overhauled contextual Help and Academy reader formatting, removed overlapping sticky article headers, and restored full scrolling on phones and tablets."],["0.63.0","Added permanent record IDs, audit metadata, local version tracking, pending-sync states, conflict readiness, device identity, and a Team Sync settings workspace."],["0.60.0","Connected major screens and Settings areas directly to matching Academy chapters with return-to-screen navigation."],["0.59.0","Added interactive tutorials, guided orientation, pinned learning, field tips, and documentation tracking."],["0.58.0","Expanded Help & Manual into FireVault Academy with bookmarks, smart search, Quick Start, and reader navigation."],["0.57.0","Added the first complete searchable in-app FireVault User Manual."],["Ongoing review rule","Any change to navigation, labels, storage, workflows, permissions, or supported layouts requires the related manual chapter to be checked."]]],
   trouble:["❓","Troubleshooting","Common problems and safe first checks.",FIREVAULT_MANUAL_058.find(x=>x.id==="trouble")?.topics||[]]
  };
  const [icon,title,note,items]=pages[type]||["ⓘ","Unavailable","This Help section is not available in the installed version.",[["Current status","Return to Help and choose an available chapter or tutorial."]]];
@@ -9517,6 +9904,7 @@ function diagnostics(){
 }
 function showChangelog(){
   const notes = [
+    "Build 0.80.0 adds a built-in multi-page account document scanner with camera capture, page-edge adjustment, cleanup modes, page ordering, and PDF download or sharing.",
     "Build 0.79.14 restores numbered Nearby Accounts map pins matched to the distance-sorted list and removes Smart Account Intelligence.",
     "Build 0.79.13 repairs the 0.79.11 Revision History syntax error and the 0.79.12 Building Navigator copy-newline error.",
     "Build 0.79.12 adds Building Navigator with exact site locations, GPS/Plus Codes, verification, linked photos, route targets, and account timeline events.",
@@ -9561,7 +9949,7 @@ function showChangelog(){
   overlay.className="releaseOverlay";
   overlay.innerHTML=`<div class="releaseSheet" role="dialog" aria-modal="true" aria-label="FireVault release notes">
     <div class="releaseHead"><div><strong>${fireVaultBrand575()}</strong><span>Build ${BUILD}</span></div><button class="ghost iconBtn" id="closeRelease" aria-label="Close release notes">×</button></div>
-    <div class="releaseBody"><h2>Release Notes</h2><p class="releaseIntro">Optional local privacy protection with a six-digit PIN, inactivity/background locking, recovery code, and safer app-switcher visibility.</p><ul>${notes.map(n=>`<li>${esc(n)}</li>`).join("")}</ul></div>
+    <div class="releaseBody"><h2>Release Notes</h2><p class="releaseIntro">Scan paper documents directly into an account with multi-page capture, corner correction, cleanup, page ordering, and PDF export.</p><ul>${notes.map(n=>`<li>${esc(n)}</li>`).join("")}</ul></div>
   </div>`;
   document.body.appendChild(overlay);
   const close=()=>overlay.remove();
