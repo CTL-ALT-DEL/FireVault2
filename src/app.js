@@ -1,4 +1,4 @@
-import { BUILD, KEY, ACTIVE_JOB_KEY, loadData, saveData, ensureSite, fullAddress, esc, uid, downloadBlob, syncSummary, syncQueue, syncConflicts, syncActivity, createSyncPackage, importSyncPackage, resolveSyncConflict, notePackageExport, deviceIdentity, recordSyncActivity, autoBackupInfo, latestAutoBackup, restoreAutoBackup, isDemoMode, setDemoMode, resetDemoData } from "./storage.js?v=0.76.6";
+import { BUILD, KEY, ACTIVE_JOB_KEY, loadData, saveData, ensureSite, fullAddress, esc, uid, downloadBlob, syncSummary, syncQueue, syncConflicts, syncActivity, createSyncPackage, importSyncPackage, resolveSyncConflict, notePackageExport, deviceIdentity, recordSyncActivity, autoBackupInfo, latestAutoBackup, restoreAutoBackup, isDemoMode, setDemoMode, resetDemoData } from "./storage.js?v=0.76.7";
 window.__FIREVAULT_MODULE_READY = true;
 
 function fvPreferenceStore0739(){
@@ -3453,7 +3453,7 @@ function accountDirectorySort0760(rows=[]){
   });
 }
 function accountsSortLabel0760(){
-  return ({az:"A–Z",favorites:"Favorites",recent:"Recent",attention:"Priority"})[accountsSort0760]||"A–Z";
+  return ({az:"Alphabetical",favorites:"Favorites",recent:"Recently opened",attention:"Priority"})[accountsSort0760]||"Alphabetical";
 }
 function sites(){
   restoreAppChrome572();
@@ -3486,7 +3486,7 @@ function sites(){
       <button type="button" data-sites-filter0759="missingGps" class="${sitesFilter0736==='missingGps'?'active':''}"><strong>${missingGpsCount}</strong><span>No GPS</span></button>
     </section>
     <section class="accountsResults0759">
-      <div class="accountsListHead0759 accountsListHead0760 accountsListHead0761 accountsListHead0763 accountsListHead0764"><div class="accountsResultSummary0761"><strong id="siteSearchCount0759" aria-live="polite">${accounts.length} account${accounts.length===1?"":"s"}</strong><span id="accountsViewSummary0761">${esc(filterLabel0761)} • ${esc(accountsSortLabel0760())}</span></div><div class="accountsListTools0761 accountsListTools0763 accountsListTools0764"><button type="button" class="ghost accountsReset0761" id="resetAccountsView0761" ${accountsViewDirty0761?"":"hidden"} aria-label="Reset account view" title="Reset view">Reset</button><label class="accountsJumpWrap0763 accountsCompactControl0764" id="accountsJumpWrap0763" ${accountsSort0760==='az'&&accountInitialsList0763.length?'':'hidden'}><span>Jump</span><select id="accountsJump0763" aria-label="Jump to account name"><option value="">A–Z</option>${accountInitialsList0763.map(letter=>`<option value="${esc(letter)}">${esc(letter)}</option>`).join("")}</select></label><label class="accountsSortWrap0764 accountsCompactControl0764"><span>Sort</span><select id="accountsSort0760" aria-label="Sort accounts"><option value="az" ${accountsSort0760==='az'?'selected':''}>A–Z</option><option value="favorites" ${accountsSort0760==='favorites'?'selected':''}>Favorites</option><option value="recent" ${accountsSort0760==='recent'?'selected':''}>Recently Opened</option><option value="attention" ${accountsSort0760==='attention'?'selected':''}>Priority</option></select></label></div></div>
+      <div class="accountsListHead0759 accountsListHead0760 accountsListHead0761 accountsListHead0763 accountsListHead0764"><div class="accountsResultSummary0761"><strong id="siteSearchCount0759" aria-live="polite">${accounts.length} account${accounts.length===1?"":"s"}</strong><span id="accountsViewSummary0761">${esc(filterLabel0761)} • ${esc(accountsSortLabel0760())}</span></div><div class="accountsListTools0761 accountsListTools0763 accountsListTools0764"><button type="button" class="ghost accountsReset0761" id="resetAccountsView0761" ${accountsViewDirty0761?"":"hidden"} aria-label="Reset account view" title="Reset view">Reset</button><label class="accountsJumpWrap0763 accountsCompactControl0764 accountsLabeledControl0767" id="accountsJumpWrap0763" ${accountsSort0760==='az'&&accountInitialsList0763.length?'':'hidden'}><span>Jump To</span><select id="accountsJump0763" aria-label="Jump to account name"><option value="">A–Z</option>${accountInitialsList0763.map(letter=>`<option value="${esc(letter)}">${esc(letter)}</option>`).join("")}</select></label><label class="accountsSortWrap0764 accountsCompactControl0764 accountsLabeledControl0767"><span>Sort By</span><select id="accountsSort0760" aria-label="Sort accounts"><option value="az" ${accountsSort0760==='az'?'selected':''}>Alphabetical</option><option value="favorites" ${accountsSort0760==='favorites'?'selected':''}>Favorites</option><option value="recent" ${accountsSort0760==='recent'?'selected':''}>Recently Opened</option><option value="attention" ${accountsSort0760==='attention'?'selected':''}>Priority</option></select></label></div></div>
       <div class="accountsList0759 accountsList0764" id="accountsList0759">
         ${accounts.length?accounts.map(s=>accountDirectoryRow0759(s,addressCounts0762.get(accountAddressKey0762(s))||1)).join(""):`<div class="accountsEmpty0759 accountsEmpty0760"><span>＋</span><strong>No accounts yet</strong><p>Create an account manually or import your customer list under Settings → Data.</p><button class="primary" id="emptyAdd0759">Add First Account</button></div>`}
         <div class="accountsNoResults0759 accountsNoResults0760" id="accountsNoResults0759" hidden><strong>No matching accounts</strong><p>Clear the search or return to All accounts.</p><button type="button" class="ghost" id="resetAccountsView0760">Reset View</button></div>
@@ -8522,7 +8522,7 @@ function diagnostics(){
 }
 function showChangelog(){
   const notes = [
-    "Build 0.76.6 replaces the oversized Accounts controls with one compact utility strip and restores stable list positioning.",
+    "Build 0.76.7 adds clear in-control labels for Jump To and Sort By while keeping both controls on one compact row.",
     "Build 0.76.2 adds one-tap Call and Route controls to every account card, identifies multi-account addresses, clarifies account health, and prevents accidental double-opening while preserving the Accounts view state.",
     "Build 0.76.1 hardens the Accounts directory with persistent view state, inline Favorites, recent-opened context, keyboard shortcuts, and a permanent app-chrome repair so the bottom navigation remains visible after saves and Favorite changes.",
     "Build 0.76.0 completes the Accounts workflow with sorting, safer manual account creation, duplicate Account ID protection, and improved empty states.",

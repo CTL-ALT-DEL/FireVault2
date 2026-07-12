@@ -1,3 +1,3 @@
-# FireVault Build 0.76.6 Deployment
+# FireVault Build 0.76.7 Deployment
 
-Deploy over the existing GitHub Pages repository. Do not delete the installed Home Screen app. After deployment, use FireVault Settings → Data → App Updates → Check for Updates, then reload if prompted. Existing local data remains unchanged.
+Deploy these files over the existing GitHub Pages repository. Do not delete or reinstall the Home Screen app. Existing FireVault accounts remain under the unchanged storage key.

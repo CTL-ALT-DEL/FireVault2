@@ -1,3 +1,7 @@
-# FireVault Build 0.76.6 — Accounts Utility Strip Repair
+# FireVault Build 0.76.7 — Accounts Control Labels
 
-Repairs the Accounts directory collapse introduced in 0.76.4. Account cards remain full-height, scroll normally, and no longer stack on top of one another. Jump and Sort use a compact, non-overlapping toolbar. Existing vault data and storage keys are unchanged.
+- Keeps Jump To and Sort By on one compact row.
+- Places readable high-contrast labels inside both controls.
+- Uses descriptive Sort choices including Alphabetical and Recently Opened.
+- Preserves the stable Accounts list repair from Build 0.76.6.
+- Does not change the FireVault data key or account database.

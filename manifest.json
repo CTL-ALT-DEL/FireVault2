@@ -8,7 +8,7 @@
   "orientation": "portrait-primary",
   "background_color": "#0b0d10",
   "theme_color": "#101216",
-  "description": "Field knowledge system for fire alarm technicians. Build 0.76.6 compacts the Accounts utility controls and stabilizes account-list positioning.",
+  "description": "Field knowledge system for fire alarm technicians. Build 0.76.7 labels Jump To and Sort By clearly while keeping both controls on one compact row.",
   "icons": [
     {
       "src": "assets/icon-192.png",
@@ -49,5 +49,5 @@
       "description": "Open FireVault settings"
     }
   ],
-  "version": "0.76.6"
+  "version": "0.76.7"
 }

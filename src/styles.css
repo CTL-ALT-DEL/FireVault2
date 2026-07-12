@@ -16853,3 +16853,132 @@ input[data-fv-phone0758="1"]{font-variant-numeric:tabular-nums;letter-spacing:.0
   .accountsSortWrap0764 select{width:78px!important;min-width:78px!important}
   .accountsListTools0764{gap:4px!important}
 }
+
+
+/* Build 0.76.7 — readable one-row Jump and Sort controls */
+.accountsListHead0759.accountsListHead0764{
+  grid-template-columns:minmax(0,1fr) minmax(240px,auto)!important;
+  align-items:center!important;
+  gap:10px!important;
+}
+.accountsListTools0764{
+  display:grid!important;
+  grid-template-columns:auto minmax(92px,112px) minmax(142px,178px)!important;
+  align-items:center!important;
+  gap:7px!important;
+}
+.accountsListTools0764 > [hidden]{display:none!important}
+.accountsLabeledControl0767{
+  position:relative!important;
+  display:block!important;
+  min-width:0!important;
+  height:48px!important;
+  padding:5px 8px 4px!important;
+  border:1px solid rgba(106,155,213,.46)!important;
+  border-radius:12px!important;
+  background:linear-gradient(180deg,rgba(25,45,69,.98),rgba(16,31,49,.98))!important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.05),0 4px 12px rgba(0,0,0,.22)!important;
+  overflow:hidden!important;
+  font-size:initial!important;
+}
+.accountsLabeledControl0767 > span{
+  display:block!important;
+  height:14px!important;
+  margin:0 24px 0 2px!important;
+  color:#8fc6ff!important;
+  font-size:10px!important;
+  line-height:14px!important;
+  font-weight:900!important;
+  letter-spacing:.11em!important;
+  text-transform:uppercase!important;
+  white-space:nowrap!important;
+}
+.accountsLabeledControl0767 select,
+.accountsJumpWrap0763.accountsLabeledControl0767 select,
+.accountsSortWrap0764.accountsLabeledControl0767 select{
+  display:block!important;
+  width:100%!important;
+  min-width:0!important;
+  height:24px!important;
+  min-height:24px!important;
+  margin:0!important;
+  padding:0 22px 0 2px!important;
+  border:0!important;
+  border-radius:0!important;
+  outline:0!important;
+  background:transparent!important;
+  color:#fff!important;
+  -webkit-text-fill-color:#fff!important;
+  font-size:15px!important;
+  line-height:24px!important;
+  font-weight:850!important;
+  box-shadow:none!important;
+  appearance:auto!important;
+  -webkit-appearance:menulist!important;
+}
+.accountsLabeledControl0767 select option{
+  color:#111!important;
+  background:#fff!important;
+}
+@media(max-width:560px){
+  .accountsListHead0759.accountsListHead0764{
+    display:flex!important;
+    flex-direction:column!important;
+    align-items:stretch!important;
+    gap:6px!important;
+  }
+  .accountsListHead0764 .accountsResultSummary0761{
+    display:flex!important;
+    align-items:baseline!important;
+    justify-content:space-between!important;
+    gap:8px!important;
+  }
+  .accountsListHead0764 .accountsResultSummary0761 span{
+    display:block!important;
+    max-width:48%!important;
+    text-align:right!important;
+  }
+  .accountsListTools0764{
+    width:100%!important;
+    grid-template-columns:auto minmax(94px,.8fr) minmax(145px,1.35fr)!important;
+  }
+}
+@media(max-width:430px){
+  .accountsListHead0759.accountsListHead0764{padding:2px 3px 7px!important}
+  .accountsListHead0764 .accountsResultSummary0761 span{display:none!important}
+  .accountsListTools0764{grid-template-columns:auto minmax(92px,.78fr) minmax(138px,1.22fr)!important;gap:6px!important}
+  .accountsLabeledControl0767{height:46px!important;padding:4px 7px 3px!important}
+  .accountsLabeledControl0767 > span{font-size:9px!important;letter-spacing:.09em!important}
+  .accountsLabeledControl0767 select{font-size:14px!important}
+}
+@media(max-width:370px){
+  .accountsListTools0764{grid-template-columns:auto minmax(84px,.72fr) minmax(126px,1.28fr)!important;gap:5px!important}
+  .accountsLabeledControl0767{padding-left:6px!important;padding-right:6px!important}
+  .accountsLabeledControl0767 select{font-size:13px!important;padding-right:18px!important}
+}
+
+/* 0.76.7 final flex sizing: both labeled controls always share one row */
+.accountsListTools0764{
+  display:flex!important;
+  align-items:center!important;
+  justify-content:flex-end!important;
+  gap:7px!important;
+}
+.accountsListTools0764 .accountsReset0761{
+  flex:0 0 34px!important;
+}
+.accountsListTools0764 .accountsReset0761[hidden]{display:none!important}
+.accountsJumpWrap0763.accountsLabeledControl0767{
+  flex:0 1 112px!important;
+  width:112px!important;
+}
+.accountsSortWrap0764.accountsLabeledControl0767{
+  flex:1 1 178px!important;
+  width:178px!important;
+  max-width:178px!important;
+}
+@media(max-width:560px){
+  .accountsListTools0764{width:100%!important;justify-content:stretch!important}
+  .accountsJumpWrap0763.accountsLabeledControl0767{flex:.78 1 94px!important;width:auto!important}
+  .accountsSortWrap0764.accountsLabeledControl0767{flex:1.22 1 145px!important;width:auto!important;max-width:none!important}
+}
