@@ -1,6 +1,6 @@
 {
-  "build": "0.76.7",
+  "build": "0.76.8",
   "released": "2026-07-12",
-  "note": "Readable Accounts Jump and Sort controls",
-  "label": "Accounts control labeling"
+  "note": "Custom Accounts Jump and Sort pickers",
+  "label": "Accounts picker redesign"
 }

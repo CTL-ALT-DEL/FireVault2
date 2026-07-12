@@ -8,7 +8,7 @@
   "orientation": "portrait-primary",
   "background_color": "#0b0d10",
   "theme_color": "#101216",
-  "description": "Field knowledge system for fire alarm technicians. Build 0.76.7 labels Jump To and Sort By clearly while keeping both controls on one compact row.",
+  "description": "Field knowledge system for fire alarm technicians. Build 0.76.8 replaces browser dropdowns with custom FireVault Jump To and Sort By pickers.",
   "icons": [
     {
       "src": "assets/icon-192.png",
@@ -49,5 +49,5 @@
       "description": "Open FireVault settings"
     }
   ],
-  "version": "0.76.7"
+  "version": "0.76.8"
 }

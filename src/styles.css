@@ -16982,3 +16982,28 @@ input[data-fv-phone0758="1"]{font-variant-numeric:tabular-nums;letter-spacing:.0
   .accountsJumpWrap0763.accountsLabeledControl0767{flex:.78 1 94px!important;width:auto!important}
   .accountsSortWrap0764.accountsLabeledControl0767{flex:1.22 1 145px!important;width:auto!important;max-width:none!important}
 }
+
+/* 0.76.8 custom Accounts pickers — replaces Safari select rendering */
+.accountsListTools0768{display:grid!important;grid-template-columns:auto minmax(128px,.82fr) minmax(174px,1.18fr)!important;gap:8px!important;align-items:stretch!important;width:100%!important}
+.accountsPickerButton0768{min-width:0!important;height:54px!important;display:grid!important;grid-template-columns:26px minmax(0,1fr) 18px!important;align-items:center!important;gap:8px!important;padding:7px 10px!important;border:1px solid rgba(91,145,209,.52)!important;border-radius:14px!important;background:linear-gradient(180deg,#193250,#10243b)!important;color:#fff!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.07),0 5px 14px rgba(0,0,0,.24)!important;text-align:left!important}
+.accountsPickerButton0768:active{transform:translateY(1px)!important;background:linear-gradient(180deg,#21456f,#15304f)!important}
+.accountsPickerIcon0768{font-size:19px!important;color:#72b7ff!important;text-align:center!important}
+.accountsPickerText0768{min-width:0!important;display:flex!important;flex-direction:column!important;gap:1px!important}
+.accountsPickerText0768 small{font-size:9px!important;line-height:12px!important;letter-spacing:.13em!important;text-transform:uppercase!important;color:#8fc6ff!important;font-weight:900!important}
+.accountsPickerText0768 strong{font-size:15px!important;line-height:20px!important;color:#fff!important;white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important}
+.accountsPickerChevron0768{font-size:26px!important;line-height:1!important;color:#b9d8f7!important;transform:rotate(90deg)!important;text-align:center!important}
+.accountsPickerOverlay0768{position:fixed!important;inset:0!important;z-index:20000!important;display:flex!important;align-items:flex-end!important;justify-content:center!important;padding:18px!important;background:rgba(0,0,0,.68)!important;backdrop-filter:blur(5px)!important;-webkit-backdrop-filter:blur(5px)!important}
+.accountsPickerSheet0768{width:min(520px,100%)!important;max-height:min(72vh,620px)!important;overflow:auto!important;border:1px solid rgba(94,154,224,.55)!important;border-radius:22px!important;background:linear-gradient(180deg,#12243a,#0a1625)!important;box-shadow:0 24px 70px rgba(0,0,0,.55)!important;padding:15px!important}
+.accountsPickerSheetHead0768{display:flex!important;justify-content:space-between!important;align-items:center!important;margin-bottom:13px!important}
+.accountsPickerSheetHead0768 small{color:#72b7ff!important;font-size:10px!important;font-weight:900!important;letter-spacing:.18em!important}
+.accountsPickerSheetHead0768 h3{margin:2px 0 0!important;font-size:25px!important;color:#fff!important}
+.accountsPickerClose0768{width:42px!important;height:42px!important;border-radius:12px!important;border:1px solid rgba(120,158,199,.45)!important;background:#17263a!important;color:#fff!important;font-size:27px!important;line-height:1!important}
+.accountsLetterGrid0768{display:grid!important;grid-template-columns:repeat(5,1fr)!important;gap:8px!important}
+.accountsLetterGrid0768 .accountsPickerOption0768{aspect-ratio:1!important;min-height:48px!important;justify-content:center!important;font-size:18px!important}
+.accountsSortList0768{display:grid!important;gap:8px!important}
+.accountsPickerOption0768{position:relative!important;display:flex!important;flex-direction:column!important;align-items:flex-start!important;justify-content:center!important;min-height:60px!important;padding:11px 48px 11px 14px!important;border:1px solid rgba(94,132,177,.38)!important;border-radius:14px!important;background:#111f31!important;color:#fff!important;text-align:left!important}
+.accountsPickerOption0768 span{font-size:17px!important;font-weight:850!important}
+.accountsPickerOption0768 small{margin-top:2px!important;color:#9dafc4!important;font-size:12px!important}
+.accountsPickerOption0768 b{position:absolute!important;right:16px!important;top:50%!important;transform:translateY(-50%)!important;color:#65b2ff!important;font-size:20px!important}
+.accountsPickerOption0768.selected{border-color:#388cff!important;background:#173c68!important;box-shadow:inset 0 0 0 1px rgba(72,151,255,.45)!important}
+@media(max-width:430px){.accountsListTools0768{grid-template-columns:auto minmax(112px,.86fr) minmax(150px,1.14fr)!important;gap:6px!important}.accountsPickerButton0768{height:50px!important;padding:6px 8px!important;grid-template-columns:22px minmax(0,1fr) 15px!important;gap:6px!important}.accountsPickerText0768 strong{font-size:14px!important}.accountsPickerIcon0768{font-size:17px!important}.accountsPickerChevron0768{font-size:22px!important}.accountsLetterGrid0768{grid-template-columns:repeat(4,1fr)!important}}

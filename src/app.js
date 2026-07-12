@@ -1,4 +1,4 @@
-import { BUILD, KEY, ACTIVE_JOB_KEY, loadData, saveData, ensureSite, fullAddress, esc, uid, downloadBlob, syncSummary, syncQueue, syncConflicts, syncActivity, createSyncPackage, importSyncPackage, resolveSyncConflict, notePackageExport, deviceIdentity, recordSyncActivity, autoBackupInfo, latestAutoBackup, restoreAutoBackup, isDemoMode, setDemoMode, resetDemoData } from "./storage.js?v=0.76.7";
+import { BUILD, KEY, ACTIVE_JOB_KEY, loadData, saveData, ensureSite, fullAddress, esc, uid, downloadBlob, syncSummary, syncQueue, syncConflicts, syncActivity, createSyncPackage, importSyncPackage, resolveSyncConflict, notePackageExport, deviceIdentity, recordSyncActivity, autoBackupInfo, latestAutoBackup, restoreAutoBackup, isDemoMode, setDemoMode, resetDemoData } from "./storage.js?v=0.76.8";
 window.__FIREVAULT_MODULE_READY = true;
 
 function fvPreferenceStore0739(){
@@ -3486,7 +3486,7 @@ function sites(){
       <button type="button" data-sites-filter0759="missingGps" class="${sitesFilter0736==='missingGps'?'active':''}"><strong>${missingGpsCount}</strong><span>No GPS</span></button>
     </section>
     <section class="accountsResults0759">
-      <div class="accountsListHead0759 accountsListHead0760 accountsListHead0761 accountsListHead0763 accountsListHead0764"><div class="accountsResultSummary0761"><strong id="siteSearchCount0759" aria-live="polite">${accounts.length} account${accounts.length===1?"":"s"}</strong><span id="accountsViewSummary0761">${esc(filterLabel0761)} • ${esc(accountsSortLabel0760())}</span></div><div class="accountsListTools0761 accountsListTools0763 accountsListTools0764"><button type="button" class="ghost accountsReset0761" id="resetAccountsView0761" ${accountsViewDirty0761?"":"hidden"} aria-label="Reset account view" title="Reset view">Reset</button><label class="accountsJumpWrap0763 accountsCompactControl0764 accountsLabeledControl0767" id="accountsJumpWrap0763" ${accountsSort0760==='az'&&accountInitialsList0763.length?'':'hidden'}><span>Jump To</span><select id="accountsJump0763" aria-label="Jump to account name"><option value="">A–Z</option>${accountInitialsList0763.map(letter=>`<option value="${esc(letter)}">${esc(letter)}</option>`).join("")}</select></label><label class="accountsSortWrap0764 accountsCompactControl0764 accountsLabeledControl0767"><span>Sort By</span><select id="accountsSort0760" aria-label="Sort accounts"><option value="az" ${accountsSort0760==='az'?'selected':''}>Alphabetical</option><option value="favorites" ${accountsSort0760==='favorites'?'selected':''}>Favorites</option><option value="recent" ${accountsSort0760==='recent'?'selected':''}>Recently Opened</option><option value="attention" ${accountsSort0760==='attention'?'selected':''}>Priority</option></select></label></div></div>
+      <div class="accountsListHead0759 accountsListHead0760 accountsListHead0761 accountsListHead0763 accountsListHead0764 accountsListHead0768"><div class="accountsResultSummary0761"><strong id="siteSearchCount0759" aria-live="polite">${accounts.length} account${accounts.length===1?"":"s"}</strong><span id="accountsViewSummary0761">${esc(filterLabel0761)} • ${esc(accountsSortLabel0760())}</span></div><div class="accountsListTools0761 accountsListTools0763 accountsListTools0764 accountsListTools0768"><button type="button" class="ghost accountsReset0761" id="resetAccountsView0761" ${accountsViewDirty0761?"":"hidden"} aria-label="Reset account view" title="Reset view">↺</button><button type="button" class="accountsPickerButton0768" id="accountsJumpButton0768" ${accountsSort0760==='az'&&accountInitialsList0763.length?'':'hidden'} aria-haspopup="dialog" aria-label="Jump to account name"><span class="accountsPickerIcon0768">⌖</span><span class="accountsPickerText0768"><small>Jump To</small><strong id="accountsJumpValue0768">A–Z</strong></span><span class="accountsPickerChevron0768">›</span></button><button type="button" class="accountsPickerButton0768 accountsSortButton0768" id="accountsSortButton0768" aria-haspopup="dialog" aria-label="Sort accounts"><span class="accountsPickerIcon0768">⇅</span><span class="accountsPickerText0768"><small>Sort By</small><strong id="accountsSortValue0768">${esc(accountsSortLabel0760())}</strong></span><span class="accountsPickerChevron0768">›</span></button></div></div>
       <div class="accountsList0759 accountsList0764" id="accountsList0759">
         ${accounts.length?accounts.map(s=>accountDirectoryRow0759(s,addressCounts0762.get(accountAddressKey0762(s))||1)).join(""):`<div class="accountsEmpty0759 accountsEmpty0760"><span>＋</span><strong>No accounts yet</strong><p>Create an account manually or import your customer list under Settings → Data.</p><button class="primary" id="emptyAdd0759">Add First Account</button></div>`}
         <div class="accountsNoResults0759 accountsNoResults0760" id="accountsNoResults0759" hidden><strong>No matching accounts</strong><p>Clear the search or return to All accounts.</p><button type="button" class="ghost" id="resetAccountsView0760">Reset View</button></div>
@@ -3506,8 +3506,9 @@ function sites(){
   const resetViewBtn=document.getElementById("resetAccountsView0761");
   const noResults=document.getElementById("accountsNoResults0759");
   const list=document.getElementById("accountsList0759");
-  const jumpSelect0763=document.getElementById("accountsJump0763");
-  const jumpWrap0763=document.getElementById("accountsJumpWrap0763");
+  const jumpButton0768=document.getElementById("accountsJumpButton0768");
+  const jumpValue0768=document.getElementById("accountsJumpValue0768");
+  const sortButton0768=document.getElementById("accountsSortButton0768");
   const scrollTopButton0763=document.getElementById("accountsScrollTop0763");
 
   const applySiteSearch=()=>{
@@ -3525,11 +3526,11 @@ function sites(){
       el.hidden=!visible;
       if(visible){shown++;visibleLetters0763.add(el.dataset.letter0763||"#");}
     });
-    if(jumpSelect0763){
-      [...jumpSelect0763.options].forEach(option=>{if(option.value)option.disabled=!visibleLetters0763.has(option.value);});
-      if(jumpSelect0763.value&&!visibleLetters0763.has(jumpSelect0763.value))jumpSelect0763.value="";
+    if(jumpButton0768){
+      jumpButton0768.hidden=accountsSort0760!=="az" || visibleLetters0763.size===0;
+      jumpButton0768.dataset.letters=[...visibleLetters0763].sort((a,b)=>a.localeCompare(b)).join(",");
     }
-    if(jumpWrap0763) jumpWrap0763.hidden=accountsSort0760!=="az" || visibleLetters0763.size===0;
+    if(jumpValue0768&&!visibleLetters0763.has(jumpValue0768.textContent||"")) jumpValue0768.textContent="A–Z";
     if(countEl) countEl.textContent=shown===allAccounts.length?`${shown} account${shown===1?"":"s"}`:`${shown} of ${allAccounts.length}`;
     const activeFilter=({all:"All accounts",attention:"Attention",open:"Open work",missingGps:"No GPS"})[sitesFilter0736]||"All accounts";
     if(summaryEl) summaryEl.textContent=[activeFilter,accountsSortLabel0760(),siteSearch?`“${siteSearch}”`:""].filter(Boolean).join(" • ");
@@ -3563,16 +3564,28 @@ function sites(){
   const resetView0761=()=>{resetAccountsViewState0761();sites();};
   document.getElementById("resetAccountsView0760")?.addEventListener("click",resetView0761);
   resetViewBtn?.addEventListener("click",resetView0761);
-  document.getElementById("accountsSort0760")?.addEventListener("change",event=>{accountsSort0760=event.target.value||"az";accountsScroll0759=0;persistAccountsViewState0761(true);sites();});
-  jumpSelect0763?.addEventListener("change",()=>{
-    const letter=jumpSelect0763.value;
-    if(!letter||!list)return;
-    const target=[...list.querySelectorAll("[data-account-card0759]")].find(el=>!el.hidden&&(el.dataset.letter0763||"#")===letter);
-    if(!target){toast(`No visible ${letter} accounts.`);jumpSelect0763.value="";return;}
-    const top=Math.max(0,target.offsetTop-list.offsetTop-2);
-    list.scrollTo({top,behavior:"smooth"});
-    window.setTimeout(()=>target.focus({preventScroll:true}),260);
-  });
+  const openAccountsPicker0768=(kind)=>{
+    document.getElementById("accountsPickerOverlay0768")?.remove();
+    const overlay=document.createElement("div");
+    overlay.id="accountsPickerOverlay0768";
+    overlay.className="accountsPickerOverlay0768";
+    const isJump=kind==="jump";
+    const options=isJump
+      ? String(jumpButton0768?.dataset.letters||"").split(",").filter(Boolean).map(letter=>({value:letter,label:letter}))
+      : [
+          {value:"az",label:"Alphabetical",detail:"Account name A–Z"},
+          {value:"favorites",label:"Favorites",detail:"Starred accounts first"},
+          {value:"recent",label:"Recently Opened",detail:"Most recently viewed first"},
+          {value:"attention",label:"Priority",detail:"Accounts needing attention first"}
+        ];
+    overlay.innerHTML=`<div class="accountsPickerSheet0768" role="dialog" aria-modal="true" aria-label="${isJump?'Jump to account':'Sort accounts'}"><div class="accountsPickerSheetHead0768"><div><small>ACCOUNTS</small><h3>${isJump?'Jump To':'Sort By'}</h3></div><button type="button" class="accountsPickerClose0768" aria-label="Close">×</button></div><div class="${isJump?'accountsLetterGrid0768':'accountsSortList0768'}">${options.map(option=>`<button type="button" class="accountsPickerOption0768 ${(!isJump&&accountsSort0760===option.value)?'selected':''}" data-picker-value0768="${esc(option.value)}"><span>${esc(option.label)}</span>${option.detail?`<small>${esc(option.detail)}</small>`:''}${(!isJump&&accountsSort0760===option.value)?'<b>✓</b>':''}</button>`).join("")}</div></div>`;
+    const close=()=>overlay.remove();
+    overlay.addEventListener("click",event=>{if(event.target===overlay||event.target.closest(".accountsPickerClose0768")){close();return;}const option=event.target.closest("[data-picker-value0768]");if(!option)return;const value=option.dataset.pickerValue0768;if(isJump){const target=[...list.querySelectorAll("[data-account-card0759]")].find(el=>!el.hidden&&(el.dataset.letter0763||"#")===value);if(!target){toast(`No visible ${value} accounts.`);close();return;}if(jumpValue0768)jumpValue0768.textContent=value;const top=Math.max(0,target.offsetTop-list.offsetTop-2);list.scrollTo({top,behavior:"smooth"});window.setTimeout(()=>target.focus({preventScroll:true}),260);}else{accountsSort0760=value||"az";accountsScroll0759=0;persistAccountsViewState0761(true);close();sites();return;}close();});
+    document.body.appendChild(overlay);
+    window.setTimeout(()=>overlay.querySelector(".accountsPickerOption0768")?.focus(),20);
+  };
+  jumpButton0768?.addEventListener("click",()=>openAccountsPicker0768("jump"));
+  sortButton0768?.addEventListener("click",()=>openAccountsPicker0768("sort"));
   scrollTopButton0763?.addEventListener("click",()=>{list?.scrollTo({top:0,behavior:"smooth"});});
   document.querySelectorAll("[data-sites-filter0759]").forEach(btn=>btn.addEventListener("click",()=>{
     sitesFilter0736=btn.dataset.sitesFilter0759||"all";
@@ -8522,7 +8535,7 @@ function diagnostics(){
 }
 function showChangelog(){
   const notes = [
-    "Build 0.76.7 adds clear in-control labels for Jump To and Sort By while keeping both controls on one compact row.",
+    "Build 0.76.8 replaces Safari dropdowns with stable custom FireVault Jump To and Sort By pickers.",
     "Build 0.76.2 adds one-tap Call and Route controls to every account card, identifies multi-account addresses, clarifies account health, and prevents accidental double-opening while preserving the Accounts view state.",
     "Build 0.76.1 hardens the Accounts directory with persistent view state, inline Favorites, recent-opened context, keyboard shortcuts, and a permanent app-chrome repair so the bottom navigation remains visible after saves and Favorite changes.",
     "Build 0.76.0 completes the Accounts workflow with sorting, safer manual account creation, duplicate Account ID protection, and improved empty states.",
