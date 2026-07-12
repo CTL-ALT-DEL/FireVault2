@@ -1,6 +1,6 @@
 {
-  "build": "0.79.7",
+  "build": "0.79.8",
   "released": "2026-07-12",
-  "note": "Settings summary polish",
-  "label": "Short descriptions and clean section overviews"
+  "note": "Accounts and Nearby simplification",
+  "label": "Cleaner Accounts directory and GPS comparison"
 }

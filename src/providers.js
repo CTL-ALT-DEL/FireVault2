@@ -1,4 +1,4 @@
-/* FireVault Build 0.79.7 — Settings summary polish */
+/* FireVault Build 0.79.8 — Accounts and Nearby simplification */
 export const PROVIDER_CONTRACT_VERSION = 3;
 export const PROVIDER_MODE = "local";
 

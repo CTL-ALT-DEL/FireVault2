@@ -16072,7 +16072,7 @@ input[data-fv-phone0758="1"]{font-variant-numeric:tabular-nums;letter-spacing:.0
    Accounts-page overrides cannot alter its geometry. */
 .accountsDirectory0759{
   display:grid!important;
-  grid-template-rows:auto auto auto minmax(0,1fr)!important;
+  grid-template-rows:auto auto minmax(0,1fr)!important;
   gap:10px!important;
   width:100%!important;
   height:100%!important;
@@ -18585,3 +18585,9 @@ body.fv-privacy-locked0791{overflow:hidden!important;background:#07090d!importan
   .settingsTabItem0736{min-height:66px!important}
   .settingsTabItem0736 small{font-size:11px!important;line-height:1.25!important}
 }
+
+
+/* Build 0.79.8 — simplified Accounts and Nearby GPS screens */
+.accountsDirectory0759{grid-template-rows:auto auto minmax(0,1fr)!important}
+.nearbyScreen0652 .nearbyHero{margin-bottom:0!important}
+.nearbyScreen0652 .nearbyResults0652{margin-top:0!important}
