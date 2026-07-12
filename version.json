@@ -1,6 +1,6 @@
 {
-  "build": "0.73.9",
+  "build": "0.74.0",
   "released": "2026-07-11",
-  "note": "Repairs Demo Mode QuotaExceededError by running the fictional Boise dataset in temporary memory.",
-  "notes": "Demo Mode no longer writes a second full vault into localStorage. Startup metadata and noncritical preferences fail safely when browser storage is full, while the real customer vault and backups remain unchanged."
+  "note": "Adds a protected default Demo Mode workspace when no real customer vault exists.",
+  "notes": "The fictional Boise demo master is generated in the app, cannot be deleted, and uses a temporary editable working copy. Exiting Demo Mode discards demonstration changes and restores the real vault. The Demo Mode indicator now appears as a small blinking label in the top header."
 }

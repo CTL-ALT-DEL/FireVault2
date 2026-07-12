@@ -1,4 +1,4 @@
-import { BUILD, KEY, ACTIVE_JOB_KEY, loadData, saveData, ensureSite, fullAddress, esc, uid, downloadBlob, syncSummary, syncQueue, syncConflicts, syncActivity, createSyncPackage, importSyncPackage, resolveSyncConflict, notePackageExport, deviceIdentity, recordSyncActivity, autoBackupInfo, latestAutoBackup, restoreAutoBackup, isDemoMode, setDemoMode, resetDemoData } from "./storage.js?v=0.73.9";
+import { BUILD, KEY, ACTIVE_JOB_KEY, loadData, saveData, ensureSite, fullAddress, esc, uid, downloadBlob, syncSummary, syncQueue, syncConflicts, syncActivity, createSyncPackage, importSyncPackage, resolveSyncConflict, notePackageExport, deviceIdentity, recordSyncActivity, autoBackupInfo, latestAutoBackup, restoreAutoBackup, isDemoMode, setDemoMode, resetDemoData } from "./storage.js?v=0.74.0";
 window.__FIREVAULT_MODULE_READY = true;
 
 function fvPreferenceStore0739(){
@@ -6962,8 +6962,8 @@ function demoModePanel0738(){
   return `<div class="settingsStack demoModeSettings0738">
     <section class="card demoModeHero0738 ${active?'active':''}">
       <div class="demoModeHeroHead0738"><span class="demoModeShield0738">D</span><div><span>SAFE PRESENTATION WORKSPACE</span><h2>${active?'Demo Mode is Active':'Demo Mode'}</h2><p>${active?'FireVault is showing only fictional Boise-area customer information. Your real vault is not loaded into this workspace.':'Switch to a completely separate fictional dataset before showing FireVault to customers, managers, or other technicians.'}</p></div></div>
-      <div class="demoModeStats0738"><div><strong>${active?siteCount:20}</strong><span>Demo Accounts</span></div><div><strong>Boise</strong><span>Simulated Area</span></div><div><strong>Temporary</strong><span>Memory Workspace</span></div></div>
-      <div class="demoModeActions0738">${active?`<button class="primary" id="exitDemoMode0738">Exit Demo Mode</button><button class="ghost" id="resetDemoMode0738">Reset Demo Data</button>`:`<button class="primary" id="enterDemoMode0738">Enter Demo Mode</button>`}</div>
+      <div class="demoModeStats0738"><div><strong>${active?siteCount:20}</strong><span>Demo Accounts</span></div><div><strong>Boise</strong><span>Simulated Area</span></div><div><strong>Protected</strong><span>Master Dataset</span></div></div>
+      <div class="demoModeActions0738">${active?`<button class="primary" id="exitDemoMode0738">Exit Demo Mode</button><button class="ghost" id="resetDemoMode0738">Restore Demo Defaults</button>`:`<button class="primary" id="enterDemoMode0738">Enter Demo Mode</button>`}</div>
     </section>
     <section class="card demoModeInfo0738">
       <h3>What Demo Mode includes</h3>
@@ -6976,7 +6976,7 @@ function demoModePanel0738(){
         <div><b>Simulated GPS</b><span>Nearby Accounts centers on downtown Boise so the demonstration works from any location.</span></div>
       </div>
     </section>
-    <div class="settingsInfo540 warning"><strong>Real data protection</strong><span>Demo records run in temporary memory and do not create a second local vault. Demo edits last for the current app session and reset after a full reload. Exiting Demo Mode reloads your original FireVault database exactly as it was. Continue downloading external backups for the real vault.</span></div>
+    <div class="settingsInfo540 warning"><strong>Real data protection</strong><span>The 20-account demo master is protected in the app and cannot be deleted. Changes are made only to a temporary working copy. Exiting Demo Mode discards those changes and reloads your real FireVault database exactly as it was. When no real vault exists, FireVault safely starts in Demo Mode by default.</span></div>
   </div>`;
 }
 function switchDemoMode0738(enabled,reset=false){
@@ -6991,7 +6991,7 @@ function switchDemoMode0738(enabled,reset=false){
 function wireDemoMode0738(){
   document.getElementById("enterDemoMode0738")?.addEventListener("click",()=>switchDemoMode0738(true,false));
   document.getElementById("exitDemoMode0738")?.addEventListener("click",()=>switchDemoMode0738(false,false));
-  document.getElementById("resetDemoMode0738")?.addEventListener("click",()=>{if(!confirm("Reset the temporary Demo Mode workspace and reload the original 20 Boise accounts?"))return;resetDemoData();location.reload();});
+  document.getElementById("resetDemoMode0738")?.addEventListener("click",()=>{if(!confirm("Discard all temporary demo changes and restore the protected 20-account Boise dataset?"))return;resetDemoData();location.reload();});
 }
 
 function settingsPanel(){

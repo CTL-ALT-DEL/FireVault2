@@ -15070,3 +15070,13 @@ body.demoMode0738 .brand small::after{content:" • DEMO";color:#fbbf24;font-wei
   .demoModeFeatureGrid0738{grid-template-columns:1fr}
 }
 @media(max-width:360px){.demoModeActions0738{grid-template-columns:1fr}.demoModeHeroHead0738 h2{font-size:21px}}
+
+
+/* Build 0.74.0 — protected default Demo Mode header indicator */
+body.demoMode0738::after{display:none!important;content:none!important}
+body.demoMode0738 .brand small::after{display:none!important;content:none!important}
+.demoHeaderMode0740{display:none;align-items:center;justify-content:center;min-width:70px;margin:0 10px;padding:4px 8px;border:1px solid rgba(250,204,21,.48);border-radius:7px;background:rgba(120,53,15,.18);color:#facc15;font-size:9px;font-weight:1000;letter-spacing:.13em;line-height:1;white-space:nowrap;text-shadow:0 0 8px rgba(250,204,21,.42)}
+body.demoMode0738 .demoHeaderMode0740{display:flex;animation:demoHeaderBlink0740 1.15s steps(2,end) infinite}
+@keyframes demoHeaderBlink0740{0%,46%{opacity:1}47%,100%{opacity:.28}}
+@media(max-width:390px){.demoHeaderMode0740{min-width:58px;margin:0 6px;padding:4px 5px;font-size:7.5px;letter-spacing:.09em}}
+@media(prefers-reduced-motion:reduce){body.demoMode0738 .demoHeaderMode0740{animation:none}}

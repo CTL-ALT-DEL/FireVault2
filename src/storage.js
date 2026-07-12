@@ -1,4 +1,4 @@
-export const BUILD = "0.73.9";
+export const BUILD = "0.74.0";
 export const KEY = "firevault_vault_build_030";
 export const ACTIVE_JOB_KEY = "firevault_active_job_modular";
 export const DEVICE_KEY = "firevault_device_identity_062";
@@ -410,16 +410,28 @@ function recoverBestLocalVault(){
   return candidates[0]||null;
 }
 export function loadData(){
-  if(isDemoMode()){
-    // Demo Mode is intentionally ephemeral. It demonstrates every feature without
-    // duplicating the real vault, recovery copy, and backups inside localStorage.
+  let demoActive=isDemoMode();
+  let best=null;
+  if(!demoActive) best=recoverBestLocalVault();
+
+  // Build 0.74.0: when no real customer vault exists, FireVault opens the
+  // protected fictional Boise workspace instead of presenting an empty app.
+  // The demo master is generated in code and is never stored as a deletable vault.
+  if(!demoActive && !best){
+    setDemoMode(true);
+    demoActive=true;
+  }
+
+  if(demoActive){
+    // Demo changes live only in a temporary working copy. Exiting Demo Mode
+    // discards them and reloads the untouched real vault. If no real vault exists,
+    // the protected demo master becomes the default again on the next startup.
     try{localStorage.removeItem(DEMO_VAULT_KEY);}catch{}
-    if(!demoRuntimeVault0739 || !Array.isArray(demoRuntimeVault0739.sites) || demoRuntimeVault0739.sites.length!==20){
+    if(!demoRuntimeVault0739 || !Array.isArray(demoRuntimeVault0739.sites)){
       demoRuntimeVault0739=createDemoVault();
     }
     return normalize(demoRuntimeVault0739);
   }
-  const best=recoverBestLocalVault();
   if(best){
     try{
       if(best.key!==KEY && best.count>0){

@@ -1,6 +1,6 @@
-# FireVault Build 0.73.9 — Demo Mode Quota Repair
+# FireVault Build 0.74.0 — Demo Mode Quota Repair
 
-Build 0.73.9 repairs the `QuotaExceededError` that could appear after entering **Settings → App → Demo Mode** on an iPhone or iPad with a large real vault, recovery copy, and automatic backups.
+Build 0.74.0 repairs the `QuotaExceededError` that could appear after entering **Settings → App → Demo Mode** on an iPhone or iPad with a large real vault, recovery copy, and automatic backups.
 
 ## What changed
 
@@ -27,3 +27,9 @@ Build 0.73.9 repairs the `QuotaExceededError` that could appear after entering *
 - The real vault, recovery copy, and automatic backups are not replaced by Demo Mode.
 - Exiting Demo Mode reloads the untouched real customer vault.
 - Continue downloading an external backup before deleting or reinstalling the Home Screen app.
+
+
+## Build 0.74.0
+- Uses the protected 20-account Boise Demo Mode workspace automatically when no real vault exists.
+- Keeps the demo master immutable; demonstration edits are temporary and discarded on exit.
+- Moves the Demo Mode indicator into the fixed top header between the logo and date.
