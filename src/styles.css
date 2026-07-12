@@ -17783,3 +17783,204 @@ body{-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}
   .accountSupporting0759{font-size:11px!important}
   .settingsTopTabs0736 button b{font-size:9.2px!important}
 }
+
+
+/* Build 0.78.4 — Settings section hierarchy and overflow repair */
+.settingsTabsPage0736,
+.settingsTabbedDetail0736,
+.settingsTabsPage0736 > *,
+.settingsTabbedDetail0736 > *,
+.settingsTabItems0736,
+.settingsTabbedBody0736,
+.settingsTabItem0736 > div,
+.settingsDetailHeader0736 > div,
+.settingsSectionIntro0784 > div{
+  min-width:0!important;
+  max-width:100%!important;
+}
+
+/* A quiet, non-interactive section introduction — deliberately not styled like a button. */
+.settingsSectionIntro0784{
+  --settings-intro-accent:var(--accent,#60a5fa);
+  position:relative!important;
+  display:grid!important;
+  grid-template-columns:34px minmax(0,1fr)!important;
+  gap:11px!important;
+  align-items:start!important;
+  margin:1px 2px 2px!important;
+  padding:9px 5px 13px 12px!important;
+  border:0!important;
+  border-bottom:1px solid rgba(255,255,255,.11)!important;
+  border-radius:0!important;
+  background:transparent!important;
+  box-shadow:none!important;
+  color:inherit!important;
+  cursor:default!important;
+  pointer-events:none!important;
+  overflow:visible!important;
+}
+.settingsSectionIntro0784:before{
+  content:"";
+  position:absolute;
+  left:0;
+  top:10px;
+  bottom:13px;
+  width:3px;
+  border-radius:999px;
+  background:var(--settings-intro-accent);
+  box-shadow:0 0 12px color-mix(in srgb,var(--settings-intro-accent) 35%,transparent);
+}
+.settingsSectionIntro0784.tone-violet{--settings-intro-accent:#a78bfa}
+.settingsSectionIntro0784.tone-cyan{--settings-intro-accent:#22d3ee}
+.settingsSectionIntro0784.tone-amber{--settings-intro-accent:#fbbf24}
+.settingsSectionIntro0784.tone-red{--settings-intro-accent:#fb7185}
+.settingsSectionIntroIcon0784{
+  display:block!important;
+  width:auto!important;
+  height:auto!important;
+  padding:2px 0 0!important;
+  border:0!important;
+  border-radius:0!important;
+  background:transparent!important;
+  box-shadow:none!important;
+  color:var(--settings-intro-accent)!important;
+  font-size:1.23rem!important;
+  line-height:1!important;
+  text-align:center!important;
+}
+.settingsSectionIntroCopy0784 small{
+  display:block!important;
+  margin:0 0 3px!important;
+  color:#8290a3!important;
+  font-size:.61rem!important;
+  line-height:1.15!important;
+  font-weight:850!important;
+  letter-spacing:.11em!important;
+  text-transform:uppercase!important;
+}
+.settingsSectionIntroCopy0784 h2{
+  margin:0!important;
+  color:#fff!important;
+  font-size:1rem!important;
+  line-height:1.22!important;
+  letter-spacing:-.015em!important;
+  overflow-wrap:anywhere!important;
+}
+.settingsSectionIntroCopy0784 p{
+  margin:4px 0 0!important;
+  color:#aeb9c8!important;
+  font-size:.75rem!important;
+  line-height:1.42!important;
+  white-space:normal!important;
+  overflow:visible!important;
+  text-overflow:clip!important;
+  overflow-wrap:anywhere!important;
+}
+
+/* Settings destination rows must grow with their text instead of clipping or overrunning. */
+.settingsTabItem0736{
+  grid-template-columns:40px minmax(0,1fr) 16px!important;
+  align-items:center!important;
+  min-height:72px!important;
+  height:auto!important;
+  padding:11px 12px!important;
+  overflow:hidden!important;
+}
+.settingsTabItem0736 strong,
+.settingsTabItem0736 small{
+  max-width:100%!important;
+  white-space:normal!important;
+  overflow:visible!important;
+  text-overflow:clip!important;
+  overflow-wrap:anywhere!important;
+  word-break:normal!important;
+}
+.settingsTabItem0736 strong{line-height:1.25!important}
+.settingsTabItem0736 small{line-height:1.42!important}
+.settingsTabItem0736 > b{
+  align-self:center!important;
+  justify-self:end!important;
+  width:16px!important;
+  overflow:hidden!important;
+}
+
+/* Detail headings, notes, URLs, status text, and nested grids stay inside the phone width. */
+.settingsDetailHeader0736 h1,
+.settingsDetailHeader0736 span,
+.settingsDetailNote0736,
+.settingsTabbedBody0736 p,
+.settingsTabbedBody0736 small,
+.settingsTabbedBody0736 strong,
+.settingsTabbedBody0736 label,
+.settingsTabbedBody0736 .fieldNote,
+.settingsTabbedBody0736 .aboutGrid span,
+.settingsTabbedBody0736 code{
+  max-width:100%!important;
+  white-space:normal!important;
+  overflow-wrap:anywhere!important;
+  word-break:normal!important;
+}
+.settingsTabbedBody0736 input,
+.settingsTabbedBody0736 textarea,
+.settingsTabbedBody0736 select,
+.settingsTabbedBody0736 button{
+  max-width:100%!important;
+  min-width:0!important;
+}
+.settingsTabbedBody0736 .settingsStack,
+.settingsTabbedBody0736 .compactPane,
+.settingsTabbedBody0736 .settingsSection540,
+.settingsTabbedBody0736 .settingsSection530,
+.settingsTabbedBody0736 .card,
+.settingsTabbedBody0736 .settingField,
+.settingsTabbedBody0736 .settingsGrid,
+.settingsTabbedBody0736 .settingsGrid540,
+.settingsTabbedBody0736 .settingsList,
+.settingsTabbedBody0736 .aboutGrid,
+.settingsTabbedBody0736 .emailBlock530,
+.settingsTabbedBody0736 .emailControl530{
+  min-width:0!important;
+  max-width:100%!important;
+}
+.settingsTabbedBody0736 .paneHead,
+.settingsTabbedBody0736 .sectionHeader,
+.settingsTabbedBody0736 .settingsSectionHead530,
+.settingsTabbedBody0736 .emailBlockHead530{
+  min-width:0!important;
+}
+.settingsTabbedBody0736 .paneHead > div,
+.settingsTabbedBody0736 .sectionHeader > div,
+.settingsTabbedBody0736 .settingsSectionHead530 > div,
+.settingsTabbedBody0736 .emailBlockHead530 > div{
+  min-width:0!important;
+  max-width:100%!important;
+}
+
+@media (max-width:520px){
+  .settingsSectionIntro0784{
+    grid-template-columns:28px minmax(0,1fr)!important;
+    gap:9px!important;
+    padding:8px 3px 12px 10px!important;
+  }
+  .settingsSectionIntroIcon0784{font-size:1.08rem!important}
+  .settingsSectionIntroCopy0784 h2{font-size:.94rem!important}
+  .settingsSectionIntroCopy0784 p{font-size:.71rem!important}
+  .settingsTabItem0736{
+    grid-template-columns:38px minmax(0,1fr) 14px!important;
+    padding:11px 10px!important;
+  }
+  .settingsTabbedBody0736 .settingsGrid,
+  .settingsTabbedBody0736 .settingsGrid540,
+  .settingsTabbedBody0736 .settingsList.twoCol,
+  .settingsTabbedBody0736 .emailRowGrid530,
+  .settingsTabbedBody0736 .overlayMiniControls510,
+  .settingsTabbedBody0736 .grid2,
+  .settingsTabbedBody0736 .grid3{
+    grid-template-columns:minmax(0,1fr)!important;
+  }
+  .settingsTabbedBody0736 .paneHead,
+  .settingsTabbedBody0736 .sectionHeader,
+  .settingsTabbedBody0736 .settingsSectionHead530{
+    flex-wrap:wrap!important;
+  }
+}

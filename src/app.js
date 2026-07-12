@@ -1,4 +1,4 @@
-import { BUILD, KEY, ACTIVE_JOB_KEY, loadData, saveData, ensureSite, fullAddress, esc, uid, downloadBlob, syncSummary, syncQueue, syncConflicts, syncActivity, createSyncPackage, importSyncPackage, resolveSyncConflict, notePackageExport, deviceIdentity, recordSyncActivity, autoBackupInfo, latestAutoBackup, restoreAutoBackup, isDemoMode, setDemoMode, resetDemoData } from "./storage.js?v=0.78.3";
+import { BUILD, KEY, ACTIVE_JOB_KEY, loadData, saveData, ensureSite, fullAddress, esc, uid, downloadBlob, syncSummary, syncQueue, syncConflicts, syncActivity, createSyncPackage, importSyncPackage, resolveSyncConflict, notePackageExport, deviceIdentity, recordSyncActivity, autoBackupInfo, latestAutoBackup, restoreAutoBackup, isDemoMode, setDemoMode, resetDemoData } from "./storage.js?v=0.78.4";
 window.__FIREVAULT_MODULE_READY = true;
 
 function fvPreferenceStore0739(){
@@ -6761,7 +6761,10 @@ function settings(){
         <button class="ghost" id="settingsHomeBtn572">Done</button>
       </div>
       ${settingsTopTabs0736(group.key)}
-      <section class="settingsTabSummary0736"><span>${group.icon}</span><div><strong>${esc(group.title)}</strong><p>${esc(group.note)}</p></div></section>
+      <div class="settingsSectionIntro0784 tone-${group.tone}" aria-label="${esc(group.title)} section overview">
+        <span class="settingsSectionIntroIcon0784" aria-hidden="true">${group.icon}</span>
+        <div class="settingsSectionIntroCopy0784"><small>Section overview</small><h2>${esc(group.title)}</h2><p>${esc(group.note)}</p></div>
+      </div>
       <div class="settingsTabItems0736 grow">
         ${groupItems.map(t=>`<button class="settingsTabItem0736" ${t[0]==="diagnostics"?'data-settings-route067="diagnostics"':`data-tab="${t[0]}"`}><span class="settingsItemIcon0736">${settingsIcon550(t[0])}</span><div><strong>${esc(t[1])}</strong><small>${esc(t[2])}</small></div><b>›</b></button>`).join("")}
       </div>
@@ -8700,6 +8703,7 @@ function diagnostics(){
 }
 function showChangelog(){
   const notes = [
+    "Build 0.78.4 redesigns Settings section introductions so they no longer resemble buttons, repairs wrapping and overflow in Data and other Settings areas, and standardizes narrow-phone settings layouts.",
     "Build 0.78.3 improves field readability across Nearby, Accounts, Account Detail, Settings, Tools, and forms with larger supporting text, stronger contrast, clearer badges, and safer touch targets.",
     "Build 0.78.2 remembers scroll position across major screens, restores each Account Detail tab independently, lets an active bottom-navigation button return its page to the top, and updates the browser title for clearer orientation.",
     "Build 0.78.1 adds smoother route transitions, improved toast and loading feedback, refined empty states, stronger disabled and focus states, and safer WebDAV operation feedback.",

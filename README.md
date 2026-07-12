@@ -1,3 +1,3 @@
-# FireVault Build 0.78.3 — Field Readability Polish
+# FireVault Build 0.78.4 — Settings Sections & Overflow Repair
 
-This release improves readability and touch accuracy across the busiest FireVault screens. Nearby and Accounts rows use larger secondary text and clearer status badges, Account Detail actions and tabs are easier to scan, Settings and Tools descriptions are more legible, and Add/Edit forms use stronger labels and field hints. The existing vault schema and storage key are unchanged.
+This release redesigns the non-interactive introduction at the top of each Settings category so it reads as a section heading rather than a button. Settings destination rows now expand for long titles and descriptions, and Data, Sync & Support plus other detail panels wrap long text, URLs, labels, and controls safely on narrow iPhones. The existing vault schema and storage key are unchanged.
