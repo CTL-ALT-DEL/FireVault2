@@ -1,6 +1,6 @@
 {
-  "build": "0.75.2",
+  "build": "0.75.3",
   "released": "2026-07-11",
-  "note": "Technician UX Refresh",
-  "notes": "Unifies page spacing, navigation, touch targets, account actions, information hierarchy, and responsive behavior for faster field use while preserving the existing FireVault data model."
+  "note": "Structural Header Repair",
+  "notes": "Replaces fixed overlay offsets on non-home screens with a real header/content/navigation grid so Accounts controls cannot be covered by the global logo and date header."
 }

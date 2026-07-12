@@ -1,4 +1,4 @@
-import { BUILD, KEY, ACTIVE_JOB_KEY, loadData, saveData, ensureSite, fullAddress, esc, uid, downloadBlob, syncSummary, syncQueue, syncConflicts, syncActivity, createSyncPackage, importSyncPackage, resolveSyncConflict, notePackageExport, deviceIdentity, recordSyncActivity, autoBackupInfo, latestAutoBackup, restoreAutoBackup, isDemoMode, setDemoMode, resetDemoData } from "./storage.js?v=0.75.2";
+import { BUILD, KEY, ACTIVE_JOB_KEY, loadData, saveData, ensureSite, fullAddress, esc, uid, downloadBlob, syncSummary, syncQueue, syncConflicts, syncActivity, createSyncPackage, importSyncPackage, resolveSyncConflict, notePackageExport, deviceIdentity, recordSyncActivity, autoBackupInfo, latestAutoBackup, restoreAutoBackup, isDemoMode, setDemoMode, resetDemoData } from "./storage.js?v=0.75.3";
 window.__FIREVAULT_MODULE_READY = true;
 
 function fvPreferenceStore0739(){
@@ -1743,11 +1743,17 @@ function injectContextualHelp060(){
 }
 function render(){
   try{
-    if(view!=="home") restoreAppChrome572();
+    const isHomeView=view === "home";
+    /* Set the structural page mode before drawing the route. This prevents a
+       route from briefly inheriting the previous screen's chrome geometry. */
+    document.body.classList.toggle("homeFullscreen480", isHomeView);
+    document.body.classList.toggle("homeLayoutFixed570", isHomeView);
+    document.body.classList.toggle("settingsChrome572", view === "settings");
+    if(!isHomeView) restoreAppChrome572();
     const routes = {home, tools:tools0734, dashboard068, dailySummary, routeLog, actionCenter, pinnedSites:pinnedSitesManager567, sites, nearbySites, attention:attentionQueue, siteDetail, visits, visitDetail, checklist, siteForm, contactsList, contactForm, siteDocs, siteDocForm, equipmentList, equipmentForm, tasks, taskForm, deficiencies, deficiencyForm, report, library, resourceForm, jobMode, serviceVisit, settings, diagnostics, dataTools};
     (routes[view] || home)();
-    document.body.classList.toggle("homeFullscreen480", view === "home");
-    document.body.classList.toggle("homeLayoutFixed570", view === "home");
+    document.body.classList.toggle("homeFullscreen480", isHomeView);
+    document.body.classList.toggle("homeLayoutFixed570", isHomeView);
     document.body.classList.toggle("settingsChrome572", view === "settings");
     if(view !== "settings") document.body.classList.remove("settingsChrome572");
     stopJobTimer();
@@ -3778,7 +3784,7 @@ function accountCategoryLabel0735(s={}){
   return ({clss:"CLSS",alarmnet:"AlarmNet",ipdact:"IPDACT",basic:"Basic"})[category]||"Basic";
 }
 
-/* Build 0.75.2 — persistent account workflow helpers */
+/* Build 0.75.3 — persistent account workflow helpers */
 function accountTabPreference0751(){
   try{
     const value=sessionStorage.getItem("firevault_account_tab_0751");
