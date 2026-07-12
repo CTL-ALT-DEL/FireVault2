@@ -1,5 +1,3 @@
-# FireVault Build 0.78.5
+# FireVault Build 0.78.6
 
-Deploy this package over the existing FireVault repository. Do not delete the installed Home Screen app. The build preserves the `firevault_vault_build_030` vault and all existing account data.
-
-The release adds runtime chrome/viewport measurement and app-wide layout guards. After deployment, allow GitHub Pages to finish publishing, then reopen FireVault or use Settings → Data → App Updates → Check for Updates.
+Deploy these files over the existing FireVault GitHub Pages repository. Do not delete the installed Home Screen app and do not clear Safari website data. This build preserves the existing `firevault_vault_build_030` vault and all backup, Demo Mode, WebDAV, category, import, and update behavior.

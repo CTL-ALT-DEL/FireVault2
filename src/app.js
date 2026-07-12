@@ -1,4 +1,4 @@
-import { BUILD, KEY, ACTIVE_JOB_KEY, loadData, saveData, ensureSite, fullAddress, esc, uid, downloadBlob, syncSummary, syncQueue, syncConflicts, syncActivity, createSyncPackage, importSyncPackage, resolveSyncConflict, notePackageExport, deviceIdentity, recordSyncActivity, autoBackupInfo, latestAutoBackup, restoreAutoBackup, isDemoMode, setDemoMode, resetDemoData } from "./storage.js?v=0.78.5";
+import { BUILD, KEY, ACTIVE_JOB_KEY, loadData, saveData, ensureSite, fullAddress, esc, uid, downloadBlob, syncSummary, syncQueue, syncConflicts, syncActivity, createSyncPackage, importSyncPackage, resolveSyncConflict, notePackageExport, deviceIdentity, recordSyncActivity, autoBackupInfo, latestAutoBackup, restoreAutoBackup, isDemoMode, setDemoMode, resetDemoData } from "./storage.js?v=0.78.6";
 window.__FIREVAULT_MODULE_READY = true;
 
 function fvPreferenceStore0739(){
@@ -4287,11 +4287,11 @@ function rememberAccountTab0751(value){
 }
 function accountPersistentActions0751(s={},ctx={}){
   const phone=formatPhone0758(ctx.primary?.phone||s.sitePhone)||"";
-  return `<section class="accountPersistentActions0751" aria-label="Account quick actions">
-    <button id="callPrimary477" ${phone?"":"disabled"}>${fvIcon073("call","accountPersistentIcon0751")}<strong>Call</strong></button>
-    <button id="navigateBtn477" ${hasGps(s)?"":"disabled"}>${fvIcon073("route","accountPersistentIcon0751")}<strong>Route</strong></button>
-    <button id="qaAddNote544">${fvIcon073("note","accountPersistentIcon0751")}<strong>Note</strong></button>
-    <button id="qaStartVisit610" class="${ctx.activeHere?"activeVisit0751":""}">${fvIcon073("visit","accountPersistentIcon0751")}<strong>${ctx.activeHere?"Resume":"Visit"}</strong></button>
+  return `<section class="accountPersistentActions0751 accountActions0786" aria-label="Account quick actions">
+    <button id="callPrimary477" ${phone?"":"disabled"} aria-label="Call account contact">${fvIcon073("call","accountPersistentIcon0751")}<strong>Call</strong><small>${phone?"Primary contact":"No phone"}</small></button>
+    <button id="navigateBtn477" ${hasGps(s)?"":"disabled"} aria-label="Route to account">${fvIcon073("route","accountPersistentIcon0751")}<strong>Route</strong><small>${hasGps(s)?"Open navigation":"No GPS"}</small></button>
+    <button id="qaAddNote544" aria-label="Add account note">${fvIcon073("note","accountPersistentIcon0751")}<strong>Note</strong><small>Quick entry</small></button>
+    <button id="qaStartVisit610" class="${ctx.activeHere?"activeVisit0751":""}" aria-label="${ctx.activeHere?"Resume":"Start"} service visit">${fvIcon073("visit","accountPersistentIcon0751")}<strong>${ctx.activeHere?"Resume":"Visit"}</strong><small>${ctx.activeHere?"Active visit":"Start service"}</small></button>
   </section>`;
 }
 function accountSince0735(s={}){
@@ -4329,27 +4329,31 @@ function accountRecentMarkup0735(s={}){
 }
 function accountOverviewTab0735(s,ctx){
   const {health,primary,lastVisit,def,open}=ctx;
-  const status=health.label;
   const contactName=primary?contactTitle(primary):"No contact saved";
   const contactPhone=formatPhone0758(primary?.phone||s.sitePhone)||"";
-  return `<div class="accountTabPanel0735 accountOverview0735">
-    <section class="accountLocationCard0735">
-      <div class="accountAddress0735"><span>LOCATION</span><strong>${esc(fullAddress(s)||"No address saved")}</strong>${hasGps(s)?`<small>${esc(gpsLine(s))}</small>`:""}</div>
-      
+  const address=fullAddress(s)||"No address saved";
+  return `<div class="accountTabPanel0735 accountOverview0735 accountOverview0786">
+    <section class="accountLocationCard0735 accountLocation0786">
+      <div class="accountAddress0735">
+        <div class="accountSectionHeading0786"><span>LOCATION</span><em class="${hasGps(s)?"gpsReady0786":"gpsMissing0786"}">${hasGps(s)?"GPS SAVED":"NO GPS"}</em></div>
+        <strong>${esc(address)}</strong>
+        ${hasGps(s)?`<small>${esc(gpsLine(s))}</small>`:`<small>Capture coordinates from the Details tab while on site.</small>`}
+        <div class="accountLocationActions0786"><button class="ghost" id="copyAddress0786" ${address==="No address saved"?"disabled":""}>Copy Address</button><button class="ghost" id="locationDetails0786">Location Details</button></div>
+      </div>
     </section>
-    <section class="accountInfoCard0735">
-      <button><span>Status</span><strong class="accountStatus0735 status-${esc(health.cls)}">${esc(status)}</strong></button>
-      <button><span>Category</span><strong>${esc(accountCategoryLabel0735(s))}</strong></button>
-      <button><span>Account Since</span><strong>${esc(accountSince0735(s))}</strong></button>
-      <button id="contactsQuick477"><span>Contact</span><strong>${esc(contactName)}</strong>${contactPhone?`<small>${esc(contactPhone)}</small>`:""}</button>
+    <section class="accountInfoCard0735 accountInfo0786">
+      <button id="contactsQuick477"><span>Primary Contact</span><strong>${esc(contactName)}</strong>${contactPhone?`<small>${esc(contactPhone)}</small>`:""}</button>
+      <button id="callSitePhone0786" ${contactPhone?"":"disabled"}><span>Phone</span><strong>${esc(contactPhone||"Not entered")}</strong></button>
       ${primary?.email?`<a href="mailto:${esc(primary.email)}"><span>Email</span><strong>${esc(primary.email)}</strong></a>`:""}
+      <div><span>Category</span><strong>${esc(accountCategoryLabel0735(s))}</strong></div>
+      <div><span>Account Since</span><strong>${esc(accountSince0735(s))}</strong></div>
     </section>
-    <section class="accountMetricCards0735">
-      <button id="visitsMini477"><span>LAST VISIT</span><strong>${esc(lastVisit?visitDateLabel(lastVisit):"None")}</strong></button>
-      <button id="defBtn" class="metricDanger0735"><span>DEFICIENCIES</span><strong>${def} Open</strong></button>
-      <button id="taskBtn" class="metricBlue0735"><span>NEXT DUE</span><strong>${esc(accountNextDue0735(s))}</strong><small>${open} open task${open===1?"":"s"}</small></button>
+    <section class="accountMetricCards0735 accountMetrics0786">
+      <button id="visitsMini477"><span>LAST VISIT</span><strong>${esc(lastVisit?visitDateLabel(lastVisit):"None")}</strong><small>Service history</small></button>
+      <button id="taskBtn" class="metricBlue0735"><span>OPEN TASKS</span><strong>${open}</strong><small>Next due ${esc(accountNextDue0735(s))}</small></button>
+      <button id="defBtn" class="metricDanger0735"><span>DEFICIENCIES</span><strong>${def}</strong><small>${def?"Needs review":"None open"}</small></button>
     </section>
-    <section class="accountPanel0735"><div class="accountPanelHead0735"><div><span>RECENT ACTIVITY</span><h2>Account Timeline</h2></div><button class="ghost" id="allVisitsBtn">View All</button></div>${accountRecentMarkup0735(s)}</section>
+    <section class="accountPanel0735 accountTimeline0786"><div class="accountPanelHead0735"><div><span>RECENT ACTIVITY</span><h2>Account Timeline</h2></div><button class="ghost" id="allVisitsBtn">View All</button></div>${accountRecentMarkup0735(s)}</section>
   </div>`;
 }
 function accountDetailsTab0735(s,ctx){
@@ -4428,15 +4432,15 @@ function siteDetail(){
   const activeHere=activeJob&&activeJob.siteId===s.id;
   const ctx={open,def,siteVisits,equipment,docs,health,lastVisit,panel,primary,access,activeHere};
   const accountId=accountId069(s)||"No Account ID";
-  const tabs=[["overview","Overview",null],["details","Details",null],["equipment","Equipment",equipment.length],["docs","Docs",docs.length],["notes","Notes",open+def]];
+  const tabs=[["overview","Overview",null,"Account overview"],["details","Details",null,"Site details"],["equipment","Equip",equipment.length,"Equipment"],["docs","Files",docs.length,"Photos and documents"],["notes","Notes",open+def,"Notes and open work"]];
   const panelMarkup=accountDetailTab0735==="details"?accountDetailsTab0735(s,ctx):accountDetailTab0735==="equipment"?accountEquipmentTab0735(s):accountDetailTab0735==="docs"?accountDocsTab0735(s):accountDetailTab0735==="notes"?accountNotesTab0735(s,ctx):accountOverviewTab0735(s,ctx);
 
   html(`<div class="screen siteDetail0735">
-    <div class="accountHeader0735 technicianHeader075 accountHeaderRewrite0757" role="banner"><button class="accountBack0735" id="backBtn" aria-label="Back to Accounts">‹</button><div class="technicianIdentity075"><strong>${esc(s.name||"Unnamed Account")}</strong><span class="accountIdLine0757">${esc(accountId)}</span>${fullAddress(s)?`<span class="accountAddressLine0757">${esc(fullAddress(s))}</span>`:""}</div><button class="accountPin0735 ${isPinnedSite566(s)?"pinned":""}" id="pinSiteBtn566" aria-label="Pin account">${isPinnedSite566(s)?"★":"☆"}</button><button class="accountEdit0735" id="editBtn" aria-label="Edit account">✎</button></div>
+    <div class="accountHeader0735 technicianHeader075 accountHeaderRewrite0757 accountHeader0786" role="banner"><button class="accountBack0735" id="backBtn" aria-label="Back to Accounts">‹</button><div class="technicianIdentity075 accountIdentity0786"><strong>${esc(s.name||"Unnamed Account")}</strong><span class="accountIdLine0757">${esc(accountId)}</span>${fullAddress(s)?`<span class="accountAddressLine0757">${esc(fullAddress(s))}</span>`:""}</div><button class="accountPin0735 ${isPinnedSite566(s)?"pinned":""}" id="pinSiteBtn566" aria-label="${isPinnedSite566(s)?"Remove account from favorites":"Add account to favorites"}" aria-pressed="${isPinnedSite566(s)?"true":"false"}">${isPinnedSite566(s)?"★":"☆"}</button><button class="accountEdit0735" id="editBtn" aria-label="Edit account">✎</button></div>
     <section class="technicianStatus075"><span class="status-${esc(health.cls)}">${esc(health.label)}</span><span>${esc(accountCategoryLabel0735(s))}</span>${open?`<span>${open} task${open===1?"":"s"}</span>`:""}${def?`<span class="hasDef075">${def} deficienc${def===1?"y":"ies"}</span>`:""}</section>
     ${accountTagChips0737(s,8)?`<div class="accountTagRail0737">${accountTagChips0737(s,8)}</div>`:""}
     ${accountPersistentActions0751(s,ctx)}
-    <nav class="accountTabs0735 accountTabsSticky0751" aria-label="Account sections">${tabs.map(([key,label,count])=>`<button class="${accountDetailTab0735===key?"active":""}" data-account-tab0735="${key}"><span>${label}</span>${Number.isFinite(count)&&count>0?`<b>${count}</b>`:""}</button>`).join("")}</nav>
+    <nav class="accountTabs0735 accountTabsSticky0751 accountTabs0786" aria-label="Account sections">${tabs.map(([key,label,count,aria])=>`<button class="${accountDetailTab0735===key?"active":""}" data-account-tab0735="${key}" aria-label="${esc(aria)}" aria-current="${accountDetailTab0735===key?"page":"false"}"><span>${label}</span>${Number.isFinite(count)&&count>0?`<b>${count}</b>`:""}</button>`).join("")}</nav>
     <div class="accountTabScroll0735 accountTabScroll0751">${panelMarkup}</div>
   </div>`);
 
@@ -4454,8 +4458,13 @@ function siteDetail(){
   document.getElementById("defBtn")?.addEventListener("click",()=>route("deficiencies"));
   document.getElementById("visitsMini477")?.addEventListener("click",()=>route("visits"));
   document.getElementById("contactsQuick477")?.addEventListener("click",()=>route("contactsList"));
+  document.getElementById("copyAddress0786")?.addEventListener("click",()=>copyText071(fullAddress(s),"Address copied."));
+  document.getElementById("locationDetails0786")?.addEventListener("click",()=>{accountDetailTab0735="details";rememberAccountTab0751(accountDetailTab0735);render();});
   const contactPhone=formatPhone0758(primary?.phone||s.sitePhone)||"";
-  if(contactPhone) document.getElementById("callPrimary477")?.addEventListener("click",()=>{location.href=`tel:${contactPhone.replace(/[^+\d]/g,"")}`;});
+  if(contactPhone){
+    document.getElementById("callPrimary477")?.addEventListener("click",()=>{location.href=`tel:${contactPhone.replace(/[^+\d]/g,"")}`;});
+    document.getElementById("callSitePhone0786")?.addEventListener("click",()=>{location.href=`tel:${contactPhone.replace(/[^+\d]/g,"")}`;});
+  }
   document.getElementById("navigateBtn477")?.addEventListener("click",()=>{if(hasGps(s))window.open(mapRouteUrl071(s),"_blank");});
   document.getElementById("accountMapRoute0735")?.addEventListener("click",()=>window.open(mapRouteUrl071(s),"_blank"));
   document.getElementById("allVisitsBtn")?.addEventListener("click",()=>route("visits"));
@@ -8704,7 +8713,8 @@ function diagnostics(){
 }
 function showChangelog(){
   const notes = [
-    "Build 0.78.5 completes a stability and consistency audit with measured app-chrome geometry, route-safe viewport sizing, overflow protection, improved Account Detail tabs, stronger Settings and Tools layouts, and consistent phone-sized component behavior.",
+    "Build 0.78.6 completes the Account Detail polish pass with a cleaner identity header, readable field actions, compact tabs, a full-width location card, clearer contact rows, and simplified service metrics.",
+    "Build 0.78.6 completes a stability and consistency audit with measured app-chrome geometry, route-safe viewport sizing, overflow protection, improved Account Detail tabs, stronger Settings and Tools layouts, and consistent phone-sized component behavior.",
     "Build 0.78.4 redesigns Settings section introductions so they no longer resemble buttons, repairs wrapping and overflow in Data and other Settings areas, and standardizes narrow-phone settings layouts.",
     "Build 0.78.3 improves field readability across Nearby, Accounts, Account Detail, Settings, Tools, and forms with larger supporting text, stronger contrast, clearer badges, and safer touch targets.",
     "Build 0.78.2 remembers scroll position across major screens, restores each Account Detail tab independently, lets an active bottom-navigation button return its page to the top, and updates the browser title for clearer orientation.",
@@ -8749,7 +8759,7 @@ function showChangelog(){
 }
 
 
-/* Build 0.78.5 — route-safe chrome and viewport metric guard. */
+/* Build 0.78.6 — route-safe chrome and viewport metric guard. */
 let layoutFrame0785=0;
 let chromeObserver0785=null;
 function elementVisible0785(el){

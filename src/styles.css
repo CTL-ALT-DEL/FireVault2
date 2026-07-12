@@ -18155,3 +18155,244 @@ body.fv-compact-height0785 .accountPersistentActions0751 button{min-height:58px!
   .toolTile0734{grid-template-columns:40px minmax(0,1fr) 14px!important;gap:9px!important}
   .toolIcon0734{width:21px!important;height:21px!important;padding:7px!important}
 }
+
+
+/* Build 0.78.6 — Account Detail final polish
+   One compact field-console hierarchy: identity, status, actions, tabs, content. */
+.siteDetail0735{
+  --account-blue:#3b82f6;
+  --account-blue-soft:#93c5fd;
+  --account-surface:#0d1928;
+  --account-surface-2:#111f31;
+  --account-border:#294563;
+  gap:7px!important;
+  background:linear-gradient(180deg,#07111d 0%,#08121c 100%)!important;
+}
+.siteDetail0735 .accountHeader0786{
+  grid-template-columns:42px minmax(0,1fr) 42px 42px!important;
+  min-height:98px!important;
+  padding:11px 10px!important;
+  gap:8px!important;
+  border-radius:16px!important;
+  border:1px solid #2b4c70!important;
+  background:radial-gradient(circle at 12% 0%,rgba(59,130,246,.22),transparent 44%),linear-gradient(145deg,#112943,#0b192a 66%,#08131f)!important;
+}
+.siteDetail0735 .accountIdentity0786{
+  min-width:0!important;
+  text-align:left!important;
+  align-self:center!important;
+}
+.siteDetail0735 .accountIdentity0786 strong{
+  display:block!important;
+  font-size:1.2rem!important;
+  line-height:1.12!important;
+  letter-spacing:-.025em!important;
+  white-space:nowrap!important;
+  overflow:hidden!important;
+  text-overflow:ellipsis!important;
+}
+.siteDetail0735 .accountIdentity0786 .accountIdLine0757{
+  margin-top:6px!important;
+  color:#7dc0ff!important;
+  font-size:.69rem!important;
+  font-weight:900!important;
+  letter-spacing:.09em!important;
+}
+.siteDetail0735 .accountIdentity0786 .accountAddressLine0757{
+  margin-top:4px!important;
+  color:#b3c0cf!important;
+  font-size:.72rem!important;
+  line-height:1.25!important;
+  letter-spacing:0!important;
+  text-transform:none!important;
+  white-space:nowrap!important;
+  overflow:hidden!important;
+  text-overflow:ellipsis!important;
+}
+.siteDetail0735 .accountBack0735,
+.siteDetail0735 .accountPin0735,
+.siteDetail0735 .accountEdit0735{
+  width:42px!important;
+  min-width:42px!important;
+  height:42px!important;
+  min-height:42px!important;
+  padding:0!important;
+  border-radius:12px!important;
+  display:grid!important;
+  place-items:center!important;
+  font-size:1.15rem!important;
+}
+.siteDetail0735 .accountPin0735.pinned{color:#fde047!important;border-color:#b68b18!important;background:#342b0f!important}
+.siteDetail0735 .technicianStatus075{
+  min-height:38px!important;
+  padding:3px 2px!important;
+  gap:6px!important;
+  overflow-x:auto!important;
+  scrollbar-width:none!important;
+}
+.siteDetail0735 .technicianStatus075 span{
+  flex:0 0 auto!important;
+  min-height:30px!important;
+  padding:6px 10px!important;
+  border-radius:999px!important;
+  font-size:.66rem!important;
+  letter-spacing:.025em!important;
+  white-space:nowrap!important;
+}
+.siteDetail0735 .accountTagRail0737{padding:0 2px 2px!important;gap:6px!important}
+.siteDetail0735 .accountActions0786{
+  grid-template-columns:repeat(4,minmax(0,1fr))!important;
+  gap:7px!important;
+  padding:2px!important;
+}
+.siteDetail0735 .accountActions0786 button{
+  min-height:72px!important;
+  height:72px!important;
+  padding:7px 3px!important;
+  gap:3px!important;
+  border-radius:14px!important;
+  overflow:hidden!important;
+}
+.siteDetail0735 .accountActions0786 .accountPersistentIcon0751{width:24px!important;height:24px!important}
+.siteDetail0735 .accountActions0786 strong{font-size:.74rem!important;line-height:1!important}
+.siteDetail0735 .accountActions0786 small{
+  display:block!important;
+  max-width:100%!important;
+  color:#d4e7fb!important;
+  font-size:.55rem!important;
+  line-height:1.05!important;
+  white-space:nowrap!important;
+  overflow:hidden!important;
+  text-overflow:ellipsis!important;
+}
+.siteDetail0735 .accountTabs0786{
+  grid-template-columns:1.18fr 1fr .82fr .82fr .88fr!important;
+  min-height:52px!important;
+  padding:5px!important;
+  gap:4px!important;
+  border-radius:13px!important;
+  background:#081421!important;
+}
+.siteDetail0735 .accountTabs0786 button{
+  min-height:42px!important;
+  height:42px!important;
+  padding:0 3px!important;
+  border-radius:10px!important;
+  font-size:.68rem!important;
+  font-weight:900!important;
+}
+.siteDetail0735 .accountTabs0786 button b{
+  min-width:16px!important;
+  height:16px!important;
+  padding:0 3px!important;
+  font-size:.52rem!important;
+}
+.siteDetail0735 .accountTabScroll0751{
+  padding:8px 8px calc(var(--navH) + 18px)!important;
+  overscroll-behavior:contain!important;
+}
+.siteDetail0735 .accountTabPanel0735{gap:9px!important}
+.siteDetail0735 .accountLocation0786{
+  display:block!important;
+  grid-template-columns:none!important;
+  min-height:0!important;
+  padding:0!important;
+}
+.siteDetail0735 .accountLocation0786 .accountAddress0735{
+  display:block!important;
+  padding:14px!important;
+}
+.accountSectionHeading0786{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.accountSectionHeading0786>span{margin:0!important}
+.accountSectionHeading0786 em{
+  padding:4px 7px;
+  border-radius:999px;
+  font-size:.56rem;
+  line-height:1;
+  font-style:normal;
+  font-weight:950;
+  letter-spacing:.06em;
+}
+.accountSectionHeading0786 .gpsReady0786{color:#9af0b6;background:#103420;border:1px solid #286e45}
+.accountSectionHeading0786 .gpsMissing0786{color:#cbd5e1;background:#1b2632;border:1px solid #3a4a5b}
+.siteDetail0735 .accountLocation0786 .accountAddress0735 strong{
+  display:block!important;
+  margin-top:8px!important;
+  font-size:.91rem!important;
+  line-height:1.38!important;
+}
+.siteDetail0735 .accountLocation0786 .accountAddress0735 small{
+  display:block!important;
+  margin-top:6px!important;
+  color:#91a3b7!important;
+  font-size:.68rem!important;
+  line-height:1.35!important;
+}
+.accountLocationActions0786{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px;margin-top:12px}
+.accountLocationActions0786 button{min-height:39px!important;height:39px!important;padding:0 10px!important;border-radius:10px!important;font-size:.65rem!important}
+.siteDetail0735 .accountInfo0786{overflow:hidden!important}
+.siteDetail0735 .accountInfo0786>button,
+.siteDetail0735 .accountInfo0786>a,
+.siteDetail0735 .accountInfo0786>div{
+  width:100%!important;
+  min-height:52px!important;
+  display:grid!important;
+  grid-template-columns:minmax(92px,.9fr) minmax(0,1.45fr)!important;
+  align-items:center!important;
+  gap:10px!important;
+  padding:9px 12px!important;
+  border:0!important;
+  border-bottom:1px solid #213650!important;
+  border-radius:0!important;
+  background:transparent!important;
+  color:inherit!important;
+  text-decoration:none!important;
+  text-align:left!important;
+}
+.siteDetail0735 .accountInfo0786>*:last-child{border-bottom:0!important}
+.siteDetail0735 .accountInfo0786 span{color:#91a9c3!important;font-size:.65rem!important}
+.siteDetail0735 .accountInfo0786 strong{
+  justify-self:end!important;
+  max-width:100%!important;
+  color:#f7fbff!important;
+  font-size:.75rem!important;
+  line-height:1.3!important;
+  text-align:right!important;
+  overflow-wrap:anywhere!important;
+}
+.siteDetail0735 .accountInfo0786 small{
+  grid-column:2!important;
+  justify-self:end!important;
+  margin-top:-6px!important;
+  color:#79c4ff!important;
+  font-size:.6rem!important;
+}
+.siteDetail0735 .accountInfo0786 button:not(:disabled):active,
+.siteDetail0735 .accountInfo0786 a:active{background:rgba(59,130,246,.10)!important}
+.siteDetail0735 .accountMetrics0786{gap:7px!important}
+.siteDetail0735 .accountMetrics0786 button{min-height:78px!important;padding:10px 6px!important}
+.siteDetail0735 .accountMetrics0786 strong{font-size:1rem!important}
+.siteDetail0735 .accountMetrics0786 small{font-size:.58rem!important;line-height:1.15!important}
+.siteDetail0735 .accountTimeline0786{margin-bottom:4px!important}
+.siteDetail0735 .accountPanelHead0735{gap:10px!important}
+.siteDetail0735 .accountPanelHead0735 h2{font-size:1rem!important;line-height:1.2!important}
+
+@media(max-width:390px){
+  .siteDetail0735 .accountHeader0786{grid-template-columns:39px minmax(0,1fr) 39px 39px!important;min-height:92px!important;padding:9px 7px!important;gap:6px!important}
+  .siteDetail0735 .accountBack0735,.siteDetail0735 .accountPin0735,.siteDetail0735 .accountEdit0735{width:39px!important;min-width:39px!important;height:39px!important;min-height:39px!important}
+  .siteDetail0735 .accountIdentity0786 strong{font-size:1.03rem!important}
+  .siteDetail0735 .accountIdentity0786 .accountAddressLine0757{font-size:.65rem!important}
+  .siteDetail0735 .accountActions0786{gap:5px!important}
+  .siteDetail0735 .accountActions0786 button{min-height:66px!important;height:66px!important;padding:6px 2px!important}
+  .siteDetail0735 .accountActions0786 small{font-size:.49rem!important}
+  .siteDetail0735 .accountTabs0786{gap:3px!important;padding:4px!important}
+  .siteDetail0735 .accountTabs0786 button{font-size:.61rem!important;padding:0 2px!important}
+  .siteDetail0735 .accountTabScroll0751{padding-left:6px!important;padding-right:6px!important}
+  .siteDetail0735 .accountInfo0786>button,.siteDetail0735 .accountInfo0786>a,.siteDetail0735 .accountInfo0786>div{grid-template-columns:84px minmax(0,1fr)!important;padding-left:10px!important;padding-right:10px!important}
+}
+@media(max-width:350px){
+  .siteDetail0735 .accountActions0786 small{display:none!important}
+  .siteDetail0735 .accountActions0786 button{min-height:58px!important;height:58px!important}
+  .siteDetail0735 .accountTabs0786 button{font-size:.56rem!important}
+  .accountLocationActions0786{grid-template-columns:1fr!important}
+}

@@ -1,6 +1,6 @@
 {
-  "build": "0.78.5",
+  "build": "0.78.6",
   "released": "2026-07-12",
-  "note": "Stability and consistency audit",
-  "label": "Measured app chrome, route-safe layouts, and app-wide overflow protection"
+  "note": "Account Detail final polish",
+  "label": "Cleaner identity, field actions, tabs, location, contacts, and service metrics"
 }
