@@ -1,4 +1,4 @@
-import { BUILD, KEY, ACTIVE_JOB_KEY, loadData, saveData, ensureSite, fullAddress, esc, uid, downloadBlob, syncSummary, syncQueue, syncConflicts, syncActivity, createSyncPackage, importSyncPackage, resolveSyncConflict, notePackageExport, deviceIdentity, recordSyncActivity, autoBackupInfo, latestAutoBackup, restoreAutoBackup, isDemoMode, setDemoMode, resetDemoData } from "./storage.js?v=0.75.3";
+import { BUILD, KEY, ACTIVE_JOB_KEY, loadData, saveData, ensureSite, fullAddress, esc, uid, downloadBlob, syncSummary, syncQueue, syncConflicts, syncActivity, createSyncPackage, importSyncPackage, resolveSyncConflict, notePackageExport, deviceIdentity, recordSyncActivity, autoBackupInfo, latestAutoBackup, restoreAutoBackup, isDemoMode, setDemoMode, resetDemoData } from "./storage.js?v=0.75.4";
 window.__FIREVAULT_MODULE_READY = true;
 
 function fvPreferenceStore0739(){
@@ -3938,8 +3938,8 @@ function siteDetail(){
     <header class="accountHeader0735 technicianHeader075"><button class="accountBack0735" id="backBtn" aria-label="Back to Accounts">‹</button><div class="technicianIdentity075"><span class="technicianEyebrow075">ACCOUNT</span><strong>${esc(s.name||"Unnamed Account")}</strong><span>${esc(accountId)}${fullAddress(s)?` • ${esc(fullAddress(s))}`:""}</span></div><button class="accountPin0735 ${isPinnedSite566(s)?"pinned":""}" id="pinSiteBtn566" aria-label="Pin account">${isPinnedSite566(s)?"★":"☆"}</button><button class="accountEdit0735" id="editBtn">Edit</button></header>
     <section class="technicianStatus075"><span class="status-${esc(health.cls)}">${esc(health.label)}</span><span>${esc(accountCategoryLabel0735(s))}</span>${open?`<span>${open} task${open===1?"":"s"}</span>`:""}${def?`<span class="hasDef075">${def} deficienc${def===1?"y":"ies"}</span>`:""}</section>
     ${accountTagChips0737(s,8)?`<div class="accountTagRail0737">${accountTagChips0737(s,8)}</div>`:""}
-    <nav class="accountTabs0735 accountTabsSticky0751" aria-label="Account sections">${tabs.map(([key,label,count])=>`<button class="${accountDetailTab0735===key?"active":""}" data-account-tab0735="${key}"><span>${label}</span>${Number.isFinite(count)&&count>0?`<b>${count}</b>`:""}</button>`).join("")}</nav>
     ${accountPersistentActions0751(s,ctx)}
+    <nav class="accountTabs0735 accountTabsSticky0751" aria-label="Account sections">${tabs.map(([key,label,count])=>`<button class="${accountDetailTab0735===key?"active":""}" data-account-tab0735="${key}"><span>${label}</span>${Number.isFinite(count)&&count>0?`<b>${count}</b>`:""}</button>`).join("")}</nav>
     <div class="accountTabScroll0735 accountTabScroll0751">${panelMarkup}</div>
   </div>`);
 

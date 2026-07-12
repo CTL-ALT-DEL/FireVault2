@@ -15525,3 +15525,93 @@ body.app-booted533:not(.homeFullscreen480) .accountsHeader0736{
     padding:10px 10px 7px!important;
   }
 }
+
+
+/* Build 0.75.4 — Account Detail Concept #2: blue field console */
+.siteDetail0735{
+  background:linear-gradient(180deg,#07111f 0%,#09131f 42%,#080e15 100%)!important;
+  border-color:#1d3552!important;
+}
+.technicianHeader075{
+  min-height:96px!important;
+  padding:12px 10px!important;
+  border:1px solid #284567!important;
+  border-radius:16px!important;
+  background:
+    radial-gradient(circle at 12% 0%,rgba(49,130,246,.20),transparent 42%),
+    linear-gradient(145deg,#10243d,#0b1728 62%,#08121e)!important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.08),0 10px 24px rgba(0,0,0,.28)!important;
+}
+.technicianEyebrow075{color:#60a5fa!important}
+.technicianIdentity075 strong{font-size:1.28rem!important;letter-spacing:-.025em!important}
+.technicianIdentity075>span:last-child{color:#9fb1c7!important;font-size:.72rem!important}
+.accountBack0735,.accountPin0735,.accountEdit0735{
+  border-color:#365476!important;
+  background:linear-gradient(160deg,#172c46,#0d1b2d)!important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.07)!important;
+}
+.accountEdit0735{color:#bfdbfe!important}
+.technicianStatus075{padding:0 2px 1px!important}
+.technicianStatus075 span{
+  border-color:#315071!important;
+  background:#0d1e31!important;
+  color:#c8dcf3!important;
+}
+.technicianStatus075 .status-healthGood{border-color:#23814c!important;background:#0d2d1d!important;color:#8ff0b3!important}
+.technicianStatus075 .status-healthWarn,.technicianStatus075 .hasDef075{border-color:#8b3037!important;background:#34171c!important;color:#ffb1b7!important}
+.accountPersistentActions0751{
+  gap:9px!important;
+  padding:1px 0 4px!important;
+}
+.accountPersistentActions0751 button{
+  min-height:76px!important;
+  border-color:#3677c8!important;
+  border-radius:13px!important;
+  background:linear-gradient(180deg,#2f73dc 0%,#1e56b8 58%,#173e88 100%)!important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.26),0 8px 18px rgba(0,64,160,.32)!important;
+}
+.accountPersistentActions0751 button:active{border-color:#93c5fd!important;background:linear-gradient(180deg,#2764c6,#194a9e)!important}
+.accountPersistentActions0751 button:disabled{opacity:.34!important;filter:saturate(.35)!important}
+.accountPersistentActions0751 button.activeVisit0751{border-color:#39b86b!important;background:linear-gradient(180deg,#24864a,#176033)!important}
+.accountPersistentIcon0751{width:28px!important;height:28px!important;color:#fff!important;stroke-width:2!important}
+.accountPersistentActions0751 strong{font-size:.77rem!important;color:#fff!important;letter-spacing:.04em!important}
+.accountTabs0735{
+  min-height:48px!important;
+  padding:4px 5px!important;
+  border-color:#243d5c!important;
+  border-radius:12px!important;
+  background:rgba(7,17,30,.92)!important;
+}
+.accountTabs0735 button{color:#8fa8c3!important}
+.accountTabs0735 button.active{
+  color:#fff!important;
+  border-color:#397ee0!important;
+  background:linear-gradient(180deg,#2a68c8,#1b4a9b)!important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.18),0 4px 12px rgba(0,76,180,.3)!important;
+}
+.accountTabsSticky0751 button.active b{background:#ef4444!important}
+.accountLocationCard0735,.accountInfoCard0735,.accountPanel0735{
+  border-color:#233a55!important;
+  background:linear-gradient(155deg,#102033,#0b1624)!important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.035),0 9px 22px rgba(0,0,0,.2)!important;
+}
+.accountAddress0735 span,.accountPanelHead0735 span,.accountDetailGrid0735 span,.accountGpsCard0735 span{color:#62b3ff!important}
+.accountInfoCard0735 button,.accountInfoCard0735 a{border-bottom-color:#213650!important}
+.accountInfoCard0735 span{color:#91a9c3!important}
+.accountInfoCard0735 strong{color:#f7fbff!important;font-size:.75rem!important}
+.accountMetricCards0735 button{
+  border-color:#284566!important;
+  background:linear-gradient(160deg,#12263d,#0c1725)!important;
+}
+.accountMetricCards0735 span{color:#6fb9ff!important}
+.accountPanelHead0735 h2{color:#f8fbff!important}
+.accountRecentList0735{border-color:#243b56!important}
+.accountRecentList0735 button{border-bottom-color:#213650!important;background:rgba(7,16,27,.45)!important}
+@media(max-width:390px){
+  .technicianHeader075{min-height:90px!important;padding:10px 7px!important}
+  .technicianIdentity075 strong{font-size:1.08rem!important}
+  .accountPersistentActions0751{grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:6px!important}
+  .accountPersistentActions0751 button{min-height:68px!important;padding:7px 3px!important;display:flex!important;flex-direction:column!important;justify-content:center!important;text-align:center!important}
+  .accountPersistentIcon0751{width:25px!important;height:25px!important;grid-row:auto!important}
+  .accountPersistentActions0751 strong{font-size:.67rem!important;justify-self:auto!important}
+}
