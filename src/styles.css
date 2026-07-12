@@ -16067,7 +16067,7 @@ input[data-fv-phone0758="1"]{font-variant-numeric:tabular-nums;letter-spacing:.0
 }
 
 
-/* Build 0.75.9 — stable Accounts directory rebuild
+/* Build 0.76.0 — stable Accounts directory rebuild
    This page uses one authoritative grid and unique class names so older
    Accounts-page overrides cannot alter its geometry. */
 .accountsDirectory0759{
@@ -16360,3 +16360,33 @@ input[data-fv-phone0758="1"]{font-variant-numeric:tabular-nums;letter-spacing:.0
   .accountCardName0759{font-size:.94rem!important}
   .accountStreet0759{font-size:.71rem!important}
 }
+
+
+/* Build 0.76.0 — Accounts workflow completion */
+.accountsDirectory0760 .accountsListHead0760{min-height:38px!important;padding:2px 4px 4px!important}
+.accountsListHead0760 label{display:flex!important;align-items:center!important;gap:7px!important;color:#7f8da0!important;font-size:.62rem!important;font-weight:900!important;text-transform:uppercase!important;letter-spacing:.08em!important}
+.accountsListHead0760 select{width:auto!important;min-width:92px!important;min-height:32px!important;height:32px!important;padding:4px 28px 4px 9px!important;border:1px solid #30445c!important;border-radius:10px!important;background-color:#132134!important;color:#e8eef7!important;font-size:.68rem!important;font-weight:900!important}
+.accountsNoResults0760{gap:10px!important}.accountsNoResults0760 button{min-width:128px!important;margin-top:4px!important}
+.accountsEmpty0760 p{max-width:300px!important;line-height:1.45!important}
+.accountFormScreen0760{display:grid!important;grid-template-rows:auto minmax(0,1fr)!important;min-height:0!important;overflow:hidden!important;padding:0!important}
+.accountFormHeader0760{position:relative!important;inset:auto!important;z-index:auto!important;height:auto!important;min-height:82px!important;padding:13px 14px!important;display:grid!important;grid-template-columns:44px minmax(0,1fr)!important;gap:12px!important;align-items:start!important;border:0!important;border-bottom:1px solid #24364a!important;background:linear-gradient(150deg,#14243a,#0d1726)!important;box-shadow:none!important}
+.accountFormHeader0760 .back{width:42px!important;height:42px!important;min-height:42px!important;padding:0!important;border-radius:12px!important;font-size:1.25rem!important}
+.accountFormHeader0760 span{display:block!important;margin:1px 0 3px!important;color:#60a5fa!important;font-size:.62rem!important;font-weight:950!important;letter-spacing:.14em!important}
+.accountFormHeader0760 h1{margin:0!important;color:#f8fafc!important;font-size:1.45rem!important;line-height:1.05!important;letter-spacing:-.035em!important}
+.accountFormHeader0760 p{margin:5px 0 0!important;color:#91a0b4!important;font-size:.7rem!important;line-height:1.4!important}
+.accountForm0760{min-height:0!important;overflow-y:auto!important;padding:12px 12px calc(22px + env(safe-area-inset-bottom))!important;gap:10px!important}
+.accountFormCard0760{display:grid!important;gap:10px!important;padding:14px!important;border-radius:16px!important;background:linear-gradient(150deg,#132236,#0d1826)!important;border:1px solid #2a3d53!important}
+.accountFormSectionTitle0760{display:grid!important;grid-template-columns:30px minmax(0,1fr)!important;gap:9px!important;align-items:center!important;padding-bottom:2px!important}
+.accountFormSectionTitle0760>span{display:grid!important;place-items:center!important;width:30px!important;height:30px!important;border-radius:9px!important;background:#173f78!important;border:1px solid #2f6fc1!important;color:#dbeafe!important;font-size:.76rem!important;font-weight:950!important}
+.accountFormSectionTitle0760 strong{display:block!important;color:#f3f6fb!important;font-size:.92rem!important}.accountFormSectionTitle0760 small{display:block!important;margin-top:2px!important;color:#8290a4!important;font-size:.63rem!important;line-height:1.35!important}
+.accountForm0760 label{display:flex!important;align-items:center!important;justify-content:space-between!important;gap:8px!important;color:#a8b5c5!important;font-size:.68rem!important;font-weight:900!important;letter-spacing:.025em!important}
+.accountForm0760 label b{color:#60a5fa!important;font-size:.55rem!important;letter-spacing:.07em!important;text-transform:uppercase!important}
+.accountForm0760 input,.accountForm0760 textarea{min-height:47px!important;border-color:#31465f!important;background:#0b1624!important;color:#f4f7fb!important;font-size:16px!important}.accountForm0760 textarea{min-height:94px!important;resize:vertical!important}
+.accountForm0760 input:focus,.accountForm0760 textarea:focus{border-color:#3b82f6!important;box-shadow:0 0 0 3px rgba(59,130,246,.16)!important}
+.accountFieldHint0760{display:block!important;margin-top:4px!important;color:#748399!important;font-size:.58rem!important;line-height:1.35!important}.accountFieldHint0760.error{color:#fca5a5!important}.fieldError0760{border-color:#ef4444!important;box-shadow:0 0 0 3px rgba(239,68,68,.12)!important}
+.accountFormError0760{padding:11px 12px!important;border:1px solid #9f3840!important;border-radius:12px!important;background:#35171d!important;color:#fecaca!important;font-size:.72rem!important;font-weight:850!important;line-height:1.4!important}.accountFormError0760[hidden]{display:none!important}
+.accountFormLocationAction0760{display:flex!important;flex-direction:column!important;align-items:stretch!important;justify-content:end!important;gap:6px!important}.accountFormLocationAction0760 button{min-height:47px!important;padding:8px!important;font-size:.7rem!important}
+.accountGpsFields0760{display:grid!important;grid-template-columns:1fr 1fr!important;gap:8px!important;padding:10px!important;border:1px dashed #2d435d!important;border-radius:12px!important;background:rgba(8,18,30,.55)!important}
+.accountFormActions0760{display:grid!important;grid-template-columns:.8fr 1.2fr!important;gap:9px!important;position:sticky!important;bottom:0!important;z-index:4!important;padding:9px 0 2px!important;background:linear-gradient(to bottom,transparent 0,#09111c 26%,#09111c 100%)!important}.accountFormActions0760 button{min-height:52px!important;font-size:.8rem!important;font-weight:950!important}
+.accountDelete0760{min-height:48px!important;margin-top:1px!important}
+@media(max-width:380px){.accountsListHead0760 select{min-width:82px!important;font-size:.63rem!important}.accountFormHeader0760{padding-left:10px!important;padding-right:10px!important}.accountForm0760{padding-left:9px!important;padding-right:9px!important}.accountFormCard0760{padding:12px!important}.accountGpsFields0760{grid-template-columns:1fr!important}}

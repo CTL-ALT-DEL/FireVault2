@@ -1,4 +1,4 @@
-import { BUILD, KEY, ACTIVE_JOB_KEY, loadData, saveData, ensureSite, fullAddress, esc, uid, downloadBlob, syncSummary, syncQueue, syncConflicts, syncActivity, createSyncPackage, importSyncPackage, resolveSyncConflict, notePackageExport, deviceIdentity, recordSyncActivity, autoBackupInfo, latestAutoBackup, restoreAutoBackup, isDemoMode, setDemoMode, resetDemoData } from "./storage.js?v=0.75.9";
+import { BUILD, KEY, ACTIVE_JOB_KEY, loadData, saveData, ensureSite, fullAddress, esc, uid, downloadBlob, syncSummary, syncQueue, syncConflicts, syncActivity, createSyncPackage, importSyncPackage, resolveSyncConflict, notePackageExport, deviceIdentity, recordSyncActivity, autoBackupInfo, latestAutoBackup, restoreAutoBackup, isDemoMode, setDemoMode, resetDemoData } from "./storage.js?v=0.76.0";
 window.__FIREVAULT_MODULE_READY = true;
 
 function fvPreferenceStore0739(){
@@ -60,6 +60,7 @@ let nearbyScanStatus0652 = {state:"idle",message:"",attempt:"",at:""};
 let siteSearch = "";
 let sitesFilter0736 = "all";
 let accountsScroll0759 = 0;
+let accountsSort0760 = "az";
 let dailySummaryDate569 = fvSafeGet0739("firevault_daily_summary_date","");
 let dailyPickerMonth571 = localDateString().slice(0,7);
 let libraryFolder = "all";
@@ -3310,9 +3311,9 @@ function attentionQueue(){
 function accountDirectoryWork0759(s){
   const openTasks=siteOpenTasks556(s).length;
   const openDef=siteOpenDeficiencies556(s).length;
-  if(openDef) return {label:`${openDef} open deficienc${openDef===1?"y":"ies"}`,cls:"danger"};
-  if(openTasks) return {label:`${openTasks} open task${openTasks===1?"":"s"}`,cls:"warning"};
-  return {label:"No open work",cls:"clear"};
+  if(openDef) return {label:`${openDef} open deficienc${openDef===1?"y":"ies"}`,cls:"danger",score:openDef*20+openTasks*4};
+  if(openTasks) return {label:`${openTasks} open task${openTasks===1?"":"s"}`,cls:"warning",score:openTasks*5};
+  return {label:"No open work",cls:"clear",score:0};
 }
 function accountDirectoryRow0759(s){
   const id=accountId069(s);
@@ -3324,7 +3325,8 @@ function accountDirectoryRow0759(s){
   const contact=primaryContact477(s);
   const supporting=panel || contact?.name || "Account details not entered";
   const pinned=isPinnedSite566(s);
-  return `<button type="button" class="accountCard0759 category-${category}" data-account-card0759 data-id="${esc(s.id)}" data-search="${esc(siteSearchBlob(s))}" data-attention="${health.cls==='healthWarn'?'1':'0'}" data-open="${work.cls==='clear'?'0':'1'}" data-gps="${hasGps(s)?'1':'0'}">
+  const address=fullAddress(s)||"No address saved";
+  return `<button type="button" class="accountCard0759 category-${category}" data-account-card0759 data-id="${esc(s.id)}" data-search="${esc(siteSearchBlob(s))}" data-attention="${health.cls==='healthWarn'?'1':'0'}" data-open="${work.cls==='clear'?'0':'1'}" data-gps="${hasGps(s)?'1':'0'}" aria-label="Open ${esc(s.name||'account')}, ${esc(address)}">
     <span class="accountTone0759" aria-hidden="true"></span>
     <span class="accountCardBody0759">
       <span class="accountCardTop0759">
@@ -3333,7 +3335,7 @@ function accountDirectoryRow0759(s){
         <span class="accountCategory0759 category-${category}">${esc(categoryLabel)}</span>
       </span>
       ${id?`<span class="accountNumber0759">${esc(id)}</span>`:""}
-      <span class="accountStreet0759">${esc(fullAddress(s)||"No address saved")}</span>
+      <span class="accountStreet0759">${esc(address)}</span>
       <span class="accountSupporting0759">${esc(supporting)}</span>
       <span class="accountBadges0759">
         <span class="accountWork0759 ${work.cls}">${esc(work.label)}</span>
@@ -3344,16 +3346,42 @@ function accountDirectoryRow0759(s){
     <span class="accountChevron0759" aria-hidden="true">›</span>
   </button>`;
 }
-
+function accountDirectorySort0760(rows=[]){
+  const nameSort=(a,b)=>String(a.name||"").localeCompare(String(b.name||""),undefined,{sensitivity:"base",numeric:true});
+  return [...rows].sort((a,b)=>{
+    if(accountsSort0760==="favorites"){
+      const pinDiff=Number(isPinnedSite566(b))-Number(isPinnedSite566(a));
+      if(pinDiff) return pinDiff;
+    }
+    if(accountsSort0760==="recent"){
+      const recentDiff=new Date(b.lastOpenedAt||0).getTime()-new Date(a.lastOpenedAt||0).getTime();
+      if(recentDiff) return recentDiff;
+    }
+    if(accountsSort0760==="attention"){
+      const priority=s=>{
+        const health=siteHealth(s);
+        const healthScore=health.cls==="healthWarn"?100:health.cls==="healthWatch"?45:0;
+        return healthScore+accountDirectoryWork0759(s).score;
+      };
+      const priorityDiff=priority(b)-priority(a);
+      if(priorityDiff) return priorityDiff;
+    }
+    return nameSort(a,b);
+  });
+}
+function accountsSortLabel0760(){
+  return ({az:"A–Z",favorites:"Favorites",recent:"Recent",attention:"Priority"})[accountsSort0760]||"A–Z";
+}
 function sites(){
   restoreAppChrome572();
-  const accounts=[...(data.sites||[])].sort((a,b)=>String(a.name||"").localeCompare(String(b.name||""),undefined,{sensitivity:"base",numeric:true}));
-  const attentionCount=accounts.filter(s=>siteHealth(s).cls==="healthWarn").length;
-  const openWorkCount=accounts.filter(s=>siteOpenTasks556(s).length||siteOpenDeficiencies556(s).length).length;
-  const missingGpsCount=accounts.filter(s=>!hasGps(s)).length;
-  html(`<div class="screen accountsDirectory0759">
+  const allAccounts=[...(data.sites||[])];
+  const accounts=accountDirectorySort0760(allAccounts);
+  const attentionCount=allAccounts.filter(s=>siteHealth(s).cls==="healthWarn").length;
+  const openWorkCount=allAccounts.filter(s=>siteOpenTasks556(s).length||siteOpenDeficiencies556(s).length).length;
+  const missingGpsCount=allAccounts.filter(s=>!hasGps(s)).length;
+  html(`<div class="screen accountsDirectory0759 accountsDirectory0760">
     <section class="accountsHero0759">
-      <div class="accountsHeroText0759"><span>Customer vault</span><h1>Accounts</h1><p>${accounts.length} saved account${accounts.length===1?"":"s"}</p></div>
+      <div class="accountsHeroText0759"><span>Customer vault</span><h1>Accounts</h1><p>${allAccounts.length} saved account${allAccounts.length===1?"":"s"}</p></div>
       <div class="accountsHeroActions0759">
         <button type="button" class="ghost" id="nearBtn0759">${fvIcon073("nearby","accountsActionIcon0759")}<span>Nearby</span></button>
         <button type="button" class="primary" id="addBtn0759"><b>＋</b><span>Add</span></button>
@@ -3365,16 +3393,16 @@ function sites(){
       <button type="button" id="clearSiteSearch0759" aria-label="Clear account search">×</button>
     </section>
     <section class="accountsFilters0759" aria-label="Account filters">
-      <button type="button" data-sites-filter0759="all" class="${sitesFilter0736==='all'?'active':''}"><strong>${accounts.length}</strong><span>All</span></button>
+      <button type="button" data-sites-filter0759="all" class="${sitesFilter0736==='all'?'active':''}"><strong>${allAccounts.length}</strong><span>All</span></button>
       <button type="button" data-sites-filter0759="attention" class="${sitesFilter0736==='attention'?'active':''}"><strong>${attentionCount}</strong><span>Attention</span></button>
       <button type="button" data-sites-filter0759="open" class="${sitesFilter0736==='open'?'active':''}"><strong>${openWorkCount}</strong><span>Open Work</span></button>
       <button type="button" data-sites-filter0759="missingGps" class="${sitesFilter0736==='missingGps'?'active':''}"><strong>${missingGpsCount}</strong><span>No GPS</span></button>
     </section>
     <section class="accountsResults0759">
-      <div class="accountsListHead0759"><strong id="siteSearchCount0759">${accounts.length} account${accounts.length===1?"":"s"}</strong><span>A–Z</span></div>
+      <div class="accountsListHead0759 accountsListHead0760"><strong id="siteSearchCount0759">${accounts.length} account${accounts.length===1?"":"s"}</strong><label>Sort<select id="accountsSort0760" aria-label="Sort accounts"><option value="az" ${accountsSort0760==='az'?'selected':''}>A–Z</option><option value="favorites" ${accountsSort0760==='favorites'?'selected':''}>Favorites</option><option value="recent" ${accountsSort0760==='recent'?'selected':''}>Recently Opened</option><option value="attention" ${accountsSort0760==='attention'?'selected':''}>Priority</option></select></label></div>
       <div class="accountsList0759" id="accountsList0759">
-        ${accounts.length?accounts.map(accountDirectoryRow0759).join(""):`<div class="accountsEmpty0759"><span>＋</span><strong>No accounts yet</strong><p>Add your first customer account to begin.</p><button class="primary" id="emptyAdd0759">Add Account</button></div>`}
-        <div class="accountsNoResults0759" id="accountsNoResults0759" hidden><strong>No matching accounts</strong><p>Try a different search or filter.</p></div>
+        ${accounts.length?accounts.map(accountDirectoryRow0759).join(""):`<div class="accountsEmpty0759 accountsEmpty0760"><span>＋</span><strong>No accounts yet</strong><p>Create an account manually or import your customer list under Settings → Data.</p><button class="primary" id="emptyAdd0759">Add First Account</button></div>`}
+        <div class="accountsNoResults0759 accountsNoResults0760" id="accountsNoResults0759" hidden><strong>No matching accounts</strong><p>Clear the search or return to All accounts.</p><button type="button" class="ghost" id="resetAccountsView0760">Reset View</button></div>
       </div>
     </section>
   </div>`);
@@ -3402,13 +3430,15 @@ function sites(){
       el.hidden=!visible;
       if(visible) shown++;
     });
-    if(countEl) countEl.textContent=`${shown} account${shown===1?"":"s"}`;
+    if(countEl) countEl.textContent=shown===allAccounts.length?`${shown} account${shown===1?"":"s"}`:`${shown} of ${allAccounts.length}`;
     if(clearBtn) clearBtn.hidden=!siteSearch;
-    if(noResults) noResults.hidden=shown!==0 || accounts.length===0;
+    if(noResults) noResults.hidden=shown!==0 || allAccounts.length===0;
   };
 
   searchEl?.addEventListener("input",applySiteSearch);
   clearBtn?.addEventListener("click",()=>{if(searchEl){searchEl.value="";searchEl.focus();}applySiteSearch();});
+  document.getElementById("resetAccountsView0760")?.addEventListener("click",()=>{siteSearch="";sitesFilter0736="all";accountsScroll0759=0;sites();});
+  document.getElementById("accountsSort0760")?.addEventListener("change",event=>{accountsSort0760=event.target.value||"az";accountsScroll0759=0;sites();});
   document.querySelectorAll("[data-sites-filter0759]").forEach(btn=>btn.addEventListener("click",()=>{
     sitesFilter0736=btn.dataset.sitesFilter0759||"all";
     document.querySelectorAll("[data-sites-filter0759]").forEach(x=>x.classList.toggle("active",x===btn));
@@ -4977,25 +5007,80 @@ function visitDetail(){
   document.getElementById("deleteVisitBtn").onclick=()=>{ if(confirm("Delete this saved visit?")){ s.visits=siteVisits.filter(x=>x.id!==v.id); save(); toast("Visit deleted."); route("visits"); } };
 }
 
+function duplicateAccountId0760(value,currentSiteId=""){
+  const key=canonicalAccountId0731(value);
+  if(!key) return null;
+  return (data.sites||[]).find(candidate=>candidate.id!==currentSiteId && canonicalAccountId0731(accountId069(candidate))===key) || null;
+}
 function siteForm(){
-  const s = mode==="edit" ? site() : {};
-  html(`<div class="screen"><div class="row"><button class="back ghost" id="backBtn">←</button><h1>${mode==="edit"?"Edit":"Add"} Site</h1></div><div class="form grow">
-    <div class="card"><label>Name</label><input id="name" value="${esc(s.name||"")}"><label>Street</label><input id="street" value="${esc(s.street||"")}"><div class="compactField"><div><label>City</label><input id="city" value="${esc(s.city||"")}"></div><div><label>State</label><input id="state" value="${esc(s.state||"")}"></div></div><label>ZIP</label><input id="zip" value="${esc(s.zip||"")}"></div>
-    <div class="card gpsEditCard"><div class="row"><h2>GPS Coordinates</h2><button type="button" class="ghost smallBtn" id="formGpsBtn">Capture</button></div><div class="compactField"><div><label>Latitude</label><input id="gpsLat" inputmode="decimal" value="${hasGps(s)?esc(s.gps.lat):""}"></div><div><label>Longitude</label><input id="gpsLng" inputmode="decimal" value="${hasGps(s)?esc(s.gps.lng):""}"></div></div><div class="compactField"><div><label>Accuracy m</label><input id="gpsAccuracy" inputmode="numeric" value="${hasGps(s)?esc(s.gps.accuracy||""):""}"></div><div><label>Captured</label><input id="gpsCapturedAt" value="${hasGps(s)?esc(s.gps.capturedAt||""):""}"></div></div><p class="fieldNote">GPS is optional. Capture requires browser location permission and works best from HTTPS.</p></div>
-    <div class="card"><div class="compactField"><div><label>Panel Make</label><input id="pm" value="${esc(s.panelManufacturer||"")}"></div><div><label>Panel Model</label><input id="model" value="${esc(s.panelModel||"")}"></div></div><label>Notes</label><textarea id="notes">${esc(s.notes||"")}</textarea></div>
-    <button class="primary" id="saveBtn">Save Site</button>${mode==="edit"?`<button class="danger" id="delBtn">Delete Site</button>`:""}
-  </div></div>`);
-  document.getElementById("backBtn").onclick=()=>{route(mode==="edit"?"siteDetail":"sites")};
-  const fg=document.getElementById("formGpsBtn"); if(fg) fg.onclick=captureGpsIntoForm;
-  document.getElementById("saveBtn").onclick=()=>{
-    const obj={name:val("name")||"Unnamed Site",street:val("street"),city:val("city"),state:val("state"),zip:val("zip"),panelManufacturer:val("pm"),panelModel:val("model"),notes:raw("notes")};
+  const editing=mode==="edit";
+  const s=editing ? site() : {};
+  if(editing && !s){route("sites");return;}
+  const currentAccountId=accountId069(s);
+  html(`<div class="screen accountFormScreen0760">
+    <section class="accountFormHeader0760"><button class="back ghost" id="backBtn" aria-label="Cancel and go back">←</button><div><span>${editing?"ACCOUNT MAINTENANCE":"NEW CUSTOMER"}</span><h1>${editing?"Edit Account":"Add Account"}</h1><p>${editing?"Update this customer record without changing its history.":"Create the core account now. Details can be added after saving."}</p></div></section>
+    <div class="form grow accountForm0760">
+      <div class="accountFormError0760" id="accountFormError0760" hidden></div>
+      <section class="card accountFormCard0760"><div class="accountFormSectionTitle0760"><span>1</span><div><strong>Account Identity</strong><small>Name and Account ID are used throughout FireVault.</small></div></div>
+        <label>Account Name <b>Required</b></label><input id="name" value="${esc(s.name||"")}" placeholder="Customer or building name" autocomplete="organization">
+        <div class="compactField"><div><label>Account ID</label><input id="externalAccountId0760" value="${esc(currentAccountId)}" placeholder="Example: G7C1234-01" autocapitalize="characters" spellcheck="false"><small class="accountFieldHint0760" id="accountIdHint0760">Exact Account IDs must be unique. Same-address buildings are allowed.</small></div><div><label>Site Phone</label><input id="sitePhone0760" inputmode="tel" autocomplete="tel" value="${esc(formatPhone0758(s.sitePhone)||s.sitePhone||"")}" placeholder="(307)555-0123"></div></div>
+      </section>
+      <section class="card accountFormCard0760"><div class="accountFormSectionTitle0760"><span>2</span><div><strong>Location</strong><small>Accounts may share an address when they represent different buildings or account numbers.</small></div></div>
+        <label>Street Address</label><input id="street" value="${esc(s.street||"")}" autocomplete="street-address">
+        <div class="compactField"><div><label>City</label><input id="city" value="${esc(s.city||"")}" autocomplete="address-level2"></div><div><label>State</label><input id="state" value="${esc(s.state||"")}" maxlength="2" autocapitalize="characters" autocomplete="address-level1"></div></div>
+        <div class="compactField"><div><label>ZIP</label><input id="zip" value="${esc(s.zip||"")}" inputmode="numeric" autocomplete="postal-code"></div><div class="accountFormLocationAction0760"><label>GPS</label><button type="button" class="ghost" id="formGpsBtn">Capture Current Location</button></div></div>
+        <div class="accountGpsFields0760"><div><label>Latitude</label><input id="gpsLat" inputmode="decimal" value="${hasGps(s)?esc(s.gps.lat):""}"></div><div><label>Longitude</label><input id="gpsLng" inputmode="decimal" value="${hasGps(s)?esc(s.gps.lng):""}"></div><input id="gpsAccuracy" type="hidden" value="${hasGps(s)?esc(s.gps.accuracy||""):""}"><input id="gpsCapturedAt" type="hidden" value="${hasGps(s)?esc(s.gps.capturedAt||""):""}"></div>
+      </section>
+      <section class="card accountFormCard0760"><div class="accountFormSectionTitle0760"><span>3</span><div><strong>Fire Alarm System</strong><small>Optional panel information helps technicians identify the account quickly.</small></div></div>
+        <div class="compactField"><div><label>Panel Make</label><input id="pm" value="${esc(s.panelManufacturer||"")}" placeholder="Notifier, EST, Siemens…"></div><div><label>Panel Model</label><input id="model" value="${esc(s.panelModel||"")}"></div></div>
+        <label>Site Notes</label><textarea id="notes" placeholder="Access details, panel location, recurring issues…">${esc(s.notes||"")}</textarea>
+      </section>
+      <div class="accountFormActions0760"><button class="ghost" id="cancelAccount0760">Cancel</button><button class="primary" id="saveBtn">${editing?"Save Changes":"Create Account"}</button></div>
+      ${editing?`<button class="danger accountDelete0760" id="delBtn">Delete Account</button>`:""}
+    </div>
+  </div>`);
+  const goBack=()=>route(editing?"siteDetail":"sites");
+  document.getElementById("backBtn")?.addEventListener("click",goBack);
+  document.getElementById("cancelAccount0760")?.addEventListener("click",goBack);
+  document.getElementById("formGpsBtn")?.addEventListener("click",captureGpsIntoForm);
+  const nameInput=document.getElementById("name");
+  const idInput=document.getElementById("externalAccountId0760");
+  const errorBox=document.getElementById("accountFormError0760");
+  const idHint=document.getElementById("accountIdHint0760");
+  const showFormError=message=>{if(errorBox){errorBox.textContent=message;errorBox.hidden=!message;}if(message)errorBox?.scrollIntoView({behavior:"smooth",block:"nearest"});};
+  const checkId=()=>{
+    const canonical=canonicalAccountId0731(idInput?.value||"");
+    if(idInput && idInput.value!==canonical) idInput.value=canonical;
+    const duplicate=duplicateAccountId0760(canonical,s.id||"");
+    idInput?.classList.toggle("fieldError0760",!!duplicate);
+    if(idHint){idHint.textContent=duplicate?`Already assigned to ${duplicate.name||"another account"}.`:`Exact Account IDs must be unique. Same-address buildings are allowed.`;idHint.classList.toggle("error",!!duplicate);}
+    return duplicate;
+  };
+  idInput?.addEventListener("blur",checkId);
+  idInput?.addEventListener("input",()=>{idInput.value=idInput.value.toUpperCase();if(idHint?.classList.contains("error"))checkId();});
+  document.getElementById("saveBtn")?.addEventListener("click",()=>{
+    showFormError("");
+    const accountName=val("name");
+    if(!accountName){showFormError("Enter an account name before saving.");nameInput?.focus();return;}
+    const duplicate=checkId();
+    if(duplicate){showFormError(`Account ID ${canonicalAccountId0731(idInput?.value||"")} already belongs to ${duplicate.name||"another account"}. Use a different Account ID.`);idInput?.focus();return;}
+    const obj={
+      name:accountName,
+      externalAccountId:canonicalAccountId0731(val("externalAccountId0760")),accountId:"",
+      sitePhone:normalizePhoneValue0758(val("sitePhone0760")),
+      street:val("street"),city:val("city"),state:val("state").toUpperCase(),zip:val("zip"),
+      panelManufacturer:val("pm"),panelModel:val("model"),notes:raw("notes")
+    };
     const gpsLat=Number(val("gpsLat")), gpsLng=Number(val("gpsLng"));
     if(Number.isFinite(gpsLat) && Number.isFinite(gpsLng)) obj.gps={lat:gpsLat,lng:gpsLng,accuracy:Number(val("gpsAccuracy"))||0,capturedAt:val("gpsCapturedAt")||new Date().toISOString()};
     else obj.gps=null;
-    if(mode==="edit" && s){ Object.assign(s,obj); } else { const n=ensureSite({...obj,id:uid(),createdAt:new Date().toISOString()}); data.sites.unshift(n); selectedSiteId=n.id; }
-    save(); route("siteDetail");
-  };
-  const del=document.getElementById("delBtn"); if(del) del.onclick=()=>{ if(!data.settings.app.confirmDeletes || confirm("Delete this site?")){ data.sites=data.sites.filter(x=>x.id!==s.id); save(); selectedSiteId=null; route("sites"); } };
+    if(editing){Object.assign(s,obj);selectedSiteId=s.id;}
+    else{const n=ensureSite({...obj,id:uid(),createdAt:new Date().toISOString()});data.sites.unshift(n);selectedSiteId=n.id;}
+    save();toast(editing?"Account updated.":"Account created.");route("siteDetail");
+  });
+  const del=document.getElementById("delBtn");
+  if(del) del.onclick=()=>{if(!data.settings.app.confirmDeletes || confirm(`Delete ${s.name||"this account"}? This removes its locally stored notes, visits, and files.`)){data.sites=data.sites.filter(x=>x.id!==s.id);save();selectedSiteId=null;toast("Account deleted.");route("sites");}};
+  if(!editing) requestAnimationFrame(()=>nameInput?.focus());
 }
 
 function tasks(){
@@ -8234,7 +8319,7 @@ function diagnostics(){
 }
 function showChangelog(){
   const notes = [
-    "Build 0.75.9 rebuilds the Accounts directory with a single stable layout, simplified cards, reliable filtering, preserved scroll position, and protected global navigation.",
+    "Build 0.76.0 completes the Accounts workflow with sorting, safer manual account creation, duplicate Account ID protection, and improved empty states.",
     "Build 0.73.9 repairs the Demo Mode QuotaExceededError by keeping the 20-account Boise workspace in temporary memory and making noncritical startup preference writes fail safely when device storage is full.",
     "Build 0.73.7 adds rule-driven multi-category account tags, repairs Settings tab spacing, and blends the global logo header into page content.",
     "Build 0.73.6 removes Plus Code text from Nearby cards, redesigns the Accounts directory, and replaces Settings folders with direct category tabs.",
@@ -8262,7 +8347,7 @@ function showChangelog(){
   overlay.className="releaseOverlay";
   overlay.innerHTML=`<div class="releaseSheet" role="dialog" aria-modal="true" aria-label="FireVault release notes">
     <div class="releaseHead"><div><strong>${fireVaultBrand575()}</strong><span>Build ${BUILD}</span></div><button class="ghost iconBtn" id="closeRelease" aria-label="Close release notes">×</button></div>
-    <div class="releaseBody"><h2>Release Notes</h2><p class="releaseIntro">A rebuilt, stable Accounts directory designed for fast field use.</p><ul>${notes.map(n=>`<li>${esc(n)}</li>`).join("")}</ul></div>
+    <div class="releaseBody"><h2>Release Notes</h2><p class="releaseIntro">A completed Accounts workflow designed for fast, safe field use.</p><ul>${notes.map(n=>`<li>${esc(n)}</li>`).join("")}</ul></div>
   </div>`;
   document.body.appendChild(overlay);
   const close=()=>overlay.remove();

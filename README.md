@@ -1,14 +1,23 @@
-# FireVault Build 0.75.9
+# FireVault Build 0.76.0
 
-## Accounts Directory Rebuild
+## Accounts Workflow Completion
 
-- Replaces the previous Accounts page with one authoritative, stable layout.
-- Simplifies account cards for faster scanning in the field.
-- Keeps search, All, Attention, Open Work, and No GPS filters fully functional without rerendering the page.
-- Preserves the Accounts list position when opening an account and returning.
-- Keeps the fixed FireVault header and global bottom navigation in their own layout rows.
-- Preserves the existing `firevault_vault_build_030` storage key, customer data, Demo Mode, automatic backups, WebDAV, categories, imports, and Account Detail features.
+This release builds on the stable 0.75.9 Accounts directory and completes the manual account workflow.
 
-## Validation
+### Accounts directory
+- Sort by A–Z, Favorites, Recently Opened, or Priority.
+- Search and filter counts now show the visible result count.
+- Reset View clears search and filters from the no-results state.
+- Improved empty-account guidance and accessibility labels.
+- Preserves list position when opening an account and returning.
 
-The release package should be checked for JavaScript syntax, JSON validity, asset references, service-worker version consistency, ZIP integrity, and mobile Accounts-page rendering before deployment.
+### Add / Edit Account
+- Rebuilt as a guided three-section form.
+- Adds Account ID and Site Phone to manual account creation.
+- Enforces a required account name.
+- Prevents exact duplicate Account IDs while still allowing multiple accounts at the same address.
+- Preserves GPS capture, panel information, notes, and safe return behavior.
+- Phone numbers continue to format as `(xxx)xxx-xxxx`.
+
+### Data safety
+The existing `firevault_vault_build_030` storage key, automatic backups, Demo Mode, WebDAV, categories, imports, and account history remain unchanged.

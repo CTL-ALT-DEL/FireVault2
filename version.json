@@ -1,6 +1,5 @@
 {
-  "build": "0.75.9",
-  "released": "2026-07-11",
-  "note": "Accounts Directory Rebuild",
-  "notes": "Rebuilds the Accounts page with one stable layout, simplified account cards, reliable search and filters, preserved list position, and protected global navigation."
+  "build": "0.76.0",
+  "released": "2026-07-12",
+  "note": "Accounts Workflow Completion"
 }
