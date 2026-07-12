@@ -1,4 +1,4 @@
-# FireVault Build 0.79.9 — Accounts Card Hierarchy Polish
+# FireVault Build 0.79.10 — Accounts Card Hierarchy Polish
 
 ## Changes
 

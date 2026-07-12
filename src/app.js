@@ -1,6 +1,6 @@
-import { BUILD, KEY, ACTIVE_JOB_KEY, loadData, saveData, ensureSite, fullAddress, esc, uid, downloadBlob, syncSummary, syncQueue, syncConflicts, syncActivity, createSyncPackage, importSyncPackage, resolveSyncConflict, notePackageExport, deviceIdentity, recordSyncActivity, autoBackupInfo, latestAutoBackup, restoreAutoBackup, isDemoMode, setDemoMode, resetDemoData, securityFoundationSummary, securityAudit, recycleBinInfo, restoreRecycleRecord, purgeRecycleBin, recordSecurityEvent, validateVaultIntegrity } from "./storage.js?v=0.79.9";
-import { backendAdapterSummary, runBackendAdapterDiagnostics, backendAdapterManifest, PROVIDER_CONTRACT_VERSION, FILE_STORAGE_CATALOG, fileStoragePlanSummary, cloudFileStorageManifest, MICROSOFT_STORAGE_TYPES, microsoftStorageAccounts, saveMicrosoftStorageAccounts, createMicrosoftStorageAccount, microsoftStorageAccountById, microsoftAppRegistration, saveMicrosoftAppRegistration, microsoftStorageSummary, microsoftStorageManifest } from "./providers.js?v=0.79.9";
-import { encodePlusCode, isValidFullPlusCode, normalizePlusCode, plusCodePrecisionLabel } from "./open-location-code.js?v=0.79.9";
+import { BUILD, KEY, ACTIVE_JOB_KEY, loadData, saveData, ensureSite, fullAddress, esc, uid, downloadBlob, syncSummary, syncQueue, syncConflicts, syncActivity, createSyncPackage, importSyncPackage, resolveSyncConflict, notePackageExport, deviceIdentity, recordSyncActivity, autoBackupInfo, latestAutoBackup, restoreAutoBackup, isDemoMode, setDemoMode, resetDemoData, securityFoundationSummary, securityAudit, recycleBinInfo, restoreRecycleRecord, purgeRecycleBin, recordSecurityEvent, validateVaultIntegrity } from "./storage.js?v=0.79.10";
+import { backendAdapterSummary, runBackendAdapterDiagnostics, backendAdapterManifest, PROVIDER_CONTRACT_VERSION, FILE_STORAGE_CATALOG, fileStoragePlanSummary, cloudFileStorageManifest, MICROSOFT_STORAGE_TYPES, microsoftStorageAccounts, saveMicrosoftStorageAccounts, createMicrosoftStorageAccount, microsoftStorageAccountById, microsoftAppRegistration, saveMicrosoftAppRegistration, microsoftStorageSummary, microsoftStorageManifest } from "./providers.js?v=0.79.10";
+import { encodePlusCode, isValidFullPlusCode, normalizePlusCode, plusCodePrecisionLabel } from "./open-location-code.js?v=0.79.10";
 window.__FIREVAULT_MODULE_READY = true;
 
 function fvPreferenceStore0739(){
@@ -3261,8 +3261,64 @@ function nearbyLocationGroups0735(rows,b){
     group.lat/=group.rows.length;group.lng/=group.rows.length;group.p=staticPoint069(group.lat,group.lng,b);
     group.selected=group.rows.some(r=>r.s.id===homeNearbySelected069);
     group.primary=group.rows.find(r=>r.s.id===homeNearbySelected069)||group.rows[0];
+    group.kind=group.rows.length>1?'address':'single';
+    group.locationCount=1;
     return group;
   }).sort((a,b)=>a.index-b.index);
+}
+function nearbyDisplayGroups07910(locationGroups,shell){
+  if(nearbyStreetFocusSite069||!shell||nearbyStaticVisibleMiles069<=.42) return locationGroups;
+  const width=Math.max(1,shell.clientWidth),height=Math.max(1,shell.clientHeight);
+  const threshold=nearbyStaticVisibleMiles069>4?58:nearbyStaticVisibleMiles069>1.5?50:42;
+  const remaining=[...locationGroups];
+  const display=[];
+  while(remaining.length){
+    const seed=remaining.shift();
+    const members=[seed];
+    let changed=true;
+    while(changed){
+      changed=false;
+      for(let i=remaining.length-1;i>=0;i--){
+        const candidate=remaining[i];
+        const cx=members.reduce((n,g)=>n+g.p.x,0)/members.length;
+        const cy=members.reduce((n,g)=>n+g.p.y,0)/members.length;
+        const dx=(candidate.p.x-cx)*width/100,dy=(candidate.p.y-cy)*height/100;
+        if(Math.hypot(dx,dy)<=threshold){members.push(candidate);remaining.splice(i,1);changed=true;}
+      }
+    }
+    if(members.length===1){display.push(seed);continue;}
+    const rows=members.flatMap(g=>g.rows);
+    const lat=members.reduce((n,g)=>n+g.lat,0)/members.length;
+    const lng=members.reduce((n,g)=>n+g.lng,0)/members.length;
+    display.push({
+      key:`cluster:${members.map(g=>g.key).join(',')}`,
+      kind:'cluster',members,rows,lat,lng,
+      p:{x:members.reduce((n,g)=>n+g.p.x,0)/members.length,y:members.reduce((n,g)=>n+g.p.y,0)/members.length},
+      index:Math.min(...members.map(g=>g.index)),
+      selected:rows.some(r=>r.s.id===homeNearbySelected069),
+      primary:rows.find(r=>r.s.id===homeNearbySelected069)||rows[0],
+      locationCount:members.length
+    });
+  }
+  return display.sort((a,b)=>a.index-b.index);
+}
+function zoomNearbyCluster07910(group){
+  if(!group||group.kind!=='cluster')return;
+  nearbyStreetFocusSite069='';
+  nearbyMapPopupSite069='';
+  nearbyStaticCenter069={lat:group.lat,lng:group.lng};
+  nearbyStaticVisibleMiles069=Math.max(.28,(Number(nearbyStaticVisibleMiles069)||1)*.48);
+  drawStaticNearbyMap069();
+}
+function deepenSelectedNearbyMap07910(){
+  const row=mapRow069(homeNearbySelected069),g=nearbyGps069(row?.s);
+  if(!row||!g)return false;
+  nearbyStreetFocusSite069=row.s.id;
+  nearbyStaticCenter069={lat:g.lat,lng:g.lng};
+  nearbyMapPopupSite069='';
+  nearbyStaticVisibleMiles069=Math.max(.028,Math.min(.08,(Number(nearbyStaticVisibleMiles069)||streetVisibleMiles069())*.45));
+  drawStaticNearbyMap069();
+  return true;
 }
 function markerContainsSite0735(marker,siteId){
   const ids=String(marker?.dataset?.staticGroup0735||marker?.dataset?.staticMarker069||"").split("|");
@@ -3297,22 +3353,26 @@ function drawStaticNearbyMap069(){
     let html='';
     if(userVisible&&!nearbyStreetFocusSite069) html+=`<span class="staticRadius069" style="left:${userPoint.x}%;top:${userPoint.y}%;width:${radiusPx*2}px;height:${radiusPx*2}px"></span>`;
     if(userVisible) html+=`<span class="staticUser069" style="left:${userPoint.x}%;top:${userPoint.y}%"></span>`;
-    const groups=nearbyLocationGroups0735(rows,b);
-    nearbyMapGroups0735=groups;
-    const rendered=groups.reduce((n,g)=>n+g.rows.length,0);
+    const locationGroups=nearbyLocationGroups0735(rows,b);
+    nearbyMapGroups0735=locationGroups;
+    const groups=nearbyDisplayGroups07910(locationGroups,shell);
+    const rendered=locationGroups.reduce((n,g)=>n+g.rows.length,0);
     groups.forEach((group,groupIndex)=>{
       const r=group.primary,p=group.p;if(!r||!p)return;
       const categories=[...new Set(group.rows.map(x=>accountCategory070(x.s)))];
-      const category=categories.length===1?categories[0]:"multi";
+      const category=group.kind==='cluster'?'cluster':(categories.length===1?categories[0]:"multi");
       const ids=group.rows.map(x=>x.s.id).join("|");
-      const countLabel=group.rows.length>1?group.rows.length:group.index+1;
-      const aria=group.rows.length>1?`${group.rows.length} accounts at ${fullAddress(r.s)}`:(r.s.name||"Account");
-      html+=`<button class="staticMarker069 category-${category} ${group.selected?'selected':''} ${group.rows.length>1?'multiAccountMarker0735':''}" style="left:${p.x}%;top:${p.y}%" data-static-marker069="${esc(r.s.id)}" data-static-group0735="${esc(ids)}" data-marker-category070="${category}" aria-label="${esc(aria)}"><span>${countLabel}</span>${group.rows.length>1?`<b>ACCTS</b>`:""}</button>`;
+      const markerClass=group.kind==='cluster'?'nearbyAreaCluster07910':group.kind==='address'?'multiAccountMarker0735':'singleAccountMarker07910';
+      const countLabel=group.kind==='single'?'':group.rows.length;
+      const aria=group.kind==='cluster'?`${group.rows.length} accounts across ${group.locationCount} nearby locations`:group.kind==='address'?`${group.rows.length} accounts at ${fullAddress(r.s)}`:(r.s.name||"Account");
+      html+=`<button class="staticMarker069 category-${category} ${group.selected?'selected':''} ${markerClass}" style="left:${p.x}%;top:${p.y}%" data-static-marker069="${esc(r.s.id)}" data-static-group0735="${esc(ids)}" data-display-kind07910="${group.kind}" data-display-index07910="${groupIndex}" data-marker-category070="${category}" aria-label="${esc(aria)}"><span>${countLabel}</span>${group.kind==='address'?`<b>ACCTS</b>`:group.kind==='cluster'?`<b>AREA</b>`:""}</button>`;
     });
     overlay.innerHTML=html||'<div class="staticMapMessage069">No mapped accounts are inside the current view.</div>';
     if(count){count.textContent=`${rendered} account${rendered===1?'':'s'} • ${groups.length} location${groups.length===1?'':'s'} • ${nearbyAdaptiveRadiusMiles069.toFixed(1)} mi radius`;count.hidden=false;}
     overlay.querySelectorAll('[data-static-marker069]').forEach(m=>m.onclick=e=>{
       e.stopPropagation();
+      const displayGroup=groups[Number(m.dataset.displayIndex07910)];
+      if(m.dataset.displayKind07910==='cluster'){zoomNearbyCluster07910(displayGroup);return;}
       const ids=String(m.dataset.staticGroup0735||m.dataset.staticMarker069).split("|");
       const id=ids.includes(homeNearbySelected069)?homeNearbySelected069:ids[0];
       selectNearby069(id,false,true,true);
@@ -3330,7 +3390,7 @@ function initNearbyMap069(){
   if(!nearbyState)return;
   drawStaticNearbyMap069();
   const shell=document.querySelector('.staticMapShell069');
-  if(shell)shell.onclick=e=>{if(!e.target.closest('[data-static-marker069]')){nearbyMapPopupSite069="";updateNearbyMapSelection069();}};
+  if(shell)shell.onclick=e=>{if(!e.target.closest('[data-static-marker069]')){if(nearbyStreetFocusSite069&&homeNearbySelected069){deepenSelectedNearbyMap07910();return;}nearbyMapPopupSite069="";updateNearbyMapSelection069();}};
 }
 
 function sameLocalDay499(iso, day=localDateString()){
@@ -3870,7 +3930,7 @@ function sites(){
   const addressCounts0762=accountAddressCounts0762(allAccounts);
   const accounts=accountDirectorySort0760(allAccounts);
   const accountInitialsList0763=accountInitials0763(accounts);
-  // Build 0.79.9: the Accounts directory no longer exposes category filter tiles.
+  // Build 0.79.10: the Accounts directory no longer exposes category filter tiles.
   // Clear any older session filter so every saved account is shown.
   sitesFilter0736="all";
   const accountsViewDirty0761=!!String(siteSearch||"").trim() || accountsSort0760!=="az";
@@ -7682,7 +7742,7 @@ function manualSimplePage058(type){
   quick:["🚀","Quick Start Guide","Get FireVault ready for a normal field day.",[["1. Verify the build","Confirm the green build badge shows 0.67.0 before entering production information."],["2. Complete Technician Profile","Enter your name, company, phone, email, and license or employee identification."],["3. Review permissions","Allow location and photo access only when FireVault requests them and the feature is needed."],["4. Create or open a site","Add the customer name, full address, panel details, contacts, access notes, and GPS location."],["5. Document the visit","Record notes, photos, tasks, deficiencies, equipment changes, and a service visit."],["6. Finish and protect the data","Review the report, send or copy the required summary, then export a current backup."]]],
   new:["🆕","What’s New in 0.67.0","Account View, Settings navigation, and FireVault Academy redesign.",[["Unified visual system","Standardized typography, spacing, card surfaces, borders, controls, and responsive behavior across FireVault."],["Settings cleanup","Improved Settings home cards and every submenu while preserving the preferred Email setup workflow."],["Help readability","Converted contextual Help and Academy articles into one uninterrupted scrolling reading column with no floating metadata."],["Site Detail stability","Reinforced natural-height cards, readable text, and scroll-safe account sections."],["Operational screens","Simplified Customer Import, Team Sync, Conflict Center, and Nearby Sites presentation without changing their workflows."],["Phone and iPad layouts","Added consistent narrow-phone and tablet behavior, bottom-navigation clearance, and overflow protection."],["Nearby scan diagnostics","Nearby Sites now shows total sites, GPS-ready records, missing coordinates, phone-location progress, and persistent error messages."],["Coordinate recovery","FireVault recovers valid latitude and longitude stored in compatible legacy or imported fields and normalizes them into the site GPS record."],["Location retry","If high-accuracy location times out or is unavailable, FireVault retries once using standard accuracy."],["Nearest-site fallback","When no site is inside the selected radius, the nearest GPS-ready sites remain visible instead of presenting an empty result."],["Latitude and longitude","Customer Import can calculate missing coordinates from each usable U.S. street address before saving records."],["Coordinate requirement","The importer requires calculated, supplied, or existing GPS coordinates by default. Unmatched addresses remain in review."],["Census address matching","Only address fields are sent to the U.S. Census Geocoder. The returned point is an address-range calculation, not a guaranteed building entrance."],["Account Id matching","Repeat imports update the matching FireVault site instead of creating duplicates or deleting field history."],["CSV coordinate columns","Files that already contain Latitude and Longitude columns use those values directly."],["Sync-ready changes","Added and updated customer records enter the pending synchronization queue and create a Sync Activity entry."]]],
   tips:["🧰","Field Tips","Short practices that improve the usefulness of FireVault records.",[["Write for the next technician","Include the exact panel, circuit, device, location, symptom, test result, and next action instead of relying on memory."],["Photograph context first","Take one wide photo showing the equipment location before close-up terminal, label, or damage photos."],["Separate facts from follow-up","Use notes for what occurred, deficiencies for code or system problems, and tasks for work that still needs completion."],["Confirm the account","Before using Quick Capture, verify the selected customer site to prevent records from being stored under the wrong account."],["Back up before updates","Download an external backup before a major update or device change and after completing significant field documentation."]]],
-  revisions:["📋","Revision History","Application and documentation checkpoints.",[["0.79.9","Removed the Accounts filter tiles and simplified the Nearby GPS comparison screen."],["0.79.7","Shortened every Settings summary and removed the colored bar from each Section Overview."],["0.79.6","Added Nearby-style account-list scroll locking so cards settle cleanly at the top while the Accounts controls remain fixed."],["0.79.5","Added separate Personal OneDrive, Work OneDrive, and SharePoint connection profiles with exact photo/document assignments and no-personal-fallback protection."],["0.79.4","Added independent photo and document storage destinations, cloud-provider integration targets, and offline Google Plus Codes for accounts and exact field locations."],["0.79.3","Added backend-neutral provider interfaces for authentication, database, file storage, synchronization, and audit while keeping FireVault fully local."],["0.79.2","Added a unified Security Center with vault integrity validation, backup health, audit filters, device naming, session clearing, and PIN confirmation for sensitive exports, restores, and deletion."],["0.79.1","Added an optional local six-digit privacy lock with PBKDF2 hashing, inactivity/background locking, app-switcher privacy screen, recovery code, cooldown protection, and local lock events."],["0.79.0","Added security-ready schema 4 metadata, stable workspace/user/device identities, local audit history, pending change queue, recoverable deletion, credential-safe exports, and protected restore/reset actions."],["0.67.0","Redesigned Account View around service actions and grouped information, consolidated Settings into five folders, and simplified FireVault Academy and contextual Help for continuous reading."],["0.65.2","Repaired Nearby Sites with GPS inventory counts, imported-coordinate recovery, persistent permission and timeout messages, a standard-accuracy retry, and nearest-site fallback results."],["0.65.1","Added online latitude/longitude calculation, coordinate validation, geocoding progress, unmatched-address review, optional CSV coordinates, and coordinate-safe repeat importing."],["0.65.0","Added preview-first customer CSV importing, Account Id update matching, validation warnings, imported monitoring details, and sync activity tracking."],["0.64.1","Simplified Academy article headers, removed floating metadata badges, and improved continuous scrolling and readability."],["0.64.0","Added Sync Activity, a conflict review center, export/import audit entries, and an automatic OneDrive connection-readiness checklist."],["0.63.1","Overhauled contextual Help and Academy reader formatting, removed overlapping sticky article headers, and restored full scrolling on phones and tablets."],["0.63.0","Added permanent record IDs, audit metadata, local version tracking, pending-sync states, conflict readiness, device identity, and a Team Sync settings workspace."],["0.60.0","Connected major screens and Settings areas directly to matching Academy chapters with return-to-screen navigation."],["0.59.0","Added interactive tutorials, guided orientation, pinned learning, field tips, and documentation tracking."],["0.58.0","Expanded Help & Manual into FireVault Academy with bookmarks, smart search, Quick Start, and reader navigation."],["0.57.0","Added the first complete searchable in-app FireVault User Manual."],["Ongoing review rule","Any change to navigation, labels, storage, workflows, permissions, or supported layouts requires the related manual chapter to be checked."]]],
+  revisions:["📋","Revision History","Application and documentation checkpoints.",[["0.79.10","Removed the Accounts filter tiles and simplified the Nearby GPS comparison screen."],["0.79.7","Shortened every Settings summary and removed the colored bar from each Section Overview."],["0.79.6","Added Nearby-style account-list scroll locking so cards settle cleanly at the top while the Accounts controls remain fixed."],["0.79.5","Added separate Personal OneDrive, Work OneDrive, and SharePoint connection profiles with exact photo/document assignments and no-personal-fallback protection."],["0.79.4","Added independent photo and document storage destinations, cloud-provider integration targets, and offline Google Plus Codes for accounts and exact field locations."],["0.79.3","Added backend-neutral provider interfaces for authentication, database, file storage, synchronization, and audit while keeping FireVault fully local."],["0.79.2","Added a unified Security Center with vault integrity validation, backup health, audit filters, device naming, session clearing, and PIN confirmation for sensitive exports, restores, and deletion."],["0.79.1","Added an optional local six-digit privacy lock with PBKDF2 hashing, inactivity/background locking, app-switcher privacy screen, recovery code, cooldown protection, and local lock events."],["0.79.0","Added security-ready schema 4 metadata, stable workspace/user/device identities, local audit history, pending change queue, recoverable deletion, credential-safe exports, and protected restore/reset actions."],["0.67.0","Redesigned Account View around service actions and grouped information, consolidated Settings into five folders, and simplified FireVault Academy and contextual Help for continuous reading."],["0.65.2","Repaired Nearby Sites with GPS inventory counts, imported-coordinate recovery, persistent permission and timeout messages, a standard-accuracy retry, and nearest-site fallback results."],["0.65.1","Added online latitude/longitude calculation, coordinate validation, geocoding progress, unmatched-address review, optional CSV coordinates, and coordinate-safe repeat importing."],["0.65.0","Added preview-first customer CSV importing, Account Id update matching, validation warnings, imported monitoring details, and sync activity tracking."],["0.64.1","Simplified Academy article headers, removed floating metadata badges, and improved continuous scrolling and readability."],["0.64.0","Added Sync Activity, a conflict review center, export/import audit entries, and an automatic OneDrive connection-readiness checklist."],["0.63.1","Overhauled contextual Help and Academy reader formatting, removed overlapping sticky article headers, and restored full scrolling on phones and tablets."],["0.63.0","Added permanent record IDs, audit metadata, local version tracking, pending-sync states, conflict readiness, device identity, and a Team Sync settings workspace."],["0.60.0","Connected major screens and Settings areas directly to matching Academy chapters with return-to-screen navigation."],["0.59.0","Added interactive tutorials, guided orientation, pinned learning, field tips, and documentation tracking."],["0.58.0","Expanded Help & Manual into FireVault Academy with bookmarks, smart search, Quick Start, and reader navigation."],["0.57.0","Added the first complete searchable in-app FireVault User Manual."],["Ongoing review rule","Any change to navigation, labels, storage, workflows, permissions, or supported layouts requires the related manual chapter to be checked."]]],
   trouble:["❓","Troubleshooting","Common problems and safe first checks.",FIREVAULT_MANUAL_058.find(x=>x.id==="trouble")?.topics||[]]
  };
  const [icon,title,note,items]=pages[type]||["ⓘ","Unavailable","This Help section is not available in the installed version.",[["Current status","Return to Help and choose an available chapter or tutorial."]]];
@@ -9458,7 +9518,7 @@ function diagnostics(){
 }
 function showChangelog(){
   const notes = [
-    "Build 0.79.9 refines Accounts cards by moving Favorites to the far right and grouping category tags with GPS status.",
+    "Build 0.79.10 refines Accounts cards by moving Favorites to the far right and grouping category tags with GPS status.",
     "Build 0.79.5 adds separate Personal OneDrive, Work OneDrive, and SharePoint profiles with exact destination assignments and strict no-personal-fallback protection.",
     "Build 0.79.4 adds independent photo/document storage destinations and full offline Google Plus Codes while keeping FireVault local-first.",
     "Build 0.79.3 adds backend-neutral provider interfaces for authentication, database, file storage, synchronization, and audit while keeping FireVault fully local.",

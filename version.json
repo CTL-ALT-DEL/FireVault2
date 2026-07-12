@@ -1,6 +1,6 @@
 {
-  "build": "0.79.9",
+  "build": "0.79.10",
   "released": "2026-07-12",
-  "note": "Accounts card hierarchy polish",
-  "label": "Favorite aligned right and category tags grouped with GPS status"
+  "note": "Nearby map marker hierarchy",
+  "label": "Single-account dots, same-address counts, area clusters, and deeper tap zoom"
 }

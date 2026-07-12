@@ -1,4 +1,4 @@
-# FireVault Build 0.79.9
+# FireVault Build 0.79.10
 
 This package refines the Accounts card layout. Deploy over the existing FireVault files without deleting the Home Screen app or clearing site data.
 

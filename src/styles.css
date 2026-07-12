@@ -18632,3 +18632,34 @@ body.fv-privacy-locked0791{overflow:hidden!important;background:#07090d!importan
 @media(max-width:380px){
   .accountCard0759 .accountRuleTag0799{max-width:108px!important;}
 }
+
+/* Build 0.79.10 — Nearby map marker hierarchy */
+.staticMarker069.singleAccountMarker07910{
+  width:25px!important;height:25px!important;border-width:2px!important;
+  box-shadow:0 3px 9px rgba(0,0,0,.45)!important;
+}
+.staticMarker069.singleAccountMarker07910 span{display:none!important}
+.staticMarker069.singleAccountMarker07910::after{
+  content:"";width:7px;height:7px;border-radius:50%;background:#fff;
+  box-shadow:0 1px 3px rgba(0,0,0,.35);
+}
+.staticMarker069.singleAccountMarker07910.selected{width:34px!important;height:34px!important}
+.staticMarker069.singleAccountMarker07910.selected::after{width:9px;height:9px;background:#062412}
+.staticMarker069.nearbyAreaCluster07910{
+  width:42px!important;height:42px!important;border-radius:50%!important;
+  background:#334155!important;border:3px solid rgba(255,255,255,.92)!important;
+  box-shadow:0 0 0 4px rgba(51,65,85,.28),0 6px 16px rgba(0,0,0,.58)!important;
+  z-index:7!important;
+}
+.staticMarker069.nearbyAreaCluster07910 span{display:block!important;font-size:.82rem!important;color:#fff!important;font-weight:950!important}
+.staticMarker069.nearbyAreaCluster07910 b{
+  position:absolute;left:50%;top:calc(100% + 3px);transform:translateX(-50%);
+  padding:2px 5px;border-radius:5px;background:rgba(8,13,20,.94);border:1px solid #94a3b8;
+  color:#e2e8f0;font-size:5px;line-height:1;letter-spacing:.09em;white-space:nowrap;
+}
+.staticMarker069.nearbyAreaCluster07910.selected{
+  width:46px!important;height:46px!important;background:#32ef76!important;
+  box-shadow:0 0 0 5px rgba(50,239,118,.28),0 7px 18px rgba(0,0,0,.6)!important;
+}
+.staticMarker069.nearbyAreaCluster07910.selected span{color:#062412!important}
+.staticMarker069.category-cluster{--category:#334155}
