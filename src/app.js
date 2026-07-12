@@ -1,4 +1,4 @@
-import { BUILD, KEY, ACTIVE_JOB_KEY, loadData, saveData, ensureSite, fullAddress, esc, uid, downloadBlob, syncSummary, syncQueue, syncConflicts, syncActivity, createSyncPackage, importSyncPackage, resolveSyncConflict, notePackageExport, deviceIdentity, recordSyncActivity, autoBackupInfo, latestAutoBackup, restoreAutoBackup, isDemoMode, setDemoMode, resetDemoData } from "./storage.js?v=0.76.0";
+import { BUILD, KEY, ACTIVE_JOB_KEY, loadData, saveData, ensureSite, fullAddress, esc, uid, downloadBlob, syncSummary, syncQueue, syncConflicts, syncActivity, createSyncPackage, importSyncPackage, resolveSyncConflict, notePackageExport, deviceIdentity, recordSyncActivity, autoBackupInfo, latestAutoBackup, restoreAutoBackup, isDemoMode, setDemoMode, resetDemoData } from "./storage.js?v=0.76.1";
 window.__FIREVAULT_MODULE_READY = true;
 
 function fvPreferenceStore0739(){
@@ -27,6 +27,39 @@ function fvSafeGet0739(key,fallback=""){
   try{const v=localStorage.getItem(key);return v===null?fallback:v;}catch{return fallback;}
 }
 function demoStorageLabel0739(){return isDemoMode()?"Temporary in-memory demo workspace":KEY;}
+
+const ACCOUNTS_VIEW_STATE_KEY_0761 = "firevault_accounts_view_0761";
+function loadAccountsViewState0761(){
+  try{
+    const raw=JSON.parse(sessionStorage.getItem(ACCOUNTS_VIEW_STATE_KEY_0761)||"null");
+    if(!raw||typeof raw!=="object") return {};
+    return raw;
+  }catch{return {};}
+}
+const restoredAccountsView0761=loadAccountsViewState0761();
+let accountsStateWriteTimer0761=0;
+function persistAccountsViewState0761(immediate=false){
+  const payload={
+    search:String(siteSearch||""),
+    filter:["all","attention","open","missingGps"].includes(sitesFilter0736)?sitesFilter0736:"all",
+    sort:["az","favorites","recent","attention"].includes(accountsSort0760)?accountsSort0760:"az",
+    scroll:Math.max(0,Number(accountsScroll0759)||0)
+  };
+  const write=()=>{
+    accountsStateWriteTimer0761=0;
+    try{sessionStorage.setItem(ACCOUNTS_VIEW_STATE_KEY_0761,JSON.stringify(payload));}catch{}
+  };
+  if(immediate){if(accountsStateWriteTimer0761)clearTimeout(accountsStateWriteTimer0761);write();return;}
+  if(accountsStateWriteTimer0761)clearTimeout(accountsStateWriteTimer0761);
+  accountsStateWriteTimer0761=setTimeout(write,120);
+}
+function resetAccountsViewState0761(){
+  siteSearch="";
+  sitesFilter0736="all";
+  accountsSort0760="az";
+  accountsScroll0759=0;
+  try{sessionStorage.removeItem(ACCOUNTS_VIEW_STATE_KEY_0761);}catch{}
+}
 
 const DEMO_ACTIVE_JOB_KEY_0738 = `${ACTIVE_JOB_KEY}_demo`;
 const DEMO_ACTIVE_ROUTE_KEY_0738 = "firevault_active_route_day_demo";
@@ -57,10 +90,10 @@ let activeJob = loadActiveJob();
 const NEARBY_STATE_KEY_0652 = "firevault_nearby_state_0652";
 let nearbyState = loadNearbyState0652();
 let nearbyScanStatus0652 = {state:"idle",message:"",attempt:"",at:""};
-let siteSearch = "";
-let sitesFilter0736 = "all";
-let accountsScroll0759 = 0;
-let accountsSort0760 = "az";
+let siteSearch = String(restoredAccountsView0761.search||"");
+let sitesFilter0736 = ["all","attention","open","missingGps"].includes(restoredAccountsView0761.filter)?restoredAccountsView0761.filter:"all";
+let accountsScroll0759 = Math.max(0,Number(restoredAccountsView0761.scroll)||0);
+let accountsSort0760 = ["az","favorites","recent","attention"].includes(restoredAccountsView0761.sort)?restoredAccountsView0761.sort:"az";
 let dailySummaryDate569 = fvSafeGet0739("firevault_daily_summary_date","");
 let dailyPickerMonth571 = localDateString().slice(0,7);
 let libraryFolder = "all";
@@ -563,6 +596,8 @@ function route(v){
   if((v === "nearbySites") && !featureOn("advancedGps")){ toast("Advanced GPS is hidden in Simple View."); v="home"; }
   if((v === "routeLog") && !activeRoute && !featureOn("dailyRoute")){ toast("Daily Route is hidden in Simple View."); v="home"; }
   if(settingsSubmenuReturn576 && v === "settings") settingsSubmenuReturn576=false;
+  const previousView=view;
+  if(v === "siteDetail" && previousView !== "siteDetail") accountDetailSite0735="";
   view = v; render();
 }
 function html(content){ appEl.innerHTML = content; requestAnimationFrame(()=>bindPhoneInputs0758(appEl)); }
@@ -1125,7 +1160,11 @@ function detectNearbySites(){
 function applyTheme(){
   const t = data.settings.theme || {};
   const body = document.body;
-  body.className = "";
+  /* Theme changes must never erase structural app classes such as app-booted,
+     app-chrome-ready, route layout modes, or Settings/Home chrome. */
+  [...body.classList].forEach(cls=>{
+    if(cls.startsWith("theme-") || ["large-text","compact-layout","square-buttons","solid-cards","demoMode0738"].includes(cls)) body.classList.remove(cls);
+  });
   if(isDemoMode()) body.classList.add("demoMode0738");
   const preset = t.name || "firevault-dark";
   body.classList.add("theme-" + preset);
@@ -3315,6 +3354,17 @@ function accountDirectoryWork0759(s){
   if(openTasks) return {label:`${openTasks} open task${openTasks===1?"":"s"}`,cls:"warning",score:openTasks*5};
   return {label:"No open work",cls:"clear",score:0};
 }
+function accountRecency0761(s){
+  const stamp=new Date(s?.lastOpenedAt||0).getTime();
+  if(!Number.isFinite(stamp)||stamp<=0) return "";
+  const diff=Math.max(0,Date.now()-stamp);
+  const minute=60*1000,hour=60*minute,day=24*hour;
+  if(diff<minute) return "Opened now";
+  if(diff<hour){const n=Math.max(1,Math.floor(diff/minute));return `Opened ${n} min ago`;}
+  if(diff<day){const n=Math.max(1,Math.floor(diff/hour));return `Opened ${n} hr${n===1?"":"s"} ago`;}
+  if(diff<7*day){const n=Math.max(1,Math.floor(diff/day));return `Opened ${n} day${n===1?"":"s"} ago`;}
+  return `Opened ${new Date(stamp).toLocaleDateString([], {month:"short",day:"numeric"})}`;
+}
 function accountDirectoryRow0759(s){
   const id=accountId069(s);
   const category=accountCategory070(s);
@@ -3326,12 +3376,13 @@ function accountDirectoryRow0759(s){
   const supporting=panel || contact?.name || "Account details not entered";
   const pinned=isPinnedSite566(s);
   const address=fullAddress(s)||"No address saved";
-  return `<button type="button" class="accountCard0759 category-${category}" data-account-card0759 data-id="${esc(s.id)}" data-search="${esc(siteSearchBlob(s))}" data-attention="${health.cls==='healthWarn'?'1':'0'}" data-open="${work.cls==='clear'?'0':'1'}" data-gps="${hasGps(s)?'1':'0'}" aria-label="Open ${esc(s.name||'account')}, ${esc(address)}">
+  const recency=accountRecency0761(s);
+  return `<article class="accountCard0759 accountCard0761 category-${category}" data-account-card0759 data-id="${esc(s.id)}" data-search="${esc(siteSearchBlob(s))}" data-attention="${health.cls==='healthWarn'?'1':'0'}" data-open="${work.cls==='clear'?'0':'1'}" data-gps="${hasGps(s)?'1':'0'}" role="button" tabindex="0" aria-label="Open ${esc(s.name||'account')}, ${esc(address)}">
     <span class="accountTone0759" aria-hidden="true"></span>
     <span class="accountCardBody0759">
       <span class="accountCardTop0759">
         <span class="accountCardName0759">${esc(s.name||"Unnamed Account")}</span>
-        ${pinned?`<span class="accountFavorite0759" aria-label="Favorite account">★</span>`:""}
+        <button type="button" class="accountFavoriteButton0761 ${pinned?"active":""}" data-account-favorite0761="${esc(s.id)}" aria-pressed="${pinned?"true":"false"}" aria-label="${pinned?"Remove":"Add"} ${esc(s.name||"account")} ${pinned?"from":"to"} favorites">${pinned?"★":"☆"}</button>
         <span class="accountCategory0759 category-${category}">${esc(categoryLabel)}</span>
       </span>
       ${id?`<span class="accountNumber0759">${esc(id)}</span>`:""}
@@ -3341,10 +3392,11 @@ function accountDirectoryRow0759(s){
         <span class="accountWork0759 ${work.cls}">${esc(work.label)}</span>
         <span class="accountGps0759 ${hasGps(s)?'ready':'missing'}">${hasGps(s)?'GPS ready':'Needs GPS'}</span>
       </span>
+      ${recency?`<span class="accountRecency0761">${esc(recency)}</span>`:""}
       ${accountTagChips0737(s,2)}
     </span>
     <span class="accountChevron0759" aria-hidden="true">›</span>
-  </button>`;
+  </article>`;
 }
 function accountDirectorySort0760(rows=[]){
   const nameSort=(a,b)=>String(a.name||"").localeCompare(String(b.name||""),undefined,{sensitivity:"base",numeric:true});
@@ -3379,7 +3431,9 @@ function sites(){
   const attentionCount=allAccounts.filter(s=>siteHealth(s).cls==="healthWarn").length;
   const openWorkCount=allAccounts.filter(s=>siteOpenTasks556(s).length||siteOpenDeficiencies556(s).length).length;
   const missingGpsCount=allAccounts.filter(s=>!hasGps(s)).length;
-  html(`<div class="screen accountsDirectory0759 accountsDirectory0760">
+  const accountsViewDirty0761=!!String(siteSearch||"").trim() || sitesFilter0736!=="all" || accountsSort0760!=="az";
+  const filterLabel0761=({all:"All accounts",attention:"Attention",open:"Open work",missingGps:"No GPS"})[sitesFilter0736]||"All accounts";
+  html(`<div class="screen accountsDirectory0759 accountsDirectory0760 accountsDirectory0761">
     <section class="accountsHero0759">
       <div class="accountsHeroText0759"><span>Customer vault</span><h1>Accounts</h1><p>${allAccounts.length} saved account${allAccounts.length===1?"":"s"}</p></div>
       <div class="accountsHeroActions0759">
@@ -3399,7 +3453,7 @@ function sites(){
       <button type="button" data-sites-filter0759="missingGps" class="${sitesFilter0736==='missingGps'?'active':''}"><strong>${missingGpsCount}</strong><span>No GPS</span></button>
     </section>
     <section class="accountsResults0759">
-      <div class="accountsListHead0759 accountsListHead0760"><strong id="siteSearchCount0759">${accounts.length} account${accounts.length===1?"":"s"}</strong><label>Sort<select id="accountsSort0760" aria-label="Sort accounts"><option value="az" ${accountsSort0760==='az'?'selected':''}>A–Z</option><option value="favorites" ${accountsSort0760==='favorites'?'selected':''}>Favorites</option><option value="recent" ${accountsSort0760==='recent'?'selected':''}>Recently Opened</option><option value="attention" ${accountsSort0760==='attention'?'selected':''}>Priority</option></select></label></div>
+      <div class="accountsListHead0759 accountsListHead0760 accountsListHead0761"><div class="accountsResultSummary0761"><strong id="siteSearchCount0759" aria-live="polite">${accounts.length} account${accounts.length===1?"":"s"}</strong><span id="accountsViewSummary0761">${esc(filterLabel0761)} • ${esc(accountsSortLabel0760())}</span></div><div class="accountsListTools0761"><button type="button" class="ghost accountsReset0761" id="resetAccountsView0761" ${accountsViewDirty0761?"":"hidden"}>Reset</button><label>Sort<select id="accountsSort0760" aria-label="Sort accounts"><option value="az" ${accountsSort0760==='az'?'selected':''}>A–Z</option><option value="favorites" ${accountsSort0760==='favorites'?'selected':''}>Favorites</option><option value="recent" ${accountsSort0760==='recent'?'selected':''}>Recently Opened</option><option value="attention" ${accountsSort0760==='attention'?'selected':''}>Priority</option></select></label></div></div>
       <div class="accountsList0759" id="accountsList0759">
         ${accounts.length?accounts.map(accountDirectoryRow0759).join(""):`<div class="accountsEmpty0759 accountsEmpty0760"><span>＋</span><strong>No accounts yet</strong><p>Create an account manually or import your customer list under Settings → Data.</p><button class="primary" id="emptyAdd0759">Add First Account</button></div>`}
         <div class="accountsNoResults0759 accountsNoResults0760" id="accountsNoResults0759" hidden><strong>No matching accounts</strong><p>Clear the search or return to All accounts.</p><button type="button" class="ghost" id="resetAccountsView0760">Reset View</button></div>
@@ -3414,14 +3468,17 @@ function sites(){
   const searchEl=document.getElementById("siteSearch0759");
   const clearBtn=document.getElementById("clearSiteSearch0759");
   const countEl=document.getElementById("siteSearchCount0759");
+  const summaryEl=document.getElementById("accountsViewSummary0761");
+  const resetViewBtn=document.getElementById("resetAccountsView0761");
   const noResults=document.getElementById("accountsNoResults0759");
   const list=document.getElementById("accountsList0759");
 
   const applySiteSearch=()=>{
-    siteSearch=(searchEl?.value||"").trim().toLowerCase();
+    siteSearch=(searchEl?.value||"").trim();
+    const normalizedSearch=siteSearch.toLowerCase();
     let shown=0;
     document.querySelectorAll("[data-account-card0759]").forEach(el=>{
-      const searchOk=!siteSearch||(el.dataset.search||"").includes(siteSearch);
+      const searchOk=!normalizedSearch||(el.dataset.search||"").includes(normalizedSearch);
       const filterOk=sitesFilter0736==="all" ||
         (sitesFilter0736==="attention"&&el.dataset.attention==="1") ||
         (sitesFilter0736==="open"&&el.dataset.open==="1") ||
@@ -3431,14 +3488,34 @@ function sites(){
       if(visible) shown++;
     });
     if(countEl) countEl.textContent=shown===allAccounts.length?`${shown} account${shown===1?"":"s"}`:`${shown} of ${allAccounts.length}`;
+    const activeFilter=({all:"All accounts",attention:"Attention",open:"Open work",missingGps:"No GPS"})[sitesFilter0736]||"All accounts";
+    if(summaryEl) summaryEl.textContent=[activeFilter,accountsSortLabel0760(),siteSearch?`“${siteSearch}”`:""].filter(Boolean).join(" • ");
     if(clearBtn) clearBtn.hidden=!siteSearch;
     if(noResults) noResults.hidden=shown!==0 || allAccounts.length===0;
+    if(resetViewBtn) resetViewBtn.hidden=!(siteSearch || sitesFilter0736!=="all" || accountsSort0760!=="az");
+    persistAccountsViewState0761();
   };
 
+  const firstVisibleAccount0761=()=>[...document.querySelectorAll("[data-account-card0759]")].find(el=>!el.hidden);
+  const openAccount0761=id=>{
+    const target=(data.sites||[]).find(s=>s.id===id);
+    if(!target){toast("That account is no longer available.");sites();return;}
+    accountsScroll0759=list?.scrollTop||0;
+    persistAccountsViewState0761(true);
+    selectedSiteId=id;
+    route("siteDetail");
+  };
   searchEl?.addEventListener("input",applySiteSearch);
+  searchEl?.addEventListener("keydown",event=>{
+    if(event.key==="Escape"){event.preventDefault();searchEl.value="";applySiteSearch();return;}
+    if(event.key==="ArrowDown"){const first=firstVisibleAccount0761();if(first){event.preventDefault();first.focus();}return;}
+    if(event.key==="Enter"){const first=firstVisibleAccount0761();if(first){event.preventDefault();openAccount0761(first.dataset.id);}}
+  });
   clearBtn?.addEventListener("click",()=>{if(searchEl){searchEl.value="";searchEl.focus();}applySiteSearch();});
-  document.getElementById("resetAccountsView0760")?.addEventListener("click",()=>{siteSearch="";sitesFilter0736="all";accountsScroll0759=0;sites();});
-  document.getElementById("accountsSort0760")?.addEventListener("change",event=>{accountsSort0760=event.target.value||"az";accountsScroll0759=0;sites();});
+  const resetView0761=()=>{resetAccountsViewState0761();sites();};
+  document.getElementById("resetAccountsView0760")?.addEventListener("click",resetView0761);
+  resetViewBtn?.addEventListener("click",resetView0761);
+  document.getElementById("accountsSort0760")?.addEventListener("change",event=>{accountsSort0760=event.target.value||"az";accountsScroll0759=0;persistAccountsViewState0761(true);sites();});
   document.querySelectorAll("[data-sites-filter0759]").forEach(btn=>btn.addEventListener("click",()=>{
     sitesFilter0736=btn.dataset.sitesFilter0759||"all";
     document.querySelectorAll("[data-sites-filter0759]").forEach(x=>x.classList.toggle("active",x===btn));
@@ -3446,13 +3523,27 @@ function sites(){
     accountsScroll0759=0;
     applySiteSearch();
   }));
-  list?.addEventListener("scroll",()=>{accountsScroll0759=list.scrollTop;},{passive:true});
+  list?.addEventListener("scroll",()=>{accountsScroll0759=list.scrollTop;persistAccountsViewState0761();},{passive:true});
   list?.addEventListener("click",event=>{
+    const favorite=event.target.closest("[data-account-favorite0761]");
+    if(favorite){
+      event.preventDefault();event.stopPropagation();
+      const target=(data.sites||[]).find(s=>s.id===favorite.dataset.accountFavorite0761);
+      if(!target){toast("That account is no longer available.");return;}
+      const wasPinned=isPinnedSite566(target);
+      if(wasPinned) delete target.pinnedAt; else target.pinnedAt=new Date().toISOString();
+      target.updatedAt=new Date().toISOString();
+      try{save();toast(wasPinned?"Removed from favorites.":"Added to favorites.");}
+      catch(err){if(wasPinned)target.pinnedAt=new Date().toISOString();else delete target.pinnedAt;toast("Favorite could not be saved.");console.error(err);return;}
+      accountsScroll0759=list.scrollTop;persistAccountsViewState0761(true);sites();return;
+    }
     const card=event.target.closest("[data-account-card0759]");
-    if(!card) return;
-    accountsScroll0759=list.scrollTop;
-    selectedSiteId=card.dataset.id;
-    route("siteDetail");
+    if(card) openAccount0761(card.dataset.id);
+  });
+  list?.addEventListener("keydown",event=>{
+    if(event.target.closest("[data-account-favorite0761]")) return;
+    const card=event.target.closest("[data-account-card0759]");
+    if(card && (event.key==="Enter"||event.key===" ")){event.preventDefault();openAccount0761(card.dataset.id);}
   });
   applySiteSearch();
   requestAnimationFrame(()=>{
@@ -4034,8 +4125,12 @@ function siteDetail(){
   restoreAppChrome572();
   showGlobalChrome537();
   const s=site(); if(!s){ route("sites"); return; }
-  if(accountDetailSite0735!==s.id){accountDetailSite0735=s.id;accountDetailTab0735=accountTabPreference0751();}
-  s.lastOpenedAt=new Date().toISOString(); saveData(data);
+  if(accountDetailSite0735!==s.id){
+    accountDetailSite0735=s.id;
+    accountDetailTab0735=accountTabPreference0751();
+    s.lastOpenedAt=new Date().toISOString();
+    saveData(data);
+  }
   const open=(s.tasks||[]).filter(t=>(t.status||"Open")!=="Done").length;
   const def=(s.deficiencies||[]).filter(d=>(d.status||"Open")!=="Closed").length;
   const siteVisits=Array.isArray(s.visits)?s.visits:[];
@@ -6346,7 +6441,7 @@ function restoreAppChrome572(){
     nav.style.opacity="1";
     nav.style.pointerEvents="auto";
   }
-  document.body.classList.add("settingsChrome572");
+  document.body.classList.toggle("settingsChrome572", view === "settings");
   showGlobalChrome537();
 }
 function openSettingsHome572(){
@@ -8319,6 +8414,7 @@ function diagnostics(){
 }
 function showChangelog(){
   const notes = [
+    "Build 0.76.1 hardens the Accounts directory with persistent view state, inline Favorites, recent-opened context, keyboard shortcuts, and a permanent app-chrome repair so the bottom navigation remains visible after saves and Favorite changes.",
     "Build 0.76.0 completes the Accounts workflow with sorting, safer manual account creation, duplicate Account ID protection, and improved empty states.",
     "Build 0.73.9 repairs the Demo Mode QuotaExceededError by keeping the 20-account Boise workspace in temporary memory and making noncritical startup preference writes fail safely when device storage is full.",
     "Build 0.73.7 adds rule-driven multi-category account tags, repairs Settings tab spacing, and blends the global logo header into page content.",
@@ -8347,7 +8443,7 @@ function showChangelog(){
   overlay.className="releaseOverlay";
   overlay.innerHTML=`<div class="releaseSheet" role="dialog" aria-modal="true" aria-label="FireVault release notes">
     <div class="releaseHead"><div><strong>${fireVaultBrand575()}</strong><span>Build ${BUILD}</span></div><button class="ghost iconBtn" id="closeRelease" aria-label="Close release notes">×</button></div>
-    <div class="releaseBody"><h2>Release Notes</h2><p class="releaseIntro">A completed Accounts workflow designed for fast, safe field use.</p><ul>${notes.map(n=>`<li>${esc(n)}</li>`).join("")}</ul></div>
+    <div class="releaseBody"><h2>Release Notes</h2><p class="releaseIntro">A hardened Accounts workflow with faster access and reliable return behavior.</p><ul>${notes.map(n=>`<li>${esc(n)}</li>`).join("")}</ul></div>
   </div>`;
   document.body.appendChild(overlay);
   const close=()=>overlay.remove();

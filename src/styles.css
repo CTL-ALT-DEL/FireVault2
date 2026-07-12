@@ -16390,3 +16390,48 @@ input[data-fv-phone0758="1"]{font-variant-numeric:tabular-nums;letter-spacing:.0
 .accountFormActions0760{display:grid!important;grid-template-columns:.8fr 1.2fr!important;gap:9px!important;position:sticky!important;bottom:0!important;z-index:4!important;padding:9px 0 2px!important;background:linear-gradient(to bottom,transparent 0,#09111c 26%,#09111c 100%)!important}.accountFormActions0760 button{min-height:52px!important;font-size:.8rem!important;font-weight:950!important}
 .accountDelete0760{min-height:48px!important;margin-top:1px!important}
 @media(max-width:380px){.accountsListHead0760 select{min-width:82px!important;font-size:.63rem!important}.accountFormHeader0760{padding-left:10px!important;padding-right:10px!important}.accountForm0760{padding-left:9px!important;padding-right:9px!important}.accountFormCard0760{padding:12px!important}.accountGpsFields0760{grid-template-columns:1fr!important}}
+
+
+/* Build 0.76.1 — Accounts quick access and state reliability */
+.accountsListHead0761{
+  display:flex!important;
+  align-items:center!important;
+  justify-content:space-between!important;
+  gap:10px!important;
+  flex-wrap:wrap!important;
+}
+.accountsResultSummary0761{display:flex!important;flex-direction:column!important;gap:2px!important;min-width:0!important}
+.accountsResultSummary0761 strong{color:#f1f5f9!important;font-size:.78rem!important;font-weight:950!important}
+.accountsResultSummary0761 span{max-width:190px!important;overflow:hidden!important;text-overflow:ellipsis!important;white-space:nowrap!important;color:#738296!important;font-size:.59rem!important;font-weight:800!important}
+.accountsListTools0761{display:flex!important;align-items:center!important;gap:7px!important;margin-left:auto!important}
+.accountsReset0761{min-height:32px!important;height:32px!important;padding:4px 9px!important;border-radius:10px!important;font-size:.64rem!important;font-weight:900!important}
+.accountsReset0761[hidden]{display:none!important}
+.accountCard0761{cursor:pointer!important;-webkit-tap-highlight-color:transparent!important}
+.accountCard0761:focus-visible{outline:3px solid rgba(96,165,250,.42)!important;outline-offset:1px!important;border-color:#60a5fa!important}
+.accountFavoriteButton0761{
+  flex:0 0 auto!important;
+  display:grid!important;
+  place-items:center!important;
+  width:31px!important;
+  min-width:31px!important;
+  height:31px!important;
+  min-height:31px!important;
+  padding:0!important;
+  border:1px solid #34475e!important;
+  border-radius:10px!important;
+  background:#101c2b!important;
+  color:#8090a5!important;
+  box-shadow:none!important;
+  font-size:1rem!important;
+  line-height:1!important;
+}
+.accountFavoriteButton0761.active{border-color:#9a721a!important;background:#34280d!important;color:#facc15!important}
+.accountFavoriteButton0761:active{transform:scale(.94)!important}
+.accountRecency0761{display:block!important;color:#65758b!important;font-size:.57rem!important;line-height:1.15!important;font-weight:850!important;letter-spacing:.015em!important}
+@media(max-width:380px){
+  .accountsResultSummary0761 span{max-width:145px!important}
+  .accountsListTools0761{gap:5px!important}
+  .accountsReset0761{padding-left:7px!important;padding-right:7px!important}
+  .accountFavoriteButton0761{width:29px!important;min-width:29px!important;height:29px!important;min-height:29px!important}
+  .accountCategory0759{padding-left:6px!important;padding-right:6px!important}
+}

@@ -8,7 +8,7 @@
   "orientation": "portrait-primary",
   "background_color": "#0b0d10",
   "theme_color": "#101216",
-  "description": "Field knowledge system for fire alarm technicians. Build 0.76.0 completes the Accounts workflow with sorting, safe account creation, duplicate-ID protection, and stable navigation.",
+  "description": "Field knowledge system for fire alarm technicians. Build 0.76.1 adds persistent Accounts view state, inline favorites, keyboard access, recent-opened context, and permanent bottom-navigation protection during saves.",
   "icons": [
     {
       "src": "assets/icon-192.png",
@@ -49,5 +49,5 @@
       "description": "Open FireVault settings"
     }
   ],
-  "version": "0.76.0"
+  "version": "0.76.1"
 }
