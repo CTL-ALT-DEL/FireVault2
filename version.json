@@ -1,6 +1,6 @@
 {
-  "build": "0.79.0",
+  "build": "0.79.1",
   "released": "2026-07-12",
-  "note": "Security-ready data foundation",
-  "label": "Workspace, user, device, audit, soft deletion, versioning, and future sync readiness"
+  "note": "Local privacy lock",
+  "label": "Optional six-digit PIN, inactivity/background locking, recovery code, cooldown protection, and privacy screen"
 }

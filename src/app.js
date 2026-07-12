@@ -1,4 +1,4 @@
-import { BUILD, KEY, ACTIVE_JOB_KEY, loadData, saveData, ensureSite, fullAddress, esc, uid, downloadBlob, syncSummary, syncQueue, syncConflicts, syncActivity, createSyncPackage, importSyncPackage, resolveSyncConflict, notePackageExport, deviceIdentity, recordSyncActivity, autoBackupInfo, latestAutoBackup, restoreAutoBackup, isDemoMode, setDemoMode, resetDemoData, securityFoundationSummary, securityAudit, recycleBinInfo, restoreRecycleRecord, purgeRecycleBin, recordSecurityEvent } from "./storage.js?v=0.79.0";
+import { BUILD, KEY, ACTIVE_JOB_KEY, loadData, saveData, ensureSite, fullAddress, esc, uid, downloadBlob, syncSummary, syncQueue, syncConflicts, syncActivity, createSyncPackage, importSyncPackage, resolveSyncConflict, notePackageExport, deviceIdentity, recordSyncActivity, autoBackupInfo, latestAutoBackup, restoreAutoBackup, isDemoMode, setDemoMode, resetDemoData, securityFoundationSummary, securityAudit, recycleBinInfo, restoreRecycleRecord, purgeRecycleBin, recordSecurityEvent } from "./storage.js?v=0.79.1";
 window.__FIREVAULT_MODULE_READY = true;
 
 function fvPreferenceStore0739(){
@@ -27,6 +27,164 @@ function fvSafeGet0739(key,fallback=""){
   try{const v=localStorage.getItem(key);return v===null?fallback:v;}catch{return fallback;}
 }
 function demoStorageLabel0739(){return isDemoMode()?"Temporary in-memory demo workspace":KEY;}
+
+
+/* Build 0.79.1 — optional local privacy lock.
+   This is a device-level privacy control, not cloud authentication or vault encryption. */
+const PRIVACY_LOCK_KEY_0791 = "firevault_privacy_lock_v0791";
+const PRIVACY_UNLOCKED_KEY_0791 = "firevault_privacy_unlocked_v0791";
+const PRIVACY_EVENTS_KEY_0791 = "firevault_privacy_events_v0791";
+const PRIVACY_FAILED_KEY_0791 = "firevault_privacy_failed_v0791";
+const PRIVACY_COOLDOWN_KEY_0791 = "firevault_privacy_cooldown_v0791";
+const PRIVACY_HASH_ITERATIONS_0791 = 120000;
+let privacyTimer0791 = 0;
+let privacyRuntimeInstalled0791 = false;
+let privacyRecoveryMode0791 = false;
+
+function privacyConfig0791(){
+  try{
+    const value=JSON.parse(localStorage.getItem(PRIVACY_LOCK_KEY_0791)||"null");
+    return value&&value.enabled&&value.pinHash&&value.pinSalt?value:null;
+  }catch{return null;}
+}
+function privacyWriteConfig0791(value){
+  try{localStorage.setItem(PRIVACY_LOCK_KEY_0791,JSON.stringify(value));return true;}catch(err){console.error("Privacy lock settings could not be saved",err);return false;}
+}
+function privacySessionUnlocked0791(){
+  try{return sessionStorage.getItem(PRIVACY_UNLOCKED_KEY_0791)==="1";}catch{return false;}
+}
+function privacySetSessionUnlocked0791(on){
+  try{if(on)sessionStorage.setItem(PRIVACY_UNLOCKED_KEY_0791,"1");else sessionStorage.removeItem(PRIVACY_UNLOCKED_KEY_0791);}catch{}
+}
+function privacyNormalizeDigits0791(value,max=12){return String(value||"").replace(/\D/g,"").slice(0,max);}
+function privacyBytesToBase640791(bytes){
+  let binary=""; bytes.forEach(byte=>binary+=String.fromCharCode(byte)); return btoa(binary);
+}
+function privacyBase64ToBytes0791(value){
+  const binary=atob(String(value||"")); const out=new Uint8Array(binary.length); for(let i=0;i<binary.length;i++)out[i]=binary.charCodeAt(i); return out;
+}
+function privacyRandomBytes0791(length=16){const bytes=new Uint8Array(length);crypto.getRandomValues(bytes);return bytes;}
+function privacyRandomRecovery0791(){
+  const bytes=privacyRandomBytes0791(12); return [...bytes].map(x=>String(x%10)).join("").replace(/(\d{4})(?=\d)/g,"$1-");
+}
+async function privacyHash0791(secret,saltBase64,iterations=PRIVACY_HASH_ITERATIONS_0791){
+  if(!window.crypto?.subtle) throw new Error("Secure local hashing is unavailable in this browser.");
+  const material=await crypto.subtle.importKey("raw",new TextEncoder().encode(String(secret)),"PBKDF2",false,["deriveBits"]);
+  const bits=await crypto.subtle.deriveBits({name:"PBKDF2",salt:privacyBase64ToBytes0791(saltBase64),iterations:Number(iterations)||PRIVACY_HASH_ITERATIONS_0791,hash:"SHA-256"},material,256);
+  return privacyBytesToBase640791(new Uint8Array(bits));
+}
+function privacySafeEqual0791(a,b){
+  const left=String(a||""),right=String(b||""); let diff=left.length^right.length; const length=Math.max(left.length,right.length);
+  for(let i=0;i<length;i++)diff|=(left.charCodeAt(i%Math.max(1,left.length))||0)^(right.charCodeAt(i%Math.max(1,right.length))||0);
+  return diff===0;
+}
+async function privacyVerifyPin0791(value,config=privacyConfig0791()){
+  if(!config)return false; const pin=privacyNormalizeDigits0791(value,6); if(pin.length!==6)return false;
+  return privacySafeEqual0791(await privacyHash0791(pin,config.pinSalt,config.iterations),config.pinHash);
+}
+async function privacyVerifyRecovery0791(value,config=privacyConfig0791()){
+  if(!config?.recoveryHash||!config?.recoverySalt)return false; const code=privacyNormalizeDigits0791(value,12); if(code.length!==12)return false;
+  return privacySafeEqual0791(await privacyHash0791(code,config.recoverySalt,config.iterations),config.recoveryHash);
+}
+async function privacyCreateConfig0791(pin,base={}){
+  const recovery=privacyRandomRecovery0791(); const pinSalt=privacyBytesToBase640791(privacyRandomBytes0791()); const recoverySalt=privacyBytesToBase640791(privacyRandomBytes0791());
+  const config={version:1,enabled:true,iterations:PRIVACY_HASH_ITERATIONS_0791,pinSalt,pinHash:await privacyHash0791(pin,pinSalt),recoverySalt,recoveryHash:await privacyHash0791(privacyNormalizeDigits0791(recovery,12),recoverySalt),autoLockMinutes:Number(base.autoLockMinutes??5),lockOnBackground:base.lockOnBackground!==false,privacyScreen:base.privacyScreen!==false,updatedAt:new Date().toISOString()};
+  return {config,recovery};
+}
+function privacyEvents0791(){try{const rows=JSON.parse(localStorage.getItem(PRIVACY_EVENTS_KEY_0791)||"[]");return Array.isArray(rows)?rows:[];}catch{return [];}}
+function privacyLog0791(type,detail=""){
+  try{const rows=[{id:`privacy-${Date.now()}-${Math.random().toString(16).slice(2)}`,type,detail:String(detail||""),at:new Date().toISOString()},...privacyEvents0791()].slice(0,50);localStorage.setItem(PRIVACY_EVENTS_KEY_0791,JSON.stringify(rows));}catch{}
+}
+function privacyEventLabel0791(type){return ({enabled:"Local lock enabled",disabled:"Local lock disabled",changed:"PIN changed",recovery:"Recovery code used",recoveryRegenerated:"Recovery code regenerated",locked:"App locked",unlocked:"App unlocked",failed:"Unlock attempt failed",cooldown:"Too many failed attempts"})[type]||type;}
+function privacyClearCooldown0791(){try{sessionStorage.removeItem(PRIVACY_FAILED_KEY_0791);sessionStorage.removeItem(PRIVACY_COOLDOWN_KEY_0791);}catch{}}
+function privacyCooldownState0791(){
+  try{return {failed:Number(sessionStorage.getItem(PRIVACY_FAILED_KEY_0791)||0),until:Number(sessionStorage.getItem(PRIVACY_COOLDOWN_KEY_0791)||0)};}catch{return {failed:0,until:0};}
+}
+function privacyRecordFailure0791(){
+  const state=privacyCooldownState0791(); const failed=state.failed+1; let until=0;
+  if(failed>=5)until=Date.now()+30000;
+  try{sessionStorage.setItem(PRIVACY_FAILED_KEY_0791,String(until?0:failed));if(until)sessionStorage.setItem(PRIVACY_COOLDOWN_KEY_0791,String(until));}catch{}
+  privacyLog0791(until?"cooldown":"failed",until?"30-second cooldown":"Incorrect PIN"); return {failed,until};
+}
+function privacyShouldLockOnBoot0791(){return !!privacyConfig0791()&&!privacySessionUnlocked0791();}
+function privacyHideContent0791(on){
+  document.documentElement.classList.toggle("fv-lock-pending0791",!!on);
+  document.body?.classList.toggle("fv-privacy-locked0791",!!on);
+}
+function privacyRemoveCurtain0791(){document.getElementById("fvPrivacyCurtain0791")?.remove();document.body?.classList.remove("fv-privacy-curtain0791");}
+function privacyShowCurtain0791(){
+  if(document.getElementById("fvPrivacyCurtain0791")||document.getElementById("fvPrivacyLock0791"))return;
+  const curtain=document.createElement("div");curtain.id="fvPrivacyCurtain0791";curtain.className="fvPrivacyCurtain0791";curtain.innerHTML=`<img src="assets/favicon.png?v=${BUILD}" alt=""><strong>FIREVAULT</strong><span>Private workspace</span>`;document.body.appendChild(curtain);document.body.classList.add("fv-privacy-curtain0791");
+}
+function privacyLockMessage0791(reason){return reason==="inactivity"?"FireVault locked after inactivity.":reason==="background"?"FireVault locked when the app left the foreground.":"Enter your local PIN to continue.";}
+function privacyShowLock0791(reason="manual"){
+  const config=privacyConfig0791(); if(!config)return;
+  clearTimeout(privacyTimer0791); privacySetSessionUnlocked0791(false); privacyRemoveCurtain0791(); privacyHideContent0791(true);
+  let overlay=document.getElementById("fvPrivacyLock0791");
+  if(!overlay){overlay=document.createElement("div");overlay.id="fvPrivacyLock0791";overlay.className="fvPrivacyOverlay0791";document.body.appendChild(overlay);}
+  privacyRecoveryMode0791=false;
+  overlay.innerHTML=`<section class="fvPrivacyCard0791" role="dialog" aria-modal="true" aria-labelledby="fvPrivacyTitle0791">
+    <div class="fvPrivacyBrand0791"><img src="assets/favicon.png?v=${BUILD}" alt=""><div><span>FIREVAULT</span><small>LOCAL PRIVACY LOCK</small></div></div>
+    <div class="fvPrivacyShield0791" aria-hidden="true">⌾</div><h1 id="fvPrivacyTitle0791">FireVault Locked</h1><p id="fvPrivacyMessage0791">${esc(privacyLockMessage0791(reason))}</p>
+    <label class="fvPrivacyInputLabel0791" for="fvPrivacyInput0791">6-digit PIN</label><input id="fvPrivacyInput0791" class="fvPrivacyInput0791" type="password" inputmode="numeric" autocomplete="off" maxlength="6" pattern="[0-9]*" aria-describedby="fvPrivacyError0791">
+    <p id="fvPrivacyError0791" class="fvPrivacyError0791" role="alert"></p><button class="primary fvPrivacyUnlock0791" id="fvPrivacyUnlock0791">Unlock FireVault</button>
+    <button class="ghost fvPrivacyRecoveryToggle0791" id="fvPrivacyRecoveryToggle0791">Use recovery code</button><small class="fvPrivacyFoot0791">This local lock reduces casual access on this device. It is not cloud login, encryption, or server-enforced authorization.</small>
+  </section>`;
+  const input=document.getElementById("fvPrivacyInput0791"),button=document.getElementById("fvPrivacyUnlock0791"),toggle=document.getElementById("fvPrivacyRecoveryToggle0791");
+  const submit=()=>privacyAttemptUnlock0791(); if(button)button.onclick=submit;if(input){input.oninput=()=>{input.value=privacyNormalizeDigits0791(input.value,privacyRecoveryMode0791?12:6);};input.onkeydown=e=>{if(e.key==="Enter")submit();};setTimeout(()=>input.focus(),80);}
+  if(toggle)toggle.onclick=()=>{
+    privacyRecoveryMode0791=!privacyRecoveryMode0791; const label=document.querySelector(".fvPrivacyInputLabel0791"); const message=document.getElementById("fvPrivacyMessage0791");
+    if(input){input.value="";input.maxLength=privacyRecoveryMode0791?14:6;input.placeholder=privacyRecoveryMode0791?"0000-0000-0000":"";input.focus();}
+    if(label)label.textContent=privacyRecoveryMode0791?"12-digit recovery code":"6-digit PIN";
+    if(message)message.textContent=privacyRecoveryMode0791?"Enter the recovery code saved when Local Privacy Lock was enabled.":privacyLockMessage0791(reason);
+    toggle.textContent=privacyRecoveryMode0791?"Use PIN instead":"Use recovery code";
+    const error=document.getElementById("fvPrivacyError0791");if(error)error.textContent="";
+  };
+  if(reason!=="startup")privacyLog0791("locked",reason);
+}
+async function privacyAttemptUnlock0791(){
+  const input=document.getElementById("fvPrivacyInput0791"),button=document.getElementById("fvPrivacyUnlock0791"),error=document.getElementById("fvPrivacyError0791"); if(!input||!button)return;
+  const state=privacyCooldownState0791(); if(state.until>Date.now()){const seconds=Math.ceil((state.until-Date.now())/1000);if(error)error.textContent=`Too many attempts. Try again in ${seconds} seconds.`;return;}
+  button.disabled=true;button.classList.add("isBusy0781");if(error)error.textContent="Checking…";
+  try{
+    const ok=privacyRecoveryMode0791?await privacyVerifyRecovery0791(input.value):await privacyVerifyPin0791(input.value);
+    if(!ok){const next=privacyRecordFailure0791();if(error)error.textContent=next.until?"Too many attempts. FireVault is paused for 30 seconds.":`PIN not recognized. ${Math.max(0,5-next.failed)} attempt${5-next.failed===1?"":"s"} before a short cooldown.`;input.value="";input.focus();return;}
+    privacyClearCooldown0791();privacySetSessionUnlocked0791(true);privacyHideContent0791(false);document.getElementById("fvPrivacyLock0791")?.remove();privacyLog0791(privacyRecoveryMode0791?"recovery":"unlocked",privacyRecoveryMode0791?"Recovery code accepted":"PIN accepted");privacyRecoveryMode0791=false;privacyResetTimer0791();
+  }catch(err){if(error)error.textContent=err?.message||"FireVault could not verify the local lock.";}
+  finally{button.disabled=false;button.classList.remove("isBusy0781");}
+}
+function privacyLockNow0791(reason="manual"){
+  if(!privacyConfig0791())return;privacyShowLock0791(reason);
+}
+function privacyResetTimer0791(){
+  clearTimeout(privacyTimer0791); const config=privacyConfig0791(); if(!config||!privacySessionUnlocked0791()||document.hidden)return;
+  const minutes=Math.max(0,Number(config.autoLockMinutes||0)); if(!minutes)return;
+  privacyTimer0791=setTimeout(()=>privacyLockNow0791("inactivity"),minutes*60*1000);
+}
+function privacyActivity0791(){if(privacySessionUnlocked0791()&&!document.getElementById("fvPrivacyLock0791"))privacyResetTimer0791();}
+function privacyInstallRuntime0791(){
+  if(privacyRuntimeInstalled0791)return;privacyRuntimeInstalled0791=true;
+  ["pointerdown","keydown","touchstart"].forEach(name=>document.addEventListener(name,privacyActivity0791,{passive:true,capture:true}));
+  document.addEventListener("visibilitychange",()=>{
+    const config=privacyConfig0791();if(!config)return;
+    if(document.hidden){clearTimeout(privacyTimer0791);if(config.lockOnBackground)privacyLockNow0791("background");else if(config.privacyScreen)privacyShowCurtain0791();}
+    else{privacyRemoveCurtain0791();if(!privacySessionUnlocked0791())privacyShowLock0791("background");else privacyResetTimer0791();}
+  });
+  window.addEventListener("pageshow",()=>{if(privacyConfig0791()&&!privacySessionUnlocked0791())privacyShowLock0791("startup");else privacyResetTimer0791();});
+}
+function privacyInitialize0791(){
+  privacyInstallRuntime0791(); const config=privacyConfig0791();
+  if(!config){privacySetSessionUnlocked0791(false);privacyHideContent0791(false);document.getElementById("fvPrivacyLock0791")?.remove();return;}
+  if(!privacySessionUnlocked0791())privacyShowLock0791("startup");else{privacyHideContent0791(false);privacyResetTimer0791();}
+}
+function privacyFormatRecovery0791(value){return privacyNormalizeDigits0791(value,12).replace(/(\d{4})(?=\d)/g,"$1-");}
+function privacyShowRecoveryCode0791(code){
+  const existing=document.getElementById("fvRecoverySheet0791");if(existing)existing.remove();
+  const overlay=document.createElement("div");overlay.id="fvRecoverySheet0791";overlay.className="fvPrivacyRecoverySheet0791";overlay.innerHTML=`<section role="dialog" aria-modal="true" aria-label="Privacy recovery code"><span class="fvRecoveryKicker0791">SAVE THIS ONCE</span><h2>Local Lock Recovery Code</h2><p>This code can unlock FireVault if the PIN is forgotten. FireVault stores only a one-way hash and cannot show this code again.</p><code id="fvRecoveryCode0791">${esc(code)}</code><div class="fvRecoveryActions0791"><button class="primary" id="fvCopyRecovery0791">Copy Code</button><button class="ghost" id="fvDownloadRecovery0791">Download</button><button class="ghost" id="fvCloseRecovery0791">Done</button></div></section>`;document.body.appendChild(overlay);
+  document.getElementById("fvCopyRecovery0791")?.addEventListener("click",async()=>{try{await navigator.clipboard.writeText(code);toast("Recovery code copied.","success");}catch{toast("Clipboard unavailable.","error");}});
+  document.getElementById("fvDownloadRecovery0791")?.addEventListener("click",()=>downloadBlob(`firevault-local-lock-recovery-${new Date().toISOString().slice(0,10)}.txt`,`FireVault Local Privacy Lock Recovery Code\n\n${code}\n\nKeep this file private. This code unlocks only the local FireVault installation where it was created.`,`text/plain`));
+  document.getElementById("fvCloseRecovery0791")?.addEventListener("click",()=>overlay.remove());
+}
 
 const ACCOUNTS_VIEW_STATE_KEY_0761 = "firevault_accounts_view_0761";
 function loadAccountsViewState0761(){
@@ -1941,7 +2099,7 @@ window.addEventListener("orientationchange",()=>setTimeout(syncGlobalHeaderClear
 function contextualHelpInfo060(){
   if(view!=="settings") return CONTEXT_HELP_060[view]||null;
   if(settingsTab==="manual") return null;
-  const tabMap={tech:["settings","Technician Profile"],gps:["route","GPS / Maps"],reports:["reports","Report Settings"],email:["reports","Email Settings"],overlay:["photos","Photo Overlay"],themes:["settings","Theme Settings"],homeLayout:["home","Home Layout"],visibility:["settings","Modules / Simple View"],advanced:["settings","Advanced Settings"],customerImport:["sites","Customer Import"],categories:["sites","Categories"],backup:["backup","Backup & Restore"],about:["release","About FireVault"]};
+  const tabMap={tech:["settings","Technician Profile"],gps:["route","GPS / Maps"],reports:["reports","Report Settings"],email:["reports","Email Settings"],overlay:["photos","Photo Overlay"],themes:["settings","Theme Settings"],homeLayout:["home","Home Layout"],visibility:["settings","Modules / Simple View"],advanced:["settings","Advanced Settings"],privacy:["settings","Privacy Lock"],security:["settings","Security Foundation"],customerImport:["sites","Customer Import"],categories:["sites","Categories"],backup:["backup","Backup & Restore"],about:["release","About FireVault"]};
   const item=tabMap[settingsTab]||["settings","Settings"];
   return {chapter:item[0],label:item[1],suggestions:settingsTab==="email"?["Recipients","Subject tags","Signature preview"]:settingsTab==="backup"?["Export backup","Restore safely","Clean update"]:["What this controls","Recommended setup","Related features"]};
 }
@@ -1993,6 +2151,7 @@ function render(){
     applyRoutePolishClass0780();
     animateRouteEntry0781();
     installLayoutGuard0785();
+    privacyInitialize0791();
   }catch(err){ showError(err); }
 }
 
@@ -6669,7 +6828,7 @@ const SETTINGS_GROUPS_067 = [
   {key:"appearance",icon:"◐",title:"App & Home",note:"Demo Mode, theme, Home layout, and visible modules.",tone:"violet",tabs:["demo","themes","homeLayout","visibility"]},
   {key:"field",icon:"🧰",title:"Field Tools",note:"GPS, photo overlays, and optional field services.",tone:"cyan",tabs:["gps","overlay","advanced"]},
   {key:"reports",icon:"▤",title:"Reports & Communication",note:"Report content, email delivery, and customer closeout.",tone:"amber",tabs:["reports","email"]},
-  {key:"data",icon:"☁",title:"Data, Sync & Support",note:"Security foundation, categories, imports, backup, team sync, Help, About, and diagnostics.",tone:"red",tabs:["security","sync","webdav","customerImport","categories","backup","updates","manual","about","diagnostics"]}
+  {key:"data",icon:"☁",title:"Data, Sync & Support",note:"Privacy lock, security foundation, categories, imports, backup, team sync, Help, About, and diagnostics.",tone:"red",tabs:["privacy","security","sync","webdav","customerImport","categories","backup","updates","manual","about","diagnostics"]}
 ];
 function settingsGroupForTab067(tab){ return SETTINGS_GROUPS_067.find(g=>g.tabs.includes(tab))?.key || "data"; }
 function settingsGroup067ByKey(key){ return SETTINGS_GROUPS_067.find(g=>g.key===key) || SETTINGS_GROUPS_067[0]; }
@@ -6692,6 +6851,7 @@ function settingsTabs(){
     ["homeLayout","Home Layout","Choose which optional Home cards appear and how they open."],
     ["visibility","Modules","Enable or disable FireVault modules for a cleaner field interface."],
     ["advanced","Advanced","Optional integrations and field services. An asterisk marks controls that require an outside service."],
+    ["privacy","Privacy Lock","Optional local PIN, inactivity timeout, background lock, recovery code, and privacy screen."],
     ["security","Security Foundation","Workspace identity, local user and device IDs, audit history, soft deletion, and future authentication readiness."],
     ["sync","Team Sync","Technician identity, shared-vault packages, pending changes, and conflict review."],
     ["webdav","WebDAV","Optional encrypted-transport backup and restore using a compatible WebDAV server."],
@@ -6753,7 +6913,7 @@ function leaveSettingsHome572(){
 }
 
 function settingsIcon550(tab){
-  return ({tech:"👤",gps:"⌖",reports:"▤",email:"✉",overlay:"▧",demo:"D",themes:"◐",homeLayout:"⌂",visibility:"☰",advanced:"⚡",security:"⌾",sync:"☁",customerImport:"⇩",categories:"◇",backup:"⇅",updates:"↻",manual:"?",about:"ⓘ"})[tab]||"•";
+  return ({tech:"👤",gps:"⌖",reports:"▤",email:"✉",overlay:"▧",demo:"D",themes:"◐",homeLayout:"⌂",visibility:"☰",advanced:"⚡",privacy:"▣",security:"⌾",sync:"☁",customerImport:"⇩",categories:"◇",backup:"⇅",updates:"↻",manual:"?",about:"ⓘ"})[tab]||"•";
 }
 function settings(){
   captureSettingsScroll576();
@@ -6790,7 +6950,7 @@ function settings(){
 
   settingsGroup067=settingsGroupForTab067(settingsTab);
   const detailGroup=settingsGroup067ByKey(settingsGroup067);
-  const saveable=!['demo','customerImport','categories','backup','updates','manual','about'].includes(settingsTab);
+  const saveable=!['demo','privacy','customerImport','categories','backup','updates','manual','about'].includes(settingsTab);
 
   if(settingsTab==="manual"){
     html(`<div class="screen settingsTabbedDetail0736 settingsManualScreen067 settingsStable573">
@@ -7396,7 +7556,7 @@ function manualSimplePage058(type){
   quick:["🚀","Quick Start Guide","Get FireVault ready for a normal field day.",[["1. Verify the build","Confirm the green build badge shows 0.67.0 before entering production information."],["2. Complete Technician Profile","Enter your name, company, phone, email, and license or employee identification."],["3. Review permissions","Allow location and photo access only when FireVault requests them and the feature is needed."],["4. Create or open a site","Add the customer name, full address, panel details, contacts, access notes, and GPS location."],["5. Document the visit","Record notes, photos, tasks, deficiencies, equipment changes, and a service visit."],["6. Finish and protect the data","Review the report, send or copy the required summary, then export a current backup."]]],
   new:["🆕","What’s New in 0.67.0","Account View, Settings navigation, and FireVault Academy redesign.",[["Unified visual system","Standardized typography, spacing, card surfaces, borders, controls, and responsive behavior across FireVault."],["Settings cleanup","Improved Settings home cards and every submenu while preserving the preferred Email setup workflow."],["Help readability","Converted contextual Help and Academy articles into one uninterrupted scrolling reading column with no floating metadata."],["Site Detail stability","Reinforced natural-height cards, readable text, and scroll-safe account sections."],["Operational screens","Simplified Customer Import, Team Sync, Conflict Center, and Nearby Sites presentation without changing their workflows."],["Phone and iPad layouts","Added consistent narrow-phone and tablet behavior, bottom-navigation clearance, and overflow protection."],["Nearby scan diagnostics","Nearby Sites now shows total sites, GPS-ready records, missing coordinates, phone-location progress, and persistent error messages."],["Coordinate recovery","FireVault recovers valid latitude and longitude stored in compatible legacy or imported fields and normalizes them into the site GPS record."],["Location retry","If high-accuracy location times out or is unavailable, FireVault retries once using standard accuracy."],["Nearest-site fallback","When no site is inside the selected radius, the nearest GPS-ready sites remain visible instead of presenting an empty result."],["Latitude and longitude","Customer Import can calculate missing coordinates from each usable U.S. street address before saving records."],["Coordinate requirement","The importer requires calculated, supplied, or existing GPS coordinates by default. Unmatched addresses remain in review."],["Census address matching","Only address fields are sent to the U.S. Census Geocoder. The returned point is an address-range calculation, not a guaranteed building entrance."],["Account Id matching","Repeat imports update the matching FireVault site instead of creating duplicates or deleting field history."],["CSV coordinate columns","Files that already contain Latitude and Longitude columns use those values directly."],["Sync-ready changes","Added and updated customer records enter the pending synchronization queue and create a Sync Activity entry."]]],
   tips:["🧰","Field Tips","Short practices that improve the usefulness of FireVault records.",[["Write for the next technician","Include the exact panel, circuit, device, location, symptom, test result, and next action instead of relying on memory."],["Photograph context first","Take one wide photo showing the equipment location before close-up terminal, label, or damage photos."],["Separate facts from follow-up","Use notes for what occurred, deficiencies for code or system problems, and tasks for work that still needs completion."],["Confirm the account","Before using Quick Capture, verify the selected customer site to prevent records from being stored under the wrong account."],["Back up before updates","Download an external backup before a major update or device change and after completing significant field documentation."]]],
-  revisions:["📋","Revision History","Application and documentation checkpoints.",[["0.79.0","Added security-ready schema 4 metadata, stable workspace/user/device identities, local audit history, pending change queue, recoverable deletion, credential-safe exports, and protected restore/reset actions."],["0.67.0","Redesigned Account View around service actions and grouped information, consolidated Settings into five folders, and simplified FireVault Academy and contextual Help for continuous reading."],["0.65.2","Repaired Nearby Sites with GPS inventory counts, imported-coordinate recovery, persistent permission and timeout messages, a standard-accuracy retry, and nearest-site fallback results."],["0.65.1","Added online latitude/longitude calculation, coordinate validation, geocoding progress, unmatched-address review, optional CSV coordinates, and coordinate-safe repeat importing."],["0.65.0","Added preview-first customer CSV importing, Account Id update matching, validation warnings, imported monitoring details, and sync activity tracking."],["0.64.1","Simplified Academy article headers, removed floating metadata badges, and improved continuous scrolling and readability."],["0.64.0","Added Sync Activity, a conflict review center, export/import audit entries, and an automatic OneDrive connection-readiness checklist."],["0.63.1","Overhauled contextual Help and Academy reader formatting, removed overlapping sticky article headers, and restored full scrolling on phones and tablets."],["0.63.0","Added permanent record IDs, audit metadata, local version tracking, pending-sync states, conflict readiness, device identity, and a Team Sync settings workspace."],["0.60.0","Connected major screens and Settings areas directly to matching Academy chapters with return-to-screen navigation."],["0.59.0","Added interactive tutorials, guided orientation, pinned learning, field tips, and documentation tracking."],["0.58.0","Expanded Help & Manual into FireVault Academy with bookmarks, smart search, Quick Start, and reader navigation."],["0.57.0","Added the first complete searchable in-app FireVault User Manual."],["Ongoing review rule","Any change to navigation, labels, storage, workflows, permissions, or supported layouts requires the related manual chapter to be checked."]]],
+  revisions:["📋","Revision History","Application and documentation checkpoints.",[["0.79.1","Added an optional local six-digit privacy lock with PBKDF2 hashing, inactivity/background locking, app-switcher privacy screen, recovery code, cooldown protection, and local lock events."],["0.79.0","Added security-ready schema 4 metadata, stable workspace/user/device identities, local audit history, pending change queue, recoverable deletion, credential-safe exports, and protected restore/reset actions."],["0.67.0","Redesigned Account View around service actions and grouped information, consolidated Settings into five folders, and simplified FireVault Academy and contextual Help for continuous reading."],["0.65.2","Repaired Nearby Sites with GPS inventory counts, imported-coordinate recovery, persistent permission and timeout messages, a standard-accuracy retry, and nearest-site fallback results."],["0.65.1","Added online latitude/longitude calculation, coordinate validation, geocoding progress, unmatched-address review, optional CSV coordinates, and coordinate-safe repeat importing."],["0.65.0","Added preview-first customer CSV importing, Account Id update matching, validation warnings, imported monitoring details, and sync activity tracking."],["0.64.1","Simplified Academy article headers, removed floating metadata badges, and improved continuous scrolling and readability."],["0.64.0","Added Sync Activity, a conflict review center, export/import audit entries, and an automatic OneDrive connection-readiness checklist."],["0.63.1","Overhauled contextual Help and Academy reader formatting, removed overlapping sticky article headers, and restored full scrolling on phones and tablets."],["0.63.0","Added permanent record IDs, audit metadata, local version tracking, pending-sync states, conflict readiness, device identity, and a Team Sync settings workspace."],["0.60.0","Connected major screens and Settings areas directly to matching Academy chapters with return-to-screen navigation."],["0.59.0","Added interactive tutorials, guided orientation, pinned learning, field tips, and documentation tracking."],["0.58.0","Expanded Help & Manual into FireVault Academy with bookmarks, smart search, Quick Start, and reader navigation."],["0.57.0","Added the first complete searchable in-app FireVault User Manual."],["Ongoing review rule","Any change to navigation, labels, storage, workflows, permissions, or supported layouts requires the related manual chapter to be checked."]]],
   trouble:["❓","Troubleshooting","Common problems and safe first checks.",FIREVAULT_MANUAL_058.find(x=>x.id==="trouble")?.topics||[]]
  };
  const [icon,title,note,items]=pages[type]||["ⓘ","Unavailable","This Help section is not available in the installed version.",[["Current status","Return to Help and choose an available chapter or tutorial."]]];
@@ -7691,6 +7851,60 @@ function confirmSensitive0790(phrase,message){
   const entered=prompt(`${message}\n\nType ${phrase} to continue.`);
   return String(entered||"").trim().toUpperCase()===String(phrase).toUpperCase();
 }
+
+
+function privacyDate0791(value){if(!value)return "Not recorded";try{return new Date(value).toLocaleString();}catch{return String(value);}}
+function privacyLockPanel0791(){
+  const config=privacyConfig0791(); const events=privacyEvents0791().slice(0,10);
+  if(!config)return `<div class="settingsStack privacySettings0791">
+    ${settingsSection540("Device privacy","Local Privacy Lock","Add a six-digit PIN to reduce casual access when FireVault is left open on this iPhone. The PIN and recovery code are stored only as one-way hashes outside the FireVault vault.",`
+      <div class="privacySetupGrid0791">
+        ${fieldBlock("New 6-digit PIN",`<input id="privacyNewPin0791" type="password" inputmode="numeric" autocomplete="new-password" maxlength="6" pattern="[0-9]*" placeholder="••••••">`,`Use six digits you can remember.`)}
+        ${fieldBlock("Confirm PIN",`<input id="privacyConfirmPin0791" type="password" inputmode="numeric" autocomplete="new-password" maxlength="6" pattern="[0-9]*" placeholder="••••••">`)}
+        ${fieldBlock("Auto-lock",`<select id="privacyTimeout0791"><option value="1">After 1 minute</option><option value="5" selected>After 5 minutes</option><option value="15">After 15 minutes</option><option value="30">After 30 minutes</option><option value="0">Never from inactivity</option></select>`)}
+      </div>
+      <div class="settingsList privacyToggleList0791">${checkBlock("privacyBackground0791","Lock whenever FireVault leaves the foreground",true)}${checkBlock("privacyScreen0791","Hide account information in the app switcher when possible",true)}</div>
+      <div class="privacyActions0791"><button class="primary" id="enablePrivacy0791">Enable Local Lock</button></div>
+    `,"blue")}
+    <div class="settingsInfo540 warning"><strong>Local protection—not account login</strong><span>This feature does not encrypt the vault or replace signup, passkeys, 2FA, user roles, or server authorization. Those require the future FireVault backend.</span></div>
+  </div>`;
+  return `<div class="settingsStack privacySettings0791">
+    ${settingsSection540("Protection active","Local Privacy Lock",`Enabled ${privacyDate0791(config.updatedAt)}. A PIN is required after a manual lock, configured inactivity period, or background lock.`,`
+      <div class="privacyStatus0791"><span>✓</span><div><strong>Local lock is enabled</strong><small>${config.lockOnBackground?"Locks when FireVault leaves the foreground":"Background locking is off"} · ${Number(config.autoLockMinutes||0)?`Auto-lock after ${Number(config.autoLockMinutes)} minute${Number(config.autoLockMinutes)===1?"":"s"}`:"Inactivity auto-lock is off"}</small></div></div>
+      <div class="privacyActions0791"><button class="primary" id="lockNow0791">Lock Now</button></div>
+    `,"green")}
+    ${settingsSection540("Lock behavior","Timeout & Privacy Screen","These preferences apply only on this installed FireVault PWA.",`
+      <div class="settingsGrid">${fieldBlock("Auto-lock",`<select id="privacyTimeout0791"><option value="1" ${Number(config.autoLockMinutes)===1?"selected":""}>After 1 minute</option><option value="5" ${Number(config.autoLockMinutes)===5?"selected":""}>After 5 minutes</option><option value="15" ${Number(config.autoLockMinutes)===15?"selected":""}>After 15 minutes</option><option value="30" ${Number(config.autoLockMinutes)===30?"selected":""}>After 30 minutes</option><option value="0" ${!Number(config.autoLockMinutes)?"selected":""}>Never from inactivity</option></select>`)}</div>
+      <div class="settingsList privacyToggleList0791">${checkBlock("privacyBackground0791","Lock whenever FireVault leaves the foreground",config.lockOnBackground!==false)}${checkBlock("privacyScreen0791","Hide account information in the app switcher when possible",config.privacyScreen!==false)}</div>
+      <div class="privacyActions0791"><button class="primary" id="savePrivacyBehavior0791">Save Lock Behavior</button></div>
+    `,"cyan")}
+    ${settingsSection540("Credentials","Change PIN or Recovery Code","Changing the PIN creates a new one-time recovery code. The current PIN is required.",`
+      <div class="privacySetupGrid0791">${fieldBlock("Current PIN",`<input id="privacyCurrentPin0791" type="password" inputmode="numeric" maxlength="6" pattern="[0-9]*" placeholder="••••••">`)}${fieldBlock("New PIN",`<input id="privacyNewPin0791" type="password" inputmode="numeric" maxlength="6" pattern="[0-9]*" placeholder="••••••">`)}${fieldBlock("Confirm new PIN",`<input id="privacyConfirmPin0791" type="password" inputmode="numeric" maxlength="6" pattern="[0-9]*" placeholder="••••••">`)}</div>
+      <div class="privacyActions0791"><button class="primary" id="changePrivacyPin0791">Change PIN</button><button class="ghost" id="regeneratePrivacyRecovery0791">New Recovery Code</button><button class="danger" id="disablePrivacy0791">Disable Local Lock</button></div>
+    `,"amber")}
+    ${settingsSection540("Recent activity","Local Lock Events","This small event list is stored outside the account vault and never includes the PIN or recovery code.",`
+      <div class="privacyEventList0791">${events.length?events.map(row=>`<div><span>${esc(privacyEventLabel0791(row.type))}</span><strong>${esc(privacyDate0791(row.at))}</strong>${row.detail?`<small>${esc(row.detail)}</small>`:""}</div>`).join(""):`<div class="securityEmpty0790"><strong>No privacy events yet</strong><span>Lock and unlock activity will appear here.</span></div>`}</div>
+    `,"slate")}
+    <div class="settingsInfo540 warning"><strong>Not a replacement for login or encryption</strong><span>The local lock helps with casual device access. Real multi-user security will still require backend authentication, passkeys or 2FA, roles, encrypted transport, and server authorization.</span></div>
+  </div>`;
+}
+function privacyPinInputs0791(){document.querySelectorAll('#privacyNewPin0791,#privacyConfirmPin0791,#privacyCurrentPin0791').forEach(input=>input.addEventListener('input',()=>input.value=privacyNormalizeDigits0791(input.value,6)));}
+async function privacyCurrentPinValid0791(){const input=document.getElementById('privacyCurrentPin0791');if(!input||privacyNormalizeDigits0791(input.value,6).length!==6){toast('Enter the current 6-digit PIN.','error');input?.focus();return false;}try{const ok=await privacyVerifyPin0791(input.value);if(!ok){toast('Current PIN was not recognized.','error');input.value='';input.focus();return false;}return true;}catch(err){toast(err?.message||'PIN verification failed.','error');return false;}}
+function wirePrivacyLock0791(){
+  privacyPinInputs0791();
+  document.getElementById('enablePrivacy0791')?.addEventListener('click',async()=>{
+    const pin=privacyNormalizeDigits0791(document.getElementById('privacyNewPin0791')?.value,6),confirmPin=privacyNormalizeDigits0791(document.getElementById('privacyConfirmPin0791')?.value,6);
+    if(pin.length!==6){toast('Enter a 6-digit PIN.','error');return;}if(pin!==confirmPin){toast('PIN confirmation does not match.','error');return;}
+    const button=document.getElementById('enablePrivacy0791');button.disabled=true;button.classList.add('isBusy0781');
+    try{const result=await privacyCreateConfig0791(pin,{autoLockMinutes:Number(document.getElementById('privacyTimeout0791')?.value||5),lockOnBackground:document.getElementById('privacyBackground0791')?.checked!==false,privacyScreen:document.getElementById('privacyScreen0791')?.checked!==false});if(!privacyWriteConfig0791(result.config))throw new Error('iPhone storage did not accept the privacy settings.');privacySetSessionUnlocked0791(true);privacyHideContent0791(false);privacyLog0791('enabled','Local PIN created');try{recordSecurityEvent(data,'privacy-lock-enabled',{autoLockMinutes:result.config.autoLockMinutes,lockOnBackground:result.config.lockOnBackground});data=loadData();}catch{}privacyResetTimer0791();privacyShowRecoveryCode0791(result.recovery);toast('Local Privacy Lock enabled.','success');settings();}catch(err){toast(err?.message||'Local lock could not be enabled.','error');}finally{button.disabled=false;button.classList.remove('isBusy0781');}
+  });
+  document.getElementById('savePrivacyBehavior0791')?.addEventListener('click',()=>{const config=privacyConfig0791();if(!config)return;config.autoLockMinutes=Number(document.getElementById('privacyTimeout0791')?.value||0);config.lockOnBackground=document.getElementById('privacyBackground0791')?.checked!==false;config.privacyScreen=document.getElementById('privacyScreen0791')?.checked!==false;config.updatedAt=new Date().toISOString();if(!privacyWriteConfig0791(config)){toast('Lock preferences could not be saved.','error');return;}privacyLog0791('changed','Lock behavior updated');privacyResetTimer0791();toast('Lock behavior saved.','success');settings();});
+  document.getElementById('lockNow0791')?.addEventListener('click',()=>privacyLockNow0791('manual'));
+  document.getElementById('changePrivacyPin0791')?.addEventListener('click',async()=>{if(!await privacyCurrentPinValid0791())return;const pin=privacyNormalizeDigits0791(document.getElementById('privacyNewPin0791')?.value,6),confirmPin=privacyNormalizeDigits0791(document.getElementById('privacyConfirmPin0791')?.value,6);if(pin.length!==6){toast('Enter a new 6-digit PIN.','error');return;}if(pin!==confirmPin){toast('New PIN confirmation does not match.','error');return;}try{const old=privacyConfig0791();const result=await privacyCreateConfig0791(pin,old||{});if(!privacyWriteConfig0791(result.config))throw new Error('Privacy settings could not be saved.');privacyLog0791('changed','PIN and recovery code changed');try{recordSecurityEvent(data,'privacy-lock-pin-changed',{});data=loadData();}catch{}privacyShowRecoveryCode0791(result.recovery);toast('PIN changed. Save the new recovery code.','success');settings();}catch(err){toast(err?.message||'PIN could not be changed.','error');}});
+  document.getElementById('regeneratePrivacyRecovery0791')?.addEventListener('click',async()=>{if(!await privacyCurrentPinValid0791())return;try{const config=privacyConfig0791(),recovery=privacyRandomRecovery0791(),salt=privacyBytesToBase640791(privacyRandomBytes0791());config.recoverySalt=salt;config.recoveryHash=await privacyHash0791(privacyNormalizeDigits0791(recovery,12),salt,config.iterations);config.updatedAt=new Date().toISOString();if(!privacyWriteConfig0791(config))throw new Error('Privacy settings could not be saved.');privacyLog0791('recoveryRegenerated','New recovery code created');privacyShowRecoveryCode0791(recovery);toast('New recovery code created.','success');}catch(err){toast(err?.message||'Recovery code could not be created.','error');}});
+  document.getElementById('disablePrivacy0791')?.addEventListener('click',async()=>{if(!await privacyCurrentPinValid0791())return;if(!confirm('Disable Local Privacy Lock on this FireVault installation?'))return;try{localStorage.removeItem(PRIVACY_LOCK_KEY_0791);sessionStorage.removeItem(PRIVACY_UNLOCKED_KEY_0791);privacyClearCooldown0791();privacyHideContent0791(false);privacyLog0791('disabled','Local lock removed');try{recordSecurityEvent(data,'privacy-lock-disabled',{});data=loadData();}catch{}clearTimeout(privacyTimer0791);toast('Local Privacy Lock disabled.','success');settings();}catch(err){toast(err?.message||'Local lock could not be disabled.','error');}});
+}
+
 function securityDate0790(value){
   if(!value)return "Not recorded";
   try{return new Date(value).toLocaleString();}catch{return String(value);}
@@ -7709,7 +7923,10 @@ function securityFoundationPanel0790(){
     "backup-exported":"External backup exported",
     "backup-imported":"External backup restored",
     "webdav-restored":"WebDAV backup restored",
-    "bulk-change-summary":"Bulk change recorded"
+    "bulk-change-summary":"Bulk change recorded",
+    "privacy-lock-enabled":"Local privacy lock enabled",
+    "privacy-lock-disabled":"Local privacy lock disabled",
+    "privacy-lock-pin-changed":"Local privacy PIN changed"
   };
   return `<div class="settingsStack securityFoundation0790">
     ${settingsSection540("Identity layer","Security-Ready Foundation","FireVault now assigns stable workspace, user, device, record-version, and change identities. This prepares the vault for real login, roles, 2FA, and cloud authorization without adding a cosmetic login screen.",`
@@ -7738,7 +7955,7 @@ function securityFoundationPanel0790(){
       <div class="securityAudit0790">${audit.length?audit.map(row=>`<div><span>${esc(auditLabels[row.type]||row.type)}</span><strong>${esc(row.title||row.recordType||row.user||"")}</strong><small>${esc(securityDate0790(row.at))} · ${esc(row.user||summary.user.displayName||"Local user")}</small></div>`).join(""):`<div class="securityEmpty0790"><strong>No audit events yet</strong><span>New changes will appear here automatically.</span></div>`}</div>
       <div class="securityActions0790"><button class="primary" id="downloadSecurityAudit0790">Download Audit Log</button></div>
     `,"slate")}
-    <div class="settingsInfo540 warning"><strong>Authentication is the next phase</strong><span>This build prepares the data safely. Real signup, passkeys, 2FA, roles, and server-enforced access still require a secure backend; no password or fake login has been added.</span></div>
+    <div class="settingsInfo540 warning"><strong>Authentication is the next phase</strong><span>This build prepares the data safely. The optional Local Privacy Lock is available separately. Real signup, passkeys, 2FA, roles, and server-enforced access still require a secure backend.</span></div>
   </div>`;
 }
 function wireSecurityFoundation0790(){
@@ -7811,6 +8028,8 @@ function settingsPanel(){
     ${settingsSection540("Optional services","Advanced Features","Enable only the integrations used in your workflow. Some require permissions, APIs, subscriptions, or external services.",`<div class="settingsInfo540 warning"><strong><span class="featureStar">*</span> External service required</strong><span>Enabling a control does not connect or purchase an outside service.</span></div><div class="settingsList twoCol advancedGrid540">${[["advAi","aiTechnician","AI Technician"],["advReverse","reverseAddressLookup","Reverse Address Lookup *"],["advCloud","cloudBackup","Cloud Backup *"],["advVoice","voiceTranscription","Voice Transcription *"],["advOcr","ocrReader","OCR Reader *"],["advEmail","emailGateway","Email Gateway *"],["advWeather","weather","Weather Context *"],["advTraffic","traffic","Traffic / Routing *"]].map(x=>checkBlock(x[0],x[2],a[x[1]])).join("")}</div>`,"amber",saveButton())}
   </div>`;
 
+  if(settingsTab==="privacy") return privacyLockPanel0791();
+
   if(settingsTab==="security") return securityFoundationPanel0790();
 
   if(settingsTab==="sync") {
@@ -7875,6 +8094,7 @@ function settingsPanel(){
   </div>`;
 }
 function wireSettingsPanel(){
+  if(settingsTab==="privacy"){wirePrivacyLock0791();return;}
   if(settingsTab==="security"){wireSecurityFoundation0790();return;}
   if(settingsTab==="webdav"){wireWebdav0757();return;}
   const saveBtn=document.getElementById("saveSettings"); if(saveBtn) saveBtn.onclick=saveSettings;
@@ -8817,6 +9037,7 @@ function diagnostics(){
 }
 function showChangelog(){
   const notes = [
+    "Build 0.79.1 adds an optional local privacy lock with PIN hashing, inactivity and background locking, recovery code support, and a privacy screen.",
     "Build 0.79.0 adds a security-ready data foundation with stable workspace, user, and device identities; record versioning; change queues; audit history; soft deletion; recycle recovery; and stronger restore/reset confirmation.",
     "Build 0.78.6 completed the Account Detail polish pass with a cleaner field workspace and improved service actions.",
     "Build 0.78.4 redesigns Settings section introductions so they no longer resemble buttons, repairs wrapping and overflow in Data and other Settings areas, and standardizes narrow-phone settings layouts.",
@@ -8854,7 +9075,7 @@ function showChangelog(){
   overlay.className="releaseOverlay";
   overlay.innerHTML=`<div class="releaseSheet" role="dialog" aria-modal="true" aria-label="FireVault release notes">
     <div class="releaseHead"><div><strong>${fireVaultBrand575()}</strong><span>Build ${BUILD}</span></div><button class="ghost iconBtn" id="closeRelease" aria-label="Close release notes">×</button></div>
-    <div class="releaseBody"><h2>Release Notes</h2><p class="releaseIntro">App-wide stability with measured chrome geometry, reliable overflow containment, and more consistent component sizing across every major route.</p><ul>${notes.map(n=>`<li>${esc(n)}</li>`).join("")}</ul></div>
+    <div class="releaseBody"><h2>Release Notes</h2><p class="releaseIntro">Optional local privacy protection with a six-digit PIN, inactivity/background locking, recovery code, and safer app-switcher visibility.</p><ul>${notes.map(n=>`<li>${esc(n)}</li>`).join("")}</ul></div>
   </div>`;
   document.body.appendChild(overlay);
   const close=()=>overlay.remove();
@@ -8907,6 +9128,7 @@ window.visualViewport?.addEventListener("scroll",scheduleLayoutMetrics0785,{pass
 function bootFireVault518(){
   try{
     window.__FIREVAULT_MODULE_READY = true;
+    if(privacyShouldLockOnBoot0791()) privacyShowLock0791("startup"); else privacyHideContent0791(false);
     document.body.classList.remove("app-loading533");
     document.body.classList.add("app-booted533");
     render();
