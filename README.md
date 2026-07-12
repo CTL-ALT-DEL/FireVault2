@@ -1,4 +1,4 @@
-# FireVault Build 0.76.8 — Custom Accounts Pickers
+# FireVault Build 0.76.9 — Custom Accounts Pickers
 
 - Keeps Jump To and Sort By on one compact row.
 - Places readable high-contrast labels inside both controls.
