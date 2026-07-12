@@ -1,4 +1,4 @@
-# FireVault Build 0.79.2
+# FireVault Build 0.79.3
 
 Deploy the contents of this package over the current FireVault GitHub Pages repository.
 

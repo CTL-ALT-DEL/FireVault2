@@ -18442,7 +18442,7 @@ body.fv-privacy-locked0791{overflow:hidden!important;background:#07090d!importan
 @media(max-width:430px){.fvPrivacyCard0791,.fvPrivacyRecoverySheet0791>section{padding:18px;border-radius:20px;}.privacySetupGrid0791{grid-template-columns:1fr;}.privacySetupGrid0791 .settingField:last-child:nth-child(odd){grid-column:auto;}.fvRecoveryActions0791{grid-template-columns:1fr;}.fvRecoveryActions0791 button:last-child{grid-column:auto;}.privacyEventList0791>div{grid-template-columns:1fr;}.privacyEventList0791 strong,.privacyEventList0791 small{grid-column:1;white-space:normal;}}
 @media(prefers-reduced-motion:reduce){.fvPrivacyOverlay0791,.fvPrivacyRecoverySheet0791,.fvPrivacyCurtain0791{scroll-behavior:auto;}}
 
-/* Build 0.79.2 — Security Center & Recovery Hardening */
+/* Build 0.79.3 — Security Center & Recovery Hardening */
 .securityCenter0792{min-width:0}
 .securityHero0792{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px;border:1px solid rgba(52,211,153,.28);border-radius:16px;background:linear-gradient(135deg,rgba(16,185,129,.15),rgba(15,23,42,.72))}
 .securityHero0792>div{display:flex;align-items:center;gap:11px;min-width:0}.securityHero0792 strong{display:block;font-size:17px;color:#f8fafc}.securityHero0792 small{display:block;margin-top:3px;color:#b9c5d4;line-height:1.35}
@@ -18461,3 +18461,18 @@ body.fv-privacy-locked0791{overflow:hidden!important;background:#07090d!importan
 .securityCenter0792 [id^="securityIntegrity0792"],.securityCenter0792 [id^="securityBackup0792"],.securityCenter0792 [id^="securityIdentity0792"]{scroll-margin-top:12px}
 @media(max-width:430px){.securityDashboard0792{grid-template-columns:1fr 1fr}.securityDashCard0792{min-height:86px;padding:10px}.securityBackupGrid0792{grid-template-columns:1fr}.securityDeviceRename0792{grid-template-columns:1fr}.securityDeviceRename0792 button{width:100%}.securityAuditControls0792{grid-template-columns:1fr}.securityActions0790{display:grid;grid-template-columns:1fr}.securityActions0790 button{width:100%}}
 @media(max-width:360px){.securityDashboard0792{grid-template-columns:1fr}.securityHero0792{align-items:flex-start}.securityHeroPill0792{margin-top:2px}.securityIntegrityStatus0792{align-items:flex-start;flex-direction:column}.securityIntegrityStatus0792 b{align-self:flex-end}}
+
+/* Build 0.79.3 — Backend Adapter Foundation */
+.backendFoundation0793{min-width:0}
+.backendStatusGrid0793{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:14px}
+.backendStatusGrid0793>div{min-width:0;padding:12px;border:1px solid rgba(148,163,184,.2);border-radius:12px;background:rgba(15,23,42,.45)}
+.backendStatusGrid0793 strong,.backendStatusGrid0793 span{display:block;overflow-wrap:anywhere}
+.backendStatusGrid0793 strong{font-size:.74rem;color:#94a3b8;text-transform:uppercase;letter-spacing:.06em;margin-bottom:5px}
+.backendStatusGrid0793 span{font-weight:750;color:#f8fafc}
+.backendProviderList0793{display:grid;gap:8px}
+.backendProviderList0793>div{display:grid;grid-template-columns:38px minmax(0,1fr) auto;align-items:center;gap:10px;min-width:0;padding:11px 12px;border:1px solid rgba(148,163,184,.18);border-radius:12px;background:rgba(15,23,42,.4)}
+.backendProviderIcon0793{display:grid;place-items:center;width:36px;height:36px;border-radius:10px;background:rgba(59,130,246,.15);color:#93c5fd;font-size:1.1rem}
+.backendProviderList0793 strong,.backendProviderList0793 small{display:block;overflow-wrap:anywhere}
+.backendProviderList0793 small{color:#94a3b8;text-transform:capitalize;margin-top:2px}
+.backendProviderList0793 b{font-size:.68rem;letter-spacing:.08em;color:#86efac;border:1px solid rgba(34,197,94,.35);border-radius:999px;padding:5px 8px}
+@media(max-width:390px){.backendStatusGrid0793{grid-template-columns:1fr}.backendProviderList0793>div{grid-template-columns:34px minmax(0,1fr) auto;padding:10px}.backendProviderIcon0793{width:32px;height:32px}}

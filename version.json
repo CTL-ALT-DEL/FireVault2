@@ -1,6 +1,6 @@
 {
-  "build": "0.79.2",
+  "build": "0.79.3",
   "released": "2026-07-12",
-  "note": "Security Center and recovery hardening",
-  "label": "Vault integrity checks, backup health, audit viewer, device controls, and PIN-gated sensitive operations"
+  "note": "Backend adapter foundation",
+  "label": "Backend-neutral authentication, database, file storage, sync, and audit provider interfaces"
 }

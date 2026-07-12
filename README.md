@@ -1,4 +1,4 @@
-# FireVault Build 0.79.2 — Security Center & Recovery Hardening
+# FireVault Build 0.79.3 — Security Center & Recovery Hardening
 
 This release consolidates FireVault’s local security and recovery tools under **Settings → Data → Security Center**.
 
@@ -21,3 +21,7 @@ This release consolidates FireVault’s local security and recovery tools under 
 - Security schema remains version 4
 - Existing accounts, Demo Mode, categories, imports, backups, WebDAV settings, and update behavior are preserved
 - No signup, cloud login, passkeys, 2FA, roles enforcement, or backend is included yet
+
+## Build 0.79.3 — Backend Adapter Foundation
+
+FireVault remains fully local and offline. This build adds replaceable provider contracts for authentication, database, file storage, synchronization, and audit. Settings → Data → Backend Foundation shows the active local providers, runs diagnostics, and exports an integration manifest for a future Supabase, Firebase, Microsoft/Azure, or custom API implementation.

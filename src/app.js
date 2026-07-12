@@ -1,4 +1,5 @@
-import { BUILD, KEY, ACTIVE_JOB_KEY, loadData, saveData, ensureSite, fullAddress, esc, uid, downloadBlob, syncSummary, syncQueue, syncConflicts, syncActivity, createSyncPackage, importSyncPackage, resolveSyncConflict, notePackageExport, deviceIdentity, recordSyncActivity, autoBackupInfo, latestAutoBackup, restoreAutoBackup, isDemoMode, setDemoMode, resetDemoData, securityFoundationSummary, securityAudit, recycleBinInfo, restoreRecycleRecord, purgeRecycleBin, recordSecurityEvent, validateVaultIntegrity } from "./storage.js?v=0.79.2";
+import { BUILD, KEY, ACTIVE_JOB_KEY, loadData, saveData, ensureSite, fullAddress, esc, uid, downloadBlob, syncSummary, syncQueue, syncConflicts, syncActivity, createSyncPackage, importSyncPackage, resolveSyncConflict, notePackageExport, deviceIdentity, recordSyncActivity, autoBackupInfo, latestAutoBackup, restoreAutoBackup, isDemoMode, setDemoMode, resetDemoData, securityFoundationSummary, securityAudit, recycleBinInfo, restoreRecycleRecord, purgeRecycleBin, recordSecurityEvent, validateVaultIntegrity } from "./storage.js?v=0.79.3";
+import { backendAdapterSummary, runBackendAdapterDiagnostics, backendAdapterManifest, PROVIDER_CONTRACT_VERSION } from "./providers.js?v=0.79.3";
 window.__FIREVAULT_MODULE_READY = true;
 
 function fvPreferenceStore0739(){
@@ -6830,7 +6831,7 @@ const SETTINGS_GROUPS_067 = [
   {key:"appearance",icon:"◐",title:"App & Home",note:"Demo Mode, theme, Home layout, and visible modules.",tone:"violet",tabs:["demo","themes","homeLayout","visibility"]},
   {key:"field",icon:"🧰",title:"Field Tools",note:"GPS, photo overlays, and optional field services.",tone:"cyan",tabs:["gps","overlay","advanced"]},
   {key:"reports",icon:"▤",title:"Reports & Communication",note:"Report content, email delivery, and customer closeout.",tone:"amber",tabs:["reports","email"]},
-  {key:"data",icon:"☁",title:"Data, Sync & Support",note:"Privacy Lock, Security Center, categories, imports, backup, team sync, Help, About, and diagnostics.",tone:"red",tabs:["privacy","security","sync","webdav","customerImport","categories","backup","updates","manual","about","diagnostics"]}
+  {key:"data",icon:"☁",title:"Data, Sync & Support",note:"Privacy Lock, Security Center, backend readiness, categories, imports, backup, team sync, Help, About, and diagnostics.",tone:"red",tabs:["privacy","security","backend","sync","webdav","customerImport","categories","backup","updates","manual","about","diagnostics"]}
 ];
 function settingsGroupForTab067(tab){ return SETTINGS_GROUPS_067.find(g=>g.tabs.includes(tab))?.key || "data"; }
 function settingsGroup067ByKey(key){ return SETTINGS_GROUPS_067.find(g=>g.key===key) || SETTINGS_GROUPS_067[0]; }
@@ -6855,6 +6856,7 @@ function settingsTabs(){
     ["advanced","Advanced","Optional integrations and field services. An asterisk marks controls that require an outside service."],
     ["privacy","Privacy Lock","Optional local PIN, inactivity timeout, background lock, recovery code, and privacy screen."],
     ["security","Security Center","Privacy, vault integrity, backup health, device identity, audit history, and recovery controls."],
+    ["backend","Backend Foundation","Provider-ready authentication, database, file storage, sync, and audit adapters."],
     ["sync","Team Sync","Technician identity, shared-vault packages, pending changes, and conflict review."],
     ["webdav","WebDAV","Optional encrypted-transport backup and restore using a compatible WebDAV server."],
     ["customerImport","Customer Import","Preview and safely import customer records from a CSV export using Account Id."],
@@ -6952,7 +6954,7 @@ function settings(){
 
   settingsGroup067=settingsGroupForTab067(settingsTab);
   const detailGroup=settingsGroup067ByKey(settingsGroup067);
-  const saveable=!['demo','privacy','customerImport','categories','backup','updates','manual','about'].includes(settingsTab);
+  const saveable=!['demo','privacy','backend','customerImport','categories','backup','updates','manual','about'].includes(settingsTab);
 
   if(settingsTab==="manual"){
     html(`<div class="screen settingsTabbedDetail0736 settingsManualScreen067 settingsStable573">
@@ -7558,7 +7560,7 @@ function manualSimplePage058(type){
   quick:["🚀","Quick Start Guide","Get FireVault ready for a normal field day.",[["1. Verify the build","Confirm the green build badge shows 0.67.0 before entering production information."],["2. Complete Technician Profile","Enter your name, company, phone, email, and license or employee identification."],["3. Review permissions","Allow location and photo access only when FireVault requests them and the feature is needed."],["4. Create or open a site","Add the customer name, full address, panel details, contacts, access notes, and GPS location."],["5. Document the visit","Record notes, photos, tasks, deficiencies, equipment changes, and a service visit."],["6. Finish and protect the data","Review the report, send or copy the required summary, then export a current backup."]]],
   new:["🆕","What’s New in 0.67.0","Account View, Settings navigation, and FireVault Academy redesign.",[["Unified visual system","Standardized typography, spacing, card surfaces, borders, controls, and responsive behavior across FireVault."],["Settings cleanup","Improved Settings home cards and every submenu while preserving the preferred Email setup workflow."],["Help readability","Converted contextual Help and Academy articles into one uninterrupted scrolling reading column with no floating metadata."],["Site Detail stability","Reinforced natural-height cards, readable text, and scroll-safe account sections."],["Operational screens","Simplified Customer Import, Team Sync, Conflict Center, and Nearby Sites presentation without changing their workflows."],["Phone and iPad layouts","Added consistent narrow-phone and tablet behavior, bottom-navigation clearance, and overflow protection."],["Nearby scan diagnostics","Nearby Sites now shows total sites, GPS-ready records, missing coordinates, phone-location progress, and persistent error messages."],["Coordinate recovery","FireVault recovers valid latitude and longitude stored in compatible legacy or imported fields and normalizes them into the site GPS record."],["Location retry","If high-accuracy location times out or is unavailable, FireVault retries once using standard accuracy."],["Nearest-site fallback","When no site is inside the selected radius, the nearest GPS-ready sites remain visible instead of presenting an empty result."],["Latitude and longitude","Customer Import can calculate missing coordinates from each usable U.S. street address before saving records."],["Coordinate requirement","The importer requires calculated, supplied, or existing GPS coordinates by default. Unmatched addresses remain in review."],["Census address matching","Only address fields are sent to the U.S. Census Geocoder. The returned point is an address-range calculation, not a guaranteed building entrance."],["Account Id matching","Repeat imports update the matching FireVault site instead of creating duplicates or deleting field history."],["CSV coordinate columns","Files that already contain Latitude and Longitude columns use those values directly."],["Sync-ready changes","Added and updated customer records enter the pending synchronization queue and create a Sync Activity entry."]]],
   tips:["🧰","Field Tips","Short practices that improve the usefulness of FireVault records.",[["Write for the next technician","Include the exact panel, circuit, device, location, symptom, test result, and next action instead of relying on memory."],["Photograph context first","Take one wide photo showing the equipment location before close-up terminal, label, or damage photos."],["Separate facts from follow-up","Use notes for what occurred, deficiencies for code or system problems, and tasks for work that still needs completion."],["Confirm the account","Before using Quick Capture, verify the selected customer site to prevent records from being stored under the wrong account."],["Back up before updates","Download an external backup before a major update or device change and after completing significant field documentation."]]],
-  revisions:["📋","Revision History","Application and documentation checkpoints.",[["0.79.2","Added a unified Security Center with vault integrity validation, backup health, audit filters, device naming, session clearing, and PIN confirmation for sensitive exports, restores, and deletion."],["0.79.1","Added an optional local six-digit privacy lock with PBKDF2 hashing, inactivity/background locking, app-switcher privacy screen, recovery code, cooldown protection, and local lock events."],["0.79.0","Added security-ready schema 4 metadata, stable workspace/user/device identities, local audit history, pending change queue, recoverable deletion, credential-safe exports, and protected restore/reset actions."],["0.67.0","Redesigned Account View around service actions and grouped information, consolidated Settings into five folders, and simplified FireVault Academy and contextual Help for continuous reading."],["0.65.2","Repaired Nearby Sites with GPS inventory counts, imported-coordinate recovery, persistent permission and timeout messages, a standard-accuracy retry, and nearest-site fallback results."],["0.65.1","Added online latitude/longitude calculation, coordinate validation, geocoding progress, unmatched-address review, optional CSV coordinates, and coordinate-safe repeat importing."],["0.65.0","Added preview-first customer CSV importing, Account Id update matching, validation warnings, imported monitoring details, and sync activity tracking."],["0.64.1","Simplified Academy article headers, removed floating metadata badges, and improved continuous scrolling and readability."],["0.64.0","Added Sync Activity, a conflict review center, export/import audit entries, and an automatic OneDrive connection-readiness checklist."],["0.63.1","Overhauled contextual Help and Academy reader formatting, removed overlapping sticky article headers, and restored full scrolling on phones and tablets."],["0.63.0","Added permanent record IDs, audit metadata, local version tracking, pending-sync states, conflict readiness, device identity, and a Team Sync settings workspace."],["0.60.0","Connected major screens and Settings areas directly to matching Academy chapters with return-to-screen navigation."],["0.59.0","Added interactive tutorials, guided orientation, pinned learning, field tips, and documentation tracking."],["0.58.0","Expanded Help & Manual into FireVault Academy with bookmarks, smart search, Quick Start, and reader navigation."],["0.57.0","Added the first complete searchable in-app FireVault User Manual."],["Ongoing review rule","Any change to navigation, labels, storage, workflows, permissions, or supported layouts requires the related manual chapter to be checked."]]],
+  revisions:["📋","Revision History","Application and documentation checkpoints.",[["0.79.3","Added backend-neutral provider interfaces for authentication, database, file storage, synchronization, and audit while keeping FireVault fully local."],["0.79.2","Added a unified Security Center with vault integrity validation, backup health, audit filters, device naming, session clearing, and PIN confirmation for sensitive exports, restores, and deletion."],["0.79.1","Added an optional local six-digit privacy lock with PBKDF2 hashing, inactivity/background locking, app-switcher privacy screen, recovery code, cooldown protection, and local lock events."],["0.79.0","Added security-ready schema 4 metadata, stable workspace/user/device identities, local audit history, pending change queue, recoverable deletion, credential-safe exports, and protected restore/reset actions."],["0.67.0","Redesigned Account View around service actions and grouped information, consolidated Settings into five folders, and simplified FireVault Academy and contextual Help for continuous reading."],["0.65.2","Repaired Nearby Sites with GPS inventory counts, imported-coordinate recovery, persistent permission and timeout messages, a standard-accuracy retry, and nearest-site fallback results."],["0.65.1","Added online latitude/longitude calculation, coordinate validation, geocoding progress, unmatched-address review, optional CSV coordinates, and coordinate-safe repeat importing."],["0.65.0","Added preview-first customer CSV importing, Account Id update matching, validation warnings, imported monitoring details, and sync activity tracking."],["0.64.1","Simplified Academy article headers, removed floating metadata badges, and improved continuous scrolling and readability."],["0.64.0","Added Sync Activity, a conflict review center, export/import audit entries, and an automatic OneDrive connection-readiness checklist."],["0.63.1","Overhauled contextual Help and Academy reader formatting, removed overlapping sticky article headers, and restored full scrolling on phones and tablets."],["0.63.0","Added permanent record IDs, audit metadata, local version tracking, pending-sync states, conflict readiness, device identity, and a Team Sync settings workspace."],["0.60.0","Connected major screens and Settings areas directly to matching Academy chapters with return-to-screen navigation."],["0.59.0","Added interactive tutorials, guided orientation, pinned learning, field tips, and documentation tracking."],["0.58.0","Expanded Help & Manual into FireVault Academy with bookmarks, smart search, Quick Start, and reader navigation."],["0.57.0","Added the first complete searchable in-app FireVault User Manual."],["Ongoing review rule","Any change to navigation, labels, storage, workflows, permissions, or supported layouts requires the related manual chapter to be checked."]]],
   trouble:["❓","Troubleshooting","Common problems and safe first checks.",FIREVAULT_MANUAL_058.find(x=>x.id==="trouble")?.topics||[]]
  };
  const [icon,title,note,items]=pages[type]||["ⓘ","Unavailable","This Help section is not available in the installed version.",[["Current status","Return to Help and choose an available chapter or tutorial."]]];
@@ -8063,6 +8065,52 @@ function wireSecurityFoundation0790(){
     try{const count=purgeRecycleBin(data);data=loadData();toast(`${count} deleted record${count===1?"":"s"} permanently removed.`,"success");settings();}catch(err){toast(err?.message||"Recycle bin could not be emptied.","error");}
   });
 }
+
+function backendFoundationPanel0793(){
+  const summary=backendAdapterSummary(data);
+  const providers=Object.entries(summary.providers||{});
+  return `<div class="settingsStack backendFoundation0793">
+    <section class="card settingsSection540 tone-blue">
+      <div class="settingsSectionHead530"><div><span class="settingsEyebrow530">Backend neutral</span><h2>Backend Adapter Foundation</h2><p>FireVault is still fully local. These adapters isolate backend-dependent work so Supabase or another service can be connected later without rebuilding the user interface.</p></div><span class="pill">Contract v${PROVIDER_CONTRACT_VERSION}</span></div>
+      <div class="backendStatusGrid0793">
+        <div><strong>Current mode</strong><span>Local offline</span></div>
+        <div><strong>Remote backend</strong><span>Not configured</span></div>
+        <div><strong>Pending changes</strong><span>${summary.pendingChanges}</span></div>
+        <div><strong>Workspace</strong><span>${esc(summary.workspaceId)}</span></div>
+      </div>
+    </section>
+    <section class="card compactPane">
+      <div class="paneHead"><div><h2>Provider Interfaces</h2><p class="paneNote">Each responsibility can be replaced independently when the backend is selected.</p></div></div>
+      <div class="backendProviderList0793">${providers.map(([kind,item])=>`<div><span class="backendProviderIcon0793">${({authentication:'◉',database:'▦',fileStorage:'▤',sync:'↻',audit:'≡'})[kind]||'•'}</span><div><strong>${esc(item.label)}</strong><small>${esc(kind.replace(/([A-Z])/g,' $1'))}</small></div><b>LOCAL</b></div>`).join('')}</div>
+    </section>
+    <section class="card compactPane">
+      <div class="paneHead"><div><h2>Backend Readiness</h2><p class="paneNote">No account data will leave this device until a remote provider is deliberately configured.</p></div></div>
+      <div class="settingsInfo540"><strong>Supported future targets</strong><span>${summary.candidateBackends.map(esc).join(' • ')}</span></div>
+      <div class="backupActionGrid449"><button class="primary" id="runBackendDiagnostics0793">Run Adapter Check</button><button class="ghost" id="downloadBackendManifest0793">Download Manifest</button></div>
+      <div id="backendDiagnosticResult0793" class="fieldNote">Ready to validate the local provider contracts.</div>
+    </section>
+    <section class="card compactPane">
+      <div class="paneHead"><div><h2>What This Build Does Not Do</h2></div></div>
+      <div class="settingsInfo540"><strong>No signup or login yet</strong><span>Authentication remains local until a backend and identity provider are selected.</span></div>
+      <div class="settingsInfo540"><strong>No remote synchronization yet</strong><span>The existing local change queue remains ready for a future Sync Provider.</span></div>
+      <div class="settingsInfo540"><strong>No credentials in the vault</strong><span>Future provider secrets must stay outside backups and account records.</span></div>
+    </section>
+  </div>`;
+}
+async function wireBackendFoundation0793(){
+  document.getElementById("runBackendDiagnostics0793")?.addEventListener("click",async()=>{
+    const out=document.getElementById("backendDiagnosticResult0793");if(out)out.textContent="Checking provider contracts…";
+    const result=await runBackendAdapterDiagnostics(data);
+    if(out)out.textContent=result.checks.map(x=>`${x.ok?'✓':'!'} ${x.provider}: ${x.detail}`).join(" • ");
+    toast(result.ok?"Backend adapter foundation is ready.":"One or more adapter checks need attention.",result.ok?"success":"error");
+  });
+  document.getElementById("downloadBackendManifest0793")?.addEventListener("click",()=>{
+    const manifest=backendAdapterManifest(data);
+    downloadBlob(`firevault-backend-adapter-manifest-${new Date().toISOString().slice(0,10)}.json`,JSON.stringify(manifest,null,2),"application/json");
+    toast("Backend adapter manifest downloaded.","success");
+  });
+}
+
 function settingsPanel(){
   const s=data.settings, t=s.theme, tech=s.technician, email=s.email, r=s.reports, o=s.overlay, a=s.advanced, gps=s.gps||{};
   const saveButton=(label="Save")=>`<button class="primary saveMini" id="saveSettings">${esc(label)}</button>`;
@@ -8114,6 +8162,7 @@ function settingsPanel(){
   if(settingsTab==="privacy") return privacyLockPanel0791();
 
   if(settingsTab==="security") return securityFoundationPanel0790();
+  if(settingsTab==="backend") return backendFoundationPanel0793();
 
   if(settingsTab==="sync") {
     const cfg=data.settings.sync||{};
@@ -8179,6 +8228,7 @@ function settingsPanel(){
 function wireSettingsPanel(){
   if(settingsTab==="privacy"){wirePrivacyLock0791();return;}
   if(settingsTab==="security"){wireSecurityFoundation0790();return;}
+  if(settingsTab==="backend"){wireBackendFoundation0793();return;}
   if(settingsTab==="webdav"){wireWebdav0757();return;}
   const saveBtn=document.getElementById("saveSettings"); if(saveBtn) saveBtn.onclick=saveSettings;
   if(settingsTab==="overlay") wireOverlaySettings510();
@@ -9120,6 +9170,7 @@ function diagnostics(){
 }
 function showChangelog(){
   const notes = [
+    "Build 0.79.3 adds backend-neutral provider interfaces for authentication, database, file storage, synchronization, and audit while keeping FireVault fully local.",
     "Build 0.79.2 adds a unified Security Center for vault integrity, backup health, audit review, device identity, recovery, and PIN-gated sensitive actions.",
     "Build 0.79.0 adds a security-ready data foundation with stable workspace, user, and device identities; record versioning; change queues; audit history; soft deletion; recycle recovery; and stronger restore/reset confirmation.",
     "Build 0.78.6 completed the Account Detail polish pass with a cleaner field workspace and improved service actions.",
