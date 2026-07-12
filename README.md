@@ -1,38 +1,32 @@
-# FireVault Build 0.79.4 — Cloud File Storage & Plus Codes Foundation
+# FireVault Build 0.79.5 — Microsoft Storage Accounts
 
-This release keeps FireVault local-first while preparing photos and documents for independent storage destinations and adding full offline Google Plus Codes.
+This release keeps FireVault local-first while preparing separate Microsoft storage destinations for a personal account, a work account, and SharePoint libraries.
 
-## Photo and document storage
+## Microsoft Storage Accounts
 
-Open **Settings → Data → Photo & Document Storage**.
+Open **Settings → Data → Microsoft Storage Accounts**.
 
-- Configure separate destinations for photos and documents
-- Available targets: Local FireVault, WebDAV, Microsoft OneDrive, SharePoint Library, Google Drive, and Dropbox
-- Local storage works now; the existing WebDAV module continues to handle vault backup and restore
-- WebDAV photo/document transfer and OAuth-based providers are represented as integration targets until their connector flows are activated
-- Keep a local copy after upload
-- Queue a future remote upload when a photo or document is saved
-- Override the default destination on an individual photo or document record
-- Download a provider integration manifest for the later cloud-connection build
+- Create multiple named Personal OneDrive, Work OneDrive, and SharePoint profiles
+- Keep connector profile metadata outside the FireVault vault and backup exports
+- Assign the exact profile used for Photos and the exact profile used for Documents
+- Protect company data with a strict no-personal-fallback rule
+- Save the public Microsoft application (client) ID, authority, tenant ID, and SPA redirect URI
+- Download a Microsoft integration manifest for the later live OAuth connector build
 
-No OAuth access tokens, refresh tokens, or passwords are stored in the FireVault vault or backup exports.
+## Current connector state
 
-## Google Plus Codes
+The account-profile and destination-assignment foundation is complete. Live Microsoft sign-in, token refresh, file upload, download, and SharePoint discovery are intentionally not activated until a Microsoft Entra app registration is available. Passwords and OAuth tokens are never accepted by this build.
 
-Open **Settings → Field → Google Plus Codes**.
+## Preserved
 
-- Generates full Plus Codes directly from latitude and longitude without a network request
-- Default account precision: 10 digits
-- Default saved-location precision: 11 digits
-- Search accounts by Plus Code
-- Include Plus Codes in reports
-- Generate or refresh codes across the existing database
-- Save exact location pins for entrances, fire panels, riser rooms, FDCs, parking, and other field locations
-- Copy codes or open them in Google Maps
+- Existing `firevault_vault_build_030` storage key
+- Security schema 4
+- Local-first account database
+- Automatic snapshots and Security Center
+- Privacy Lock
+- WebDAV backup and restore
+- Independent photo/document storage settings
+- Offline Google Plus Codes
+- Backend adapter foundation
 
-## Data compatibility
-
-- Existing storage key remains `firevault_vault_build_030`
-- Security schema remains version 4
-- Existing accounts, Demo Mode, automatic backups, WebDAV, categories, imports, Privacy Lock, Security Center, and backend adapters are preserved
-- No remote OAuth provider or live cloud synchronization is activated in this release
+Deploy over the existing FireVault installation. Do not delete or reinstall the Home Screen PWA.

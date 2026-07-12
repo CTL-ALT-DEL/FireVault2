@@ -1,6 +1,6 @@
 {
-  "build": "0.79.4",
+  "build": "0.79.5",
   "released": "2026-07-12",
-  "note": "Cloud file storage and Plus Codes foundation",
-  "label": "Independent photo/document destinations and offline Google Plus Codes"
+  "note": "Microsoft storage accounts foundation",
+  "label": "Separate Personal, Work, and SharePoint storage profiles"
 }

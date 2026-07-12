@@ -1,4 +1,4 @@
-export const BUILD = "0.79.4";
+export const BUILD = "0.79.5";
 export const SECURITY_SCHEMA_VERSION = 4;
 export const KEY = "firevault_vault_build_030";
 export const ACTIVE_JOB_KEY = "firevault_active_job_modular";
@@ -876,11 +876,12 @@ export function normalize(data){
   data.settings.sync = {provider:"onedrive",enabled:false,organization:"",workspace:"FireVault Shared Vault",autoSync:true,wifiOnly:false,conflictPolicy:"review",...(data.settings.sync||{})};
   const fileStorage=data.settings.fileStorage||{};
   data.settings.fileStorage={
-    version:1,
-    photo:{provider:"local",folder:"FireVault/Photos",...(fileStorage.photo||{})},
-    document:{provider:"local",folder:"FireVault/Documents",...(fileStorage.document||{})},
+    version:2,
+    photo:{provider:"local",connectionId:"",folder:"FireVault/Photos",...(fileStorage.photo||{})},
+    document:{provider:"local",connectionId:"",folder:"FireVault/Documents",...(fileStorage.document||{})},
     keepLocalCopy:fileStorage.keepLocalCopy!==false,
-    uploadOnSave:!!fileStorage.uploadOnSave
+    uploadOnSave:!!fileStorage.uploadOnSave,
+    neverFallbackToPersonal:fileStorage.neverFallbackToPersonal!==false
   };
   data.settings.plusCodes={
     enabled:true,
@@ -929,6 +930,7 @@ export function normalize(data){
       const isPhoto=!!(doc.imageData||doc.photoData||/^image\//i.test(String(doc.mime||doc.mimeType||"")));
       const target=isPhoto?data.settings.fileStorage.photo:data.settings.fileStorage.document;
       doc.storageProvider=doc.storageProvider||target.provider||"local";
+      doc.storageConnectionId=doc.storageConnectionId||target.connectionId||"";
       doc.storageFolder=doc.storageFolder||target.folder||`FireVault/${isPhoto?"Photos":"Documents"}`;
       doc.storageTargetId=doc.storageTargetId||`${doc.storageProvider}:${isPhoto?"photo":"document"}`;
       doc.storageStatus=doc.storageStatus||(doc.storageProvider==="local"?"local":"pending");

@@ -1,6 +1,6 @@
-const BUILD="0.79.4";
+const BUILD="0.79.5";
 const CACHE=`firevault-${BUILD}`;
-const SHELL=["./","./index.html","./manifest.json","./src/app.js?v=0.79.4","./src/storage.js?v=0.79.4","./src/providers.js?v=0.79.4","./src/open-location-code.js?v=0.79.4","./src/styles.css?v=0.79.4","./assets/favicon.png","./assets/apple-touch-icon.png","./assets/icon-192.png","./assets/icon-512.png"];
+const SHELL=["./","./index.html","./manifest.json","./src/app.js?v=0.79.5","./src/storage.js?v=0.79.5","./src/providers.js?v=0.79.5","./src/open-location-code.js?v=0.79.5","./src/styles.css?v=0.79.5","./assets/favicon.png","./assets/apple-touch-icon.png","./assets/icon-192.png","./assets/icon-512.png"];
 self.addEventListener("install",event=>{event.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(SHELL)).then(()=>self.skipWaiting()));});
 self.addEventListener("activate",event=>{event.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(k=>k.startsWith("firevault-")&&k!==CACHE).map(k=>caches.delete(k)))).then(()=>self.clients.claim()));});
 self.addEventListener("message",event=>{if(event.data&&event.data.type==="SKIP_WAITING") self.skipWaiting();});

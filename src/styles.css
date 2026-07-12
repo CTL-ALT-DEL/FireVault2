@@ -18536,3 +18536,32 @@ body.fv-privacy-locked0791{overflow:hidden!important;background:#07090d!importan
   .cloudStorageActions0794{display:grid;grid-template-columns:1fr}
   .cloudStorageActions0794 button{width:100%}
 }
+
+
+/* Build 0.79.5 — Microsoft Storage Accounts */
+.microsoftStorage0795{min-width:0}
+.microsoftSummaryGrid0795{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
+.microsoftSummaryGrid0795 article{min-width:0;padding:12px;border:1px solid rgba(96,165,250,.2);border-radius:13px;background:linear-gradient(145deg,rgba(8,24,45,.78),rgba(12,17,27,.86));display:grid;gap:4px}
+.microsoftSummaryGrid0795 span{color:#8ea4bb;font-size:9.5px;font-weight:900;letter-spacing:.065em;text-transform:uppercase}
+.microsoftSummaryGrid0795 strong{color:#f8fbff;font-size:15px;line-height:1.2;overflow-wrap:anywhere}
+.microsoftSummaryGrid0795 small{color:#9eacbf;font-size:10.5px;line-height:1.3}
+.microsoftProfileList0795{display:grid;gap:9px}
+.microsoftProfileCard0795{display:grid;grid-template-columns:42px minmax(0,1fr) auto;gap:10px;align-items:center;min-width:0;padding:12px;border:1px solid rgba(59,130,246,.22);border-radius:14px;background:rgba(8,17,31,.76)}
+.microsoftProfileIcon0795{display:grid;place-items:center;width:40px;height:40px;border-radius:12px;background:linear-gradient(135deg,#2563eb,#0ea5e9);color:#fff;font-size:18px;font-weight:950}
+.microsoftProfileCard0795>div:nth-child(2){min-width:0}
+.microsoftProfileCard0795 strong,.microsoftProfileCard0795 small,.microsoftProfileCard0795 em{display:block;overflow-wrap:anywhere}
+.microsoftProfileCard0795 strong{color:#f8fafc;font-size:14px}
+.microsoftProfileCard0795 small{margin-top:3px;color:#a8b5c7;font-size:11px;line-height:1.3}
+.microsoftProfileCard0795 em{margin-top:4px;color:#7dd3fc;font-size:10px;font-style:normal}
+.microsoftProfileCard0795>b{padding:5px 7px;border:1px solid rgba(251,191,36,.28);border-radius:999px;background:rgba(180,83,9,.16);color:#fde68a;font-size:8.5px;letter-spacing:.055em;white-space:nowrap}
+.microsoftProfileActions0795{grid-column:1/-1;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:7px}
+.microsoftProfileActions0795 button{min-width:0;min-height:40px;height:auto;padding:7px 8px;font-size:10px;line-height:1.15;white-space:normal}
+.microsoftAssignmentField0795{display:none;margin-top:9px;padding:11px;border:1px solid rgba(59,130,246,.22);border-radius:13px;background:rgba(15,23,42,.5)}
+.microsoftAssignmentField0795.show{display:grid;grid-template-columns:minmax(0,1fr);gap:6px}
+.microsoftAssignmentField0795 label{color:#a9b7c9;font-size:10px;font-weight:900;letter-spacing:.06em;text-transform:uppercase}
+.microsoftAssignmentField0795 select{width:100%;min-width:0}
+.microsoftAssignmentField0795 small{color:#8fa0b6;font-size:10.5px;line-height:1.35}
+.microsoftOAuthStatus0795>.paneHead{align-items:center}
+.microsoftOAuthStatus0795>.paneHead>b{padding:6px 8px;border-radius:999px;background:rgba(34,197,94,.15);border:1px solid rgba(74,222,128,.25);color:#bbf7d0;font-size:9px;letter-spacing:.06em;white-space:nowrap}
+@media(max-width:520px){.microsoftSummaryGrid0795{grid-template-columns:1fr}.microsoftProfileCard0795{grid-template-columns:38px minmax(0,1fr)}.microsoftProfileCard0795>b{grid-column:2;justify-self:start}.microsoftProfileActions0795{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:360px){.microsoftProfileActions0795{grid-template-columns:1fr}.microsoftOAuthStatus0795>.paneHead{align-items:flex-start;flex-direction:column}.microsoftOAuthStatus0795>.paneHead>b{align-self:flex-start}}
