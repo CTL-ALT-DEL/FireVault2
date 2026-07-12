@@ -8,7 +8,7 @@
   "orientation": "portrait-primary",
   "background_color": "#0b0d10",
   "theme_color": "#101216",
-  "description": "Field knowledge system for fire alarm technicians. Build 0.73.6 introduces a simplified Accounts directory, tabbed Settings navigation, and a cleaner Nearby account list.",
+  "description": "Field knowledge system for fire alarm technicians. Build 0.73.7 adds rule-driven multi-category account tags and repairs the Settings interface.",
   "icons": [
     {
       "src": "assets/icon-192.png",
@@ -49,5 +49,5 @@
       "description": "Open FireVault settings"
     }
   ],
-  "version": "0.73.6"
+  "version": "0.73.7"
 }

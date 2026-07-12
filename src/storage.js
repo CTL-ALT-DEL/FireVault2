@@ -1,4 +1,4 @@
-export const BUILD = "0.73.6";
+export const BUILD = "0.73.7";
 export const KEY = "firevault_vault_build_030";
 export const ACTIVE_JOB_KEY = "firevault_active_job_modular";
 export const DEVICE_KEY = "firevault_device_identity_062";
@@ -334,6 +334,25 @@ export function normalize(data){
   data.settings.advanced = data.settings.advanced || {aiTechnician:false, reverseAddressLookup:false, cloudBackup:false, voiceTranscription:false, ocrReader:false, emailGateway:false, weather:false, traffic:false};
   data.settings.gps = {enabled:true, mapProvider:"apple", highAccuracy:true, includeInReports:true, nearbyRadiusMiles:1, ...(data.settings.gps || {})};
   data.settings.sync = {provider:"onedrive",enabled:false,organization:"",workspace:"FireVault Shared Vault",autoSync:true,wifiOnly:false,conflictPolicy:"review",...(data.settings.sync||{})};
+  const defaultCategories0737 = [];
+  const rawCategories0737 = data.settings.accountCategories;
+  const sourceCategories0737 = rawCategories0737 && Array.isArray(rawCategories0737.definitions) ? rawCategories0737.definitions : defaultCategories0737;
+  data.settings.accountCategories = {
+    version:1,
+    definitions:sourceCategories0737.map((category,index)=>({
+      id:String(category?.id||`category-${index+1}`),
+      name:String(category?.name||`Category ${index+1}`).trim()||`Category ${index+1}`,
+      color:/^#[0-9a-f]{6}$/i.test(String(category?.color||""))?String(category.color):"#22c55e",
+      enabled:category?.enabled!==false,
+      match:category?.match==="any"?"any":"all",
+      rules:(Array.isArray(category?.rules)?category.rules:[]).map((rule,ruleIndex)=>({
+        id:String(rule?.id||`rule-${index+1}-${ruleIndex+1}`),
+        field:["accountId","name","address","city","state","zip","deviceType","sourceGroup","panel","phone"].includes(rule?.field)?rule.field:"accountId",
+        operator:["startsWith","contains","equals","endsWith","notContains","present","empty"].includes(rule?.operator)?rule.operator:"contains",
+        value:String(rule?.value||"").trim()
+      }))
+    }))
+  };
   data.syncState = {...(data.syncState||{}),schemaVersion:3,deviceId:deviceIdentity(),provider:data.settings.sync.provider,lastLocalSave:data.syncState?.lastLocalSave||"",lastSuccessfulSync:data.syncState?.lastSuccessfulSync||""};
   const homeCardDefaults = {pinnedSites:{visible:true,behavior:"remember"},fieldFocus:{visible:true,behavior:"remember"},nearbyAccounts:{visible:true,behavior:"remember"},recentAccounts:{visible:true,behavior:"remember"}};
   data.settings.homeLayout = data.settings.homeLayout || {preset:"custom",cards:{}};

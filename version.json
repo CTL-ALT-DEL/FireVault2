@@ -1,6 +1,6 @@
 {
-  "build": "0.73.6",
+  "build": "0.73.7",
   "released": "2026-07-11",
-  "note": "Simplifies the Accounts directory, redesigns Settings with category tabs, and removes Plus Code text from Nearby account cards.",
-  "notes": "Adds fast account filters, cleaner account rows, direct tabbed Settings navigation, and preserves all existing data and Plus Code tools inside account details."
+  "note": "Adds rule-driven multi-category account tags, repairs Settings tabs, and blends the global header into page content.",
+  "notes": "Adds editable category rules under Settings → Data, supports multiple automatic tags per account, improves Settings tab spacing, and removes the faint global header separator."
 }

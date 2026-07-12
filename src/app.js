@@ -1021,7 +1021,7 @@ function checklist(){
 
 function siteSearchBlob(s){
   ensureSite(s);
-  const parts=[s.name, fullAddress(s), s.panelManufacturer, s.panelModel, s.notes, s.externalAccountId, s.sitePhone, s.devicePhone, s.deviceType, s.siteId1, s.siteId2, s.siteLanguage, s.devicePhoneComment, s.sourceGroupNumber];
+  const parts=[s.name, fullAddress(s), s.panelManufacturer, s.panelModel, s.notes, s.externalAccountId, s.sitePhone, s.devicePhone, s.deviceType, s.siteId1, s.siteId2, s.siteLanguage, s.devicePhoneComment, s.sourceGroupNumber, ...accountTags0737(s).map(tag=>tag.name)];
   (s.contacts||[]).forEach(c=>parts.push(c.name,c.company,c.role,c.phone,c.email,c.type,c.accessNotes,c.notes));
   (s.equipment||[]).forEach(e=>parts.push(e.type,e.status,e.location,e.make,e.model,e.serial,e.notes));
   (s.docs||[]).forEach(d=>parts.push(d.type,d.title,d.ref,d.url,d.notes));
@@ -1671,7 +1671,7 @@ function showGlobalChrome537(){ const h=document.getElementById("appHeader"); co
 function contextualHelpInfo060(){
   if(view!=="settings") return CONTEXT_HELP_060[view]||null;
   if(settingsTab==="manual") return null;
-  const tabMap={tech:["settings","Technician Profile"],gps:["route","GPS / Maps"],reports:["reports","Report Settings"],email:["reports","Email Settings"],overlay:["photos","Photo Overlay"],themes:["settings","Theme Settings"],homeLayout:["home","Home Layout"],visibility:["settings","Modules / Simple View"],advanced:["settings","Advanced Settings"],customerImport:["sites","Customer Import"],backup:["backup","Backup & Restore"],about:["release","About FireVault"]};
+  const tabMap={tech:["settings","Technician Profile"],gps:["route","GPS / Maps"],reports:["reports","Report Settings"],email:["reports","Email Settings"],overlay:["photos","Photo Overlay"],themes:["settings","Theme Settings"],homeLayout:["home","Home Layout"],visibility:["settings","Modules / Simple View"],advanced:["settings","Advanced Settings"],customerImport:["sites","Customer Import"],categories:["sites","Categories"],backup:["backup","Backup & Restore"],about:["release","About FireVault"]};
   const item=tabMap[settingsTab]||["settings","Settings"];
   return {chapter:item[0],label:item[1],suggestions:settingsTab==="email"?["Recipients","Subject tags","Signature preview"]:settingsTab==="backup"?["Export backup","Restore safely","Clean update"]:["What this controls","Recommended setup","Related features"]};
 }
@@ -2371,6 +2371,57 @@ function accountCategory070(s){
   if(id.startsWith("AN")) return "alarmnet";
   if(id.startsWith("VA1")) return "ipdact";
   return "basic";
+}
+
+/* Build 0.73.7 — rule-driven account categories that behave as multi-value tags. */
+const ACCOUNT_CATEGORY_FIELDS_0737 = [
+  ["accountId","Account ID"],["name","Account name"],["address","Full address"],["city","City"],["state","State"],["zip","ZIP code"],["deviceType","Device type"],["sourceGroup","Source group"],["panel","Panel"],["phone","Phone"]
+];
+const ACCOUNT_CATEGORY_OPERATORS_0737 = [
+  ["startsWith","starts with"],["contains","contains"],["equals","equals"],["endsWith","ends with"],["notContains","does not contain"],["present","is present"],["empty","is empty"]
+];
+function safeCategoryColor0737(value){ return /^#[0-9a-f]{6}$/i.test(String(value||""))?String(value):"#22c55e"; }
+function accountCategoryConfig0737(){
+  const cfg=data?.settings?.accountCategories;
+  return cfg&&Array.isArray(cfg.definitions)?cfg.definitions:[];
+}
+function accountCategoryFieldValue0737(s,field){
+  const panel=[s?.panelManufacturer,s?.panelModel].filter(Boolean).join(" ");
+  const values={
+    accountId:accountId069(s), name:s?.name, address:fullAddress(s), city:s?.city, state:s?.state, zip:s?.zip,
+    deviceType:s?.deviceType, sourceGroup:s?.sourceGroupNumber, panel, phone:s?.sitePhone||s?.devicePhone||primaryContact477(s)?.phone
+  };
+  let value=String(values[field]??"").trim();
+  if(field==="accountId") value=canonicalAccountId0731(value);
+  return value.toLowerCase();
+}
+function accountCategoryRuleMatches0737(s,rule={}){
+  const actual=accountCategoryFieldValue0737(s,rule.field||"accountId");
+  let expected=String(rule.value??"").trim();
+  if((rule.field||"accountId")==="accountId") expected=canonicalAccountId0731(expected);
+  expected=expected.toLowerCase();
+  switch(rule.operator){
+    case "startsWith": return !!expected&&actual.startsWith(expected);
+    case "equals": return !!expected&&actual===expected;
+    case "endsWith": return !!expected&&actual.endsWith(expected);
+    case "notContains": return !!expected&&!actual.includes(expected);
+    case "present": return actual.length>0;
+    case "empty": return actual.length===0;
+    default: return !!expected&&actual.includes(expected);
+  }
+}
+function accountCategoryMatches0737(s,category={}){
+  if(category.enabled===false) return false;
+  const rules=Array.isArray(category.rules)?category.rules:[];
+  if(!rules.length) return false;
+  return category.match==="any"?rules.some(rule=>accountCategoryRuleMatches0737(s,rule)):rules.every(rule=>accountCategoryRuleMatches0737(s,rule));
+}
+function accountTags0737(s){ return accountCategoryConfig0737().filter(category=>accountCategoryMatches0737(s,category)); }
+function accountTagChips0737(s,limit=4){
+  const tags=accountTags0737(s);
+  if(!tags.length) return "";
+  const shown=tags.slice(0,limit);
+  return `<div class="accountTags0737">${shown.map(tag=>`<span style="--tag-color:${safeCategoryColor0737(tag.color)}">${esc(tag.name)}</span>`).join("")}${tags.length>limit?`<span class="accountTagMore0737">+${tags.length-limit}</span>`:""}</div>`;
 }
 function phone069(s){ const c=primaryContact477(s); return String(s?.sitePhone||c?.phone||"").trim(); }
 function todayHeader070(){
@@ -3174,6 +3225,7 @@ function siteAccountRow0736(s){
       ${id?`<b class="accountId0736">${esc(id)}</b>`:""}
       <p class="accountAddress0736">${esc(fullAddress(s)||"No address saved")}</p>
       <small class="accountDetail0736">${esc(panel||contact?.name||"Account details not entered")}</small>
+      ${accountTagChips0737(s,3)}
     </div>
     <div class="accountRight0736">
       <span class="accountWork0736 ${openDef?'hasDeficiency':openTasks?'hasTasks':'clear'}">${esc(status.join(" • "))}</span>
@@ -3811,6 +3863,7 @@ function siteDetail(){
 
   html(`<div class="screen siteDetail0735">
     <header class="accountHeader0735"><button class="accountBack0735" id="backBtn" aria-label="Back to Accounts">‹</button><div><strong>${esc(s.name||"Unnamed Account")}</strong><span>${esc(accountId)}</span></div><button class="accountPin0735 ${isPinnedSite566(s)?"pinned":""}" id="pinSiteBtn566" aria-label="Pin account">${isPinnedSite566(s)?"★":"☆"}</button><button class="accountEdit0735" id="editBtn">Edit</button></header>
+    ${accountTagChips0737(s,8)?`<div class="accountTagRail0737">${accountTagChips0737(s,8)}</div>`:""}
     <nav class="accountTabs0735" aria-label="Account sections">${tabs.map(([key,label])=>`<button class="${accountDetailTab0735===key?"active":""}" data-account-tab0735="${key}">${label}</button>`).join("")}</nav>
     <div class="accountTabScroll0735">${panelMarkup}</div>
   </div>`);
@@ -5980,7 +6033,7 @@ const SETTINGS_GROUPS_067 = [
   {key:"appearance",icon:"◐",title:"App & Home",note:"Theme, Home layout, and visible modules.",tone:"violet",tabs:["themes","homeLayout","visibility"]},
   {key:"field",icon:"🧰",title:"Field Tools",note:"GPS, photo overlays, and optional field services.",tone:"cyan",tabs:["gps","overlay","advanced"]},
   {key:"reports",icon:"▤",title:"Reports & Communication",note:"Report content, email delivery, and customer closeout.",tone:"amber",tabs:["reports","email"]},
-  {key:"data",icon:"☁",title:"Data, Sync & Support",note:"Imports, backup, team sync, Help, About, and diagnostics.",tone:"red",tabs:["sync","customerImport","backup","updates","manual","about","diagnostics"]}
+  {key:"data",icon:"☁",title:"Data, Sync & Support",note:"Categories, imports, backup, team sync, Help, About, and diagnostics.",tone:"red",tabs:["sync","customerImport","categories","backup","updates","manual","about","diagnostics"]}
 ];
 function settingsGroupForTab067(tab){ return SETTINGS_GROUPS_067.find(g=>g.tabs.includes(tab))?.key || "data"; }
 function settingsGroup067ByKey(key){ return SETTINGS_GROUPS_067.find(g=>g.key===key) || SETTINGS_GROUPS_067[0]; }
@@ -6004,6 +6057,7 @@ function settingsTabs(){
     ["advanced","Advanced","Optional integrations and field services. An asterisk marks controls that require an outside service."],
     ["sync","Team Sync","Technician identity, shared-vault packages, pending changes, and conflict review."],
     ["customerImport","Customer Import","Preview and safely import customer records from a CSV export using Account Id."],
+    ["categories","Categories","Create rule-driven account tags. Multiple categories can be assigned to the same account."],
     ["backup","Backup","Export, import, data safety snapshot, restore tools, and danger zone."],
     ["updates","App Updates","Check for a new build, clear cached app files, and reload FireVault."],
     ["manual","Help & Manual","Searchable instructions for using FireVault, field workflows, settings, reports, photos, GPS, and troubleshooting."],
@@ -6060,7 +6114,7 @@ function leaveSettingsHome572(){
 }
 
 function settingsIcon550(tab){
-  return ({tech:"👤",gps:"⌖",reports:"▤",email:"✉",overlay:"▧",themes:"◐",homeLayout:"⌂",visibility:"☰",advanced:"⚡",sync:"☁",customerImport:"⇩",backup:"⇅",updates:"↻",manual:"?",about:"ⓘ"})[tab]||"•";
+  return ({tech:"👤",gps:"⌖",reports:"▤",email:"✉",overlay:"▧",themes:"◐",homeLayout:"⌂",visibility:"☰",advanced:"⚡",sync:"☁",customerImport:"⇩",categories:"◇",backup:"⇅",updates:"↻",manual:"?",about:"ⓘ"})[tab]||"•";
 }
 function settings(){
   captureSettingsScroll576();
@@ -6094,7 +6148,7 @@ function settings(){
 
   settingsGroup067=settingsGroupForTab067(settingsTab);
   const detailGroup=settingsGroup067ByKey(settingsGroup067);
-  const saveable=!['customerImport','backup','updates','manual','about'].includes(settingsTab);
+  const saveable=!['customerImport','categories','backup','updates','manual','about'].includes(settingsTab);
 
   if(settingsTab==="manual"){
     html(`<div class="screen settingsTabbedDetail0736 settingsManualScreen067 settingsStable573">
@@ -6764,6 +6818,100 @@ function wireManual058(){
  const clear=document.getElementById("manualClear058"); if(clear) clear.onclick=()=>{manualQuery058="";settings();};
 }
 
+function accountCategoryOptions0737(items,current){ return items.map(([value,label])=>`<option value="${value}" ${value===current?"selected":""}>${esc(label)}</option>`).join(""); }
+function accountCategoryCount0737(category){ return (data.sites||[]).filter(site=>accountCategoryMatches0737(site,category)).length; }
+function accountCategoryPreview0737(category){
+  const matches=(data.sites||[]).filter(site=>accountCategoryMatches0737(site,category));
+  if(!matches.length) return "No accounts currently match these rules.";
+  const names=matches.slice(0,4).map(site=>site.name||accountId069(site)||"Unnamed account");
+  return `${names.join(" • ")}${matches.length>4?` • +${matches.length-4} more`:""}`;
+}
+function accountCategoryRuleEditor0737(rule={},categoryId=""){
+  const operator=rule.operator||"contains";
+  return `<div class="categoryRule0737" data-category-rule0737 data-rule-id="${esc(rule.id||uid())}">
+    <select data-category-rule-field0737 aria-label="Rule field">${accountCategoryOptions0737(ACCOUNT_CATEGORY_FIELDS_0737,rule.field||"accountId")}</select>
+    <select data-category-rule-operator0737 aria-label="Rule operator">${accountCategoryOptions0737(ACCOUNT_CATEGORY_OPERATORS_0737,operator)}</select>
+    <input data-category-rule-value0737 value="${esc(rule.value||"")}" placeholder="Value" ${(operator==="present"||operator==="empty")?"disabled":""}>
+    <button class="danger" data-delete-category-rule0737 aria-label="Delete rule">×</button>
+  </div>`;
+}
+function accountCategoryEditor0737(category,index){
+  const rules=Array.isArray(category.rules)?category.rules:[];
+  const count=accountCategoryCount0737(category);
+  return `<article class="categoryEditorCard0737" data-category-card0737 data-category-id="${esc(category.id||uid())}">
+    <header class="categoryEditorHead0737">
+      <input type="color" data-category-color0737 value="${safeCategoryColor0737(category.color)}" aria-label="Category color">
+      <input class="categoryName0737" data-category-name0737 value="${esc(category.name||`Category ${index+1}`)}" aria-label="Category name">
+      <label class="categoryEnabled0737"><input type="checkbox" data-category-enabled0737 ${category.enabled!==false?"checked":""}><span>Enabled</span></label>
+      <strong>${count} match${count===1?"":"es"}</strong>
+    </header>
+    <div class="categoryMatch0737"><span>Match</span><select data-category-match0737><option value="all" ${category.match!=="any"?"selected":""}>all</option><option value="any" ${category.match==="any"?"selected":""}>any</option></select><span>of these rules</span></div>
+    <div class="categoryRules0737">${rules.length?rules.map(rule=>accountCategoryRuleEditor0737(rule,category.id)).join(""):`<div class="categoryNoRules0737">No rules yet. Add a rule to begin assigning this tag.</div>`}</div>
+    <p class="categoryPreview0737"><b>Matches:</b> ${esc(accountCategoryPreview0737(category))}</p>
+    <footer><button class="ghost" data-add-category-rule0737>＋ Add Rule</button><button class="danger" data-delete-category0737>Delete Category</button></footer>
+  </article>`;
+}
+function accountCategoriesPanel0737(){
+  const categories=accountCategoryConfig0737();
+  const taggedAccounts=new Set();
+  (data.sites||[]).forEach(site=>{if(accountTags0737(site).length)taggedAccounts.add(site.id);});
+  return `<div class="settingsStack categoriesSettings0737">
+    <section class="categoryHero0737">
+      <div><span>ACCOUNT TAGGING</span><h2>Categories</h2><p>Categories behave like tags. Every category has its own rules, and one account may match several categories at the same time.</p></div>
+      <div class="categoryHeroStats0737"><strong>${categories.length}</strong><span>Categories</span><strong>${taggedAccounts.size}</strong><span>Tagged Accounts</span></div>
+    </section>
+    <div class="categoryToolbar0737"><button class="ghost" id="addAccountCategory0737">＋ New Category</button><button class="primary" id="saveAccountCategories0737">Save &amp; Apply Rules</button></div>
+    <div class="categoryRuleHelp0737"><strong>Example</strong><span>Account ID starts with G7C + City equals Casper. Choose <b>all</b> when every rule must match, or <b>any</b> when one rule is enough.</span></div>
+    <div class="categoryEditorList0737">${categories.length?categories.map(accountCategoryEditor0737).join(""):`<div class="categoryEmpty0737"><strong>No categories saved</strong><span>Create a category to begin automatically tagging accounts.</span></div>`}</div>
+  </div>`;
+}
+function captureAccountCategoriesEditor0737(){
+  const definitions=[...document.querySelectorAll("[data-category-card0737]")].map((card,index)=>({
+    id:card.dataset.categoryId||uid(),
+    name:(card.querySelector("[data-category-name0737]")?.value||`Category ${index+1}`).trim()||`Category ${index+1}`,
+    color:safeCategoryColor0737(card.querySelector("[data-category-color0737]")?.value),
+    enabled:!!card.querySelector("[data-category-enabled0737]")?.checked,
+    match:card.querySelector("[data-category-match0737]")?.value==="any"?"any":"all",
+    rules:[...card.querySelectorAll("[data-category-rule0737]")].map((row,ruleIndex)=>({
+      id:row.dataset.ruleId||uid(),field:row.querySelector("[data-category-rule-field0737]")?.value||"accountId",operator:row.querySelector("[data-category-rule-operator0737]")?.value||"contains",value:(row.querySelector("[data-category-rule-value0737]")?.value||"").trim()
+    }))
+  }));
+  data.settings.accountCategories={version:1,definitions};
+  return definitions;
+}
+function saveAccountCategories0737(){
+  const definitions=captureAccountCategoriesEditor0737();
+  const names=definitions.map(category=>category.name.toLowerCase());
+  const duplicate=names.find((name,index)=>names.indexOf(name)!==index);
+  if(duplicate){alert("Each category needs a unique name.");return;}
+  saveData(data);data=loadData();toast("Category rules saved and applied.");settings();
+}
+function wireAccountCategories0737(){
+  document.getElementById("saveAccountCategories0737")?.addEventListener("click",saveAccountCategories0737);
+  document.getElementById("addAccountCategory0737")?.addEventListener("click",()=>{
+    captureAccountCategoriesEditor0737();
+    const colors=["#22c55e","#38bdf8","#f59e0b","#a78bfa","#f43f5e","#14b8a6"];
+    data.settings.accountCategories.definitions.push({id:uid(),name:`Category ${data.settings.accountCategories.definitions.length+1}`,color:colors[data.settings.accountCategories.definitions.length%colors.length],enabled:true,match:"all",rules:[{id:uid(),field:"accountId",operator:"contains",value:""}]});
+    saveData(data);data=loadData();settings();
+  });
+  document.querySelectorAll("[data-add-category-rule0737]").forEach(button=>button.onclick=()=>{
+    const card=button.closest("[data-category-card0737]");captureAccountCategoriesEditor0737();
+    const category=data.settings.accountCategories.definitions.find(item=>item.id===card?.dataset.categoryId);if(!category)return;
+    category.rules.push({id:uid(),field:"accountId",operator:"contains",value:""});saveData(data);data=loadData();settings();
+  });
+  document.querySelectorAll("[data-delete-category-rule0737]").forEach(button=>button.onclick=()=>{
+    const card=button.closest("[data-category-card0737]");const row=button.closest("[data-category-rule0737]");captureAccountCategoriesEditor0737();
+    const category=data.settings.accountCategories.definitions.find(item=>item.id===card?.dataset.categoryId);if(!category)return;
+    category.rules=category.rules.filter(rule=>rule.id!==row?.dataset.ruleId);saveData(data);data=loadData();settings();
+  });
+  document.querySelectorAll("[data-delete-category0737]").forEach(button=>button.onclick=()=>{
+    const card=button.closest("[data-category-card0737]");const name=card?.querySelector("[data-category-name0737]")?.value||"this category";
+    if(!confirm(`Delete ${name}? Accounts will keep their data; only this automatic tag rule will be removed.`))return;
+    captureAccountCategoriesEditor0737();data.settings.accountCategories.definitions=data.settings.accountCategories.definitions.filter(item=>item.id!==card?.dataset.categoryId);saveData(data);data=loadData();settings();
+  });
+  document.querySelectorAll("[data-category-rule-operator0737]").forEach(select=>select.onchange=()=>{const input=select.closest("[data-category-rule0737]")?.querySelector("[data-category-rule-value0737]");if(input)input.disabled=["present","empty"].includes(select.value);});
+}
+
 function settingsPanel(){
   const s=data.settings, t=s.theme, tech=s.technician, email=s.email, r=s.reports, o=s.overlay, a=s.advanced, gps=s.gps||{};
   const saveButton=(label="Save")=>`<button class="primary saveMini" id="saveSettings">${esc(label)}</button>`;
@@ -6855,6 +7003,7 @@ function settingsPanel(){
   }
 
   if(settingsTab==="customerImport") return customerImportPanel065();
+  if(settingsTab==="categories") return accountCategoriesPanel0737();
   if(settingsTab==="backup") return backupSettingsPanel();
   if(settingsTab==="manual") return manualPanel058();
 
@@ -6873,6 +7022,7 @@ function wireSettingsPanel(){
   if(settingsTab==="overlay") wireOverlaySettings510();
   if(settingsTab==="manual") wireManual058();
   if(settingsTab==="customerImport") wireCustomerImport065();
+  if(settingsTab==="categories") wireAccountCategories0737();
   if(settingsTab==="updates"){
     const state=document.getElementById("updateState072");
     const setState=(title,note)=>{if(state)state.innerHTML=`<strong>${esc(title)}</strong><span>${esc(note)}</span>`;};
@@ -7797,6 +7947,7 @@ function diagnostics(){
 }
 function showChangelog(){
   const notes = [
+    "Build 0.73.7 adds rule-driven multi-category account tags, repairs Settings tab spacing, and blends the global logo header into page content.",
     "Build 0.73.6 removes Plus Code text from Nearby cards, redesigns the Accounts directory, and replaces Settings folders with direct category tabs.",
     "Build 0.73.5 redesigns Account Detail with five information tabs, groups same-address accounts on the Nearby map, and removes the cellular coverage tool.",
     "Build 0.73.4 adds the Tools hub and global navigation structure.",
@@ -7822,7 +7973,7 @@ function showChangelog(){
   overlay.className="releaseOverlay";
   overlay.innerHTML=`<div class="releaseSheet" role="dialog" aria-modal="true" aria-label="FireVault release notes">
     <div class="releaseHead"><div><strong>${fireVaultBrand575()}</strong><span>Build ${BUILD}</span></div><button class="ghost iconBtn" id="closeRelease" aria-label="Close release notes">×</button></div>
-    <div class="releaseBody"><h2>Release Notes</h2><p class="releaseIntro">Tabbed account detail and grouped multi-account map locations.</p><ul>${notes.map(n=>`<li>${esc(n)}</li>`).join("")}</ul></div>
+    <div class="releaseBody"><h2>Release Notes</h2><p class="releaseIntro">Rule-driven account tags and Settings interface repairs.</p><ul>${notes.map(n=>`<li>${esc(n)}</li>`).join("")}</ul></div>
   </div>`;
   document.body.appendChild(overlay);
   const close=()=>overlay.remove();

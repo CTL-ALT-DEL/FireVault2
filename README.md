@@ -1,13 +1,15 @@
-# FireVault Build 0.73.6
+# FireVault Build 0.73.7
 
-Build 0.73.6 polishes two major navigation areas. The Accounts page is now a clean, searchable field directory with compact status filters and simplified account rows. Settings now uses five direct category tabs—General, App, Field, Reports, and Data—removing the extra folder-navigation step.
+Build 0.73.7 adds a rule-driven **Categories** workspace under Settings → Data. Categories behave as automatic account tags, and a single account may match several categories at once. This build also repairs the Settings tab sizing and spacing and removes the faint separator under the global FireVault logo header.
 
-## Changes
+## Highlights
 
-- Removed Plus Code text from account cards on the main Nearby Accounts screen.
-- Renamed and redesigned the Sites screen as a cleaner Accounts directory.
-- Added All, Attention, Open Work, and No GPS account filters.
-- Kept Account ID, address, category, panel/contact summary, open-work state, and GPS state visible without overcrowding.
-- Rebuilt Settings around five persistent category tabs.
-- Preserved all existing detailed settings panels, backup tools, imports, updates, account-detail tabs, and grouped same-address map markers.
-- Preserved the existing `firevault_vault_build_030` storage key.
+- Create unlimited custom category tags.
+- Build each category from one or more rules.
+- Choose whether **all** rules or **any** rule must match.
+- Rule fields include Account ID, account name, address, city, state, ZIP, device type, source group, panel, and phone.
+- Matching tags appear in the Accounts directory and the individual Account Detail header.
+- Existing communicator categories and Nearby map colors remain unchanged.
+- Settings category tabs now have larger touch targets and better separation from the page heading.
+- The global logo header now blends directly into the page background without the faint gray divider.
+- The storage key remains `firevault_vault_build_030`, with existing automatic backup protections preserved.
