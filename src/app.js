@@ -1,4 +1,4 @@
-import { BUILD, KEY, ACTIVE_JOB_KEY, loadData, saveData, ensureSite, fullAddress, esc, uid, downloadBlob, syncSummary, syncQueue, syncConflicts, syncActivity, createSyncPackage, importSyncPackage, resolveSyncConflict, notePackageExport, deviceIdentity, recordSyncActivity, autoBackupInfo, latestAutoBackup, restoreAutoBackup, isDemoMode, setDemoMode, resetDemoData } from "./storage.js?v=0.75.0";
+import { BUILD, KEY, ACTIVE_JOB_KEY, loadData, saveData, ensureSite, fullAddress, esc, uid, downloadBlob, syncSummary, syncQueue, syncConflicts, syncActivity, createSyncPackage, importSyncPackage, resolveSyncConflict, notePackageExport, deviceIdentity, recordSyncActivity, autoBackupInfo, latestAutoBackup, restoreAutoBackup, isDemoMode, setDemoMode, resetDemoData } from "./storage.js?v=0.75.1";
 window.__FIREVAULT_MODULE_READY = true;
 
 function fvPreferenceStore0739(){
@@ -3769,6 +3769,26 @@ function accountCategoryLabel0735(s={}){
   const category=accountCategory070(s);
   return ({clss:"CLSS",alarmnet:"AlarmNet",ipdact:"IPDACT",basic:"Basic"})[category]||"Basic";
 }
+
+/* Build 0.75.1 — persistent account workflow helpers */
+function accountTabPreference0751(){
+  try{
+    const value=sessionStorage.getItem("firevault_account_tab_0751");
+    return ["overview","details","equipment","docs","notes"].includes(value)?value:"overview";
+  }catch{return "overview";}
+}
+function rememberAccountTab0751(value){
+  try{sessionStorage.setItem("firevault_account_tab_0751",value);}catch{}
+}
+function accountPersistentActions0751(s={},ctx={}){
+  const phone=ctx.primary?.phone||s.sitePhone||"";
+  return `<section class="accountPersistentActions0751" aria-label="Account quick actions">
+    <button id="callPrimary477" ${phone?"":"disabled"}>${fvIcon073("call","accountPersistentIcon0751")}<strong>Call</strong></button>
+    <button id="navigateBtn477" ${hasGps(s)?"":"disabled"}>${fvIcon073("route","accountPersistentIcon0751")}<strong>Route</strong></button>
+    <button id="qaAddNote544">${fvIcon073("note","accountPersistentIcon0751")}<strong>Note</strong></button>
+    <button id="qaStartVisit610" class="${ctx.activeHere?"activeVisit0751":""}">${fvIcon073("visit","accountPersistentIcon0751")}<strong>${ctx.activeHere?"Resume":"Visit"}</strong></button>
+  </section>`;
+}
 function accountSince0735(s={}){
   const value=s.createdAt||s.importMetadata?.lastImportedAt||s.updatedAt;
   if(!value) return "Not recorded";
@@ -3823,12 +3843,6 @@ function accountOverviewTab0735(s,ctx){
       <button id="visitsMini477"><span>LAST VISIT</span><strong>${esc(lastVisit?visitDateLabel(lastVisit):"None")}</strong></button>
       <button id="defBtn" class="metricDanger0735"><span>DEFICIENCIES</span><strong>${def} Open</strong></button>
       <button id="taskBtn" class="metricBlue0735"><span>NEXT DUE</span><strong>${esc(accountNextDue0735(s))}</strong><small>${open} open task${open===1?"":"s"}</small></button>
-    </section>
-    <section class="accountQuickBar0735 technicianActionBar075" aria-label="Primary account actions">
-      <button id="callPrimary477" ${contactPhone?"":"disabled"}>${fvIcon073("call","technicianActionIcon075")}<strong>Call</strong><small>${contactPhone?"Primary contact":"No phone"}</small></button>
-      <button id="navigateBtn477" ${hasGps(s)?"":"disabled"}>${fvIcon073("route","technicianActionIcon075")}<strong>Route</strong><small>${hasGps(s)?"Open directions":"No GPS"}</small></button>
-      <button id="qaAddNote544">${fvIcon073("note","technicianActionIcon075")}<strong>Note</strong><small>Add site note</small></button>
-      <button id="qaStartVisit610">${fvIcon073("visit","technicianActionIcon075")}<strong>${ctx.activeHere?"Resume":"Visit"}</strong><small>${ctx.activeHere?"Continue work":"Start service"}</small></button>
     </section>
     <section class="accountPanel0735"><div class="accountPanelHead0735"><div><span>RECENT ACTIVITY</span><h2>Account Timeline</h2></div><button class="ghost" id="allVisitsBtn">View All</button></div>${accountRecentMarkup0735(s)}</section>
   </div>`;
@@ -3888,7 +3902,7 @@ function accountNotesTab0735(s,ctx){
 }
 function siteDetail(){
   const s=site(); if(!s){ route("sites"); return; }
-  if(accountDetailSite0735!==s.id){accountDetailSite0735=s.id;accountDetailTab0735="overview";}
+  if(accountDetailSite0735!==s.id){accountDetailSite0735=s.id;accountDetailTab0735=accountTabPreference0751();}
   s.lastOpenedAt=new Date().toISOString(); saveData(data);
   const open=(s.tasks||[]).filter(t=>(t.status||"Open")!=="Done").length;
   const def=(s.deficiencies||[]).filter(d=>(d.status||"Open")!=="Closed").length;
@@ -3903,21 +3917,22 @@ function siteDetail(){
   const activeHere=activeJob&&activeJob.siteId===s.id;
   const ctx={open,def,siteVisits,equipment,docs,health,lastVisit,panel,primary,access,activeHere};
   const accountId=accountId069(s)||"No Account ID";
-  const tabs=[["overview","Overview"],["details","Details"],["equipment","Equipment"],["docs","Docs"],["notes","Notes"]];
+  const tabs=[["overview","Overview",null],["details","Details",null],["equipment","Equipment",equipment.length],["docs","Docs",docs.length],["notes","Notes",open+def]];
   const panelMarkup=accountDetailTab0735==="details"?accountDetailsTab0735(s,ctx):accountDetailTab0735==="equipment"?accountEquipmentTab0735(s):accountDetailTab0735==="docs"?accountDocsTab0735(s):accountDetailTab0735==="notes"?accountNotesTab0735(s,ctx):accountOverviewTab0735(s,ctx);
 
   html(`<div class="screen siteDetail0735">
     <header class="accountHeader0735 technicianHeader075"><button class="accountBack0735" id="backBtn" aria-label="Back to Accounts">‹</button><div class="technicianIdentity075"><span class="technicianEyebrow075">ACCOUNT</span><strong>${esc(s.name||"Unnamed Account")}</strong><span>${esc(accountId)}${fullAddress(s)?` • ${esc(fullAddress(s))}`:""}</span></div><button class="accountPin0735 ${isPinnedSite566(s)?"pinned":""}" id="pinSiteBtn566" aria-label="Pin account">${isPinnedSite566(s)?"★":"☆"}</button><button class="accountEdit0735" id="editBtn">Edit</button></header>
     <section class="technicianStatus075"><span class="status-${esc(health.cls)}">${esc(health.label)}</span><span>${esc(accountCategoryLabel0735(s))}</span>${open?`<span>${open} task${open===1?"":"s"}</span>`:""}${def?`<span class="hasDef075">${def} deficienc${def===1?"y":"ies"}</span>`:""}</section>
     ${accountTagChips0737(s,8)?`<div class="accountTagRail0737">${accountTagChips0737(s,8)}</div>`:""}
-    <nav class="accountTabs0735" aria-label="Account sections">${tabs.map(([key,label])=>`<button class="${accountDetailTab0735===key?"active":""}" data-account-tab0735="${key}">${label}</button>`).join("")}</nav>
-    <div class="accountTabScroll0735">${panelMarkup}</div>
+    <nav class="accountTabs0735 accountTabsSticky0751" aria-label="Account sections">${tabs.map(([key,label,count])=>`<button class="${accountDetailTab0735===key?"active":""}" data-account-tab0735="${key}"><span>${label}</span>${Number.isFinite(count)&&count>0?`<b>${count}</b>`:""}</button>`).join("")}</nav>
+    ${accountPersistentActions0751(s,ctx)}
+    <div class="accountTabScroll0735 accountTabScroll0751">${panelMarkup}</div>
   </div>`);
 
   document.getElementById("backBtn")?.addEventListener("click",()=>route("sites"));
   document.getElementById("editBtn")?.addEventListener("click",()=>{mode="edit";route("siteForm");});
   document.getElementById("pinSiteBtn566")?.addEventListener("click",toggleSitePinned566);
-  document.querySelectorAll("[data-account-tab0735]").forEach(b=>b.onclick=()=>{accountDetailTab0735=b.dataset.accountTab0735;siteDetail();});
+  document.querySelectorAll("[data-account-tab0735]").forEach(b=>b.onclick=()=>{accountDetailTab0735=b.dataset.accountTab0735;rememberAccountTab0751(accountDetailTab0735);siteDetail();});
   document.getElementById("editDetails0735")?.addEventListener("click",()=>{mode="edit";route("siteForm");});
   document.getElementById("qaStartVisit610")?.addEventListener("click",startServiceVisit610);
   document.getElementById("qaAddNote544")?.addEventListener("click",addSiteNotePrompt);

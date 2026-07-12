@@ -1,5 +1,5 @@
 {
-  "build": "0.75.0",
+  "build": "0.75.1",
   "released": "2026-07-11",
   "note": "Technician UX Refresh",
   "notes": "Unifies page spacing, navigation, touch targets, account actions, information hierarchy, and responsive behavior for faster field use while preserving the existing FireVault data model."
