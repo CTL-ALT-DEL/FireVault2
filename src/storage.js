@@ -1,4 +1,4 @@
-export const BUILD = "0.74.0";
+export const BUILD = "0.74.1";
 export const KEY = "firevault_vault_build_030";
 export const ACTIVE_JOB_KEY = "firevault_active_job_modular";
 export const DEVICE_KEY = "firevault_device_identity_062";
@@ -414,7 +414,7 @@ export function loadData(){
   let best=null;
   if(!demoActive) best=recoverBestLocalVault();
 
-  // Build 0.74.0: when no real customer vault exists, FireVault opens the
+  // Build 0.74.1: when no real customer vault exists, FireVault opens the
   // protected fictional Boise workspace instead of presenting an empty app.
   // The demo master is generated in code and is never stored as a deletable vault.
   if(!demoActive && !best){

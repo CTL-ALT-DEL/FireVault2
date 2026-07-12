@@ -15080,3 +15080,69 @@ body.demoMode0738 .demoHeaderMode0740{display:flex;animation:demoHeaderBlink0740
 @keyframes demoHeaderBlink0740{0%,46%{opacity:1}47%,100%{opacity:.28}}
 @media(max-width:390px){.demoHeaderMode0740{min-width:58px;margin:0 6px;padding:4px 5px;font-size:7.5px;letter-spacing:.09em}}
 @media(prefers-reduced-motion:reduce){body.demoMode0738 .demoHeaderMode0740{animation:none}}
+
+
+/* Build 0.74.1 — Accounts header clearance and simplified Account Detail */
+body.app-booted533 main .accountsPage0736{
+  box-sizing:border-box!important;
+  padding-top:14px!important;
+  scroll-padding-top:14px!important;
+}
+.accountsHeader0736{
+  flex:0 0 auto!important;
+  margin-top:0!important;
+  padding-top:2px!important;
+}
+
+/* Remove the overview map image and turn Location into a clean full-width card. */
+.accountLocationCard0735{
+  display:block!important;
+  min-height:0!important;
+}
+.accountLocationCard0735 .accountAddress0735{
+  min-height:96px!important;
+  padding:16px 15px!important;
+  justify-content:center!important;
+}
+.accountLocationCard0735 .accountAddress0735 strong{
+  font-size:15px!important;
+  line-height:1.38!important;
+}
+.accountLocationCard0735 .accountAddress0735 small{
+  font-size:11px!important;
+}
+.accountMapPreview0735,.accountMapEmpty0735{display:none!important}
+
+/* Make primary field actions easier to read and tap. */
+.accountQuickBar0735{
+  gap:9px!important;
+}
+.accountQuickBar0735 button{
+  min-height:82px!important;
+  padding:10px 5px!important;
+  gap:7px!important;
+  border-radius:13px!important;
+}
+.accountQuickBar0735 span{
+  width:38px!important;
+  height:38px!important;
+  border-radius:11px!important;
+  font-size:22px!important;
+  line-height:1!important;
+}
+.accountQuickBar0735 strong{
+  font-size:13px!important;
+  line-height:1.1!important;
+  letter-spacing:.01em!important;
+}
+.accountQuickBar0735 button:active{
+  transform:translateY(1px) scale(.98)!important;
+}
+
+@media(max-width:390px){
+  body.app-booted533 main .accountsPage0736{padding-top:12px!important}
+  .accountQuickBar0735{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+  .accountQuickBar0735 button{min-height:76px!important}
+  .accountQuickBar0735 span{width:36px!important;height:36px!important;font-size:21px!important}
+  .accountQuickBar0735 strong{font-size:13px!important}
+}

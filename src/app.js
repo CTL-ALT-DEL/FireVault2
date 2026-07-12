@@ -1,4 +1,4 @@
-import { BUILD, KEY, ACTIVE_JOB_KEY, loadData, saveData, ensureSite, fullAddress, esc, uid, downloadBlob, syncSummary, syncQueue, syncConflicts, syncActivity, createSyncPackage, importSyncPackage, resolveSyncConflict, notePackageExport, deviceIdentity, recordSyncActivity, autoBackupInfo, latestAutoBackup, restoreAutoBackup, isDemoMode, setDemoMode, resetDemoData } from "./storage.js?v=0.74.0";
+import { BUILD, KEY, ACTIVE_JOB_KEY, loadData, saveData, ensureSite, fullAddress, esc, uid, downloadBlob, syncSummary, syncQueue, syncConflicts, syncActivity, createSyncPackage, importSyncPackage, resolveSyncConflict, notePackageExport, deviceIdentity, recordSyncActivity, autoBackupInfo, latestAutoBackup, restoreAutoBackup, isDemoMode, setDemoMode, resetDemoData } from "./storage.js?v=0.74.1";
 window.__FIREVAULT_MODULE_READY = true;
 
 function fvPreferenceStore0739(){
@@ -3807,7 +3807,7 @@ function accountOverviewTab0735(s,ctx){
   return `<div class="accountTabPanel0735 accountOverview0735">
     <section class="accountLocationCard0735">
       <div class="accountAddress0735"><span>LOCATION</span><strong>${esc(fullAddress(s)||"No address saved")}</strong>${hasGps(s)?`<small>${esc(gpsLine(s))}</small>`:""}</div>
-      ${accountMapPreview0735(s)}
+      
     </section>
     <section class="accountInfoCard0735">
       <button><span>Status</span><strong class="accountStatus0735 status-${esc(health.cls)}">${esc(status)}</strong></button>

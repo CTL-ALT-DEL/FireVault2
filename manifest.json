@@ -8,7 +8,7 @@
   "orientation": "portrait-primary",
   "background_color": "#0b0d10",
   "theme_color": "#101216",
-  "description": "Field knowledge system for fire alarm technicians. Build 0.74.0 repairs Demo Mode storage quota handling.",
+  "description": "Field knowledge system for fire alarm technicians. Build 0.74.1 refines Accounts and Account Detail layouts.",
   "icons": [
     {
       "src": "assets/icon-192.png",
@@ -49,5 +49,5 @@
       "description": "Open FireVault settings"
     }
   ],
-  "version": "0.74.0"
+  "version": "0.74.1"
 }
