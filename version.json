@@ -1,6 +1,6 @@
 {
-  "build": "0.77.0",
+  "build": "0.77.1",
   "released": "2026-07-12",
-  "note": "Custom Accounts Jump and Sort pickers",
-  "label": "Accounts picker redesign"
+  "note": "Fixed Accounts Jump and Sort controls",
+  "label": "Accounts toolbar rebuild"
 }

@@ -1,4 +1,4 @@
-import { BUILD, KEY, ACTIVE_JOB_KEY, loadData, saveData, ensureSite, fullAddress, esc, uid, downloadBlob, syncSummary, syncQueue, syncConflicts, syncActivity, createSyncPackage, importSyncPackage, resolveSyncConflict, notePackageExport, deviceIdentity, recordSyncActivity, autoBackupInfo, latestAutoBackup, restoreAutoBackup, isDemoMode, setDemoMode, resetDemoData } from "./storage.js?v=0.77.0";
+import { BUILD, KEY, ACTIVE_JOB_KEY, loadData, saveData, ensureSite, fullAddress, esc, uid, downloadBlob, syncSummary, syncQueue, syncConflicts, syncActivity, createSyncPackage, importSyncPackage, resolveSyncConflict, notePackageExport, deviceIdentity, recordSyncActivity, autoBackupInfo, latestAutoBackup, restoreAutoBackup, isDemoMode, setDemoMode, resetDemoData } from "./storage.js?v=0.77.1";
 window.__FIREVAULT_MODULE_READY = true;
 
 function fvPreferenceStore0739(){
@@ -3486,7 +3486,20 @@ function sites(){
       <button type="button" data-sites-filter0759="missingGps" class="${sitesFilter0736==='missingGps'?'active':''}"><strong>${missingGpsCount}</strong><span>No GPS</span></button>
     </section>
     <section class="accountsResults0759">
-      <div class="accountsListHead0759 accountsListHead0760 accountsListHead0761 accountsListHead0763 accountsListHead0764 accountsListHead0768 accountsListHead0769"><div class="accountsResultSummary0761"><strong id="siteSearchCount0759" aria-live="polite">${accounts.length} account${accounts.length===1?"":"s"}</strong><span id="accountsViewSummary0761">${esc(filterLabel0761)} • ${esc(accountsSortLabel0760())}</span></div><div class="accountsListTools0761 accountsListTools0763 accountsListTools0764 accountsListTools0768 accountsListTools0769"><button type="button" class="ghost accountsReset0761" id="resetAccountsView0761" ${accountsViewDirty0761?"":"hidden"} aria-label="Reset account view" title="Reset view">↺</button><button type="button" class="accountsPickerButton0768 accountsPickerButton0769" id="accountsJumpButton0768" ${accountsSort0760==='az'&&accountInitialsList0763.length?'':'hidden'} aria-haspopup="dialog" aria-label="Jump to account name"><span class="accountsPickerLabel0769">Jump</span><strong id="accountsJumpValue0768">A–Z</strong><span class="accountsPickerChevron0769">⌄</span></button><button type="button" class="accountsPickerButton0768 accountsSortButton0768 accountsPickerButton0769" id="accountsSortButton0768" aria-haspopup="dialog" aria-label="Sort accounts"><span class="accountsPickerLabel0769">Sort</span><strong id="accountsSortValue0768">${esc(accountsSortLabel0760())}</strong><span class="accountsPickerChevron0769">⌄</span></button></div></div>
+      <div class="accountsListHead0759 accountsListHead0771">
+        <div class="accountsSummaryRow0771">
+          <div class="accountsResultSummary0761 accountsResultSummary0771"><strong id="siteSearchCount0759" aria-live="polite">${accounts.length} account${accounts.length===1?"":"s"}</strong><span id="accountsViewSummary0761">${esc(filterLabel0761)} • ${esc(accountsSortLabel0760())}</span></div>
+          <button type="button" class="ghost accountsReset0761 accountsReset0771" id="resetAccountsView0761" ${accountsViewDirty0761?"":"hidden"} aria-label="Reset account view" title="Reset view">↺</button>
+        </div>
+        <div class="accountsToolbar0771" aria-label="Account list tools">
+          <button type="button" class="accountsToolButton0771 accountsJumpTool0771" id="accountsJumpButton0768" ${accountsSort0760==='az'&&accountInitialsList0763.length?'':'hidden'} aria-haspopup="dialog" aria-label="Jump to account name">
+            <span class="accountsToolText0771"><span class="accountsToolLabel0771">Jump To</span><strong id="accountsJumpValue0768">A–Z</strong></span><span class="accountsToolChevron0771" aria-hidden="true">⌄</span>
+          </button>
+          <button type="button" class="accountsToolButton0771 accountsSortTool0771" id="accountsSortButton0768" aria-haspopup="dialog" aria-label="Sort accounts">
+            <span class="accountsToolText0771"><span class="accountsToolLabel0771">Sort By</span><strong id="accountsSortValue0768">${esc(accountsSortLabel0760())}</strong></span><span class="accountsToolChevron0771" aria-hidden="true">⌄</span>
+          </button>
+        </div>
+      </div>
       <div class="accountsList0759 accountsList0764" id="accountsList0759">
         ${accounts.length?accounts.map(s=>accountDirectoryRow0759(s,addressCounts0762.get(accountAddressKey0762(s))||1)).join(""):`<div class="accountsEmpty0759 accountsEmpty0760"><span>＋</span><strong>No accounts yet</strong><p>Create an account manually or import your customer list under Settings → Data.</p><button class="primary" id="emptyAdd0759">Add First Account</button></div>`}
         <div class="accountsNoResults0759 accountsNoResults0760" id="accountsNoResults0759" hidden><strong>No matching accounts</strong><p>Clear the search or return to All accounts.</p><button type="button" class="ghost" id="resetAccountsView0760">Reset View</button></div>
@@ -8535,7 +8548,7 @@ function diagnostics(){
 }
 function showChangelog(){
   const notes = [
-    "Build 0.77.0 repairs the custom Jump and Sort toolbar with compact single-line controls that cannot wrap or overflow on iPhone.",
+    "Build 0.77.1 replaces the Accounts toolbar with two fixed FireVault controls that keep Jump To and Sort By readable on narrow iPhones.",
     "Build 0.76.2 adds one-tap Call and Route controls to every account card, identifies multi-account addresses, clarifies account health, and prevents accidental double-opening while preserving the Accounts view state.",
     "Build 0.76.1 hardens the Accounts directory with persistent view state, inline Favorites, recent-opened context, keyboard shortcuts, and a permanent app-chrome repair so the bottom navigation remains visible after saves and Favorite changes.",
     "Build 0.76.0 completes the Accounts workflow with sorting, safer manual account creation, duplicate Account ID protection, and improved empty states.",

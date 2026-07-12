@@ -1,7 +1,7 @@
-# FireVault Build 0.77.0 — Accounts Toolbar Polish
+# FireVault Build 0.77.1 — Accounts Toolbar Rebuild
 
-- Makes the Sort control use the remaining toolbar width.
-- Shows the full default value, Alphabetical, on iPhone.
-- Keeps Jump compact and readable.
-- Docks the Top button above the bottom navigation instead of over account cards.
-- Preserves all account data and the existing storage key.
+- Replaces the accumulated Jump/Sort CSS with a new authoritative toolbar.
+- Keeps Jump To and Sort By on one row.
+- Uses stacked label/value text inside each button so Alphabetical remains readable on iPhone.
+- Moves Reset outside the two-button grid.
+- Preserves account data and the existing vault key.
