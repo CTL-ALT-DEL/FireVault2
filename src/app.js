@@ -1,4 +1,4 @@
-import { BUILD, KEY, ACTIVE_JOB_KEY, loadData, saveData, ensureSite, fullAddress, esc, uid, downloadBlob, syncSummary, syncQueue, syncConflicts, syncActivity, createSyncPackage, importSyncPackage, resolveSyncConflict, notePackageExport, deviceIdentity, recordSyncActivity, autoBackupInfo, latestAutoBackup, restoreAutoBackup, isDemoMode, setDemoMode, resetDemoData } from "./storage.js?v=0.78.4";
+import { BUILD, KEY, ACTIVE_JOB_KEY, loadData, saveData, ensureSite, fullAddress, esc, uid, downloadBlob, syncSummary, syncQueue, syncConflicts, syncActivity, createSyncPackage, importSyncPackage, resolveSyncConflict, notePackageExport, deviceIdentity, recordSyncActivity, autoBackupInfo, latestAutoBackup, restoreAutoBackup, isDemoMode, setDemoMode, resetDemoData } from "./storage.js?v=0.78.5";
 window.__FIREVAULT_MODULE_READY = true;
 
 function fvPreferenceStore0739(){
@@ -1992,6 +1992,7 @@ function render(){
     injectContextualHelp060();
     applyRoutePolishClass0780();
     animateRouteEntry0781();
+    installLayoutGuard0785();
   }catch(err){ showError(err); }
 }
 
@@ -8703,6 +8704,7 @@ function diagnostics(){
 }
 function showChangelog(){
   const notes = [
+    "Build 0.78.5 completes a stability and consistency audit with measured app-chrome geometry, route-safe viewport sizing, overflow protection, improved Account Detail tabs, stronger Settings and Tools layouts, and consistent phone-sized component behavior.",
     "Build 0.78.4 redesigns Settings section introductions so they no longer resemble buttons, repairs wrapping and overflow in Data and other Settings areas, and standardizes narrow-phone settings layouts.",
     "Build 0.78.3 improves field readability across Nearby, Accounts, Account Detail, Settings, Tools, and forms with larger supporting text, stronger contrast, clearer badges, and safer touch targets.",
     "Build 0.78.2 remembers scroll position across major screens, restores each Account Detail tab independently, lets an active bottom-navigation button return its page to the top, and updates the browser title for clearer orientation.",
@@ -8738,13 +8740,54 @@ function showChangelog(){
   overlay.className="releaseOverlay";
   overlay.innerHTML=`<div class="releaseSheet" role="dialog" aria-modal="true" aria-label="FireVault release notes">
     <div class="releaseHead"><div><strong>${fireVaultBrand575()}</strong><span>Build ${BUILD}</span></div><button class="ghost iconBtn" id="closeRelease" aria-label="Close release notes">×</button></div>
-    <div class="releaseBody"><h2>Release Notes</h2><p class="releaseIntro">Field readability with clearer typography, stronger contrast, safer touch targets, and more consistent scanning across the app.</p><ul>${notes.map(n=>`<li>${esc(n)}</li>`).join("")}</ul></div>
+    <div class="releaseBody"><h2>Release Notes</h2><p class="releaseIntro">App-wide stability with measured chrome geometry, reliable overflow containment, and more consistent component sizing across every major route.</p><ul>${notes.map(n=>`<li>${esc(n)}</li>`).join("")}</ul></div>
   </div>`;
   document.body.appendChild(overlay);
   const close=()=>overlay.remove();
   document.getElementById("closeRelease").onclick=close;
   overlay.addEventListener("click",e=>{ if(e.target===overlay) close(); });
 }
+
+
+/* Build 0.78.5 — route-safe chrome and viewport metric guard. */
+let layoutFrame0785=0;
+let chromeObserver0785=null;
+function elementVisible0785(el){
+  if(!el) return false;
+  const style=getComputedStyle(el);
+  return style.display!=="none" && style.visibility!=="hidden" && style.opacity!=="0";
+}
+function syncLayoutMetrics0785(){
+  const root=document.documentElement;
+  const body=document.body;
+  const header=document.getElementById("appHeader");
+  const nav=document.getElementById("appNav");
+  const viewportHeight=Math.max(320,Math.round(window.visualViewport?.height||window.innerHeight||document.documentElement.clientHeight||0));
+  const home=body.classList.contains("homeFullscreen480");
+  const headerHeight=!home&&elementVisible0785(header)?Math.ceil(header.getBoundingClientRect().height||0):0;
+  const navHeight=!home&&elementVisible0785(nav)?Math.ceil(nav.getBoundingClientRect().height||0):0;
+  if(headerHeight>0) root.style.setProperty("--fv0785-header-h",`${headerHeight}px`);
+  if(navHeight>0) root.style.setProperty("--fv0785-nav-h",`${navHeight}px`);
+  root.style.setProperty("--fv0785-viewport-h",`${viewportHeight}px`);
+  body.classList.toggle("fv-compact-height0785",viewportHeight<720);
+  body.classList.add("fv-layout-audited0785");
+  body.dataset.fvLayoutRoute=String(view||"home");
+}
+function scheduleLayoutMetrics0785(){
+  cancelAnimationFrame(layoutFrame0785);
+  layoutFrame0785=requestAnimationFrame(()=>requestAnimationFrame(syncLayoutMetrics0785));
+}
+function installLayoutGuard0785(){
+  if(!chromeObserver0785 && "ResizeObserver" in window){
+    chromeObserver0785=new ResizeObserver(scheduleLayoutMetrics0785);
+    [document.getElementById("appHeader"),document.getElementById("appNav"),document.getElementById("app")].filter(Boolean).forEach(el=>chromeObserver0785.observe(el));
+  }
+  scheduleLayoutMetrics0785();
+}
+window.addEventListener("resize",scheduleLayoutMetrics0785,{passive:true});
+window.addEventListener("orientationchange",()=>setTimeout(scheduleLayoutMetrics0785,100),{passive:true});
+window.visualViewport?.addEventListener("resize",scheduleLayoutMetrics0785,{passive:true});
+window.visualViewport?.addEventListener("scroll",scheduleLayoutMetrics0785,{passive:true});
 
 
 function bootFireVault518(){

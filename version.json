@@ -1,6 +1,6 @@
 {
-  "build": "0.78.4",
+  "build": "0.78.5",
   "released": "2026-07-12",
-  "note": "Settings sections and overflow repair",
-  "label": "Clear section introductions and reliable Settings text wrapping"
+  "note": "Stability and consistency audit",
+  "label": "Measured app chrome, route-safe layouts, and app-wide overflow protection"
 }

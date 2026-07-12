@@ -8,7 +8,7 @@
   "orientation": "portrait-primary",
   "background_color": "#0b0d10",
   "theme_color": "#101216",
-  "description": "Field knowledge system for fire alarm technicians. Build 0.78.4 redesigns Settings section introductions, repairs text wrapping and overflow in Data and other Settings areas, and improves narrow-phone settings layout while preserving FireVault data and workflows.",
+  "description": "Field knowledge system for fire alarm technicians. Build 0.78.5 completes a stability and consistency audit with measured app-chrome geometry, route-safe viewport sizing, overflow protection, and improved consistency across Account Detail, Settings, Tools, forms, dialogs, and navigation.",
   "icons": [
     {
       "src": "assets/icon-192.png",
@@ -49,5 +49,5 @@
       "description": "Open FireVault settings"
     }
   ],
-  "version": "0.78.4"
+  "version": "0.78.5"
 }

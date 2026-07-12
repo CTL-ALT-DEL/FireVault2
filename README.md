@@ -1,3 +1,3 @@
-# FireVault Build 0.78.4 — Settings Sections & Overflow Repair
+# FireVault Build 0.78.5 — Stability & Consistency Audit
 
-This release redesigns the non-interactive introduction at the top of each Settings category so it reads as a section heading rather than a button. Settings destination rows now expand for long titles and descriptions, and Data, Sync & Support plus other detail panels wrap long text, URLs, labels, and controls safely on narrow iPhones. The existing vault schema and storage key are unchanged.
+This release audits the major FireVault routes and establishes measured top-header, bottom-navigation, and viewport geometry so page content cannot drift beneath app chrome. It also adds authoritative overflow containment and consistency rules for Account Detail tabs, Settings navigation, Tools tiles, forms, dialogs, empty states, and narrow-phone layouts. The existing vault schema and storage key are unchanged.
