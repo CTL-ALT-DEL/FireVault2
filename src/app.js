@@ -1,6 +1,6 @@
-import { BUILD, KEY, ACTIVE_JOB_KEY, loadData, saveData, ensureSite, fullAddress, esc, uid, downloadBlob, syncSummary, syncQueue, syncConflicts, syncActivity, createSyncPackage, importSyncPackage, resolveSyncConflict, notePackageExport, deviceIdentity, recordSyncActivity, autoBackupInfo, latestAutoBackup, restoreAutoBackup, isDemoMode, setDemoMode, resetDemoData, securityFoundationSummary, securityAudit, recycleBinInfo, restoreRecycleRecord, purgeRecycleBin, recordSecurityEvent, validateVaultIntegrity } from "./storage.js?v=0.79.6";
-import { backendAdapterSummary, runBackendAdapterDiagnostics, backendAdapterManifest, PROVIDER_CONTRACT_VERSION, FILE_STORAGE_CATALOG, fileStoragePlanSummary, cloudFileStorageManifest, MICROSOFT_STORAGE_TYPES, microsoftStorageAccounts, saveMicrosoftStorageAccounts, createMicrosoftStorageAccount, microsoftStorageAccountById, microsoftAppRegistration, saveMicrosoftAppRegistration, microsoftStorageSummary, microsoftStorageManifest } from "./providers.js?v=0.79.6";
-import { encodePlusCode, isValidFullPlusCode, normalizePlusCode, plusCodePrecisionLabel } from "./open-location-code.js?v=0.79.6";
+import { BUILD, KEY, ACTIVE_JOB_KEY, loadData, saveData, ensureSite, fullAddress, esc, uid, downloadBlob, syncSummary, syncQueue, syncConflicts, syncActivity, createSyncPackage, importSyncPackage, resolveSyncConflict, notePackageExport, deviceIdentity, recordSyncActivity, autoBackupInfo, latestAutoBackup, restoreAutoBackup, isDemoMode, setDemoMode, resetDemoData, securityFoundationSummary, securityAudit, recycleBinInfo, restoreRecycleRecord, purgeRecycleBin, recordSecurityEvent, validateVaultIntegrity } from "./storage.js?v=0.79.7";
+import { backendAdapterSummary, runBackendAdapterDiagnostics, backendAdapterManifest, PROVIDER_CONTRACT_VERSION, FILE_STORAGE_CATALOG, fileStoragePlanSummary, cloudFileStorageManifest, MICROSOFT_STORAGE_TYPES, microsoftStorageAccounts, saveMicrosoftStorageAccounts, createMicrosoftStorageAccount, microsoftStorageAccountById, microsoftAppRegistration, saveMicrosoftAppRegistration, microsoftStorageSummary, microsoftStorageManifest } from "./providers.js?v=0.79.7";
+import { encodePlusCode, isValidFullPlusCode, normalizePlusCode, plusCodePrecisionLabel } from "./open-location-code.js?v=0.79.7";
 window.__FIREVAULT_MODULE_READY = true;
 
 function fvPreferenceStore0739(){
@@ -6963,11 +6963,11 @@ function importedAccountCard065(s={}){
 
 
 const SETTINGS_GROUPS_067 = [
-  {key:"profile",icon:"👤",title:"Profile & Organization",note:"Technician identity and company details.",tone:"blue",tabs:["tech"]},
-  {key:"appearance",icon:"◐",title:"App & Home",note:"Demo Mode, theme, Home layout, and visible modules.",tone:"violet",tabs:["demo","themes","homeLayout","visibility"]},
-  {key:"field",icon:"🧰",title:"Field Tools",note:"GPS, photo overlays, and optional field services.",tone:"cyan",tabs:["gps","plusCodes","overlay","advanced"]},
-  {key:"reports",icon:"▤",title:"Reports & Communication",note:"Report content, email delivery, and customer closeout.",tone:"amber",tabs:["reports","email"]},
-  {key:"data",icon:"☁",title:"Data, Sync & Support",note:"Privacy Lock, Security Center, Microsoft storage, backend readiness, categories, imports, backup, team sync, Help, About, and diagnostics.",tone:"red",tabs:["privacy","security","cloudFiles","microsoftStorage","backend","sync","webdav","customerImport","categories","backup","updates","manual","about","diagnostics"]}
+  {key:"profile",icon:"👤",title:"Profile & Organization",note:"Your technician and company details.",tone:"blue",tabs:["tech"]},
+  {key:"appearance",icon:"◐",title:"App & Home",note:"Theme, Demo Mode, Home, and modules.",tone:"violet",tabs:["demo","themes","homeLayout","visibility"]},
+  {key:"field",icon:"🧰",title:"Field Tools",note:"GPS, Plus Codes, overlays, and services.",tone:"cyan",tabs:["gps","plusCodes","overlay","advanced"]},
+  {key:"reports",icon:"▤",title:"Reports & Communication",note:"Report defaults and email.",tone:"amber",tabs:["reports","email"]},
+  {key:"data",icon:"☁",title:"Data, Sync & Support",note:"Security, storage, sync, backups, and support.",tone:"red",tabs:["privacy","security","cloudFiles","microsoftStorage","backend","sync","webdav","customerImport","categories","backup","updates","manual","about","diagnostics"]}
 ];
 function settingsGroupForTab067(tab){ return SETTINGS_GROUPS_067.find(g=>g.tabs.includes(tab))?.key || "data"; }
 function settingsGroup067ByKey(key){ return SETTINGS_GROUPS_067.find(g=>g.key===key) || SETTINGS_GROUPS_067[0]; }
@@ -6980,30 +6980,30 @@ function settingsGroupSummary067(group,tabs){
 
 function settingsTabs(){
   return [
-    ["tech","Technician","Name, company, phone, email, and license information used in reports."],
-    ["gps","GPS / Maps","Location capture, map provider, nearby radius, and GPS report visibility."],
-    ["plusCodes","Google Plus Codes","Offline Plus Code generation, precision, search, routing, and location-point settings."],
-    ["reports","Reports","Default report title, format, and included report sections."],
-    ["email","Email","Default recipients, subject template, signature template, and tag tools."],
-    ["overlay","Photo Overlay","Photo stamp preview, template fields, alignment, colors, and logo visibility."],
-    ["demo","Demo Mode","Use a separate fictional Boise account database to demonstrate FireVault without showing real customer information."],
-    ["themes","Theme","Theme presets, accent color, 3D controls, text size, and haptics."],
-    ["homeLayout","Home Layout","Choose which optional Home cards appear and how they open."],
-    ["visibility","Modules","Enable or disable FireVault modules for a cleaner field interface."],
-    ["advanced","Advanced","Optional integrations and field services. An asterisk marks controls that require an outside service."],
-    ["privacy","Privacy Lock","Optional local PIN, inactivity timeout, background lock, recovery code, and privacy screen."],
-    ["security","Security Center","Privacy, vault integrity, backup health, device identity, audit history, and recovery controls."],
-    ["cloudFiles","Photo & Document Storage","Choose separate local or cloud destinations for photos and documents."],
-    ["microsoftStorage","Microsoft Storage Accounts","Create separate Personal OneDrive, Work OneDrive, and SharePoint connection profiles."],
-    ["backend","Backend Foundation","Provider-ready authentication, database, file storage, sync, and audit adapters."],
-    ["sync","Team Sync","Technician identity, shared-vault packages, pending changes, and conflict review."],
-    ["webdav","WebDAV","Optional encrypted-transport backup and restore using a compatible WebDAV server."],
-    ["customerImport","Customer Import","Preview and safely import customer records from a CSV export using Account Id."],
-    ["categories","Categories","Create rule-driven account tags. Multiple categories can be assigned to the same account."],
-    ["backup","Backup","Export, import, data safety snapshot, restore tools, and danger zone."],
-    ["updates","App Updates","Check for a new build, clear cached app files, and reload FireVault."],
-    ["manual","Help & Manual","Searchable instructions for using FireVault, field workflows, settings, reports, photos, GPS, and troubleshooting."],
-    ["about","About","Installed version, local storage details, and application information."]
+    ["tech","Technician","Name and contact details."],
+    ["gps","GPS / Maps","GPS, maps, and nearby range."],
+    ["plusCodes","Google Plus Codes","Offline codes and saved pins."],
+    ["reports","Reports","Report defaults and sections."],
+    ["email","Email","Recipients, subjects, and signature."],
+    ["overlay","Photo Overlay","Photo stamps, fields, and logo."],
+    ["demo","Demo Mode","Use fictional Boise accounts."],
+    ["themes","Theme","Colors, text size, and controls."],
+    ["homeLayout","Home Layout","Choose cards shown on Home."],
+    ["visibility","Modules","Show or hide optional modules."],
+    ["advanced","Advanced","Optional services and integrations."],
+    ["privacy","Privacy Lock","PIN, timeout, and recovery."],
+    ["security","Security Center","Vault health, audit, and recovery."],
+    ["cloudFiles","Photo & Document Storage","Choose storage for photos and files."],
+    ["microsoftStorage","Microsoft Storage Accounts","Manage OneDrive and SharePoint profiles."],
+    ["backend","Backend Foundation","Review backend-ready providers."],
+    ["sync","Team Sync","Shared-vault status and conflicts."],
+    ["webdav","WebDAV","WebDAV backup and restore."],
+    ["customerImport","Customer Import","Import accounts from CSV."],
+    ["categories","Categories","Create automatic account tags."],
+    ["backup","Backup","Export, restore, and snapshots."],
+    ["updates","App Updates","Check, reload, or clear cache."],
+    ["manual","Help & Manual","Search FireVault instructions."],
+    ["about","About","Version and storage information."]
   ];
 }
 function settingsTabLabel0736(key){
@@ -7016,7 +7016,7 @@ function wireSettingsTopTabs0736(){
   document.querySelectorAll("[data-settings-top-tab0736]").forEach(btn=>btn.onclick=()=>{settingsGroup067=btn.dataset.settingsTopTab0736||"profile";mode=null;render();});
 }
 function settingsGroupItems0736(group,tabs){
-  return group.tabs.map(id=>id==="diagnostics"?["diagnostics","Diagnostics","Check build, storage, GPS, database, and module health."]:tabs.find(t=>t[0]===id)).filter(Boolean);
+  return group.tabs.map(id=>id==="diagnostics"?["diagnostics","Diagnostics","Check app and database health."]:tabs.find(t=>t[0]===id)).filter(Boolean);
 }
 
 
@@ -7699,7 +7699,7 @@ function manualSimplePage058(type){
   quick:["🚀","Quick Start Guide","Get FireVault ready for a normal field day.",[["1. Verify the build","Confirm the green build badge shows 0.67.0 before entering production information."],["2. Complete Technician Profile","Enter your name, company, phone, email, and license or employee identification."],["3. Review permissions","Allow location and photo access only when FireVault requests them and the feature is needed."],["4. Create or open a site","Add the customer name, full address, panel details, contacts, access notes, and GPS location."],["5. Document the visit","Record notes, photos, tasks, deficiencies, equipment changes, and a service visit."],["6. Finish and protect the data","Review the report, send or copy the required summary, then export a current backup."]]],
   new:["🆕","What’s New in 0.67.0","Account View, Settings navigation, and FireVault Academy redesign.",[["Unified visual system","Standardized typography, spacing, card surfaces, borders, controls, and responsive behavior across FireVault."],["Settings cleanup","Improved Settings home cards and every submenu while preserving the preferred Email setup workflow."],["Help readability","Converted contextual Help and Academy articles into one uninterrupted scrolling reading column with no floating metadata."],["Site Detail stability","Reinforced natural-height cards, readable text, and scroll-safe account sections."],["Operational screens","Simplified Customer Import, Team Sync, Conflict Center, and Nearby Sites presentation without changing their workflows."],["Phone and iPad layouts","Added consistent narrow-phone and tablet behavior, bottom-navigation clearance, and overflow protection."],["Nearby scan diagnostics","Nearby Sites now shows total sites, GPS-ready records, missing coordinates, phone-location progress, and persistent error messages."],["Coordinate recovery","FireVault recovers valid latitude and longitude stored in compatible legacy or imported fields and normalizes them into the site GPS record."],["Location retry","If high-accuracy location times out or is unavailable, FireVault retries once using standard accuracy."],["Nearest-site fallback","When no site is inside the selected radius, the nearest GPS-ready sites remain visible instead of presenting an empty result."],["Latitude and longitude","Customer Import can calculate missing coordinates from each usable U.S. street address before saving records."],["Coordinate requirement","The importer requires calculated, supplied, or existing GPS coordinates by default. Unmatched addresses remain in review."],["Census address matching","Only address fields are sent to the U.S. Census Geocoder. The returned point is an address-range calculation, not a guaranteed building entrance."],["Account Id matching","Repeat imports update the matching FireVault site instead of creating duplicates or deleting field history."],["CSV coordinate columns","Files that already contain Latitude and Longitude columns use those values directly."],["Sync-ready changes","Added and updated customer records enter the pending synchronization queue and create a Sync Activity entry."]]],
   tips:["🧰","Field Tips","Short practices that improve the usefulness of FireVault records.",[["Write for the next technician","Include the exact panel, circuit, device, location, symptom, test result, and next action instead of relying on memory."],["Photograph context first","Take one wide photo showing the equipment location before close-up terminal, label, or damage photos."],["Separate facts from follow-up","Use notes for what occurred, deficiencies for code or system problems, and tasks for work that still needs completion."],["Confirm the account","Before using Quick Capture, verify the selected customer site to prevent records from being stored under the wrong account."],["Back up before updates","Download an external backup before a major update or device change and after completing significant field documentation."]]],
-  revisions:["📋","Revision History","Application and documentation checkpoints.",[["0.79.6","Added Nearby-style account-list scroll locking so cards settle cleanly at the top while the Accounts controls remain fixed."],["0.79.5","Added separate Personal OneDrive, Work OneDrive, and SharePoint connection profiles with exact photo/document assignments and no-personal-fallback protection."],["0.79.4","Added independent photo and document storage destinations, cloud-provider integration targets, and offline Google Plus Codes for accounts and exact field locations."],["0.79.3","Added backend-neutral provider interfaces for authentication, database, file storage, synchronization, and audit while keeping FireVault fully local."],["0.79.2","Added a unified Security Center with vault integrity validation, backup health, audit filters, device naming, session clearing, and PIN confirmation for sensitive exports, restores, and deletion."],["0.79.1","Added an optional local six-digit privacy lock with PBKDF2 hashing, inactivity/background locking, app-switcher privacy screen, recovery code, cooldown protection, and local lock events."],["0.79.0","Added security-ready schema 4 metadata, stable workspace/user/device identities, local audit history, pending change queue, recoverable deletion, credential-safe exports, and protected restore/reset actions."],["0.67.0","Redesigned Account View around service actions and grouped information, consolidated Settings into five folders, and simplified FireVault Academy and contextual Help for continuous reading."],["0.65.2","Repaired Nearby Sites with GPS inventory counts, imported-coordinate recovery, persistent permission and timeout messages, a standard-accuracy retry, and nearest-site fallback results."],["0.65.1","Added online latitude/longitude calculation, coordinate validation, geocoding progress, unmatched-address review, optional CSV coordinates, and coordinate-safe repeat importing."],["0.65.0","Added preview-first customer CSV importing, Account Id update matching, validation warnings, imported monitoring details, and sync activity tracking."],["0.64.1","Simplified Academy article headers, removed floating metadata badges, and improved continuous scrolling and readability."],["0.64.0","Added Sync Activity, a conflict review center, export/import audit entries, and an automatic OneDrive connection-readiness checklist."],["0.63.1","Overhauled contextual Help and Academy reader formatting, removed overlapping sticky article headers, and restored full scrolling on phones and tablets."],["0.63.0","Added permanent record IDs, audit metadata, local version tracking, pending-sync states, conflict readiness, device identity, and a Team Sync settings workspace."],["0.60.0","Connected major screens and Settings areas directly to matching Academy chapters with return-to-screen navigation."],["0.59.0","Added interactive tutorials, guided orientation, pinned learning, field tips, and documentation tracking."],["0.58.0","Expanded Help & Manual into FireVault Academy with bookmarks, smart search, Quick Start, and reader navigation."],["0.57.0","Added the first complete searchable in-app FireVault User Manual."],["Ongoing review rule","Any change to navigation, labels, storage, workflows, permissions, or supported layouts requires the related manual chapter to be checked."]]],
+  revisions:["📋","Revision History","Application and documentation checkpoints.",[["0.79.7","Shortened every Settings summary and removed the colored bar from each Section Overview."],["0.79.6","Added Nearby-style account-list scroll locking so cards settle cleanly at the top while the Accounts controls remain fixed."],["0.79.5","Added separate Personal OneDrive, Work OneDrive, and SharePoint connection profiles with exact photo/document assignments and no-personal-fallback protection."],["0.79.4","Added independent photo and document storage destinations, cloud-provider integration targets, and offline Google Plus Codes for accounts and exact field locations."],["0.79.3","Added backend-neutral provider interfaces for authentication, database, file storage, synchronization, and audit while keeping FireVault fully local."],["0.79.2","Added a unified Security Center with vault integrity validation, backup health, audit filters, device naming, session clearing, and PIN confirmation for sensitive exports, restores, and deletion."],["0.79.1","Added an optional local six-digit privacy lock with PBKDF2 hashing, inactivity/background locking, app-switcher privacy screen, recovery code, cooldown protection, and local lock events."],["0.79.0","Added security-ready schema 4 metadata, stable workspace/user/device identities, local audit history, pending change queue, recoverable deletion, credential-safe exports, and protected restore/reset actions."],["0.67.0","Redesigned Account View around service actions and grouped information, consolidated Settings into five folders, and simplified FireVault Academy and contextual Help for continuous reading."],["0.65.2","Repaired Nearby Sites with GPS inventory counts, imported-coordinate recovery, persistent permission and timeout messages, a standard-accuracy retry, and nearest-site fallback results."],["0.65.1","Added online latitude/longitude calculation, coordinate validation, geocoding progress, unmatched-address review, optional CSV coordinates, and coordinate-safe repeat importing."],["0.65.0","Added preview-first customer CSV importing, Account Id update matching, validation warnings, imported monitoring details, and sync activity tracking."],["0.64.1","Simplified Academy article headers, removed floating metadata badges, and improved continuous scrolling and readability."],["0.64.0","Added Sync Activity, a conflict review center, export/import audit entries, and an automatic OneDrive connection-readiness checklist."],["0.63.1","Overhauled contextual Help and Academy reader formatting, removed overlapping sticky article headers, and restored full scrolling on phones and tablets."],["0.63.0","Added permanent record IDs, audit metadata, local version tracking, pending-sync states, conflict readiness, device identity, and a Team Sync settings workspace."],["0.60.0","Connected major screens and Settings areas directly to matching Academy chapters with return-to-screen navigation."],["0.59.0","Added interactive tutorials, guided orientation, pinned learning, field tips, and documentation tracking."],["0.58.0","Expanded Help & Manual into FireVault Academy with bookmarks, smart search, Quick Start, and reader navigation."],["0.57.0","Added the first complete searchable in-app FireVault User Manual."],["Ongoing review rule","Any change to navigation, labels, storage, workflows, permissions, or supported layouts requires the related manual chapter to be checked."]]],
   trouble:["❓","Troubleshooting","Common problems and safe first checks.",FIREVAULT_MANUAL_058.find(x=>x.id==="trouble")?.topics||[]]
  };
  const [icon,title,note,items]=pages[type]||["ⓘ","Unavailable","This Help section is not available in the installed version.",[["Current status","Return to Help and choose an available chapter or tutorial."]]];
@@ -9475,7 +9475,7 @@ function diagnostics(){
 }
 function showChangelog(){
   const notes = [
-    "Build 0.79.6 adds Nearby-style scrolling lock to the Accounts directory so the controls stay fixed and account cards settle cleanly at the top.",
+    "Build 0.79.7 shortens Settings summaries and simplifies each Section Overview for cleaner phone layouts.",
     "Build 0.79.5 adds separate Personal OneDrive, Work OneDrive, and SharePoint profiles with exact destination assignments and strict no-personal-fallback protection.",
     "Build 0.79.4 adds independent photo/document storage destinations and full offline Google Plus Codes while keeping FireVault local-first.",
     "Build 0.79.3 adds backend-neutral provider interfaces for authentication, database, file storage, synchronization, and audit while keeping FireVault fully local.",

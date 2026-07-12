@@ -1,23 +1,21 @@
-# FireVault Build 0.79.6 — Accounts Scrolling Lock
+# FireVault Build 0.79.7 — Settings Summary Polish
 
-This release applies the stable Nearby Accounts scrolling behavior to the main Accounts directory.
+This release cleans up the Settings directory for faster reading on iPhone.
 
-## Accounts scrolling lock
+## Settings improvements
 
-- The Accounts title, search, filters, result summary, Jump To, and Sort By controls stay fixed in place.
-- Only the account-card list scrolls.
-- After a finger or mouse-wheel scroll ends, the closest visible account card settles cleanly at the top of the list area.
-- A protected tail spacer allows the final account card to reach the same top position without changing card heights.
-- The implementation uses JavaScript settling rather than CSS scroll snapping, avoiding the card-collapse problem from the earlier snap experiment.
-- Search, filters, Jump To, Sort By, Favorites, Call, Route, Top, and restored list position remain supported.
+- Rewrites every Settings item description as a short, direct summary.
+- Shortens all five category overview descriptions, including Data, Sync & Support.
+- Removes the colored vertical bar from the left side of each Section Overview.
+- Keeps the overview icon and hierarchy without making the area resemble a button.
+- Preserves natural wrapping and full visibility on narrow phones.
 
 ## Preserved
 
 - Existing `firevault_vault_build_030` storage key
-- Security schema 4
-- Account data and view-state memory
+- Security schema 4 and all account data
+- Accounts scroll lock
 - Demo Mode, automatic snapshots, Privacy Lock, and Security Center
-- WebDAV and Microsoft storage-account foundation
-- Google Plus Codes and backend adapters
+- WebDAV, Microsoft storage profiles, Plus Codes, and backend adapters
 
 Deploy over the existing FireVault installation. Do not delete or reinstall the Home Screen PWA.

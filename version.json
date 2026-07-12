@@ -1,6 +1,6 @@
 {
-  "build": "0.79.6",
+  "build": "0.79.7",
   "released": "2026-07-12",
-  "note": "Accounts scrolling lock",
-  "label": "Nearby-style account list settling"
+  "note": "Settings summary polish",
+  "label": "Short descriptions and clean section overviews"
 }
