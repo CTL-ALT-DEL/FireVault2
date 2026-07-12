@@ -1,4 +1,4 @@
-import { BUILD, KEY, ACTIVE_JOB_KEY, loadData, saveData, ensureSite, fullAddress, esc, uid, downloadBlob, syncSummary, syncQueue, syncConflicts, syncActivity, createSyncPackage, importSyncPackage, resolveSyncConflict, notePackageExport, deviceIdentity, recordSyncActivity, autoBackupInfo, latestAutoBackup, restoreAutoBackup, isDemoMode, setDemoMode, resetDemoData } from "./storage.js?v=0.78.0";
+import { BUILD, KEY, ACTIVE_JOB_KEY, loadData, saveData, ensureSite, fullAddress, esc, uid, downloadBlob, syncSummary, syncQueue, syncConflicts, syncActivity, createSyncPackage, importSyncPackage, resolveSyncConflict, notePackageExport, deviceIdentity, recordSyncActivity, autoBackupInfo, latestAutoBackup, restoreAutoBackup, isDemoMode, setDemoMode, resetDemoData } from "./storage.js?v=0.78.1";
 window.__FIREVAULT_MODULE_READY = true;
 
 function fvPreferenceStore0739(){
@@ -601,7 +601,37 @@ function route(v){
   view = v; render();
 }
 function html(content){ appEl.innerHTML = content; requestAnimationFrame(()=>bindPhoneInputs0758(appEl)); }
-function toast(msg){ const t=document.createElement("div"); t.className="toast"; t.textContent=msg; document.body.appendChild(t); setTimeout(()=>t.remove(),1800); }
+
+let routeAnimationFrame0781=0;
+function animateRouteEntry0781(){
+  const root=document.getElementById("app");
+  if(!root || window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches) return;
+  cancelAnimationFrame(routeAnimationFrame0781);
+  root.classList.remove("fvRouteEnter0781");
+  routeAnimationFrame0781=requestAnimationFrame(()=>{
+    root.classList.add("fvRouteEnter0781");
+    setTimeout(()=>root.classList.remove("fvRouteEnter0781"),260);
+  });
+}
+function setButtonBusy0781(button,busy,label="Working…"){
+  if(!button) return;
+  if(busy){
+    if(!button.dataset.fvOriginalLabel) button.dataset.fvOriginalLabel=button.textContent||"";
+    button.disabled=true;button.setAttribute("aria-busy","true");button.classList.add("fvButtonBusy0781");button.textContent=label;
+  }else{
+    button.disabled=false;button.removeAttribute("aria-busy");button.classList.remove("fvButtonBusy0781");
+    if(button.dataset.fvOriginalLabel!==undefined){button.textContent=button.dataset.fvOriginalLabel;delete button.dataset.fvOriginalLabel;}
+  }
+}
+function toast(msg,type="info"){
+  const stack=document.getElementById("fvToastStack0781")||(()=>{const el=document.createElement("div");el.id="fvToastStack0781";el.className="fvToastStack0781";el.setAttribute("aria-live","polite");el.setAttribute("aria-atomic","false");document.body.appendChild(el);return el;})();
+  const t=document.createElement("div");t.className=`toast fvToast0781 ${type||"info"}`;t.setAttribute("role","status");
+  t.innerHTML=`<span class="fvToastIcon0781" aria-hidden="true"></span><span>${esc(String(msg||""))}</span><i aria-hidden="true"></i>`;
+  stack.appendChild(t);
+  while(stack.children.length>3) stack.firstElementChild?.remove();
+  const remove=()=>{t.classList.add("leaving");setTimeout(()=>t.remove(),180);};
+  setTimeout(remove,2600);
+}
 function haptic(ms=12){
   if(data.settings.app?.haptics === false) return;
   try{ if(navigator.vibrate) navigator.vibrate(ms); }catch{}
@@ -1855,6 +1885,7 @@ function render(){
     setActiveNav();
     injectContextualHelp060();
     applyRoutePolishClass0780();
+    animateRouteEntry0781();
   }catch(err){ showError(err); }
 }
 
@@ -7483,9 +7514,10 @@ async function ensureWebdavFolders0757(cfg){
 }
 function webdavStatus0757(message){const el=document.getElementById("webdavStatus0757");if(el)el.textContent=message;}
 async function testWebdav0757(){
-  const cfg=collectWebdavInputs0757(); webdavStatus0757("Testing connection…");
-  try{await webdavRequest0757("PROPFIND",String(cfg.url||"").trim().replace(/\/+$/g,"/") ,webdavHeaders0757(cfg,{Depth:"0"}));data.settings.webdav={...cfg,lastStatus:`Connected ${new Date().toLocaleString()}`};saveData(data);webdavStatus0757("Connected successfully.");toast("WebDAV connection successful.");}
-  catch(err){webdavStatus0757(err.message);alert(err.message);}
+  const cfg=collectWebdavInputs0757();const button=document.getElementById("testWebdav0757");setButtonBusy0781(button,true,"Testing…");webdavStatus0757("Testing connection…");
+  try{await webdavRequest0757("PROPFIND",String(cfg.url||"").trim().replace(/\/+$/g,"/") ,webdavHeaders0757(cfg,{Depth:"0"}));data.settings.webdav={...cfg,lastStatus:`Connected ${new Date().toLocaleString()}`};saveData(data);webdavStatus0757("Connected successfully.");toast("WebDAV connection successful.","success");}
+  catch(err){webdavStatus0757(err.message);toast(err.message,"error");}
+  finally{setButtonBusy0781(button,false);}
 }
 function collectWebdavInputs0757(){
   const current=webdavConfig0757();
@@ -7494,14 +7526,16 @@ function collectWebdavInputs0757(){
   return cfg;
 }
 async function uploadWebdavBackup0757(){
-  const cfg=collectWebdavInputs0757();webdavStatus0757("Preparing secure backup…");
-  try{await ensureWebdavFolders0757(cfg);const payload=JSON.stringify(webdavBackupPayload0757(),null,2);const url=normalizeWebdavUrl0757(cfg);await webdavRequest0757("PUT",url,webdavHeaders0757(cfg,{"Content-Type":"application/json"}),payload);data.settings.webdav={...cfg,lastUpload:new Date().toLocaleString(),lastStatus:"Upload successful"};saveData(data);webdavStatus0757("Backup uploaded successfully.");toast("WebDAV backup uploaded.");settings();}
-  catch(err){webdavStatus0757(err.message);alert(err.message);}
+  const cfg=collectWebdavInputs0757();const button=document.getElementById("uploadWebdav0757");setButtonBusy0781(button,true,"Uploading…");webdavStatus0757("Preparing secure backup…");
+  try{await ensureWebdavFolders0757(cfg);const payload=JSON.stringify(webdavBackupPayload0757(),null,2);const url=normalizeWebdavUrl0757(cfg);await webdavRequest0757("PUT",url,webdavHeaders0757(cfg,{"Content-Type":"application/json"}),payload);data.settings.webdav={...cfg,lastUpload:new Date().toLocaleString(),lastStatus:"Upload successful"};saveData(data);webdavStatus0757("Backup uploaded successfully.");toast("WebDAV backup uploaded.","success");settings();}
+  catch(err){webdavStatus0757(err.message);toast(err.message,"error");}
+  finally{setButtonBusy0781(button,false);}
 }
 async function restoreWebdavBackup0757(){
-  const cfg=collectWebdavInputs0757();if(!confirm("Download the WebDAV backup and replace the current FireVault vault? A local automatic snapshot will be created first."))return;webdavStatus0757("Downloading backup…");
-  try{const url=normalizeWebdavUrl0757(cfg);const response=await webdavRequest0757("GET",url,webdavHeaders0757(cfg));const parsed=JSON.parse(await response.text());const incoming=parsed?.data&&Array.isArray(parsed.data.sites)?parsed.data:parsed;if(!incoming||!Array.isArray(incoming.sites))throw new Error("The WebDAV file is not a valid FireVault backup.");Object.assign(data,incoming);data.settings=data.settings||{};data.settings.webdav={...cfg,lastDownload:new Date().toLocaleString(),lastStatus:"Restore successful"};saveData(data);data=loadData();webdavStatus0757("Backup restored. Reloading…");toast("WebDAV backup restored.");setTimeout(()=>route("home"),400);}
-  catch(err){webdavStatus0757(err.message);alert(err.message);}
+  const cfg=collectWebdavInputs0757();if(!confirm("Download the WebDAV backup and replace the current FireVault vault? A local automatic snapshot will be created first."))return;const button=document.getElementById("restoreWebdav0757");setButtonBusy0781(button,true,"Restoring…");webdavStatus0757("Downloading backup…");
+  try{const url=normalizeWebdavUrl0757(cfg);const response=await webdavRequest0757("GET",url,webdavHeaders0757(cfg));const parsed=JSON.parse(await response.text());const incoming=parsed?.data&&Array.isArray(parsed.data.sites)?parsed.data:parsed;if(!incoming||!Array.isArray(incoming.sites))throw new Error("The WebDAV file is not a valid FireVault backup.");Object.assign(data,incoming);data.settings=data.settings||{};data.settings.webdav={...cfg,lastDownload:new Date().toLocaleString(),lastStatus:"Restore successful"};saveData(data);data=loadData();webdavStatus0757("Backup restored. Reloading…");toast("WebDAV backup restored.","success");setTimeout(()=>route("home"),400);}
+  catch(err){webdavStatus0757(err.message);toast(err.message,"error");}
+  finally{setButtonBusy0781(button,false);}
 }
 function webdavPanel0757(){
   const cfg=webdavConfig0757();
@@ -8560,6 +8594,7 @@ function diagnostics(){
 }
 function showChangelog(){
   const notes = [
+    "Build 0.78.1 adds smoother route transitions, improved toast and loading feedback, refined empty states, stronger disabled and focus states, and safer WebDAV operation feedback.",
     "Build 0.78.0 scopes the fixed app header and bottom dock to the real global chrome, then polishes Tools, Settings, Account Detail, forms, dialogs, and touch states across FireVault.",
     "Build 0.76.2 adds one-tap Call and Route controls to every account card, identifies multi-account addresses, clarifies account health, and prevents accidental double-opening while preserving the Accounts view state.",
     "Build 0.76.1 hardens the Accounts directory with persistent view state, inline Favorites, recent-opened context, keyboard shortcuts, and a permanent app-chrome repair so the bottom navigation remains visible after saves and Favorite changes.",
@@ -8591,7 +8626,7 @@ function showChangelog(){
   overlay.className="releaseOverlay";
   overlay.innerHTML=`<div class="releaseSheet" role="dialog" aria-modal="true" aria-label="FireVault release notes">
     <div class="releaseHead"><div><strong>${fireVaultBrand575()}</strong><span>Build ${BUILD}</span></div><button class="ghost iconBtn" id="closeRelease" aria-label="Close release notes">×</button></div>
-    <div class="releaseBody"><h2>Release Notes</h2><p class="releaseIntro">App-wide structural cleanup with consistent page surfaces, navigation, controls, and field-ready spacing.</p><ul>${notes.map(n=>`<li>${esc(n)}</li>`).join("")}</ul></div>
+    <div class="releaseBody"><h2>Release Notes</h2><p class="releaseIntro">Interaction polish with clearer feedback, smoother page changes, safer loading states, and improved empty-state presentation.</p><ul>${notes.map(n=>`<li>${esc(n)}</li>`).join("")}</ul></div>
   </div>`;
   document.body.appendChild(overlay);
   const close=()=>overlay.remove();

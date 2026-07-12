@@ -1,3 +1,3 @@
-# FireVault Build 0.78.0 — App-Wide Polish
+# FireVault Build 0.78.1 — Interaction & Feedback Polish
 
-This release scopes legacy global `header` and `nav` CSS to the real FireVault app header and bottom dock, preventing nested page headers and tab navigation from inheriting fixed-position behavior. It also polishes Tools, Settings, Account Detail, Add/Edit Account, dialogs, empty states, focus states, and global navigation without changing the vault schema or storage key.
+This release improves page transitions, button feedback, loading states, toasts, empty states, and accessibility across FireVault. It also adds safe busy-state handling to WebDAV operations while preserving the existing vault schema and storage key.

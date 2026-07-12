@@ -8,7 +8,7 @@
   "orientation": "portrait-primary",
   "background_color": "#0b0d10",
   "theme_color": "#101216",
-  "description": "Field knowledge system for fire alarm technicians. Build 0.78.0 scopes global chrome correctly and delivers an app-wide polish pass for Tools, Settings, Account Detail, forms, dialogs, and navigation.",
+  "description": "Field knowledge system for fire alarm technicians. Build 0.78.1 improves transitions, loading feedback, button states, empty states, accessibility, and WebDAV operation feedback across FireVault.",
   "icons": [
     {
       "src": "assets/icon-192.png",
@@ -49,5 +49,5 @@
       "description": "Open FireVault settings"
     }
   ],
-  "version": "0.78.0"
+  "version": "0.78.1"
 }

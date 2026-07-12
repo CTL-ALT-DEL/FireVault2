@@ -1,6 +1,6 @@
 {
-  "build": "0.78.0",
+  "build": "0.78.1",
   "released": "2026-07-12",
-  "note": "App-wide structural and visual polish",
-  "label": "Global chrome and interface polish"
+  "note": "Interaction and feedback polish",
+  "label": "Transitions, loading states, and empty-state refinement"
 }

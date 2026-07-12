@@ -17333,7 +17333,7 @@ input[data-fv-phone0758="1"]{font-variant-numeric:tabular-nums;letter-spacing:.0
 }
 
 
-/* Build 0.78.0 — App-wide structural and visual polish
+/* Build 0.78.1 — App-wide structural and visual polish
    Legacy header/nav rules are now scoped to #appHeader and #appNav. */
 :root{
   --fv0780-surface:#101a28;
@@ -17558,4 +17558,94 @@ body.app-booted533 > #appHeader{
 }
 @media(prefers-reduced-motion:reduce){
   *,*::before,*::after{scroll-behavior:auto!important;animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
+}
+
+
+/* Build 0.78.1 — Interaction, loading, and feedback polish */
+:root{
+  --fv0781-fast:140ms;
+  --fv0781-normal:220ms;
+  --fv0781-focus:#69b1ff;
+}
+#app.fvRouteEnter0781 > .screen,
+#app.fvRouteEnter0781 > .homeScreen069,
+#app.fvRouteEnter0781 > .nearbyScreen069,
+#app.fvRouteEnter0781 > .siteDetail0735{
+  animation:fvRouteEnter0781 var(--fv0781-normal) cubic-bezier(.2,.72,.28,1) both;
+}
+@keyframes fvRouteEnter0781{
+  from{opacity:.55;transform:translateY(5px)}
+  to{opacity:1;transform:none}
+}
+
+/* One consistent tactile response across native buttons, anchors, and cards. */
+button,.btn,[role="button"]{
+  -webkit-tap-highlight-color:transparent;
+  transition:transform var(--fv0781-fast) ease,border-color var(--fv0781-fast) ease,background-color var(--fv0781-fast) ease,box-shadow var(--fv0781-fast) ease,opacity var(--fv0781-fast) ease;
+}
+button:active:not(:disabled),.btn:active:not([aria-disabled="true"]),[role="button"]:active:not([aria-disabled="true"]){transform:scale(.975)}
+button:disabled,.btn[aria-disabled="true"],[aria-busy="true"]{cursor:default;opacity:.52;filter:saturate(.62)}
+button:focus-visible,.btn:focus-visible,[role="button"]:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{
+  outline:3px solid color-mix(in srgb,var(--fv0781-focus) 72%,transparent)!important;
+  outline-offset:2px!important;
+}
+
+/* Loading buttons retain their width and show a compact activity indicator. */
+.fvButtonBusy0781{position:relative!important;justify-content:center!important;gap:9px!important}
+.fvButtonBusy0781::before{
+  content:"";width:15px;height:15px;flex:0 0 15px;border-radius:50%;
+  border:2px solid rgba(255,255,255,.30);border-top-color:#fff;
+  animation:fvSpin0781 .72s linear infinite;
+}
+@keyframes fvSpin0781{to{transform:rotate(360deg)}}
+
+/* Toast stack: readable, non-blocking, and safe above the bottom dock. */
+.fvToastStack0781{
+  position:fixed;left:50%;bottom:calc(var(--navH,72px) + env(safe-area-inset-bottom) + 14px);
+  transform:translateX(-50%);z-index:10020;width:min(92vw,430px);
+  display:grid;gap:8px;pointer-events:none;padding:0 10px;
+}
+.toast.fvToast0781{
+  position:relative!important;inset:auto!important;transform:none!important;
+  display:grid;grid-template-columns:24px minmax(0,1fr);align-items:center;gap:10px;
+  min-height:48px;margin:0!important;padding:11px 13px!important;border-radius:15px!important;
+  color:#f8fbff!important;background:linear-gradient(145deg,rgba(25,43,67,.98),rgba(10,20,33,.98))!important;
+  border:1px solid rgba(112,160,214,.42)!important;box-shadow:0 15px 40px rgba(0,0,0,.45)!important;
+  font-size:13px!important;font-weight:760!important;line-height:1.3!important;
+  animation:fvToastIn0781 .2s ease both;overflow:hidden;
+}
+.toast.fvToast0781.success{border-color:rgba(52,211,153,.55)!important}.toast.fvToast0781.success .fvToastIcon0781{background:#22c55e}
+.toast.fvToast0781.error{border-color:rgba(248,113,113,.62)!important}.toast.fvToast0781.error .fvToastIcon0781{background:#ef4444}
+.toast.fvToast0781.info .fvToastIcon0781{background:#60a5fa}
+.fvToastIcon0781{width:10px;height:10px;border-radius:50%;justify-self:center;box-shadow:0 0 0 5px rgba(255,255,255,.07)}
+.toast.fvToast0781 i{position:absolute;left:0;bottom:0;height:2px;width:100%;background:rgba(255,255,255,.48);transform-origin:left;animation:fvToastTimer0781 2.6s linear both}
+.toast.fvToast0781.leaving{animation:fvToastOut0781 .18s ease both}
+@keyframes fvToastIn0781{from{opacity:0;transform:translateY(10px) scale(.98)}to{opacity:1;transform:none}}
+@keyframes fvToastOut0781{to{opacity:0;transform:translateY(6px) scale(.985)}}
+@keyframes fvToastTimer0781{to{transform:scaleX(0)}}
+
+/* Empty states now read as intentional, actionable surfaces rather than blank gaps. */
+.list>.empty,.grow>.empty,.accountTabPanel0735>.empty,.accountEmpty067,.homeEmpty476,.overlayEmpty513{
+  min-height:108px!important;display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:center!important;
+  gap:8px!important;padding:20px 16px!important;text-align:center!important;line-height:1.42!important;
+  color:#9fb0c8!important;background:linear-gradient(145deg,rgba(17,32,51,.78),rgba(8,18,30,.78))!important;
+  border:1px dashed rgba(117,151,190,.34)!important;border-radius:16px!important;
+}
+.list>.empty::before,.grow>.empty::before,.accountTabPanel0735>.empty::before,.accountEmpty067::before,.homeEmpty476::before,.overlayEmpty513::before{
+  content:"";width:28px;height:28px;border-radius:50%;border:2px solid rgba(96,165,250,.42);box-shadow:inset 0 0 0 7px rgba(96,165,250,.06);
+}
+
+/* Form and scrolling polish. */
+input,select,textarea{transition:border-color var(--fv0781-fast) ease,box-shadow var(--fv0781-fast) ease,background-color var(--fv0781-fast) ease}
+input:focus,select:focus,textarea:focus{border-color:rgba(96,165,250,.72)!important;box-shadow:0 0 0 3px rgba(96,165,250,.13)!important}
+.screen,.list,.accountTabScroll0735,.settingsTabbedBody0736{-webkit-overflow-scrolling:touch;overscroll-behavior-y:contain}
+
+@media(max-width:430px){
+  .fvToastStack0781{bottom:calc(var(--navH,72px) + env(safe-area-inset-bottom) + 9px);width:96vw}
+  .toast.fvToast0781{font-size:12.5px!important;padding:10px 12px!important}
+}
+@media(prefers-reduced-motion:reduce){
+  #app.fvRouteEnter0781>*{animation:none!important}
+  .fvButtonBusy0781::before{animation-duration:1.4s!important}
+  .toast.fvToast0781,.toast.fvToast0781 i{animation:none!important}
 }
