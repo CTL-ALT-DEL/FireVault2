@@ -1,4 +1,4 @@
-import { BUILD, KEY, ACTIVE_JOB_KEY, loadData, saveData, ensureSite, fullAddress, esc, uid, downloadBlob, syncSummary, syncQueue, syncConflicts, syncActivity, createSyncPackage, importSyncPackage, resolveSyncConflict, notePackageExport, deviceIdentity, recordSyncActivity, autoBackupInfo, latestAutoBackup, restoreAutoBackup, isDemoMode, setDemoMode, resetDemoData } from "./storage.js?v=0.76.2";
+import { BUILD, KEY, ACTIVE_JOB_KEY, loadData, saveData, ensureSite, fullAddress, esc, uid, downloadBlob, syncSummary, syncQueue, syncConflicts, syncActivity, createSyncPackage, importSyncPackage, resolveSyncConflict, notePackageExport, deviceIdentity, recordSyncActivity, autoBackupInfo, latestAutoBackup, restoreAutoBackup, isDemoMode, setDemoMode, resetDemoData } from "./storage.js?v=0.76.3";
 window.__FIREVAULT_MODULE_READY = true;
 
 function fvPreferenceStore0739(){
@@ -3374,6 +3374,14 @@ function accountAddressCounts0762(rows=[]){
   rows.forEach(s=>{const key=accountAddressKey0762(s);if(key)counts.set(key,(counts.get(key)||0)+1);});
   return counts;
 }
+function accountInitial0763(s){
+  const first=String(s?.name||"").trim().charAt(0).toUpperCase();
+  return /^[A-Z]$/.test(first)?first:"#";
+}
+function accountInitials0763(rows=[]){
+  const initials=[...new Set(rows.map(accountInitial0763))];
+  return initials.sort((a,b)=>a==="#"?-1:b==="#"?1:a.localeCompare(b));
+}
 function accountHealthBadge0762(health){
   if(health?.cls==="healthWarn") return {label:"Attention",cls:"danger"};
   if(health?.cls==="healthWatch") return {label:"Watch",cls:"warning"};
@@ -3394,7 +3402,7 @@ function accountDirectoryRow0759(s,addressCount=1){
   const recency=accountRecency0761(s);
   const phone=phone069(s);
   const gpsReady=hasGps(s);
-  return `<article class="accountCard0759 accountCard0761 accountCard0762 category-${category}" data-account-card0759 data-id="${esc(s.id)}" data-search="${esc(siteSearchBlob(s))}" data-attention="${health.cls==='healthWarn'?'1':'0'}" data-open="${work.cls==='clear'?'0':'1'}" data-gps="${gpsReady?'1':'0'}" role="button" tabindex="0" aria-label="Open ${esc(s.name||'account')}, ${esc(address)}">
+  return `<article class="accountCard0759 accountCard0761 accountCard0762 category-${category}" data-account-card0759 data-id="${esc(s.id)}" data-search="${esc(siteSearchBlob(s))}" data-letter0763="${esc(accountInitial0763(s))}" data-attention="${health.cls==='healthWarn'?'1':'0'}" data-open="${work.cls==='clear'?'0':'1'}" data-gps="${gpsReady?'1':'0'}" role="button" tabindex="0" aria-label="Open ${esc(s.name||'account')}, ${esc(address)}">
     <span class="accountTone0759" aria-hidden="true"></span>
     <span class="accountCardBody0759">
       <span class="accountCardTop0759">
@@ -3452,6 +3460,7 @@ function sites(){
   const allAccounts=[...(data.sites||[])];
   const addressCounts0762=accountAddressCounts0762(allAccounts);
   const accounts=accountDirectorySort0760(allAccounts);
+  const accountInitialsList0763=accountInitials0763(accounts);
   const attentionCount=allAccounts.filter(s=>siteHealth(s).cls==="healthWarn").length;
   const openWorkCount=allAccounts.filter(s=>siteOpenTasks556(s).length||siteOpenDeficiencies556(s).length).length;
   const missingGpsCount=allAccounts.filter(s=>!hasGps(s)).length;
@@ -3477,11 +3486,12 @@ function sites(){
       <button type="button" data-sites-filter0759="missingGps" class="${sitesFilter0736==='missingGps'?'active':''}"><strong>${missingGpsCount}</strong><span>No GPS</span></button>
     </section>
     <section class="accountsResults0759">
-      <div class="accountsListHead0759 accountsListHead0760 accountsListHead0761"><div class="accountsResultSummary0761"><strong id="siteSearchCount0759" aria-live="polite">${accounts.length} account${accounts.length===1?"":"s"}</strong><span id="accountsViewSummary0761">${esc(filterLabel0761)} • ${esc(accountsSortLabel0760())}</span></div><div class="accountsListTools0761"><button type="button" class="ghost accountsReset0761" id="resetAccountsView0761" ${accountsViewDirty0761?"":"hidden"}>Reset</button><label>Sort<select id="accountsSort0760" aria-label="Sort accounts"><option value="az" ${accountsSort0760==='az'?'selected':''}>A–Z</option><option value="favorites" ${accountsSort0760==='favorites'?'selected':''}>Favorites</option><option value="recent" ${accountsSort0760==='recent'?'selected':''}>Recently Opened</option><option value="attention" ${accountsSort0760==='attention'?'selected':''}>Priority</option></select></label></div></div>
+      <div class="accountsListHead0759 accountsListHead0760 accountsListHead0761 accountsListHead0763"><div class="accountsResultSummary0761"><strong id="siteSearchCount0759" aria-live="polite">${accounts.length} account${accounts.length===1?"":"s"}</strong><span id="accountsViewSummary0761">${esc(filterLabel0761)} • ${esc(accountsSortLabel0760())}</span></div><div class="accountsListTools0761 accountsListTools0763"><button type="button" class="ghost accountsReset0761" id="resetAccountsView0761" ${accountsViewDirty0761?"":"hidden"}>Reset</button><label class="accountsJumpWrap0763" id="accountsJumpWrap0763" ${accountsSort0760==='az'&&accountInitialsList0763.length?'':'hidden'}>Jump<select id="accountsJump0763" aria-label="Jump to account name"><option value="">A–Z</option>${accountInitialsList0763.map(letter=>`<option value="${esc(letter)}">${esc(letter)}</option>`).join("")}</select></label><label>Sort<select id="accountsSort0760" aria-label="Sort accounts"><option value="az" ${accountsSort0760==='az'?'selected':''}>A–Z</option><option value="favorites" ${accountsSort0760==='favorites'?'selected':''}>Favorites</option><option value="recent" ${accountsSort0760==='recent'?'selected':''}>Recently Opened</option><option value="attention" ${accountsSort0760==='attention'?'selected':''}>Priority</option></select></label></div></div>
       <div class="accountsList0759" id="accountsList0759">
         ${accounts.length?accounts.map(s=>accountDirectoryRow0759(s,addressCounts0762.get(accountAddressKey0762(s))||1)).join(""):`<div class="accountsEmpty0759 accountsEmpty0760"><span>＋</span><strong>No accounts yet</strong><p>Create an account manually or import your customer list under Settings → Data.</p><button class="primary" id="emptyAdd0759">Add First Account</button></div>`}
         <div class="accountsNoResults0759 accountsNoResults0760" id="accountsNoResults0759" hidden><strong>No matching accounts</strong><p>Clear the search or return to All accounts.</p><button type="button" class="ghost" id="resetAccountsView0760">Reset View</button></div>
       </div>
+      <button type="button" class="accountsScrollTop0763" id="accountsScrollTop0763" aria-label="Scroll accounts to top" hidden><span aria-hidden="true">↑</span>Top</button>
     </section>
   </div>`);
 
@@ -3496,11 +3506,15 @@ function sites(){
   const resetViewBtn=document.getElementById("resetAccountsView0761");
   const noResults=document.getElementById("accountsNoResults0759");
   const list=document.getElementById("accountsList0759");
+  const jumpSelect0763=document.getElementById("accountsJump0763");
+  const jumpWrap0763=document.getElementById("accountsJumpWrap0763");
+  const scrollTopButton0763=document.getElementById("accountsScrollTop0763");
 
   const applySiteSearch=()=>{
     siteSearch=(searchEl?.value||"").trim();
     const normalizedSearch=siteSearch.toLowerCase();
     let shown=0;
+    const visibleLetters0763=new Set();
     document.querySelectorAll("[data-account-card0759]").forEach(el=>{
       const searchOk=!normalizedSearch||(el.dataset.search||"").includes(normalizedSearch);
       const filterOk=sitesFilter0736==="all" ||
@@ -3509,8 +3523,13 @@ function sites(){
         (sitesFilter0736==="missingGps"&&el.dataset.gps!=="1");
       const visible=searchOk&&filterOk;
       el.hidden=!visible;
-      if(visible) shown++;
+      if(visible){shown++;visibleLetters0763.add(el.dataset.letter0763||"#");}
     });
+    if(jumpSelect0763){
+      [...jumpSelect0763.options].forEach(option=>{if(option.value)option.disabled=!visibleLetters0763.has(option.value);});
+      if(jumpSelect0763.value&&!visibleLetters0763.has(jumpSelect0763.value))jumpSelect0763.value="";
+    }
+    if(jumpWrap0763) jumpWrap0763.hidden=accountsSort0760!=="az" || visibleLetters0763.size===0;
     if(countEl) countEl.textContent=shown===allAccounts.length?`${shown} account${shown===1?"":"s"}`:`${shown} of ${allAccounts.length}`;
     const activeFilter=({all:"All accounts",attention:"Attention",open:"Open work",missingGps:"No GPS"})[sitesFilter0736]||"All accounts";
     if(summaryEl) summaryEl.textContent=[activeFilter,accountsSortLabel0760(),siteSearch?`“${siteSearch}”`:""].filter(Boolean).join(" • ");
@@ -3545,6 +3564,16 @@ function sites(){
   document.getElementById("resetAccountsView0760")?.addEventListener("click",resetView0761);
   resetViewBtn?.addEventListener("click",resetView0761);
   document.getElementById("accountsSort0760")?.addEventListener("change",event=>{accountsSort0760=event.target.value||"az";accountsScroll0759=0;persistAccountsViewState0761(true);sites();});
+  jumpSelect0763?.addEventListener("change",()=>{
+    const letter=jumpSelect0763.value;
+    if(!letter||!list)return;
+    const target=[...list.querySelectorAll("[data-account-card0759]")].find(el=>!el.hidden&&(el.dataset.letter0763||"#")===letter);
+    if(!target){toast(`No visible ${letter} accounts.`);jumpSelect0763.value="";return;}
+    const top=Math.max(0,target.offsetTop-list.offsetTop-2);
+    list.scrollTo({top,behavior:"smooth"});
+    window.setTimeout(()=>target.focus({preventScroll:true}),260);
+  });
+  scrollTopButton0763?.addEventListener("click",()=>{list?.scrollTo({top:0,behavior:"smooth"});});
   document.querySelectorAll("[data-sites-filter0759]").forEach(btn=>btn.addEventListener("click",()=>{
     sitesFilter0736=btn.dataset.sitesFilter0759||"all";
     document.querySelectorAll("[data-sites-filter0759]").forEach(x=>x.classList.toggle("active",x===btn));
@@ -3552,7 +3581,11 @@ function sites(){
     accountsScroll0759=0;
     applySiteSearch();
   }));
-  list?.addEventListener("scroll",()=>{accountsScroll0759=list.scrollTop;persistAccountsViewState0761();},{passive:true});
+  list?.addEventListener("scroll",()=>{
+    accountsScroll0759=list.scrollTop;
+    if(scrollTopButton0763)scrollTopButton0763.hidden=list.scrollTop<420;
+    persistAccountsViewState0761();
+  },{passive:true});
   list?.addEventListener("click",event=>{
     const callButton=event.target.closest("[data-account-call0762]");
     if(callButton){
@@ -3579,9 +3612,24 @@ function sites(){
       const wasPinned=isPinnedSite566(target);
       if(wasPinned) delete target.pinnedAt; else target.pinnedAt=new Date().toISOString();
       target.updatedAt=new Date().toISOString();
-      try{save();toast(wasPinned?"Removed from favorites.":"Added to favorites.");}
+      try{save();}
       catch(err){if(wasPinned)target.pinnedAt=new Date().toISOString();else delete target.pinnedAt;toast("Favorite could not be saved.");console.error(err);return;}
-      accountsScroll0759=list.scrollTop;persistAccountsViewState0761(true);sites();return;
+      const nowPinned=!wasPinned;
+      favorite.classList.toggle("active",nowPinned);
+      favorite.textContent=nowPinned?"★":"☆";
+      favorite.setAttribute("aria-pressed",nowPinned?"true":"false");
+      favorite.setAttribute("aria-label",`${nowPinned?"Remove":"Add"} ${target.name||"account"} ${nowPinned?"from":"to"} favorites`);
+      favorite.classList.add("favoriteSaved0763");
+      window.setTimeout(()=>favorite.classList.remove("favoriteSaved0763"),360);
+      toast(nowPinned?"Added to favorites.":"Removed from favorites.");
+      if(accountsSort0760==="favorites"&&!nowPinned){
+        const card=favorite.closest("[data-account-card0759]");
+        card?.classList.add("accountLeaving0763");
+        window.setTimeout(()=>{card?.remove();applySiteSearch();},170);
+      }else{
+        applySiteSearch();
+      }
+      accountsScroll0759=list.scrollTop;persistAccountsViewState0761(true);return;
     }
     const card=event.target.closest("[data-account-card0759]");
     if(card) openAccount0761(card.dataset.id);
@@ -3593,7 +3641,10 @@ function sites(){
   });
   applySiteSearch();
   requestAnimationFrame(()=>{
-    if(list) list.scrollTop=Math.max(0,accountsScroll0759||0);
+    if(list){
+      list.scrollTop=Math.max(0,accountsScroll0759||0);
+      if(scrollTopButton0763)scrollTopButton0763.hidden=list.scrollTop<420;
+    }
     showGlobalChrome537();
     setActiveNav();
   });
@@ -8460,6 +8511,7 @@ function diagnostics(){
 }
 function showChangelog(){
   const notes = [
+    "Build 0.76.3 adds A–Z fast jump, a floating Top control, and inline Favorite updates that preserve scroll position and app navigation.",
     "Build 0.76.2 adds one-tap Call and Route controls to every account card, identifies multi-account addresses, clarifies account health, and prevents accidental double-opening while preserving the Accounts view state.",
     "Build 0.76.1 hardens the Accounts directory with persistent view state, inline Favorites, recent-opened context, keyboard shortcuts, and a permanent app-chrome repair so the bottom navigation remains visible after saves and Favorite changes.",
     "Build 0.76.0 completes the Accounts workflow with sorting, safer manual account creation, duplicate Account ID protection, and improved empty states.",
@@ -8490,7 +8542,7 @@ function showChangelog(){
   overlay.className="releaseOverlay";
   overlay.innerHTML=`<div class="releaseSheet" role="dialog" aria-modal="true" aria-label="FireVault release notes">
     <div class="releaseHead"><div><strong>${fireVaultBrand575()}</strong><span>Build ${BUILD}</span></div><button class="ghost iconBtn" id="closeRelease" aria-label="Close release notes">×</button></div>
-    <div class="releaseBody"><h2>Release Notes</h2><p class="releaseIntro">A hardened Accounts workflow with faster access and reliable return behavior.</p><ul>${notes.map(n=>`<li>${esc(n)}</li>`).join("")}</ul></div>
+    <div class="releaseBody"><h2>Release Notes</h2><p class="releaseIntro">Faster account finding with stable inline actions and preserved directory position.</p><ul>${notes.map(n=>`<li>${esc(n)}</li>`).join("")}</ul></div>
   </div>`;
   document.body.appendChild(overlay);
   const close=()=>overlay.remove();

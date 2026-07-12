@@ -1,5 +1,5 @@
-# FireVault 0.76.2 deployment
+# FireVault Build 0.76.3 Deployment
 
-Deploy this package over the existing GitHub Pages repository. Do not delete the installed Home Screen app.
+Deploy over the existing FireVault GitHub Pages files. Do not delete or reinstall the Home Screen PWA. The existing `firevault_vault_build_030` storage key is unchanged.
 
-After GitHub Pages publishes, open FireVault and use Settings → Data → App Updates → Check for Updates, or reload the existing Home Screen app. The 0.76.2 service worker removes older application caches without deleting the local customer vault.
+After GitHub Pages completes deployment, open the installed FireVault app. Use Settings → Data → App Updates → Check for Updates if the new build is not detected immediately.

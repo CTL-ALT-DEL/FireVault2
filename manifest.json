@@ -8,7 +8,7 @@
   "orientation": "portrait-primary",
   "background_color": "#0b0d10",
   "theme_color": "#101216",
-  "description": "Field knowledge system for fire alarm technicians. Build 0.76.2 adds account-card Call and Route shortcuts, multi-account address indicators, clearer health badges, and safer account opening.",
+  "description": "Field knowledge system for fire alarm technicians. Build 0.76.3 adds A\u2013Z fast jump, a scroll-to-top control, and inline Favorite updates that preserve the Accounts view.",
   "icons": [
     {
       "src": "assets/icon-192.png",
@@ -49,5 +49,5 @@
       "description": "Open FireVault settings"
     }
   ],
-  "version": "0.76.2"
+  "version": "0.76.3"
 }
