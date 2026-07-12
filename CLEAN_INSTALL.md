@@ -1,4 +1,7 @@
-# FireVault Build 0.79.8
+# FireVault Build 0.79.9
+
+This package refines the Accounts card layout. Deploy over the existing FireVault files without deleting the Home Screen app or clearing site data.
+
 
 Deploy the contents of this package over the existing GitHub Pages repository. Do not delete the installed iPhone Home Screen app and do not clear Safari website data.
 

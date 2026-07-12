@@ -1,4 +1,4 @@
-/* FireVault Build 0.79.8 — Accounts and Nearby simplification */
+/* FireVault Build 0.79.9 — Accounts and Nearby simplification */
 export const PROVIDER_CONTRACT_VERSION = 3;
 export const PROVIDER_MODE = "local";
 

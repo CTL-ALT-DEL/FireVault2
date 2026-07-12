@@ -1,4 +1,13 @@
-# FireVault Build 0.79.8 — Accounts & Nearby Simplification
+# FireVault Build 0.79.9 — Accounts Card Hierarchy Polish
+
+## Changes
+
+- Moved the Favorite star to the far-right side of each Accounts card title row.
+- Moved the built-in account category badge into the lower status row.
+- Moved automatic custom category tags into the same row as GPS Ready / Needs GPS.
+- Preserved account opening, Favorites, Call, Route, search, sorting, and locked-list scrolling.
+- No vault or storage-key changes.
+
 
 This release removes unnecessary summary controls from the Accounts and Nearby GPS workflows.
 

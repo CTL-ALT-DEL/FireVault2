@@ -1,6 +1,6 @@
 {
-  "build": "0.79.8",
+  "build": "0.79.9",
   "released": "2026-07-12",
-  "note": "Accounts and Nearby simplification",
-  "label": "Cleaner Accounts directory and GPS comparison"
+  "note": "Accounts card hierarchy polish",
+  "label": "Favorite aligned right and category tags grouped with GPS status"
 }

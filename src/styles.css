@@ -18587,7 +18587,48 @@ body.fv-privacy-locked0791{overflow:hidden!important;background:#07090d!importan
 }
 
 
-/* Build 0.79.8 — simplified Accounts and Nearby GPS screens */
+/* Build 0.79.9 — simplified Accounts and Nearby GPS screens */
 .accountsDirectory0759{grid-template-rows:auto auto minmax(0,1fr)!important}
 .nearbyScreen0652 .nearbyHero{margin-bottom:0!important}
 .nearbyScreen0652 .nearbyResults0652{margin-top:0!important}
+
+
+/* Build 0.79.9 — Accounts card hierarchy polish */
+.accountCard0759 .accountCardTop0759{
+  width:100%!important;
+}
+.accountCard0759 .accountFavoriteButton0761{
+  margin-left:auto!important;
+  align-self:center!important;
+}
+.accountCard0759 .accountBadges0759{
+  align-items:center!important;
+}
+.accountCard0759 .accountRuleTag0799{
+  display:inline-flex!important;
+  align-items:center!important;
+  margin:0!important;
+  min-height:24px!important;
+  padding:4px 8px!important;
+  max-width:145px!important;
+  overflow:hidden!important;
+  text-overflow:ellipsis!important;
+  white-space:nowrap!important;
+  border:1px solid color-mix(in srgb,var(--tag-color) 42%,transparent)!important;
+  border-radius:999px!important;
+  background:color-mix(in srgb,var(--tag-color) 14%,transparent)!important;
+  color:color-mix(in srgb,var(--tag-color) 78%,white)!important;
+  font-size:10px!important;
+  line-height:1!important;
+  font-weight:900!important;
+  letter-spacing:.035em!important;
+}
+.accountCard0759 .accountCategory0759{
+  min-height:24px!important;
+  padding:4px 8px!important;
+  display:inline-flex!important;
+  align-items:center!important;
+}
+@media(max-width:380px){
+  .accountCard0759 .accountRuleTag0799{max-width:108px!important;}
+}
