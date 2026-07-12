@@ -8,7 +8,7 @@
   "orientation": "portrait-primary",
   "background_color": "#0b0d10",
   "theme_color": "#101216",
-  "description": "Field knowledge system for fire alarm technicians. Build 0.78.6 completes the Account Detail polish pass with a cleaner identity header, readable field actions, compact information tabs, a full-width location card, clearer contact rows, and simplified service metrics.",
+  "description": "Field knowledge system for fire alarm technicians. Build 0.79.0 adds a security-ready data foundation with stable workspace, local-user, and device identities; record versioning; audit history; recoverable deletion; credential-safe exports; and future authentication readiness.",
   "icons": [
     {
       "src": "assets/icon-192.png",
@@ -49,5 +49,5 @@
       "description": "Open FireVault settings"
     }
   ],
-  "version": "0.78.6"
+  "version": "0.79.0"
 }

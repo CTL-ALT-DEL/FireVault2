@@ -1,4 +1,5 @@
-export const BUILD = "0.78.6";
+export const BUILD = "0.79.0";
+export const SECURITY_SCHEMA_VERSION = 4;
 export const KEY = "firevault_vault_build_030";
 export const ACTIVE_JOB_KEY = "firevault_active_job_modular";
 export const DEVICE_KEY = "firevault_device_identity_062";
@@ -7,6 +8,12 @@ export const DEMO_MODE_KEY = "firevault_demo_mode_0738";
 export const DEMO_VAULT_KEY = `${KEY}_demo_0738`; // legacy key; Build 0.73.9 no longer stores the demo vault here
 let demoRuntimeVault0739 = null;
 let runtimeDeviceIdentity0739 = "";
+
+const SECURITY_FOUNDATION_VERSION_0790 = 1;
+const SECURITY_AUDIT_LIMIT_0790 = 300;
+const SECURITY_CHANGE_QUEUE_LIMIT_0790 = 500;
+const SECURITY_RECYCLE_LIMIT_0790 = 12;
+const SECURITY_RECYCLE_DAYS_0790 = 30;
 
 export function isDemoMode(){
   try{if(localStorage.getItem(DEMO_MODE_KEY)==="1") return true;}catch{}
@@ -149,7 +156,7 @@ export function createDemoVault(){
         {id:"demo-category-boise",name:"Boise Metro",color:"#a78bfa",enabled:true,match:"any",rules:[{id:"demo-rule-b1",field:"state",operator:"equals",value:"ID"}]}
       ]}
     },
-    syncState:{schemaVersion:3,lastLocalSave:demoIso(0),lastSuccessfulSync:"",activity:[{id:"demo-sync-01",type:"customer-csv-import",at:demoIso(2),technician:"Demo Technician",details:"20 fictional Boise accounts loaded for demonstration."}]}
+    syncState:{schemaVersion:SECURITY_SCHEMA_VERSION,lastLocalSave:demoIso(0),lastSuccessfulSync:"",activity:[{id:"demo-sync-01",type:"customer-csv-import",at:demoIso(2),technician:"Demo Technician",details:"20 fictional Boise accounts loaded for demonstration."}]}
   });
 }
 
@@ -229,23 +236,271 @@ function techIdentity(data){
 function comparable(record){
   if(!record || typeof record!=="object") return record;
   const clone={...record};
-  delete clone.sync; delete clone.createdAt; delete clone.modifiedAt; delete clone.createdBy; delete clone.modifiedBy; delete clone.recordVersion; delete clone.deletedAt;
+  delete clone.sync; delete clone.createdAt; delete clone.modifiedAt; delete clone.createdBy; delete clone.modifiedBy;
+  delete clone.createdByUserId; delete clone.modifiedByUserId; delete clone.recordVersion; delete clone.changeId;
+  delete clone.deletedAt; delete clone.deletedBy; delete clone.deletedByUserId; delete clone.workspaceId;
   return JSON.stringify(clone);
 }
 function syncMeta(record,data,previous){
   const now=nowIso(), tech=techIdentity(data), device=deviceIdentity();
+  const foundation=ensureSecurityFoundation0790(data);
+  const userId=foundation.localUser.id;
+  record.workspaceId=record.workspaceId||previous?.workspaceId||foundation.workspaceId;
   record.createdAt=record.createdAt||previous?.createdAt||now;
   record.createdBy=record.createdBy||previous?.createdBy||tech;
+  record.createdByUserId=record.createdByUserId||previous?.createdByUserId||userId;
   record.modifiedAt=record.modifiedAt||previous?.modifiedAt||record.createdAt;
   record.modifiedBy=record.modifiedBy||previous?.modifiedBy||record.createdBy;
-  record.recordVersion=Number(record.recordVersion||previous?.recordVersion||1);
-  record.sync={status:record.sync?.status||previous?.sync?.status||"pending",deviceId:record.sync?.deviceId||previous?.sync?.deviceId||device,lastSyncedAt:record.sync?.lastSyncedAt||previous?.sync?.lastSyncedAt||"",remoteVersion:Number(record.sync?.remoteVersion||previous?.sync?.remoteVersion||0),conflict:!!(record.sync?.conflict||previous?.sync?.conflict)};
+  record.modifiedByUserId=record.modifiedByUserId||previous?.modifiedByUserId||record.createdByUserId;
+  record.recordVersion=Math.max(1,Number(record.recordVersion||previous?.recordVersion||1));
+  record.changeId=record.changeId||previous?.changeId||`change-${uid()}`;
+  record.deletedAt=record.deletedAt||previous?.deletedAt||"";
+  record.deletedBy=record.deletedBy||previous?.deletedBy||"";
+  record.deletedByUserId=record.deletedByUserId||previous?.deletedByUserId||"";
+  record.sync={
+    status:record.sync?.status||previous?.sync?.status||"pending",
+    deviceId:record.sync?.deviceId||previous?.sync?.deviceId||device,
+    lastSyncedAt:record.sync?.lastSyncedAt||previous?.sync?.lastSyncedAt||"",
+    remoteVersion:Number(record.sync?.remoteVersion||previous?.sync?.remoteVersion||0),
+    baseVersion:Number(record.sync?.baseVersion||previous?.sync?.baseVersion||0),
+    conflict:!!(record.sync?.conflict||previous?.sync?.conflict)
+  };
   if(previous && comparable(record)!==comparable(previous)){
-    record.modifiedAt=now; record.modifiedBy=tech; record.recordVersion=Math.max(Number(previous.recordVersion||1)+1,record.recordVersion+1);
-    record.sync.status="pending"; record.sync.deviceId=device; record.sync.conflict=false;
+    record.modifiedAt=now;
+    record.modifiedBy=tech;
+    record.modifiedByUserId=userId;
+    record.recordVersion=Math.max(Number(previous.recordVersion||1)+1,record.recordVersion+1);
+    record.changeId=`change-${uid()}`;
+    record.sync.status="pending";
+    record.sync.deviceId=device;
+    record.sync.baseVersion=Number(previous.recordVersion||1);
+    record.sync.conflict=false;
   }
 }
 const CHILD_ARRAYS=["visits","knownIssues","equipment","contacts","docs","checklist","deficiencies","tasks","reportDeliveries","noteEntries"];
+
+function securityUserLabel0790(data){
+  const tech=data?.settings?.technician||{};
+  return String(tech.name||tech.email||"Local FireVault User").trim()||"Local FireVault User";
+}
+function securityUserEmail0790(data){ return String(data?.settings?.technician?.email||"").trim(); }
+function ensureSecurityFoundation0790(data){
+  data=data&&typeof data==="object"?data:{};
+  const now=nowIso();
+  const prior=data.securityFoundation&&typeof data.securityFoundation==="object"?data.securityFoundation:{};
+  const workspaceId=String(prior.workspaceId||`workspace-${uid()}`);
+  const localUserPrior=prior.localUser&&typeof prior.localUser==="object"?prior.localUser:{};
+  const localUserId=String(localUserPrior.id||`user-local-${uid()}`);
+  const devicePrior=prior.device&&typeof prior.device==="object"?prior.device:{};
+  data.securityFoundation={
+    schemaVersion:SECURITY_SCHEMA_VERSION,
+    foundationVersion:SECURITY_FOUNDATION_VERSION_0790,
+    workspaceId,
+    migratedAt:prior.migratedAt||now,
+    lastValidatedAt:prior.lastValidatedAt||now,
+    localUser:{
+      id:localUserId,
+      displayName:securityUserLabel0790(data),
+      email:securityUserEmail0790(data),
+      role:localUserPrior.role||"owner",
+      status:localUserPrior.status||"active",
+      createdAt:localUserPrior.createdAt||now
+    },
+    device:{
+      id:deviceIdentity(),
+      label:devicePrior.label||"This FireVault device",
+      registeredAt:devicePrior.registeredAt||now,
+      lastSeenAt:devicePrior.lastSeenAt||now
+    },
+    protections:{
+      confirmRestore:prior.protections?.confirmRestore!==false,
+      confirmReset:prior.protections?.confirmReset!==false,
+      excludeCredentialsFromBackups:true,
+      softDelete:true,
+      auditHistory:true,
+      ...(prior.protections||{})
+    }
+  };
+  data.auditLog=Array.isArray(data.auditLog)?data.auditLog:[];
+  data.recycleBin=Array.isArray(data.recycleBin)?data.recycleBin:[];
+  data.syncState=data.syncState||{};
+  data.syncState.changeQueue=Array.isArray(data.syncState.changeQueue)?data.syncState.changeQueue:[];
+  return data.securityFoundation;
+}
+function auditEntry0790(data,type,details={}){
+  const foundation=ensureSecurityFoundation0790(data);
+  const row={
+    id:`audit-${uid()}`,
+    at:nowIso(),
+    type,
+    workspaceId:foundation.workspaceId,
+    userId:foundation.localUser.id,
+    user:foundation.localUser.displayName,
+    deviceId:foundation.device.id,
+    ...details
+  };
+  data.auditLog.unshift(row);
+  data.auditLog=data.auditLog.slice(0,SECURITY_AUDIT_LIMIT_0790);
+  return row;
+}
+function queueChange0790(data,operation,row,details={}){
+  const foundation=ensureSecurityFoundation0790(data);
+  data.syncState.changeQueue.unshift({
+    id:`queue-${uid()}`,
+    operation,
+    at:nowIso(),
+    workspaceId:foundation.workspaceId,
+    userId:foundation.localUser.id,
+    deviceId:foundation.device.id,
+    recordType:row?.type||details.recordType||"record",
+    recordId:row?.record?.id||details.recordId||"",
+    siteId:row?.siteId||details.siteId||"",
+    version:Number(row?.record?.recordVersion||details.version||1),
+    changeId:row?.record?.changeId||details.changeId||"",
+    status:"pending"
+  });
+  data.syncState.changeQueue=data.syncState.changeQueue.slice(0,SECURITY_CHANGE_QUEUE_LIMIT_0790);
+}
+function auditComparable0790(record){
+  if(!record||typeof record!=="object") return "";
+  const clone=JSON.parse(JSON.stringify(record));
+  ["sync","createdAt","modifiedAt","createdBy","modifiedBy","createdByUserId","modifiedByUserId","recordVersion","changeId","workspaceId","deletedAt","deletedBy","deletedByUserId"].forEach(k=>delete clone[k]);
+  CHILD_ARRAYS.forEach(k=>delete clone[k]);
+  return JSON.stringify(clone);
+}
+function securitySnapshot0790(record){
+  let attachmentsOmitted=false;
+  const walk=value=>{
+    if(Array.isArray(value)) return value.map(walk);
+    if(value&&typeof value==="object"){
+      const out={}; Object.entries(value).forEach(([k,v])=>{out[k]=walk(v);}); return out;
+    }
+    if(typeof value==="string" && value.length>100000 && value.startsWith("data:")){
+      attachmentsOmitted=true; return "[large attachment omitted from local recycle snapshot]";
+    }
+    return value;
+  };
+  return {snapshot:walk(record),attachmentsOmitted};
+}
+function trimRecycleBin0790(data){
+  const cutoff=Date.now()-SECURITY_RECYCLE_DAYS_0790*86400000;
+  data.recycleBin=(data.recycleBin||[]).filter(x=>Date.parse(x?.deletedAt||0)>=cutoff).slice(0,SECURITY_RECYCLE_LIMIT_0790);
+}
+function captureSoftDeletes0790(previous,next){
+  if(!previous||!Array.isArray(previous.sites)) return 0;
+  ensureSecurityFoundation0790(next);
+  const prevRows=trackedRows(previous), nextKeys=new Set(trackedRows(next).map(r=>`${r.type}:${r.record?.id}`));
+  const removedSiteIds=new Set(prevRows.filter(r=>r.type==="site"&&!nextKeys.has(`site:${r.record?.id}`)).map(r=>r.record?.id));
+  let count=0;
+  prevRows.forEach(row=>{
+    const key=`${row.type}:${row.record?.id}`;
+    if(nextKeys.has(key)) return;
+    if(row.type!=="site"&&removedSiteIds.has(row.siteId)) return;
+    if((next.recycleBin||[]).some(x=>x.recordType===row.type&&x.recordId===row.record?.id)) return;
+    const secured=securitySnapshot0790(row.record);
+    const foundation=next.securityFoundation;
+    next.recycleBin.unshift({
+      id:`deleted-${uid()}`,
+      recordId:row.record?.id||"",
+      recordType:row.type,
+      siteId:row.siteId||"",
+      siteName:row.siteName||"",
+      title:row.record?.name||row.record?.title||row.record?.summary||row.record?.note||row.type,
+      deletedAt:nowIso(),
+      deletedBy:foundation.localUser.displayName,
+      deletedByUserId:foundation.localUser.id,
+      deviceId:foundation.device.id,
+      workspaceId:foundation.workspaceId,
+      recordVersion:Number(row.record?.recordVersion||1)+1,
+      attachmentsOmitted:secured.attachmentsOmitted,
+      snapshot:secured.snapshot,
+      sync:{status:"pending",deviceId:foundation.device.id,conflict:false}
+    });
+    auditEntry0790(next,"record-deleted",{recordType:row.type,recordId:row.record?.id||"",siteId:row.siteId||"",title:row.record?.name||row.record?.title||row.type});
+    queueChange0790(next,"delete",row,{version:Number(row.record?.recordVersion||1)+1});
+    count++;
+  });
+  trimRecycleBin0790(next);
+  return count;
+}
+function auditRecordChanges0790(previous,next){
+  if(!previous||!Array.isArray(previous.sites)) return;
+  ensureSecurityFoundation0790(next);
+  const prevMap=new Map(trackedRows(previous).map(r=>[`${r.type}:${r.record?.id}`,r]));
+  let emitted=0;
+  trackedRows(next).forEach(row=>{
+    const key=`${row.type}:${row.record?.id}`;
+    const before=prevMap.get(key);
+    if(!before){
+      if(emitted<60) auditEntry0790(next,"record-created",{recordType:row.type,recordId:row.record?.id||"",siteId:row.siteId||"",title:row.record?.name||row.record?.title||row.type});
+      queueChange0790(next,"create",row); emitted++; return;
+    }
+    if(auditComparable0790(before.record)!==auditComparable0790(row.record)){
+      if(emitted<60) auditEntry0790(next,"record-updated",{recordType:row.type,recordId:row.record?.id||"",siteId:row.siteId||"",title:row.record?.name||row.record?.title||row.type,version:Number(row.record?.recordVersion||1)});
+      queueChange0790(next,"update",row); emitted++;
+    }
+  });
+  if(emitted>60) auditEntry0790(next,"bulk-change-summary",{changedRecords:emitted,detailLimit:60});
+}
+export function securityFoundationSummary(data){
+  const f=ensureSecurityFoundation0790(data);
+  trimRecycleBin0790(data);
+  return {
+    schemaVersion:SECURITY_SCHEMA_VERSION,
+    foundationVersion:f.foundationVersion,
+    workspaceId:f.workspaceId,
+    user:{...f.localUser},
+    device:{...f.device},
+    auditCount:(data.auditLog||[]).length,
+    recycleCount:(data.recycleBin||[]).length,
+    pendingChanges:(data.syncState?.changeQueue||[]).filter(x=>x.status!=="synced").length,
+    migratedAt:f.migratedAt,
+    protections:{...f.protections}
+  };
+}
+export function securityAudit(data){ return Array.isArray(data?.auditLog)?data.auditLog:[]; }
+export function recordSecurityEvent(data,type,details={}){
+  const row=auditEntry0790(data,type,details);
+  saveData(data);
+  return row;
+}
+export function recycleBinInfo(data){
+  ensureSecurityFoundation0790(data); trimRecycleBin0790(data);
+  return {count:data.recycleBin.length,items:data.recycleBin.map(x=>({id:x.id,recordId:x.recordId,recordType:x.recordType,siteName:x.siteName,title:x.title,deletedAt:x.deletedAt,attachmentsOmitted:!!x.attachmentsOmitted}))};
+}
+export function restoreRecycleRecord(data,deletedId){
+  ensureSecurityFoundation0790(data);
+  const index=data.recycleBin.findIndex(x=>x.id===deletedId);
+  if(index<0) throw new Error("Deleted record was not found.");
+  const item=data.recycleBin[index], record=JSON.parse(JSON.stringify(item.snapshot));
+  record.deletedAt=""; record.deletedBy=""; record.deletedByUserId="";
+  record.modifiedAt=nowIso(); record.modifiedBy=securityUserLabel0790(data); record.modifiedByUserId=data.securityFoundation.localUser.id;
+  record.recordVersion=Math.max(Number(record.recordVersion||1),Number(item.recordVersion||1))+1;
+  record.changeId=`change-${uid()}`; record.sync={...(record.sync||{}),status:"pending",deviceId:deviceIdentity(),conflict:false};
+  if(item.recordType==="site"){
+    if(data.sites.some(x=>x.id===record.id)) throw new Error("That account already exists.");
+    data.sites.push(record);
+  }else{
+    const site=data.sites.find(x=>x.id===item.siteId);
+    if(!site||!CHILD_ARRAYS.includes(item.recordType)) throw new Error("The parent account is no longer available.");
+    site[item.recordType]=Array.isArray(site[item.recordType])?site[item.recordType]:[];
+    if(site[item.recordType].some(x=>x.id===record.id)) throw new Error("That record already exists.");
+    site[item.recordType].push(record);
+  }
+  data.recycleBin.splice(index,1);
+  auditEntry0790(data,"record-restored",{recordType:item.recordType,recordId:item.recordId,siteId:item.siteId,title:item.title});
+  queueChange0790(data,"restore",{type:item.recordType,siteId:item.siteId,record});
+  saveData(data);
+  return record;
+}
+export function purgeRecycleBin(data){
+  ensureSecurityFoundation0790(data);
+  const count=data.recycleBin.length;
+  data.recycleBin=[];
+  auditEntry0790(data,"recycle-bin-purged",{recordCount:count});
+  saveData(data);
+  return count;
+}
 function migrateRecordTree(record,data,previous){
   if(!record || typeof record!=="object") return;
   record.id=record.id||uid();
@@ -330,10 +585,18 @@ export function notePackageExport(data,pkg){
 
 function packageRecord(record){ return JSON.parse(JSON.stringify(record)); }
 export function createSyncPackage(data){
+  const foundation=ensureSecurityFoundation0790(data);
+  const tombstones=(data.recycleBin||[]).map(item=>({
+    id:item.id,recordId:item.recordId,recordType:item.recordType,siteId:item.siteId,deletedAt:item.deletedAt,
+    deletedByUserId:item.deletedByUserId,deviceId:item.deviceId,workspaceId:item.workspaceId,recordVersion:item.recordVersion,
+    sync:item.sync||{status:"pending"}
+  }));
   return {
-    format:"firevault-shared-vault-package",formatVersion:1,appBuild:BUILD,exportedAt:nowIso(),deviceId:deviceIdentity(),
+    format:"firevault-shared-vault-package",formatVersion:2,appBuild:BUILD,securitySchema:SECURITY_SCHEMA_VERSION,
+    exportedAt:nowIso(),deviceId:deviceIdentity(),exportedByUserId:foundation.localUser.id,
     technician:techIdentity(data),organization:data.settings?.sync?.organization||"",workspace:data.settings?.sync?.workspace||"FireVault Shared Vault",
-    sites:(data.sites||[]).map(packageRecord),resources:(data.resources||[]).map(packageRecord)
+    workspaceId:foundation.workspaceId,sites:(data.sites||[]).map(packageRecord),resources:(data.resources||[]).map(packageRecord),
+    changeQueue:(data.syncState?.changeQueue||[]).map(packageRecord),tombstones
   };
 }
 function contentKey(record){
@@ -379,8 +642,11 @@ export function importSyncPackage(data,pkg){
   });
   data.resources=Array.isArray(data.resources)?data.resources:[];
   mergeArray(data.resources,pkg.resources||[],data,when,stats);
-  data.syncState={...(data.syncState||{}),schemaVersion:3,lastSuccessfulSync:when,lastImportedPackage:{exportedAt:pkg.exportedAt||"",deviceId:pkg.deviceId||"",technician:pkg.technician||"",workspace:pkg.workspace||""}};
-  recordSyncActivity(data,"package-import",{workspace:pkg.workspace||"",fromDevice:pkg.deviceId||"",fromTechnician:pkg.technician||"",stats:{...stats}});
+  const remoteTombstones=Array.isArray(pkg.tombstones)?pkg.tombstones:[];
+  const existingRemote=new Map((data.syncState?.remoteTombstones||[]).map(x=>[`${x.recordType}:${x.recordId}`,x]));
+  remoteTombstones.forEach(x=>existingRemote.set(`${x.recordType}:${x.recordId}`,packageRecord(x)));
+  data.syncState={...(data.syncState||{}),schemaVersion:SECURITY_SCHEMA_VERSION,lastSuccessfulSync:when,remoteTombstones:[...existingRemote.values()].slice(-200),lastImportedPackage:{exportedAt:pkg.exportedAt||"",deviceId:pkg.deviceId||"",technician:pkg.technician||"",workspace:pkg.workspace||"",workspaceId:pkg.workspaceId||"",securitySchema:Number(pkg.securitySchema||0)}};
+  recordSyncActivity(data,"package-import",{workspace:pkg.workspace||"",fromDevice:pkg.deviceId||"",fromTechnician:pkg.technician||"",remoteDeleted:remoteTombstones.length,stats:{...stats}});
   saveData(data);
   return stats;
 }
@@ -397,9 +663,15 @@ function parseVaultCandidate(raw,key){
   }catch{return null;}
 }
 function recoverBestLocalVault(){
+  let primary=null;
+  try{primary=parseVaultCandidate(localStorage.getItem(KEY),KEY);}catch{}
+  // Build 0.79.0: a valid populated primary vault is authoritative. Older
+  // recovery logic preferred whichever copy had more accounts, which could
+  // unintentionally undo legitimate deletions by reopening the recovery copy.
+  if(primary && primary.count>0) return primary;
   const candidates=[];
   try{
-    [KEY,RECOVERY_KEY].forEach(key=>{const c=parseVaultCandidate(localStorage.getItem(key),key);if(c)candidates.push(c);});
+    const recovery=parseVaultCandidate(localStorage.getItem(RECOVERY_KEY),RECOVERY_KEY); if(recovery)candidates.push(recovery);
     for(let i=0;i<localStorage.length;i++){
       const key=localStorage.key(i)||"";
       if(!key.toLowerCase().includes("firevault") || key===KEY || key===RECOVERY_KEY || key===DEMO_VAULT_KEY || key.toLowerCase().includes("_demo_")) continue;
@@ -407,7 +679,7 @@ function recoverBestLocalVault(){
     }
   }catch(err){console.error("Vault recovery scan failed",err);}
   candidates.sort((a,b)=>b.count-a.count || String(b.updated).localeCompare(String(a.updated)));
-  return candidates[0]||null;
+  return candidates[0]||primary||null;
 }
 export function loadData(){
   let demoActive=isDemoMode();
@@ -440,8 +712,26 @@ export function loadData(){
         localStorage.setItem("firevault_last_recovery_source",best.key);
       }
     }catch{}
+    const sourceSchema=Number(best.value?.securityFoundation?.schemaVersion||best.value?.syncState?.schemaVersion||0);
+    if(sourceSchema<SECURITY_SCHEMA_VERSION) createAutoBackupSnapshot(best.value,"before-security-migration");
     const loaded=normalize(best.value);
-    createAutoBackupSnapshot(loaded,"startup");
+    if(sourceSchema<SECURITY_SCHEMA_VERSION){
+      loaded.securityFoundation.migratedAt=nowIso();
+      loaded.securityFoundation.lastValidatedAt=nowIso();
+      auditEntry0790(loaded,"security-foundation-migrated",{fromSchema:sourceSchema,toSchema:SECURITY_SCHEMA_VERSION,siteCount:loaded.sites.length});
+      loaded.syncState.schemaVersion=SECURITY_SCHEMA_VERSION;
+      const migratedText=JSON.stringify(loaded);
+      let persisted=false;
+      try{localStorage.setItem(KEY,migratedText);persisted=true;}catch(err){
+        // Keep the pre-migration recovery copy, remove only rolling snapshots,
+        // and retry so schema metadata does not trigger a startup quota crash.
+        const index=readAutoBackupIndex();
+        index.forEach(item=>{try{localStorage.removeItem(item.key);}catch{}});
+        writeAutoBackupIndex([]);
+        try{localStorage.setItem(KEY,migratedText);persisted=true;}catch(retryErr){console.error("Security foundation migration could not be persisted",retryErr);}
+      }
+      if(persisted) createAutoBackupSnapshot(loaded,"after-security-migration");
+    }else createAutoBackupSnapshot(loaded,"startup");
     return loaded;
   }
   return normalize({sites:[], resources:[], breadcrumbs:[]});
@@ -455,7 +745,7 @@ export function saveData(data){
     const prevResources=new Map((previous?.resources||[]).map(x=>[x?.id,x]));
     data.resources.forEach(item=>migrateRecordTree(item,data,prevResources.get(item.id)));
     data.demoMode=true;
-    data.syncState={...(data.syncState||{}),schemaVersion:3,deviceId:deviceIdentity(),provider:data.settings?.sync?.provider||"onedrive",lastLocalSave:nowIso(),lastSuccessfulSync:data.syncState?.lastSuccessfulSync||""};
+    data.syncState={...(data.syncState||{}),schemaVersion:SECURITY_SCHEMA_VERSION,deviceId:deviceIdentity(),provider:data.settings?.sync?.provider||"onedrive",lastLocalSave:nowIso(),lastSuccessfulSync:data.syncState?.lastSuccessfulSync||""};
     demoRuntimeVault0739=data;
     return data;
   }
@@ -473,11 +763,17 @@ export function saveData(data){
     try{localStorage.setItem(RECOVERY_KEY,JSON.stringify(previous));}catch{}
     createAutoBackupSnapshot(previous,"before-save");
   }
-  const prevSites=new Map((previous?.sites||[]).map(x=>[x?.id,x]));
+  const previousNormalized=previous?normalize(JSON.parse(JSON.stringify(previous))):null;
+  ensureSecurityFoundation0790(data);
+  captureSoftDeletes0790(previousNormalized,data);
+  const prevSites=new Map((previousNormalized?.sites||[]).map(x=>[x?.id,x]));
   data.sites.forEach(site=>migrateRecordTree(site,data,prevSites.get(site.id)));
-  const prevResources=new Map((previous?.resources||[]).map(x=>[x?.id,x]));
+  const prevResources=new Map((previousNormalized?.resources||[]).map(x=>[x?.id,x]));
   data.resources.forEach(item=>migrateRecordTree(item,data,prevResources.get(item.id)));
-  data.syncState={...(data.syncState||{}),schemaVersion:3,deviceId:deviceIdentity(),provider:data.settings?.sync?.provider||"onedrive",lastLocalSave:nowIso(),lastSuccessfulSync:data.syncState?.lastSuccessfulSync||""};
+  auditRecordChanges0790(previousNormalized,data);
+  data.securityFoundation.device.lastSeenAt=nowIso();
+  data.securityFoundation.lastValidatedAt=nowIso();
+  data.syncState={...(data.syncState||{}),schemaVersion:SECURITY_SCHEMA_VERSION,deviceId:deviceIdentity(),provider:data.settings?.sync?.provider||"onedrive",lastLocalSave:nowIso(),lastSuccessfulSync:data.syncState?.lastSuccessfulSync||""};
   const serialized=JSON.stringify(data);
   try{
     localStorage.setItem(KEY,serialized);
@@ -542,7 +838,9 @@ export function normalize(data){
       }))
     }))
   };
-  data.syncState = {...(data.syncState||{}),schemaVersion:3,deviceId:deviceIdentity(),provider:data.settings.sync.provider,lastLocalSave:data.syncState?.lastLocalSave||"",lastSuccessfulSync:data.syncState?.lastSuccessfulSync||""};
+  data.syncState = {...(data.syncState||{}),schemaVersion:SECURITY_SCHEMA_VERSION,deviceId:deviceIdentity(),provider:data.settings.sync.provider,lastLocalSave:data.syncState?.lastLocalSave||"",lastSuccessfulSync:data.syncState?.lastSuccessfulSync||""};
+  ensureSecurityFoundation0790(data);
+  trimRecycleBin0790(data);
   const homeCardDefaults = {pinnedSites:{visible:true,behavior:"remember"},fieldFocus:{visible:true,behavior:"remember"},nearbyAccounts:{visible:true,behavior:"remember"},recentAccounts:{visible:true,behavior:"remember"}};
   data.settings.homeLayout = data.settings.homeLayout || {preset:"custom",cards:{}};
   data.settings.homeLayout.preset = data.settings.homeLayout.preset || "custom";

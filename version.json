@@ -1,6 +1,6 @@
 {
-  "build": "0.78.6",
+  "build": "0.79.0",
   "released": "2026-07-12",
-  "note": "Account Detail final polish",
-  "label": "Cleaner identity, field actions, tabs, location, contacts, and service metrics"
+  "note": "Security-ready data foundation",
+  "label": "Workspace, user, device, audit, soft deletion, versioning, and future sync readiness"
 }

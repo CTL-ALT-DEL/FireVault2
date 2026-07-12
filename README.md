@@ -1,3 +1,3 @@
-# FireVault Build 0.78.6 — Account Detail Final Polish
+# FireVault Build 0.79.0 — Security-Ready Data Foundation
 
-This release refines the individual Account Detail workspace for faster field use. It simplifies the identity header, adds supporting labels to Call/Route/Note/Visit, shortens the tab rail for reliable phone-width rendering, removes the leftover blank map column from Overview, and reorganizes location, contact, task, deficiency, and visit information into clearer field-ready cards. The existing vault schema and storage key are unchanged.
+This release prepares FireVault for future signup, login, passkeys, 2FA, roles, server authorization, and multi-technician synchronization without adding a cosmetic login screen. It adds stable workspace, local-user, and device identities; schema version 4 record metadata; record versions and change IDs; a pending change queue; local audit history; recoverable soft deletion; a recycle bin; credential-safe exports; and stronger confirmation before restore or destructive reset actions. The existing `firevault_vault_build_030` storage key is unchanged.
