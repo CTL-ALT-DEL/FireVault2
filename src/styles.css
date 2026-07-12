@@ -15725,12 +15725,166 @@ body.app-booted533:not(.homeFullscreen480) .accountsHeader0736{
   .accountPersistentActions0751 button{min-height:66px!important}
 }
 
-/* Build 0.75.6 WebDAV module */
-.webdavStack0756 .settingsGrid540{align-items:end}
-.webdavActions0756{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
-.webdavActions0756 button{min-height:52px}
-.webdavHistory0756{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:12px}
-.webdavHistory0756>div{padding:13px;border:1px solid var(--fv-border,rgba(148,163,184,.24));border-radius:12px;background:rgba(15,23,42,.46);display:flex;flex-direction:column;gap:5px}
-.webdavHistory0756 span{font-size:.76rem;color:var(--muted)}
-.webdavHistory0756 strong{font-size:.92rem;overflow-wrap:anywhere}
-@media(max-width:620px){.webdavActions0756{grid-template-columns:1fr}.webdavHistory0756{grid-template-columns:1fr}}
+/* Build 0.75.7 WebDAV module */
+.webdavStack0757 .settingsGrid540{align-items:end}
+.webdavActions0757{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.webdavActions0757 button{min-height:52px}
+.webdavHistory0757{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:12px}
+.webdavHistory0757>div{padding:13px;border:1px solid var(--fv-border,rgba(148,163,184,.24));border-radius:12px;background:rgba(15,23,42,.46);display:flex;flex-direction:column;gap:5px}
+.webdavHistory0757 span{font-size:.76rem;color:var(--muted)}
+.webdavHistory0757 strong{font-size:.92rem;overflow-wrap:anywhere}
+@media(max-width:620px){.webdavActions0757{grid-template-columns:1fr}.webdavHistory0757{grid-template-columns:1fr}}
+
+/* Build 0.75.7 — Account Detail single-flow structural rewrite */
+.siteDetail0735{
+  display:flex!important;
+  flex-direction:column!important;
+  align-items:stretch!important;
+  gap:8px!important;
+  width:100%!important;
+  min-width:0!important;
+  height:100%!important;
+  min-height:0!important;
+  padding:0!important;
+  overflow:hidden!important;
+  grid-template-columns:none!important;
+  grid-template-rows:none!important;
+}
+.siteDetail0735 > .accountHeader0735,
+.siteDetail0735 > .technicianStatus075,
+.siteDetail0735 > .accountTagRail0737,
+.siteDetail0735 > .accountPersistentActions0751,
+.siteDetail0735 > .accountTabs0735{
+  position:relative!important;
+  inset:auto!important;
+  top:auto!important;
+  left:auto!important;
+  right:auto!important;
+  bottom:auto!important;
+  z-index:1!important;
+  flex:0 0 auto!important;
+  width:100%!important;
+  min-width:0!important;
+  margin:0!important;
+  transform:none!important;
+}
+.siteDetail0735 > .accountTabScroll0735{
+  position:relative!important;
+  inset:auto!important;
+  z-index:0!important;
+  flex:1 1 auto!important;
+  width:100%!important;
+  min-width:0!important;
+  min-height:0!important;
+  margin:0!important;
+  padding:8px 2px 22px!important;
+  overflow-x:hidden!important;
+  overflow-y:auto!important;
+  -webkit-overflow-scrolling:touch!important;
+}
+.accountHeaderRewrite0757{
+  display:grid!important;
+  grid-template-columns:48px minmax(0,1fr) 48px 48px!important;
+  align-items:center!important;
+  gap:8px!important;
+  min-height:86px!important;
+  padding:10px!important;
+  overflow:hidden!important;
+}
+.accountHeaderRewrite0757 .technicianIdentity075{
+  display:flex!important;
+  flex-direction:column!important;
+  align-items:center!important;
+  justify-content:center!important;
+  gap:2px!important;
+  min-width:0!important;
+  text-align:center!important;
+}
+.accountHeaderRewrite0757 .technicianIdentity075 strong{
+  width:100%!important;
+  font-size:1.22rem!important;
+  line-height:1.1!important;
+  white-space:nowrap!important;
+  overflow:hidden!important;
+  text-overflow:ellipsis!important;
+}
+.accountHeaderRewrite0757 .accountIdLine0757{
+  margin:1px 0 0!important;
+  color:#79b8ff!important;
+  font-size:.72rem!important;
+  line-height:1.1!important;
+  font-weight:900!important;
+  letter-spacing:.10em!important;
+  white-space:nowrap!important;
+}
+.accountHeaderRewrite0757 .accountAddressLine0757{
+  width:100%!important;
+  margin:1px 0 0!important;
+  color:#aab9ca!important;
+  font-size:.64rem!important;
+  line-height:1.2!important;
+  font-weight:750!important;
+  letter-spacing:.025em!important;
+  text-transform:none!important;
+  white-space:normal!important;
+  overflow:hidden!important;
+  display:-webkit-box!important;
+  -webkit-line-clamp:2!important;
+  -webkit-box-orient:vertical!important;
+}
+.accountHeaderRewrite0757 .accountEdit0735{
+  width:48px!important;
+  min-width:48px!important;
+  padding:0!important;
+  font-size:1.35rem!important;
+  line-height:1!important;
+}
+.accountPersistentActions0751{
+  display:grid!important;
+  grid-template-columns:repeat(4,minmax(0,1fr))!important;
+  grid-auto-flow:row!important;
+  gap:7px!important;
+  padding:0 2px!important;
+}
+.accountPersistentActions0751 button{
+  min-height:72px!important;
+  width:100%!important;
+  min-width:0!important;
+  padding:8px 3px!important;
+  display:flex!important;
+  flex-direction:column!important;
+  align-items:center!important;
+  justify-content:center!important;
+  gap:5px!important;
+}
+.accountPersistentIcon0751{width:27px!important;height:27px!important}
+.accountPersistentActions0751 strong{font-size:.72rem!important}
+.accountTabsSticky0751{
+  position:relative!important;
+  top:auto!important;
+  z-index:1!important;
+  backdrop-filter:none!important;
+  -webkit-backdrop-filter:none!important;
+}
+.accountTabs0735{
+  flex:0 0 auto!important;
+  width:100%!important;
+  min-width:0!important;
+  overflow-x:auto!important;
+  overflow-y:hidden!important;
+}
+@media(max-width:390px){
+  .accountHeaderRewrite0757{
+    grid-template-columns:44px minmax(0,1fr) 44px 44px!important;
+    min-height:82px!important;
+    gap:6px!important;
+    padding:8px 7px!important;
+  }
+  .accountHeaderRewrite0757 .technicianIdentity075 strong{font-size:1.08rem!important}
+  .accountHeaderRewrite0757 .accountAddressLine0757{font-size:.59rem!important}
+  .accountHeaderRewrite0757 .accountEdit0735{width:44px!important;min-width:44px!important}
+  .accountPersistentActions0751{grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:5px!important}
+  .accountPersistentActions0751 button{min-height:66px!important;padding:6px 2px!important}
+  .accountPersistentIcon0751{width:24px!important;height:24px!important}
+  .accountPersistentActions0751 strong{font-size:.65rem!important}
+}

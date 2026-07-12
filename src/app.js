@@ -1,4 +1,4 @@
-import { BUILD, KEY, ACTIVE_JOB_KEY, loadData, saveData, ensureSite, fullAddress, esc, uid, downloadBlob, syncSummary, syncQueue, syncConflicts, syncActivity, createSyncPackage, importSyncPackage, resolveSyncConflict, notePackageExport, deviceIdentity, recordSyncActivity, autoBackupInfo, latestAutoBackup, restoreAutoBackup, isDemoMode, setDemoMode, resetDemoData } from "./storage.js?v=0.75.6";
+import { BUILD, KEY, ACTIVE_JOB_KEY, loadData, saveData, ensureSite, fullAddress, esc, uid, downloadBlob, syncSummary, syncQueue, syncConflicts, syncActivity, createSyncPackage, importSyncPackage, resolveSyncConflict, notePackageExport, deviceIdentity, recordSyncActivity, autoBackupInfo, latestAutoBackup, restoreAutoBackup, isDemoMode, setDemoMode, resetDemoData } from "./storage.js?v=0.75.7";
 window.__FIREVAULT_MODULE_READY = true;
 
 function fvPreferenceStore0739(){
@@ -3935,7 +3935,7 @@ function siteDetail(){
   const panelMarkup=accountDetailTab0735==="details"?accountDetailsTab0735(s,ctx):accountDetailTab0735==="equipment"?accountEquipmentTab0735(s):accountDetailTab0735==="docs"?accountDocsTab0735(s):accountDetailTab0735==="notes"?accountNotesTab0735(s,ctx):accountOverviewTab0735(s,ctx);
 
   html(`<div class="screen siteDetail0735">
-    <header class="accountHeader0735 technicianHeader075"><button class="accountBack0735" id="backBtn" aria-label="Back to Accounts">‹</button><div class="technicianIdentity075"><span class="technicianEyebrow075">ACCOUNT</span><strong>${esc(s.name||"Unnamed Account")}</strong><span>${esc(accountId)}${fullAddress(s)?` • ${esc(fullAddress(s))}`:""}</span></div><button class="accountPin0735 ${isPinnedSite566(s)?"pinned":""}" id="pinSiteBtn566" aria-label="Pin account">${isPinnedSite566(s)?"★":"☆"}</button><button class="accountEdit0735" id="editBtn">Edit</button></header>
+    <header class="accountHeader0735 technicianHeader075 accountHeaderRewrite0757"><button class="accountBack0735" id="backBtn" aria-label="Back to Accounts">‹</button><div class="technicianIdentity075"><strong>${esc(s.name||"Unnamed Account")}</strong><span class="accountIdLine0757">${esc(accountId)}</span>${fullAddress(s)?`<span class="accountAddressLine0757">${esc(fullAddress(s))}</span>`:""}</div><button class="accountPin0735 ${isPinnedSite566(s)?"pinned":""}" id="pinSiteBtn566" aria-label="Pin account">${isPinnedSite566(s)?"★":"☆"}</button><button class="accountEdit0735" id="editBtn" aria-label="Edit account">✎</button></header>
     <section class="technicianStatus075"><span class="status-${esc(health.cls)}">${esc(health.label)}</span><span>${esc(accountCategoryLabel0735(s))}</span>${open?`<span>${open} task${open===1?"":"s"}</span>`:""}${def?`<span class="hasDef075">${def} deficienc${def===1?"y":"ies"}</span>`:""}</section>
     ${accountTagChips0737(s,8)?`<div class="accountTagRail0737">${accountTagChips0737(s,8)}</div>`:""}
     ${accountPersistentActions0751(s,ctx)}
@@ -7029,14 +7029,14 @@ function wireDemoMode0738(){
 }
 
 
-const WEBDAV_PASSWORD_SESSION_KEY_0756="firevault_webdav_password_0756";
-function webdavConfig0756(){
+const WEBDAV_PASSWORD_SESSION_KEY_0757="firevault_webdav_password_0757";
+function webdavConfig0757(){
   const cfg=data.settings.webdav||{};
   return {enabled:!!cfg.enabled,url:String(cfg.url||""),username:String(cfg.username||""),folder:String(cfg.folder||"FireVault"),fileName:String(cfg.fileName||"firevault-latest.json"),autoUpload:!!cfg.autoUpload,lastUpload:String(cfg.lastUpload||""),lastDownload:String(cfg.lastDownload||""),lastStatus:String(cfg.lastStatus||"")};
 }
-function webdavPassword0756(){try{return sessionStorage.getItem(WEBDAV_PASSWORD_SESSION_KEY_0756)||""}catch{return ""}}
-function setWebdavPassword0756(value){try{if(value)sessionStorage.setItem(WEBDAV_PASSWORD_SESSION_KEY_0756,value);else sessionStorage.removeItem(WEBDAV_PASSWORD_SESSION_KEY_0756)}catch{}}
-function normalizeWebdavUrl0756(cfg,fileOverride=""){
+function webdavPassword0757(){try{return sessionStorage.getItem(WEBDAV_PASSWORD_SESSION_KEY_0757)||""}catch{return ""}}
+function setWebdavPassword0757(value){try{if(value)sessionStorage.setItem(WEBDAV_PASSWORD_SESSION_KEY_0757,value);else sessionStorage.removeItem(WEBDAV_PASSWORD_SESSION_KEY_0757)}catch{}}
+function normalizeWebdavUrl0757(cfg,fileOverride=""){
   let base=String(cfg.url||"").trim();
   if(!/^https:\/\//i.test(base)) throw new Error("Use an HTTPS WebDAV server address.");
   base=base.replace(/\/+$/g,"");
@@ -7044,64 +7044,64 @@ function normalizeWebdavUrl0756(cfg,fileOverride=""){
   const file=String(fileOverride||cfg.fileName||"firevault-latest.json").trim();
   return [base,...parts,file?encodeURIComponent(file):""].filter(Boolean).join("/");
 }
-function webdavHeaders0756(cfg,extra={}){
-  const password=webdavPassword0756();
+function webdavHeaders0757(cfg,extra={}){
+  const password=webdavPassword0757();
   if(!cfg.username||!password) throw new Error("Enter the WebDAV username and app password.");
   let token="";try{token=btoa(unescape(encodeURIComponent(`${cfg.username}:${password}`)))}catch{token=btoa(`${cfg.username}:${password}`)}
   return {Authorization:`Basic ${token}`,...extra};
 }
-function webdavBackupPayload0756(){return {app:"FireVault",build:BUILD,exportedAt:new Date().toISOString(),stats:backupSafetyStats552(),data};}
-async function webdavRequest0756(method,url,headers={},body){
+function webdavBackupPayload0757(){return {app:"FireVault",build:BUILD,exportedAt:new Date().toISOString(),stats:backupSafetyStats552(),data};}
+async function webdavRequest0757(method,url,headers={},body){
   let response;
   try{response=await fetch(url,{method,headers,body,cache:"no-store",credentials:"omit"});}
   catch(err){throw new Error("WebDAV connection failed. Confirm the server permits CORS access from this FireVault address.");}
   if(!response.ok) throw new Error(`WebDAV returned ${response.status} ${response.statusText||""}`.trim());
   return response;
 }
-async function ensureWebdavFolders0756(cfg){
+async function ensureWebdavFolders0757(cfg){
   let root=String(cfg.url||"").trim().replace(/\/+$/g,"");
   if(!/^https:\/\//i.test(root)) throw new Error("Use an HTTPS WebDAV server address.");
   const folders=String(cfg.folder||"").split("/").map(x=>x.trim()).filter(Boolean);
   for(const folder of folders){
     root += "/"+encodeURIComponent(folder);
-    try{await webdavRequest0756("MKCOL",root,webdavHeaders0756(cfg));}catch(err){if(!/405|301|302|409/.test(String(err.message))) throw err;}
+    try{await webdavRequest0757("MKCOL",root,webdavHeaders0757(cfg));}catch(err){if(!/405|301|302|409/.test(String(err.message))) throw err;}
   }
 }
-function webdavStatus0756(message){const el=document.getElementById("webdavStatus0756");if(el)el.textContent=message;}
-async function testWebdav0756(){
-  const cfg=collectWebdavInputs0756(); webdavStatus0756("Testing connection…");
-  try{await webdavRequest0756("PROPFIND",String(cfg.url||"").trim().replace(/\/+$/g,"/") ,webdavHeaders0756(cfg,{Depth:"0"}));data.settings.webdav={...cfg,lastStatus:`Connected ${new Date().toLocaleString()}`};saveData(data);webdavStatus0756("Connected successfully.");toast("WebDAV connection successful.");}
-  catch(err){webdavStatus0756(err.message);alert(err.message);}
+function webdavStatus0757(message){const el=document.getElementById("webdavStatus0757");if(el)el.textContent=message;}
+async function testWebdav0757(){
+  const cfg=collectWebdavInputs0757(); webdavStatus0757("Testing connection…");
+  try{await webdavRequest0757("PROPFIND",String(cfg.url||"").trim().replace(/\/+$/g,"/") ,webdavHeaders0757(cfg,{Depth:"0"}));data.settings.webdav={...cfg,lastStatus:`Connected ${new Date().toLocaleString()}`};saveData(data);webdavStatus0757("Connected successfully.");toast("WebDAV connection successful.");}
+  catch(err){webdavStatus0757(err.message);alert(err.message);}
 }
-function collectWebdavInputs0756(){
-  const current=webdavConfig0756();
-  const cfg={...current,enabled:!!document.getElementById("webdavEnabled0756")?.checked,url:document.getElementById("webdavUrl0756")?.value.trim()||"",username:document.getElementById("webdavUser0756")?.value.trim()||"",folder:document.getElementById("webdavFolder0756")?.value.trim()||"FireVault",fileName:document.getElementById("webdavFile0756")?.value.trim()||"firevault-latest.json",autoUpload:!!document.getElementById("webdavAuto0756")?.checked};
-  const password=document.getElementById("webdavPassword0756")?.value||"";if(password)setWebdavPassword0756(password);
+function collectWebdavInputs0757(){
+  const current=webdavConfig0757();
+  const cfg={...current,enabled:!!document.getElementById("webdavEnabled0757")?.checked,url:document.getElementById("webdavUrl0757")?.value.trim()||"",username:document.getElementById("webdavUser0757")?.value.trim()||"",folder:document.getElementById("webdavFolder0757")?.value.trim()||"FireVault",fileName:document.getElementById("webdavFile0757")?.value.trim()||"firevault-latest.json",autoUpload:!!document.getElementById("webdavAuto0757")?.checked};
+  const password=document.getElementById("webdavPassword0757")?.value||"";if(password)setWebdavPassword0757(password);
   return cfg;
 }
-async function uploadWebdavBackup0756(){
-  const cfg=collectWebdavInputs0756();webdavStatus0756("Preparing secure backup…");
-  try{await ensureWebdavFolders0756(cfg);const payload=JSON.stringify(webdavBackupPayload0756(),null,2);const url=normalizeWebdavUrl0756(cfg);await webdavRequest0756("PUT",url,webdavHeaders0756(cfg,{"Content-Type":"application/json"}),payload);data.settings.webdav={...cfg,lastUpload:new Date().toLocaleString(),lastStatus:"Upload successful"};saveData(data);webdavStatus0756("Backup uploaded successfully.");toast("WebDAV backup uploaded.");settings();}
-  catch(err){webdavStatus0756(err.message);alert(err.message);}
+async function uploadWebdavBackup0757(){
+  const cfg=collectWebdavInputs0757();webdavStatus0757("Preparing secure backup…");
+  try{await ensureWebdavFolders0757(cfg);const payload=JSON.stringify(webdavBackupPayload0757(),null,2);const url=normalizeWebdavUrl0757(cfg);await webdavRequest0757("PUT",url,webdavHeaders0757(cfg,{"Content-Type":"application/json"}),payload);data.settings.webdav={...cfg,lastUpload:new Date().toLocaleString(),lastStatus:"Upload successful"};saveData(data);webdavStatus0757("Backup uploaded successfully.");toast("WebDAV backup uploaded.");settings();}
+  catch(err){webdavStatus0757(err.message);alert(err.message);}
 }
-async function restoreWebdavBackup0756(){
-  const cfg=collectWebdavInputs0756();if(!confirm("Download the WebDAV backup and replace the current FireVault vault? A local automatic snapshot will be created first."))return;webdavStatus0756("Downloading backup…");
-  try{const url=normalizeWebdavUrl0756(cfg);const response=await webdavRequest0756("GET",url,webdavHeaders0756(cfg));const parsed=JSON.parse(await response.text());const incoming=parsed?.data&&Array.isArray(parsed.data.sites)?parsed.data:parsed;if(!incoming||!Array.isArray(incoming.sites))throw new Error("The WebDAV file is not a valid FireVault backup.");Object.assign(data,incoming);data.settings=data.settings||{};data.settings.webdav={...cfg,lastDownload:new Date().toLocaleString(),lastStatus:"Restore successful"};saveData(data);data=loadData();webdavStatus0756("Backup restored. Reloading…");toast("WebDAV backup restored.");setTimeout(()=>route("home"),400);}
-  catch(err){webdavStatus0756(err.message);alert(err.message);}
+async function restoreWebdavBackup0757(){
+  const cfg=collectWebdavInputs0757();if(!confirm("Download the WebDAV backup and replace the current FireVault vault? A local automatic snapshot will be created first."))return;webdavStatus0757("Downloading backup…");
+  try{const url=normalizeWebdavUrl0757(cfg);const response=await webdavRequest0757("GET",url,webdavHeaders0757(cfg));const parsed=JSON.parse(await response.text());const incoming=parsed?.data&&Array.isArray(parsed.data.sites)?parsed.data:parsed;if(!incoming||!Array.isArray(incoming.sites))throw new Error("The WebDAV file is not a valid FireVault backup.");Object.assign(data,incoming);data.settings=data.settings||{};data.settings.webdav={...cfg,lastDownload:new Date().toLocaleString(),lastStatus:"Restore successful"};saveData(data);data=loadData();webdavStatus0757("Backup restored. Reloading…");toast("WebDAV backup restored.");setTimeout(()=>route("home"),400);}
+  catch(err){webdavStatus0757(err.message);alert(err.message);}
 }
-function webdavPanel0756(){
-  const cfg=webdavConfig0756();
-  return `<div class="settingsStack settingsStack540 webdavStack0756">
-    ${settingsSection540("Optional remote backup","WebDAV","Connect FireVault to a compatible HTTPS WebDAV service. This is an optional manual backup and restore module; your local vault remains the working database.",`<div class="settingsList settingsToggleList540">${checkBlock("webdavEnabled0756","Enable WebDAV controls",cfg.enabled)}</div><div class="settingsGrid settingsGrid540">${fieldBlock("Server URL",`<input id="webdavUrl0756" inputmode="url" placeholder="https://cloud.example.com/remote.php/dav/files/name" value="${esc(cfg.url)}">`,`The server must allow HTTPS and CORS requests from FireVault.`)}${fieldBlock("Username",`<input id="webdavUser0756" autocomplete="username" value="${esc(cfg.username)}">`)}${fieldBlock("App password",`<input id="webdavPassword0756" type="password" autocomplete="current-password" placeholder="Stored only for this app session">`,`For safety, FireVault does not save the password in the vault.`)}${fieldBlock("Remote folder",`<input id="webdavFolder0756" value="${esc(cfg.folder)}">`)}${fieldBlock("Backup filename",`<input id="webdavFile0756" value="${esc(cfg.fileName)}">`)}</div><div class="settingsList settingsToggleList540">${checkBlock("webdavAuto0756","Upload after manual backup exports",cfg.autoUpload)}</div>`,"blue",`<button class="primary saveMini" id="saveWebdav0756">Save</button>`)}
-    ${settingsSection540("Connection & transfer","WebDAV Actions","Test access before uploading. Restore replaces the current local vault only after confirmation.",`<div class="webdavActions0756"><button class="ghost" id="testWebdav0756">Test Connection</button><button class="primary" id="uploadWebdav0756">Upload Backup</button><button class="ghost" id="restoreWebdav0756">Restore from Server</button></div><div class="settingsInfo540"><strong>Status</strong><span id="webdavStatus0756">${esc(cfg.lastStatus||"Not tested")}</span></div><div class="webdavHistory0756"><div><span>Last upload</span><strong>${esc(cfg.lastUpload||"Never")}</strong></div><div><span>Last restore</span><strong>${esc(cfg.lastDownload||"Never")}</strong></div></div>`,"cyan")}
+function webdavPanel0757(){
+  const cfg=webdavConfig0757();
+  return `<div class="settingsStack settingsStack540 webdavStack0757">
+    ${settingsSection540("Optional remote backup","WebDAV","Connect FireVault to a compatible HTTPS WebDAV service. This is an optional manual backup and restore module; your local vault remains the working database.",`<div class="settingsList settingsToggleList540">${checkBlock("webdavEnabled0757","Enable WebDAV controls",cfg.enabled)}</div><div class="settingsGrid settingsGrid540">${fieldBlock("Server URL",`<input id="webdavUrl0757" inputmode="url" placeholder="https://cloud.example.com/remote.php/dav/files/name" value="${esc(cfg.url)}">`,`The server must allow HTTPS and CORS requests from FireVault.`)}${fieldBlock("Username",`<input id="webdavUser0757" autocomplete="username" value="${esc(cfg.username)}">`)}${fieldBlock("App password",`<input id="webdavPassword0757" type="password" autocomplete="current-password" placeholder="Stored only for this app session">`,`For safety, FireVault does not save the password in the vault.`)}${fieldBlock("Remote folder",`<input id="webdavFolder0757" value="${esc(cfg.folder)}">`)}${fieldBlock("Backup filename",`<input id="webdavFile0757" value="${esc(cfg.fileName)}">`)}</div><div class="settingsList settingsToggleList540">${checkBlock("webdavAuto0757","Upload after manual backup exports",cfg.autoUpload)}</div>`,"blue",`<button class="primary saveMini" id="saveWebdav0757">Save</button>`)}
+    ${settingsSection540("Connection & transfer","WebDAV Actions","Test access before uploading. Restore replaces the current local vault only after confirmation.",`<div class="webdavActions0757"><button class="ghost" id="testWebdav0757">Test Connection</button><button class="primary" id="uploadWebdav0757">Upload Backup</button><button class="ghost" id="restoreWebdav0757">Restore from Server</button></div><div class="settingsInfo540"><strong>Status</strong><span id="webdavStatus0757">${esc(cfg.lastStatus||"Not tested")}</span></div><div class="webdavHistory0757"><div><span>Last upload</span><strong>${esc(cfg.lastUpload||"Never")}</strong></div><div><span>Last restore</span><strong>${esc(cfg.lastDownload||"Never")}</strong></div></div>`,"cyan")}
     <div class="settingsInfo540 warning"><strong>Compatibility note</strong><span>Some WebDAV providers block browser requests through CORS. If the connection test fails even with correct credentials, the server must be configured to allow requests from your FireVault GitHub Pages address.</span></div>
   </div>`;
 }
-function wireWebdav0756(){
-  document.getElementById("saveWebdav0756")?.addEventListener("click",()=>{data.settings.webdav=collectWebdavInputs0756();saveData(data);data=loadData();toast("WebDAV settings saved.");settings();});
-  document.getElementById("testWebdav0756")?.addEventListener("click",testWebdav0756);
-  document.getElementById("uploadWebdav0756")?.addEventListener("click",uploadWebdavBackup0756);
-  document.getElementById("restoreWebdav0756")?.addEventListener("click",restoreWebdavBackup0756);
+function wireWebdav0757(){
+  document.getElementById("saveWebdav0757")?.addEventListener("click",()=>{data.settings.webdav=collectWebdavInputs0757();saveData(data);data=loadData();toast("WebDAV settings saved.");settings();});
+  document.getElementById("testWebdav0757")?.addEventListener("click",testWebdav0757);
+  document.getElementById("uploadWebdav0757")?.addEventListener("click",uploadWebdavBackup0757);
+  document.getElementById("restoreWebdav0757")?.addEventListener("click",restoreWebdavBackup0757);
 }
 
 function settingsPanel(){
@@ -7128,7 +7128,7 @@ function settingsPanel(){
 
   if(settingsTab==="demo") return demoModePanel0738();
 
-  if(settingsTab==="webdav") return webdavPanel0756();
+  if(settingsTab==="webdav") return webdavPanel0757();
 
   if(settingsTab==="themes") return `<div class="settingsStack settingsStack540">
     ${settingsSection540("One-tap styles","Quick Themes","Apply a coordinated accent and contrast preset without changing your stored field data.",`<div class="presetGrid settingsPresetGrid540">${Object.entries(themePresets).map(([key,p])=>`<button class="ghost presetBtn" data-preset="${key}"><span class="themeSwatch" style="background:${p.accentColor}"></span><span>${p.label}</span></button>`).join("")}</div>`,"violet",saveButton("Apply"))}
@@ -7214,7 +7214,7 @@ function settingsPanel(){
   </div>`;
 }
 function wireSettingsPanel(){
-  if(settingsTab==="webdav"){wireWebdav0756();return;}
+  if(settingsTab==="webdav"){wireWebdav0757();return;}
   const saveBtn=document.getElementById("saveSettings"); if(saveBtn) saveBtn.onclick=saveSettings;
   if(settingsTab==="overlay") wireOverlaySettings510();
   if(settingsTab==="demo") wireDemoMode0738();
@@ -7851,7 +7851,7 @@ function downloadVaultBackup552(){
     a.click();
     setTimeout(()=>{URL.revokeObjectURL(url); a.remove();},450);
     toast("Backup downloaded.");
-    if(data.settings?.webdav?.enabled && data.settings?.webdav?.autoUpload && webdavPassword0756()) setTimeout(()=>uploadWebdavBackup0756(),250);
+    if(data.settings?.webdav?.enabled && data.settings?.webdav?.autoUpload && webdavPassword0757()) setTimeout(()=>uploadWebdavBackup0757(),250);
   }catch(err){
     console.error(err);
     toast("Backup failed.");

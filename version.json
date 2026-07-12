@@ -1,6 +1,6 @@
 {
-  "build": "0.75.6",
+  "build": "0.75.7",
   "released": "2026-07-11",
-  "note": "Structural Header Repair",
-  "notes": "Replaces fixed overlay offsets on non-home screens with a real header/content/navigation grid so Accounts controls cannot be covered by the global logo and date header."
+  "note": "Account Detail Layout Rewrite",
+  "notes": "Rebuilds Account Detail as one normal vertical flow with a compact identity header, four-column action bar, non-sticky tabs, and one scrolling content region to eliminate overlap on iPhone."
 }

@@ -1,3 +1,10 @@
-# FireVault Build 0.75.6 — Account Detail Concept #2
+# FireVault Build 0.75.7
 
-Build 0.75.6 applies the selected blue field-console design to the individual Account Detail page. The account identity is presented in a navy hero header, the primary Call, Route, Note, and Visit controls use large blue action buttons, and the information tabs and content cards use a coordinated blue hierarchy. Existing account data and storage keys are unchanged.
+Account Detail Layout Rewrite.
+
+- Replaces competing grid and sticky positioning with a single vertical flex layout.
+- Keeps the account header, action bar, tabs, and content in normal document flow.
+- Uses a full-width four-column Call / Route / Note / Visit action row on iPhone.
+- Removes the large ACCOUNT eyebrow and gives the address room to wrap.
+- Uses compact icon-only Pin and Edit controls.
+- Preserves the WebDAV module, Demo Mode, backups, categories, imports, and the existing vault storage key.
