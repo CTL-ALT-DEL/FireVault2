@@ -1,4 +1,4 @@
-import { BUILD, KEY, ACTIVE_JOB_KEY, loadData, saveData, ensureSite, fullAddress, esc, uid, downloadBlob, syncSummary, syncQueue, syncConflicts, syncActivity, createSyncPackage, importSyncPackage, resolveSyncConflict, notePackageExport, deviceIdentity, recordSyncActivity, autoBackupInfo, latestAutoBackup, restoreAutoBackup, isDemoMode, setDemoMode, resetDemoData } from "./storage.js?v=0.76.1";
+import { BUILD, KEY, ACTIVE_JOB_KEY, loadData, saveData, ensureSite, fullAddress, esc, uid, downloadBlob, syncSummary, syncQueue, syncConflicts, syncActivity, createSyncPackage, importSyncPackage, resolveSyncConflict, notePackageExport, deviceIdentity, recordSyncActivity, autoBackupInfo, latestAutoBackup, restoreAutoBackup, isDemoMode, setDemoMode, resetDemoData } from "./storage.js?v=0.76.2";
 window.__FIREVAULT_MODULE_READY = true;
 
 function fvPreferenceStore0739(){
@@ -3365,11 +3365,26 @@ function accountRecency0761(s){
   if(diff<7*day){const n=Math.max(1,Math.floor(diff/day));return `Opened ${n} day${n===1?"":"s"} ago`;}
   return `Opened ${new Date(stamp).toLocaleDateString([], {month:"short",day:"numeric"})}`;
 }
-function accountDirectoryRow0759(s){
+function accountAddressKey0762(s){
+  const key=normalizedAddressKey065(s).toLowerCase();
+  return key.replace(/\|/g,"").trim()?key:"";
+}
+function accountAddressCounts0762(rows=[]){
+  const counts=new Map();
+  rows.forEach(s=>{const key=accountAddressKey0762(s);if(key)counts.set(key,(counts.get(key)||0)+1);});
+  return counts;
+}
+function accountHealthBadge0762(health){
+  if(health?.cls==="healthWarn") return {label:"Attention",cls:"danger"};
+  if(health?.cls==="healthWatch") return {label:"Watch",cls:"warning"};
+  return null;
+}
+function accountDirectoryRow0759(s,addressCount=1){
   const id=accountId069(s);
   const category=accountCategory070(s);
   const categoryLabel=NEARBY_CATEGORY_META_070[category]?.label||"Basic";
   const health=siteHealth(s);
+  const healthBadge=accountHealthBadge0762(health);
   const work=accountDirectoryWork0759(s);
   const panel=[s.panelManufacturer,s.panelModel].filter(Boolean).join(" ");
   const contact=primaryContact477(s);
@@ -3377,7 +3392,9 @@ function accountDirectoryRow0759(s){
   const pinned=isPinnedSite566(s);
   const address=fullAddress(s)||"No address saved";
   const recency=accountRecency0761(s);
-  return `<article class="accountCard0759 accountCard0761 category-${category}" data-account-card0759 data-id="${esc(s.id)}" data-search="${esc(siteSearchBlob(s))}" data-attention="${health.cls==='healthWarn'?'1':'0'}" data-open="${work.cls==='clear'?'0':'1'}" data-gps="${hasGps(s)?'1':'0'}" role="button" tabindex="0" aria-label="Open ${esc(s.name||'account')}, ${esc(address)}">
+  const phone=phone069(s);
+  const gpsReady=hasGps(s);
+  return `<article class="accountCard0759 accountCard0761 accountCard0762 category-${category}" data-account-card0759 data-id="${esc(s.id)}" data-search="${esc(siteSearchBlob(s))}" data-attention="${health.cls==='healthWarn'?'1':'0'}" data-open="${work.cls==='clear'?'0':'1'}" data-gps="${gpsReady?'1':'0'}" role="button" tabindex="0" aria-label="Open ${esc(s.name||'account')}, ${esc(address)}">
     <span class="accountTone0759" aria-hidden="true"></span>
     <span class="accountCardBody0759">
       <span class="accountCardTop0759">
@@ -3388,12 +3405,18 @@ function accountDirectoryRow0759(s){
       ${id?`<span class="accountNumber0759">${esc(id)}</span>`:""}
       <span class="accountStreet0759">${esc(address)}</span>
       <span class="accountSupporting0759">${esc(supporting)}</span>
-      <span class="accountBadges0759">
+      <span class="accountBadges0759 accountBadges0762">
+        ${healthBadge?`<span class="accountHealth0762 ${healthBadge.cls}">${esc(healthBadge.label)}</span>`:""}
+        ${addressCount>1?`<span class="accountSharedAddress0762">${addressCount} accounts here</span>`:""}
         <span class="accountWork0759 ${work.cls}">${esc(work.label)}</span>
-        <span class="accountGps0759 ${hasGps(s)?'ready':'missing'}">${hasGps(s)?'GPS ready':'Needs GPS'}</span>
+        <span class="accountGps0759 ${gpsReady?'ready':'missing'}">${gpsReady?'GPS ready':'Needs GPS'}</span>
       </span>
       ${recency?`<span class="accountRecency0761">${esc(recency)}</span>`:""}
       ${accountTagChips0737(s,2)}
+      <span class="accountQuickActions0762" role="group" aria-label="Quick actions for ${esc(s.name||'account')}">
+        <button type="button" class="accountQuickButton0762 call" data-account-call0762="${esc(s.id)}" ${phone?"":"disabled"} aria-label="Call ${esc(s.name||'account')}">${fvIcon073("call","accountQuickIcon0762")}<span>Call</span></button>
+        <button type="button" class="accountQuickButton0762 route" data-account-route0762="${esc(s.id)}" ${gpsReady?"":"disabled"} aria-label="Route to ${esc(s.name||'account')}">${fvIcon073("route","accountQuickIcon0762")}<span>Route</span></button>
+      </span>
     </span>
     <span class="accountChevron0759" aria-hidden="true">›</span>
   </article>`;
@@ -3427,6 +3450,7 @@ function accountsSortLabel0760(){
 function sites(){
   restoreAppChrome572();
   const allAccounts=[...(data.sites||[])];
+  const addressCounts0762=accountAddressCounts0762(allAccounts);
   const accounts=accountDirectorySort0760(allAccounts);
   const attentionCount=allAccounts.filter(s=>siteHealth(s).cls==="healthWarn").length;
   const openWorkCount=allAccounts.filter(s=>siteOpenTasks556(s).length||siteOpenDeficiencies556(s).length).length;
@@ -3455,7 +3479,7 @@ function sites(){
     <section class="accountsResults0759">
       <div class="accountsListHead0759 accountsListHead0760 accountsListHead0761"><div class="accountsResultSummary0761"><strong id="siteSearchCount0759" aria-live="polite">${accounts.length} account${accounts.length===1?"":"s"}</strong><span id="accountsViewSummary0761">${esc(filterLabel0761)} • ${esc(accountsSortLabel0760())}</span></div><div class="accountsListTools0761"><button type="button" class="ghost accountsReset0761" id="resetAccountsView0761" ${accountsViewDirty0761?"":"hidden"}>Reset</button><label>Sort<select id="accountsSort0760" aria-label="Sort accounts"><option value="az" ${accountsSort0760==='az'?'selected':''}>A–Z</option><option value="favorites" ${accountsSort0760==='favorites'?'selected':''}>Favorites</option><option value="recent" ${accountsSort0760==='recent'?'selected':''}>Recently Opened</option><option value="attention" ${accountsSort0760==='attention'?'selected':''}>Priority</option></select></label></div></div>
       <div class="accountsList0759" id="accountsList0759">
-        ${accounts.length?accounts.map(accountDirectoryRow0759).join(""):`<div class="accountsEmpty0759 accountsEmpty0760"><span>＋</span><strong>No accounts yet</strong><p>Create an account manually or import your customer list under Settings → Data.</p><button class="primary" id="emptyAdd0759">Add First Account</button></div>`}
+        ${accounts.length?accounts.map(s=>accountDirectoryRow0759(s,addressCounts0762.get(accountAddressKey0762(s))||1)).join(""):`<div class="accountsEmpty0759 accountsEmpty0760"><span>＋</span><strong>No accounts yet</strong><p>Create an account manually or import your customer list under Settings → Data.</p><button class="primary" id="emptyAdd0759">Add First Account</button></div>`}
         <div class="accountsNoResults0759 accountsNoResults0760" id="accountsNoResults0759" hidden><strong>No matching accounts</strong><p>Clear the search or return to All accounts.</p><button type="button" class="ghost" id="resetAccountsView0760">Reset View</button></div>
       </div>
     </section>
@@ -3497,9 +3521,14 @@ function sites(){
   };
 
   const firstVisibleAccount0761=()=>[...document.querySelectorAll("[data-account-card0759]")].find(el=>!el.hidden);
+  let accountsOpening0762=false;
   const openAccount0761=id=>{
+    if(accountsOpening0762) return;
     const target=(data.sites||[]).find(s=>s.id===id);
     if(!target){toast("That account is no longer available.");sites();return;}
+    accountsOpening0762=true;
+    const card=[...document.querySelectorAll("[data-account-card0759]")].find(el=>el.dataset.id===id);
+    card?.classList.add("opening0762");
     accountsScroll0759=list?.scrollTop||0;
     persistAccountsViewState0761(true);
     selectedSiteId=id;
@@ -3525,6 +3554,23 @@ function sites(){
   }));
   list?.addEventListener("scroll",()=>{accountsScroll0759=list.scrollTop;persistAccountsViewState0761();},{passive:true});
   list?.addEventListener("click",event=>{
+    const callButton=event.target.closest("[data-account-call0762]");
+    if(callButton){
+      event.preventDefault();event.stopPropagation();
+      const target=(data.sites||[]).find(s=>s.id===callButton.dataset.accountCall0762);
+      const phone=phone069(target);
+      if(!target||!phone){toast("No phone number is saved for this account.");return;}
+      location.href=`tel:${phone.replace(/[^+\d]/g,"")}`;
+      return;
+    }
+    const routeButton=event.target.closest("[data-account-route0762]");
+    if(routeButton){
+      event.preventDefault();event.stopPropagation();
+      const target=(data.sites||[]).find(s=>s.id===routeButton.dataset.accountRoute0762);
+      if(!target||!hasGps(target)){toast("GPS coordinates are not saved for this account.");return;}
+      window.open(mapRouteUrl071(target),"_blank","noopener");
+      return;
+    }
     const favorite=event.target.closest("[data-account-favorite0761]");
     if(favorite){
       event.preventDefault();event.stopPropagation();
@@ -3541,7 +3587,7 @@ function sites(){
     if(card) openAccount0761(card.dataset.id);
   });
   list?.addEventListener("keydown",event=>{
-    if(event.target.closest("[data-account-favorite0761]")) return;
+    if(event.target.closest("[data-account-favorite0761], [data-account-call0762], [data-account-route0762]")) return;
     const card=event.target.closest("[data-account-card0759]");
     if(card && (event.key==="Enter"||event.key===" ")){event.preventDefault();openAccount0761(card.dataset.id);}
   });
@@ -8414,6 +8460,7 @@ function diagnostics(){
 }
 function showChangelog(){
   const notes = [
+    "Build 0.76.2 adds one-tap Call and Route controls to every account card, identifies multi-account addresses, clarifies account health, and prevents accidental double-opening while preserving the Accounts view state.",
     "Build 0.76.1 hardens the Accounts directory with persistent view state, inline Favorites, recent-opened context, keyboard shortcuts, and a permanent app-chrome repair so the bottom navigation remains visible after saves and Favorite changes.",
     "Build 0.76.0 completes the Accounts workflow with sorting, safer manual account creation, duplicate Account ID protection, and improved empty states.",
     "Build 0.73.9 repairs the Demo Mode QuotaExceededError by keeping the 20-account Boise workspace in temporary memory and making noncritical startup preference writes fail safely when device storage is full.",

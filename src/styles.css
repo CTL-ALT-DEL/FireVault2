@@ -16435,3 +16435,74 @@ input[data-fv-phone0758="1"]{font-variant-numeric:tabular-nums;letter-spacing:.0
   .accountFavoriteButton0761{width:29px!important;min-width:29px!important;height:29px!important;min-height:29px!important}
   .accountCategory0759{padding-left:6px!important;padding-right:6px!important}
 }
+
+
+/* Build 0.76.2 — Accounts quick actions and multi-building clarity */
+.accountCard0762{
+  min-height:154px!important;
+  transition:border-color .14s ease,background .14s ease,opacity .14s ease,transform .14s ease!important;
+}
+.accountCard0762.opening0762{
+  pointer-events:none!important;
+  opacity:.72!important;
+  border-color:#4d83c3!important;
+  transform:scale(.992)!important;
+}
+.accountBadges0762{
+  display:flex!important;
+  flex-wrap:wrap!important;
+  align-items:center!important;
+  gap:5px!important;
+}
+.accountHealth0762,
+.accountSharedAddress0762{
+  display:inline-flex!important;
+  align-items:center!important;
+  min-height:22px!important;
+  padding:3px 7px!important;
+  border:1px solid transparent!important;
+  border-radius:999px!important;
+  font-size:.56rem!important;
+  line-height:1!important;
+  font-weight:950!important;
+  white-space:nowrap!important;
+}
+.accountHealth0762.danger{border-color:#8e3945!important;background:#361820!important;color:#fecaca!important}
+.accountHealth0762.warning{border-color:#7a5d22!important;background:#30250e!important;color:#fde68a!important}
+.accountSharedAddress0762{border-color:#365d8a!important;background:#142b47!important;color:#bfdbfe!important}
+.accountQuickActions0762{
+  display:grid!important;
+  grid-template-columns:repeat(2,minmax(0,1fr))!important;
+  gap:7px!important;
+  width:100%!important;
+  margin-top:8px!important;
+}
+.accountQuickButton0762{
+  min-width:0!important;
+  height:40px!important;
+  min-height:40px!important;
+  padding:5px 9px!important;
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  gap:7px!important;
+  border-radius:11px!important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.045)!important;
+  font-size:.66rem!important;
+  line-height:1!important;
+  font-weight:950!important;
+  letter-spacing:.015em!important;
+}
+.accountQuickButton0762.call{border:1px solid #2a624c!important;background:#123126!important;color:#bbf7d0!important}
+.accountQuickButton0762.route{border:1px solid #315f94!important;background:#142d4f!important;color:#dbeafe!important}
+.accountQuickButton0762:not(:disabled):active{transform:scale(.97)!important;filter:brightness(1.12)!important}
+.accountQuickButton0762:disabled{opacity:.36!important;filter:saturate(.55)!important;cursor:not-allowed!important}
+.accountQuickIcon0762{width:17px!important;height:17px!important;flex:0 0 auto!important}
+.accountCard0762 .accountChevron0759{align-self:center!important}
+@media(max-width:380px){
+  .accountCard0762{min-height:150px!important}
+  .accountQuickActions0762{gap:6px!important;margin-top:7px!important}
+  .accountQuickButton0762{height:38px!important;min-height:38px!important;padding-left:6px!important;padding-right:6px!important;font-size:.62rem!important}
+  .accountQuickIcon0762{width:16px!important;height:16px!important}
+  .accountHealth0762,.accountSharedAddress0762{font-size:.52rem!important;padding-left:6px!important;padding-right:6px!important}
+}
