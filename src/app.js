@@ -1,4 +1,4 @@
-import { BUILD, KEY, ACTIVE_JOB_KEY, loadData, saveData, ensureSite, fullAddress, esc, uid, downloadBlob, syncSummary, syncQueue, syncConflicts, syncActivity, createSyncPackage, importSyncPackage, resolveSyncConflict, notePackageExport, deviceIdentity, recordSyncActivity, autoBackupInfo, latestAutoBackup, restoreAutoBackup, isDemoMode, setDemoMode, resetDemoData } from "./storage.js?v=0.75.7";
+import { BUILD, KEY, ACTIVE_JOB_KEY, loadData, saveData, ensureSite, fullAddress, esc, uid, downloadBlob, syncSummary, syncQueue, syncConflicts, syncActivity, createSyncPackage, importSyncPackage, resolveSyncConflict, notePackageExport, deviceIdentity, recordSyncActivity, autoBackupInfo, latestAutoBackup, restoreAutoBackup, isDemoMode, setDemoMode, resetDemoData } from "./storage.js?v=0.75.8";
 window.__FIREVAULT_MODULE_READY = true;
 
 function fvPreferenceStore0739(){
@@ -505,7 +505,48 @@ document.querySelectorAll("nav button").forEach(btn => btn.addEventListener("cli
 window.addEventListener("error", e => showError(e.error || e.message));
 window.addEventListener("unhandledrejection", e => showError(e.reason || e));
 
-function save(){ saveData(data); applyTheme(); }
+function phoneDigits0758(value=""){
+  let digits=String(value??"").replace(/\D/g,"");
+  if(digits.length===11 && digits.startsWith("1")) digits=digits.slice(1);
+  return digits.slice(0,10);
+}
+function formatPhone0758(value="",partial=false){
+  const digits=phoneDigits0758(value);
+  if(!digits) return "";
+  if(digits.length<4) return partial?`(${digits}`:digits;
+  if(digits.length<7) return `(${digits.slice(0,3)})${digits.slice(3)}`;
+  return `(${digits.slice(0,3)})${digits.slice(3,6)}-${digits.slice(6)}`;
+}
+function normalizePhoneValue0758(value=""){
+  const digits=phoneDigits0758(value);
+  return digits.length===10?formatPhone0758(digits):String(value??"").trim();
+}
+function normalizeAllPhoneData0758(){
+  (data.sites||[]).forEach(site=>{
+    if(site.sitePhone) site.sitePhone=normalizePhoneValue0758(site.sitePhone);
+    if(site.devicePhone) site.devicePhone=normalizePhoneValue0758(site.devicePhone);
+    (site.contacts||[]).forEach(contact=>{if(contact.phone) contact.phone=normalizePhoneValue0758(contact.phone);});
+  });
+  if(data.settings?.technician?.phone) data.settings.technician.phone=normalizePhoneValue0758(data.settings.technician.phone);
+}
+function bindPhoneInputs0758(scope=document){
+  const inputs=scope.querySelectorAll('input[inputmode="tel"],input[type="tel"],input[id*="Phone"],input[id*="phone"]');
+  inputs.forEach(input=>{
+    if(input.dataset.fvPhone0758==="1") return;
+    input.dataset.fvPhone0758="1";
+    input.value=formatPhone0758(input.value,true)||input.value;
+    input.setAttribute("inputmode","numeric");
+    input.setAttribute("autocomplete",input.getAttribute("autocomplete")||"tel");
+    input.addEventListener("input",()=>{
+      const before=input.value;
+      const end=input.selectionStart===before.length;
+      input.value=formatPhone0758(before,true);
+      if(end) input.setSelectionRange(input.value.length,input.value.length);
+    });
+    input.addEventListener("blur",()=>{input.value=normalizePhoneValue0758(input.value);});
+  });
+}
+function save(){ normalizeAllPhoneData0758(); saveData(data); applyTheme(); }
 function site(){ return data.sites.find(s => s.id === selectedSiteId); }
 function val(id){ return document.getElementById(id)?.value?.trim() || ""; }
 function raw(id){ return document.getElementById(id)?.value || ""; }
@@ -522,7 +563,7 @@ function route(v){
   if(settingsSubmenuReturn576 && v === "settings") settingsSubmenuReturn576=false;
   view = v; render();
 }
-function html(content){ appEl.innerHTML = content; }
+function html(content){ appEl.innerHTML = content; requestAnimationFrame(()=>bindPhoneInputs0758(appEl)); }
 function toast(msg){ const t=document.createElement("div"); t.className="toast"; t.textContent=msg; document.body.appendChild(t); setTimeout(()=>t.remove(),1800); }
 function haptic(ms=12){
   if(data.settings.app?.haptics === false) return;
@@ -533,6 +574,7 @@ document.addEventListener("pointerup", e=>{
   if(target) haptic(target.classList?.contains("primary") ? 18 : 10);
 }, {passive:true});
 
+normalizeAllPhoneData0758();
 queueMicrotask(()=>{ try{ normalizeAllSiteGps0652(); }catch{} });
 
 function finiteGpsNumber0652(value,min,max){
@@ -2190,7 +2232,7 @@ function toggleSitePinned566(){
   }
   s.updatedAt=new Date().toISOString();
   save();
-  siteDetail();
+  render();
 }
 
 /* Build 0.50.75 Pinned Sites Manager */
@@ -3733,14 +3775,14 @@ function importantSiteInfoText568(s={}){
     `Site: ${s.name||"Unnamed Account"}`,
     `Address: ${fullAddress(s)||"No address saved"}`,
     `Contact: ${[c.name,c.role].filter(Boolean).join(" - ") || "No contact saved"}`,
-    `Phone: ${c.phone||"No phone saved"}`,
+    `Phone: ${formatPhone0758(c.phone)||"No phone saved"}`,
     `Email: ${c.email||"No email saved"}`,
     `Access: ${accessLine568(s)||"No access notes saved"}`,
     `Panel: ${panelLine568(s)||"No panel info saved"}`,
     `GPS: ${gpsLine(s)}`,
     s.externalAccountId?`External Account ID: ${s.externalAccountId}`:"",
     s.deviceType?`Device Type: ${s.deviceType}`:"",
-    s.devicePhone?`Device Phone: ${s.devicePhone}`:""
+    s.devicePhone?`Device Phone: ${formatPhone0758(s.devicePhone)||s.devicePhone}`:""
   ].filter(Boolean);
   return lines.join("\n");
 }
@@ -3756,7 +3798,7 @@ async function copyImportantSiteInfo568(){
 function importantSiteInfoMarkup568(s={}){
   const c=primaryContact568(s);
   const contact=[c.name,c.role].filter(Boolean).join(" • ") || "No contact saved";
-  const phone=c.phone || c.email || "No phone/email";
+  const phone=formatPhone0758(c.phone)||c.email||"No phone/email";
   const access=accessLine568(s) || "No access notes";
   const panel=panelLine568(s) || "No panel info";
   const gps=hasGps(s) ? "GPS saved" : "No GPS";
@@ -3795,7 +3837,7 @@ function rememberAccountTab0751(value){
   try{sessionStorage.setItem("firevault_account_tab_0751",value);}catch{}
 }
 function accountPersistentActions0751(s={},ctx={}){
-  const phone=ctx.primary?.phone||s.sitePhone||"";
+  const phone=formatPhone0758(ctx.primary?.phone||s.sitePhone)||"";
   return `<section class="accountPersistentActions0751" aria-label="Account quick actions">
     <button id="callPrimary477" ${phone?"":"disabled"}>${fvIcon073("call","accountPersistentIcon0751")}<strong>Call</strong></button>
     <button id="navigateBtn477" ${hasGps(s)?"":"disabled"}>${fvIcon073("route","accountPersistentIcon0751")}<strong>Route</strong></button>
@@ -3840,7 +3882,7 @@ function accountOverviewTab0735(s,ctx){
   const {health,primary,lastVisit,def,open}=ctx;
   const status=health.label;
   const contactName=primary?contactTitle(primary):"No contact saved";
-  const contactPhone=primary?.phone||s.sitePhone||"";
+  const contactPhone=formatPhone0758(primary?.phone||s.sitePhone)||"";
   return `<div class="accountTabPanel0735 accountOverview0735">
     <section class="accountLocationCard0735">
       <div class="accountAddress0735"><span>LOCATION</span><strong>${esc(fullAddress(s)||"No address saved")}</strong>${hasGps(s)?`<small>${esc(gpsLine(s))}</small>`:""}</div>
@@ -3871,7 +3913,7 @@ function accountDetailsTab0735(s,ctx){
         <div><span>Primary Contact</span><strong>${esc(primary?contactTitle(primary):"No contact saved")}</strong>${primaryMeta?`<small>${esc(primaryMeta)}</small>`:""}</div>
         <div><span>Access</span><strong>${esc(access||"No access notes")}</strong></div>
         <div><span>Account ID</span><strong>${esc(accountId069(s)||"Not assigned")}</strong></div>
-        <div><span>Site Phone</span><strong>${esc(s.sitePhone||"Not entered")}</strong></div>
+        <div><span>Site Phone</span><strong>${esc(formatPhone0758(s.sitePhone)||s.sitePhone||"Not entered")}</strong></div>
         <div><span>Health</span><strong>${esc(siteHealthLine(s))}</strong></div>
       </div>
       <div class="accountInlineActions067"><button class="ghost" id="copyImportantInfo568">Copy Site Info</button><button class="ghost" id="snapshotBtn">Copy Snapshot</button><button class="ghost" id="contactsQuick477">Contacts</button></div>
@@ -3915,6 +3957,8 @@ function accountNotesTab0735(s,ctx){
   </div>`;
 }
 function siteDetail(){
+  restoreAppChrome572();
+  showGlobalChrome537();
   const s=site(); if(!s){ route("sites"); return; }
   if(accountDetailSite0735!==s.id){accountDetailSite0735=s.id;accountDetailTab0735=accountTabPreference0751();}
   s.lastOpenedAt=new Date().toISOString(); saveData(data);
@@ -3946,7 +3990,7 @@ function siteDetail(){
   document.getElementById("backBtn")?.addEventListener("click",()=>route("sites"));
   document.getElementById("editBtn")?.addEventListener("click",()=>{mode="edit";route("siteForm");});
   document.getElementById("pinSiteBtn566")?.addEventListener("click",toggleSitePinned566);
-  document.querySelectorAll("[data-account-tab0735]").forEach(b=>b.onclick=()=>{accountDetailTab0735=b.dataset.accountTab0735;rememberAccountTab0751(accountDetailTab0735);siteDetail();});
+  document.querySelectorAll("[data-account-tab0735]").forEach(b=>b.onclick=()=>{accountDetailTab0735=b.dataset.accountTab0735;rememberAccountTab0751(accountDetailTab0735);render();});
   document.getElementById("editDetails0735")?.addEventListener("click",()=>{mode="edit";route("siteForm");});
   document.getElementById("qaStartVisit610")?.addEventListener("click",startServiceVisit610);
   document.getElementById("qaAddNote544")?.addEventListener("click",addSiteNotePrompt);
@@ -3957,7 +4001,7 @@ function siteDetail(){
   document.getElementById("defBtn")?.addEventListener("click",()=>route("deficiencies"));
   document.getElementById("visitsMini477")?.addEventListener("click",()=>route("visits"));
   document.getElementById("contactsQuick477")?.addEventListener("click",()=>route("contactsList"));
-  const contactPhone=primary?.phone||s.sitePhone||"";
+  const contactPhone=formatPhone0758(primary?.phone||s.sitePhone)||"";
   if(contactPhone) document.getElementById("callPrimary477")?.addEventListener("click",()=>{location.href=`tel:${contactPhone.replace(/[^+\d]/g,"")}`;});
   document.getElementById("navigateBtn477")?.addEventListener("click",()=>{if(hasGps(s))window.open(mapRouteUrl071(s),"_blank");});
   document.getElementById("accountMapRoute0735")?.addEventListener("click",()=>window.open(mapRouteUrl071(s),"_blank"));
@@ -4764,7 +4808,7 @@ function contactForm(){
   html(`<div class="screen"><div class="row"><button class="back ghost" id="backBtn">←</button><h1>${mode?"Edit":"Add"} Contact</h1></div><div class="form grow">
     <div class="card contactFormCard"><div class="compactField"><div><label>Type</label><select id="contactType">${types.map(x=>`<option value="${esc(x)}" ${((c.type||"Customer")===x)?"selected":""}>${esc(x)}</option>`).join("")}</select></div><div><label>Role / Title</label><input id="contactRole" value="${esc(c.role||"")}" placeholder="Manager, owner, security"></div></div>
     <label>Name</label><input id="contactName" value="${esc(c.name||"")}" placeholder="Contact name or department">
-    <div class="compactField"><div><label>Phone</label><input id="contactPhone" inputmode="tel" value="${esc(c.phone||"")}"></div><div><label>Email</label><input id="contactEmail" inputmode="email" value="${esc(c.email||"")}"></div></div>
+    <div class="compactField"><div><label>Phone</label><input id="contactPhone" inputmode="tel" value="${esc(formatPhone0758(c.phone)||c.phone||"")}"></div><div><label>Email</label><input id="contactEmail" inputmode="email" value="${esc(c.email||"")}"></div></div>
     <label class="checkRow inlineCheck"><input type="checkbox" id="contactAfterHours" ${c.afterHours?"checked":""}> After-hours / emergency contact</label>
     <label>Access Notes</label><textarea id="contactAccess" placeholder="Gate code, key box, panel room access, alarm account, call-before-entry notes...">${esc(c.accessNotes||"")}</textarea>
     <label>General Notes</label><textarea id="contactNotes" placeholder="Preferences, instructions, who to notify, billing notes...">${esc(c.notes||"")}</textarea></div>
@@ -4772,7 +4816,7 @@ function contactForm(){
   </div></div>`);
   document.getElementById("backBtn").onclick=()=>route("contactsList");
   document.getElementById("saveContactBtn").onclick=()=>{
-    const obj={type:val("contactType"),role:val("contactRole"),name:val("contactName"),phone:val("contactPhone"),email:val("contactEmail"),afterHours:checked("contactAfterHours"),accessNotes:raw("contactAccess"),notes:raw("contactNotes")};
+    const obj={type:val("contactType"),role:val("contactRole"),name:val("contactName"),phone:normalizePhoneValue0758(val("contactPhone")),email:val("contactEmail"),afterHours:checked("contactAfterHours"),accessNotes:raw("contactAccess"),notes:raw("contactNotes")};
     if(mode && c){ Object.assign(c,obj); }
     else s.contacts.unshift({...obj,id:uid(),createdAt:new Date().toISOString()});
     save(); toast("Contact saved."); route("contactsList");
@@ -7110,7 +7154,7 @@ function settingsPanel(){
 
   if(settingsTab==="tech") return `<div class="settingsStack settingsStack540">
     ${settingsSection540("Identity","Technician Profile","This information is reused throughout reports, email templates, and photo stamps.",`<div class="settingsGrid settingsGrid540">${fieldBlock("Technician name",`<input id="techName" autocomplete="name" value="${esc(tech.name)}">`)}${fieldBlock("Company",`<input id="techCompany" autocomplete="organization" value="${esc(tech.company)}">`)}</div>`,"blue",saveButton())}
-    ${settingsSection540("Contact","Contact & Credentials","Keep customer-facing contact details and your license or employee identifier together.",`<div class="settingsGrid settingsGrid540">${fieldBlock("Phone",`<input id="techPhone" autocomplete="tel" inputmode="tel" value="${esc(tech.phone)}">`)}${fieldBlock("Email",`<input id="techEmail" autocomplete="email" inputmode="email" value="${esc(tech.email)}">`)}${fieldBlock("License / ID",`<input id="techLicense" value="${esc(tech.license)}">`,`Optional identifier shown on reports`)}</div>`,"cyan")}
+    ${settingsSection540("Contact","Contact & Credentials","Keep customer-facing contact details and your license or employee identifier together.",`<div class="settingsGrid settingsGrid540">${fieldBlock("Phone",`<input id="techPhone" autocomplete="tel" inputmode="tel" value="${esc(formatPhone0758(tech.phone)||tech.phone)}">`)}${fieldBlock("Email",`<input id="techEmail" autocomplete="email" inputmode="email" value="${esc(tech.email)}">`)}${fieldBlock("License / ID",`<input id="techLicense" value="${esc(tech.license)}">`,`Optional identifier shown on reports`)}</div>`,"cyan")}
   </div>`;
 
   if(settingsTab==="reports") return `<div class="settingsStack settingsStack540">
@@ -7261,7 +7305,7 @@ function wireSettingsPanel(){
 }
 function saveSettings(){
   const s=data.settings;
-  if(settingsTab==="tech") s.technician={name:val("techName"),company:val("techCompany"),phone:val("techPhone"),email:val("techEmail"),license:val("techLicense"),defaultRole:"Fire Alarm Technician"};
+  if(settingsTab==="tech") s.technician={name:val("techName"),company:val("techCompany"),phone:normalizePhoneValue0758(val("techPhone")),email:val("techEmail"),license:val("techLicense"),defaultRole:"Fire Alarm Technician"};
   if(settingsTab==="reports") s.reports={...s.reports,title:val("reportTitle")||"FireVault Service Report",format:val("reportFormat"),includeTechnician:checked("repTech"),includeTasks:checked("repTasks"),includeDeficiencies:checked("repDef")};
   if(settingsTab==="email") s.email={...s.email,defaultTo:val("emailTo"),cc:val("emailCc"),defaultSubject:val("emailSubject"),signature:raw("emailSig")};
   if(settingsTab==="overlay") s.overlay={...s.overlay,...collectOverlayFromInputs510()};

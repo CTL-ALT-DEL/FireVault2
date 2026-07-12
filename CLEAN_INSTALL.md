@@ -1,3 +1,3 @@
-# FireVault 0.75.7 deployment
+# FireVault 0.75.8 deployment
 
-Deploy this package over the existing FireVault GitHub Pages files. Do not delete the installed Home Screen app and do not clear Safari website data. The existing FireVault vault and storage key are unchanged.
+Deploy the contents over the existing GitHub Pages package. Do not delete the installed Home Screen app. The storage key and existing account database are unchanged. After deployment, use Settings → Data → App Updates or reload the installed PWA.

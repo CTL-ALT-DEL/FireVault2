@@ -1,6 +1,6 @@
 {
-  "build": "0.75.7",
+  "build": "0.75.8",
   "released": "2026-07-11",
-  "note": "Account Detail Layout Rewrite",
-  "notes": "Rebuilds Account Detail as one normal vertical flow with a compact identity header, four-column action bar, non-sticky tabs, and one scrolling content region to eliminate overlap on iPhone."
+  "note": "Site Detail Stability and Phone Formatting",
+  "notes": "Polishes the Site Detail layout, keeps global navigation visible after Favorite changes, and automatically formats all 10-digit phone fields as (xxx)xxx-xxxx."
 }

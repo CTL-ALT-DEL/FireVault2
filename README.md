@@ -1,10 +1,8 @@
-# FireVault Build 0.75.7
+# FireVault Build 0.75.8
 
-Account Detail Layout Rewrite.
+## Site Detail Stability and Phone Formatting
 
-- Replaces competing grid and sticky positioning with a single vertical flex layout.
-- Keeps the account header, action bar, tabs, and content in normal document flow.
-- Uses a full-width four-column Call / Route / Note / Visit action row on iPhone.
-- Removes the large ACCOUNT eyebrow and gives the address room to wrap.
-- Uses compact icon-only Pin and Edit controls.
-- Preserves the WebDAV module, Demo Mode, backups, categories, imports, and the existing vault storage key.
+- Redesigns and polishes the Site Detail page with one stable vertical flow.
+- Keeps the global bottom navigation visible after toggling Favorite or switching account tabs.
+- Formats all standard 10-digit phone fields as `(xxx)xxx-xxxx` while typing and when displayed.
+- Preserves the existing `firevault_vault_build_030` storage key, account data, Demo Mode, backups, WebDAV, categories, and imports.

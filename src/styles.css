@@ -15888,3 +15888,180 @@ body.app-booted533:not(.homeFullscreen480) .accountsHeader0736{
   .accountPersistentIcon0751{width:24px!important;height:24px!important}
   .accountPersistentActions0751 strong{font-size:.65rem!important}
 }
+
+
+/* Build 0.75.8 — Site Detail polish and navigation persistence */
+body.app-booted533:not(.homeFullscreen480) > main#app:has(.siteDetail0735){
+  padding:8px 8px 6px!important;
+  overflow:hidden!important;
+}
+.siteDetail0735{
+  display:flex!important;
+  flex-direction:column!important;
+  height:100%!important;
+  min-height:0!important;
+  gap:8px!important;
+  padding:0!important;
+  overflow:hidden!important;
+  border:0!important;
+  border-radius:0!important;
+  background:linear-gradient(180deg,#07111f 0%,#08131f 48%,#070d14 100%)!important;
+}
+.siteDetail0735 .accountHeader0735.accountHeaderRewrite0757{
+  position:relative!important;
+  inset:auto!important;
+  flex:0 0 auto!important;
+  display:grid!important;
+  grid-template-columns:50px minmax(0,1fr) 50px 50px!important;
+  align-items:center!important;
+  min-height:92px!important;
+  height:auto!important;
+  margin:0!important;
+  padding:10px!important;
+  gap:8px!important;
+  overflow:hidden!important;
+  z-index:1!important;
+}
+.siteDetail0735 .technicianIdentity075{
+  min-width:0!important;
+  display:flex!important;
+  flex-direction:column!important;
+  align-items:flex-start!important;
+  gap:3px!important;
+  text-align:left!important;
+}
+.siteDetail0735 .technicianIdentity075 strong{
+  width:100%!important;
+  overflow:hidden!important;
+  text-overflow:ellipsis!important;
+  white-space:nowrap!important;
+  font-size:1.22rem!important;
+  line-height:1.15!important;
+}
+.siteDetail0735 .accountIdLine0757{
+  color:#60a5fa!important;
+  font-size:.72rem!important;
+  font-weight:900!important;
+  letter-spacing:.11em!important;
+  text-transform:uppercase!important;
+}
+.siteDetail0735 .accountAddressLine0757{
+  width:100%!important;
+  overflow:hidden!important;
+  text-overflow:ellipsis!important;
+  white-space:nowrap!important;
+  color:#9fb1c7!important;
+  font-size:.68rem!important;
+  line-height:1.2!important;
+}
+.siteDetail0735 .accountBack0735,
+.siteDetail0735 .accountPin0735,
+.siteDetail0735 .accountEdit0735{
+  width:50px!important;
+  min-width:50px!important;
+  height:54px!important;
+  min-height:54px!important;
+  padding:0!important;
+  display:grid!important;
+  place-items:center!important;
+  font-size:1.65rem!important;
+}
+.siteDetail0735 .technicianStatus075,
+.siteDetail0735 .accountTagRail0737{
+  flex:0 0 auto!important;
+  margin:0!important;
+}
+.siteDetail0735 .accountPersistentActions0751{
+  position:relative!important;
+  inset:auto!important;
+  flex:0 0 auto!important;
+  display:grid!important;
+  grid-template-columns:repeat(4,minmax(0,1fr))!important;
+  width:100%!important;
+  min-height:76px!important;
+  margin:0!important;
+  padding:0!important;
+  gap:8px!important;
+  z-index:1!important;
+}
+.siteDetail0735 .accountPersistentActions0751 button{
+  width:100%!important;
+  min-width:0!important;
+  min-height:76px!important;
+  height:76px!important;
+  margin:0!important;
+  padding:8px 4px!important;
+  display:flex!important;
+  flex-direction:column!important;
+  align-items:center!important;
+  justify-content:center!important;
+  gap:5px!important;
+  font-size:.78rem!important;
+}
+.siteDetail0735 .accountTabs0735{
+  position:relative!important;
+  inset:auto!important;
+  flex:0 0 auto!important;
+  display:grid!important;
+  grid-template-columns:repeat(5,minmax(0,1fr))!important;
+  min-height:58px!important;
+  margin:0!important;
+  padding:6px!important;
+  gap:6px!important;
+  overflow:visible!important;
+  z-index:1!important;
+}
+.siteDetail0735 .accountTabs0735 button{
+  min-width:0!important;
+  min-height:46px!important;
+  height:46px!important;
+  padding:5px 3px!important;
+  font-size:.69rem!important;
+  white-space:nowrap!important;
+}
+.siteDetail0735 .accountTabScroll0735{
+  position:relative!important;
+  inset:auto!important;
+  flex:1 1 auto!important;
+  min-height:0!important;
+  height:auto!important;
+  margin:0!important;
+  padding:4px 4px 24px!important;
+  overflow-x:hidden!important;
+  overflow-y:auto!important;
+  -webkit-overflow-scrolling:touch!important;
+  overscroll-behavior:contain!important;
+}
+.siteDetail0735 .accountTabPanel0735{gap:10px!important}
+.siteDetail0735 .accountLocationCard0735,
+.siteDetail0735 .accountInfoCard0735,
+.siteDetail0735 .accountMetrics0735,
+.siteDetail0735 .accountRecentCard0735{
+  border-radius:14px!important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.04),0 8px 20px rgba(0,0,0,.20)!important;
+}
+/* The global dock must remain present after an in-page favorite or tab refresh. */
+body.app-booted533:not(.homeFullscreen480) > #appNav{
+  display:grid!important;
+  visibility:visible!important;
+  opacity:1!important;
+}
+input[data-fv-phone0758="1"]{font-variant-numeric:tabular-nums;letter-spacing:.025em}
+@media(max-width:390px){
+  .siteDetail0735{gap:6px!important}
+  .siteDetail0735 .accountHeader0735.accountHeaderRewrite0757{
+    grid-template-columns:46px minmax(0,1fr) 46px 46px!important;
+    min-height:86px!important;
+    padding:8px!important;
+    gap:6px!important;
+  }
+  .siteDetail0735 .accountBack0735,
+  .siteDetail0735 .accountPin0735,
+  .siteDetail0735 .accountEdit0735{width:46px!important;min-width:46px!important;height:50px!important;min-height:50px!important}
+  .siteDetail0735 .technicianIdentity075 strong{font-size:1.08rem!important}
+  .siteDetail0735 .accountPersistentActions0751{gap:6px!important;min-height:70px!important}
+  .siteDetail0735 .accountPersistentActions0751 button{height:70px!important;min-height:70px!important;font-size:.72rem!important}
+  .siteDetail0735 .accountPersistentIcon0751{width:24px!important;height:24px!important}
+  .siteDetail0735 .accountTabs0735{gap:4px!important;padding:5px 4px!important;min-height:54px!important}
+  .siteDetail0735 .accountTabs0735 button{height:43px!important;min-height:43px!important;font-size:.62rem!important;padding:4px 1px!important}
+}
