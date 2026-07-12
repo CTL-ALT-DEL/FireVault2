@@ -1,4 +1,4 @@
-import { BUILD, KEY, ACTIVE_JOB_KEY, loadData, saveData, ensureSite, fullAddress, esc, uid, downloadBlob, syncSummary, syncQueue, syncConflicts, syncActivity, createSyncPackage, importSyncPackage, resolveSyncConflict, notePackageExport, deviceIdentity, recordSyncActivity, autoBackupInfo, latestAutoBackup, restoreAutoBackup, isDemoMode, setDemoMode, resetDemoData } from "./storage.js?v=0.78.1";
+import { BUILD, KEY, ACTIVE_JOB_KEY, loadData, saveData, ensureSite, fullAddress, esc, uid, downloadBlob, syncSummary, syncQueue, syncConflicts, syncActivity, createSyncPackage, importSyncPackage, resolveSyncConflict, notePackageExport, deviceIdentity, recordSyncActivity, autoBackupInfo, latestAutoBackup, restoreAutoBackup, isDemoMode, setDemoMode, resetDemoData } from "./storage.js?v=0.78.2";
 window.__FIREVAULT_MODULE_READY = true;
 
 function fvPreferenceStore0739(){
@@ -167,6 +167,104 @@ const PHOTO_CATEGORY_HINTS_524 = {
 const REPORT_SECTION_KEY = "firevault_report_section_prefs";
 let reportSectionPrefs = loadReportSectionPrefs();
 const appEl = document.getElementById("app");
+
+/* Build 0.78.2 — navigation continuity and scroll memory. */
+const ROUTE_SCROLL_KEY_0782 = "firevault_route_scroll_0782";
+let lastRenderedScrollKey0782 = "";
+let routeScrollRestoreFrame0782 = 0;
+function routeTitle0782(routeName=view){
+  const titles={
+    home:"Nearby Accounts",tools:"Tools",dashboard068:"Dashboard",dailySummary:"Daily Summary",
+    routeLog:"Daily Route",actionCenter:"Action Center",pinnedSites:"Pinned Accounts",sites:"Accounts",
+    nearbySites:"Nearby Accounts",attention:"Attention Queue",siteDetail:"Account Detail",visits:"Visits",
+    visitDetail:"Visit Detail",checklist:"Checklist",siteForm:selectedSiteId?"Edit Account":"Add Account",
+    contactsList:"Contacts",contactForm:"Contact",siteDocs:"Documents",siteDocForm:"Document",
+    equipmentList:"Equipment",equipmentForm:"Equipment Item",tasks:"Tasks",taskForm:"Task",
+    deficiencies:"Deficiencies",deficiencyForm:"Deficiency",report:"Report",library:"Library",
+    resourceForm:"Library Item",jobMode:"Job Mode",serviceVisit:"Service Visit",settings:"Settings",
+    diagnostics:"Diagnostics",dataTools:"Data Tools"
+  };
+  return titles[routeName]||"FireVault";
+}
+function routeScrollKey0782(){
+  const parts=[String(view||"home")];
+  if(selectedSiteId && ["siteDetail","visits","visitDetail","checklist","contactsList","contactForm","siteDocs","siteDocForm","equipmentList","equipmentForm","tasks","taskForm","deficiencies","deficiencyForm","report","jobMode","serviceVisit","siteForm"].includes(view)) parts.push(String(selectedSiteId));
+  if(view==="siteDetail") parts.push(String(accountDetailTab0735||"overview"));
+  if(view==="settings") parts.push(String(mode||"home"),String(settingsTab||"tech"));
+  return parts.join("|");
+}
+function loadRouteScrollMap0782(){
+  try{const parsed=JSON.parse(sessionStorage.getItem(ROUTE_SCROLL_KEY_0782)||"{}");return parsed&&typeof parsed==="object"?parsed:{};}catch{return {};}
+}
+function saveRouteScroll0782(key,value){
+  if(!key) return;
+  const map=loadRouteScrollMap0782();
+  map[key]=Math.max(0,Math.round(Number(value)||0));
+  const entries=Object.entries(map).slice(-40);
+  try{sessionStorage.setItem(ROUTE_SCROLL_KEY_0782,JSON.stringify(Object.fromEntries(entries)));}catch{}
+}
+function routeScrollCandidates0782(){
+  const selectors=[
+    ".accountsList0759",".accountTabScroll0735",".settingsTabbedBody0736",".settingsTabItems0736",
+    ".settingsManualScreen067",".nearbyCards069",".accountForm0760",".toolsScreen0734",
+    ".screen.grow",".grow",".list",".screen"
+  ];
+  const seen=new Set();
+  return selectors.flatMap(sel=>Array.from(appEl.querySelectorAll(sel))).filter(el=>{
+    if(seen.has(el)) return false;seen.add(el);return true;
+  });
+}
+function primaryScrollContainer0782(){
+  const candidates=routeScrollCandidates0782().filter(el=>{
+    const style=getComputedStyle(el);
+    const rect=el.getBoundingClientRect();
+    return style.display!=="none" && style.visibility!=="hidden" && rect.width>0 && rect.height>0 && el.scrollHeight>el.clientHeight+5;
+  });
+  if(!candidates.length) return null;
+  const preferred=candidates.find(el=>["accountsList0759","accountTabScroll0735","settingsTabbedBody0736","settingsManualScreen067","nearbyCards069","accountForm0760"].some(c=>el.classList.contains(c)));
+  return preferred||candidates.sort((a,b)=>(b.scrollHeight-b.clientHeight)-(a.scrollHeight-a.clientHeight))[0];
+}
+function captureRouteScroll0782(key=routeScrollKey0782()){
+  const scroller=primaryScrollContainer0782();
+  if(scroller) saveRouteScroll0782(key,scroller.scrollTop);
+}
+function restoreRouteScroll0782(){
+  cancelAnimationFrame(routeScrollRestoreFrame0782);
+  const key=routeScrollKey0782();
+  const saved=Number(loadRouteScrollMap0782()[key]||0);
+  routeScrollRestoreFrame0782=requestAnimationFrame(()=>requestAnimationFrame(()=>{
+    const scroller=primaryScrollContainer0782();
+    if(!scroller) return;
+    const max=Math.max(0,scroller.scrollHeight-scroller.clientHeight);
+    scroller.scrollTop=Math.min(saved,max);
+    wireRouteScrollState0782(scroller);
+  }));
+}
+function wireRouteScrollState0782(scroller=primaryScrollContainer0782()){
+  if(!scroller) return;
+  const sync=()=>{
+    appEl.classList.toggle("fvRouteScrolled0782",scroller.scrollTop>8);
+    appEl.classList.toggle("fvRouteAtEnd0782",scroller.scrollTop>=scroller.scrollHeight-scroller.clientHeight-8);
+  };
+  if(scroller.dataset.fvScrollWire0782!=="1"){
+    scroller.dataset.fvScrollWire0782="1";
+    scroller.addEventListener("scroll",()=>{sync();saveRouteScroll0782(routeScrollKey0782(),scroller.scrollTop);},{passive:true});
+  }
+  sync();
+}
+function scrollCurrentRouteToTop0782(){
+  const scroller=primaryScrollContainer0782();
+  const smooth=!window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches;
+  if(scroller) scroller.scrollTo({top:0,behavior:smooth?"smooth":"auto"});
+  else window.scrollTo({top:0,behavior:smooth?"smooth":"auto"});
+  saveRouteScroll0782(routeScrollKey0782(),0);
+}
+function updateRouteContext0782(){
+  const title=routeTitle0782();
+  document.title=title==="FireVault"?"FireVault":`${title} — FireVault`;
+  appEl.setAttribute("aria-label",title);
+  appEl.dataset.fvRouteTitle=title;
+}
 function fireVaultBrand575(extraClass=""){
   return `<span class="fireVaultWordmark575 ${esc(extraClass)}"><span>FIRE</span><b>VAULT</b></span>`;
 }
@@ -527,8 +625,13 @@ ensureModuleBaseline476();
 
 applyTheme();
 
-document.querySelectorAll("nav button").forEach(btn => btn.addEventListener("click", () => {
+document.querySelectorAll("#appNav button, .nearbyBottomNav069 button").forEach(btn => btn.addEventListener("click", () => {
   const target=btn.dataset.route;
+  if(!target) return;
+  if(target===view){
+    scrollCurrentRouteToTop0782();
+    return;
+  }
   if(target==="settings"){
     openSettingsHome572();
     return;
@@ -587,6 +690,7 @@ function val(id){ return document.getElementById(id)?.value?.trim() || ""; }
 function raw(id){ return document.getElementById(id)?.value || ""; }
 function checked(id){ return !!document.getElementById(id)?.checked; }
 function route(v){
+  captureRouteScroll0782();
   if(view === "settings") captureSettingsScroll576();
   if(settingsSubmenuReturn576 && ["diagnostics","dataTools"].includes(view) && !["diagnostics","dataTools","settings"].includes(v)) settingsSubmenuReturn576=false;
   if(v === "library" && !featureOn("library")){ toast("Library is hidden in Simple View. Turn it on in Settings → Modules."); v="home"; }
@@ -1866,6 +1970,8 @@ function applyRoutePolishClass0780(){
 
 function render(){
   try{
+    const nextScrollKey0782=routeScrollKey0782();
+    if(lastRenderedScrollKey0782 && lastRenderedScrollKey0782===nextScrollKey0782) captureRouteScroll0782(lastRenderedScrollKey0782);
     applyRoutePolishClass0780();
     const isHomeView=view === "home";
     /* Set the structural page mode before drawing the route. This prevents a
@@ -4336,7 +4442,7 @@ function siteDetail(){
   document.getElementById("backBtn")?.addEventListener("click",()=>route("sites"));
   document.getElementById("editBtn")?.addEventListener("click",()=>{mode="edit";route("siteForm");});
   document.getElementById("pinSiteBtn566")?.addEventListener("click",toggleSitePinned566);
-  document.querySelectorAll("[data-account-tab0735]").forEach(b=>b.onclick=()=>{accountDetailTab0735=b.dataset.accountTab0735;rememberAccountTab0751(accountDetailTab0735);render();});
+  document.querySelectorAll("[data-account-tab0735]").forEach(b=>b.onclick=()=>{captureRouteScroll0782();accountDetailTab0735=b.dataset.accountTab0735;rememberAccountTab0751(accountDetailTab0735);render();});
   document.getElementById("editDetails0735")?.addEventListener("click",()=>{mode="edit";route("siteForm");});
   document.getElementById("qaStartVisit610")?.addEventListener("click",startServiceVisit610);
   document.getElementById("qaAddNote544")?.addEventListener("click",addSiteNotePrompt);
@@ -8594,6 +8700,7 @@ function diagnostics(){
 }
 function showChangelog(){
   const notes = [
+    "Build 0.78.2 remembers scroll position across major screens, restores each Account Detail tab independently, lets an active bottom-navigation button return its page to the top, and updates the browser title for clearer orientation.",
     "Build 0.78.1 adds smoother route transitions, improved toast and loading feedback, refined empty states, stronger disabled and focus states, and safer WebDAV operation feedback.",
     "Build 0.78.0 scopes the fixed app header and bottom dock to the real global chrome, then polishes Tools, Settings, Account Detail, forms, dialogs, and touch states across FireVault.",
     "Build 0.76.2 adds one-tap Call and Route controls to every account card, identifies multi-account addresses, clarifies account health, and prevents accidental double-opening while preserving the Accounts view state.",
@@ -8626,7 +8733,7 @@ function showChangelog(){
   overlay.className="releaseOverlay";
   overlay.innerHTML=`<div class="releaseSheet" role="dialog" aria-modal="true" aria-label="FireVault release notes">
     <div class="releaseHead"><div><strong>${fireVaultBrand575()}</strong><span>Build ${BUILD}</span></div><button class="ghost iconBtn" id="closeRelease" aria-label="Close release notes">×</button></div>
-    <div class="releaseBody"><h2>Release Notes</h2><p class="releaseIntro">Interaction polish with clearer feedback, smoother page changes, safer loading states, and improved empty-state presentation.</p><ul>${notes.map(n=>`<li>${esc(n)}</li>`).join("")}</ul></div>
+    <div class="releaseBody"><h2>Release Notes</h2><p class="releaseIntro">Navigation continuity with remembered scroll positions, active-tab return-to-top behavior, and clearer page orientation.</p><ul>${notes.map(n=>`<li>${esc(n)}</li>`).join("")}</ul></div>
   </div>`;
   document.body.appendChild(overlay);
   const close=()=>overlay.remove();

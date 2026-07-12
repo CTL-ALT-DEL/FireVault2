@@ -17649,3 +17649,14 @@ input:focus,select:focus,textarea:focus{border-color:rgba(96,165,250,.72)!import
   .fvButtonBusy0781::before{animation-duration:1.4s!important}
   .toast.fvToast0781,.toast.fvToast0781 i{animation:none!important}
 }
+
+
+/* Build 0.78.2 — navigation continuity and scroll-position feedback. */
+#app{position:relative}
+#app.fvRouteScrolled0782::before{
+  content:"";position:absolute;z-index:80;top:0;left:0;right:0;height:10px;pointer-events:none;
+  background:linear-gradient(180deg,rgba(0,0,0,.28),transparent);opacity:.75;
+}
+#appNav button.active:active{transform:translateY(1px) scale(.965)!important}
+.accountTabs0735 button,.settingsTopTabs0736 button{scroll-margin-top:8px}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto!important}}

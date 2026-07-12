@@ -1,6 +1,6 @@
 {
-  "build": "0.78.1",
+  "build": "0.78.2",
   "released": "2026-07-12",
-  "note": "Interaction and feedback polish",
-  "label": "Transitions, loading states, and empty-state refinement"
+  "note": "Navigation continuity polish",
+  "label": "Scroll memory, return-to-top, and page context"
 }

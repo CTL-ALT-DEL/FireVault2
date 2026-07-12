@@ -1,3 +1,3 @@
-# FireVault Build 0.78.1 — Interaction & Feedback Polish
+# FireVault Build 0.78.2 — Navigation Continuity Polish
 
-This release improves page transitions, button feedback, loading states, toasts, empty states, and accessibility across FireVault. It also adds safe busy-state handling to WebDAV operations while preserving the existing vault schema and storage key.
+This release remembers scroll position across major screens and each Account Detail tab, restores the technician’s place after navigation and safe rerenders, lets a second tap on the active bottom-navigation destination return that page to the top, and updates the browser/PWA page title for clearer orientation. The existing vault schema and storage key are unchanged.
