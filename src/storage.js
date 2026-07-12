@@ -1,4 +1,4 @@
-export const BUILD = "0.79.11";
+export const BUILD = "0.79.13";
 export const SECURITY_SCHEMA_VERSION = 4;
 export const KEY = "firevault_vault_build_030";
 export const ACTIVE_JOB_KEY = "firevault_active_job_modular";
@@ -99,7 +99,10 @@ function demoSite(spec,index){
     noteEntries:[
       {id:demoId("note",index+1),note:"Demo technician note: account reviewed and access information confirmed.",createdAt:demoIso(3+index),type:"Site Note",technician:"Demo Technician"}
     ],
-    knownIssues:[],reportDeliveries:[],locationPoints:[],createdAt:demoIso(300+index),modifiedAt:demoIso(index),modifiedBy:"Demo Technician",createdBy:"Demo Technician"
+    knownIssues:[],reportDeliveries:[],locationPoints:[
+      {id:demoId("location",index*2+1),type:"Main Entrance",label:"Main Entrance",floor:"1",placement:"Outdoor",description:"Primary technician entrance",notes:"Check in with the site contact on arrival.",lat:Number((spec.lat+0.00008).toFixed(7)),lng:Number((spec.lng-0.00006).toFixed(7)),accuracy:7,verification:"verified",lastVerifiedAt:demoIso(12+index),createdAt:demoIso(120+index),updatedAt:demoIso(12+index)},
+      {id:demoId("location",index*2+2),type:"Fire Alarm Control Panel",label:"Main Fire Alarm Panel",floor:index%3===0?"B1":"1",placement:"Indoor",description:["Main electrical room","Lobby riser room","Fire command center","Receiving electrical room"][index%4],notes:"Demo location for Building Navigator.",lat:Number((spec.lat-0.00005).toFixed(7)),lng:Number((spec.lng+0.00007).toFixed(7)),accuracy:6,verification:index%5===0?"needs":"verified",lastVerifiedAt:index%5===0?demoIso(240):demoIso(20+index),photoDocId:demoId("photo",index+1),createdAt:demoIso(115+index),updatedAt:demoIso(20+index)}
+    ],preferredLocationPointId:demoId("location",index*2+1),createdAt:demoIso(300+index),modifiedAt:demoIso(index),modifiedBy:"Demo Technician",createdBy:"Demo Technician"
   };
 }
 export function createDemoVault(){
@@ -890,10 +893,12 @@ export function normalize(data){
     locationLength:11,
     includeInReports:true,
     searchable:true,
+    verifyAfterDays:180,
     ...(data.settings.plusCodes||{})
   };
   data.settings.plusCodes.accountLength=[10,11].includes(Number(data.settings.plusCodes.accountLength))?Number(data.settings.plusCodes.accountLength):10;
   data.settings.plusCodes.locationLength=[10,11].includes(Number(data.settings.plusCodes.locationLength))?Number(data.settings.plusCodes.locationLength):11;
+  data.settings.plusCodes.verifyAfterDays=[90,180,365].includes(Number(data.settings.plusCodes.verifyAfterDays))?Number(data.settings.plusCodes.verifyAfterDays):180;
   data.settings.dataQuality={
     enabled:true,
     showOnCards:true,
@@ -970,6 +975,7 @@ export function ensureSite(s){
   s.tasks = Array.isArray(s.tasks) ? s.tasks : [];
   s.reportDeliveries = Array.isArray(s.reportDeliveries) ? s.reportDeliveries : [];
   s.noteEntries = Array.isArray(s.noteEntries) ? s.noteEntries : [];
+  s.locationPoints = Array.isArray(s.locationPoints) ? s.locationPoints : [];
   if(s.gps && (!Number.isFinite(Number(s.gps.lat)) || !Number.isFinite(Number(s.gps.lng)))) s.gps = null;
   return s;
 }

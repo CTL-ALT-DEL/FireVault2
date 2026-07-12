@@ -1,4 +1,4 @@
-/* FireVault Build 0.79.11 — Accounts and Nearby simplification */
+/* FireVault Build 0.79.13 — Building Navigator Foundation */
 export const PROVIDER_CONTRACT_VERSION = 3;
 export const PROVIDER_MODE = "local";
 

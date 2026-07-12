@@ -1,21 +1,11 @@
-# FireVault Build 0.79.11 — Smart Account Intelligence
+# FireVault Build 0.79.13 — Startup Repair + Building Navigator
+## Startup repair
 
-## Changes
+- Corrects the malformed Revision History array introduced in 0.79.11.
+- Corrects the Building Navigator location-copy newline introduced in the first 0.79.12 package.
+- Preserves the existing FireVault storage key and account database.
 
-- Adds a configurable Account Health / Data Quality score from 0–100.
-- Evaluates address, Account ID, GPS, Plus Code, contacts, phone, panel information, photos, documents, notes, and visit history.
-- Applies limited operational deductions for overdue tasks and open or critical deficiencies.
-- Shows optional Health controls on Accounts cards and Account Detail.
-- Tapping a Health score opens a missing-information checklist with direct navigation to the appropriate workspace.
-- Adds **Settings → Data → Data Quality** with display controls, minimum acceptable score, optional-field handling, and a downloadable Data Quality report.
-- Preserves the 0.79.10 map-marker hierarchy and deeper selected-account zoom.
 
-## Preserved
+This build adds a dedicated Locations tab to Account Detail for exact site navigation. Technicians can save entrances, fire alarm panels, annunciators, risers, FDCs, pumps, Knox Boxes, electrical rooms, parking, and custom points with GPS, Google Plus Codes, floors, indoor/outdoor status, notes, linked account photos, verification state, navigation, sharing, and a preferred route target. Location changes are recorded in the account timeline. Demo Mode includes sample saved locations.
 
-- Existing `firevault_vault_build_030` storage key
-- Security schema 4 and all account records
-- Demo Mode, automatic snapshots, Privacy Lock, and Security Center
-- WebDAV and Microsoft storage profiles
-- Google Plus Codes and backend adapters
-
-Deploy over the existing FireVault installation. Do not delete or reinstall the Home Screen PWA.
+The existing `firevault_vault_build_030` storage key, security schema 4, accounts, Smart Account Intelligence, backups, Privacy Lock, Security Center, WebDAV, Microsoft storage profiles, backend adapters, and Nearby map hierarchy remain unchanged.

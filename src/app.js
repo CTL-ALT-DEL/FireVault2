@@ -1,6 +1,6 @@
-import { BUILD, KEY, ACTIVE_JOB_KEY, loadData, saveData, ensureSite, fullAddress, esc, uid, downloadBlob, syncSummary, syncQueue, syncConflicts, syncActivity, createSyncPackage, importSyncPackage, resolveSyncConflict, notePackageExport, deviceIdentity, recordSyncActivity, autoBackupInfo, latestAutoBackup, restoreAutoBackup, isDemoMode, setDemoMode, resetDemoData, securityFoundationSummary, securityAudit, recycleBinInfo, restoreRecycleRecord, purgeRecycleBin, recordSecurityEvent, validateVaultIntegrity } from "./storage.js?v=0.79.11";
-import { backendAdapterSummary, runBackendAdapterDiagnostics, backendAdapterManifest, PROVIDER_CONTRACT_VERSION, FILE_STORAGE_CATALOG, fileStoragePlanSummary, cloudFileStorageManifest, MICROSOFT_STORAGE_TYPES, microsoftStorageAccounts, saveMicrosoftStorageAccounts, createMicrosoftStorageAccount, microsoftStorageAccountById, microsoftAppRegistration, saveMicrosoftAppRegistration, microsoftStorageSummary, microsoftStorageManifest } from "./providers.js?v=0.79.11";
-import { encodePlusCode, isValidFullPlusCode, normalizePlusCode, plusCodePrecisionLabel } from "./open-location-code.js?v=0.79.11";
+import { BUILD, KEY, ACTIVE_JOB_KEY, loadData, saveData, ensureSite, fullAddress, esc, uid, downloadBlob, syncSummary, syncQueue, syncConflicts, syncActivity, createSyncPackage, importSyncPackage, resolveSyncConflict, notePackageExport, deviceIdentity, recordSyncActivity, autoBackupInfo, latestAutoBackup, restoreAutoBackup, isDemoMode, setDemoMode, resetDemoData, securityFoundationSummary, securityAudit, recycleBinInfo, restoreRecycleRecord, purgeRecycleBin, recordSecurityEvent, validateVaultIntegrity } from "./storage.js?v=0.79.13";
+import { backendAdapterSummary, runBackendAdapterDiagnostics, backendAdapterManifest, PROVIDER_CONTRACT_VERSION, FILE_STORAGE_CATALOG, fileStoragePlanSummary, cloudFileStorageManifest, MICROSOFT_STORAGE_TYPES, microsoftStorageAccounts, saveMicrosoftStorageAccounts, createMicrosoftStorageAccount, microsoftStorageAccountById, microsoftAppRegistration, saveMicrosoftAppRegistration, microsoftStorageSummary, microsoftStorageManifest } from "./providers.js?v=0.79.13";
+import { encodePlusCode, isValidFullPlusCode, normalizePlusCode, plusCodePrecisionLabel } from "./open-location-code.js?v=0.79.13";
 window.__FIREVAULT_MODULE_READY = true;
 
 function fvPreferenceStore0739(){
@@ -1050,7 +1050,13 @@ function gpsLine(s){
   const when=g.capturedAt ? ` • Saved ${new Date(g.capturedAt).toLocaleString([], {month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}` : "";
   return `${Number(g.lat).toFixed(6)}, ${Number(g.lng).toFixed(6)}${acc}${when}`;
 }
-const LOCATION_POINT_TYPES_071=["Main Entrance","Parking","Exterior Door","Riser Room","Fire Alarm Panel","FDC","Sprinkler Room","Other"];
+const LOCATION_POINT_TYPES_071=[
+  "Fire Alarm Control Panel","Annunciator","Sprinkler Riser","Fire Pump","Fire Department Connection","Knox Box","Elevator Recall Panel","Generator","Electrical Room","Roof Access","Main Entrance","Secondary Entrance","Parking Area","Key Box","Other"
+];
+const LOCATION_TYPE_ICONS_07912={
+  "Fire Alarm Control Panel":"🚨","Annunciator":"▣","Sprinkler Riser":"💧","Fire Pump":"🔥","Fire Department Connection":"🚒","Knox Box":"🔑","Elevator Recall Panel":"↕","Generator":"⚡","Electrical Room":"⚡","Roof Access":"⬆","Main Entrance":"🚪","Secondary Entrance":"↪","Parking Area":"P","Key Box":"🔐","Other":"⌖",
+  "Parking":"P","Exterior Door":"🚪","Riser Room":"💧","FDC":"🚒","Sprinkler Room":"💧","Fire Alarm Panel":"🚨"
+};
 function plusCodeSettings0794(){
   const cfg=data?.settings?.plusCodes||{};
   return {
@@ -1059,7 +1065,8 @@ function plusCodeSettings0794(){
     accountLength:[10,11].includes(Number(cfg.accountLength))?Number(cfg.accountLength):10,
     locationLength:[10,11].includes(Number(cfg.locationLength))?Number(cfg.locationLength):11,
     includeInReports:cfg.includeInReports!==false,
-    searchable:cfg.searchable!==false
+    searchable:cfg.searchable!==false,
+    verifyAfterDays:[90,180,365].includes(Number(cfg.verifyAfterDays))?Number(cfg.verifyAfterDays):180
   };
 }
 function encodePlusCode071(latitude,longitude,length){
@@ -1078,17 +1085,35 @@ function sitePlusCode071(s){
   }
   return isValidFullPlusCode(saved)?saved:"";
 }
-function locationPoints071(s){
-  if(!s) return [];
+function normalizeLocationPoint07912(p,index=0){
   const cfg=plusCodeSettings0794();
-  s.locationPoints=Array.isArray(s.locationPoints)?s.locationPoints:[];
-  s.locationPoints.forEach(p=>{
-    if(!p.id)p.id=uid();
-    if(cfg.enabled&&cfg.autoGenerate&&Number.isFinite(Number(p.lat))&&Number.isFinite(Number(p.lng))){
-      const code=encodePlusCode071(p.lat,p.lng,cfg.locationLength);
-      if(code&&p.plusCode!==code)p.plusCode=code;
-    }else p.plusCode=normalizePlusCode(p.plusCode||"");
-  });
+  p=p&&typeof p==="object"?p:{};
+  p.id=String(p.id||uid());
+  const legacyType={"Fire Alarm Panel":"Fire Alarm Control Panel","FDC":"Fire Department Connection","Riser Room":"Sprinkler Riser","Sprinkler Room":"Sprinkler Riser","Parking":"Parking Area","Exterior Door":"Secondary Entrance"};
+  p.type=legacyType[p.type]||p.type||"Other";
+  if(!LOCATION_POINT_TYPES_071.includes(p.type))p.type="Other";
+  p.label=String(p.label||p.name||p.type||`Location ${index+1}`).trim()||`Location ${index+1}`;
+  p.floor=String(p.floor||"").trim();
+  p.placement=["Indoor","Outdoor"].includes(p.placement)?p.placement:(p.indoor===false?"Outdoor":"Indoor");
+  p.description=String(p.description||"").trim();
+  p.notes=String(p.notes||"").trim();
+  p.photoDocId=String(p.photoDocId||"");
+  p.lat=p.lat!==null&&p.lat!==""&&Number.isFinite(Number(p.lat))?Number(p.lat):null;
+  p.lng=p.lng!==null&&p.lng!==""&&Number.isFinite(Number(p.lng))?Number(p.lng):null;
+  p.accuracy=Number.isFinite(Number(p.accuracy))?Math.max(0,Math.round(Number(p.accuracy))):0;
+  p.createdAt=p.createdAt||new Date().toISOString();
+  p.updatedAt=p.updatedAt||p.createdAt;
+  p.lastVerifiedAt=String(p.lastVerifiedAt||"");
+  p.verification=["verified","needs","unknown"].includes(p.verification)?p.verification:(p.lastVerifiedAt?"verified":"unknown");
+  if(cfg.enabled&&cfg.autoGenerate&&Number.isFinite(p.lat)&&Number.isFinite(p.lng)){
+    const code=encodePlusCode071(p.lat,p.lng,cfg.locationLength);
+    if(code)p.plusCode=code;
+  }else p.plusCode=normalizePlusCode(p.plusCode||"");
+  return p;
+}
+function locationPoints071(s){
+  if(!s)return [];
+  s.locationPoints=(Array.isArray(s.locationPoints)?s.locationPoints:[]).map(normalizeLocationPoint07912);
   return s.locationPoints;
 }
 function preferredLocation071(s){
@@ -1120,35 +1145,97 @@ function copyText071(text,label="Copied"){
   if(navigator.clipboard?.writeText) navigator.clipboard.writeText(String(text||"")).then(()=>toast(label),()=>toast("Clipboard unavailable."));
   else toast("Clipboard unavailable.");
 }
+function locationIcon07912(type){return LOCATION_TYPE_ICONS_07912[type]||"⌖";}
+function locationVerification07912(p){
+  if(p?.verification==="needs")return {key:"needs",label:"Needs Verification"};
+  if(!p?.lastVerifiedAt)return {key:"unknown",label:"Unknown"};
+  const age=(Date.now()-new Date(p.lastVerifiedAt).getTime())/86400000;
+  if(!Number.isFinite(age)||age>plusCodeSettings0794().verifyAfterDays)return {key:"needs",label:"Needs Verification"};
+  return {key:"verified",label:"Verified"};
+}
+function locationMeta07912(p){
+  return [p.floor?`Floor ${p.floor}`:"",p.placement,p.accuracy?`±${p.accuracy} m`:""].filter(Boolean).join(" • ");
+}
+function locationTimeline07912(s,action,p){
+  s.noteEntries=Array.isArray(s.noteEntries)?s.noteEntries:[];
+  s.noteEntries.unshift({id:uid(),type:"Building Location",note:`${action}: ${p.label} (${p.type})${p.plusCode?` • ${p.plusCode}`:""}`,createdAt:new Date().toISOString(),technician:data.settings?.technician?.name||"Local technician",locationPointId:p.id});
+}
 function plusCodePointNote071(point){ return `[Location: ${point.label||point.type||'Saved Point'}] Plus Code: ${point.plusCode}${point.notes?` — ${point.notes}`:''}`; }
-function addLocationPoint071(){
-  const s=site(); if(!s)return;
-  if(!navigator.geolocation){toast("GPS is not available in this browser.");return;}
-  const type=prompt(`Location type:\n${LOCATION_POINT_TYPES_071.join(', ')}`,"Main Entrance"); if(type===null)return;
-  const label=prompt("Location name",type||"Saved Location"); if(label===null)return;
-  const notes=prompt("Optional location notes (parking instructions, door description, access details)","")||"";
-  toast("Capturing precise location…");
-  navigator.geolocation.getCurrentPosition(pos=>{
-    const lat=Number(pos.coords.latitude.toFixed(7)),lng=Number(pos.coords.longitude.toFixed(7));
-    const point={id:uid(),type:type||"Other",label:(label||type||"Saved Location").trim(),notes:notes.trim(),lat,lng,accuracy:Math.round(pos.coords.accuracy||0),plusCode:encodePlusCode071(lat,lng,plusCodeSettings0794().locationLength),createdAt:new Date().toISOString()};
-    locationPoints071(s).push(point);
-    s.notes=[String(s.notes||"").trim(),plusCodePointNote071(point)].filter(Boolean).join("\n");
-    if(!s.preferredLocationPointId)s.preferredLocationPointId=point.id;
-    save(); toast(`${point.label} saved.`); siteDetail();
-  },err=>toast("GPS failed: "+(err.message||"permission denied")),{enableHighAccuracy:true,timeout:20000,maximumAge:0});
+function locationPhoto07912(s,p){return (s.docs||[]).find(d=>d.id===p.photoDocId&&docHasPhoto512(d))||null;}
+function locationTypeOptions07912(selected){return LOCATION_POINT_TYPES_071.map(type=>`<option value="${esc(type)}" ${type===selected?"selected":""}>${esc(type)}</option>`).join("");}
+function openLocationEditor07912(pointId=""){
+  const s=site();if(!s)return;
+  const existing=locationPoints071(s).find(p=>p.id===pointId)||null;
+  const p=existing?{...existing}:normalizeLocationPoint07912({type:"Fire Alarm Control Panel",label:"Fire Alarm Panel",placement:"Indoor",verification:"unknown",lat:hasGps(s)?s.gps.lat:null,lng:hasGps(s)?s.gps.lng:null,accuracy:hasGps(s)?s.gps.accuracy:0});
+  const photos=(s.docs||[]).filter(docHasPhoto512);
+  const overlay=document.createElement("div");overlay.className="buildingLocationOverlay07912";
+  overlay.innerHTML=`<form class="buildingLocationSheet07912" id="buildingLocationForm07912">
+    <div class="buildingLocationHead07912"><div><span>BUILDING NAVIGATOR</span><h2>${existing?"Edit Location":"Add Location"}</h2><p>Save the exact place a technician needs to find.</p></div><button type="button" class="ghost" id="closeLocationEditor07912">Close</button></div>
+    <div class="buildingLocationGrid07912">
+      <label><span>Location Type</span><select id="locationType07912">${locationTypeOptions07912(p.type)}</select></label>
+      <label><span>Location Name</span><input id="locationLabel07912" value="${esc(p.label)}" maxlength="80" required></label>
+      <label><span>Floor / Level</span><input id="locationFloor07912" value="${esc(p.floor)}" placeholder="1, B1, Roof"></label>
+      <label><span>Placement</span><select id="locationPlacement07912"><option ${p.placement==="Indoor"?"selected":""}>Indoor</option><option ${p.placement==="Outdoor"?"selected":""}>Outdoor</option></select></label>
+      <label class="wide"><span>Description</span><input id="locationDescription07912" value="${esc(p.description)}" placeholder="West lobby beside elevator bank"></label>
+      <label class="wide"><span>Access Notes</span><textarea id="locationNotes07912" rows="3" placeholder="Door, key, escort, or access instructions">${esc(p.notes)}</textarea></label>
+      <label><span>Latitude</span><input id="locationLat07912" inputmode="decimal" value="${Number.isFinite(p.lat)?p.lat:""}"></label>
+      <label><span>Longitude</span><input id="locationLng07912" inputmode="decimal" value="${Number.isFinite(p.lng)?p.lng:""}"></label>
+      <label><span>Verification</span><select id="locationVerification07912"><option value="unknown" ${p.verification==="unknown"?"selected":""}>Unknown</option><option value="verified" ${p.verification==="verified"?"selected":""}>Verified</option><option value="needs" ${p.verification==="needs"?"selected":""}>Needs Verification</option></select></label>
+      <label><span>Location Photo</span><select id="locationPhoto07912"><option value="">No linked photo</option>${photos.map(d=>`<option value="${esc(d.id)}" ${p.photoDocId===d.id?"selected":""}>${esc(d.title||d.imageName||"Account Photo")}</option>`).join("")}</select></label>
+    </div>
+    <div class="buildingLocationGpsActions07912"><button type="button" class="ghost" id="useAccountGps07912" ${hasGps(s)?"":"disabled"}>Use Account GPS</button><button type="button" class="primary" id="captureLocationGps07912">Capture Current GPS</button><span id="locationPlusPreview07912">${p.plusCode?esc(p.plusCode):"Plus Code generated after GPS is saved"}</span></div>
+    <div class="buildingLocationActions07912"><button type="button" class="ghost" id="cancelLocation07912">Cancel</button><button type="submit" class="primary">${existing?"Save Changes":"Add Location"}</button></div>
+  </form>`;
+  document.body.appendChild(overlay);
+  const close=()=>overlay.remove();
+  const updatePreview=()=>{const latRaw=String(document.getElementById("locationLat07912")?.value||"").trim(),lngRaw=String(document.getElementById("locationLng07912")?.value||"").trim();const lat=latRaw===""?null:Number(latRaw),lng=lngRaw===""?null:Number(lngRaw);const code=Number.isFinite(lat)&&Number.isFinite(lng)?encodePlusCode071(lat,lng,plusCodeSettings0794().locationLength):"";document.getElementById("locationPlusPreview07912").textContent=code||"Plus Code generated after GPS is saved";};
+  overlay.addEventListener("click",e=>{if(e.target===overlay)close();});
+  document.getElementById("closeLocationEditor07912").onclick=close;document.getElementById("cancelLocation07912").onclick=close;
+  document.getElementById("locationLat07912").oninput=updatePreview;document.getElementById("locationLng07912").oninput=updatePreview;
+  document.getElementById("useAccountGps07912").onclick=()=>{if(!hasGps(s))return;document.getElementById("locationLat07912").value=s.gps.lat;document.getElementById("locationLng07912").value=s.gps.lng;updatePreview();};
+  document.getElementById("captureLocationGps07912").onclick=()=>{if(!navigator.geolocation){toast("GPS is not available.","error");return;}toast("Capturing precise location…");navigator.geolocation.getCurrentPosition(pos=>{document.getElementById("locationLat07912").value=Number(pos.coords.latitude.toFixed(7));document.getElementById("locationLng07912").value=Number(pos.coords.longitude.toFixed(7));p.accuracy=Math.round(pos.coords.accuracy||0);updatePreview();toast("Location captured.","success");},err=>toast(`GPS failed: ${err.message||"permission denied"}`,"error"),{enableHighAccuracy:true,timeout:20000,maximumAge:0});};
+  document.getElementById("buildingLocationForm07912").onsubmit=e=>{
+    e.preventDefault();
+    const label=val("locationLabel07912").trim();if(!label){toast("Enter a location name.","error");return;}
+    const latRaw=val("locationLat07912").trim(),lngRaw=val("locationLng07912").trim();
+    const lat=latRaw===""?null:Number(latRaw),lng=lngRaw===""?null:Number(lngRaw);
+    if((latRaw!==""||lngRaw!=="")&&(!Number.isFinite(lat)||!Number.isFinite(lng)||lat>90||lat< -90||lng>180||lng< -180)){toast("Enter valid latitude and longitude.","error");return;}
+    const target=existing||p;
+    Object.assign(target,{type:val("locationType07912"),label,floor:val("locationFloor07912").trim(),placement:val("locationPlacement07912"),description:val("locationDescription07912").trim(),notes:val("locationNotes07912").trim(),lat,lng,accuracy:p.accuracy||target.accuracy||0,verification:val("locationVerification07912"),photoDocId:val("locationPhoto07912"),updatedAt:new Date().toISOString()});
+    if(target.verification==="verified"&&!target.lastVerifiedAt)target.lastVerifiedAt=new Date().toISOString();
+    if(target.verification!=="verified"&&target.verification!=="needs")target.lastVerifiedAt="";
+    target.plusCode=Number.isFinite(lat)&&Number.isFinite(lng)?encodePlusCode071(lat,lng,plusCodeSettings0794().locationLength):"";
+    if(!existing){locationPoints071(s).push(target);if(!s.preferredLocationPointId)s.preferredLocationPointId=target.id;}
+    locationTimeline07912(s,existing?"Location updated":"Location added",target);
+    save();close();accountDetailTab0735="locations";rememberAccountTab0751("locations");toast(`${target.label} saved.`,"success");siteDetail();
+  };
 }
-function setPreferredLocation071(id){ const s=site();if(!s)return;s.preferredLocationPointId=id||"";save();toast("Route destination updated.");siteDetail(); }
-function deleteLocationPoint071(id){ const s=site();if(!s)return;const p=locationPoints071(s).find(x=>x.id===id);if(!p||!confirm(`Delete ${p.label||'this location'}?`))return;s.locationPoints=s.locationPoints.filter(x=>x.id!==id);if(s.preferredLocationPointId===id)s.preferredLocationPointId="";save();siteDetail(); }
+function addLocationPoint071(){openLocationEditor07912();}
+function setPreferredLocation071(id){ const s=site();if(!s)return;s.preferredLocationPointId=id||"";const p=locationPoints071(s).find(x=>x.id===id);if(p)locationTimeline07912(s,"Default route changed",p);save();toast("Route destination updated.","success");siteDetail(); }
+function deleteLocationPoint071(id){ const s=site();if(!s)return;const p=locationPoints071(s).find(x=>x.id===id);if(!p||!confirm(`Delete ${p.label||'this location'}?`))return;locationTimeline07912(s,"Location deleted",p);s.locationPoints=s.locationPoints.filter(x=>x.id!==id);if(s.preferredLocationPointId===id)s.preferredLocationPointId="";save();siteDetail(); }
 function routeLocationPoint071(id){ const s=site();const p=locationPoints071(s).find(x=>x.id===id);if(p)window.open(`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(p.plusCode||`${p.lat},${p.lng}`)}`,'_blank'); }
-function plusCodeSection071(s){
-  const cfg=plusCodeSettings0794();
-  if(!cfg.enabled)return "";
-  const code=sitePlusCode071(s),points=locationPoints071(s),preferred=preferredLocation071(s);
-  return `<details class="accountSection067 tone-cyan plusCodes071" open><summary><span>＋</span><div><strong>Plus Codes & Site Locations</strong><small>Offline full codes for the account, entrances, panel rooms, risers, parking, and FDC locations</small></div><b>⌄</b></summary><div class="accountSectionBody067">
-    <div class="primaryPlus071"><div><span>Account Plus Code</span><strong>${esc(code||'GPS required')}</strong><small>${code?`${cfg.accountLength} digits • ${plusCodePrecisionLabel(cfg.accountLength)}`:(hasGps(s)?'Generate codes in Settings → Field → Google Plus Codes':'Save GPS coordinates to generate a code')}${preferred?` • Route targets ${esc(preferred.label)}`:''}</small></div><div>${code?`<button class="ghost" id="copyPrimaryPlus071">Copy</button><button class="ghost" id="openPrimaryPlus0794">Google Maps</button>`:''}<button class="primary" id="addLocationPoint071">＋ Drop Pin</button></div></div>
-    ${points.length?`<div class="locationPointList071">${points.map(p=>`<article class="locationPoint071 ${s.preferredLocationPointId===p.id?'preferred':''}"><div><span>${esc(p.type||'Saved Location')}</span><strong>${esc(p.label||'Saved Location')}</strong><b>${esc(p.plusCode||'GPS required')}</b><small>${p.plusCode?`${cfg.locationLength} digits • ${plusCodePrecisionLabel(cfg.locationLength)}`:''}${p.notes?`${p.plusCode?' • ':''}${esc(p.notes)}`:''}</small></div><div><button class="ghost" data-copy-plus071="${esc(p.id)}">Copy</button><button class="ghost" data-route-plus071="${esc(p.id)}">Route</button><button class="${s.preferredLocationPointId===p.id?'primary':'ghost'}" data-prefer-plus071="${esc(p.id)}">${s.preferredLocationPointId===p.id?'Default':'Use'}</button><button class="danger" data-delete-plus071="${esc(p.id)}">×</button></div></article>`).join('')}</div>`:`<p class="accountEmpty067">Drop pins at the main entrance, preferred parking, exterior access door, riser room, fire alarm panel, FDC, or another exact field location.</p>`}
-  </div></details>`;
+function markLocationVerified07912(id){const s=site();const p=locationPoints071(s).find(x=>x.id===id);if(!p)return;p.verification="verified";p.lastVerifiedAt=new Date().toISOString();p.updatedAt=p.lastVerifiedAt;locationTimeline07912(s,"Location verified",p);save();toast(`${p.label} verified.`,"success");siteDetail();}
+async function shareLocation07912(id){const s=site();const p=locationPoints071(s).find(x=>x.id===id);if(!p)return;const text=[`${s.name||"FireVault Account"} — ${p.label}`,p.type,locationMeta07912(p),p.plusCode?`Plus Code: ${p.plusCode}`:"",Number.isFinite(p.lat)&&Number.isFinite(p.lng)?`GPS: ${p.lat}, ${p.lng}`:"",p.notes].filter(Boolean).join("\n");if(navigator.share){try{await navigator.share({title:p.label,text});return;}catch(err){if(err?.name==="AbortError")return;}}copyText071(text,"Location copied.");}
+function locationPlot07912(s,points){
+  const valid=points.filter(p=>Number.isFinite(p.lat)&&Number.isFinite(p.lng));
+  if(!valid.length)return `<div class="buildingPlotEmpty07912"><span>⌖</span><strong>No precise locations plotted</strong><small>Add GPS coordinates to place critical equipment on the site plot.</small></div>`;
+  let minLat=Math.min(...valid.map(p=>p.lat)),maxLat=Math.max(...valid.map(p=>p.lat)),minLng=Math.min(...valid.map(p=>p.lng)),maxLng=Math.max(...valid.map(p=>p.lng));
+  if(maxLat-minLat<0.00005){minLat-=0.00005;maxLat+=0.00005;}if(maxLng-minLng<0.00005){minLng-=0.00005;maxLng+=0.00005;}
+  return `<div class="buildingLocationPlot07912" aria-label="Relative site location plot"><div class="buildingPlotGrid07912"></div>${valid.map((p,i)=>{let x=8+84*((p.lng-minLng)/(maxLng-minLng)),y=8+84*(1-(p.lat-minLat)/(maxLat-minLat));if(valid.length>1&&valid.every(q=>Math.abs(q.lat-p.lat)<1e-8&&Math.abs(q.lng-p.lng)<1e-8)){const a=(i/valid.length)*Math.PI*2;x=50+Math.cos(a)*18;y=50+Math.sin(a)*18;}return `<button class="buildingPlotPin07912 ${s.preferredLocationPointId===p.id?"preferred":""}" style="left:${x.toFixed(1)}%;top:${y.toFixed(1)}%" data-location-open07912="${esc(p.id)}" aria-label="${esc(p.label)}"><span>${locationIcon07912(p.type)}</span><b>${esc(p.label)}</b></button>`;}).join("")}<small>Relative GPS view • Tap a pin to edit</small></div>`;
 }
+function accountPlusCodeSummary07912(s){
+  const code=sitePlusCode071(s),preferred=preferredLocation071(s),count=locationPoints071(s).length;
+  return `<section class="accountPanel0735 accountPlusSummary07912"><div class="accountPanelHead0735"><div><span>GOOGLE PLUS CODE</span><h2>${esc(code||"GPS required")}</h2></div><button class="primary" id="openLocations07912">Locations ${count?`(${count})`:""}</button></div><p>${preferred?`Route currently targets ${esc(preferred.label)}.`:"Add exact entrances, panels, risers, FDCs, and other critical locations."}</p><div class="accountInlineActions067">${code?`<button class="ghost" id="copyPrimaryPlus071">Copy Code</button><button class="ghost" id="openPrimaryPlus0794">Google Maps</button>`:""}<button class="ghost" id="addLocationPoint071">＋ Add Location</button></div></section>`;
+}
+function accountLocationsTab07912(s){
+  const points=locationPoints071(s),preferred=preferredLocation071(s),verified=points.filter(p=>locationVerification07912(p).key==="verified").length,needs=points.filter(p=>locationVerification07912(p).key!=="verified").length;
+  return `<div class="accountTabPanel0735 buildingNavigator07912">
+    <section class="accountPanel0735 buildingNavigatorHero07912"><div class="accountPanelHead0735"><div><span>BUILDING NAVIGATOR</span><h2>${points.length} Saved Location${points.length===1?"":"s"}</h2><p>Find the exact entrance, panel, riser, FDC, pump, or access point.</p></div><button class="primary" id="addLocationPoint071">＋ Add Location</button></div><div class="buildingNavigatorStats07912"><span><strong>${verified}</strong> Verified</span><span><strong>${needs}</strong> Review</span><span><strong>${preferred?esc(preferred.label):"Account"}</strong> Route target</span></div>${locationPlot07912(s,points)}</section>
+    ${points.length?`<section class="buildingLocationList07912">${points.map(p=>{const status=locationVerification07912(p),photo=locationPhoto07912(s,p);return `<article class="buildingLocationCard07912 ${s.preferredLocationPointId===p.id?"preferred":""}">${photo?`<button class="buildingLocationPhoto07912" data-location-photo07912="${esc(p.id)}"><img src="${esc(photo.imageData)}" alt="${esc(p.label)}"></button>`:`<div class="buildingLocationIcon07912">${locationIcon07912(p.type)}</div>`}<div class="buildingLocationMain07912"><div class="buildingLocationTitle07912"><div><span>${esc(p.type)}</span><strong>${esc(p.label)}</strong></div><em class="locationVerify-${status.key}">${status.label}</em></div><p>${esc([p.description,p.notes].filter(Boolean).join(" • ")||"No access notes entered.")}</p><div class="buildingLocationMeta07912"><span>${esc(locationMeta07912(p)||"Location details not entered")}</span>${p.plusCode?`<b>${esc(p.plusCode)}</b>`:"<b>GPS required</b>"}</div><div class="buildingLocationActionsCard07912"><button class="primary" data-location-route07912="${esc(p.id)}" ${Number.isFinite(p.lat)&&Number.isFinite(p.lng)?"":"disabled"}>Route</button><button class="ghost" data-location-copy07912="${esc(p.id)}">Copy</button><button class="ghost" data-location-share07912="${esc(p.id)}">Share</button><button class="ghost" data-location-verify07912="${esc(p.id)}">Verify</button><button class="ghost" data-location-open07912="${esc(p.id)}">Edit</button><button class="${s.preferredLocationPointId===p.id?"primary":"ghost"}" data-location-default07912="${esc(p.id)}">${s.preferredLocationPointId===p.id?"Default":"Use"}</button><button class="danger" data-location-delete07912="${esc(p.id)}" aria-label="Delete ${esc(p.label)}">×</button></div></div></article>`;}).join("")}</section>`:`<section class="accountEmptyState0735 buildingNavigatorEmpty07912"><strong>No building locations saved</strong><span>Add the main entrance, fire alarm panel, riser room, FDC, Knox Box, parking area, or another exact point.</span><button class="primary" id="addLocationEmpty07912">Add First Location</button></section>`}
+  </div>`;
+}
+function plusCodeSection071(s){return accountPlusCodeSummary07912(s);}
+
 function mapQuery(s){ return hasGps(s) ? `${Number(s.gps.lat).toFixed(6)},${Number(s.gps.lng).toFixed(6)}` : fullAddress(s); }
 function mapUrl(s, provider){
   const plus=navigationPlusCode071(s);
@@ -4751,7 +4838,7 @@ function accountCategoryLabel0735(s={}){
 function accountTabPreference0751(){
   try{
     const value=sessionStorage.getItem("firevault_account_tab_0751");
-    return ["overview","details","equipment","docs","notes"].includes(value)?value:"overview";
+    return ["overview","details","locations","equipment","docs","notes"].includes(value)?value:"overview";
   }catch{return "overview";}
 }
 function rememberAccountTab0751(value){
@@ -4791,12 +4878,13 @@ function accountRecentActivity0735(s={},limit=5){
   (s.deficiencies||[]).forEach(d=>add(d.createdAt||d.updatedAt,"deficiency",d.title||"Deficiency",`${d.priority||"Normal"} • ${d.status||"Open"}`,"deficiencies"));
   (s.tasks||[]).forEach(t=>add(t.createdAt||t.updatedAt,"task",t.title||"Task",t.status||"Open","tasks"));
   (s.docs||[]).forEach(d=>add(d.createdAt||d.updatedAt,"document",d.title||d.imageName||"Document",docHasPhoto512(d)?"Photo added":"Document added","siteDocs"));
+  (s.noteEntries||[]).filter(n=>n.type==="Building Location").forEach(n=>add(n.createdAt,"location","Building location",n.note||"Location updated","locations"));
   return rows.sort((a,b)=>b.t-a.t).slice(0,limit);
 }
 function accountRecentMarkup0735(s={}){
   const rows=accountRecentActivity0735(s,6);
   if(!rows.length) return `<div class="accountEmptyState0735"><strong>No recent activity</strong><span>Visits, tasks, deficiencies, photos, and documents will appear here.</span></div>`;
-  const icons={visit:"✓",deficiency:"!",task:"□",document:"▣"};
+  const icons={visit:"✓",deficiency:"!",task:"□",document:"▣",location:"⌖"};
   return `<div class="accountRecentList0735">${rows.map(r=>`<button data-account-activity0735="${esc(r.routeName)}"><span class="kind-${esc(r.kind)}">${icons[r.kind]||"•"}</span><div><strong>${esc(r.title)}</strong><small>${esc(new Date(r.t).toLocaleDateString([], {month:"short",day:"numeric",year:"numeric"}))}${r.detail?` • ${esc(r.detail)}`:""}</small></div><b>›</b></button>`).join("")}</div>`;
 }
 function accountOverviewTab0735(s,ctx){
@@ -4906,8 +4994,9 @@ function siteDetail(){
   const activeHere=activeJob&&activeJob.siteId===s.id;
   const ctx={open,def,siteVisits,equipment,docs,health,lastVisit,panel,primary,access,activeHere};
   const accountId=accountId069(s)||"No Account ID";
-  const tabs=[["overview","Overview",null,"Account overview"],["details","Details",null,"Site details"],["equipment","Equip",equipment.length,"Equipment"],["docs","Files",docs.length,"Photos and documents"],["notes","Notes",open+def,"Notes and open work"]];
-  const panelMarkup=accountDetailTab0735==="details"?accountDetailsTab0735(s,ctx):accountDetailTab0735==="equipment"?accountEquipmentTab0735(s):accountDetailTab0735==="docs"?accountDocsTab0735(s):accountDetailTab0735==="notes"?accountNotesTab0735(s,ctx):accountOverviewTab0735(s,ctx);
+  const locations=locationPoints071(s);
+  const tabs=[["overview","Overview",null,"Account overview"],["details","Details",null,"Site details"],["locations","Locations",locations.length,"Building locations"],["equipment","Equip",equipment.length,"Equipment"],["docs","Files",docs.length,"Photos and documents"],["notes","Notes",open+def,"Notes and open work"]];
+  const panelMarkup=accountDetailTab0735==="details"?accountDetailsTab0735(s,ctx):accountDetailTab0735==="locations"?accountLocationsTab07912(s):accountDetailTab0735==="equipment"?accountEquipmentTab0735(s):accountDetailTab0735==="docs"?accountDocsTab0735(s):accountDetailTab0735==="notes"?accountNotesTab0735(s,ctx):accountOverviewTab0735(s,ctx);
 
   html(`<div class="screen siteDetail0735">
     <div class="accountHeader0735 technicianHeader075 accountHeaderRewrite0757 accountHeader0786" role="banner"><button class="accountBack0735" id="backBtn" aria-label="Back to Accounts">‹</button><div class="technicianIdentity075 accountIdentity0786"><strong>${esc(s.name||"Unnamed Account")}</strong><span class="accountIdLine0757">${esc(accountId)}</span>${fullAddress(s)?`<span class="accountAddressLine0757">${esc(fullAddress(s))}</span>`:""}</div><button class="accountPin0735 ${isPinnedSite566(s)?"pinned":""}" id="pinSiteBtn566" aria-label="${isPinnedSite566(s)?"Remove account from favorites":"Add account to favorites"}" aria-pressed="${isPinnedSite566(s)?"true":"false"}">${isPinnedSite566(s)?"★":"☆"}</button><button class="accountEdit0735" id="editBtn" aria-label="Edit account">✎</button></div>
@@ -4943,18 +5032,23 @@ function siteDetail(){
   document.getElementById("navigateBtn477")?.addEventListener("click",()=>{if(hasGps(s))window.open(mapRouteUrl071(s),"_blank");});
   document.getElementById("accountMapRoute0735")?.addEventListener("click",()=>window.open(mapRouteUrl071(s),"_blank"));
   document.getElementById("allVisitsBtn")?.addEventListener("click",()=>route("visits"));
-  document.querySelectorAll("[data-account-activity0735]").forEach(b=>b.onclick=()=>route(b.dataset.accountActivity0735));
+  document.querySelectorAll("[data-account-activity0735]").forEach(b=>b.onclick=()=>{const target=b.dataset.accountActivity0735;if(target==="locations"){accountDetailTab0735="locations";rememberAccountTab0751("locations");render();}else route(target);});
   document.getElementById("snapshotBtn")?.addEventListener("click",shareSiteSnapshot);
   document.getElementById("captureGpsBtn")?.addEventListener("click",captureGpsForSite);
   document.getElementById("appleBtn")?.addEventListener("click",()=>{if(hasGps(s))window.open(mapUrl(s,"apple"),"_blank");});
   document.getElementById("googleBtn")?.addEventListener("click",()=>{if(hasGps(s))window.open(mapUrl(s,"google"),"_blank");});
   document.getElementById("copyPrimaryPlus071")?.addEventListener("click",()=>copyText071(sitePlusCode071(s),"Plus Code copied."));
   document.getElementById("openPrimaryPlus0794")?.addEventListener("click",()=>{const code=sitePlusCode071(s);if(code)window.open(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(code)}`,"_blank");});
-  document.getElementById("addLocationPoint071")?.addEventListener("click",addLocationPoint071);
-  document.querySelectorAll("[data-copy-plus071]").forEach(b=>b.onclick=()=>{const p=locationPoints071(s).find(x=>x.id===b.dataset.copyPlus071);if(p)copyText071(p.plusCode,"Plus Code copied.");});
-  document.querySelectorAll("[data-route-plus071]").forEach(b=>b.onclick=()=>routeLocationPoint071(b.dataset.routePlus071));
-  document.querySelectorAll("[data-prefer-plus071]").forEach(b=>b.onclick=()=>setPreferredLocation071(b.dataset.preferPlus071));
-  document.querySelectorAll("[data-delete-plus071]").forEach(b=>b.onclick=()=>deleteLocationPoint071(b.dataset.deletePlus071));
+  document.getElementById("openLocations07912")?.addEventListener("click",()=>{accountDetailTab0735="locations";rememberAccountTab0751("locations");render();});
+  document.querySelectorAll("#addLocationPoint071,#addLocationEmpty07912").forEach(b=>b.addEventListener("click",addLocationPoint071));
+  document.querySelectorAll("[data-location-open07912]").forEach(b=>b.onclick=()=>openLocationEditor07912(b.dataset.locationOpen07912));
+  document.querySelectorAll("[data-location-route07912]").forEach(b=>b.onclick=()=>routeLocationPoint071(b.dataset.locationRoute07912));
+  document.querySelectorAll("[data-location-copy07912]").forEach(b=>b.onclick=()=>{const p=locationPoints071(s).find(x=>x.id===b.dataset.locationCopy07912);if(p)copyText071([p.label,p.plusCode||"",Number.isFinite(p.lat)&&Number.isFinite(p.lng)?`${p.lat}, ${p.lng}`:""].filter(Boolean).join("\n"),"Location copied.");});
+  document.querySelectorAll("[data-location-share07912]").forEach(b=>b.onclick=()=>shareLocation07912(b.dataset.locationShare07912));
+  document.querySelectorAll("[data-location-verify07912]").forEach(b=>b.onclick=()=>markLocationVerified07912(b.dataset.locationVerify07912));
+  document.querySelectorAll("[data-location-default07912]").forEach(b=>b.onclick=()=>setPreferredLocation071(b.dataset.locationDefault07912));
+  document.querySelectorAll("[data-location-delete07912]").forEach(b=>b.onclick=()=>deleteLocationPoint071(b.dataset.locationDelete07912));
+  document.querySelectorAll("[data-location-photo07912]").forEach(b=>b.onclick=()=>{const p=locationPoints071(s).find(x=>x.id===b.dataset.locationPhoto07912);const photo=p?locationPhoto07912(s,p):null;if(photo)photoPreviewModal524(photo);});
   document.getElementById("openEquipment0735")?.addEventListener("click",()=>route("equipmentList"));
   const addEquipment=()=>{mode=null;route("equipmentForm");};
   document.getElementById("addEquipment0735")?.addEventListener("click",addEquipment);
@@ -7893,7 +7987,7 @@ function manualSimplePage058(type){
   quick:["🚀","Quick Start Guide","Get FireVault ready for a normal field day.",[["1. Verify the build","Confirm the green build badge shows 0.67.0 before entering production information."],["2. Complete Technician Profile","Enter your name, company, phone, email, and license or employee identification."],["3. Review permissions","Allow location and photo access only when FireVault requests them and the feature is needed."],["4. Create or open a site","Add the customer name, full address, panel details, contacts, access notes, and GPS location."],["5. Document the visit","Record notes, photos, tasks, deficiencies, equipment changes, and a service visit."],["6. Finish and protect the data","Review the report, send or copy the required summary, then export a current backup."]]],
   new:["🆕","What’s New in 0.67.0","Account View, Settings navigation, and FireVault Academy redesign.",[["Unified visual system","Standardized typography, spacing, card surfaces, borders, controls, and responsive behavior across FireVault."],["Settings cleanup","Improved Settings home cards and every submenu while preserving the preferred Email setup workflow."],["Help readability","Converted contextual Help and Academy articles into one uninterrupted scrolling reading column with no floating metadata."],["Site Detail stability","Reinforced natural-height cards, readable text, and scroll-safe account sections."],["Operational screens","Simplified Customer Import, Team Sync, Conflict Center, and Nearby Sites presentation without changing their workflows."],["Phone and iPad layouts","Added consistent narrow-phone and tablet behavior, bottom-navigation clearance, and overflow protection."],["Nearby scan diagnostics","Nearby Sites now shows total sites, GPS-ready records, missing coordinates, phone-location progress, and persistent error messages."],["Coordinate recovery","FireVault recovers valid latitude and longitude stored in compatible legacy or imported fields and normalizes them into the site GPS record."],["Location retry","If high-accuracy location times out or is unavailable, FireVault retries once using standard accuracy."],["Nearest-site fallback","When no site is inside the selected radius, the nearest GPS-ready sites remain visible instead of presenting an empty result."],["Latitude and longitude","Customer Import can calculate missing coordinates from each usable U.S. street address before saving records."],["Coordinate requirement","The importer requires calculated, supplied, or existing GPS coordinates by default. Unmatched addresses remain in review."],["Census address matching","Only address fields are sent to the U.S. Census Geocoder. The returned point is an address-range calculation, not a guaranteed building entrance."],["Account Id matching","Repeat imports update the matching FireVault site instead of creating duplicates or deleting field history."],["CSV coordinate columns","Files that already contain Latitude and Longitude columns use those values directly."],["Sync-ready changes","Added and updated customer records enter the pending synchronization queue and create a Sync Activity entry."]]],
   tips:["🧰","Field Tips","Short practices that improve the usefulness of FireVault records.",[["Write for the next technician","Include the exact panel, circuit, device, location, symptom, test result, and next action instead of relying on memory."],["Photograph context first","Take one wide photo showing the equipment location before close-up terminal, label, or damage photos."],["Separate facts from follow-up","Use notes for what occurred, deficiencies for code or system problems, and tasks for work that still needs completion."],["Confirm the account","Before using Quick Capture, verify the selected customer site to prevent records from being stored under the wrong account."],["Back up before updates","Download an external backup before a major update or device change and after completing significant field documentation."]]],
-  revisions:["📋","Revision History","Application and documentation checkpoints.",["0.79.11","Added Smart Account Intelligence with configurable data-quality scores, missing-information guidance, account indicators, and downloadable reporting."],["0.79.10","Added single-account dots, same-address account counts, area clusters, and deeper selected-account map zoom."],["0.79.7","Shortened every Settings summary and removed the colored bar from each Section Overview."],["0.79.6","Added Nearby-style account-list scroll locking so cards settle cleanly at the top while the Accounts controls remain fixed."],["0.79.5","Added separate Personal OneDrive, Work OneDrive, and SharePoint connection profiles with exact photo/document assignments and no-personal-fallback protection."],["0.79.4","Added independent photo and document storage destinations, cloud-provider integration targets, and offline Google Plus Codes for accounts and exact field locations."],["0.79.3","Added backend-neutral provider interfaces for authentication, database, file storage, synchronization, and audit while keeping FireVault fully local."],["0.79.2","Added a unified Security Center with vault integrity validation, backup health, audit filters, device naming, session clearing, and PIN confirmation for sensitive exports, restores, and deletion."],["0.79.1","Added an optional local six-digit privacy lock with PBKDF2 hashing, inactivity/background locking, app-switcher privacy screen, recovery code, cooldown protection, and local lock events."],["0.79.0","Added security-ready schema 4 metadata, stable workspace/user/device identities, local audit history, pending change queue, recoverable deletion, credential-safe exports, and protected restore/reset actions."],["0.67.0","Redesigned Account View around service actions and grouped information, consolidated Settings into five folders, and simplified FireVault Academy and contextual Help for continuous reading."],["0.65.2","Repaired Nearby Sites with GPS inventory counts, imported-coordinate recovery, persistent permission and timeout messages, a standard-accuracy retry, and nearest-site fallback results."],["0.65.1","Added online latitude/longitude calculation, coordinate validation, geocoding progress, unmatched-address review, optional CSV coordinates, and coordinate-safe repeat importing."],["0.65.0","Added preview-first customer CSV importing, Account Id update matching, validation warnings, imported monitoring details, and sync activity tracking."],["0.64.1","Simplified Academy article headers, removed floating metadata badges, and improved continuous scrolling and readability."],["0.64.0","Added Sync Activity, a conflict review center, export/import audit entries, and an automatic OneDrive connection-readiness checklist."],["0.63.1","Overhauled contextual Help and Academy reader formatting, removed overlapping sticky article headers, and restored full scrolling on phones and tablets."],["0.63.0","Added permanent record IDs, audit metadata, local version tracking, pending-sync states, conflict readiness, device identity, and a Team Sync settings workspace."],["0.60.0","Connected major screens and Settings areas directly to matching Academy chapters with return-to-screen navigation."],["0.59.0","Added interactive tutorials, guided orientation, pinned learning, field tips, and documentation tracking."],["0.58.0","Expanded Help & Manual into FireVault Academy with bookmarks, smart search, Quick Start, and reader navigation."],["0.57.0","Added the first complete searchable in-app FireVault User Manual."],["Ongoing review rule","Any change to navigation, labels, storage, workflows, permissions, or supported layouts requires the related manual chapter to be checked."]]],
+  revisions:["📋","Revision History","Application and documentation checkpoints.",[["0.79.13","Repaired startup parsing inherited from 0.79.11 and corrected Building Navigator location-copy syntax."],["0.79.12","Added Building Navigator with exact site locations, GPS/Plus Codes, verification, linked photos, route targets, and timeline events."],["0.79.11","Added Smart Account Intelligence with configurable data-quality scores, missing-information guidance, account indicators, and downloadable reporting."],["0.79.10","Added single-account dots, same-address account counts, area clusters, and deeper selected-account map zoom."],["0.79.7","Shortened every Settings summary and removed the colored bar from each Section Overview."],["0.79.6","Added Nearby-style account-list scroll locking so cards settle cleanly at the top while the Accounts controls remain fixed."],["0.79.5","Added separate Personal OneDrive, Work OneDrive, and SharePoint connection profiles with exact photo/document assignments and no-personal-fallback protection."],["0.79.4","Added independent photo and document storage destinations, cloud-provider integration targets, and offline Google Plus Codes for accounts and exact field locations."],["0.79.3","Added backend-neutral provider interfaces for authentication, database, file storage, synchronization, and audit while keeping FireVault fully local."],["0.79.2","Added a unified Security Center with vault integrity validation, backup health, audit filters, device naming, session clearing, and PIN confirmation for sensitive exports, restores, and deletion."],["0.79.1","Added an optional local six-digit privacy lock with PBKDF2 hashing, inactivity/background locking, app-switcher privacy screen, recovery code, cooldown protection, and local lock events."],["0.79.0","Added security-ready schema 4 metadata, stable workspace/user/device identities, local audit history, pending change queue, recoverable deletion, credential-safe exports, and protected restore/reset actions."],["0.67.0","Redesigned Account View around service actions and grouped information, consolidated Settings into five folders, and simplified FireVault Academy and contextual Help for continuous reading."],["0.65.2","Repaired Nearby Sites with GPS inventory counts, imported-coordinate recovery, persistent permission and timeout messages, a standard-accuracy retry, and nearest-site fallback results."],["0.65.1","Added online latitude/longitude calculation, coordinate validation, geocoding progress, unmatched-address review, optional CSV coordinates, and coordinate-safe repeat importing."],["0.65.0","Added preview-first customer CSV importing, Account Id update matching, validation warnings, imported monitoring details, and sync activity tracking."],["0.64.1","Simplified Academy article headers, removed floating metadata badges, and improved continuous scrolling and readability."],["0.64.0","Added Sync Activity, a conflict review center, export/import audit entries, and an automatic OneDrive connection-readiness checklist."],["0.63.1","Overhauled contextual Help and Academy reader formatting, removed overlapping sticky article headers, and restored full scrolling on phones and tablets."],["0.63.0","Added permanent record IDs, audit metadata, local version tracking, pending-sync states, conflict readiness, device identity, and a Team Sync settings workspace."],["0.60.0","Connected major screens and Settings areas directly to matching Academy chapters with return-to-screen navigation."],["0.59.0","Added interactive tutorials, guided orientation, pinned learning, field tips, and documentation tracking."],["0.58.0","Expanded Help & Manual into FireVault Academy with bookmarks, smart search, Quick Start, and reader navigation."],["0.57.0","Added the first complete searchable in-app FireVault User Manual."],["Ongoing review rule","Any change to navigation, labels, storage, workflows, permissions, or supported layouts requires the related manual chapter to be checked."]]],
   trouble:["❓","Troubleshooting","Common problems and safe first checks.",FIREVAULT_MANUAL_058.find(x=>x.id==="trouble")?.topics||[]]
  };
  const [icon,title,note,items]=pages[type]||["ⓘ","Unavailable","This Help section is not available in the installed version.",[["Current status","Return to Help and choose an available chapter or tutorial."]]];
@@ -8531,7 +8625,7 @@ function plusCodesPanel0794(){
       <div class="plusCodeStats0794"><div><strong>${stats.accounts}</strong><span>Account codes</span></div><div><strong>${stats.points}</strong><span>Exact location pins</span></div><div><strong>${stats.total-stats.accounts}</strong><span>Need GPS</span></div></div>
       <div class="settingsInfo540"><strong>Full codes only</strong><span>FireVault stores full codes such as 85HPMM7R+42 so they work without a nearby city reference.</span></div>` ,"cyan")}
     ${settingsSection540("Precision","Plus Code Settings","Use standard precision for an account location and higher precision for entrances, panels, riser rooms, FDCs, and other field pins.",`
-      <div class="settingsGrid settingsGrid540">${fieldBlock("Account code precision",`<select id="plusAccountLength0794"><option value="10" ${cfg.accountLength===10?"selected":""}>10 digits — ${plusCodePrecisionLabel(10)}</option><option value="11" ${cfg.accountLength===11?"selected":""}>11 digits — ${plusCodePrecisionLabel(11)}</option></select>`)}${fieldBlock("Saved location precision",`<select id="plusLocationLength0794"><option value="10" ${cfg.locationLength===10?"selected":""}>10 digits — ${plusCodePrecisionLabel(10)}</option><option value="11" ${cfg.locationLength===11?"selected":""}>11 digits — ${plusCodePrecisionLabel(11)}</option></select>`,`11 digits is recommended for doors, fire panels, riser rooms, and FDC locations.`)}</div>
+      <div class="settingsGrid settingsGrid540">${fieldBlock("Account code precision",`<select id="plusAccountLength0794"><option value="10" ${cfg.accountLength===10?"selected":""}>10 digits — ${plusCodePrecisionLabel(10)}</option><option value="11" ${cfg.accountLength===11?"selected":""}>11 digits — ${plusCodePrecisionLabel(11)}</option></select>`)}${fieldBlock("Saved location precision",`<select id="plusLocationLength0794"><option value="10" ${cfg.locationLength===10?"selected":""}>10 digits — ${plusCodePrecisionLabel(10)}</option><option value="11" ${cfg.locationLength===11?"selected":""}>11 digits — ${plusCodePrecisionLabel(11)}</option></select>`,`11 digits is recommended for doors, fire panels, riser rooms, and FDC locations.`)}${fieldBlock("Reverify locations",`<select id="plusVerifyDays07912"><option value="90" ${cfg.verifyAfterDays===90?"selected":""}>Every 90 days</option><option value="180" ${cfg.verifyAfterDays===180?"selected":""}>Every 180 days</option><option value="365" ${cfg.verifyAfterDays===365?"selected":""}>Every year</option></select>`)}</div>
       <div class="settingsList settingsToggleList540">${checkBlock("plusEnabled0794","Show Plus Code tools",cfg.enabled)}${checkBlock("plusAuto0794","Generate codes automatically from GPS",cfg.autoGenerate)}${checkBlock("plusSearch0794","Allow account search by Plus Code",cfg.searchable)}${checkBlock("plusReports0794","Include Plus Codes in reports",cfg.includeInReports)}</div>` ,"blue",`<button class="primary saveMini" id="savePlusCodes0794">Save</button>`)}
     ${settingsSection540("Database tools","Generate & Verify","Recalculate account and saved-location codes from the stored GPS coordinates using the selected precision.",`
       <div class="cloudStorageActions0794"><button class="primary" id="backfillPlusCodes0794">Generate / Refresh Codes</button><button class="ghost" id="copyPlusCodeSummary0794">Copy Summary</button></div><div id="plusCodeResult0794" class="fieldNote">${stats.accounts} of ${stats.total} accounts currently have a full Plus Code.</div>` ,"green")}
@@ -8539,7 +8633,7 @@ function plusCodesPanel0794(){
 }
 function wirePlusCodes0794(){
   document.getElementById("savePlusCodes0794")?.addEventListener("click",()=>{
-    data.settings.plusCodes={enabled:checked("plusEnabled0794"),autoGenerate:checked("plusAuto0794"),accountLength:Number(val("plusAccountLength0794"))||10,locationLength:Number(val("plusLocationLength0794"))||11,searchable:checked("plusSearch0794"),includeInReports:checked("plusReports0794")};
+    data.settings.plusCodes={enabled:checked("plusEnabled0794"),autoGenerate:checked("plusAuto0794"),accountLength:Number(val("plusAccountLength0794"))||10,locationLength:Number(val("plusLocationLength0794"))||11,verifyAfterDays:Number(val("plusVerifyDays07912"))||180,searchable:checked("plusSearch0794"),includeInReports:checked("plusReports0794")};
     ensureAllPlusCodes071();saveData(data);data=loadData();toast("Plus Code settings saved.","success");settings();
   });
   document.getElementById("backfillPlusCodes0794")?.addEventListener("click",()=>{
@@ -9674,6 +9768,8 @@ function diagnostics(){
 }
 function showChangelog(){
   const notes = [
+    "Build 0.79.13 repairs the 0.79.11 Revision History syntax error and the 0.79.12 Building Navigator copy-newline error.",
+    "Build 0.79.12 adds Building Navigator with exact site locations, GPS/Plus Codes, verification, linked photos, route targets, and account timeline events.",
     "Build 0.79.11 adds Smart Account Intelligence with configurable data-quality scores, missing-information guidance, Account card/detail indicators, and a downloadable report.",
     "Build 0.79.10 adds single-account dots, same-address counts, area clusters, and deeper selected-account map zoom.",
     "Build 0.79.5 adds separate Personal OneDrive, Work OneDrive, and SharePoint profiles with exact destination assignments and strict no-personal-fallback protection.",

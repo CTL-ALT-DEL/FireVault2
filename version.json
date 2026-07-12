@@ -1,6 +1,8 @@
 {
-  "build": "0.79.11",
+  "build": "0.79.13",
   "released": "2026-07-12",
-  "note": "Smart Account Intelligence",
-  "label": "Account health scoring, missing-data guidance, and Data Quality reporting"
+  "note": "Startup parsing repaired; Smart Account Intelligence and Building Navigator included",
+  "label": "Repairs 0.79.11/0.79.12 syntax failures while preserving the existing vault",
+  "version": "0.79.13",
+  "name": "Startup Repair + Building Navigator"
 }
