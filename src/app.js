@@ -1,4 +1,4 @@
-import { BUILD, KEY, ACTIVE_JOB_KEY, loadData, saveData, ensureSite, fullAddress, esc, uid, downloadBlob, syncSummary, syncQueue, syncConflicts, syncActivity, createSyncPackage, importSyncPackage, resolveSyncConflict, notePackageExport, deviceIdentity, recordSyncActivity, autoBackupInfo, latestAutoBackup, restoreAutoBackup, isDemoMode, setDemoMode, resetDemoData } from "./storage.js?v=0.75.1";
+import { BUILD, KEY, ACTIVE_JOB_KEY, loadData, saveData, ensureSite, fullAddress, esc, uid, downloadBlob, syncSummary, syncQueue, syncConflicts, syncActivity, createSyncPackage, importSyncPackage, resolveSyncConflict, notePackageExport, deviceIdentity, recordSyncActivity, autoBackupInfo, latestAutoBackup, restoreAutoBackup, isDemoMode, setDemoMode, resetDemoData } from "./storage.js?v=0.75.2";
 window.__FIREVAULT_MODULE_READY = true;
 
 function fvPreferenceStore0739(){
@@ -1710,8 +1710,16 @@ function setActiveNav(){
   const active=document.getElementById("nav-"+section);
   if(active){active.classList.add("active");active.setAttribute("aria-current","page");}
 }
-function wireGlobalHeader537(){ updateGlobalToday071(); }
-function showGlobalChrome537(){ const h=document.getElementById("appHeader"); const n=document.getElementById("appNav"); if(h){ h.style.display="flex"; h.style.visibility="visible"; h.style.opacity="1"; } if(n){ n.style.display="grid"; n.style.visibility="visible"; n.style.opacity="1"; } wireGlobalHeader537(); }
+function syncGlobalHeaderClearance0752(){
+  const header=document.getElementById("appHeader");
+  if(!header || getComputedStyle(header).display==="none") return;
+  const measured=Math.ceil(header.getBoundingClientRect().height||0);
+  if(measured>0) document.documentElement.style.setProperty("--fv-measured-header-h",`${measured}px`);
+}
+function wireGlobalHeader537(){ updateGlobalToday071(); requestAnimationFrame(syncGlobalHeaderClearance0752); }
+function showGlobalChrome537(){ const h=document.getElementById("appHeader"); const n=document.getElementById("appNav"); if(h){ h.style.display="flex"; h.style.visibility="visible"; h.style.opacity="1"; } if(n){ n.style.display="grid"; n.style.visibility="visible"; n.style.opacity="1"; } wireGlobalHeader537(); requestAnimationFrame(()=>requestAnimationFrame(syncGlobalHeaderClearance0752)); }
+window.addEventListener("resize",()=>requestAnimationFrame(syncGlobalHeaderClearance0752),{passive:true});
+window.addEventListener("orientationchange",()=>setTimeout(syncGlobalHeaderClearance0752,120),{passive:true});
 
 function contextualHelpInfo060(){
   if(view!=="settings") return CONTEXT_HELP_060[view]||null;
@@ -3770,7 +3778,7 @@ function accountCategoryLabel0735(s={}){
   return ({clss:"CLSS",alarmnet:"AlarmNet",ipdact:"IPDACT",basic:"Basic"})[category]||"Basic";
 }
 
-/* Build 0.75.1 — persistent account workflow helpers */
+/* Build 0.75.2 — persistent account workflow helpers */
 function accountTabPreference0751(){
   try{
     const value=sessionStorage.getItem("firevault_account_tab_0751");
