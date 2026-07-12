@@ -1,5 +1,6 @@
 {
-  "build": "0.76.4",
+  "build": "0.76.5",
   "released": "2026-07-12",
-  "note": "Accounts Fast Find and Inline Favorites"
+  "note": "Accounts Fast Find and Inline Favorites",
+  "label": "Accounts list stability repair"
 }

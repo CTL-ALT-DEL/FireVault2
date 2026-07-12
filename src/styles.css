@@ -16679,3 +16679,99 @@ input[data-fv-phone0758="1"]{font-variant-numeric:tabular-nums;letter-spacing:.0
   .accountsSortWrap0764 select{width:88px!important}
   .accountsListTools0764{gap:4px!important}
 }
+
+
+/* Build 0.76.5 — emergency Accounts list stability repair */
+.accountsListHead0759.accountsListHead0764{
+  display:flex!important;
+  flex-direction:column!important;
+  align-items:stretch!important;
+  justify-content:flex-start!important;
+  gap:6px!important;
+  min-height:auto!important;
+  padding:3px 4px 7px!important;
+}
+.accountsListHead0764 .accountsResultSummary0761{
+  min-width:0!important;
+  display:flex!important;
+  align-items:baseline!important;
+  justify-content:space-between!important;
+  gap:8px!important;
+}
+.accountsListHead0764 .accountsResultSummary0761 strong{
+  flex:0 0 auto!important;
+  white-space:nowrap!important;
+}
+.accountsListHead0764 .accountsResultSummary0761 span{
+  min-width:0!important;
+  max-width:none!important;
+  overflow:hidden!important;
+  text-overflow:ellipsis!important;
+  white-space:nowrap!important;
+  text-align:right!important;
+}
+.accountsListTools0764{
+  width:100%!important;
+  max-width:none!important;
+  display:grid!important;
+  grid-template-columns:34px 78px minmax(104px,1fr)!important;
+  align-items:center!important;
+  justify-content:stretch!important;
+  gap:6px!important;
+}
+.accountsListTools0764 > [hidden]{display:none!important}
+.accountsListTools0764 .accountsReset0761[hidden]{display:block!important;visibility:hidden!important;pointer-events:none!important}
+.accountsCompactControl0764{
+  display:block!important;
+  min-width:0!important;
+  font-size:0!important;
+}
+.accountsCompactControl0764 > span{display:none!important}
+.accountsCompactControl0764 select,
+.accountsListHead0764 .accountsListTools0764 > label:last-child select{
+  display:block!important;
+  width:100%!important;
+  min-width:0!important;
+  height:34px!important;
+  min-height:34px!important;
+  padding:4px 25px 4px 9px!important;
+}
+.accountsJumpWrap0763.accountsCompactControl0764 select,
+.accountsSortWrap0764 select{width:100%!important}
+.accountsList0759.accountsList0764{
+  display:flex!important;
+  flex-direction:column!important;
+  align-items:stretch!important;
+  gap:9px!important;
+  min-height:0!important;
+  overflow-y:auto!important;
+  overflow-x:hidden!important;
+  scroll-snap-type:none!important;
+  scroll-padding-top:0!important;
+  scroll-behavior:auto!important;
+  padding-top:4px!important;
+}
+.accountCard0759.accountCard0764{
+  flex:0 0 auto!important;
+  min-height:0!important;
+  height:auto!important;
+  overflow:hidden!important;
+  scroll-snap-align:none!important;
+  scroll-snap-stop:normal!important;
+  scroll-margin-top:0!important;
+}
+.accountCard0764 .accountCardBody0759{
+  min-height:150px!important;
+  height:auto!important;
+  padding-top:12px!important;
+  padding-bottom:12px!important;
+}
+.accountCard0764 .accountQuickActions0762{
+  flex:0 0 auto!important;
+  margin-top:7px!important;
+  padding-bottom:1px!important;
+}
+@media(max-width:380px){
+  .accountsListTools0764{grid-template-columns:34px 70px minmax(92px,1fr)!important;gap:5px!important}
+  .accountCard0764 .accountCardBody0759{min-height:146px!important}
+}

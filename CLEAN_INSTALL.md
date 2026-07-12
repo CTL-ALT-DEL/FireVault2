@@ -1,7 +1,3 @@
-# FireVault Build 0.76.4 Deployment
+# FireVault Build 0.76.5 Deployment
 
-Deploy the contents of this ZIP over the existing FireVault GitHub Pages repository. Do not delete or reinstall the current Home Screen app.
-
-After GitHub Pages finishes deploying, open FireVault and use its update prompt or Settings → Data → App Updates.
-
-This build does not change the FireVault vault key or database format.
+Deploy over the existing GitHub Pages repository. Do not delete the installed Home Screen app. After deployment, use FireVault Settings → Data → App Updates → Check for Updates, then reload if prompted. Existing local data remains unchanged.

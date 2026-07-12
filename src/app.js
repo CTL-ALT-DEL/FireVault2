@@ -1,4 +1,4 @@
-import { BUILD, KEY, ACTIVE_JOB_KEY, loadData, saveData, ensureSite, fullAddress, esc, uid, downloadBlob, syncSummary, syncQueue, syncConflicts, syncActivity, createSyncPackage, importSyncPackage, resolveSyncConflict, notePackageExport, deviceIdentity, recordSyncActivity, autoBackupInfo, latestAutoBackup, restoreAutoBackup, isDemoMode, setDemoMode, resetDemoData } from "./storage.js?v=0.76.4";
+import { BUILD, KEY, ACTIVE_JOB_KEY, loadData, saveData, ensureSite, fullAddress, esc, uid, downloadBlob, syncSummary, syncQueue, syncConflicts, syncActivity, createSyncPackage, importSyncPackage, resolveSyncConflict, notePackageExport, deviceIdentity, recordSyncActivity, autoBackupInfo, latestAutoBackup, restoreAutoBackup, isDemoMode, setDemoMode, resetDemoData } from "./storage.js?v=0.76.5";
 window.__FIREVAULT_MODULE_READY = true;
 
 function fvPreferenceStore0739(){
@@ -3574,26 +3574,6 @@ function sites(){
     window.setTimeout(()=>target.focus({preventScroll:true}),260);
   });
   scrollTopButton0763?.addEventListener("click",()=>{list?.scrollTo({top:0,behavior:"smooth"});});
-  let accountsSnapTimer0764=0;
-  let accountsSnapBusy0764=false;
-  const snapAccountsToCard0764=()=>{
-    if(!list||accountsSnapBusy0764)return;
-    const cards=[...list.querySelectorAll("[data-account-card0759]")].filter(el=>!el.hidden);
-    if(!cards.length)return;
-    const listTop=list.getBoundingClientRect().top;
-    const nearest=cards.reduce((best,card)=>{
-      const distance=Math.abs(card.getBoundingClientRect().top-listTop-4);
-      return !best||distance<best.distance?{card,distance}:best;
-    },null);
-    if(!nearest||nearest.distance<3)return;
-    accountsSnapBusy0764=true;
-    const top=Math.max(0,nearest.card.offsetTop-list.offsetTop-4);
-    list.scrollTo({top,behavior:"smooth"});
-    window.setTimeout(()=>{accountsSnapBusy0764=false;},240);
-  };
-  if("onscrollend" in window){
-    list?.addEventListener("scrollend",snapAccountsToCard0764,{passive:true});
-  }
   document.querySelectorAll("[data-sites-filter0759]").forEach(btn=>btn.addEventListener("click",()=>{
     sitesFilter0736=btn.dataset.sitesFilter0759||"all";
     document.querySelectorAll("[data-sites-filter0759]").forEach(x=>x.classList.toggle("active",x===btn));
@@ -3605,10 +3585,6 @@ function sites(){
     accountsScroll0759=list.scrollTop;
     if(scrollTopButton0763)scrollTopButton0763.hidden=list.scrollTop<420;
     persistAccountsViewState0761();
-    if(!("onscrollend" in window)&&!accountsSnapBusy0764){
-      window.clearTimeout(accountsSnapTimer0764);
-      accountsSnapTimer0764=window.setTimeout(snapAccountsToCard0764,180);
-    }
   },{passive:true});
   list?.addEventListener("click",event=>{
     const callButton=event.target.closest("[data-account-call0762]");
@@ -8535,7 +8511,7 @@ function diagnostics(){
 }
 function showChangelog(){
   const notes = [
-    "Build 0.76.4 compacts the Jump and Sort controls, prevents account-card actions from clipping, and snaps scrolled accounts cleanly to the top of the list area.",
+    "Build 0.76.5 compacts the Jump and Sort controls, prevents account-card actions from clipping, and snaps scrolled accounts cleanly to the top of the list area.",
     "Build 0.76.2 adds one-tap Call and Route controls to every account card, identifies multi-account addresses, clarifies account health, and prevents accidental double-opening while preserving the Accounts view state.",
     "Build 0.76.1 hardens the Accounts directory with persistent view state, inline Favorites, recent-opened context, keyboard shortcuts, and a permanent app-chrome repair so the bottom navigation remains visible after saves and Favorite changes.",
     "Build 0.76.0 completes the Accounts workflow with sorting, safer manual account creation, duplicate Account ID protection, and improved empty states.",
