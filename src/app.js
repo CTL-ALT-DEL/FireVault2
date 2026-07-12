@@ -28,6 +28,7 @@ const NEARBY_STATE_KEY_0652 = "firevault_nearby_state_0652";
 let nearbyState = loadNearbyState0652();
 let nearbyScanStatus0652 = {state:"idle",message:"",attempt:"",at:""};
 let siteSearch = "";
+let sitesFilter0736 = "all";
 let dailySummaryDate569 = localStorage.getItem("firevault_daily_summary_date") || "";
 let dailyPickerMonth571 = localDateString().slice(0,7);
 let libraryFolder = "all";
@@ -252,7 +253,7 @@ function persistSettingsScrollState576(){
   try{ sessionStorage.setItem(SETTINGS_SCROLL_KEY_576, JSON.stringify(settingsScrollState576)); }catch{}
 }
 function captureSettingsScroll576(){
-  const home=document.querySelector(".settingsHomeScreen488.settingsStable573");
+  const home=document.querySelector(".settingsTabItems0736, .settingsHomeScreen488.settingsStable573");
   if(home) settingsScrollState576.home=Math.max(0,Number(home.scrollTop)||0);
   const detail=document.querySelector(".settingsDetailBody488, .settingsDetailBody451");
   if(detail) settingsScrollState576.details[settingsTab]=Math.max(0,Number(detail.scrollTop)||0);
@@ -260,7 +261,7 @@ function captureSettingsScroll576(){
   persistSettingsScrollState576();
 }
 function restoreSettingsScroll576(inDetail){
-  const selector=inDetail ? ".settingsDetailBody488, .settingsDetailBody451" : ".settingsHomeScreen488.settingsStable573";
+  const selector=inDetail ? ".settingsDetailBody488, .settingsDetailBody451" : ".settingsTabItems0736, .settingsHomeScreen488.settingsStable573";
   const target=inDetail ? Number(settingsScrollState576.details[settingsTab])||0 : Number(settingsScrollState576.home)||0;
   const restore=()=>{
     const el=document.querySelector(selector);
@@ -2402,14 +2403,14 @@ function nearbySummary069(){
   return {inv,allRows,rows,nearby:rows.length};
 }
 function nearbyAccountCard069(r,index){
-  const s=r.s,id=accountId069(s),category=accountCategory070(s),plus=sitePlusCode071(s);
+  const s=r.s,id=accountId069(s),category=accountCategory070(s);
   const categoryLabel=NEARBY_CATEGORY_META_070[category]?.label||'Basic';
   return `<article class="nearbyAccount069 category-${category} ${homeNearbySelected069===s.id?'selected':''}" data-nearby-card069="${esc(s.id)}" data-nearby-index069="${index}" data-nearby-category070="${category}">
     <span class="nearbyNumber069">${index+1}</span>
     <div class="nearbyInfo069">
       <strong>${esc(s.name||'Unnamed Account')}</strong>
       <div class="nearbyAddress0712"><span>${esc(fullAddress(s)||'No address saved')}</span></div>
-      <small class="nearbyMeta0712">${id?`<b>${esc(id)}</b>`:''}<em class="nearbyCategoryBadge0712 category-${category}">${esc(categoryLabel)}</em>${plus?`<span>Plus Code: ${esc(plus)}</span>`:''}</small>
+      <small class="nearbyMeta0712">${id?`<b>${esc(id)}</b>`:''}<em class="nearbyCategoryBadge0712 category-${category}">${esc(categoryLabel)}</em></small>
     </div>
     <span class="nearbyDistance069">${esc(distanceLabel(r.meters))}<i class="gpsDot069"></i></span>
   </article>`;
@@ -3153,35 +3154,86 @@ function attentionQueue(){
   document.querySelectorAll(".attentionItem").forEach(el=>el.onclick=()=>{selectedSiteId=el.dataset.id; route("siteDetail");});
 }
 
+function siteAccountRow0736(s){
+  const id=accountId069(s);
+  const category=accountCategory070(s);
+  const categoryLabel=NEARBY_CATEGORY_META_070[category]?.label||"Basic";
+  const health=siteHealth(s);
+  const openTasks=siteOpenTasks556(s).length;
+  const openDef=siteOpenDeficiencies556(s).length;
+  const panel=[s.panelManufacturer,s.panelModel].filter(Boolean).join(" ");
+  const contact=primaryContact477(s);
+  const status=[];
+  if(openDef) status.push(`${openDef} deficienc${openDef===1?"y":"ies"}`);
+  if(openTasks) status.push(`${openTasks} task${openTasks===1?"":"s"}`);
+  if(!status.length) status.push("No open work");
+  return `<article class="accountRow0736 category-${category}" data-id="${esc(s.id)}" data-search="${esc(siteSearchBlob(s))}" data-attention="${health.cls==='healthWarn'?'1':'0'}" data-open="${openTasks||openDef?'1':'0'}" data-gps="${hasGps(s)?'1':'0'}">
+    <span class="accountAccent0736" aria-hidden="true"></span>
+    <div class="accountBody0736">
+      <div class="accountTitleLine0736"><strong>${esc(s.name||"Unnamed Account")}</strong><span class="accountType0736 category-${category}">${esc(categoryLabel)}</span></div>
+      ${id?`<b class="accountId0736">${esc(id)}</b>`:""}
+      <p class="accountAddress0736">${esc(fullAddress(s)||"No address saved")}</p>
+      <small class="accountDetail0736">${esc(panel||contact?.name||"Account details not entered")}</small>
+    </div>
+    <div class="accountRight0736">
+      <span class="accountWork0736 ${openDef?'hasDeficiency':openTasks?'hasTasks':'clear'}">${esc(status.join(" • "))}</span>
+      <span class="accountGps0736 ${hasGps(s)?'ready':'missing'}">${hasGps(s)?'GPS':'No GPS'}</span>
+      <b aria-hidden="true">›</b>
+    </div>
+  </article>`;
+}
+
 function sites(){
-  const gpsSavedCount = data.sites.filter(hasGps).length;
-  const attentionCount = data.sites.filter(s=>siteHealth(s).cls === "healthWarn").length;
-  html(`<div class="screen sitesScreen423 sitesScreen432"><div class="row"><h1>Sites</h1><div class="miniActions"><button class="ghost smallBtn" id="nearBtn">Nearby</button><button class="primary" id="addBtn">＋</button></div></div>
-    <div class="card siteFinderCard"><div class="siteFinderTop"><input id="siteSearch" type="search" placeholder="Search sites, panels, contacts, equipment..." value="${esc(siteSearch)}" autocomplete="off"><button class="ghost smallBtn" id="clearSiteSearch">Clear</button></div><div class="siteFinderHint"><span id="siteSearchCount">${data.sites.length} site${data.sites.length===1?"":"s"}</span><span>Searches all saved vault details</span></div></div>
-    <div class="card gpsStatusBar"><div><strong>GPS / Nearby</strong><p>${gpsSavedCount} site${gpsSavedCount===1?"":"s"} with GPS saved • ${attentionCount} need attention • radius ${nearbyRadiusMiles()} mi</p></div><button class="ghost smallBtn" id="gpsStripScan">Scan Nearby</button></div>
-    <div class="list grow siteSearchList">${data.sites.length?data.sites.map(s=>`<div class="card siteItem redline" data-id="${esc(s.id)}" data-search="${esc(siteSearchBlob(s))}"><div class="row"><div><h2>${esc(s.name||"Unnamed Site")}</h2><p>${esc(fullAddress(s))}</p><p>${esc([s.panelManufacturer,s.panelModel].filter(Boolean).join(" ")||"Panel not entered")}</p></div><div class="sitePills"><span class="pill healthPill ${siteHealth(s).cls}">${siteHealth(s).label} ${siteHealth(s).score}%</span><span class="pill">${(s.tasks||[]).filter(t=>(t.status||"Open")!=="Done").length} open</span><span class="pill">${(s.equipment||[]).length} equip</span><span class="pill ${hasGps(s)?"gpsPill":"noGpsPill"}">${hasGps(s)?"GPS saved":"No GPS"}</span></div></div></div>`).join(""):`<div class="empty">No sites yet. Add your first customer vault.</div>`}</div></div>`);
-  document.getElementById("addBtn").onclick=()=>{selectedSiteId=null; mode=null; route("siteForm");};
-  document.getElementById("nearBtn").onclick=detectNearbySites;
-  document.getElementById("gpsStripScan").onclick=detectNearbySites;
+  const accounts=[...(data.sites||[])].sort((a,b)=>String(a.name||"").localeCompare(String(b.name||""),undefined,{sensitivity:"base"}));
+  const attentionCount=accounts.filter(s=>siteHealth(s).cls==="healthWarn").length;
+  const openWorkCount=accounts.filter(s=>siteOpenTasks556(s).length||siteOpenDeficiencies556(s).length).length;
+  const missingGpsCount=accounts.filter(s=>!hasGps(s)).length;
+  html(`<div class="screen accountsPage0736">
+    <header class="accountsHeader0736">
+      <div><span>Customer vault</span><h1>Accounts</h1><p>${accounts.length} saved account${accounts.length===1?"":"s"}</p></div>
+      <div class="accountsHeaderActions0736"><button class="ghost" id="nearBtn" aria-label="Find nearby accounts">${fvIcon073("nearby","accountsHeaderIcon0736")}</button><button class="primary" id="addBtn" aria-label="Add account">＋</button></div>
+    </header>
+    <section class="accountSearch0736">
+      <span aria-hidden="true">⌕</span><input id="siteSearch" type="search" placeholder="Search names, addresses, IDs, panels…" value="${esc(siteSearch)}" autocomplete="off"><button id="clearSiteSearch" aria-label="Clear search">×</button>
+    </section>
+    <section class="accountStats0736" aria-label="Account summary">
+      <button data-sites-filter0736="all" class="${sitesFilter0736==='all'?'active':''}"><strong>${accounts.length}</strong><span>All</span></button>
+      <button data-sites-filter0736="attention" class="${sitesFilter0736==='attention'?'active':''}"><strong>${attentionCount}</strong><span>Attention</span></button>
+      <button data-sites-filter0736="open" class="${sitesFilter0736==='open'?'active':''}"><strong>${openWorkCount}</strong><span>Open Work</span></button>
+      <button data-sites-filter0736="missingGps" class="${sitesFilter0736==='missingGps'?'active':''}"><strong>${missingGpsCount}</strong><span>No GPS</span></button>
+    </section>
+    <div class="accountListHead0736"><strong id="siteSearchCount">${accounts.length} account${accounts.length===1?"":"s"}</strong><span>Tap an account to open</span></div>
+    <div class="accountList0736 grow" id="accountList0736">${accounts.length?accounts.map(siteAccountRow0736).join(""):`<div class="accountEmpty0736"><span>＋</span><strong>No accounts yet</strong><p>Add your first customer account to begin.</p><button class="primary" id="emptyAdd0736">Add Account</button></div>`}</div>
+  </div>`);
+  const openAdd=()=>{selectedSiteId=null;mode=null;route("siteForm");};
+  document.getElementById("addBtn")?.addEventListener("click",openAdd);
+  document.getElementById("emptyAdd0736")?.addEventListener("click",openAdd);
+  document.getElementById("nearBtn")?.addEventListener("click",detectNearbySites);
   const searchEl=document.getElementById("siteSearch");
   const clearBtn=document.getElementById("clearSiteSearch");
   const countEl=document.getElementById("siteSearchCount");
   const applySiteSearch=()=>{
     siteSearch=(searchEl?.value||"").trim().toLowerCase();
     let shown=0;
-    document.querySelectorAll(".siteSearchList .siteItem").forEach(el=>{
-      const ok=!siteSearch || (el.dataset.search||"").includes(siteSearch);
+    document.querySelectorAll(".accountRow0736").forEach(el=>{
+      const searchOk=!siteSearch||(el.dataset.search||"").includes(siteSearch);
+      const filterOk=sitesFilter0736==="all" ||
+        (sitesFilter0736==="attention"&&el.dataset.attention==="1") ||
+        (sitesFilter0736==="open"&&el.dataset.open==="1") ||
+        (sitesFilter0736==="missingGps"&&el.dataset.gps!=="1");
+      const ok=searchOk&&filterOk;
       el.hidden=!ok;
       if(ok) shown++;
     });
-    if(countEl) countEl.textContent = `${shown} of ${data.sites.length} site${data.sites.length===1?"":"s"}`;
-    if(clearBtn) clearBtn.style.visibility = siteSearch ? "visible" : "hidden";
+    if(countEl) countEl.textContent=`${shown} account${shown===1?"":"s"}`;
+    if(clearBtn) clearBtn.hidden=!siteSearch;
   };
-  if(searchEl){ searchEl.oninput=applySiteSearch; applySiteSearch(); }
-  if(clearBtn) clearBtn.onclick=()=>{ if(searchEl){ searchEl.value=""; searchEl.focus(); } applySiteSearch(); };
-  document.querySelectorAll(".siteItem").forEach(el=>el.onclick=()=>{selectedSiteId=el.dataset.id; route("siteDetail");});
+  searchEl?.addEventListener("input",applySiteSearch);
+  clearBtn?.addEventListener("click",()=>{if(searchEl){searchEl.value="";searchEl.focus();}applySiteSearch();});
+  document.querySelectorAll("[data-sites-filter0736]").forEach(btn=>btn.onclick=()=>{sitesFilter0736=btn.dataset.sitesFilter0736||"all";sites();});
+  document.querySelectorAll(".accountRow0736").forEach(el=>el.onclick=()=>{selectedSiteId=el.dataset.id;route("siteDetail");});
+  applySiteSearch();
 }
-
 
 function nearbySites(){
   const radius=nearbyRadiusMiles();
@@ -5932,7 +5984,7 @@ const SETTINGS_GROUPS_067 = [
 ];
 function settingsGroupForTab067(tab){ return SETTINGS_GROUPS_067.find(g=>g.tabs.includes(tab))?.key || "data"; }
 function settingsGroup067ByKey(key){ return SETTINGS_GROUPS_067.find(g=>g.key===key) || SETTINGS_GROUPS_067[0]; }
-function openSettingsGroup067(key){ settingsGroup067=key||"profile"; mode="settingsGroup"; view="settings"; render(); }
+function openSettingsGroup067(key){ settingsGroup067=key||"profile"; mode=null; view="settings"; render(); }
 function settingsGroupSummary067(group,tabs){
   const labels=group.tabs.filter(x=>x!=="diagnostics").map(id=>tabs.find(t=>t[0]===id)?.[1]).filter(Boolean);
   if(group.tabs.includes("diagnostics")) labels.push("Diagnostics");
@@ -5958,6 +6010,19 @@ function settingsTabs(){
     ["about","About","Installed version, local storage details, and application information."]
   ];
 }
+function settingsTabLabel0736(key){
+  return ({profile:"General",appearance:"App",field:"Field",reports:"Reports",data:"Data"})[key]||"Settings";
+}
+function settingsTopTabs0736(activeKey){
+  return `<div class="settingsTopTabs0736" role="tablist" aria-label="Settings categories">${SETTINGS_GROUPS_067.map(g=>`<button role="tab" aria-selected="${g.key===activeKey?'true':'false'}" class="${g.key===activeKey?'active':''}" data-settings-top-tab0736="${g.key}"><span>${g.icon}</span><b>${esc(settingsTabLabel0736(g.key))}</b></button>`).join("")}</div>`;
+}
+function wireSettingsTopTabs0736(){
+  document.querySelectorAll("[data-settings-top-tab0736]").forEach(btn=>btn.onclick=()=>{settingsGroup067=btn.dataset.settingsTopTab0736||"profile";mode=null;render();});
+}
+function settingsGroupItems0736(group,tabs){
+  return group.tabs.map(id=>id==="diagnostics"?["diagnostics","Diagnostics","Check build, storage, GPS, database, and module health."]:tabs.find(t=>t[0]===id)).filter(Boolean);
+}
+
 
 
 /* Build 0.50.75 Settings navigation recovery */
@@ -5981,7 +6046,7 @@ function restoreAppChrome572(){
   showGlobalChrome537();
 }
 function openSettingsHome572(){
-  settingsGroup067="";
+  settingsGroup067=settingsGroup067||"profile";
   mode=null;
   view="settings";
   restoreAppChrome572();
@@ -6002,91 +6067,71 @@ function settings(){
   restoreAppChrome572();
   const tabs=settingsTabs();
   const active=tabs.find(t=>t[0]===settingsTab)||tabs[0];
-  const inDetail = mode === "settingsDetail";
-  const inGroup = mode === "settingsGroup";
+  const inDetail=mode==="settingsDetail";
+  settingsGroup067=settingsGroup067||settingsGroupForTab067(settingsTab)||"profile";
+  const group=settingsGroup067ByKey(settingsGroup067);
 
-  if(!inDetail && !inGroup){
-    html(`<div class="screen settingsHome067 settingsStable573">
-      <header class="settingsLandingHead067">
-        <button class="ghost settingsHomeBtn572" id="settingsHomeBtn572" aria-label="Return to Home">⌂</button>
-        <div><span>Preferences and data tools</span><h1>Settings</h1><p>Choose a section to adjust FireVault for your field workflow.</p></div>
-        <button class="ghost settingsModulesQuick488" id="modulesQuickBtn">Modules</button>
+  if(!inDetail){
+    const groupItems=settingsGroupItems0736(group,tabs);
+    html(`<div class="screen settingsTabsPage0736 settingsStable573 tone-${group.tone}">
+      <header class="settingsTabsHeader0736">
+        <div><span>FireVault preferences</span><h1>Settings</h1><p>Choose a tab, then open the setting you need.</p></div>
+        <button class="ghost" id="settingsHomeBtn572">Done</button>
       </header>
-      <section class="settingsLandingIntro067">
-        <div><strong>Set up your workflow.</strong><p>Manage field tools, reports, appearance, backups, and account data from one place.</p></div>
-        <span>${SETTINGS_GROUPS_067.length} sections</span>
-      </section>
-      <div class="settingsGroupGrid067" aria-label="Settings folders">
-        ${SETTINGS_GROUPS_067.map(g=>`<button class="settingsGroupCard067 tone-${g.tone}" data-settings-group067="${g.key}"><span class="settingsGroupIcon067">${g.icon}</span><span class="settingsGroupCopy067"><strong>${esc(g.title)}</strong><small>${esc(g.note)}</small><em>${esc(settingsGroupSummary067(g,tabs))}</em></span><b>›</b></button>`).join("")}
+      ${settingsTopTabs0736(group.key)}
+      <section class="settingsTabSummary0736"><span>${group.icon}</span><div><strong>${esc(group.title)}</strong><p>${esc(group.note)}</p></div></section>
+      <div class="settingsTabItems0736 grow">
+        ${groupItems.map(t=>`<button class="settingsTabItem0736" ${t[0]==="diagnostics"?'data-settings-route067="diagnostics"':`data-tab="${t[0]}"`}><span class="settingsItemIcon0736">${settingsIcon550(t[0])}</span><div><strong>${esc(t[1])}</strong><small>${esc(t[2])}</small></div><b>›</b></button>`).join("")}
       </div>
     </div>`);
     document.getElementById("settingsHomeBtn572")?.addEventListener("click",leaveSettingsHome572);
-    document.getElementById("modulesQuickBtn")?.addEventListener("click",()=>{settingsGroup067="appearance";settingsTab="visibility";mode="settingsDetail";render();});
-    document.querySelectorAll("[data-settings-group067]").forEach(b=>b.onclick=()=>openSettingsGroup067(b.dataset.settingsGroup067));
-    restoreSettingsScroll576(false);
-    return;
-  }
-
-  if(inGroup){
-    const group=settingsGroup067ByKey(settingsGroup067);
-    const groupItems=group.tabs.map(id=>id==="diagnostics"?["diagnostics","Diagnostics","Build, storage, GPS, database, and module health checks."]:tabs.find(t=>t[0]===id)).filter(Boolean);
-    html(`<div class="screen settingsGroupScreen067 settingsStable573 tone-${group.tone}">
-      <header class="settingsGroupHead067">
-        <button class="ghost" id="settingsGroupBack067" aria-label="Back to Settings">←</button>
-        <div><span>${group.icon} Settings folder</span><h1>${esc(group.title)}</h1><p>${esc(group.note)}</p></div>
-        <button class="ghost" id="settingsGroupHome067" aria-label="Return to Home">⌂</button>
-      </header>
-      <div class="settingsFolderList067">
-        ${groupItems.map(t=>`<button class="settingsFolderRow067 settingsChoice-${t[0]}" ${t[0]==="diagnostics"?'data-settings-route067="diagnostics"':`data-tab="${t[0]}"`}><span>${settingsIcon550(t[0])}</span><div><strong>${esc(t[1])}</strong><small>${esc(t[2])}</small></div><b>›</b></button>`).join("")}
-      </div>
-      <aside class="settingsFolderTip067"><strong>Tip</strong><span>Use the Home icon to leave Settings, or the back arrow to choose another folder.</span></aside>
-    </div>`);
-    document.getElementById("settingsGroupBack067")?.addEventListener("click",openSettingsHome572);
-    document.getElementById("settingsGroupHome067")?.addEventListener("click",leaveSettingsHome572);
-    document.querySelectorAll(".settingsFolderRow067[data-tab]").forEach(b=>b.onclick=()=>{settingsTab=b.dataset.tab;settingsGroup067=settingsGroupForTab067(settingsTab);if(settingsTab==="manual"){contextualHelpReturn060=null;manualView058="home";manualQuery058="";}mode="settingsDetail";render();});
+    wireSettingsTopTabs0736();
+    document.querySelectorAll(".settingsTabItem0736[data-tab]").forEach(b=>b.onclick=()=>{settingsTab=b.dataset.tab;settingsGroup067=settingsGroupForTab067(settingsTab);if(settingsTab==="manual"){contextualHelpReturn060=null;manualView058="home";manualQuery058="";}mode="settingsDetail";render();});
     document.querySelectorAll("[data-settings-route067]").forEach(b=>b.onclick=()=>openSettingsSubmenu576(b.dataset.settingsRoute067));
     restoreSettingsScroll576(false);
     return;
   }
 
-  if(inDetail && settingsTab==="manual"){
-    settingsGroup067="data";
-    html(`<div class="screen settingsManualScreen067 settingsStable573">
-      <div class="settingsManualShell067">
-        <button class="ghost" id="settingsManualBack067" aria-label="Back to Data, Sync & Support">←</button>
-        <div><span>Data, Sync & Support</span><strong>FireVault Academy</strong></div>
-        <button class="ghost" id="settingsManualHome067" aria-label="Return to Home">⌂</button>
-      </div>
-      <div class="settingsManualBody067 settingsDetailBody488">${manualPanel058()}</div>
+  settingsGroup067=settingsGroupForTab067(settingsTab);
+  const detailGroup=settingsGroup067ByKey(settingsGroup067);
+  const saveable=!['customerImport','backup','updates','manual','about'].includes(settingsTab);
+
+  if(settingsTab==="manual"){
+    html(`<div class="screen settingsTabbedDetail0736 settingsManualScreen067 settingsStable573">
+      <header class="settingsDetailHeader0736">
+        <button class="ghost" id="settingsManualBack067" aria-label="Back to Data settings">←</button>
+        <div><span>${detailGroup.icon} ${esc(settingsTabLabel0736(detailGroup.key))}</span><h1>Help & Manual</h1></div>
+        <button class="ghost" id="settingsManualHome067">Done</button>
+      </header>
+      ${settingsTopTabs0736(detailGroup.key)}
+      <div class="settingsManualBody067 settingsDetailBody488 settingsTabbedBody0736">${manualPanel058()}</div>
     </div>`);
     document.getElementById("settingsManualBack067")?.addEventListener("click",()=>openSettingsGroup067("data"));
     document.getElementById("settingsManualHome067")?.addEventListener("click",leaveSettingsHome572);
+    wireSettingsTopTabs0736();
     wireSettingsPanel();
     restoreSettingsScroll576(true);
     return;
   }
 
-  settingsGroup067=settingsGroupForTab067(settingsTab);
-  const group=settingsGroup067ByKey(settingsGroup067);
-  const saveable=!['customerImport','backup','updates','manual','about'].includes(settingsTab);
-  html(`<div class="screen settingsDetailScreen067 settingsScreen settingsStable573 settingsTab-${settingsTab}" data-settings-tab="${settingsTab}">
-    <header class="settingsDetailHead067 tone-${group.tone}">
-      <button class="ghost" id="settingsBackBtn" aria-label="Back to ${esc(group.title)}">←</button>
-      <div><span>${group.icon} ${esc(group.title)}</span><h1>${esc(active[1])}</h1><p>${esc(active[2])}</p></div>
-      <div class="settingsDetailActions067">
-        <button class="ghost" id="settingsDetailHome572" aria-label="Return to Home">⌂</button>
-        ${saveable?`<button class="primary" id="saveSettingsTop">Save</button>`:`<button class="ghost" id="settingsDoneBtn">Done</button>`}
-      </div>
+  html(`<div class="screen settingsTabbedDetail0736 settingsDetailScreen067 settingsScreen settingsStable573 settingsTab-${settingsTab}" data-settings-tab="${settingsTab}">
+    <header class="settingsDetailHeader0736 tone-${detailGroup.tone}">
+      <button class="ghost" id="settingsBackBtn" aria-label="Back to ${esc(settingsTabLabel0736(detailGroup.key))} settings">←</button>
+      <div><span>${detailGroup.icon} ${esc(settingsTabLabel0736(detailGroup.key))}</span><h1>${esc(active[1])}</h1></div>
+      <div class="settingsDetailActions0736">${saveable?`<button class="primary" id="saveSettingsTop">Save</button>`:`<button class="ghost" id="settingsDoneBtn">Done</button>`}</div>
     </header>
-    <div class="settingsDetailBody067 settingsDetailBody488 settingsContent448">${settingsPanel()}</div>
+    ${settingsTopTabs0736(detailGroup.key)}
+    <p class="settingsDetailNote0736">${esc(active[2])}</p>
+    <div class="settingsDetailBody067 settingsDetailBody488 settingsContent448 settingsTabbedBody0736">${settingsPanel()}</div>
   </div>`);
-  document.getElementById("settingsBackBtn")?.addEventListener("click",()=>openSettingsGroup067(settingsGroup067));
-  document.getElementById("settingsDetailHome572")?.addEventListener("click",leaveSettingsHome572);
-  document.getElementById("settingsDoneBtn")?.addEventListener("click",()=>openSettingsGroup067(settingsGroup067));
+  document.getElementById("settingsBackBtn")?.addEventListener("click",()=>openSettingsGroup067(detailGroup.key));
+  document.getElementById("settingsDoneBtn")?.addEventListener("click",()=>openSettingsGroup067(detailGroup.key));
   document.getElementById("saveSettingsTop")?.addEventListener("click",saveSettings);
+  wireSettingsTopTabs0736();
   wireSettingsPanel();
   restoreSettingsScroll576(true);
 }
+
 function fieldBlock(label, inner, note=""){
   return `<div class="settingField"><label>${label}</label>${inner}${note?`<p class="fieldNote">${note}</p>`:""}</div>`;
 }
@@ -7752,6 +7797,7 @@ function diagnostics(){
 }
 function showChangelog(){
   const notes = [
+    "Build 0.73.6 removes Plus Code text from Nearby cards, redesigns the Accounts directory, and replaces Settings folders with direct category tabs.",
     "Build 0.73.5 redesigns Account Detail with five information tabs, groups same-address accounts on the Nearby map, and removes the cellular coverage tool.",
     "Build 0.73.4 adds the Tools hub and global navigation structure.",
     "Build 0.73.2 restores the brighter selected-account green and adds an old-school terminal typing sequence for database and latest-version checks on the splash screen.",

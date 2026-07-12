@@ -14852,3 +14852,91 @@ body.app-booted533.homeFullscreen480 > #appNav{display:none!important}
 .staticMarker069.multiAccountMarker0735{width:38px!important;height:38px!important;background:#0d6b38!important;border-width:3px!important;box-shadow:0 0 0 3px rgba(255,255,255,.18),0 5px 14px rgba(0,0,0,.6)!important;z-index:8!important}.staticMarker069.multiAccountMarker0735 span{font-size:.82rem!important;color:#fff!important}.staticMarker069.multiAccountMarker0735 b{position:absolute;left:50%;top:calc(100% + 3px);transform:translateX(-50%);padding:2px 4px;border-radius:4px;background:rgba(5,12,8,.94);border:1px solid #a7f3d0;color:#caffdb;font-size:5px;line-height:1;letter-spacing:.08em;white-space:nowrap}.staticMarker069.multiAccountMarker0735.selected{width:43px!important;height:43px!important;background:#32ef76!important}.staticMarker069.multiAccountMarker0735.selected span{color:#062412!important}.staticMarker069.category-multi{--category:#0d6b38}
 @media(max-width:390px){.accountHeader0735{grid-template-columns:39px minmax(0,1fr) 39px auto;padding-left:6px;padding-right:6px}.accountHeader0735 strong{font-size:13px}.accountEdit0735{padding:0 8px;font-size:9px}.accountTabs0735{grid-template-columns:repeat(5,minmax(68px,1fr))!important}.accountLocationCard0735{grid-template-columns:minmax(0,1fr) 40%}.accountAddress0735{padding:11px}.accountAddress0735 strong{font-size:11.5px}.accountInfoCard0735 button,.accountInfoCard0735 a{grid-template-columns:80px minmax(0,1fr);padding-left:10px;padding-right:10px}.accountMetricCards0735 strong{font-size:10.5px}.accountDetailGrid0735{grid-template-columns:1fr}.accountPhotoGrid0735{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(min-width:760px){.accountTabScroll0735{padding-left:max(16px,calc((100vw - 820px)/2));padding-right:max(16px,calc((100vw - 820px)/2))}.accountLocationCard0735{grid-template-columns:minmax(0,1fr) 330px}.accountPhotoGrid0735{grid-template-columns:repeat(4,minmax(0,1fr))}}
+
+
+/* Build 0.73.6 — simplified Accounts and tabbed Settings */
+.accountsPage0736{gap:10px;min-height:0}
+.accountsHeader0736{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:4px 2px 2px;background:transparent;border:0;height:auto}
+.accountsHeader0736>div:first-child{min-width:0}
+.accountsHeader0736 span{display:block;color:#9aa7ba;font-size:10px;font-weight:900;text-transform:uppercase;letter-spacing:.13em}
+.accountsHeader0736 h1{font-size:28px;letter-spacing:-.035em;margin:2px 0 0}
+.accountsHeader0736 p{font-size:12px;margin:3px 0 0}
+.accountsHeaderActions0736{display:flex;gap:8px;flex:0 0 auto}
+.accountsHeaderActions0736 button{width:46px;height:46px;min-height:46px;padding:0;border-radius:13px;display:grid;place-items:center}
+.accountsHeaderActions0736 .primary{font-size:25px;line-height:1}
+.accountsHeaderIcon0736{width:23px;height:23px}
+.accountSearch0736{display:grid;grid-template-columns:26px minmax(0,1fr) 36px;align-items:center;gap:4px;padding:5px 7px 5px 12px;background:#101722;border:1px solid rgba(255,255,255,.11);border-radius:14px;box-shadow:0 8px 22px rgba(0,0,0,.16)}
+.accountSearch0736>span{font-size:22px;color:#8794a7;line-height:1}
+.accountSearch0736 input{min-height:40px;padding:7px 4px;background:transparent;border:0;border-radius:0;font-size:14px;outline:none}
+.accountSearch0736 button{width:34px;height:34px;min-height:34px;padding:0;border:0;border-radius:10px;background:rgba(255,255,255,.06);font-size:20px;color:#cbd5e1}
+.accountSearch0736 button[hidden]{visibility:hidden;display:block}
+.accountStats0736{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px}
+.accountStats0736 button{min-width:0;min-height:52px;padding:7px 4px;border-radius:12px;background:linear-gradient(145deg,#151e2a,#101620);border:1px solid rgba(255,255,255,.08);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;color:#9aa7b8}
+.accountStats0736 button strong{font-size:16px;line-height:1;color:#f8fafc}
+.accountStats0736 button span{font-size:9.5px;font-weight:850;white-space:nowrap;color:#9aa7b8}
+.accountStats0736 button.active{background:color-mix(in srgb,var(--accent) 18%,#111827);border-color:color-mix(in srgb,var(--accent) 58%,rgba(255,255,255,.1));box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--accent) 18%,transparent)}
+.accountStats0736 button.active span{color:#fff}
+.accountListHead0736{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:1px 3px;color:#8794a7}
+.accountListHead0736 strong{font-size:11px;color:#cbd5e1;text-transform:uppercase;letter-spacing:.08em}
+.accountListHead0736 span{font-size:10px}
+.accountList0736{overflow:auto;display:grid;align-content:start;gap:7px;padding:0 1px calc(var(--navH) + 18px)}
+.accountRow0736{--accountTone:#94a3b8;position:relative;display:grid;grid-template-columns:4px minmax(0,1fr) auto;gap:11px;align-items:stretch;min-height:91px;padding:11px 10px 11px 0;background:linear-gradient(145deg,rgba(25,35,49,.98),rgba(14,20,29,.98));border:1px solid rgba(255,255,255,.085);border-radius:14px;overflow:hidden;cursor:pointer;box-shadow:0 7px 18px rgba(0,0,0,.12)}
+.accountRow0736.category-clss{--accountTone:#38bdf8}.accountRow0736.category-alarmnet{--accountTone:#f59e0b}.accountRow0736.category-ipdact{--accountTone:#a78bfa}.accountRow0736.category-basic{--accountTone:#94a3b8}
+.accountRow0736[hidden]{display:none!important}
+.accountAccent0736{display:block;width:4px;height:100%;min-height:69px;border-radius:0 999px 999px 0;background:var(--accountTone);box-shadow:0 0 14px color-mix(in srgb,var(--accountTone) 42%,transparent)}
+.accountBody0736{min-width:0;align-self:center}
+.accountTitleLine0736{display:flex;align-items:center;gap:7px;min-width:0}
+.accountTitleLine0736 strong{font-size:15.5px;line-height:1.15;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#fff}
+.accountType0736{flex:0 0 auto!important;padding:3px 6px;border-radius:999px;font-size:8.5px!important;letter-spacing:.04em!important;color:var(--accountTone)!important;background:color-mix(in srgb,var(--accountTone) 12%,transparent);border:1px solid color-mix(in srgb,var(--accountTone) 35%,transparent)}
+.accountId0736{display:block;margin-top:4px;font-size:11.5px;color:var(--accountTone);letter-spacing:.025em}
+.accountAddress0736{margin:4px 0 0;font-size:11.5px;color:#c3cddd;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.accountDetail0736{display:block;margin-top:3px;font-size:10.5px;color:#8491a4;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.accountRight0736{min-width:76px;display:grid;grid-template-columns:1fr 18px;grid-template-rows:auto auto;align-content:center;align-items:center;gap:6px 6px;text-align:right}
+.accountRight0736>b{grid-column:2;grid-row:1/3;font-size:25px;color:#718096;font-weight:400}
+.accountWork0736{grid-column:1;font-size:9.5px;line-height:1.2;color:#9aa7b8;white-space:nowrap}
+.accountWork0736.hasDeficiency{color:#fca5a5}.accountWork0736.hasTasks{color:#fbbf24}.accountWork0736.clear{color:#86efac}
+.accountGps0736{grid-column:1;justify-self:end;padding:3px 6px;border-radius:999px;font-size:8.5px;font-weight:900;text-transform:uppercase;letter-spacing:.06em}
+.accountGps0736.ready{color:#86efac;background:rgba(34,197,94,.12);border:1px solid rgba(34,197,94,.25)}
+.accountGps0736.missing{color:#cbd5e1;background:rgba(148,163,184,.1);border:1px solid rgba(148,163,184,.2)}
+.accountEmpty0736{display:grid;place-items:center;text-align:center;gap:8px;padding:28px 18px;border:1px dashed rgba(255,255,255,.14);border-radius:16px;color:#94a3b8}
+.accountEmpty0736>span{font-size:30px;color:var(--accent)}.accountEmpty0736 strong{font-size:17px;color:#fff}.accountEmpty0736 p{font-size:12px}.accountEmpty0736 button{margin-top:4px}
+
+.settingsTabsPage0736,.settingsTabbedDetail0736{gap:9px;min-height:0}
+.settingsTabsHeader0736,.settingsDetailHeader0736{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:62px;padding:8px 2px;background:transparent;border:0;height:auto}
+.settingsTabsHeader0736>div,.settingsDetailHeader0736>div:nth-child(2){min-width:0}
+.settingsTabsHeader0736 span,.settingsDetailHeader0736 span{display:block;font-size:9.5px;color:#91a0b4;text-transform:uppercase;letter-spacing:.12em;font-weight:900}
+.settingsTabsHeader0736 h1{font-size:27px;margin:2px 0 0;letter-spacing:-.035em}
+.settingsTabsHeader0736 p{font-size:11.5px;margin:3px 0 0}
+.settingsTabsHeader0736>button{min-height:39px;padding:8px 13px;border-radius:11px}
+.settingsTopTabs0736{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:5px;padding:5px;background:#0e141d;border:1px solid rgba(255,255,255,.08);border-radius:14px}
+.settingsTopTabs0736 button{min-width:0;min-height:45px;padding:5px 2px;border-radius:10px;border:1px solid transparent;background:transparent;color:#8794a7;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px}
+.settingsTopTabs0736 button span{font-size:15px;line-height:1;filter:grayscale(.25)}
+.settingsTopTabs0736 button b{font-size:9px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+.settingsTopTabs0736 button.active{color:#fff;background:color-mix(in srgb,var(--accent) 17%,#182231);border-color:color-mix(in srgb,var(--accent) 46%,rgba(255,255,255,.08));box-shadow:inset 0 -2px 0 color-mix(in srgb,var(--accent) 80%,white 4%)}
+.settingsTabSummary0736{display:flex;align-items:center;gap:11px;padding:11px 12px;border-radius:14px;background:linear-gradient(145deg,color-mix(in srgb,var(--accent) 8%,#172130),#101720);border:1px solid rgba(255,255,255,.08)}
+.settingsTabSummary0736>span{display:grid;place-items:center;width:38px;height:38px;border-radius:11px;background:color-mix(in srgb,var(--accent) 14%,rgba(255,255,255,.04));font-size:20px}
+.settingsTabSummary0736 strong{font-size:14px;color:#fff}.settingsTabSummary0736 p{font-size:10.5px;margin-top:2px}
+.settingsTabItems0736{overflow:auto;display:grid;align-content:start;gap:7px;padding:0 1px calc(var(--navH) + 18px)}
+.settingsTabItem0736{width:100%;display:grid;grid-template-columns:38px minmax(0,1fr) 20px;align-items:center;gap:10px;min-height:68px;padding:10px 11px;text-align:left;border-radius:14px;background:linear-gradient(145deg,rgba(25,35,49,.98),rgba(14,20,29,.98));border:1px solid rgba(255,255,255,.085)}
+.settingsItemIcon0736{display:grid!important;place-items:center;width:38px;height:38px;border-radius:11px;background:rgba(255,255,255,.055);font-size:18px!important;color:#dbe4ef!important}
+.settingsTabItem0736 div{min-width:0}.settingsTabItem0736 strong{display:block;font-size:14px;color:#fff}.settingsTabItem0736 small{display:block;margin-top:3px;font-size:10.5px;line-height:1.35;color:#98a5b7;text-transform:none;letter-spacing:0;font-weight:600}
+.settingsTabItem0736>b{font-size:24px;color:#6f7e91;font-weight:400}
+.settingsDetailHeader0736{display:grid;grid-template-columns:42px minmax(0,1fr) auto;gap:10px}
+.settingsDetailHeader0736>button:first-child{width:42px;height:42px;min-height:42px;padding:0;border-radius:12px;font-size:20px}
+.settingsDetailHeader0736 h1{font-size:20px;margin:2px 0 0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.settingsDetailActions0736 button,.settingsDetailHeader0736>button:last-child{min-height:39px;padding:8px 12px;border-radius:11px}
+.settingsDetailNote0736{margin:-1px 3px 1px;font-size:10.5px;line-height:1.35;color:#8e9caf}
+.settingsTabbedBody0736{min-height:0;overflow:auto;padding:0 1px calc(var(--navH) + 26px)!important}
+.settingsTabbedDetail0736 .settingsTopTabs0736{flex:0 0 auto}
+
+@media(max-width:430px){
+  .accountStats0736{gap:4px}.accountStats0736 button{min-height:49px;padding-left:2px;padding-right:2px}.accountStats0736 button strong{font-size:15px}.accountStats0736 button span{font-size:8.7px}
+  .accountRow0736{grid-template-columns:4px minmax(0,1fr) 72px;gap:9px;padding-right:7px}.accountTitleLine0736 strong{font-size:14.5px}.accountRight0736{min-width:68px}.accountWork0736{font-size:8.8px}
+  .settingsTopTabs0736{gap:3px;padding:4px}.settingsTopTabs0736 button{min-height:42px}.settingsTopTabs0736 button span{font-size:14px}.settingsTopTabs0736 button b{font-size:8.3px}
+  .settingsTabItem0736{grid-template-columns:35px minmax(0,1fr) 18px;min-height:64px;padding:9px}.settingsItemIcon0736{width:35px;height:35px}
+}
+@media(max-width:360px){
+  .accountsHeader0736 h1{font-size:25px}.accountsHeaderActions0736 button{width:42px;height:42px;min-height:42px}
+  .accountType0736{display:none!important}.accountRow0736{grid-template-columns:4px minmax(0,1fr) 64px}.accountRight0736{min-width:60px}.accountWork0736{max-width:58px;overflow:hidden;text-overflow:ellipsis}.accountAddress0736{font-size:10.8px}
+  .settingsTopTabs0736 button span{display:none}.settingsTopTabs0736 button{min-height:36px}.settingsTopTabs0736 button b{font-size:8.2px}
+}

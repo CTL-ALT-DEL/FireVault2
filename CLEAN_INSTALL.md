@@ -1,5 +1,8 @@
-# FireVault Build 0.73.5 Deployment
+# FireVault Build 0.73.6 Deployment
 
-Deploy all files over the existing GitHub Pages project without deleting the installed Home Screen app. Wait for Pages deployment to finish, then use FireVault Settings → App Updates → Check for Updates or reload the existing PWA.
+1. Download and extract the package.
+2. Replace the existing GitHub Pages files with the contents of this package.
+3. Commit and wait for GitHub Pages deployment to finish.
+4. Open FireVault and use Settings → Data → App Updates if the Home Screen app still shows an older build.
 
-This build preserves the existing FireVault storage key and local account database. It removes the Cellular Coverage tool, redesigns individual Account Detail with five Info Tabs, and groups same-address accounts into counted map locations.
+Do not delete and reinstall the Home Screen app unless a current external backup has been downloaded and verified. The live vault storage key remains `firevault_vault_build_030`.
