@@ -16065,3 +16065,298 @@ input[data-fv-phone0758="1"]{font-variant-numeric:tabular-nums;letter-spacing:.0
   .siteDetail0735 .accountTabs0735{gap:4px!important;padding:5px 4px!important;min-height:54px!important}
   .siteDetail0735 .accountTabs0735 button{height:43px!important;min-height:43px!important;font-size:.62rem!important;padding:4px 1px!important}
 }
+
+
+/* Build 0.75.9 — stable Accounts directory rebuild
+   This page uses one authoritative grid and unique class names so older
+   Accounts-page overrides cannot alter its geometry. */
+.accountsDirectory0759{
+  display:grid!important;
+  grid-template-rows:auto auto auto minmax(0,1fr)!important;
+  gap:10px!important;
+  width:100%!important;
+  height:100%!important;
+  min-height:0!important;
+  margin:0!important;
+  padding:0!important;
+  overflow:hidden!important;
+  background:transparent!important;
+}
+.accountsHero0759{
+  position:relative!important;
+  inset:auto!important;
+  transform:none!important;
+  display:flex!important;
+  align-items:center!important;
+  justify-content:space-between!important;
+  gap:12px!important;
+  min-height:68px!important;
+  margin:0!important;
+  padding:1px 2px 3px!important;
+  overflow:visible!important;
+}
+.accountsHeroText0759{min-width:0!important}
+.accountsHeroText0759>span{
+  display:block!important;
+  color:#6faeff!important;
+  font-size:.61rem!important;
+  line-height:1!important;
+  font-weight:950!important;
+  letter-spacing:.15em!important;
+  text-transform:uppercase!important;
+}
+.accountsHeroText0759 h1{
+  margin:5px 0 0!important;
+  color:#f7f9fc!important;
+  font-size:1.7rem!important;
+  line-height:1!important;
+  letter-spacing:-.035em!important;
+}
+.accountsHeroText0759 p{
+  margin:5px 0 0!important;
+  color:#8f9cac!important;
+  font-size:.72rem!important;
+  line-height:1.15!important;
+}
+.accountsHeroActions0759{
+  display:flex!important;
+  align-items:center!important;
+  gap:7px!important;
+  flex:0 0 auto!important;
+}
+.accountsHeroActions0759 button{
+  min-width:64px!important;
+  height:48px!important;
+  min-height:48px!important;
+  padding:5px 9px!important;
+  display:flex!important;
+  flex-direction:column!important;
+  align-items:center!important;
+  justify-content:center!important;
+  gap:2px!important;
+  border-radius:13px!important;
+}
+.accountsHeroActions0759 button span{font-size:.63rem!important;line-height:1!important;font-weight:900!important}
+.accountsHeroActions0759 button b{font-size:1.25rem!important;line-height:.85!important}
+.accountsActionIcon0759{width:20px!important;height:20px!important}
+.accountsSearch0759{
+  display:grid!important;
+  grid-template-columns:34px minmax(0,1fr) 38px!important;
+  align-items:center!important;
+  min-height:52px!important;
+  padding:0 5px 0 8px!important;
+  border:1px solid #2f4258!important;
+  border-radius:15px!important;
+  background:linear-gradient(155deg,#142235,#0c1725)!important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.035),0 7px 18px rgba(0,0,0,.16)!important;
+  overflow:hidden!important;
+}
+.accountsSearchIcon0759{display:grid!important;place-items:center!important;color:#7f92ab!important;font-size:1.4rem!important}
+.accountsSearch0759 input{
+  width:100%!important;
+  height:48px!important;
+  min-height:48px!important;
+  padding:0 5px!important;
+  border:0!important;
+  border-radius:0!important;
+  background:transparent!important;
+  box-shadow:none!important;
+  color:#f4f7fb!important;
+  font-size:16px!important;
+  outline:0!important;
+}
+.accountsSearch0759 input::placeholder{color:#718097!important;opacity:1!important}
+.accountsSearch0759 button{
+  width:34px!important;
+  height:34px!important;
+  min-height:34px!important;
+  padding:0!important;
+  border:0!important;
+  border-radius:10px!important;
+  background:#1a2a3d!important;
+  color:#b8c5d4!important;
+  font-size:1.15rem!important;
+  box-shadow:none!important;
+}
+.accountsSearch0759 button[hidden]{display:none!important}
+.accountsFilters0759{
+  display:grid!important;
+  grid-template-columns:repeat(4,minmax(0,1fr))!important;
+  gap:7px!important;
+  min-height:58px!important;
+}
+.accountsFilters0759 button{
+  min-width:0!important;
+  min-height:58px!important;
+  padding:7px 3px!important;
+  display:flex!important;
+  flex-direction:column!important;
+  align-items:center!important;
+  justify-content:center!important;
+  gap:3px!important;
+  border:1px solid #2d3d50!important;
+  border-radius:13px!important;
+  background:linear-gradient(155deg,#162231,#101923)!important;
+  color:#95a3b5!important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.035),0 6px 14px rgba(0,0,0,.14)!important;
+}
+.accountsFilters0759 button strong{color:#f4f7fb!important;font-size:1rem!important;line-height:1!important}
+.accountsFilters0759 button span{font-size:.59rem!important;line-height:1!important;font-weight:900!important;white-space:nowrap!important}
+.accountsFilters0759 button.active{
+  border-color:#3b82f6!important;
+  background:linear-gradient(160deg,#173d72,#102b54)!important;
+  color:#dbeafe!important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.08),0 7px 18px rgba(15,89,190,.22)!important;
+}
+.accountsResults0759{
+  display:grid!important;
+  grid-template-rows:auto minmax(0,1fr)!important;
+  min-height:0!important;
+  overflow:hidden!important;
+}
+.accountsListHead0759{
+  display:flex!important;
+  align-items:center!important;
+  justify-content:space-between!important;
+  gap:10px!important;
+  min-height:32px!important;
+  padding:0 5px!important;
+}
+.accountsListHead0759 strong{
+  color:#e8edf4!important;
+  font-size:.7rem!important;
+  font-weight:950!important;
+  letter-spacing:.1em!important;
+  text-transform:uppercase!important;
+}
+.accountsListHead0759 span{color:#738296!important;font-size:.66rem!important;font-weight:800!important}
+.accountsList0759{
+  min-height:0!important;
+  overflow-y:auto!important;
+  overflow-x:hidden!important;
+  overscroll-behavior:contain!important;
+  -webkit-overflow-scrolling:touch!important;
+  display:flex!important;
+  flex-direction:column!important;
+  gap:9px!important;
+  padding:2px 2px calc(18px + env(safe-area-inset-bottom))!important;
+  scroll-padding-top:6px!important;
+}
+.accountCard0759{
+  --accountTone0759:#94a3b8;
+  position:relative!important;
+  display:grid!important;
+  grid-template-columns:5px minmax(0,1fr) 18px!important;
+  align-items:stretch!important;
+  gap:11px!important;
+  width:100%!important;
+  min-height:112px!important;
+  padding:0 12px 0 0!important;
+  border:1px solid #293b50!important;
+  border-radius:16px!important;
+  background:linear-gradient(150deg,#152437,#0d1826)!important;
+  color:#f5f7fb!important;
+  text-align:left!important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.035),0 8px 20px rgba(0,0,0,.16)!important;
+  overflow:hidden!important;
+  transform:none!important;
+}
+.accountCard0759.category-clss{--accountTone0759:#38bdf8}
+.accountCard0759.category-alarmnet{--accountTone0759:#f59e0b}
+.accountCard0759.category-ipdact{--accountTone0759:#a78bfa}
+.accountCard0759.category-basic{--accountTone0759:#94a3b8}
+.accountCard0759[hidden]{display:none!important}
+.accountCard0759:active{
+  transform:scale(.99)!important;
+  border-color:#4c6c91!important;
+  background:linear-gradient(150deg,#1b2c42,#102033)!important;
+}
+.accountTone0759{display:block!important;width:5px!important;height:100%!important;background:var(--accountTone0759)!important;box-shadow:0 0 14px color-mix(in srgb,var(--accountTone0759) 45%,transparent)!important}
+.accountCardBody0759{
+  min-width:0!important;
+  padding:11px 0!important;
+  display:flex!important;
+  flex-direction:column!important;
+  align-items:stretch!important;
+  justify-content:center!important;
+  gap:4px!important;
+}
+.accountCardTop0759{display:flex!important;align-items:center!important;gap:7px!important;min-width:0!important}
+.accountCardName0759{
+  min-width:0!important;
+  flex:0 1 auto!important;
+  overflow:hidden!important;
+  text-overflow:ellipsis!important;
+  white-space:nowrap!important;
+  color:#f8fafc!important;
+  font-size:1rem!important;
+  line-height:1.15!important;
+  font-weight:950!important;
+  letter-spacing:-.018em!important;
+}
+.accountFavorite0759{flex:0 0 auto!important;color:#facc15!important;font-size:.9rem!important;line-height:1!important}
+.accountCategory0759{
+  flex:0 0 auto!important;
+  padding:3px 7px!important;
+  border:1px solid color-mix(in srgb,var(--accountTone0759) 55%,#64748b)!important;
+  border-radius:999px!important;
+  background:color-mix(in srgb,var(--accountTone0759) 12%,#111827)!important;
+  color:var(--accountTone0759)!important;
+  font-size:.58rem!important;
+  line-height:1!important;
+  font-weight:950!important;
+  letter-spacing:.08em!important;
+  text-transform:uppercase!important;
+}
+.accountNumber0759{color:var(--accountTone0759)!important;font-size:.75rem!important;line-height:1.1!important;font-weight:950!important;letter-spacing:.075em!important}
+.accountStreet0759{color:#d2dae5!important;font-size:.76rem!important;line-height:1.25!important;white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important}
+.accountSupporting0759{color:#8291a5!important;font-size:.65rem!important;line-height:1.2!important;white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important}
+.accountBadges0759{display:flex!important;align-items:center!important;flex-wrap:wrap!important;gap:6px!important;margin-top:2px!important}
+.accountBadges0759>span{
+  display:inline-flex!important;
+  align-items:center!important;
+  min-height:22px!important;
+  padding:3px 7px!important;
+  border:1px solid #304258!important;
+  border-radius:999px!important;
+  font-size:.58rem!important;
+  line-height:1!important;
+  font-weight:900!important;
+}
+.accountWork0759.clear{border-color:#176b42!important;background:#0e3524!important;color:#78eda9!important}
+.accountWork0759.warning{border-color:#875e18!important;background:#38280d!important;color:#ffd06b!important}
+.accountWork0759.danger{border-color:#8e3039!important;background:#3a171d!important;color:#ff9aa2!important}
+.accountGps0759.ready{border-color:#1f6a47!important;background:#103323!important;color:#83e9ae!important}
+.accountGps0759.missing{border-color:#76521a!important;background:#33240d!important;color:#f5c769!important}
+.accountChevron0759{display:grid!important;place-items:center!important;color:#708198!important;font-size:1.55rem!important;line-height:1!important}
+.accountCard0759 .accountTags0737{margin-top:2px!important;gap:5px!important}
+.accountCard0759 .accountTag0737{font-size:.54rem!important;padding:3px 6px!important}
+.accountsEmpty0759,.accountsNoResults0759{
+  min-height:220px!important;
+  padding:28px 18px!important;
+  display:flex!important;
+  flex-direction:column!important;
+  align-items:center!important;
+  justify-content:center!important;
+  gap:8px!important;
+  border:1px dashed #34485f!important;
+  border-radius:16px!important;
+  background:#0e1824!important;
+  color:#8e9bad!important;
+  text-align:center!important;
+}
+.accountsNoResults0759[hidden]{display:none!important}
+.accountsEmpty0759>span{font-size:2rem!important;color:#60a5fa!important}
+.accountsEmpty0759 strong,.accountsNoResults0759 strong{color:#f3f6fa!important;font-size:1rem!important}
+.accountsEmpty0759 p,.accountsNoResults0759 p{margin:0!important;font-size:.72rem!important}
+.accountsEmpty0759 button{margin-top:6px!important}
+@media(max-width:380px){
+  .accountsHeroText0759 h1{font-size:1.48rem!important}
+  .accountsHeroActions0759 button{min-width:58px!important;padding-left:7px!important;padding-right:7px!important}
+  .accountsFilters0759{gap:5px!important}
+  .accountsFilters0759 button{min-height:55px!important;padding:6px 2px!important}
+  .accountsFilters0759 button span{font-size:.54rem!important}
+  .accountCard0759{min-height:108px!important;gap:9px!important}
+  .accountCardName0759{font-size:.94rem!important}
+  .accountStreet0759{font-size:.71rem!important}
+}

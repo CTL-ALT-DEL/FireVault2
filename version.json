@@ -1,6 +1,6 @@
 {
-  "build": "0.75.8",
+  "build": "0.75.9",
   "released": "2026-07-11",
-  "note": "Site Detail Stability and Phone Formatting",
-  "notes": "Polishes the Site Detail layout, keeps global navigation visible after Favorite changes, and automatically formats all 10-digit phone fields as (xxx)xxx-xxxx."
+  "note": "Accounts Directory Rebuild",
+  "notes": "Rebuilds the Accounts page with one stable layout, simplified account cards, reliable search and filters, preserved list position, and protected global navigation."
 }

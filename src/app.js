@@ -1,4 +1,4 @@
-import { BUILD, KEY, ACTIVE_JOB_KEY, loadData, saveData, ensureSite, fullAddress, esc, uid, downloadBlob, syncSummary, syncQueue, syncConflicts, syncActivity, createSyncPackage, importSyncPackage, resolveSyncConflict, notePackageExport, deviceIdentity, recordSyncActivity, autoBackupInfo, latestAutoBackup, restoreAutoBackup, isDemoMode, setDemoMode, resetDemoData } from "./storage.js?v=0.75.8";
+import { BUILD, KEY, ACTIVE_JOB_KEY, loadData, saveData, ensureSite, fullAddress, esc, uid, downloadBlob, syncSummary, syncQueue, syncConflicts, syncActivity, createSyncPackage, importSyncPackage, resolveSyncConflict, notePackageExport, deviceIdentity, recordSyncActivity, autoBackupInfo, latestAutoBackup, restoreAutoBackup, isDemoMode, setDemoMode, resetDemoData } from "./storage.js?v=0.75.9";
 window.__FIREVAULT_MODULE_READY = true;
 
 function fvPreferenceStore0739(){
@@ -59,6 +59,7 @@ let nearbyState = loadNearbyState0652();
 let nearbyScanStatus0652 = {state:"idle",message:"",attempt:"",at:""};
 let siteSearch = "";
 let sitesFilter0736 = "all";
+let accountsScroll0759 = 0;
 let dailySummaryDate569 = fvSafeGet0739("firevault_daily_summary_date","");
 let dailyPickerMonth571 = localDateString().slice(0,7);
 let libraryFolder = "all";
@@ -3306,86 +3307,129 @@ function attentionQueue(){
   document.querySelectorAll(".attentionItem").forEach(el=>el.onclick=()=>{selectedSiteId=el.dataset.id; route("siteDetail");});
 }
 
-function siteAccountRow0736(s){
+function accountDirectoryWork0759(s){
+  const openTasks=siteOpenTasks556(s).length;
+  const openDef=siteOpenDeficiencies556(s).length;
+  if(openDef) return {label:`${openDef} open deficienc${openDef===1?"y":"ies"}`,cls:"danger"};
+  if(openTasks) return {label:`${openTasks} open task${openTasks===1?"":"s"}`,cls:"warning"};
+  return {label:"No open work",cls:"clear"};
+}
+function accountDirectoryRow0759(s){
   const id=accountId069(s);
   const category=accountCategory070(s);
   const categoryLabel=NEARBY_CATEGORY_META_070[category]?.label||"Basic";
   const health=siteHealth(s);
-  const openTasks=siteOpenTasks556(s).length;
-  const openDef=siteOpenDeficiencies556(s).length;
+  const work=accountDirectoryWork0759(s);
   const panel=[s.panelManufacturer,s.panelModel].filter(Boolean).join(" ");
   const contact=primaryContact477(s);
-  const status=[];
-  if(openDef) status.push(`${openDef} deficienc${openDef===1?"y":"ies"}`);
-  if(openTasks) status.push(`${openTasks} task${openTasks===1?"":"s"}`);
-  if(!status.length) status.push("No open work");
-  return `<article class="accountRow0736 category-${category}" data-id="${esc(s.id)}" data-search="${esc(siteSearchBlob(s))}" data-attention="${health.cls==='healthWarn'?'1':'0'}" data-open="${openTasks||openDef?'1':'0'}" data-gps="${hasGps(s)?'1':'0'}">
-    <span class="accountAccent0736" aria-hidden="true"></span>
-    <div class="accountBody0736">
-      <div class="accountTitleLine0736"><strong>${esc(s.name||"Unnamed Account")}</strong><span class="accountType0736 category-${category}">${esc(categoryLabel)}</span></div>
-      ${id?`<b class="accountId0736">${esc(id)}</b>`:""}
-      <p class="accountAddress0736">${esc(fullAddress(s)||"No address saved")}</p>
-      <small class="accountDetail0736">${esc(panel||contact?.name||"Account details not entered")}</small>
-      ${accountTagChips0737(s,3)}
-    </div>
-    <div class="accountRight0736">
-      <span class="accountWork0736 ${openDef?'hasDeficiency':openTasks?'hasTasks':'clear'}">${esc(status.join(" • "))}</span>
-      <span class="accountGps0736 ${hasGps(s)?'ready':'missing'}">${hasGps(s)?'GPS':'No GPS'}</span>
-      <b aria-hidden="true">›</b>
-    </div>
-  </article>`;
+  const supporting=panel || contact?.name || "Account details not entered";
+  const pinned=isPinnedSite566(s);
+  return `<button type="button" class="accountCard0759 category-${category}" data-account-card0759 data-id="${esc(s.id)}" data-search="${esc(siteSearchBlob(s))}" data-attention="${health.cls==='healthWarn'?'1':'0'}" data-open="${work.cls==='clear'?'0':'1'}" data-gps="${hasGps(s)?'1':'0'}">
+    <span class="accountTone0759" aria-hidden="true"></span>
+    <span class="accountCardBody0759">
+      <span class="accountCardTop0759">
+        <span class="accountCardName0759">${esc(s.name||"Unnamed Account")}</span>
+        ${pinned?`<span class="accountFavorite0759" aria-label="Favorite account">★</span>`:""}
+        <span class="accountCategory0759 category-${category}">${esc(categoryLabel)}</span>
+      </span>
+      ${id?`<span class="accountNumber0759">${esc(id)}</span>`:""}
+      <span class="accountStreet0759">${esc(fullAddress(s)||"No address saved")}</span>
+      <span class="accountSupporting0759">${esc(supporting)}</span>
+      <span class="accountBadges0759">
+        <span class="accountWork0759 ${work.cls}">${esc(work.label)}</span>
+        <span class="accountGps0759 ${hasGps(s)?'ready':'missing'}">${hasGps(s)?'GPS ready':'Needs GPS'}</span>
+      </span>
+      ${accountTagChips0737(s,2)}
+    </span>
+    <span class="accountChevron0759" aria-hidden="true">›</span>
+  </button>`;
 }
 
 function sites(){
-  const accounts=[...(data.sites||[])].sort((a,b)=>String(a.name||"").localeCompare(String(b.name||""),undefined,{sensitivity:"base"}));
+  restoreAppChrome572();
+  const accounts=[...(data.sites||[])].sort((a,b)=>String(a.name||"").localeCompare(String(b.name||""),undefined,{sensitivity:"base",numeric:true}));
   const attentionCount=accounts.filter(s=>siteHealth(s).cls==="healthWarn").length;
   const openWorkCount=accounts.filter(s=>siteOpenTasks556(s).length||siteOpenDeficiencies556(s).length).length;
   const missingGpsCount=accounts.filter(s=>!hasGps(s)).length;
-  html(`<div class="screen accountsPage0736">
-    <header class="accountsHeader0736">
-      <div><span>Customer vault</span><h1>Accounts</h1><p>${accounts.length} saved account${accounts.length===1?"":"s"}</p></div>
-      <div class="accountsHeaderActions0736"><button class="ghost" id="nearBtn" aria-label="Find nearby accounts">${fvIcon073("nearby","accountsHeaderIcon0736")}</button><button class="primary" id="addBtn" aria-label="Add account">＋</button></div>
-    </header>
-    <section class="accountSearch0736">
-      <span aria-hidden="true">⌕</span><input id="siteSearch" type="search" placeholder="Search names, addresses, IDs, panels…" value="${esc(siteSearch)}" autocomplete="off"><button id="clearSiteSearch" aria-label="Clear search">×</button>
+  html(`<div class="screen accountsDirectory0759">
+    <section class="accountsHero0759">
+      <div class="accountsHeroText0759"><span>Customer vault</span><h1>Accounts</h1><p>${accounts.length} saved account${accounts.length===1?"":"s"}</p></div>
+      <div class="accountsHeroActions0759">
+        <button type="button" class="ghost" id="nearBtn0759">${fvIcon073("nearby","accountsActionIcon0759")}<span>Nearby</span></button>
+        <button type="button" class="primary" id="addBtn0759"><b>＋</b><span>Add</span></button>
+      </div>
     </section>
-    <section class="accountStats0736" aria-label="Account summary">
-      <button data-sites-filter0736="all" class="${sitesFilter0736==='all'?'active':''}"><strong>${accounts.length}</strong><span>All</span></button>
-      <button data-sites-filter0736="attention" class="${sitesFilter0736==='attention'?'active':''}"><strong>${attentionCount}</strong><span>Attention</span></button>
-      <button data-sites-filter0736="open" class="${sitesFilter0736==='open'?'active':''}"><strong>${openWorkCount}</strong><span>Open Work</span></button>
-      <button data-sites-filter0736="missingGps" class="${sitesFilter0736==='missingGps'?'active':''}"><strong>${missingGpsCount}</strong><span>No GPS</span></button>
+    <section class="accountsSearch0759" aria-label="Search accounts">
+      <span class="accountsSearchIcon0759" aria-hidden="true">⌕</span>
+      <input id="siteSearch0759" type="search" placeholder="Search name, address, ID, panel…" value="${esc(siteSearch)}" autocomplete="off" autocapitalize="none" spellcheck="false">
+      <button type="button" id="clearSiteSearch0759" aria-label="Clear account search">×</button>
     </section>
-    <div class="accountListHead0736"><strong id="siteSearchCount">${accounts.length} account${accounts.length===1?"":"s"}</strong><span>Tap an account to open</span></div>
-    <div class="accountList0736 grow" id="accountList0736">${accounts.length?accounts.map(siteAccountRow0736).join(""):`<div class="accountEmpty0736"><span>＋</span><strong>No accounts yet</strong><p>Add your first customer account to begin.</p><button class="primary" id="emptyAdd0736">Add Account</button></div>`}</div>
+    <section class="accountsFilters0759" aria-label="Account filters">
+      <button type="button" data-sites-filter0759="all" class="${sitesFilter0736==='all'?'active':''}"><strong>${accounts.length}</strong><span>All</span></button>
+      <button type="button" data-sites-filter0759="attention" class="${sitesFilter0736==='attention'?'active':''}"><strong>${attentionCount}</strong><span>Attention</span></button>
+      <button type="button" data-sites-filter0759="open" class="${sitesFilter0736==='open'?'active':''}"><strong>${openWorkCount}</strong><span>Open Work</span></button>
+      <button type="button" data-sites-filter0759="missingGps" class="${sitesFilter0736==='missingGps'?'active':''}"><strong>${missingGpsCount}</strong><span>No GPS</span></button>
+    </section>
+    <section class="accountsResults0759">
+      <div class="accountsListHead0759"><strong id="siteSearchCount0759">${accounts.length} account${accounts.length===1?"":"s"}</strong><span>A–Z</span></div>
+      <div class="accountsList0759" id="accountsList0759">
+        ${accounts.length?accounts.map(accountDirectoryRow0759).join(""):`<div class="accountsEmpty0759"><span>＋</span><strong>No accounts yet</strong><p>Add your first customer account to begin.</p><button class="primary" id="emptyAdd0759">Add Account</button></div>`}
+        <div class="accountsNoResults0759" id="accountsNoResults0759" hidden><strong>No matching accounts</strong><p>Try a different search or filter.</p></div>
+      </div>
+    </section>
   </div>`);
+
   const openAdd=()=>{selectedSiteId=null;mode=null;route("siteForm");};
-  document.getElementById("addBtn")?.addEventListener("click",openAdd);
-  document.getElementById("emptyAdd0736")?.addEventListener("click",openAdd);
-  document.getElementById("nearBtn")?.addEventListener("click",detectNearbySites);
-  const searchEl=document.getElementById("siteSearch");
-  const clearBtn=document.getElementById("clearSiteSearch");
-  const countEl=document.getElementById("siteSearchCount");
+  document.getElementById("addBtn0759")?.addEventListener("click",openAdd);
+  document.getElementById("emptyAdd0759")?.addEventListener("click",openAdd);
+  document.getElementById("nearBtn0759")?.addEventListener("click",detectNearbySites);
+  const searchEl=document.getElementById("siteSearch0759");
+  const clearBtn=document.getElementById("clearSiteSearch0759");
+  const countEl=document.getElementById("siteSearchCount0759");
+  const noResults=document.getElementById("accountsNoResults0759");
+  const list=document.getElementById("accountsList0759");
+
   const applySiteSearch=()=>{
     siteSearch=(searchEl?.value||"").trim().toLowerCase();
     let shown=0;
-    document.querySelectorAll(".accountRow0736").forEach(el=>{
+    document.querySelectorAll("[data-account-card0759]").forEach(el=>{
       const searchOk=!siteSearch||(el.dataset.search||"").includes(siteSearch);
       const filterOk=sitesFilter0736==="all" ||
         (sitesFilter0736==="attention"&&el.dataset.attention==="1") ||
         (sitesFilter0736==="open"&&el.dataset.open==="1") ||
         (sitesFilter0736==="missingGps"&&el.dataset.gps!=="1");
-      const ok=searchOk&&filterOk;
-      el.hidden=!ok;
-      if(ok) shown++;
+      const visible=searchOk&&filterOk;
+      el.hidden=!visible;
+      if(visible) shown++;
     });
     if(countEl) countEl.textContent=`${shown} account${shown===1?"":"s"}`;
     if(clearBtn) clearBtn.hidden=!siteSearch;
+    if(noResults) noResults.hidden=shown!==0 || accounts.length===0;
   };
+
   searchEl?.addEventListener("input",applySiteSearch);
   clearBtn?.addEventListener("click",()=>{if(searchEl){searchEl.value="";searchEl.focus();}applySiteSearch();});
-  document.querySelectorAll("[data-sites-filter0736]").forEach(btn=>btn.onclick=()=>{sitesFilter0736=btn.dataset.sitesFilter0736||"all";sites();});
-  document.querySelectorAll(".accountRow0736").forEach(el=>el.onclick=()=>{selectedSiteId=el.dataset.id;route("siteDetail");});
+  document.querySelectorAll("[data-sites-filter0759]").forEach(btn=>btn.addEventListener("click",()=>{
+    sitesFilter0736=btn.dataset.sitesFilter0759||"all";
+    document.querySelectorAll("[data-sites-filter0759]").forEach(x=>x.classList.toggle("active",x===btn));
+    if(list) list.scrollTop=0;
+    accountsScroll0759=0;
+    applySiteSearch();
+  }));
+  list?.addEventListener("scroll",()=>{accountsScroll0759=list.scrollTop;},{passive:true});
+  list?.addEventListener("click",event=>{
+    const card=event.target.closest("[data-account-card0759]");
+    if(!card) return;
+    accountsScroll0759=list.scrollTop;
+    selectedSiteId=card.dataset.id;
+    route("siteDetail");
+  });
   applySiteSearch();
+  requestAnimationFrame(()=>{
+    if(list) list.scrollTop=Math.max(0,accountsScroll0759||0);
+    showGlobalChrome537();
+    setActiveNav();
+  });
 }
 
 function nearbySites(){
@@ -8190,6 +8234,7 @@ function diagnostics(){
 }
 function showChangelog(){
   const notes = [
+    "Build 0.75.9 rebuilds the Accounts directory with a single stable layout, simplified cards, reliable filtering, preserved scroll position, and protected global navigation.",
     "Build 0.73.9 repairs the Demo Mode QuotaExceededError by keeping the 20-account Boise workspace in temporary memory and making noncritical startup preference writes fail safely when device storage is full.",
     "Build 0.73.7 adds rule-driven multi-category account tags, repairs Settings tab spacing, and blends the global logo header into page content.",
     "Build 0.73.6 removes Plus Code text from Nearby cards, redesigns the Accounts directory, and replaces Settings folders with direct category tabs.",
@@ -8217,7 +8262,7 @@ function showChangelog(){
   overlay.className="releaseOverlay";
   overlay.innerHTML=`<div class="releaseSheet" role="dialog" aria-modal="true" aria-label="FireVault release notes">
     <div class="releaseHead"><div><strong>${fireVaultBrand575()}</strong><span>Build ${BUILD}</span></div><button class="ghost iconBtn" id="closeRelease" aria-label="Close release notes">×</button></div>
-    <div class="releaseBody"><h2>Release Notes</h2><p class="releaseIntro">Quota-safe Demo Mode with 20 fictional Boise-area accounts.</p><ul>${notes.map(n=>`<li>${esc(n)}</li>`).join("")}</ul></div>
+    <div class="releaseBody"><h2>Release Notes</h2><p class="releaseIntro">A rebuilt, stable Accounts directory designed for fast field use.</p><ul>${notes.map(n=>`<li>${esc(n)}</li>`).join("")}</ul></div>
   </div>`;
   document.body.appendChild(overlay);
   const close=()=>overlay.remove();
