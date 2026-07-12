@@ -1,8 +1,8 @@
 {
-  "build": "0.79.13",
+  "build": "0.79.14",
   "released": "2026-07-12",
-  "note": "Startup parsing repaired; Smart Account Intelligence and Building Navigator included",
-  "label": "Repairs 0.79.11/0.79.12 syntax failures while preserving the existing vault",
-  "version": "0.79.13",
-  "name": "Startup Repair + Building Navigator"
+  "note": "Numbered Nearby Accounts restored; Smart Account Intelligence removed",
+  "label": "Restores numbered distance-matched map pins while preserving Building Navigator and the existing vault",
+  "version": "0.79.14",
+  "name": "Numbered Nearby Accounts"
 }
