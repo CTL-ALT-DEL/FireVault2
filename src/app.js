@@ -1,4 +1,4 @@
-import { BUILD, KEY, ACTIVE_JOB_KEY, loadData, saveData, ensureSite, fullAddress, esc, uid, downloadBlob, syncSummary, syncQueue, syncConflicts, syncActivity, createSyncPackage, importSyncPackage, resolveSyncConflict, notePackageExport, deviceIdentity, recordSyncActivity, autoBackupInfo, latestAutoBackup, restoreAutoBackup, isDemoMode, setDemoMode, resetDemoData } from "./storage.js?v=0.75.5";
+import { BUILD, KEY, ACTIVE_JOB_KEY, loadData, saveData, ensureSite, fullAddress, esc, uid, downloadBlob, syncSummary, syncQueue, syncConflicts, syncActivity, createSyncPackage, importSyncPackage, resolveSyncConflict, notePackageExport, deviceIdentity, recordSyncActivity, autoBackupInfo, latestAutoBackup, restoreAutoBackup, isDemoMode, setDemoMode, resetDemoData } from "./storage.js?v=0.75.6";
 window.__FIREVAULT_MODULE_READY = true;
 
 function fvPreferenceStore0739(){
@@ -6108,7 +6108,7 @@ const SETTINGS_GROUPS_067 = [
   {key:"appearance",icon:"◐",title:"App & Home",note:"Demo Mode, theme, Home layout, and visible modules.",tone:"violet",tabs:["demo","themes","homeLayout","visibility"]},
   {key:"field",icon:"🧰",title:"Field Tools",note:"GPS, photo overlays, and optional field services.",tone:"cyan",tabs:["gps","overlay","advanced"]},
   {key:"reports",icon:"▤",title:"Reports & Communication",note:"Report content, email delivery, and customer closeout.",tone:"amber",tabs:["reports","email"]},
-  {key:"data",icon:"☁",title:"Data, Sync & Support",note:"Categories, imports, backup, team sync, Help, About, and diagnostics.",tone:"red",tabs:["sync","customerImport","categories","backup","updates","manual","about","diagnostics"]}
+  {key:"data",icon:"☁",title:"Data, Sync & Support",note:"Categories, imports, backup, team sync, Help, About, and diagnostics.",tone:"red",tabs:["sync","webdav","customerImport","categories","backup","updates","manual","about","diagnostics"]}
 ];
 function settingsGroupForTab067(tab){ return SETTINGS_GROUPS_067.find(g=>g.tabs.includes(tab))?.key || "data"; }
 function settingsGroup067ByKey(key){ return SETTINGS_GROUPS_067.find(g=>g.key===key) || SETTINGS_GROUPS_067[0]; }
@@ -6132,6 +6132,7 @@ function settingsTabs(){
     ["visibility","Modules","Enable or disable FireVault modules for a cleaner field interface."],
     ["advanced","Advanced","Optional integrations and field services. An asterisk marks controls that require an outside service."],
     ["sync","Team Sync","Technician identity, shared-vault packages, pending changes, and conflict review."],
+    ["webdav","WebDAV","Optional encrypted-transport backup and restore using a compatible WebDAV server."],
     ["customerImport","Customer Import","Preview and safely import customer records from a CSV export using Account Id."],
     ["categories","Categories","Create rule-driven account tags. Multiple categories can be assigned to the same account."],
     ["backup","Backup","Export, import, data safety snapshot, restore tools, and danger zone."],
@@ -7027,6 +7028,82 @@ function wireDemoMode0738(){
   document.getElementById("resetDemoMode0738")?.addEventListener("click",()=>{if(!confirm("Discard all temporary demo changes and restore the protected 20-account Boise dataset?"))return;resetDemoData();location.reload();});
 }
 
+
+const WEBDAV_PASSWORD_SESSION_KEY_0756="firevault_webdav_password_0756";
+function webdavConfig0756(){
+  const cfg=data.settings.webdav||{};
+  return {enabled:!!cfg.enabled,url:String(cfg.url||""),username:String(cfg.username||""),folder:String(cfg.folder||"FireVault"),fileName:String(cfg.fileName||"firevault-latest.json"),autoUpload:!!cfg.autoUpload,lastUpload:String(cfg.lastUpload||""),lastDownload:String(cfg.lastDownload||""),lastStatus:String(cfg.lastStatus||"")};
+}
+function webdavPassword0756(){try{return sessionStorage.getItem(WEBDAV_PASSWORD_SESSION_KEY_0756)||""}catch{return ""}}
+function setWebdavPassword0756(value){try{if(value)sessionStorage.setItem(WEBDAV_PASSWORD_SESSION_KEY_0756,value);else sessionStorage.removeItem(WEBDAV_PASSWORD_SESSION_KEY_0756)}catch{}}
+function normalizeWebdavUrl0756(cfg,fileOverride=""){
+  let base=String(cfg.url||"").trim();
+  if(!/^https:\/\//i.test(base)) throw new Error("Use an HTTPS WebDAV server address.");
+  base=base.replace(/\/+$/g,"");
+  const parts=String(cfg.folder||"").split("/").map(x=>x.trim()).filter(Boolean).map(encodeURIComponent);
+  const file=String(fileOverride||cfg.fileName||"firevault-latest.json").trim();
+  return [base,...parts,file?encodeURIComponent(file):""].filter(Boolean).join("/");
+}
+function webdavHeaders0756(cfg,extra={}){
+  const password=webdavPassword0756();
+  if(!cfg.username||!password) throw new Error("Enter the WebDAV username and app password.");
+  let token="";try{token=btoa(unescape(encodeURIComponent(`${cfg.username}:${password}`)))}catch{token=btoa(`${cfg.username}:${password}`)}
+  return {Authorization:`Basic ${token}`,...extra};
+}
+function webdavBackupPayload0756(){return {app:"FireVault",build:BUILD,exportedAt:new Date().toISOString(),stats:backupSafetyStats552(),data};}
+async function webdavRequest0756(method,url,headers={},body){
+  let response;
+  try{response=await fetch(url,{method,headers,body,cache:"no-store",credentials:"omit"});}
+  catch(err){throw new Error("WebDAV connection failed. Confirm the server permits CORS access from this FireVault address.");}
+  if(!response.ok) throw new Error(`WebDAV returned ${response.status} ${response.statusText||""}`.trim());
+  return response;
+}
+async function ensureWebdavFolders0756(cfg){
+  let root=String(cfg.url||"").trim().replace(/\/+$/g,"");
+  if(!/^https:\/\//i.test(root)) throw new Error("Use an HTTPS WebDAV server address.");
+  const folders=String(cfg.folder||"").split("/").map(x=>x.trim()).filter(Boolean);
+  for(const folder of folders){
+    root += "/"+encodeURIComponent(folder);
+    try{await webdavRequest0756("MKCOL",root,webdavHeaders0756(cfg));}catch(err){if(!/405|301|302|409/.test(String(err.message))) throw err;}
+  }
+}
+function webdavStatus0756(message){const el=document.getElementById("webdavStatus0756");if(el)el.textContent=message;}
+async function testWebdav0756(){
+  const cfg=collectWebdavInputs0756(); webdavStatus0756("Testing connection…");
+  try{await webdavRequest0756("PROPFIND",String(cfg.url||"").trim().replace(/\/+$/g,"/") ,webdavHeaders0756(cfg,{Depth:"0"}));data.settings.webdav={...cfg,lastStatus:`Connected ${new Date().toLocaleString()}`};saveData(data);webdavStatus0756("Connected successfully.");toast("WebDAV connection successful.");}
+  catch(err){webdavStatus0756(err.message);alert(err.message);}
+}
+function collectWebdavInputs0756(){
+  const current=webdavConfig0756();
+  const cfg={...current,enabled:!!document.getElementById("webdavEnabled0756")?.checked,url:document.getElementById("webdavUrl0756")?.value.trim()||"",username:document.getElementById("webdavUser0756")?.value.trim()||"",folder:document.getElementById("webdavFolder0756")?.value.trim()||"FireVault",fileName:document.getElementById("webdavFile0756")?.value.trim()||"firevault-latest.json",autoUpload:!!document.getElementById("webdavAuto0756")?.checked};
+  const password=document.getElementById("webdavPassword0756")?.value||"";if(password)setWebdavPassword0756(password);
+  return cfg;
+}
+async function uploadWebdavBackup0756(){
+  const cfg=collectWebdavInputs0756();webdavStatus0756("Preparing secure backup…");
+  try{await ensureWebdavFolders0756(cfg);const payload=JSON.stringify(webdavBackupPayload0756(),null,2);const url=normalizeWebdavUrl0756(cfg);await webdavRequest0756("PUT",url,webdavHeaders0756(cfg,{"Content-Type":"application/json"}),payload);data.settings.webdav={...cfg,lastUpload:new Date().toLocaleString(),lastStatus:"Upload successful"};saveData(data);webdavStatus0756("Backup uploaded successfully.");toast("WebDAV backup uploaded.");settings();}
+  catch(err){webdavStatus0756(err.message);alert(err.message);}
+}
+async function restoreWebdavBackup0756(){
+  const cfg=collectWebdavInputs0756();if(!confirm("Download the WebDAV backup and replace the current FireVault vault? A local automatic snapshot will be created first."))return;webdavStatus0756("Downloading backup…");
+  try{const url=normalizeWebdavUrl0756(cfg);const response=await webdavRequest0756("GET",url,webdavHeaders0756(cfg));const parsed=JSON.parse(await response.text());const incoming=parsed?.data&&Array.isArray(parsed.data.sites)?parsed.data:parsed;if(!incoming||!Array.isArray(incoming.sites))throw new Error("The WebDAV file is not a valid FireVault backup.");Object.assign(data,incoming);data.settings=data.settings||{};data.settings.webdav={...cfg,lastDownload:new Date().toLocaleString(),lastStatus:"Restore successful"};saveData(data);data=loadData();webdavStatus0756("Backup restored. Reloading…");toast("WebDAV backup restored.");setTimeout(()=>route("home"),400);}
+  catch(err){webdavStatus0756(err.message);alert(err.message);}
+}
+function webdavPanel0756(){
+  const cfg=webdavConfig0756();
+  return `<div class="settingsStack settingsStack540 webdavStack0756">
+    ${settingsSection540("Optional remote backup","WebDAV","Connect FireVault to a compatible HTTPS WebDAV service. This is an optional manual backup and restore module; your local vault remains the working database.",`<div class="settingsList settingsToggleList540">${checkBlock("webdavEnabled0756","Enable WebDAV controls",cfg.enabled)}</div><div class="settingsGrid settingsGrid540">${fieldBlock("Server URL",`<input id="webdavUrl0756" inputmode="url" placeholder="https://cloud.example.com/remote.php/dav/files/name" value="${esc(cfg.url)}">`,`The server must allow HTTPS and CORS requests from FireVault.`)}${fieldBlock("Username",`<input id="webdavUser0756" autocomplete="username" value="${esc(cfg.username)}">`)}${fieldBlock("App password",`<input id="webdavPassword0756" type="password" autocomplete="current-password" placeholder="Stored only for this app session">`,`For safety, FireVault does not save the password in the vault.`)}${fieldBlock("Remote folder",`<input id="webdavFolder0756" value="${esc(cfg.folder)}">`)}${fieldBlock("Backup filename",`<input id="webdavFile0756" value="${esc(cfg.fileName)}">`)}</div><div class="settingsList settingsToggleList540">${checkBlock("webdavAuto0756","Upload after manual backup exports",cfg.autoUpload)}</div>`,"blue",`<button class="primary saveMini" id="saveWebdav0756">Save</button>`)}
+    ${settingsSection540("Connection & transfer","WebDAV Actions","Test access before uploading. Restore replaces the current local vault only after confirmation.",`<div class="webdavActions0756"><button class="ghost" id="testWebdav0756">Test Connection</button><button class="primary" id="uploadWebdav0756">Upload Backup</button><button class="ghost" id="restoreWebdav0756">Restore from Server</button></div><div class="settingsInfo540"><strong>Status</strong><span id="webdavStatus0756">${esc(cfg.lastStatus||"Not tested")}</span></div><div class="webdavHistory0756"><div><span>Last upload</span><strong>${esc(cfg.lastUpload||"Never")}</strong></div><div><span>Last restore</span><strong>${esc(cfg.lastDownload||"Never")}</strong></div></div>`,"cyan")}
+    <div class="settingsInfo540 warning"><strong>Compatibility note</strong><span>Some WebDAV providers block browser requests through CORS. If the connection test fails even with correct credentials, the server must be configured to allow requests from your FireVault GitHub Pages address.</span></div>
+  </div>`;
+}
+function wireWebdav0756(){
+  document.getElementById("saveWebdav0756")?.addEventListener("click",()=>{data.settings.webdav=collectWebdavInputs0756();saveData(data);data=loadData();toast("WebDAV settings saved.");settings();});
+  document.getElementById("testWebdav0756")?.addEventListener("click",testWebdav0756);
+  document.getElementById("uploadWebdav0756")?.addEventListener("click",uploadWebdavBackup0756);
+  document.getElementById("restoreWebdav0756")?.addEventListener("click",restoreWebdavBackup0756);
+}
+
 function settingsPanel(){
   const s=data.settings, t=s.theme, tech=s.technician, email=s.email, r=s.reports, o=s.overlay, a=s.advanced, gps=s.gps||{};
   const saveButton=(label="Save")=>`<button class="primary saveMini" id="saveSettings">${esc(label)}</button>`;
@@ -7050,6 +7127,8 @@ function settingsPanel(){
   </div>`;
 
   if(settingsTab==="demo") return demoModePanel0738();
+
+  if(settingsTab==="webdav") return webdavPanel0756();
 
   if(settingsTab==="themes") return `<div class="settingsStack settingsStack540">
     ${settingsSection540("One-tap styles","Quick Themes","Apply a coordinated accent and contrast preset without changing your stored field data.",`<div class="presetGrid settingsPresetGrid540">${Object.entries(themePresets).map(([key,p])=>`<button class="ghost presetBtn" data-preset="${key}"><span class="themeSwatch" style="background:${p.accentColor}"></span><span>${p.label}</span></button>`).join("")}</div>`,"violet",saveButton("Apply"))}
@@ -7135,6 +7214,7 @@ function settingsPanel(){
   </div>`;
 }
 function wireSettingsPanel(){
+  if(settingsTab==="webdav"){wireWebdav0756();return;}
   const saveBtn=document.getElementById("saveSettings"); if(saveBtn) saveBtn.onclick=saveSettings;
   if(settingsTab==="overlay") wireOverlaySettings510();
   if(settingsTab==="demo") wireDemoMode0738();
@@ -7771,6 +7851,7 @@ function downloadVaultBackup552(){
     a.click();
     setTimeout(()=>{URL.revokeObjectURL(url); a.remove();},450);
     toast("Backup downloaded.");
+    if(data.settings?.webdav?.enabled && data.settings?.webdav?.autoUpload && webdavPassword0756()) setTimeout(()=>uploadWebdavBackup0756(),250);
   }catch(err){
     console.error(err);
     toast("Backup failed.");
