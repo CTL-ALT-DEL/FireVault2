@@ -18476,3 +18476,63 @@ body.fv-privacy-locked0791{overflow:hidden!important;background:#07090d!importan
 .backendProviderList0793 small{color:#94a3b8;text-transform:capitalize;margin-top:2px}
 .backendProviderList0793 b{font-size:.68rem;letter-spacing:.08em;color:#86efac;border:1px solid rgba(34,197,94,.35);border-radius:999px;padding:5px 8px}
 @media(max-width:390px){.backendStatusGrid0793{grid-template-columns:1fr}.backendProviderList0793>div{grid-template-columns:34px minmax(0,1fr) auto;padding:10px}.backendProviderIcon0793{width:32px;height:32px}}
+
+/* Build 0.79.4 — Cloud File Storage & Google Plus Codes Foundation */
+.cloudStorage0794,.plusCodesSettings0794{min-width:0}
+.cloudDestinationGrid0794{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.cloudDestinationCard0794{position:relative;min-width:0;display:grid;gap:5px;padding:14px;border:1px solid rgba(148,163,184,.2);border-radius:15px;background:linear-gradient(145deg,rgba(15,23,42,.88),rgba(8,13,22,.92));overflow:hidden}
+.cloudDestinationCard0794.photo{border-color:rgba(56,189,248,.3)}
+.cloudDestinationCard0794.document{border-color:rgba(167,139,250,.3)}
+.cloudDestinationCard0794>span{font-size:10px;font-weight:900;letter-spacing:.085em;color:#91a3b8}
+.cloudDestinationCard0794>strong{min-width:0;color:#f8fafc;font-size:15px;line-height:1.2;overflow-wrap:anywhere}
+.cloudDestinationCard0794>small{min-width:0;color:#9eacc0;font-size:11.5px;line-height:1.35;overflow-wrap:anywhere;word-break:break-word}
+.cloudDestinationCard0794>em{justify-self:start;margin-top:4px;padding:5px 8px;border-radius:999px;font-size:9px;font-style:normal;font-weight:900;letter-spacing:.07em;text-transform:uppercase}
+.cloudDestinationCard0794>em.ready{color:#bbf7d0;background:rgba(22,163,74,.18);border:1px solid rgba(74,222,128,.25)}
+.cloudDestinationCard0794>em.planned{color:#fde68a;background:rgba(180,83,9,.2);border:1px solid rgba(251,191,36,.28)}
+.cloudStorageActions0794{display:flex;flex-wrap:wrap;gap:9px;margin-top:12px}
+.cloudStorageActions0794 button{flex:1 1 150px;min-width:0;min-height:44px;white-space:normal;line-height:1.18}
+.cloudProviderCatalog0794{min-width:0}
+.cloudProviderCatalog0794>.paneHead{margin-bottom:10px}
+.cloudProviderCatalog0794>div:last-child{display:grid;gap:8px}
+.cloudProviderCatalog0794 article{display:grid;grid-template-columns:40px minmax(0,1fr) auto;align-items:center;gap:10px;min-width:0;padding:10px 11px;border:1px solid rgba(148,163,184,.15);border-radius:13px;background:rgba(15,23,42,.46)}
+.cloudProviderCatalog0794 article>span{display:grid;place-items:center;width:38px;height:38px;border-radius:11px;background:rgba(59,130,246,.15);color:#bfdbfe;font-size:16px;font-weight:950}
+.cloudProviderCatalog0794 article>div{min-width:0}
+.cloudProviderCatalog0794 article strong,.cloudProviderCatalog0794 article small{display:block;min-width:0;overflow-wrap:anywhere}
+.cloudProviderCatalog0794 article strong{font-size:13px;color:#f8fafc}
+.cloudProviderCatalog0794 article small{margin-top:3px;color:#9ba9bb;font-size:11px;line-height:1.35}
+.cloudProviderCatalog0794 article>b{padding:5px 7px;border-radius:999px;white-space:nowrap;font-size:8.5px;letter-spacing:.055em}
+.cloudProviderCatalog0794 article>b.available{color:#bbf7d0;background:rgba(22,163,74,.17);border:1px solid rgba(74,222,128,.25)}
+.cloudProviderCatalog0794 article>b.planned{color:#fde68a;background:rgba(180,83,9,.18);border:1px solid rgba(251,191,36,.25)}
+.plusCodeStats0794{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.plusCodeStats0794>div{min-width:0;padding:12px 8px;border:1px solid rgba(56,189,248,.2);border-radius:13px;background:rgba(8,20,34,.72);text-align:center}
+.plusCodeStats0794 strong{display:block;color:#f8fafc;font-size:18px;line-height:1.1}
+.plusCodeStats0794 span{display:block;margin-top:5px;color:#9eb0c5;font-size:9.5px;line-height:1.25;text-transform:uppercase;letter-spacing:.055em;overflow-wrap:anywhere}
+.docStorageDestination0794{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;margin:10px 0;padding:11px;border:1px solid rgba(96,165,250,.2);border-radius:14px;background:rgba(15,23,42,.5)}
+.docStorageDestination0794>div{min-width:0}
+.docStorageDestination0794 label{display:block;margin-bottom:6px;color:#a9b7c9;font-size:10px;font-weight:900;letter-spacing:.06em;text-transform:uppercase}
+.docStorageDestination0794 select,.docStorageDestination0794 input{width:100%;min-width:0}
+.docStorageDestination0794 p{grid-column:1/-1;margin:0;color:#8fa0b6;font-size:10.5px;line-height:1.4;overflow-wrap:anywhere}
+.accountPlusPreview0794{display:grid;gap:3px;margin-top:8px;padding:10px 11px;border:1px solid rgba(34,211,238,.22);border-radius:12px;background:rgba(8,31,43,.55)}
+.accountPlusPreview0794 span{color:#8fd7e8;font-size:9.5px;font-weight:900;letter-spacing:.065em;text-transform:uppercase}
+.accountPlusPreview0794 strong{color:#f2fdff;font:800 14px/1.2 ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.035em;overflow-wrap:anywhere}
+.accountPlusPreview0794 small{color:#9fb2c5;font-size:10.5px;line-height:1.3}
+.backendFilePlan0794{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:10px}
+.backendFilePlan0794>div{min-width:0;padding:10px;border:1px solid rgba(96,165,250,.17);border-radius:12px;background:rgba(15,23,42,.42)}
+.backendFilePlan0794 span,.backendFilePlan0794 strong,.backendFilePlan0794 small{display:block;overflow-wrap:anywhere}
+.backendFilePlan0794 span{font-size:9px;color:#8ea0b5;text-transform:uppercase;letter-spacing:.065em;font-weight:900}
+.backendFilePlan0794 strong{margin-top:4px;color:#f8fafc;font-size:12.5px}
+.backendFilePlan0794 small{margin-top:3px;color:#9cabbf;font-size:10.5px}
+@media(max-width:520px){
+  .cloudDestinationGrid0794{grid-template-columns:1fr}
+  .docStorageDestination0794{grid-template-columns:1fr}
+  .docStorageDestination0794 p{grid-column:auto}
+  .cloudProviderCatalog0794 article{grid-template-columns:36px minmax(0,1fr)}
+  .cloudProviderCatalog0794 article>span{width:34px;height:34px}
+  .cloudProviderCatalog0794 article>b{grid-column:2;justify-self:start}
+  .backendFilePlan0794{grid-template-columns:1fr}
+}
+@media(max-width:360px){
+  .plusCodeStats0794{grid-template-columns:1fr}
+  .cloudStorageActions0794{display:grid;grid-template-columns:1fr}
+  .cloudStorageActions0794 button{width:100%}
+}

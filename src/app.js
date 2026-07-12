@@ -1,5 +1,6 @@
-import { BUILD, KEY, ACTIVE_JOB_KEY, loadData, saveData, ensureSite, fullAddress, esc, uid, downloadBlob, syncSummary, syncQueue, syncConflicts, syncActivity, createSyncPackage, importSyncPackage, resolveSyncConflict, notePackageExport, deviceIdentity, recordSyncActivity, autoBackupInfo, latestAutoBackup, restoreAutoBackup, isDemoMode, setDemoMode, resetDemoData, securityFoundationSummary, securityAudit, recycleBinInfo, restoreRecycleRecord, purgeRecycleBin, recordSecurityEvent, validateVaultIntegrity } from "./storage.js?v=0.79.3";
-import { backendAdapterSummary, runBackendAdapterDiagnostics, backendAdapterManifest, PROVIDER_CONTRACT_VERSION } from "./providers.js?v=0.79.3";
+import { BUILD, KEY, ACTIVE_JOB_KEY, loadData, saveData, ensureSite, fullAddress, esc, uid, downloadBlob, syncSummary, syncQueue, syncConflicts, syncActivity, createSyncPackage, importSyncPackage, resolveSyncConflict, notePackageExport, deviceIdentity, recordSyncActivity, autoBackupInfo, latestAutoBackup, restoreAutoBackup, isDemoMode, setDemoMode, resetDemoData, securityFoundationSummary, securityAudit, recycleBinInfo, restoreRecycleRecord, purgeRecycleBin, recordSecurityEvent, validateVaultIntegrity } from "./storage.js?v=0.79.4";
+import { backendAdapterSummary, runBackendAdapterDiagnostics, backendAdapterManifest, PROVIDER_CONTRACT_VERSION, FILE_STORAGE_CATALOG, fileStoragePlanSummary, cloudFileStorageManifest } from "./providers.js?v=0.79.4";
+import { encodePlusCode, isValidFullPlusCode, normalizePlusCode, plusCodePrecisionLabel } from "./open-location-code.js?v=0.79.4";
 window.__FIREVAULT_MODULE_READY = true;
 
 function fvPreferenceStore0739(){
@@ -1043,40 +1044,44 @@ function gpsLine(s){
   const when=g.capturedAt ? ` • Saved ${new Date(g.capturedAt).toLocaleString([], {month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}` : "";
   return `${Number(g.lat).toFixed(6)}, ${Number(g.lng).toFixed(6)}${acc}${when}`;
 }
-const PLUS_CODE_ALPHABET_071="23456789CFGHJMPQRVWX";
-const PLUS_CODE_RESOLUTIONS_071=[20,1,.05,.0025,.000125];
 const LOCATION_POINT_TYPES_071=["Main Entrance","Parking","Exterior Door","Riser Room","Fire Alarm Panel","FDC","Sprinkler Room","Other"];
-function encodePlusCode071(latitude,longitude){
-  let lat=Number(latitude),lng=Number(longitude);
-  if(!Number.isFinite(lat)||!Number.isFinite(lng)) return "";
-  lat=Math.min(90,Math.max(-90,lat));
-  if(lat===90) lat=90-1e-12;
-  while(lng<-180) lng+=360; while(lng>=180) lng-=360;
-  lat+=90; lng+=180;
-  let code="";
-  for(const resolution of PLUS_CODE_RESOLUTIONS_071){
-    const latDigit=Math.floor(lat/resolution),lngDigit=Math.floor(lng/resolution);
-    code+=PLUS_CODE_ALPHABET_071[latDigit]+PLUS_CODE_ALPHABET_071[lngDigit];
-    lat-=latDigit*resolution; lng-=lngDigit*resolution;
-    if(code.length===8) code+="+";
-  }
-  return code;
+function plusCodeSettings0794(){
+  const cfg=data?.settings?.plusCodes||{};
+  return {
+    enabled:cfg.enabled!==false,
+    autoGenerate:cfg.autoGenerate!==false,
+    accountLength:[10,11].includes(Number(cfg.accountLength))?Number(cfg.accountLength):10,
+    locationLength:[10,11].includes(Number(cfg.locationLength))?Number(cfg.locationLength):11,
+    includeInReports:cfg.includeInReports!==false,
+    searchable:cfg.searchable!==false
+  };
+}
+function encodePlusCode071(latitude,longitude,length){
+  const cfg=plusCodeSettings0794();
+  return encodePlusCode(latitude,longitude,Number(length||cfg.accountLength));
 }
 function sitePlusCode071(s){
   if(!s) return "";
-  if(hasGps(s)){
-    const code=encodePlusCode071(s.gps.lat,s.gps.lng);
+  const cfg=plusCodeSettings0794();
+  const saved=normalizePlusCode(s.plusCode||"");
+  if(!cfg.enabled) return saved;
+  if(hasGps(s)&&cfg.autoGenerate){
+    const code=encodePlusCode071(s.gps.lat,s.gps.lng,cfg.accountLength);
     if(code&&s.plusCode!==code) s.plusCode=code;
     return code;
   }
-  return String(s.plusCode||"").trim();
+  return isValidFullPlusCode(saved)?saved:"";
 }
 function locationPoints071(s){
   if(!s) return [];
+  const cfg=plusCodeSettings0794();
   s.locationPoints=Array.isArray(s.locationPoints)?s.locationPoints:[];
   s.locationPoints.forEach(p=>{
     if(!p.id)p.id=uid();
-    if(!p.plusCode&&Number.isFinite(Number(p.lat))&&Number.isFinite(Number(p.lng)))p.plusCode=encodePlusCode071(p.lat,p.lng);
+    if(cfg.enabled&&cfg.autoGenerate&&Number.isFinite(Number(p.lat))&&Number.isFinite(Number(p.lng))){
+      const code=encodePlusCode071(p.lat,p.lng,cfg.locationLength);
+      if(code&&p.plusCode!==code)p.plusCode=code;
+    }else p.plusCode=normalizePlusCode(p.plusCode||"");
   });
   return s.locationPoints;
 }
@@ -1095,10 +1100,13 @@ function updateGlobalToday071(){
   el.innerHTML=`<span>${esc(now.toLocaleDateString(undefined,{weekday:'long'}))}</span><b>${esc(now.toLocaleDateString(undefined,{month:'long',day:'numeric'}))}</b>`;
 }
 function ensureAllPlusCodes071(){
+  const cfg=plusCodeSettings0794();
+  if(!cfg.enabled||!cfg.autoGenerate)return;
   let changed=false;
   (data.sites||[]).forEach(s=>{
-    const before=s.plusCode||""; const code=sitePlusCode071(s); locationPoints071(s);
-    if(code!==before)changed=true;
+    const before=s.plusCode||""; const beforePoints=JSON.stringify((s.locationPoints||[]).map(p=>p.plusCode||""));
+    const code=sitePlusCode071(s); locationPoints071(s);
+    if(code!==before||beforePoints!==JSON.stringify((s.locationPoints||[]).map(p=>p.plusCode||"")))changed=true;
   });
   if(changed) saveData(data);
 }
@@ -1116,7 +1124,7 @@ function addLocationPoint071(){
   toast("Capturing precise location…");
   navigator.geolocation.getCurrentPosition(pos=>{
     const lat=Number(pos.coords.latitude.toFixed(7)),lng=Number(pos.coords.longitude.toFixed(7));
-    const point={id:uid(),type:type||"Other",label:(label||type||"Saved Location").trim(),notes:notes.trim(),lat,lng,accuracy:Math.round(pos.coords.accuracy||0),plusCode:encodePlusCode071(lat,lng),createdAt:new Date().toISOString()};
+    const point={id:uid(),type:type||"Other",label:(label||type||"Saved Location").trim(),notes:notes.trim(),lat,lng,accuracy:Math.round(pos.coords.accuracy||0),plusCode:encodePlusCode071(lat,lng,plusCodeSettings0794().locationLength),createdAt:new Date().toISOString()};
     locationPoints071(s).push(point);
     s.notes=[String(s.notes||"").trim(),plusCodePointNote071(point)].filter(Boolean).join("\n");
     if(!s.preferredLocationPointId)s.preferredLocationPointId=point.id;
@@ -1127,10 +1135,12 @@ function setPreferredLocation071(id){ const s=site();if(!s)return;s.preferredLoc
 function deleteLocationPoint071(id){ const s=site();if(!s)return;const p=locationPoints071(s).find(x=>x.id===id);if(!p||!confirm(`Delete ${p.label||'this location'}?`))return;s.locationPoints=s.locationPoints.filter(x=>x.id!==id);if(s.preferredLocationPointId===id)s.preferredLocationPointId="";save();siteDetail(); }
 function routeLocationPoint071(id){ const s=site();const p=locationPoints071(s).find(x=>x.id===id);if(p)window.open(`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(p.plusCode||`${p.lat},${p.lng}`)}`,'_blank'); }
 function plusCodeSection071(s){
+  const cfg=plusCodeSettings0794();
+  if(!cfg.enabled)return "";
   const code=sitePlusCode071(s),points=locationPoints071(s),preferred=preferredLocation071(s);
-  return `<details class="accountSection067 tone-cyan plusCodes071" open><summary><span>＋</span><div><strong>Plus Codes & Site Locations</strong><small>Exact entrances, parking, exterior doors, riser rooms, and field access points</small></div><b>⌄</b></summary><div class="accountSectionBody067">
-    <div class="primaryPlus071"><div><span>Account Plus Code</span><strong>${esc(code||'GPS required')}</strong><small>${preferred?`Route currently targets ${esc(preferred.label)}`:'Route targets the account location'}</small></div><div>${code?`<button class="ghost" id="copyPrimaryPlus071">Copy</button>`:''}<button class="primary" id="addLocationPoint071">＋ Drop Pin</button></div></div>
-    ${points.length?`<div class="locationPointList071">${points.map(p=>`<article class="locationPoint071 ${s.preferredLocationPointId===p.id?'preferred':''}"><div><span>${esc(p.type||'Saved Location')}</span><strong>${esc(p.label||'Saved Location')}</strong><b>${esc(p.plusCode||'')}</b>${p.notes?`<small>${esc(p.notes)}</small>`:''}</div><div><button class="ghost" data-copy-plus071="${esc(p.id)}">Copy</button><button class="ghost" data-route-plus071="${esc(p.id)}">Route</button><button class="${s.preferredLocationPointId===p.id?'primary':'ghost'}" data-prefer-plus071="${esc(p.id)}">${s.preferredLocationPointId===p.id?'Default':'Use'}</button><button class="danger" data-delete-plus071="${esc(p.id)}">×</button></div></article>`).join('')}</div>`:`<p class="accountEmpty067">Drop pins at the main entrance, preferred parking, exterior access door, riser room, FDC, or another exact field location.</p>`}
+  return `<details class="accountSection067 tone-cyan plusCodes071" open><summary><span>＋</span><div><strong>Plus Codes & Site Locations</strong><small>Offline full codes for the account, entrances, panel rooms, risers, parking, and FDC locations</small></div><b>⌄</b></summary><div class="accountSectionBody067">
+    <div class="primaryPlus071"><div><span>Account Plus Code</span><strong>${esc(code||'GPS required')}</strong><small>${code?`${cfg.accountLength} digits • ${plusCodePrecisionLabel(cfg.accountLength)}`:(hasGps(s)?'Generate codes in Settings → Field → Google Plus Codes':'Save GPS coordinates to generate a code')}${preferred?` • Route targets ${esc(preferred.label)}`:''}</small></div><div>${code?`<button class="ghost" id="copyPrimaryPlus071">Copy</button><button class="ghost" id="openPrimaryPlus0794">Google Maps</button>`:''}<button class="primary" id="addLocationPoint071">＋ Drop Pin</button></div></div>
+    ${points.length?`<div class="locationPointList071">${points.map(p=>`<article class="locationPoint071 ${s.preferredLocationPointId===p.id?'preferred':''}"><div><span>${esc(p.type||'Saved Location')}</span><strong>${esc(p.label||'Saved Location')}</strong><b>${esc(p.plusCode||'GPS required')}</b><small>${p.plusCode?`${cfg.locationLength} digits • ${plusCodePrecisionLabel(cfg.locationLength)}`:''}${p.notes?`${p.plusCode?' • ':''}${esc(p.notes)}`:''}</small></div><div><button class="ghost" data-copy-plus071="${esc(p.id)}">Copy</button><button class="ghost" data-route-plus071="${esc(p.id)}">Route</button><button class="${s.preferredLocationPointId===p.id?'primary':'ghost'}" data-prefer-plus071="${esc(p.id)}">${s.preferredLocationPointId===p.id?'Default':'Use'}</button><button class="danger" data-delete-plus071="${esc(p.id)}">×</button></div></article>`).join('')}</div>`:`<p class="accountEmpty067">Drop pins at the main entrance, preferred parking, exterior access door, riser room, fire alarm panel, FDC, or another exact field location.</p>`}
   </div></details>`;
 }
 function mapQuery(s){ return hasGps(s) ? `${Number(s.gps.lat).toFixed(6)},${Number(s.gps.lng).toFixed(6)}` : fullAddress(s); }
@@ -1153,6 +1163,13 @@ function captureGpsForSite(){
     save(); toast("GPS saved to site."); render();
   },err=>toast("GPS failed: " + (err.message || "permission denied")),gpsOptions());
 }
+function updateAccountPlusPreview0794(){
+  const box=document.getElementById("accountPlusPreview0794");if(!box)return;
+  const lat=Number(document.getElementById("gpsLat")?.value),lng=Number(document.getElementById("gpsLng")?.value);
+  const cfg=plusCodeSettings0794();
+  const code=Number.isFinite(lat)&&Number.isFinite(lng)?encodePlusCode071(lat,lng,cfg.accountLength):"";
+  box.innerHTML=code?`<span>Google Plus Code</span><strong>${esc(code)}</strong><small>${cfg.accountLength} digits • ${plusCodePrecisionLabel(cfg.accountLength)}</small>`:`<span>Google Plus Code</span><strong>GPS required</strong><small>Enter or capture latitude and longitude.</small>`;
+}
 function captureGpsIntoForm(){
   if(!navigator.geolocation){ toast("GPS is not available in this browser."); return; }
   toast("Requesting GPS location...");
@@ -1162,6 +1179,7 @@ function captureGpsIntoForm(){
     if(lng) lng.value=Number(pos.coords.longitude.toFixed(6));
     if(acc) acc.value=Math.round(pos.coords.accuracy || 0);
     if(at) at.value=new Date().toISOString();
+    updateAccountPlusPreview0794();
     toast("GPS captured. Save the site to keep it.");
   },err=>toast("GPS failed: " + (err.message || "permission denied")),gpsOptions());
 }
@@ -1220,6 +1238,12 @@ function siteHealthLine(s){
   const h=siteHealth(s);
   return `${h.label} • ${h.score}% • ${h.details.slice(0,2).join(" • ")}`;
 }
+function reportPlusCodeLine0794(s){
+  const cfg=plusCodeSettings0794();
+  if(!cfg.enabled||!cfg.includeInReports)return "";
+  const code=navigationPlusCode071(s)||sitePlusCode071(s);
+  return code?`Plus Code: ${code}`:"Plus Code: GPS required";
+}
 function siteSnapshotText(s){
   ensureSite(s);
   const h=siteHealth(s);
@@ -1235,6 +1259,7 @@ function siteSnapshotText(s){
     `Panel: ${[s.panelManufacturer,s.panelModel].filter(Boolean).join(" ")||"Not entered"}`,
     `Health: ${h.label} ${h.score}% - ${h.details.join("; ")}`,
     `GPS: ${gpsLine(s)}`,
+    ...(reportPlusCodeLine0794(s)?[reportPlusCodeLine0794(s)]:[]),
     `Maps: ${mapUrl(s, data.settings.gps?.mapProvider==="google" ? "google" : "apple")}`,
     ``,
     `CONTACTS / ACCESS`,
@@ -1437,7 +1462,7 @@ function checklist(){
 
 function siteSearchBlob(s){
   ensureSite(s);
-  const parts=[s.name, fullAddress(s), s.panelManufacturer, s.panelModel, s.notes, s.externalAccountId, s.sitePhone, s.devicePhone, s.deviceType, s.siteId1, s.siteId2, s.siteLanguage, s.devicePhoneComment, s.sourceGroupNumber, ...accountTags0737(s).map(tag=>tag.name)];
+  const parts=[s.name, fullAddress(s), s.panelManufacturer, s.panelModel, s.notes, s.externalAccountId, s.sitePhone, s.devicePhone, s.deviceType, s.siteId1, s.siteId2, s.siteLanguage, s.devicePhoneComment, s.sourceGroupNumber, plusCodeSettings0794().searchable?sitePlusCode071(s):"", ...(plusCodeSettings0794().searchable?locationPoints071(s).map(p=>p.plusCode):[]), ...accountTags0737(s).map(tag=>tag.name)];
   (s.contacts||[]).forEach(c=>parts.push(c.name,c.company,c.role,c.phone,c.email,c.type,c.accessNotes,c.notes));
   (s.equipment||[]).forEach(e=>parts.push(e.type,e.status,e.location,e.make,e.model,e.serial,e.notes));
   (s.docs||[]).forEach(d=>parts.push(d.type,d.title,d.ref,d.url,d.notes));
@@ -4636,6 +4661,7 @@ function siteDetail(){
   document.getElementById("appleBtn")?.addEventListener("click",()=>{if(hasGps(s))window.open(mapUrl(s,"apple"),"_blank");});
   document.getElementById("googleBtn")?.addEventListener("click",()=>{if(hasGps(s))window.open(mapUrl(s,"google"),"_blank");});
   document.getElementById("copyPrimaryPlus071")?.addEventListener("click",()=>copyText071(sitePlusCode071(s),"Plus Code copied."));
+  document.getElementById("openPrimaryPlus0794")?.addEventListener("click",()=>{const code=sitePlusCode071(s);if(code)window.open(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(code)}`,"_blank");});
   document.getElementById("addLocationPoint071")?.addEventListener("click",addLocationPoint071);
   document.querySelectorAll("[data-copy-plus071]").forEach(b=>b.onclick=()=>{const p=locationPoints071(s).find(x=>x.id===b.dataset.copyPlus071);if(p)copyText071(p.plusCode,"Plus Code copied.");});
   document.querySelectorAll("[data-route-plus071]").forEach(b=>b.onclick=()=>routeLocationPoint071(b.dataset.routePlus071));
@@ -4992,6 +5018,7 @@ function docMeta(d){
   if(d.ref) parts.push(d.ref);
   if(d.url) parts.push("Link saved");
   if(d.date) parts.push(d.date);
+  if(d.storageProvider && d.storageProvider!=="local") parts.push(`${fileStorageProviderLabel0794(d.storageProvider)} ${d.storageStatus==="pending"?"queued":"stored"}`);
   return parts.join(" • ") || "No reference details entered";
 }
 function docReportLine(d){
@@ -5366,12 +5393,17 @@ function siteDocForm(){
   const formTitle523 = mode && !isNewPhoto523 ? "Edit Document / Photo" : isDefPhoto525 ? "Add Deficiency Photo" : isNewPhoto523 ? "Add Account Photo" : "Add Document / Link";
   const defaultType523 = isNewPhoto523 ? "Photo Set" : "Panel Manual";
   const defaultTitle523 = isDefPhoto525 ? `Deficiency Photo - ${linkedDef525?.title||"Issue"}` : isNewPhoto523 ? "Site Photo" : "";
+  const storageKind0794=(isNewPhoto523||d?.imageData)?"photo":"document";
+  const defaultStorage0794=fileStorageTarget0794(storageKind0794);
+  const selectedStorageProvider0794=d?.storageProvider||defaultStorage0794.provider||"local";
+  const selectedStorageFolder0794=d?.storageFolder||defaultStorage0794.folder||`FireVault/${storageKind0794==="photo"?"Photos":"Documents"}`;
   html(`<div class="screen"><div class="row"><button class="back ghost" id="backBtn">←</button><h1>${formTitle523}</h1></div><div class="form grow">
     ${isNewPhoto523?`<div class="card addPhotoHint523"><strong>${isDefPhoto525?"Add Photo to Deficiency":"Add Photo to Account"}</strong><span>${isDefPhoto525?`This photo will be linked directly to: ${esc(linkedDef525?.title||"Deficiency")}.`:"Choose a photo, add a title or notes, then save it to this account’s Photo Vault."}</span></div>`:""}
     <div class="card docFormCard docFormCard512"><div class="compactField"><div><label>Type</label><select id="docType">${types.map(x=>`<option value="${esc(x)}" ${((d.type||defaultType523)===x)?"selected":""}>${esc(x)}</option>`).join("")}</select></div><div><label>Date / Revision</label><input id="docDate" value="${esc(d.date||"")}" placeholder="Rev, date, or version"></div></div>
     <label>Title</label><input id="docTitle" value="${esc(d.title||defaultTitle523)}" placeholder="Panel cabinet photo, SLC module, NAC wiring, deficiency photo...">
     <label>Reference / Account / Permit #</label><input id="docRef" value="${esc(d.ref||"")}" placeholder="Account number, permit number, drawing ID...">
     <label>URL / Link</label><input id="docUrl" value="${esc(d.url||"")}" placeholder="https://...">
+    <div class="docStorageDestination0794"><div><label>Storage Destination</label><select id="docStorageProvider0794">${fileStorageOptions0794(selectedStorageProvider0794)}</select></div><div><label>Destination Folder</label><input id="docStorageFolder0794" value="${esc(selectedStorageFolder0794)}" placeholder="FireVault/${storageKind0794==="photo"?"Photos":"Documents"}"></div><p>Remote providers remain queued until their OAuth or WebDAV connection is active. FireVault keeps the local record available.</p></div>
     ${docPhotoPreviewMarkup512(d)}
     <label>Photo / Document Notes</label><textarea id="docNotes" class="photoNotesField524" placeholder="Internal field notes: device address, circuit, problem found, parts needed...">${esc(d.notes||"")}</textarea>
     <label>Customer Photo Caption</label><textarea id="docCustomerCaption528" class="photoCaptionField528" placeholder="Short customer-facing caption for reports, for example: Battery dated 2019 and due for replacement.">${esc(d.customerCaption||"")}</textarea><p class="fieldNote">Customer captions appear in customer report photo lists. Internal notes stay available for technician detail.</p></div>
@@ -5381,7 +5413,11 @@ function siteDocForm(){
   wireDocPhotoControls512(d||{});
   document.getElementById("saveDocBtn").onclick=()=>{
     const imageData=docPhotoClearRequested512 ? "" : (docPhotoDraftDataUrl512 || d?.imageData || "");
-    const obj={type:val("docType"),title:val("docTitle")||"Untitled Reference",ref:isDefPhoto525?"Deficiency":val("docRef"),url:val("docUrl"),date:val("docDate"),notes:raw("docNotes"),customerCaption:raw("docCustomerCaption528"),imageData,imageName:imageData?(docPhotoDraftName512||d?.imageName||"Site photo"):"",photoCategory:imageData?(isDefPhoto525?"Deficiency":selectedPhotoCategory524()):"",useOverlayOnSave:checked("docUseOverlay524"),imageUpdatedAt:imageData?new Date().toISOString():"",updatedAt:new Date().toISOString(),linkedDeficiencyId:isDefPhoto525?linkedDefId525:(d?.linkedDeficiencyId||""),linkedDeficiencyTitle:isDefPhoto525?(linkedDef525?.title||""):(d?.linkedDeficiencyTitle||""),includeInCustomerReport:imageData?checked("docIncludeReport526"):false};
+    const storageKind0794=imageData?"photo":"document";
+    const configuredTarget0794=fileStorageTarget0794(storageKind0794);
+    const storageProvider0794=val("docStorageProvider0794")||configuredTarget0794.provider||"local";
+    const storageFolder0794=val("docStorageFolder0794")||configuredTarget0794.folder||`FireVault/${storageKind0794==="photo"?"Photos":"Documents"}`;
+    const obj={type:val("docType"),title:val("docTitle")||"Untitled Reference",ref:isDefPhoto525?"Deficiency":val("docRef"),url:val("docUrl"),date:val("docDate"),notes:raw("docNotes"),customerCaption:raw("docCustomerCaption528"),imageData,imageName:imageData?(docPhotoDraftName512||d?.imageName||"Site photo"):"",photoCategory:imageData?(isDefPhoto525?"Deficiency":selectedPhotoCategory524()):"",useOverlayOnSave:checked("docUseOverlay524"),imageUpdatedAt:imageData?new Date().toISOString():"",updatedAt:new Date().toISOString(),linkedDeficiencyId:isDefPhoto525?linkedDefId525:(d?.linkedDeficiencyId||""),linkedDeficiencyTitle:isDefPhoto525?(linkedDef525?.title||""):(d?.linkedDeficiencyTitle||""),includeInCustomerReport:imageData?checked("docIncludeReport526"):false,storageTargetId:`${storageProvider0794}:${storageKind0794}`,storageProvider:storageProvider0794,storageFolder:storageFolder0794,storageStatus:storageProvider0794==="local"?"local":"pending",remoteFileId:d?.remoteFileId||"",remoteRevision:d?.remoteRevision||"",remoteUrl:d?.remoteUrl||""};
     if(mode && !isNewPhoto523 && d){ Object.assign(d,obj); }
     else s.docs.unshift({...obj,id:uid(),createdAt:new Date().toISOString()});
     save(); toast(isDefPhoto525?"Deficiency photo saved.":"Document saved."); if(isDefPhoto525){ mode=linkedDefId525; route("deficiencyForm"); } else route("siteDocs");
@@ -5580,6 +5616,7 @@ function siteForm(){
         <div class="compactField"><div><label>City</label><input id="city" value="${esc(s.city||"")}" autocomplete="address-level2"></div><div><label>State</label><input id="state" value="${esc(s.state||"")}" maxlength="2" autocapitalize="characters" autocomplete="address-level1"></div></div>
         <div class="compactField"><div><label>ZIP</label><input id="zip" value="${esc(s.zip||"")}" inputmode="numeric" autocomplete="postal-code"></div><div class="accountFormLocationAction0760"><label>GPS</label><button type="button" class="ghost" id="formGpsBtn">Capture Current Location</button></div></div>
         <div class="accountGpsFields0760"><div><label>Latitude</label><input id="gpsLat" inputmode="decimal" value="${hasGps(s)?esc(s.gps.lat):""}"></div><div><label>Longitude</label><input id="gpsLng" inputmode="decimal" value="${hasGps(s)?esc(s.gps.lng):""}"></div><input id="gpsAccuracy" type="hidden" value="${hasGps(s)?esc(s.gps.accuracy||""):""}"><input id="gpsCapturedAt" type="hidden" value="${hasGps(s)?esc(s.gps.capturedAt||""):""}"></div>
+        <div class="accountPlusPreview0794" id="accountPlusPreview0794"></div>
       </section>
       <section class="card accountFormCard0760"><div class="accountFormSectionTitle0760"><span>3</span><div><strong>Fire Alarm System</strong><small>Optional panel information helps technicians identify the account quickly.</small></div></div>
         <div class="compactField"><div><label>Panel Make</label><input id="pm" value="${esc(s.panelManufacturer||"")}" placeholder="Notifier, EST, Siemens…"></div><div><label>Panel Model</label><input id="model" value="${esc(s.panelModel||"")}"></div></div>
@@ -5593,6 +5630,8 @@ function siteForm(){
   document.getElementById("backBtn")?.addEventListener("click",goBack);
   document.getElementById("cancelAccount0760")?.addEventListener("click",goBack);
   document.getElementById("formGpsBtn")?.addEventListener("click",captureGpsIntoForm);
+  ["gpsLat","gpsLng"].forEach(id=>document.getElementById(id)?.addEventListener("input",updateAccountPlusPreview0794));
+  updateAccountPlusPreview0794();
   const nameInput=document.getElementById("name");
   const idInput=document.getElementById("externalAccountId0760");
   const errorBox=document.getElementById("accountFormError0760");
@@ -5622,8 +5661,10 @@ function siteForm(){
       panelManufacturer:val("pm"),panelModel:val("model"),notes:raw("notes")
     };
     const gpsLat=Number(val("gpsLat")), gpsLng=Number(val("gpsLng"));
-    if(Number.isFinite(gpsLat) && Number.isFinite(gpsLng)) obj.gps={lat:gpsLat,lng:gpsLng,accuracy:Number(val("gpsAccuracy"))||0,capturedAt:val("gpsCapturedAt")||new Date().toISOString()};
-    else obj.gps=null;
+    if(Number.isFinite(gpsLat) && Number.isFinite(gpsLng)){
+      obj.gps={lat:gpsLat,lng:gpsLng,accuracy:Number(val("gpsAccuracy"))||0,capturedAt:val("gpsCapturedAt")||new Date().toISOString()};
+      obj.plusCode=encodePlusCode071(gpsLat,gpsLng,plusCodeSettings0794().accountLength);
+    }else{obj.gps=null;obj.plusCode="";}
     if(editing){Object.assign(s,obj);selectedSiteId=s.id;}
     else{const n=ensureSite({...obj,id:uid(),createdAt:new Date().toISOString()});data.sites.unshift(n);selectedSiteId=n.id;}
     save();toast(editing?"Account updated.":"Account created.");route("siteDetail");
@@ -5869,7 +5910,7 @@ function reportText(s, opts=reportSectionState()){
   const checklist=checklistReportBlock(s);
   const sections=[];
   sections.push([set.reports.title || "FireVault Service Report", `Generated: ${new Date().toLocaleString()}\nBuild: ${BUILD}`]);
-  if(opts.site) sections.push(["SITE", `${s.name||"Unnamed Site"}\n${fullAddress(s)}\nPanel: ${[s.panelManufacturer,s.panelModel].filter(Boolean).join(" ")||"Not entered"}\nGPS: ${data.settings.gps?.includeInReports===false?"Hidden in Settings":gpsLine(s)}\nMap: ${mapUrl(s,(set.gps&&set.gps.mapProvider)||"apple")}\nHealth: ${siteHealthLine(s)}`]);
+  if(opts.site) sections.push(["SITE", `${s.name||"Unnamed Site"}\n${fullAddress(s)}\nPanel: ${[s.panelManufacturer,s.panelModel].filter(Boolean).join(" ")||"Not entered"}\nGPS: ${data.settings.gps?.includeInReports===false?"Hidden in Settings":gpsLine(s)}${reportPlusCodeLine0794(s)?`\n${reportPlusCodeLine0794(s)}`:""}\nMap: ${mapUrl(s,(set.gps&&set.gps.mapProvider)||"apple")}\nHealth: ${siteHealthLine(s)}`]);
   if(opts.tech) sections.push(["TECHNICIAN", `${tech.name||""}\n${tech.company||""}\n${tech.phone||""}\n${tech.email||""}`.trim() || "No technician profile entered"]);
   if(opts.visits) sections.push(["VISITS", visits]);
   if(opts.contacts) sections.push(["CONTACTS / ACCESS", contacts]);
@@ -6829,9 +6870,9 @@ function importedAccountCard065(s={}){
 const SETTINGS_GROUPS_067 = [
   {key:"profile",icon:"👤",title:"Profile & Organization",note:"Technician identity and company details.",tone:"blue",tabs:["tech"]},
   {key:"appearance",icon:"◐",title:"App & Home",note:"Demo Mode, theme, Home layout, and visible modules.",tone:"violet",tabs:["demo","themes","homeLayout","visibility"]},
-  {key:"field",icon:"🧰",title:"Field Tools",note:"GPS, photo overlays, and optional field services.",tone:"cyan",tabs:["gps","overlay","advanced"]},
+  {key:"field",icon:"🧰",title:"Field Tools",note:"GPS, photo overlays, and optional field services.",tone:"cyan",tabs:["gps","plusCodes","overlay","advanced"]},
   {key:"reports",icon:"▤",title:"Reports & Communication",note:"Report content, email delivery, and customer closeout.",tone:"amber",tabs:["reports","email"]},
-  {key:"data",icon:"☁",title:"Data, Sync & Support",note:"Privacy Lock, Security Center, backend readiness, categories, imports, backup, team sync, Help, About, and diagnostics.",tone:"red",tabs:["privacy","security","backend","sync","webdav","customerImport","categories","backup","updates","manual","about","diagnostics"]}
+  {key:"data",icon:"☁",title:"Data, Sync & Support",note:"Privacy Lock, Security Center, backend readiness, categories, imports, backup, team sync, Help, About, and diagnostics.",tone:"red",tabs:["privacy","security","cloudFiles","backend","sync","webdav","customerImport","categories","backup","updates","manual","about","diagnostics"]}
 ];
 function settingsGroupForTab067(tab){ return SETTINGS_GROUPS_067.find(g=>g.tabs.includes(tab))?.key || "data"; }
 function settingsGroup067ByKey(key){ return SETTINGS_GROUPS_067.find(g=>g.key===key) || SETTINGS_GROUPS_067[0]; }
@@ -6846,6 +6887,7 @@ function settingsTabs(){
   return [
     ["tech","Technician","Name, company, phone, email, and license information used in reports."],
     ["gps","GPS / Maps","Location capture, map provider, nearby radius, and GPS report visibility."],
+    ["plusCodes","Google Plus Codes","Offline Plus Code generation, precision, search, routing, and location-point settings."],
     ["reports","Reports","Default report title, format, and included report sections."],
     ["email","Email","Default recipients, subject template, signature template, and tag tools."],
     ["overlay","Photo Overlay","Photo stamp preview, template fields, alignment, colors, and logo visibility."],
@@ -6856,6 +6898,7 @@ function settingsTabs(){
     ["advanced","Advanced","Optional integrations and field services. An asterisk marks controls that require an outside service."],
     ["privacy","Privacy Lock","Optional local PIN, inactivity timeout, background lock, recovery code, and privacy screen."],
     ["security","Security Center","Privacy, vault integrity, backup health, device identity, audit history, and recovery controls."],
+    ["cloudFiles","Photo & Document Storage","Choose separate local or cloud destinations for photos and documents."],
     ["backend","Backend Foundation","Provider-ready authentication, database, file storage, sync, and audit adapters."],
     ["sync","Team Sync","Technician identity, shared-vault packages, pending changes, and conflict review."],
     ["webdav","WebDAV","Optional encrypted-transport backup and restore using a compatible WebDAV server."],
@@ -6917,7 +6960,7 @@ function leaveSettingsHome572(){
 }
 
 function settingsIcon550(tab){
-  return ({tech:"👤",gps:"⌖",reports:"▤",email:"✉",overlay:"▧",demo:"D",themes:"◐",homeLayout:"⌂",visibility:"☰",advanced:"⚡",privacy:"▣",security:"⌾",sync:"☁",customerImport:"⇩",categories:"◇",backup:"⇅",updates:"↻",manual:"?",about:"ⓘ"})[tab]||"•";
+  return ({tech:"👤",gps:"⌖",plusCodes:"＋",reports:"▤",email:"✉",overlay:"▧",demo:"D",themes:"◐",homeLayout:"⌂",visibility:"☰",advanced:"⚡",privacy:"▣",security:"⌾",cloudFiles:"☁",sync:"☁",customerImport:"⇩",categories:"◇",backup:"⇅",updates:"↻",manual:"?",about:"ⓘ"})[tab]||"•";
 }
 function settings(){
   captureSettingsScroll576();
@@ -6954,7 +6997,7 @@ function settings(){
 
   settingsGroup067=settingsGroupForTab067(settingsTab);
   const detailGroup=settingsGroup067ByKey(settingsGroup067);
-  const saveable=!['demo','privacy','backend','customerImport','categories','backup','updates','manual','about'].includes(settingsTab);
+  const saveable=!['demo','privacy','cloudFiles','backend','customerImport','categories','backup','updates','manual','about'].includes(settingsTab);
 
   if(settingsTab==="manual"){
     html(`<div class="screen settingsTabbedDetail0736 settingsManualScreen067 settingsStable573">
@@ -7560,7 +7603,7 @@ function manualSimplePage058(type){
   quick:["🚀","Quick Start Guide","Get FireVault ready for a normal field day.",[["1. Verify the build","Confirm the green build badge shows 0.67.0 before entering production information."],["2. Complete Technician Profile","Enter your name, company, phone, email, and license or employee identification."],["3. Review permissions","Allow location and photo access only when FireVault requests them and the feature is needed."],["4. Create or open a site","Add the customer name, full address, panel details, contacts, access notes, and GPS location."],["5. Document the visit","Record notes, photos, tasks, deficiencies, equipment changes, and a service visit."],["6. Finish and protect the data","Review the report, send or copy the required summary, then export a current backup."]]],
   new:["🆕","What’s New in 0.67.0","Account View, Settings navigation, and FireVault Academy redesign.",[["Unified visual system","Standardized typography, spacing, card surfaces, borders, controls, and responsive behavior across FireVault."],["Settings cleanup","Improved Settings home cards and every submenu while preserving the preferred Email setup workflow."],["Help readability","Converted contextual Help and Academy articles into one uninterrupted scrolling reading column with no floating metadata."],["Site Detail stability","Reinforced natural-height cards, readable text, and scroll-safe account sections."],["Operational screens","Simplified Customer Import, Team Sync, Conflict Center, and Nearby Sites presentation without changing their workflows."],["Phone and iPad layouts","Added consistent narrow-phone and tablet behavior, bottom-navigation clearance, and overflow protection."],["Nearby scan diagnostics","Nearby Sites now shows total sites, GPS-ready records, missing coordinates, phone-location progress, and persistent error messages."],["Coordinate recovery","FireVault recovers valid latitude and longitude stored in compatible legacy or imported fields and normalizes them into the site GPS record."],["Location retry","If high-accuracy location times out or is unavailable, FireVault retries once using standard accuracy."],["Nearest-site fallback","When no site is inside the selected radius, the nearest GPS-ready sites remain visible instead of presenting an empty result."],["Latitude and longitude","Customer Import can calculate missing coordinates from each usable U.S. street address before saving records."],["Coordinate requirement","The importer requires calculated, supplied, or existing GPS coordinates by default. Unmatched addresses remain in review."],["Census address matching","Only address fields are sent to the U.S. Census Geocoder. The returned point is an address-range calculation, not a guaranteed building entrance."],["Account Id matching","Repeat imports update the matching FireVault site instead of creating duplicates or deleting field history."],["CSV coordinate columns","Files that already contain Latitude and Longitude columns use those values directly."],["Sync-ready changes","Added and updated customer records enter the pending synchronization queue and create a Sync Activity entry."]]],
   tips:["🧰","Field Tips","Short practices that improve the usefulness of FireVault records.",[["Write for the next technician","Include the exact panel, circuit, device, location, symptom, test result, and next action instead of relying on memory."],["Photograph context first","Take one wide photo showing the equipment location before close-up terminal, label, or damage photos."],["Separate facts from follow-up","Use notes for what occurred, deficiencies for code or system problems, and tasks for work that still needs completion."],["Confirm the account","Before using Quick Capture, verify the selected customer site to prevent records from being stored under the wrong account."],["Back up before updates","Download an external backup before a major update or device change and after completing significant field documentation."]]],
-  revisions:["📋","Revision History","Application and documentation checkpoints.",[["0.79.3","Added backend-neutral provider interfaces for authentication, database, file storage, synchronization, and audit while keeping FireVault fully local."],["0.79.2","Added a unified Security Center with vault integrity validation, backup health, audit filters, device naming, session clearing, and PIN confirmation for sensitive exports, restores, and deletion."],["0.79.1","Added an optional local six-digit privacy lock with PBKDF2 hashing, inactivity/background locking, app-switcher privacy screen, recovery code, cooldown protection, and local lock events."],["0.79.0","Added security-ready schema 4 metadata, stable workspace/user/device identities, local audit history, pending change queue, recoverable deletion, credential-safe exports, and protected restore/reset actions."],["0.67.0","Redesigned Account View around service actions and grouped information, consolidated Settings into five folders, and simplified FireVault Academy and contextual Help for continuous reading."],["0.65.2","Repaired Nearby Sites with GPS inventory counts, imported-coordinate recovery, persistent permission and timeout messages, a standard-accuracy retry, and nearest-site fallback results."],["0.65.1","Added online latitude/longitude calculation, coordinate validation, geocoding progress, unmatched-address review, optional CSV coordinates, and coordinate-safe repeat importing."],["0.65.0","Added preview-first customer CSV importing, Account Id update matching, validation warnings, imported monitoring details, and sync activity tracking."],["0.64.1","Simplified Academy article headers, removed floating metadata badges, and improved continuous scrolling and readability."],["0.64.0","Added Sync Activity, a conflict review center, export/import audit entries, and an automatic OneDrive connection-readiness checklist."],["0.63.1","Overhauled contextual Help and Academy reader formatting, removed overlapping sticky article headers, and restored full scrolling on phones and tablets."],["0.63.0","Added permanent record IDs, audit metadata, local version tracking, pending-sync states, conflict readiness, device identity, and a Team Sync settings workspace."],["0.60.0","Connected major screens and Settings areas directly to matching Academy chapters with return-to-screen navigation."],["0.59.0","Added interactive tutorials, guided orientation, pinned learning, field tips, and documentation tracking."],["0.58.0","Expanded Help & Manual into FireVault Academy with bookmarks, smart search, Quick Start, and reader navigation."],["0.57.0","Added the first complete searchable in-app FireVault User Manual."],["Ongoing review rule","Any change to navigation, labels, storage, workflows, permissions, or supported layouts requires the related manual chapter to be checked."]]],
+  revisions:["📋","Revision History","Application and documentation checkpoints.",[["0.79.4","Added independent photo and document storage destinations, cloud-provider integration targets, and offline Google Plus Codes for accounts and exact field locations."],["0.79.3","Added backend-neutral provider interfaces for authentication, database, file storage, synchronization, and audit while keeping FireVault fully local."],["0.79.2","Added a unified Security Center with vault integrity validation, backup health, audit filters, device naming, session clearing, and PIN confirmation for sensitive exports, restores, and deletion."],["0.79.1","Added an optional local six-digit privacy lock with PBKDF2 hashing, inactivity/background locking, app-switcher privacy screen, recovery code, cooldown protection, and local lock events."],["0.79.0","Added security-ready schema 4 metadata, stable workspace/user/device identities, local audit history, pending change queue, recoverable deletion, credential-safe exports, and protected restore/reset actions."],["0.67.0","Redesigned Account View around service actions and grouped information, consolidated Settings into five folders, and simplified FireVault Academy and contextual Help for continuous reading."],["0.65.2","Repaired Nearby Sites with GPS inventory counts, imported-coordinate recovery, persistent permission and timeout messages, a standard-accuracy retry, and nearest-site fallback results."],["0.65.1","Added online latitude/longitude calculation, coordinate validation, geocoding progress, unmatched-address review, optional CSV coordinates, and coordinate-safe repeat importing."],["0.65.0","Added preview-first customer CSV importing, Account Id update matching, validation warnings, imported monitoring details, and sync activity tracking."],["0.64.1","Simplified Academy article headers, removed floating metadata badges, and improved continuous scrolling and readability."],["0.64.0","Added Sync Activity, a conflict review center, export/import audit entries, and an automatic OneDrive connection-readiness checklist."],["0.63.1","Overhauled contextual Help and Academy reader formatting, removed overlapping sticky article headers, and restored full scrolling on phones and tablets."],["0.63.0","Added permanent record IDs, audit metadata, local version tracking, pending-sync states, conflict readiness, device identity, and a Team Sync settings workspace."],["0.60.0","Connected major screens and Settings areas directly to matching Academy chapters with return-to-screen navigation."],["0.59.0","Added interactive tutorials, guided orientation, pinned learning, field tips, and documentation tracking."],["0.58.0","Expanded Help & Manual into FireVault Academy with bookmarks, smart search, Quick Start, and reader navigation."],["0.57.0","Added the first complete searchable in-app FireVault User Manual."],["Ongoing review rule","Any change to navigation, labels, storage, workflows, permissions, or supported layouts requires the related manual chapter to be checked."]]],
   trouble:["❓","Troubleshooting","Common problems and safe first checks.",FIREVAULT_MANUAL_058.find(x=>x.id==="trouble")?.topics||[]]
  };
  const [icon,title,note,items]=pages[type]||["ⓘ","Unavailable","This Help section is not available in the installed version.",[["Current status","Return to Help and choose an available chapter or tutorial."]]];
@@ -8066,6 +8109,81 @@ function wireSecurityFoundation0790(){
   });
 }
 
+
+function fileStorageProviderLabel0794(id){return FILE_STORAGE_CATALOG[id]?.label||FILE_STORAGE_CATALOG.local.label;}
+function fileStorageTarget0794(kind="document"){
+  const cfg=data.settings?.fileStorage||{};
+  return kind==="photo"?{provider:"local",folder:"FireVault/Photos",...(cfg.photo||{})}:{provider:"local",folder:"FireVault/Documents",...(cfg.document||{})};
+}
+function fileStorageOptions0794(selected="local"){
+  return Object.values(FILE_STORAGE_CATALOG).map(item=>`<option value="${esc(item.id)}" ${item.id===selected?"selected":""}>${esc(item.label)}${item.available?"":" — setup required"}</option>`).join("");
+}
+function fileStorageStatusClass0794(item){return item.ready?"ready":item.provider==="local"?"ready":"planned";}
+function cloudFileStoragePanel0794(){
+  const cfg=data.settings.fileStorage||{};
+  const photo=fileStorageTarget0794("photo"),documentTarget=fileStorageTarget0794("document");
+  const plan=fileStoragePlanSummary(data);
+  const providers=Object.values(FILE_STORAGE_CATALOG);
+  return `<div class="settingsStack cloudStorage0794">
+    ${settingsSection540("Independent destinations","Photo & Document Storage","Choose one destination for account photos and a different destination for manuals, drawings, reports, and other documents. FireVault remains local-first until a remote upload is confirmed.",`
+      <div class="cloudDestinationGrid0794">
+        <article class="cloudDestinationCard0794 photo"><span>PHOTO STORAGE</span><strong>${esc(fileStorageProviderLabel0794(photo.provider))}</strong><small>${esc(photo.folder||"FireVault/Photos")}</small><em class="${fileStorageStatusClass0794(plan.photo)}">${esc(plan.photo.status)}</em></article>
+        <article class="cloudDestinationCard0794 document"><span>DOCUMENT STORAGE</span><strong>${esc(fileStorageProviderLabel0794(documentTarget.provider))}</strong><small>${esc(documentTarget.folder||"FireVault/Documents")}</small><em class="${fileStorageStatusClass0794(plan.document)}">${esc(plan.document.status)}</em></article>
+      </div>` ,"blue")}
+    ${settingsSection540("Photo destination","Account Photos","New account photos inherit this destination. A technician can still choose a different destination on an individual photo record.",`
+      <div class="settingsGrid settingsGrid540">${fieldBlock("Provider",`<select id="photoProvider0794">${fileStorageOptions0794(photo.provider)}</select>`)}${fieldBlock("Remote folder",`<input id="photoFolder0794" value="${esc(photo.folder||"FireVault/Photos")}" placeholder="FireVault/Photos">`,`Folder is stored as a destination path only; credentials are never stored here.`)}</div>
+      <div class="settingsInfo540"><strong>${esc(plan.photo.status)}</strong><span>${esc(plan.photo.note)}</span></div>` ,"cyan")}
+    ${settingsSection540("Document destination","Documents & Drawings","Use a separate provider or folder for PDFs, panel manuals, reports, drawings, and links.",`
+      <div class="settingsGrid settingsGrid540">${fieldBlock("Provider",`<select id="documentProvider0794">${fileStorageOptions0794(documentTarget.provider)}</select>`)}${fieldBlock("Remote folder",`<input id="documentFolder0794" value="${esc(documentTarget.folder||"FireVault/Documents")}" placeholder="FireVault/Documents">`)}</div>
+      <div class="settingsInfo540"><strong>${esc(plan.document.status)}</strong><span>${esc(plan.document.note)}</span></div>` ,"violet")}
+    ${settingsSection540("Local-first behavior","Transfer Policy","Remote destinations must never destroy the only copy of a field photo or document.",`
+      <div class="settingsList settingsToggleList540">${checkBlock("keepLocalCopy0794","Keep a local FireVault copy after upload",cfg.keepLocalCopy!==false)}${checkBlock("uploadOnSave0794","Queue remote upload when a photo or document is saved",!!cfg.uploadOnSave)}</div>
+      <div class="cloudStorageActions0794"><button class="primary" id="saveCloudStorage0794">Save Destinations</button><button class="ghost" id="downloadCloudManifest0794">Download Integration Manifest</button><button class="ghost" id="openWebdavCloud0794">WebDAV Settings</button></div>` ,"green")}
+    <section class="card compactPane cloudProviderCatalog0794"><div class="paneHead"><div><h2>Available Storage Targets</h2><p class="paneNote">Local storage works now. The existing WebDAV module remains available for vault backup; photo/document transfer and OAuth providers are prepared as later connectors.</p></div></div><div>${providers.map(item=>`<article><span>${item.id==="onedrive"||item.id==="sharepoint"?"M":item.id==="googledrive"?"G":item.id==="dropbox"?"D":item.id==="webdav"?"W":"L"}</span><div><strong>${esc(item.label)}</strong><small>${esc(item.note)}</small></div><b class="${item.id==="local"?"available":"planned"}">${item.id==="local"?"READY":item.id==="webdav"?"BACKUP READY":"OAUTH SETUP"}</b></article>`).join("")}</div></section>
+  </div>`;
+}
+function wireCloudFileStorage0794(){
+  document.getElementById("saveCloudStorage0794")?.addEventListener("click",()=>{
+    const photoProvider=val("photoProvider0794")||"local",documentProvider=val("documentProvider0794")||"local";
+    data.settings.fileStorage={version:1,photo:{provider:photoProvider,folder:val("photoFolder0794")||"FireVault/Photos"},document:{provider:documentProvider,folder:val("documentFolder0794")||"FireVault/Documents"},keepLocalCopy:checked("keepLocalCopy0794"),uploadOnSave:checked("uploadOnSave0794")};
+    recordSecurityEvent(data,"file-storage-destinations-updated",{photoProvider,documentProvider});
+    data=loadData();toast("Photo and document destinations saved.","success");settings();
+  });
+  document.getElementById("downloadCloudManifest0794")?.addEventListener("click",()=>{downloadBlob(`firevault-cloud-file-storage-${new Date().toISOString().slice(0,10)}.json`,JSON.stringify(cloudFileStorageManifest(data),null,2),"application/json");toast("Cloud file-storage manifest downloaded.","success");});
+  document.getElementById("openWebdavCloud0794")?.addEventListener("click",()=>{settingsTab="webdav";mode="settingsDetail";render();});
+}
+function plusCodeStats0794(){
+  const sites=data.sites||[];
+  const accounts=sites.filter(s=>!!sitePlusCode071(s)).length;
+  const points=sites.reduce((sum,s)=>sum+locationPoints071(s).filter(p=>isValidFullPlusCode(p.plusCode)).length,0);
+  return {accounts,points,total:sites.length};
+}
+function plusCodesPanel0794(){
+  const cfg=plusCodeSettings0794(),stats=plusCodeStats0794();
+  return `<div class="settingsStack plusCodesSettings0794">
+    ${settingsSection540("Offline location addressing","Google Plus Codes","FireVault generates full Open Location Codes directly from saved latitude and longitude. No paid API, network connection, or address lookup is required.",`
+      <div class="plusCodeStats0794"><div><strong>${stats.accounts}</strong><span>Account codes</span></div><div><strong>${stats.points}</strong><span>Exact location pins</span></div><div><strong>${stats.total-stats.accounts}</strong><span>Need GPS</span></div></div>
+      <div class="settingsInfo540"><strong>Full codes only</strong><span>FireVault stores full codes such as 85HPMM7R+42 so they work without a nearby city reference.</span></div>` ,"cyan")}
+    ${settingsSection540("Precision","Plus Code Settings","Use standard precision for an account location and higher precision for entrances, panels, riser rooms, FDCs, and other field pins.",`
+      <div class="settingsGrid settingsGrid540">${fieldBlock("Account code precision",`<select id="plusAccountLength0794"><option value="10" ${cfg.accountLength===10?"selected":""}>10 digits — ${plusCodePrecisionLabel(10)}</option><option value="11" ${cfg.accountLength===11?"selected":""}>11 digits — ${plusCodePrecisionLabel(11)}</option></select>`)}${fieldBlock("Saved location precision",`<select id="plusLocationLength0794"><option value="10" ${cfg.locationLength===10?"selected":""}>10 digits — ${plusCodePrecisionLabel(10)}</option><option value="11" ${cfg.locationLength===11?"selected":""}>11 digits — ${plusCodePrecisionLabel(11)}</option></select>`,`11 digits is recommended for doors, fire panels, riser rooms, and FDC locations.`)}</div>
+      <div class="settingsList settingsToggleList540">${checkBlock("plusEnabled0794","Show Plus Code tools",cfg.enabled)}${checkBlock("plusAuto0794","Generate codes automatically from GPS",cfg.autoGenerate)}${checkBlock("plusSearch0794","Allow account search by Plus Code",cfg.searchable)}${checkBlock("plusReports0794","Include Plus Codes in reports",cfg.includeInReports)}</div>` ,"blue",`<button class="primary saveMini" id="savePlusCodes0794">Save</button>`)}
+    ${settingsSection540("Database tools","Generate & Verify","Recalculate account and saved-location codes from the stored GPS coordinates using the selected precision.",`
+      <div class="cloudStorageActions0794"><button class="primary" id="backfillPlusCodes0794">Generate / Refresh Codes</button><button class="ghost" id="copyPlusCodeSummary0794">Copy Summary</button></div><div id="plusCodeResult0794" class="fieldNote">${stats.accounts} of ${stats.total} accounts currently have a full Plus Code.</div>` ,"green")}
+  </div>`;
+}
+function wirePlusCodes0794(){
+  document.getElementById("savePlusCodes0794")?.addEventListener("click",()=>{
+    data.settings.plusCodes={enabled:checked("plusEnabled0794"),autoGenerate:checked("plusAuto0794"),accountLength:Number(val("plusAccountLength0794"))||10,locationLength:Number(val("plusLocationLength0794"))||11,searchable:checked("plusSearch0794"),includeInReports:checked("plusReports0794")};
+    ensureAllPlusCodes071();saveData(data);data=loadData();toast("Plus Code settings saved.","success");settings();
+  });
+  document.getElementById("backfillPlusCodes0794")?.addEventListener("click",()=>{
+    let accounts=0,points=0;
+    (data.sites||[]).forEach(s=>{if(hasGps(s)){s.plusCode=encodePlusCode071(s.gps.lat,s.gps.lng,Number(val("plusAccountLength0794"))||10);accounts++;}(s.locationPoints||[]).forEach(p=>{if(Number.isFinite(Number(p.lat))&&Number.isFinite(Number(p.lng))){p.plusCode=encodePlusCode071(p.lat,p.lng,Number(val("plusLocationLength0794"))||11);points++;}});});
+    saveData(data);data=loadData();const out=document.getElementById("plusCodeResult0794");if(out)out.textContent=`Generated ${accounts} account codes and ${points} saved-location codes.`;toast("Plus Codes refreshed.","success");
+  });
+  document.getElementById("copyPlusCodeSummary0794")?.addEventListener("click",async()=>{const stats=plusCodeStats0794();const text=`FireVault Plus Codes\nAccounts: ${stats.accounts} of ${stats.total}\nSaved location pins: ${stats.points}\nAccount precision: ${plusCodeSettings0794().accountLength} digits\nLocation precision: ${plusCodeSettings0794().locationLength} digits`;try{await navigator.clipboard.writeText(text);toast("Plus Code summary copied.","success");}catch{toast("Clipboard unavailable.","error");}});
+}
+
 function backendFoundationPanel0793(){
   const summary=backendAdapterSummary(data);
   const providers=Object.entries(summary.providers||{});
@@ -8078,6 +8196,7 @@ function backendFoundationPanel0793(){
         <div><strong>Pending changes</strong><span>${summary.pendingChanges}</span></div>
         <div><strong>Workspace</strong><span>${esc(summary.workspaceId)}</span></div>
       </div>
+      <div class="backendFilePlan0794"><div><span>Photo destination</span><strong>${esc(summary.fileStoragePlan.photo.label)}</strong><small>${esc(summary.fileStoragePlan.photo.status)} • ${esc(summary.fileStoragePlan.photo.folder)}</small></div><div><span>Document destination</span><strong>${esc(summary.fileStoragePlan.document.label)}</strong><small>${esc(summary.fileStoragePlan.document.status)} • ${esc(summary.fileStoragePlan.document.folder)}</small></div></div>
     </section>
     <section class="card compactPane">
       <div class="paneHead"><div><h2>Provider Interfaces</h2><p class="paneNote">Each responsibility can be replaced independently when the backend is selected.</p></div></div>
@@ -8128,6 +8247,8 @@ function settingsPanel(){
   if(settingsTab==="email") return emailSettingsPanel(email);
   if(settingsTab==="overlay") return overlaySettingsPanel510(o);
 
+  if(settingsTab==="plusCodes") return plusCodesPanel0794();
+
   if(settingsTab==="gps") return `<div class="settingsStack settingsStack540">
     ${settingsSection540("Navigation","Map Preferences","Set the map service, GPS accuracy, and distance used for nearby-account detection.",`<div class="settingsGrid settingsGrid540">${fieldBlock("Default map",`<select id="gpsMapProvider"><option value="apple" ${gps.mapProvider!=="google"?"selected":""}>Apple Maps</option><option value="google" ${gps.mapProvider==="google"?"selected":""}>Google Maps</option></select>`)}${fieldBlock("GPS accuracy",`<select id="gpsHighAccuracy"><option value="true" ${gps.highAccuracy!==false?"selected":""}>High accuracy</option><option value="false" ${gps.highAccuracy===false?"selected":""}>Standard</option></select>`)}${fieldBlock("Nearby radius",`<input id="gpsNearbyRadius" inputmode="decimal" value="${esc(gps.nearbyRadiusMiles||1)}">`,`Distance in miles used by Nearby Sites`)}</div>`,"green",saveButton())}
     ${settingsSection540("Availability","GPS Tools","Choose where location controls and saved coordinates are available.",`<div class="settingsList settingsToggleList540">${checkBlock("gpsEnabled","Show GPS capture buttons on site pages",gps.enabled!==false)}${checkBlock("gpsReports","Include GPS coordinates in reports",gps.includeInReports!==false)}</div><div class="settingsInfo540"><strong>Location permission required</strong><span>Browser GPS works only when FireVault is served over HTTPS and location access is allowed on the device.</span></div>`,"teal")}
@@ -8162,6 +8283,7 @@ function settingsPanel(){
   if(settingsTab==="privacy") return privacyLockPanel0791();
 
   if(settingsTab==="security") return securityFoundationPanel0790();
+  if(settingsTab==="cloudFiles") return cloudFileStoragePanel0794();
   if(settingsTab==="backend") return backendFoundationPanel0793();
 
   if(settingsTab==="sync") {
@@ -8228,6 +8350,8 @@ function settingsPanel(){
 function wireSettingsPanel(){
   if(settingsTab==="privacy"){wirePrivacyLock0791();return;}
   if(settingsTab==="security"){wireSecurityFoundation0790();return;}
+  if(settingsTab==="cloudFiles"){wireCloudFileStorage0794();return;}
+  if(settingsTab==="plusCodes"){wirePlusCodes0794();return;}
   if(settingsTab==="backend"){wireBackendFoundation0793();return;}
   if(settingsTab==="webdav"){wireWebdav0757();return;}
   const saveBtn=document.getElementById("saveSettings"); if(saveBtn) saveBtn.onclick=saveSettings;
@@ -8303,6 +8427,10 @@ function stabilityReport(){
   if(Array.isArray(data.resources)) pass.push("Library resources database is an array"); else issues.push("Library resources database is not an array");
   if(Array.isArray(data.resourceFolders)) pass.push("Library folders are available"); else issues.push("Library folders are missing");
   if(data.settings && data.settings.app && data.settings.theme && data.settings.gps) pass.push("Core settings objects are present"); else issues.push("One or more core settings objects are missing");
+  const storagePlan=fileStoragePlanSummary(data);
+  if(data.settings?.fileStorage?.photo && data.settings?.fileStorage?.document) pass.push(`Independent photo/document storage destinations are configured (${storagePlan.photo.label} / ${storagePlan.document.label})`); else issues.push("Photo or document storage destination settings are missing");
+  const plusCfg=plusCodeSettings0794();
+  if(data.settings?.plusCodes && [10,11].includes(Number(plusCfg.accountLength)) && [10,11].includes(Number(plusCfg.locationLength))) pass.push("Google Plus Code settings are valid"); else issues.push("Google Plus Code settings are invalid");
   const security=securityFoundationSummary(data);
   if(Number(security.schemaVersion)===4) pass.push("Security schema 4 is active"); else issues.push(`Security schema is ${security.schemaVersion||"missing"}`);
   if(security.workspaceId && security.user?.id && security.device?.id) pass.push("Workspace, user, and device identities are present"); else issues.push("Security identity metadata is incomplete");
@@ -8316,6 +8444,7 @@ function stabilityReport(){
       if(!Array.isArray(s[k])) issues.push(`${s.name||"Unnamed site"} has invalid ${k} storage`);
     });
     if(s.gps && (!Number.isFinite(Number(s.gps.lat)) || !Number.isFinite(Number(s.gps.lng)))) issues.push(`${s.name||"Unnamed site"} has invalid GPS coordinates`);
+    if(plusCfg.enabled && hasGps(s) && s.plusCode && !isValidFullPlusCode(s.plusCode)) issues.push(`${s.name||"Unnamed site"} has an invalid Plus Code`);
   });
   const resourceIds=new Set();
   (data.resources||[]).forEach((r,idx)=>{
@@ -9170,6 +9299,7 @@ function diagnostics(){
 }
 function showChangelog(){
   const notes = [
+    "Build 0.79.4 adds independent photo/document storage destinations and full offline Google Plus Codes while keeping FireVault local-first.",
     "Build 0.79.3 adds backend-neutral provider interfaces for authentication, database, file storage, synchronization, and audit while keeping FireVault fully local.",
     "Build 0.79.2 adds a unified Security Center for vault integrity, backup health, audit review, device identity, recovery, and PIN-gated sensitive actions.",
     "Build 0.79.0 adds a security-ready data foundation with stable workspace, user, and device identities; record versioning; change queues; audit history; soft deletion; recycle recovery; and stronger restore/reset confirmation.",

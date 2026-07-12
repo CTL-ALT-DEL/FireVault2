@@ -1,4 +1,4 @@
-export const BUILD = "0.79.3";
+export const BUILD = "0.79.4";
 export const SECURITY_SCHEMA_VERSION = 4;
 export const KEY = "firevault_vault_build_030";
 export const ACTIVE_JOB_KEY = "firevault_active_job_modular";
@@ -874,6 +874,25 @@ export function normalize(data){
   data.settings.advanced = data.settings.advanced || {aiTechnician:false, reverseAddressLookup:false, cloudBackup:false, voiceTranscription:false, ocrReader:false, emailGateway:false, weather:false, traffic:false};
   data.settings.gps = {enabled:true, mapProvider:"apple", highAccuracy:true, includeInReports:true, nearbyRadiusMiles:1, ...(data.settings.gps || {})};
   data.settings.sync = {provider:"onedrive",enabled:false,organization:"",workspace:"FireVault Shared Vault",autoSync:true,wifiOnly:false,conflictPolicy:"review",...(data.settings.sync||{})};
+  const fileStorage=data.settings.fileStorage||{};
+  data.settings.fileStorage={
+    version:1,
+    photo:{provider:"local",folder:"FireVault/Photos",...(fileStorage.photo||{})},
+    document:{provider:"local",folder:"FireVault/Documents",...(fileStorage.document||{})},
+    keepLocalCopy:fileStorage.keepLocalCopy!==false,
+    uploadOnSave:!!fileStorage.uploadOnSave
+  };
+  data.settings.plusCodes={
+    enabled:true,
+    autoGenerate:true,
+    accountLength:10,
+    locationLength:11,
+    includeInReports:true,
+    searchable:true,
+    ...(data.settings.plusCodes||{})
+  };
+  data.settings.plusCodes.accountLength=[10,11].includes(Number(data.settings.plusCodes.accountLength))?Number(data.settings.plusCodes.accountLength):10;
+  data.settings.plusCodes.locationLength=[10,11].includes(Number(data.settings.plusCodes.locationLength))?Number(data.settings.plusCodes.locationLength):11;
   const defaultCategories0737 = [];
   const rawCategories0737 = data.settings.accountCategories;
   const sourceCategories0737 = rawCategories0737 && Array.isArray(rawCategories0737.definitions) ? rawCategories0737.definitions : defaultCategories0737;
@@ -905,6 +924,19 @@ export function normalize(data){
     data.settings.homeLayout.cards[key]={visible:current.visible!==false,behavior:["remember","expanded","collapsed"].includes(current.behavior)?current.behavior:defaults.behavior};
   });
   data.sites.forEach(ensureSite);
+  data.sites.forEach(site=>{
+    (site.docs||[]).forEach(doc=>{
+      const isPhoto=!!(doc.imageData||doc.photoData||/^image\//i.test(String(doc.mime||doc.mimeType||"")));
+      const target=isPhoto?data.settings.fileStorage.photo:data.settings.fileStorage.document;
+      doc.storageProvider=doc.storageProvider||target.provider||"local";
+      doc.storageFolder=doc.storageFolder||target.folder||`FireVault/${isPhoto?"Photos":"Documents"}`;
+      doc.storageTargetId=doc.storageTargetId||`${doc.storageProvider}:${isPhoto?"photo":"document"}`;
+      doc.storageStatus=doc.storageStatus||(doc.storageProvider==="local"?"local":"pending");
+      doc.remoteFileId=doc.remoteFileId||"";
+      doc.remoteRevision=doc.remoteRevision||"";
+      doc.remoteUrl=doc.remoteUrl||"";
+    });
+  });
   data.sites.forEach(site=>migrateRecordTree(site,data,null));
   data.resources.forEach(item=>migrateRecordTree(item,data,null));
   return data;

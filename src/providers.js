@@ -1,6 +1,52 @@
-/* FireVault Build 0.79.3 — Backend Adapter Foundation */
-export const PROVIDER_CONTRACT_VERSION = 1;
+/* FireVault Build 0.79.4 — Backend Adapter & Cloud File Storage Foundation */
+export const PROVIDER_CONTRACT_VERSION = 2;
 export const PROVIDER_MODE = "local";
+
+export const FILE_STORAGE_CATALOG = Object.freeze({
+  local:{id:"local",label:"This Device / Downloads",kind:"local",available:true,auth:"none",note:"Files remain in FireVault or are downloaded manually."},
+  webdav:{id:"webdav",label:"WebDAV",kind:"remote",available:true,transferReady:false,auth:"session-password",note:"The existing WebDAV connection remains available for vault backup; individual photo/document transfer is prepared for a later connector build."},
+  onedrive:{id:"onedrive",label:"Microsoft OneDrive",kind:"remote",available:false,auth:"oauth",note:"Requires a Microsoft app registration and OAuth connection."},
+  sharepoint:{id:"sharepoint",label:"SharePoint Library",kind:"remote",available:false,auth:"oauth",note:"Designed for company document libraries through Microsoft Graph."},
+  googledrive:{id:"googledrive",label:"Google Drive",kind:"remote",available:false,auth:"oauth",note:"Requires a Google Cloud OAuth client and Drive API access."},
+  dropbox:{id:"dropbox",label:"Dropbox",kind:"remote",available:false,auth:"oauth-pkce",note:"Requires a Dropbox app and OAuth PKCE connection."}
+});
+
+function storageTargetConfig(vault,kind){
+  const cfg=vault?.settings?.fileStorage||{};
+  return kind==="photo"?(cfg.photo||{}):(cfg.document||{});
+}
+export function fileStoragePlanSummary(vault={}){
+  const webdavReady=!!(vault?.settings?.webdav?.enabled&&String(vault?.settings?.webdav?.url||"").trim());
+  const summarize=kind=>{
+    const target=storageTargetConfig(vault,kind);
+    const provider=FILE_STORAGE_CATALOG[target.provider]||FILE_STORAGE_CATALOG.local;
+    const ready=provider.id==="local";
+    const connectionReady=provider.id==="local"||(provider.id==="webdav"&&webdavReady);
+    const status=provider.id==="local"?"Ready":provider.id==="webdav"?(webdavReady?"Backup connection saved • file connector pending":"Needs WebDAV settings"):"OAuth connector required";
+    return {kind,provider:provider.id,label:provider.label,folder:target.folder||`FireVault/${kind==="photo"?"Photos":"Documents"}`,ready,connectionReady,status,note:provider.note};
+  };
+  return {photo:summarize("photo"),document:summarize("document"),catalog:FILE_STORAGE_CATALOG};
+}
+
+export function cloudFileStorageManifest(vault={}){
+  const plan=fileStoragePlanSummary(vault);
+  return {
+    format:"firevault-cloud-file-storage-manifest",
+    generatedAt:new Date().toISOString(),
+    contractVersion:PROVIDER_CONTRACT_VERSION,
+    localFirst:true,
+    destinations:{photo:plan.photo,document:plan.document},
+    providers:Object.values(FILE_STORAGE_CATALOG),
+    recordFields:["storageTargetId","storageProvider","storageFolder","storageStatus","remoteFileId","remoteRevision","remoteUrl"],
+    integrationRules:[
+      "Photo and document destinations are configured independently.",
+      "The local FireVault record remains authoritative until a remote upload is confirmed.",
+      "OAuth access and refresh tokens must never be stored inside the FireVault vault or backup exports.",
+      "Remote providers must return stable file identifiers and revision metadata.",
+      "Failed uploads remain queued without deleting the local file copy."
+    ]
+  };
+}
 
 const CONTRACTS = Object.freeze({
   authentication:["initialize","getCurrentUser","signIn","signOut","getSession","onSessionChanged"],
@@ -84,7 +130,8 @@ export function backendAdapterSummary(vault={}){
     deviceId:idFromVault(vault,["securityFoundation","device","id"]),
     pendingChanges:pending,
     providers:Object.fromEntries(Object.entries(backendProviders).map(([key,value])=>[key,{id:value.id,label:value.label,status:"Local"}])),
-    candidateBackends:["Supabase","Firebase","Custom API","Microsoft / Azure"]
+    candidateBackends:["Supabase","Firebase","Custom API","Microsoft / Azure"],
+    fileStoragePlan:fileStoragePlanSummary(vault)
   };
 }
 
@@ -105,6 +152,7 @@ export function backendAdapterManifest(vault={}){
     mode:PROVIDER_MODE,
     summary:backendAdapterSummary(vault),
     contracts:CONTRACTS,
+    cloudFileStorage:cloudFileStorageManifest(vault),
     integrationRules:[
       "The local vault remains the offline working copy.",
       "Remote providers must enforce workspace and role authorization on the server.",
