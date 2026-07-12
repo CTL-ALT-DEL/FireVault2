@@ -8,7 +8,7 @@
   "orientation": "portrait-primary",
   "background_color": "#0b0d10",
   "theme_color": "#101216",
-  "description": "Field knowledge system for fire alarm technicians. Build 0.78.2 adds route-aware scroll memory, active-navigation return-to-top behavior, and clearer page context while preserving FireVault data and workflows.",
+  "description": "Field knowledge system for fire alarm technicians. Build 0.78.3 improves field readability, text contrast, touch targets, and scanning across Nearby, Accounts, Account Detail, Settings, Tools, and forms while preserving FireVault data and workflows.",
   "icons": [
     {
       "src": "assets/icon-192.png",
@@ -49,5 +49,5 @@
       "description": "Open FireVault settings"
     }
   ],
-  "version": "0.78.2"
+  "version": "0.78.3"
 }

@@ -1,4 +1,4 @@
-import { BUILD, KEY, ACTIVE_JOB_KEY, loadData, saveData, ensureSite, fullAddress, esc, uid, downloadBlob, syncSummary, syncQueue, syncConflicts, syncActivity, createSyncPackage, importSyncPackage, resolveSyncConflict, notePackageExport, deviceIdentity, recordSyncActivity, autoBackupInfo, latestAutoBackup, restoreAutoBackup, isDemoMode, setDemoMode, resetDemoData } from "./storage.js?v=0.78.2";
+import { BUILD, KEY, ACTIVE_JOB_KEY, loadData, saveData, ensureSite, fullAddress, esc, uid, downloadBlob, syncSummary, syncQueue, syncConflicts, syncActivity, createSyncPackage, importSyncPackage, resolveSyncConflict, notePackageExport, deviceIdentity, recordSyncActivity, autoBackupInfo, latestAutoBackup, restoreAutoBackup, isDemoMode, setDemoMode, resetDemoData } from "./storage.js?v=0.78.3";
 window.__FIREVAULT_MODULE_READY = true;
 
 function fvPreferenceStore0739(){
@@ -8700,6 +8700,7 @@ function diagnostics(){
 }
 function showChangelog(){
   const notes = [
+    "Build 0.78.3 improves field readability across Nearby, Accounts, Account Detail, Settings, Tools, and forms with larger supporting text, stronger contrast, clearer badges, and safer touch targets.",
     "Build 0.78.2 remembers scroll position across major screens, restores each Account Detail tab independently, lets an active bottom-navigation button return its page to the top, and updates the browser title for clearer orientation.",
     "Build 0.78.1 adds smoother route transitions, improved toast and loading feedback, refined empty states, stronger disabled and focus states, and safer WebDAV operation feedback.",
     "Build 0.78.0 scopes the fixed app header and bottom dock to the real global chrome, then polishes Tools, Settings, Account Detail, forms, dialogs, and touch states across FireVault.",
@@ -8733,7 +8734,7 @@ function showChangelog(){
   overlay.className="releaseOverlay";
   overlay.innerHTML=`<div class="releaseSheet" role="dialog" aria-modal="true" aria-label="FireVault release notes">
     <div class="releaseHead"><div><strong>${fireVaultBrand575()}</strong><span>Build ${BUILD}</span></div><button class="ghost iconBtn" id="closeRelease" aria-label="Close release notes">×</button></div>
-    <div class="releaseBody"><h2>Release Notes</h2><p class="releaseIntro">Navigation continuity with remembered scroll positions, active-tab return-to-top behavior, and clearer page orientation.</p><ul>${notes.map(n=>`<li>${esc(n)}</li>`).join("")}</ul></div>
+    <div class="releaseBody"><h2>Release Notes</h2><p class="releaseIntro">Field readability with clearer typography, stronger contrast, safer touch targets, and more consistent scanning across the app.</p><ul>${notes.map(n=>`<li>${esc(n)}</li>`).join("")}</ul></div>
   </div>`;
   document.body.appendChild(overlay);
   const close=()=>overlay.remove();

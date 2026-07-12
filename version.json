@@ -1,6 +1,6 @@
 {
-  "build": "0.78.2",
+  "build": "0.78.3",
   "released": "2026-07-12",
-  "note": "Navigation continuity polish",
-  "label": "Scroll memory, return-to-top, and page context"
+  "note": "Field readability polish",
+  "label": "Clearer text, stronger contrast, and safer touch targets"
 }

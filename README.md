@@ -1,3 +1,3 @@
-# FireVault Build 0.78.2 — Navigation Continuity Polish
+# FireVault Build 0.78.3 — Field Readability Polish
 
-This release remembers scroll position across major screens and each Account Detail tab, restores the technician’s place after navigation and safe rerenders, lets a second tap on the active bottom-navigation destination return that page to the top, and updates the browser/PWA page title for clearer orientation. The existing vault schema and storage key are unchanged.
+This release improves readability and touch accuracy across the busiest FireVault screens. Nearby and Accounts rows use larger secondary text and clearer status badges, Account Detail actions and tabs are easier to scan, Settings and Tools descriptions are more legible, and Add/Edit forms use stronger labels and field hints. The existing vault schema and storage key are unchanged.

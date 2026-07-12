@@ -17660,3 +17660,126 @@ input:focus,select:focus,textarea:focus{border-color:rgba(96,165,250,.72)!import
 #appNav button.active:active{transform:translateY(1px) scale(.965)!important}
 .accountTabs0735 button,.settingsTopTabs0736 button{scroll-margin-top:8px}
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto!important}}
+
+
+/* Build 0.78.3 — Field readability and touch-target polish */
+:root{
+  --fv0783-primary-text:#f8fafc;
+  --fv0783-secondary-text:#c5cfdd;
+  --fv0783-muted-text:#95a4b8;
+  --fv0783-min-touch:44px;
+}
+html{-webkit-text-size-adjust:100%;text-rendering:optimizeLegibility}
+body{-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}
+
+/* Nearby Accounts — larger, calmer rows that remain fast to scan. */
+.nearbyCards069{gap:7px!important;padding-left:2px!important;padding-right:2px!important}
+.nearbyAccount069{
+  grid-template-columns:34px minmax(0,1fr) auto!important;
+  gap:10px!important;
+  min-height:70px!important;
+  padding:9px 10px!important;
+  border-radius:14px!important;
+  border-color:rgba(117,151,190,.30)!important;
+  background:linear-gradient(145deg,#172333,#0e1722)!important;
+}
+.nearbyAccount069.selected{
+  border-color:#35d06f!important;
+  background:linear-gradient(145deg,#17352a,#0d2119)!important;
+  box-shadow:0 0 0 1px rgba(53,208,111,.76),0 8px 20px rgba(0,0,0,.22)!important;
+}
+.nearbyNumber069{width:32px!important;height:38px!important;border-radius:9px!important;font-size:12px!important}
+.nearbyInfo069>strong{font-size:14px!important;line-height:1.22!important;color:var(--fv0783-primary-text)!important}
+.nearbyAddress0712{margin-top:4px!important}
+.nearbyAddress0712 span{font-size:12px!important;line-height:1.28!important;color:var(--fv0783-secondary-text)!important}
+.nearbyMeta0712{display:flex!important;align-items:center!important;gap:6px!important;margin-top:5px!important;font-size:10.5px!important;line-height:1.2!important}
+.nearbyMeta0712 b{color:#7ec2ff!important;font-size:11px!important}
+.nearbyCategoryBadge0712{min-height:21px!important;padding:3px 7px!important;font-size:9.5px!important}
+.nearbyDistance069{font-size:12px!important;font-weight:850!important;color:#eef3f9!important}
+.gpsDot069{width:8px!important;height:8px!important}
+
+/* Accounts — preserve the stable layout while making supporting data readable. */
+.accountCard0759{min-height:164px!important;border-color:rgba(117,151,190,.32)!important}
+.accountCardBody0759{gap:5px!important;padding-top:12px!important;padding-bottom:12px!important}
+.accountCardName0759{font-size:17px!important;line-height:1.18!important}
+.accountNumber0759{font-size:12.5px!important;line-height:1.25!important}
+.accountStreet0759{font-size:13px!important;line-height:1.35!important;color:#dce4ee!important}
+.accountSupporting0759{font-size:11.5px!important;line-height:1.35!important;color:#a6b3c4!important}
+.accountBadges0759>span,.accountHealth0762,.accountSharedAddress0762{
+  min-height:24px!important;
+  padding:4px 8px!important;
+  font-size:10px!important;
+  letter-spacing:.01em!important;
+}
+.accountRecency0761{font-size:10.5px!important;line-height:1.3!important;color:#8fa0b6!important}
+.accountCard0759 .accountTag0737{min-height:23px!important;padding:4px 7px!important;font-size:9.5px!important}
+.accountFavoriteButton0761{width:36px!important;min-width:36px!important;height:36px!important;min-height:36px!important;font-size:18px!important}
+.accountQuickButton0762{min-height:46px!important;font-size:12px!important;border-radius:12px!important}
+.accountQuickButton0762 span{font-size:12px!important;font-weight:900!important}
+.accountQuickIcon0762{width:19px!important;height:19px!important}
+.accountsResultSummary0761 strong{font-size:13px!important}
+.accountsResultSummary0761 span{font-size:11px!important;color:#9eacbd!important}
+
+/* Account Detail — stronger hierarchy and larger action/tab text. */
+.siteDetail0735 .technicianIdentity075 strong{font-size:19px!important;line-height:1.18!important}
+.siteDetail0735 .accountAddressLine0757{font-size:12.5px!important;line-height:1.38!important;color:#d3deea!important}
+.siteDetail0735 .technicianStatus075 span{min-height:29px!important;font-size:10.5px!important}
+.siteDetail0735 .accountPersistentActions0751 button{min-height:66px!important}
+.siteDetail0735 .accountPersistentActions0751 strong{font-size:12px!important;line-height:1.15!important}
+.siteDetail0735 .accountPersistentActions0751 small{font-size:10px!important;line-height:1.15!important;color:#d0e3f8!important}
+.siteDetail0735 .accountTabs0735 button{min-height:45px!important;font-size:11px!important;font-weight:900!important}
+.siteDetail0735 .accountTabPanel0735 h2,.siteDetail0735 .accountTabPanel0735 h3{color:var(--fv0783-primary-text)!important}
+.siteDetail0735 .accountTabPanel0735 p,.siteDetail0735 .accountTabPanel0735 small{color:var(--fv0783-secondary-text)!important;line-height:1.45!important}
+
+/* Settings and Tools — descriptions should not require squinting. */
+.settingsTabsHeader0736 p,.settingsDetailHeader0736 p{font-size:13px!important;color:#bdc8d6!important}
+.settingsTopTabs0736 button b{font-size:10px!important;line-height:1.15!important;color:#d6dfeb!important}
+.settingsTabSummary0736 strong{font-size:15px!important}
+.settingsTabSummary0736 p,.settingsTabSummary0736 small{font-size:12px!important;line-height:1.45!important;color:#b5c1d0!important}
+.settingsTabItem0736{min-height:70px!important}
+.settingsTabItem0736 strong{font-size:14.5px!important;line-height:1.2!important}
+.settingsTabItem0736 small{font-size:12px!important;line-height:1.4!important;color:#acb9c9!important}
+.settingsDetailNote0736{font-size:12.5px!important;color:#aebccd!important}
+.toolTile0734 strong{font-size:15.5px!important;line-height:1.2!important}
+.toolTile0734 small{font-size:12.5px!important;line-height:1.42!important;color:#aeb9c8!important}
+.toolsHero0734 p{font-size:13px!important;color:#bdc8d6!important}
+
+/* Forms — clear labels, hints, and reliable phone-sized touch targets. */
+.accountForm0760 label,.settingsDetailScreen488.settingsStable573 label:not(.checkRow),.settingField>label{
+  font-size:12px!important;
+  line-height:1.3!important;
+  color:#d0d8e4!important;
+}
+.accountFormSectionTitle0760 small,.accountFieldHint0760,.fieldNote{
+  font-size:11.5px!important;
+  line-height:1.45!important;
+  color:#9eacbd!important;
+}
+.accountForm0760 input,.accountForm0760 textarea,.accountForm0760 select,
+.settingsDetailScreen488 input,.settingsDetailScreen488 textarea,.settingsDetailScreen488 select{
+  min-height:var(--fv0783-min-touch)!important;
+}
+.accountFormError0760{font-size:12px!important}
+
+/* General field controls and empty states. */
+#app button:not(.accountTag0737):not(.nearbyCategoryBadge0712),#app .btn{min-height:var(--fv0783-min-touch)}
+#app .empty p,#app .accountsEmpty0759 p,#app .accountsNoResults0759 p,#app .accountEmptyState0735 p{
+  font-size:12px!important;
+  line-height:1.5!important;
+  color:#aeb9c8!important;
+}
+#app .empty strong,#app .accountsEmpty0759 strong,#app .accountsNoResults0759 strong,#app .accountEmptyState0735 strong{
+  font-size:16px!important;
+  color:#f6f8fb!important;
+}
+
+@media(max-width:390px){
+  .nearbyAccount069{grid-template-columns:32px minmax(0,1fr) auto!important;padding-left:8px!important;padding-right:8px!important}
+  .nearbyInfo069>strong{font-size:13.5px!important}
+  .nearbyAddress0712 span{font-size:11.5px!important}
+  .nearbyDistance069{font-size:11px!important}
+  .accountCardName0759{font-size:16px!important}
+  .accountStreet0759{font-size:12.5px!important}
+  .accountSupporting0759{font-size:11px!important}
+  .settingsTopTabs0736 button b{font-size:9.2px!important}
+}
