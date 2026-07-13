@@ -1,9 +1,13 @@
-# FireVault Build 0.79.13 — Startup Repair + Building Navigator
-## Startup repair
+# FireVault Build 0.80.1 — Deployment Notes
 
-- Corrects the malformed Revision History array introduced in 0.79.11.
-- Corrects the Building Navigator location-copy newline introduced in the first 0.79.12 package.
-- Preserves the existing FireVault storage key and account database.
+## Update procedure
 
+Deploy this package over the existing FireVault GitHub Pages files. Do not delete the current FireVault Home Screen app or clear browser storage before updating.
 
-Deploy this package over the existing FireVault GitHub Pages files. Do not delete or reinstall the current iPhone Home Screen app. The existing `firevault_vault_build_030` local vault remains unchanged and saved account data is migrated in place.
+## Data preservation
+
+Build 0.80.1 preserves the existing `firevault_vault_build_030` storage key. Existing accounts, notes, photos, scanned documents, Building Navigator locations, settings, backups, and security metadata remain in place.
+
+## After deployment
+
+Open FireVault while online once so the service worker can download Build 0.80.1. If the older build remains visible, close FireVault completely and reopen it. Use Tools → Backup & Data before any future reinstall or device migration.

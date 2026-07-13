@@ -1,25 +1,23 @@
-# FireVault Build 0.80.0 — Account Document Scanner
+# FireVault Build 0.80.1 — Scanner Account Matching
 
-## Built-in account scanner
+## Scanner workflow upgrade
 
-- Adds **Scan Document** to each account’s Files and Notes areas.
-- Uses the phone or tablet camera to capture one document page at a time.
-- Supports importing several existing document photos at once.
-- Automatically detects the likely paper boundaries after capture.
-- Provides a four-corner touch editor so each page can be manually corrected.
-- Rotates pages left or right.
-- Includes Auto Color, Grayscale, Black & White, and Original cleanup modes.
-- Supports Compact, Standard, and High scan quality.
-- Allows pages to be reviewed, reordered, adjusted, or deleted before saving.
-- Saves multi-page scans to the selected account and adds an account activity note.
-- Opens a full-page scan preview inside FireVault.
-- Generates a standard PDF for download or native device sharing.
-- Allows an existing scan to be reopened, edited, and expanded with additional pages.
+- Moves the primary **Document Scanner** entry point to the **Tools** section.
+- Allows scanning to begin without first opening an account.
+- After the first page is captured, provides an account search and match step.
+- Searches account name, Account ID, address, city, state, ZIP code, and site phone.
+- Shows recent accounts before a search is entered.
+- Clearly identifies the selected account before Save is enabled.
+- Saves the scanned document into the matched account and logs it in that account’s Site Notes activity.
+- Opens the matched account’s Files tab after a scan started from Tools is saved.
+- Adds **Scan Document** directly to the full Site Notes workspace.
+- Keeps scanner access on the account Notes tab.
+- Removes scanner capture buttons from the Files/Photo Vault areas; existing scans remain visible and editable there.
 
-## Storage safety
+## Scanner capabilities preserved
 
-Scanned pages are compressed before they are stored in the existing local FireVault vault. Standard quality is the recommended default. FireVault blocks exceptionally large scans before they can endanger the local vault and recommends Compact quality for long documents.
+Multi-page camera capture, photo import, automatic edge detection, four-corner correction, rotation, Auto Color, Grayscale, Black & White, Original mode, page reordering, local storage safeguards, PDF preview, PDF download, native sharing, and editing of existing scans remain intact.
 
-## Preserved from Build 0.79.14
+## Preserved from earlier builds
 
-Numbered Nearby Accounts map pins remain matched to the distance-sorted list. Smart Account Intelligence remains removed. Building Navigator, exact site locations, Plus Codes, linked photos, preferred route targets, security schema 4, backups, Privacy Lock, Security Center, OneDrive/SharePoint profiles, backend adapters, and the existing `firevault_vault_build_030` storage key remain intact.
+Numbered Nearby Accounts map pins remain matched to the distance-sorted list. Smart Account Intelligence remains removed. Building Navigator, Plus Codes, security, backups, cloud-storage profiles, and the existing `firevault_vault_build_030` storage key remain intact.

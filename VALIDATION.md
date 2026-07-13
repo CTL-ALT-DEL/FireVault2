@@ -1,12 +1,15 @@
-# FireVault Build 0.80.0 Validation
+# FireVault Build 0.80.1 Validation
 
 - JavaScript syntax checked for app, storage, providers, and Plus Code modules.
 - CSS parsed without stylesheet errors.
 - Existing storage key preserved: `firevault_vault_build_030`.
-- Existing numbered Nearby Accounts marker override preserved.
+- Tools includes the Document Scanner entry point.
+- Tools scanner starts without inheriting a previously selected account.
+- Account search matches name, Account ID, address, city, state, ZIP, and phone; exact-ID, name, address, phone, and multi-term searches passed a source-level unit test.
+- Save remains disabled until at least one page and a matched account are present.
+- Scans save into the selected account and create a Site Notes activity entry.
+- Full Site Notes workspace includes direct scanner access.
+- Files and Photo Vault continue to display, preview, edit, download, share, and delete existing scans.
+- Numbered Nearby Accounts behavior and Building Navigator remain present.
 - Smart Account Intelligence remains removed.
-- Scanner route and Account Files / Account Notes entry points verified.
-- Camera input uses the rear-camera capture hint when supported.
-- Multi-page PDF generator validated with portrait and landscape test pages as PDF 1.4.
-- Scanned-document fields survive FireVault storage normalization and remain classified as account documents.
-- Service-worker and asset cache references updated to Build 0.80.0.
+- Service-worker and asset cache references updated to Build 0.80.1.

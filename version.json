@@ -1,8 +1,8 @@
 {
-  "build": "0.80.0",
+  "build": "0.80.1",
   "released": "2026-07-12",
-  "note": "Built-in multi-page account document scanner",
-  "label": "Camera capture, corner correction, cleanup modes, page ordering, and PDF export",
-  "version": "0.80.0",
-  "name": "Account Document Scanner"
+  "note": "Tools document scanner with account matching",
+  "label": "Capture first, search and match to an account, plus Site Notes access",
+  "version": "0.80.1",
+  "name": "Scanner Account Matching"
 }
