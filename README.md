@@ -1,10 +1,10 @@
-# FireVault Build 0.87.1
+# FireVault Build 0.87.2
 
-Corrective Account Directory and Account Detail rebuild created from the stable 0.86.1 baseline.
+Account Directory card polish.
 
-- Rebuilt Account Directory and Search screen
-- New account cards with clearer identity, status, and quick actions
-- Rebuilt Account Detail shell, action row, tabs, and content layout
-- Removed the empty black layout band above the bottom navigation
-- Removed obsolete scanner copy from the account Files tab
+- Removed the default READY status tag
+- Removed the NO OPEN WORK tag
+- Removed the GPS status tag
+- Cards now show issue tags only when an account actually needs attention
+- Refined spacing, dividers, buttons, and the Details affordance
 - Existing account data and storage key preserved

@@ -1,3 +1,3 @@
-# Clean Install — Build 0.87.1
+# Clean Install — Build 0.87.2
 
-Deploy every file from this package together. Close any installed FireVault Home Screen window, refresh the GitHub Pages site, and reopen FireVault so the new service-worker cache is used. Existing local customer data remains under the same storage key.
+Deploy the full package and refresh the installed PWA so the new service-worker cache is activated. Existing FireVault account data remains compatible.
