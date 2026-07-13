@@ -1,3 +1,3 @@
-# Clean Install — Build 0.87.0
+# Clean Install — Build 0.87.1
 
-Deploy all files together. If an older interface remains cached, close FireVault, refresh GitHub Pages, and reopen the installed Home Screen app. Existing local account data uses the same FireVault storage key.
+Deploy every file from this package together. Close any installed FireVault Home Screen window, refresh the GitHub Pages site, and reopen FireVault so the new service-worker cache is used. Existing local customer data remains under the same storage key.

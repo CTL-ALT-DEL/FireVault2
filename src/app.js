@@ -1,6 +1,6 @@
-import { BUILD, KEY, ACTIVE_JOB_KEY, loadData, saveData, ensureSite, fullAddress, esc, uid, downloadBlob, syncSummary, syncQueue, syncConflicts, syncActivity, createSyncPackage, importSyncPackage, resolveSyncConflict, notePackageExport, deviceIdentity, recordSyncActivity, autoBackupInfo, latestAutoBackup, restoreAutoBackup, isDemoMode, setDemoMode, resetDemoData, securityFoundationSummary, securityAudit, recycleBinInfo, restoreRecycleRecord, purgeRecycleBin, recordSecurityEvent, validateVaultIntegrity } from "./storage.js?v=0.87.0";
-import { backendAdapterSummary, runBackendAdapterDiagnostics, backendAdapterManifest, PROVIDER_CONTRACT_VERSION, FILE_STORAGE_CATALOG, fileStoragePlanSummary, cloudFileStorageManifest, MICROSOFT_STORAGE_TYPES, microsoftStorageAccounts, saveMicrosoftStorageAccounts, createMicrosoftStorageAccount, microsoftStorageAccountById, microsoftAppRegistration, saveMicrosoftAppRegistration, microsoftStorageSummary, microsoftStorageManifest } from "./providers.js?v=0.87.0";
-import { encodePlusCode, isValidFullPlusCode, normalizePlusCode, plusCodePrecisionLabel } from "./open-location-code.js?v=0.87.0";
+import { BUILD, KEY, ACTIVE_JOB_KEY, loadData, saveData, ensureSite, fullAddress, esc, uid, downloadBlob, syncSummary, syncQueue, syncConflicts, syncActivity, createSyncPackage, importSyncPackage, resolveSyncConflict, notePackageExport, deviceIdentity, recordSyncActivity, autoBackupInfo, latestAutoBackup, restoreAutoBackup, isDemoMode, setDemoMode, resetDemoData, securityFoundationSummary, securityAudit, recycleBinInfo, restoreRecycleRecord, purgeRecycleBin, recordSecurityEvent, validateVaultIntegrity } from "./storage.js?v=0.87.1";
+import { backendAdapterSummary, runBackendAdapterDiagnostics, backendAdapterManifest, PROVIDER_CONTRACT_VERSION, FILE_STORAGE_CATALOG, fileStoragePlanSummary, cloudFileStorageManifest, MICROSOFT_STORAGE_TYPES, microsoftStorageAccounts, saveMicrosoftStorageAccounts, createMicrosoftStorageAccount, microsoftStorageAccountById, microsoftAppRegistration, saveMicrosoftAppRegistration, microsoftStorageSummary, microsoftStorageManifest } from "./providers.js?v=0.87.1";
+import { encodePlusCode, isValidFullPlusCode, normalizePlusCode, plusCodePrecisionLabel } from "./open-location-code.js?v=0.87.1";
 window.__FIREVAULT_MODULE_READY = true;
 
 function fvPreferenceStore0739(){
@@ -452,6 +452,8 @@ function fvIcon073(name, extraClass=""){
     library:'<path d="M5 4h11a3 3 0 0 1 3 3v13H8a3 3 0 0 1-3-3z"/><path d="M8 4v16M8 17h11"/>',
     tools:'<path d="M4 9h16v10H4z"/><path d="M9 9V6h6v3M4 13h16M10 13v2h4v-2"/>',
     settings:'<path d="M4 6h10M18 6h2M4 12h3M11 12h9M4 18h8M16 18h4"/><circle cx="16" cy="6" r="2"/><circle cx="9" cy="12" r="2"/><circle cx="14" cy="18" r="2"/>',
+    search:'<circle cx="11" cy="11" r="7"/><path d="m16.5 16.5 4 4"/>',
+    info:'<circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7h.01"/>',
     map:'<path d="m3 6 6-3 6 3 6-3v15l-6 3-6-3-6 3z"/><path d="M9 3v15M15 6v15"/>',
     list:'<path d="M8 6h13M8 12h13M8 18h13"/><circle cx="4" cy="6" r="1"/><circle cx="4" cy="12" r="1"/><circle cx="4" cy="18" r="1"/>',
     route:'<path d="M5 19 19 5M10 5h9v9"/><path d="M5 8v11h11"/>',
@@ -3789,44 +3791,39 @@ function accountDirectoryRow0759(s,addressCount=1){
   const category=accountCategory070(s);
   const categoryLabel=NEARBY_CATEGORY_META_070[category]?.label||"Basic";
   const health=siteHealth(s);
-  const healthBadge=accountHealthBadge0762(health);
   const work=accountDirectoryWork0759(s);
   const panel=[s.panelManufacturer,s.panelModel].filter(Boolean).join(" ");
   const contact=primaryContact477(s);
-  const supporting=panel || contact?.name || "Account details not entered";
+  const supporting=panel || contact?.name || "No panel or contact entered";
   const pinned=isPinnedSite566(s);
   const address=fullAddress(s)||"No address saved";
-  const recency=accountRecency0761(s);
   const phone=phone069(s);
   const gpsReady=hasGps(s);
-  const customTags0799=accountTags0737(s);
-  const shownTags0799=customTags0799.slice(0,2);
-  const customTagBadges0799=shownTags0799.map(tag=>`<span class="accountRuleTag0799" style="--tag-color:${safeCategoryColor0737(tag.color)}">${esc(tag.name)}</span>`).join("")+(customTags0799.length>2?`<span class="accountRuleTag0799 accountTagMore0737" style="--tag-color:#94a3b8">+${customTags0799.length-2}</span>`:"");
-  return `<article class="accountCard0759 accountCard0761 accountCard0762 accountCard0764 category-${category}" data-account-card0759 data-id="${esc(s.id)}" data-search="${esc(siteSearchBlob(s))}" data-letter0763="${esc(accountInitial0763(s))}" data-attention="${health.cls==='healthWarn'?'1':'0'}" data-open="${work.cls==='clear'?'0':'1'}" data-gps="${gpsReady?'1':'0'}" role="button" tabindex="0" aria-label="Open ${esc(s.name||'account')}, ${esc(address)}">
-    <span class="accountTone0759" aria-hidden="true"></span>
-    <span class="accountCardBody0759">
-      <span class="accountCardTop0759">
-        <span class="accountCardName0759">${esc(s.name||"Unnamed Account")}</span>
-        <button type="button" class="accountFavoriteButton0761 ${pinned?"active":""}" data-account-favorite0761="${esc(s.id)}" aria-pressed="${pinned?"true":"false"}" aria-label="${pinned?"Remove":"Add"} ${esc(s.name||"account")} ${pinned?"from":"to"} favorites">${pinned?"★":"☆"}</button>
-      </span>
-      ${id?`<span class="accountNumber0759">${esc(id)}</span>`:""}
-      <span class="accountStreet0759">${esc(address)}</span>
-      <span class="accountSupporting0759">${esc(supporting)}</span>
-      <span class="accountBadges0759 accountBadges0762">
-        <span class="accountCategory0759 category-${category}">${esc(categoryLabel)}</span>
-        ${healthBadge?`<span class="accountHealth0762 ${healthBadge.cls}">${esc(healthBadge.label)}</span>`:""}
-        ${addressCount>1?`<span class="accountSharedAddress0762">${addressCount} accounts here</span>`:""}
-        <span class="accountWork0759 ${work.cls}">${esc(work.label)}</span>
-        <span class="accountGps0759 ${gpsReady?'ready':'missing'}">${gpsReady?'GPS ready':'Needs GPS'}</span>
-        ${customTagBadges0799}
-      </span>
-      ${recency?`<span class="accountRecency0761">${esc(recency)}</span>`:""}
-      <span class="accountQuickActions0762" role="group" aria-label="Quick actions for ${esc(s.name||'account')}">
-        <button type="button" class="accountQuickButton0762 call" data-account-call0762="${esc(s.id)}" ${phone?"":"disabled"} aria-label="Call ${esc(s.name||'account')}">${fvIcon073("call","accountQuickIcon0762")}<span>Call</span></button>
-        <button type="button" class="accountQuickButton0762 route" data-account-route0762="${esc(s.id)}" ${gpsReady?"":"disabled"} aria-label="Route to ${esc(s.name||'account')}">${fvIcon073("route","accountQuickIcon0762")}<span>Route</span></button>
-      </span>
-    </span>
-    <span class="accountChevron0759" aria-hidden="true">›</span>
+  const initial=accountInitial0763(s);
+  const healthLabel=health?.cls==="healthWarn"?"Attention":health?.cls==="healthWatch"?"Watch":"Ready";
+  const healthClass=health?.cls==="healthWarn"?"danger":health?.cls==="healthWatch"?"warning":"good";
+  return `<article class="accountCard0871 category-${category}" data-account-card0759 data-id="${esc(s.id)}" data-search="${esc(siteSearchBlob(s))}" data-letter0763="${esc(initial)}" role="button" tabindex="0" aria-label="Open ${esc(s.name||'account')}, ${esc(address)}">
+    <div class="accountAvatar0871" aria-hidden="true">${esc(initial)}</div>
+    <div class="accountCardMain0871">
+      <div class="accountCardHeading0871">
+        <div><h2>${esc(s.name||"Unnamed Account")}</h2><div class="accountCardIdentity0871">${id?`<span>${esc(id)}</span>`:""}<em>${esc(categoryLabel)}</em>${addressCount>1?`<b>${addressCount} here</b>`:""}</div></div>
+        <button type="button" class="accountFavorite0871 ${pinned?"active":""}" data-account-favorite0761="${esc(s.id)}" aria-pressed="${pinned?"true":"false"}" aria-label="${pinned?"Remove":"Add"} favorite">${pinned?"★":"☆"}</button>
+      </div>
+      <p class="accountAddress0871">${esc(address)}</p>
+      <p class="accountSupporting0871">${esc(supporting)}</p>
+      <div class="accountStatusRow0871">
+        <span class="${healthClass}">${esc(healthLabel)}</span>
+        <span class="${work.cls}">${esc(work.label)}</span>
+        <span class="${gpsReady?"gps":"muted"}">${gpsReady?"GPS":"No GPS"}</span>
+      </div>
+      <div class="accountCardFooter0871">
+        <div class="accountCardActions0871">
+          <button type="button" data-account-call0762="${esc(s.id)}" ${phone?"":"disabled"}>${fvIcon073("call","accountCardIcon0871")}<span>Call</span></button>
+          <button type="button" data-account-route0762="${esc(s.id)}" ${gpsReady?"":"disabled"}>${fvIcon073("route","accountCardIcon0871")}<span>Route</span></button>
+        </div>
+        <span class="accountOpen0871">Open <b>›</b></span>
+      </div>
+    </div>
   </article>`;
 }
 function accountDirectorySort0760(rows=[]){
@@ -3914,250 +3911,111 @@ function settleAccountsList0796(list){
   },360);
 }
 function sites(){
-  clearTimeout(accountsSnapTimer0796);
-  accountsTouching0796=false;
-  accountsTouchMoved0796=false;
-  accountsScrollActivated0796=false;
-  accountsScrollLock0796=false;
   restoreAppChrome572();
+  showGlobalChrome537();
   const allAccounts=[...(data.sites||[])];
-  const addressCounts0762=accountAddressCounts0762(allAccounts);
+  const addressCounts=accountAddressCounts0762(allAccounts);
   const accounts=accountDirectorySort0760(allAccounts);
-  const accountInitialsList0763=accountInitials0763(accounts);
-  // Build 0.79.11: the Accounts directory no longer exposes category filter tiles.
-  // Clear any older session filter so every saved account is shown.
   sitesFilter0736="all";
-  const accountsViewDirty0761=!!String(siteSearch||"").trim() || accountsSort0760!=="az";
-  html(`<div class="screen accountsDirectory0759 accountsDirectory0760 accountsDirectory0761">
-    <section class="accountsHero0759">
-      <div class="accountsHeroText0759"><span>ACCOUNT DIRECTORY</span><h1>Search</h1><p>Find customer records, site IDs, addresses, panels, and contacts.</p></div>
-      <div class="accountsHeroActions0759">
-        <button type="button" class="ghost" id="nearBtn0759">${fvIcon073("nearby","accountsActionIcon0759")}<span>Nearby</span></button>
-        <button type="button" class="primary" id="addBtn0759"><b>＋</b><span>Add</span></button>
-      </div>
+  html(`<div class="screen accountDirectory0871">
+    <header class="accountDirectoryHeader0871">
+      <div><span>ACCOUNT DIRECTORY</span><h1>Search</h1><p id="siteSearchCount0759">${accounts.length} account${accounts.length===1?"":"s"}</p></div>
+      <button type="button" class="accountAdd0871" id="addBtn0759" aria-label="Add account">＋</button>
+    </header>
+    <section class="accountSearch0871" aria-label="Search accounts">
+      ${fvIcon073("search","accountSearchIcon0871")}
+      <input id="siteSearch0759" type="search" placeholder="Name, address, Account ID, panel…" value="${esc(siteSearch)}" autocomplete="off" autocapitalize="none" spellcheck="false">
+      <button type="button" id="clearSiteSearch0759" aria-label="Clear search" ${siteSearch?"":"hidden"}>×</button>
     </section>
-    <section class="accountsSearch0759" aria-label="Search accounts">
-      <span class="accountsSearchIcon0759" aria-hidden="true">⌕</span>
-      <input id="siteSearch0759" type="search" placeholder="Search accounts" value="${esc(siteSearch)}" autocomplete="off" autocapitalize="none" spellcheck="false">
-      <button type="button" id="clearSiteSearch0759" aria-label="Clear account search">×</button>
+    <section class="accountDirectoryTools0871">
+      <button type="button" id="nearBtn0759">${fvIcon073("nearby","accountToolIcon0871")}<span>Nearby</span></button>
+      <label><span>Sort</span><select id="accountsSort0871" aria-label="Sort accounts"><option value="az" ${accountsSort0760==="az"?"selected":""}>A–Z</option><option value="favorites" ${accountsSort0760==="favorites"?"selected":""}>Favorites</option><option value="recent" ${accountsSort0760==="recent"?"selected":""}>Recent</option><option value="attention" ${accountsSort0760==="attention"?"selected":""}>Priority</option></select></label>
+      <button type="button" id="resetAccounts0871" ${(!siteSearch&&accountsSort0760==="az")?"hidden":""}>Reset</button>
     </section>
-    <section class="accountsResults0759">
-      <div class="accountsListHead0759 accountsListHead0771">
-        <div class="accountsSummaryRow0771">
-          <div class="accountsResultSummary0761 accountsResultSummary0771"><strong id="siteSearchCount0759" aria-live="polite">${accounts.length} account${accounts.length===1?"":"s"}</strong><span id="accountsViewSummary0761">${esc(accountsSortLabel0760())}</span></div>
-          <button type="button" class="ghost accountsReset0761 accountsReset0771" id="resetAccountsView0761" ${accountsViewDirty0761?"":"hidden"} aria-label="Reset account view" title="Reset view">↺</button>
-        </div>
-        <div class="accountsToolbar0771" aria-label="Account list tools">
-          <button type="button" class="accountsToolButton0771 accountsJumpTool0771" id="accountsJumpButton0768" ${accountsSort0760==='az'&&accountInitialsList0763.length?'':'hidden'} aria-haspopup="dialog" aria-label="Jump to account name">
-            <span class="accountsToolText0771"><span class="accountsToolLabel0771">Jump To</span><strong id="accountsJumpValue0768">A–Z</strong></span><span class="accountsToolChevron0771" aria-hidden="true">⌄</span>
-          </button>
-          <button type="button" class="accountsToolButton0771 accountsSortTool0771" id="accountsSortButton0768" aria-haspopup="dialog" aria-label="Sort accounts">
-            <span class="accountsToolText0771"><span class="accountsToolLabel0771">Sort By</span><strong id="accountsSortValue0768">${esc(accountsSortLabel0760())}</strong></span><span class="accountsToolChevron0771" aria-hidden="true">⌄</span>
-          </button>
-        </div>
+    <section class="accountDirectoryListShell0871">
+      <div class="accountDirectoryList0871" id="accountsList0759">
+        ${accounts.length?accounts.map(s=>accountDirectoryRow0759(s,addressCounts.get(accountAddressKey0762(s))||1)).join(""):`<div class="accountEmpty0871"><span>＋</span><strong>No accounts yet</strong><p>Add an account or import your customer list from Settings.</p><button class="primary" id="emptyAdd0759">Add First Account</button></div>`}
+        <div class="accountNoResults0871" id="accountsNoResults0759" hidden><span>⌕</span><strong>No matching accounts</strong><p>Try a name, address, Account ID, panel, or contact.</p><button type="button" id="clearNoResults0871">Clear Search</button></div>
       </div>
-      <div class="accountsList0759 accountsList0764" id="accountsList0759">
-        ${accounts.length?accounts.map(s=>accountDirectoryRow0759(s,addressCounts0762.get(accountAddressKey0762(s))||1)).join(""):`<div class="accountsEmpty0759 accountsEmpty0760"><span>＋</span><strong>No accounts yet</strong><p>Create an account manually or import your customer list under Settings → Data.</p><button class="primary" id="emptyAdd0759">Add First Account</button></div>`}
-        <div class="accountsNoResults0759 accountsNoResults0760" id="accountsNoResults0759" hidden><strong>No matching accounts</strong><p>Clear the search or reset the account view.</p><button type="button" class="ghost" id="resetAccountsView0760">Reset View</button></div>
-      </div>
-      <button type="button" class="accountsScrollTop0763" id="accountsScrollTop0763" aria-label="Scroll accounts to top" hidden><span aria-hidden="true">↑</span>Top</button>
     </section>
   </div>`);
 
+  const list=document.getElementById("accountsList0759");
+  const searchEl=document.getElementById("siteSearch0759");
+  const clearBtn=document.getElementById("clearSiteSearch0759");
+  const countEl=document.getElementById("siteSearchCount0759");
+  const noResults=document.getElementById("accountsNoResults0759");
+  const resetBtn=document.getElementById("resetAccounts0871");
   const openAdd=()=>{selectedSiteId=null;mode=null;route("siteForm");};
   document.getElementById("addBtn0759")?.addEventListener("click",openAdd);
   document.getElementById("emptyAdd0759")?.addEventListener("click",openAdd);
   document.getElementById("nearBtn0759")?.addEventListener("click",detectNearbySites);
-  const searchEl=document.getElementById("siteSearch0759");
-  const clearBtn=document.getElementById("clearSiteSearch0759");
-  const countEl=document.getElementById("siteSearchCount0759");
-  const summaryEl=document.getElementById("accountsViewSummary0761");
-  const resetViewBtn=document.getElementById("resetAccountsView0761");
-  const noResults=document.getElementById("accountsNoResults0759");
-  const list=document.getElementById("accountsList0759");
-  const jumpButton0768=document.getElementById("accountsJumpButton0768");
-  const jumpValue0768=document.getElementById("accountsJumpValue0768");
-  const sortButton0768=document.getElementById("accountsSortButton0768");
-  const scrollTopButton0763=document.getElementById("accountsScrollTop0763");
+  document.getElementById("accountsSort0871")?.addEventListener("change",event=>{accountsSort0760=event.target.value||"az";accountsScroll0759=0;persistAccountsViewState0761(true);sites();});
+  const reset=()=>{siteSearch="";accountsSort0760="az";accountsScroll0759=0;persistAccountsViewState0761(true);sites();};
+  resetBtn?.addEventListener("click",reset);
 
-  const applySiteSearch=()=>{
-    siteSearch=(searchEl?.value||"").trim();
-    const normalizedSearch=siteSearch.toLowerCase();
-    let shown=0;
-    const visibleLetters0763=new Set();
-    document.querySelectorAll("[data-account-card0759]").forEach(el=>{
-      const searchOk=!normalizedSearch||(el.dataset.search||"").includes(normalizedSearch);
-      const visible=searchOk;
-      el.hidden=!visible;
-      if(visible){shown++;visibleLetters0763.add(el.dataset.letter0763||"#");}
-    });
-    if(jumpButton0768){
-      jumpButton0768.hidden=accountsSort0760!=="az" || visibleLetters0763.size===0;
-      jumpButton0768.dataset.letters=[...visibleLetters0763].sort((a,b)=>a.localeCompare(b)).join(",");
-    }
-    if(jumpValue0768&&!visibleLetters0763.has(jumpValue0768.textContent||"")) jumpValue0768.textContent="A–Z";
-    if(countEl) countEl.textContent=shown===allAccounts.length?`${shown} account${shown===1?"":"s"}`:`${shown} of ${allAccounts.length}`;
-    if(summaryEl) summaryEl.textContent=[accountsSortLabel0760(),siteSearch?`“${siteSearch}”`:""].filter(Boolean).join(" • ");
-    if(clearBtn) clearBtn.hidden=!siteSearch;
-    if(noResults) noResults.hidden=shown!==0 || allAccounts.length===0;
-    if(resetViewBtn) resetViewBtn.hidden=!(siteSearch || accountsSort0760!=="az");
-    persistAccountsViewState0761();
-    requestAnimationFrame(()=>prepareAccountsScrollTail0796(list));
-  };
-
-  const firstVisibleAccount0761=()=>[...document.querySelectorAll("[data-account-card0759]")].find(el=>!el.hidden);
-  let accountsOpening0762=false;
-  const openAccount0761=id=>{
-    if(accountsOpening0762) return;
+  let opening=false;
+  const openAccount=id=>{
+    if(opening)return;
     const target=(data.sites||[]).find(s=>s.id===id);
-    if(!target){toast("That account is no longer available.");sites();return;}
-    accountsOpening0762=true;
-    const card=[...document.querySelectorAll("[data-account-card0759]")].find(el=>el.dataset.id===id);
-    card?.classList.add("opening0762");
+    if(!target){toast("That account is no longer available.");return;}
+    opening=true;
     accountsScroll0759=list?.scrollTop||0;
     persistAccountsViewState0761(true);
     selectedSiteId=id;
     route("siteDetail");
   };
-  const applySiteSearch0830=debounce0830(applySiteSearch,85);
-  searchEl?.addEventListener("input",applySiteSearch0830);
-  searchEl?.addEventListener("search",applySiteSearch);
-  searchEl?.addEventListener("keydown",event=>{
-    if(event.key==="Escape"){event.preventDefault();searchEl.value="";applySiteSearch();return;}
-    if(event.key==="ArrowDown"){const first=firstVisibleAccount0761();if(first){event.preventDefault();first.focus();}return;}
-    if(event.key==="Enter"){const first=firstVisibleAccount0761();if(first){event.preventDefault();openAccount0761(first.dataset.id);}}
-  });
-  clearBtn?.addEventListener("click",()=>{if(searchEl){searchEl.value="";searchEl.focus();}applySiteSearch();});
-  const resetView0761=()=>{resetAccountsViewState0761();sites();};
-  document.getElementById("resetAccountsView0760")?.addEventListener("click",resetView0761);
-  resetViewBtn?.addEventListener("click",resetView0761);
-  const openAccountsPicker0768=(kind)=>{
-    document.getElementById("accountsPickerOverlay0768")?.remove();
-    const overlay=document.createElement("div");
-    overlay.id="accountsPickerOverlay0768";
-    overlay.className="accountsPickerOverlay0768";
-    const isJump=kind==="jump";
-    const options=isJump
-      ? String(jumpButton0768?.dataset.letters||"").split(",").filter(Boolean).map(letter=>({value:letter,label:letter}))
-      : [
-          {value:"az",label:"Alphabetical",detail:"Account name A–Z"},
-          {value:"favorites",label:"Favorites",detail:"Starred accounts first"},
-          {value:"recent",label:"Recently Opened",detail:"Most recently viewed first"},
-          {value:"attention",label:"Priority",detail:"Accounts needing attention first"}
-        ];
-    overlay.innerHTML=`<div class="accountsPickerSheet0768" role="dialog" aria-modal="true" aria-label="${isJump?'Jump to account':'Sort accounts'}"><div class="accountsPickerSheetHead0768"><div><small>ACCOUNTS</small><h3>${isJump?'Jump To':'Sort By'}</h3></div><button type="button" class="accountsPickerClose0768" aria-label="Close">×</button></div><div class="${isJump?'accountsLetterGrid0768':'accountsSortList0768'}">${options.map(option=>`<button type="button" class="accountsPickerOption0768 ${(!isJump&&accountsSort0760===option.value)?'selected':''}" data-picker-value0768="${esc(option.value)}"><span>${esc(option.label)}</span>${option.detail?`<small>${esc(option.detail)}</small>`:''}${(!isJump&&accountsSort0760===option.value)?'<b>✓</b>':''}</button>`).join("")}</div></div>`;
-    const close=()=>overlay.remove();
-    overlay.addEventListener("click",event=>{if(event.target===overlay||event.target.closest(".accountsPickerClose0768")){close();return;}const option=event.target.closest("[data-picker-value0768]");if(!option)return;const value=option.dataset.pickerValue0768;if(isJump){const target=[...list.querySelectorAll("[data-account-card0759]")].find(el=>!el.hidden&&(el.dataset.letter0763||"#")===value);if(!target){toast(`No visible ${value} accounts.`);close();return;}if(jumpValue0768)jumpValue0768.textContent=value;prepareAccountsScrollTail0796(list);const top=Math.max(0,accountsCardTop0796(list,target));accountsScrollActivated0796=false;accountsScrollLock0796=true;list.scrollTo({top,behavior:"smooth"});window.setTimeout(()=>{accountsScrollLock0796=false;accountsScroll0759=list.scrollTop;persistAccountsViewState0761(true);target.focus({preventScroll:true});},360);}else{accountsSort0760=value||"az";accountsScroll0759=0;persistAccountsViewState0761(true);close();sites();return;}close();});
-    document.body.appendChild(overlay);
-    window.setTimeout(()=>overlay.querySelector(".accountsPickerOption0768")?.focus(),20);
-  };
-  jumpButton0768?.addEventListener("click",()=>openAccountsPicker0768("jump"));
-  sortButton0768?.addEventListener("click",()=>openAccountsPicker0768("sort"));
-  scrollTopButton0763?.addEventListener("click",()=>{if(!list)return;accountsScrollActivated0796=false;accountsScrollLock0796=true;list.scrollTo({top:0,behavior:"smooth"});window.setTimeout(()=>{accountsScrollLock0796=false;accountsScroll0759=0;persistAccountsViewState0761(true);},340);});
-  list?.addEventListener("touchstart",()=>{
-    accountsTouching0796=true;
-    accountsTouchStart0796=list.scrollTop;
-    accountsTouchMoved0796=false;
-    accountsScrollActivated0796=false;
-    clearTimeout(accountsSnapTimer0796);
-  },{passive:true});
-  list?.addEventListener("touchend",()=>{
-    accountsTouching0796=false;
-    if(accountsTouchMoved0796){accountsScrollActivated0796=true;scheduleAccountsSettle0796(list,220);}
-  },{passive:true});
-  list?.addEventListener("touchcancel",()=>{
-    accountsTouching0796=false;
-    if(accountsTouchMoved0796){accountsScrollActivated0796=true;scheduleAccountsSettle0796(list,220);}
-  },{passive:true});
-  list?.addEventListener("wheel",()=>{
-    if(accountsScrollLock0796)return;
-    accountsScrollActivated0796=true;
-    scheduleAccountsSettle0796(list,240);
-  },{passive:true});
-  list?.addEventListener("scroll",()=>{
-    accountsScroll0759=list.scrollTop;
-    if(scrollTopButton0763)scrollTopButton0763.hidden=list.scrollTop<420;
-    if(accountsTouching0796&&Math.abs(list.scrollTop-accountsTouchStart0796)>4){accountsTouchMoved0796=true;accountsScrollActivated0796=true;}
-    if(accountsScrollActivated0796&&!accountsTouching0796&&!accountsScrollLock0796)scheduleAccountsSettle0796(list,190);
+  const applySearch=()=>{
+    siteSearch=(searchEl?.value||"").trim();
+    const query=siteSearch.toLowerCase();
+    let shown=0;
+    list?.querySelectorAll("[data-account-card0759]").forEach(card=>{
+      const visible=!query||(card.dataset.search||"").includes(query);
+      card.hidden=!visible;
+      if(visible)shown++;
+    });
+    if(countEl)countEl.textContent=query?`${shown} of ${allAccounts.length}`:`${shown} account${shown===1?"":"s"}`;
+    if(clearBtn)clearBtn.hidden=!query;
+    if(noResults)noResults.hidden=shown!==0||allAccounts.length===0;
+    if(resetBtn)resetBtn.hidden=!query&&accountsSort0760==="az";
     persistAccountsViewState0761();
-  },{passive:true});
+  };
+  const delayedSearch=debounce0830(applySearch,70);
+  searchEl?.addEventListener("input",delayedSearch);
+  searchEl?.addEventListener("search",applySearch);
+  searchEl?.addEventListener("keydown",event=>{
+    if(event.key==="Escape"){event.preventDefault();searchEl.value="";applySearch();}
+    if(event.key==="Enter"){
+      const first=[...list.querySelectorAll("[data-account-card0759]")].find(card=>!card.hidden);
+      if(first){event.preventDefault();openAccount(first.dataset.id);}
+    }
+  });
+  const clearSearch=()=>{if(searchEl){searchEl.value="";searchEl.focus();}applySearch();};
+  clearBtn?.addEventListener("click",clearSearch);
+  document.getElementById("clearNoResults0871")?.addEventListener("click",clearSearch);
+
   list?.addEventListener("click",event=>{
-    const callButton=event.target.closest("[data-account-call0762]");
-    if(callButton){
-      event.preventDefault();event.stopPropagation();
-      const target=(data.sites||[]).find(s=>s.id===callButton.dataset.accountCall0762);
-      const phone=phone069(target);
-      if(!target||!phone){toast("No phone number is saved for this account.");return;}
-      location.href=`tel:${phone.replace(/[^+\d]/g,"")}`;
-      return;
-    }
+    const call=event.target.closest("[data-account-call0762]");
+    if(call){event.preventDefault();event.stopPropagation();const target=(data.sites||[]).find(s=>s.id===call.dataset.accountCall0762);const phone=phone069(target);if(!phone){toast("No phone number is saved for this account.");return;}location.href=`tel:${phone.replace(/[^+\d]/g,"")}`;return;}
     const routeButton=event.target.closest("[data-account-route0762]");
-    if(routeButton){
-      event.preventDefault();event.stopPropagation();
-      const target=(data.sites||[]).find(s=>s.id===routeButton.dataset.accountRoute0762);
-      if(!target||!hasGps(target)){toast("GPS coordinates are not saved for this account.");return;}
-      window.open(mapRouteUrl071(target),"_blank","noopener");
-      return;
-    }
+    if(routeButton){event.preventDefault();event.stopPropagation();const target=(data.sites||[]).find(s=>s.id===routeButton.dataset.accountRoute0762);if(!target||!hasGps(target)){toast("GPS coordinates are not saved for this account.");return;}window.open(mapRouteUrl071(target),"_blank","noopener");return;}
     const favorite=event.target.closest("[data-account-favorite0761]");
     if(favorite){
       event.preventDefault();event.stopPropagation();
       const target=(data.sites||[]).find(s=>s.id===favorite.dataset.accountFavorite0761);
-      if(!target){toast("That account is no longer available.");return;}
-      const wasPinned=isPinnedSite566(target);
-      if(wasPinned) delete target.pinnedAt; else target.pinnedAt=new Date().toISOString();
-      target.updatedAt=new Date().toISOString();
-      try{save();}
-      catch(err){if(wasPinned)target.pinnedAt=new Date().toISOString();else delete target.pinnedAt;toast("Favorite could not be saved.");console.error(err);return;}
-      const nowPinned=!wasPinned;
-      favorite.classList.toggle("active",nowPinned);
-      favorite.textContent=nowPinned?"★":"☆";
-      favorite.setAttribute("aria-pressed",nowPinned?"true":"false");
-      favorite.setAttribute("aria-label",`${nowPinned?"Remove":"Add"} ${target.name||"account"} ${nowPinned?"from":"to"} favorites`);
-      favorite.classList.add("favoriteSaved0763");
-      window.setTimeout(()=>favorite.classList.remove("favoriteSaved0763"),360);
-      toast(nowPinned?"Added to favorites.":"Removed from favorites.");
-      if(accountsSort0760==="favorites"&&!nowPinned){
-        const card=favorite.closest("[data-account-card0759]");
-        card?.classList.add("accountLeaving0763");
-        window.setTimeout(()=>{card?.remove();applySiteSearch();},170);
-      }else{
-        applySiteSearch();
-      }
-      accountsScroll0759=list.scrollTop;persistAccountsViewState0761(true);return;
+      if(!target)return;
+      if(isPinnedSite566(target))delete target.pinnedAt;else target.pinnedAt=new Date().toISOString();
+      target.updatedAt=new Date().toISOString();save();
+      accountsScroll0759=list?.scrollTop||0;persistAccountsViewState0761(true);sites();return;
     }
     const card=event.target.closest("[data-account-card0759]");
-    if(card) openAccount0761(card.dataset.id);
+    if(card)openAccount(card.dataset.id);
   });
-  list?.addEventListener("keydown",event=>{
-    if(event.target.closest("[data-account-favorite0761], [data-account-call0762], [data-account-route0762]")) return;
-    const card=event.target.closest("[data-account-card0759]");
-    if(card && (event.key==="Enter"||event.key===" ")){event.preventDefault();openAccount0761(card.dataset.id);}
-  });
-  applySiteSearch();
-  requestAnimationFrame(()=>{
-    if(list){
-      prepareAccountsScrollTail0796(list);
-      const requested=Math.max(0,accountsScroll0759||0);
-      list.scrollTop=requested;
-      if(requested>0){
-        const cards=[...list.querySelectorAll("[data-account-card0759]")].filter(el=>!el.hidden);
-        let nearest=null;
-        for(const card of cards){
-          if(card.offsetTop-list.offsetTop<=requested+8) nearest=card;
-          else break;
-        }
-        if(nearest) list.scrollTop=Math.max(0,nearest.offsetTop-list.offsetTop-2);
-      }
-      accountsScroll0759=list.scrollTop;
-      if(scrollTopButton0763)scrollTopButton0763.hidden=list.scrollTop<420;
-    }
-    showGlobalChrome537();
-    setActiveNav();
-  });
-  if(list)window.addEventListener("resize",()=>prepareAccountsScrollTail0796(list),{once:true});
+  list?.addEventListener("keydown",event=>{const card=event.target.closest("[data-account-card0759]");if(card&&(event.key==="Enter"||event.key===" ")){event.preventDefault();openAccount(card.dataset.id);}});
+  list?.addEventListener("scroll",()=>{accountsScroll0759=list.scrollTop;persistAccountsViewState0761();},{passive:true});
+  applySearch();
+  requestAnimationFrame(()=>{if(list)list.scrollTop=Math.max(0,accountsScroll0759||0);setActiveNav();});
 }
-
 function nearbySites(){
   const radius=nearbyRadiusMiles();
   const inv=gpsInventory0652();
@@ -4711,16 +4569,11 @@ function accountEquipmentTab0735(s){
 function accountDocsTab0735(s){
   const docs=Array.isArray(s.docs)?s.docs:[];
   const photos=docs.filter(docHasPhoto512);
-  const scans=docs.filter(docIsScan0800);
   return `<div class="accountTabPanel0735">
     <section class="accountPanel0735"><div class="accountPanelHead0735"><div><span>PHOTOS</span><h2>${photos.length} Account Photo${photos.length===1?"":"s"}</h2></div><div><button class="ghost" id="openPhotoVaultBtn523">Open Vault</button><button class="primary" id="addAccountPhotoBtn523">＋ Photo</button></div></div>
       ${photos.length?`<div class="accountPhotoGrid0735">${photos.slice(0,8).map(d=>`<button class="accountPhotoThumb523" data-doc="${esc(d.id)}">${docPhotoThumb512(d)}<span>${esc(d.title||d.imageName||"Photo")}</span></button>`).join("")}</div>`:`<div class="accountEmptyState0735"><strong>No photos saved</strong><span>Add panel, device, wiring, deficiency, or completed-work photos.</span></div>`}
     </section>
-    <section class="accountPanel0735 accountScannerPanel0800"><div class="accountPanelHead0735"><div><span>SCANNED DOCUMENTS</span><h2>${scans.length} Scanned Document${scans.length===1?"":"s"}</h2></div></div>
-      <p>New scans are captured from Tools or Site Notes, then stored here after they are matched to this account.</p>
-      
-    </section>
-    <section class="accountPanel0735"><div class="accountPanelHead0735"><div><span>DOCUMENTS</span><h2>${docs.length} Total File${docs.length===1?"":"s"}</h2></div><button class="ghost" id="manageDocsBtn">Manage</button></div>
+    <section class="accountPanel0735"><div class="accountPanelHead0735"><div><span>FILES</span><h2>${docs.length} Saved Item${docs.length===1?"":"s"}</h2></div><button class="ghost" id="manageDocsBtn">Manage</button></div>
       <div class="accountDocActions0735"><button id="reportBtn"><span>▤</span><strong>Report</strong><small>Customer closeout</small></button><button id="checklistBtn"><span>✓</span><strong>Checklist</strong><small>Inspection workflow</small></button><button id="qaCloseout544"><span>↗</span><strong>Copy Closeout</strong><small>Customer packet</small></button></div>
     </section>
   </div>`;
@@ -4735,20 +4588,11 @@ function accountNotesTab0735(s,ctx){
     ${featureOn("siteTimeline")?siteActivityTimelineMarkup557(s):""}
   </div>`;
 }
-function contactPhoneForAccount0870(s,primary){
-  return formatPhone0758(primary?.phone||s?.sitePhone)||"";
-}
-
 function siteDetail(){
   restoreAppChrome572();
   showGlobalChrome537();
-  const s=site(); if(!s){ route("sites"); return; }
-  if(accountDetailSite0735!==s.id){
-    accountDetailSite0735=s.id;
-    accountDetailTab0735=accountTabPreference0751();
-    s.lastOpenedAt=new Date().toISOString();
-    saveData(data);
-  }
+  const s=site(); if(!s){route("sites");return;}
+  if(accountDetailSite0735!==s.id){accountDetailSite0735=s.id;accountDetailTab0735=accountTabPreference0751();s.lastOpenedAt=new Date().toISOString();saveData(data);}
   const open=(s.tasks||[]).filter(t=>(t.status||"Open")!=="Done").length;
   const def=(s.deficiencies||[]).filter(d=>(d.status||"Open")!=="Closed").length;
   const siteVisits=Array.isArray(s.visits)?s.visits:[];
@@ -4763,27 +4607,38 @@ function siteDetail(){
   const ctx={open,def,siteVisits,equipment,docs,health,lastVisit,panel,primary,access,activeHere};
   const accountId=accountId069(s)||"No Account ID";
   const locations=locationPoints071(s);
-  const tabs=[["overview","Overview",null,"Account overview"],["details","Details",null,"Site details"],["locations","Locations",locations.length,"Building locations"],["equipment","Equip",equipment.length,"Equipment"],["docs","Files",docs.length,"Photos and documents"],["notes","Notes",open+def,"Notes and open work"]];
+  const phone=formatPhone0758(primary?.phone||s.sitePhone)||"";
+  const address=fullAddress(s)||"No address saved";
+  const tabs=[["overview","Overview",null],["details","Details",null],["locations","Locations",locations.length],["equipment","Equipment",equipment.length],["docs","Files",docs.length],["notes","Notes",open+def]];
   const panelMarkup=accountDetailTab0735==="details"?accountDetailsTab0735(s,ctx):accountDetailTab0735==="locations"?accountLocationsTab07912(s):accountDetailTab0735==="equipment"?accountEquipmentTab0735(s):accountDetailTab0735==="docs"?accountDocsTab0735(s):accountDetailTab0735==="notes"?accountNotesTab0735(s,ctx):accountOverviewTab0735(s,ctx);
-
-  html(`<div class="screen siteDetail0735">
-    <div class="accountHeader0735 technicianHeader075 accountHeaderRewrite0757 accountHeader0786" role="banner"><button class="accountBack0735" id="backBtn" aria-label="Back to Accounts">‹</button><div class="technicianIdentity075 accountIdentity0786"><strong>${esc(s.name||"Unnamed Account")}</strong><span class="accountIdLine0757">${esc(accountId)}</span>${fullAddress(s)?`<span class="accountAddressLine0757">${esc(fullAddress(s))}</span>`:""}</div><button class="accountPin0735 ${isPinnedSite566(s)?"pinned":""}" id="pinSiteBtn566" aria-label="${isPinnedSite566(s)?"Remove account from favorites":"Add account to favorites"}" aria-pressed="${isPinnedSite566(s)?"true":"false"}">${isPinnedSite566(s)?"★":"☆"}</button><button class="accountEdit0735" id="editBtn" aria-label="Edit account">✎</button></div>
-    <section class="technicianStatus075"><span class="status-${esc(health.cls)}">${esc(health.label)}</span><span>${esc(accountCategoryLabel0735(s))}</span>${open?`<span>${open} task${open===1?"":"s"}</span>`:""}${def?`<span class="hasDef075">${def} deficienc${def===1?"y":"ies"}</span>`:""}</section>
-    ${accountTagChips0737(s,8)?`<div class="accountTagRail0737">${accountTagChips0737(s,8)}</div>`:""}
-    <section class="accountCommand0870" aria-label="Account quick actions">
-      <button id="accountCall0870" ${contactPhoneForAccount0870(s,primary)?"":"disabled"}>${fvIcon073("call","accountCommandIcon0870")}<span>Call</span></button>
-      <button id="accountRoute0870" ${hasGps(s)?"":"disabled"}>${fvIcon073("route","accountCommandIcon0870")}<span>Route</span></button>
-      <button id="accountNote0870">${fvIcon073("note","accountCommandIcon0870")}<span>Note</span></button>
-      <button id="accountMore0870">${fvIcon073("more","accountCommandIcon0870")}<span>Details</span></button>
+  html(`<div class="screen accountDetail0871">
+    <header class="accountDetailTop0871">
+      <button id="backBtn" aria-label="Back to Search">‹</button><span>ACCOUNT</span><div><button class="${isPinnedSite566(s)?"active":""}" id="pinSiteBtn566" aria-label="Favorite account">${isPinnedSite566(s)?"★":"☆"}</button><button id="editBtn" aria-label="Edit account">✎</button></div>
+    </header>
+    <section class="accountIdentity0871 category-${accountCategory070(s)}">
+      <div class="accountIdentityMeta0871"><span>${esc(accountCategoryLabel0735(s))}</span><b>${esc(accountId)}</b></div>
+      <h1>${esc(s.name||"Unnamed Account")}</h1>
+      <p>${esc(address)}</p>
+      <div class="accountIdentityStatus0871"><span class="status-${esc(health.cls)}">${esc(health.label)}</span>${open?`<span>${open} task${open===1?"":"s"}</span>`:""}${def?`<span class="danger">${def} deficienc${def===1?"y":"ies"}</span>`:""}${hasGps(s)?`<span>GPS ready</span>`:`<span class="muted">No GPS</span>`}</div>
     </section>
-    ${accountPersistentActions0751(s,ctx)}
-    <nav class="accountTabs0735 accountTabsSticky0751 accountTabs0786" aria-label="Account sections">${tabs.map(([key,label,count,aria])=>`<button class="${accountDetailTab0735===key?"active":""}" data-account-tab0735="${key}" aria-label="${esc(aria)}" aria-current="${accountDetailTab0735===key?"page":"false"}"><span>${label}</span>${Number.isFinite(count)&&count>0?`<b>${count}</b>`:""}</button>`).join("")}</nav>
-    <div class="accountTabScroll0735 accountTabScroll0751">${panelMarkup}</div>
+    ${accountTagChips0737(s,8)?`<div class="accountTags0871">${accountTagChips0737(s,8)}</div>`:""}
+    <section class="accountActionGrid0871" aria-label="Account actions">
+      <button id="detailCall0871" ${phone?"":"disabled"}>${fvIcon073("call","accountActionIcon0871")}<span>Call</span></button>
+      <button id="detailRoute0871" ${hasGps(s)?"":"disabled"}>${fvIcon073("route","accountActionIcon0871")}<span>Route</span></button>
+      <button id="detailNote0871">${fvIcon073("note","accountActionIcon0871")}<span>Add Note</span></button>
+      <button id="detailInfo0871">${fvIcon073("info","accountActionIcon0871")}<span>Site Info</span></button>
+    </section>
+    <nav class="accountTabs0871" aria-label="Account sections">${tabs.map(([key,label,count])=>`<button class="${accountDetailTab0735===key?"active":""}" data-account-tab0735="${key}" aria-current="${accountDetailTab0735===key?"page":"false"}"><span>${label}</span>${Number.isFinite(count)&&count>0?`<b>${count}</b>`:""}</button>`).join("")}</nav>
+    <div class="accountDetailContent0871">${panelMarkup}</div>
   </div>`);
 
   document.getElementById("backBtn")?.addEventListener("click",()=>route("sites"));
   document.getElementById("editBtn")?.addEventListener("click",()=>{mode="edit";route("siteForm");});
   document.getElementById("pinSiteBtn566")?.addEventListener("click",toggleSitePinned566);
+  document.getElementById("detailCall0871")?.addEventListener("click",()=>{if(phone)location.href=`tel:${phone.replace(/[^+\d]/g,"")}`;});
+  document.getElementById("detailRoute0871")?.addEventListener("click",()=>{if(hasGps(s))window.open(mapRouteUrl071(s),"_blank","noopener");});
+  document.getElementById("detailNote0871")?.addEventListener("click",addSiteNotePrompt);
+  document.getElementById("detailInfo0871")?.addEventListener("click",()=>{accountDetailTab0735="details";rememberAccountTab0751("details");render();});
   document.querySelectorAll("[data-account-tab0735]").forEach(b=>b.onclick=()=>{captureRouteScroll0782();accountDetailTab0735=b.dataset.accountTab0735;rememberAccountTab0751(accountDetailTab0735);render();});
   document.getElementById("editDetails0735")?.addEventListener("click",()=>{mode="edit";route("siteForm");});
   document.getElementById("qaAddNote544")?.addEventListener("click",addSiteNotePrompt);
@@ -4795,16 +4650,8 @@ function siteDetail(){
   document.getElementById("visitsMini477")?.addEventListener("click",()=>route("visits"));
   document.getElementById("contactsQuick477")?.addEventListener("click",()=>route("contactsList"));
   document.getElementById("copyAddress0786")?.addEventListener("click",()=>copyText071(fullAddress(s),"Address copied."));
-  document.getElementById("locationDetails0786")?.addEventListener("click",()=>{accountDetailTab0735="details";rememberAccountTab0751(accountDetailTab0735);render();});
-  const contactPhone=formatPhone0758(primary?.phone||s.sitePhone)||"";
-  document.getElementById("accountCall0870")?.addEventListener("click",()=>{if(contactPhone)location.href=`tel:${contactPhone.replace(/[^+\d]/g,"")}`;});
-  document.getElementById("accountRoute0870")?.addEventListener("click",()=>{if(hasGps(s))window.open(mapRouteUrl071(s),"_blank");});
-  document.getElementById("accountNote0870")?.addEventListener("click",()=>{accountDetailTab0735="notes";rememberAccountTab0751("notes");render();});
-  document.getElementById("accountMore0870")?.addEventListener("click",()=>{accountDetailTab0735="details";rememberAccountTab0751("details");render();});
-  if(contactPhone){
-    document.getElementById("callPrimary477")?.addEventListener("click",()=>{location.href=`tel:${contactPhone.replace(/[^+\d]/g,"")}`;});
-    document.getElementById("callSitePhone0786")?.addEventListener("click",()=>{location.href=`tel:${contactPhone.replace(/[^+\d]/g,"")}`;});
-  }
+  document.getElementById("locationDetails0786")?.addEventListener("click",()=>{accountDetailTab0735="details";rememberAccountTab0751("details");render();});
+  if(phone){document.getElementById("callPrimary477")?.addEventListener("click",()=>{location.href=`tel:${phone.replace(/[^+\d]/g,"")}`;});document.getElementById("callSitePhone0786")?.addEventListener("click",()=>{location.href=`tel:${phone.replace(/[^+\d]/g,"")}`;});}
   document.getElementById("navigateBtn477")?.addEventListener("click",()=>{if(hasGps(s))window.open(mapRouteUrl071(s),"_blank");});
   document.getElementById("accountMapRoute0735")?.addEventListener("click",()=>window.open(mapRouteUrl071(s),"_blank"));
   document.getElementById("allVisitsBtn")?.addEventListener("click",()=>route("visits"));
@@ -4832,8 +4679,6 @@ function siteDetail(){
   document.querySelectorAll("[data-account-equipment0735]").forEach(b=>b.onclick=()=>{mode=b.dataset.accountEquipment0735;route("equipmentForm");});
   document.getElementById("openPhotoVaultBtn523")?.addEventListener("click",()=>{docVaultFilter516="photos";route("siteDocs");});
   document.getElementById("addAccountPhotoBtn523")?.addEventListener("click",()=>{mode="newPhoto";route("siteDocForm");});
-  document.getElementById("scanDocNoteBtn0800")?.addEventListener("click",()=>scannerStart0800("","siteDetail",s.id));
-  document.querySelectorAll("[data-account-scan0800]").forEach(b=>b.onclick=()=>{const d=(site()?.docs||[]).find(x=>x.id===b.dataset.accountScan0800);if(d)scannedDocumentModal0800(d);});
   document.querySelectorAll(".accountPhotoThumb523").forEach(b=>b.onclick=()=>{const d=(site()?.docs||[]).find(x=>x.id===b.dataset.doc);if(d)photoPreviewModal524(d);});
   document.getElementById("manageDocsBtn")?.addEventListener("click",()=>route("siteDocs"));
   document.getElementById("reportBtn")?.addEventListener("click",()=>route("report"));
@@ -4842,9 +4687,9 @@ function siteDetail(){
   document.getElementById("addSiteNoteBtn491")?.addEventListener("click",addSiteNotePrompt);
   document.getElementById("openSiteNotesBtn494")?.addEventListener("click",()=>route("jobMode"));
   document.getElementById("qaReport544")?.addEventListener("click",()=>route("report"));
-  wireImportantSiteInfo568(); wireSiteBrief556(); wireSiteActivity557();
+  wireImportantSiteInfo568();wireSiteBrief556();wireSiteActivity557();
+  requestAnimationFrame(setActiveNav);
 }
-
 function photoCategory524(d={}){ return d.photoCategory || (docHasPhoto512(d) ? "Panel" : ""); }
 function photoReportSelected526(d={}){ return !!(d && d.imageData && d.includeInCustomerReport === true); }
 function reportPhotos526(s={}){ return (s.docs||[]).filter(photoReportSelected526); }
@@ -8392,7 +8237,7 @@ function manualSimplePage058(type){
   quick:["🚀","Quick Start Guide","Get FireVault ready for a normal field day.",[["1. Verify the build","Confirm the green build badge shows 0.67.0 before entering production information."],["2. Complete Technician Profile","Enter your name, company, phone, email, and license or employee identification."],["3. Review permissions","Allow location and photo access only when FireVault requests them and the feature is needed."],["4. Create or open a site","Add the customer name, full address, panel details, contacts, access notes, and GPS location."],["5. Document the visit","Record notes, photos, tasks, deficiencies, equipment changes, and a service visit."],["6. Finish and protect the data","Review the report, send or copy the required summary, then export a current backup."]]],
   new:["🆕","What’s New in 0.67.0","Account View, Settings navigation, and FireVault Academy redesign.",[["Unified visual system","Standardized typography, spacing, card surfaces, borders, controls, and responsive behavior across FireVault."],["Settings cleanup","Improved Settings home cards and every submenu while preserving the preferred Email setup workflow."],["Help readability","Converted contextual Help and Academy articles into one uninterrupted scrolling reading column with no floating metadata."],["Site Detail stability","Reinforced natural-height cards, readable text, and scroll-safe account sections."],["Operational screens","Simplified Customer Import, Team Sync, Conflict Center, and Nearby Sites presentation without changing their workflows."],["Phone and iPad layouts","Added consistent narrow-phone and tablet behavior, bottom-navigation clearance, and overflow protection."],["Nearby scan diagnostics","Nearby Sites now shows total sites, GPS-ready records, missing coordinates, phone-location progress, and persistent error messages."],["Coordinate recovery","FireVault recovers valid latitude and longitude stored in compatible legacy or imported fields and normalizes them into the site GPS record."],["Location retry","If high-accuracy location times out or is unavailable, FireVault retries once using standard accuracy."],["Nearest-site fallback","When no site is inside the selected radius, the nearest GPS-ready sites remain visible instead of presenting an empty result."],["Latitude and longitude","Customer Import can calculate missing coordinates from each usable U.S. street address before saving records."],["Coordinate requirement","The importer requires calculated, supplied, or existing GPS coordinates by default. Unmatched addresses remain in review."],["Census address matching","Only address fields are sent to the U.S. Census Geocoder. The returned point is an address-range calculation, not a guaranteed building entrance."],["Account Id matching","Repeat imports update the matching FireVault site instead of creating duplicates or deleting field history."],["CSV coordinate columns","Files that already contain Latitude and Longitude columns use those values directly."],["Sync-ready changes","Added and updated customer records enter the pending synchronization queue and create a Sync Activity entry."]]],
   tips:["🧰","Field Tips","Short practices that improve the usefulness of FireVault records.",[["Write for the next technician","Include the exact panel, circuit, device, location, symptom, test result, and next action instead of relying on memory."],["Photograph context first","Take one wide photo showing the equipment location before close-up terminal, label, or damage photos."],["Separate facts from follow-up","Use notes for what occurred, deficiencies for code or system problems, and tasks for work that still needs completion."],["Confirm the account","Before using Quick Capture, verify the selected customer site to prevent records from being stored under the wrong account."],["Back up before updates","Download an external backup before a major update or device change and after completing significant field documentation."]]],
-  revisions:["📋","Revision History","Application and documentation checkpoints.",[[["0.87.0","Repaired the Settings startup error and standardized the three-button Nearby, Search, and Settings dock across the app."],["0.86.0","Redesigned Settings as a simplified dark tile dashboard and renamed the bottom Accounts navigation button to Search."],["0.85.0","Removed Tools navigation and the Account Detail Visit action, and rebuilt Settings as a simple grouped menu with clean detail screens."],["0.84.0","Refined Nearby map selection with a fixed details overlay, no marker popup, delayed street-level zoom, and direct account-card navigation."],["0.81.0","Prepared FireVault for App Store review by removing the document scanner, Daily Route and time-tracking controls, theme selection, advanced settings, diagnostics access, and excess instructional copy while preserving account data."]],["0.80.3","Defaulted new Tools scanner documents to the closest GPS-ready account with visible distance, accuracy, retry, and manual override."],["0.80.2","Simplified Document Scanner, added on-device AI Auto Scan with live corner framing and hands-free capture, and repaired mobile keyboard field visibility."],["0.80.1","Moved Document Scanner to Tools, added post-capture account search and matching, and added scanner access inside the full Site Notes workspace."],["0.80.0","Added an account-specific multi-page camera document scanner with automatic edge detection, manual corner correction, rotation, cleanup modes, page ordering, PDF preview/download/share, and account-note activity."],["0.79.14","Restored numbered Nearby Accounts map pins matched to distance-sorted list rows and removed Smart Account Intelligence."],["0.79.13","Repaired startup parsing inherited from 0.79.11 and corrected Building Navigator location-copy syntax."],["0.79.12","Added Building Navigator with exact site locations, GPS/Plus Codes, verification, linked photos, route targets, and timeline events."],["0.79.7","Shortened every Settings summary and removed the colored bar from each Section Overview."],["0.79.6","Added Nearby-style account-list scroll locking so cards settle cleanly at the top while the Accounts controls remain fixed."],["0.79.5","Added separate Personal OneDrive, Work OneDrive, and SharePoint connection profiles with exact photo/document assignments and no-personal-fallback protection."],["0.79.4","Added independent photo and document storage destinations, cloud-provider integration targets, and offline Google Plus Codes for accounts and exact field locations."],["0.79.3","Added backend-neutral provider interfaces for authentication, database, file storage, synchronization, and audit while keeping FireVault fully local."],["0.79.2","Added a unified Security Center with vault integrity validation, backup health, audit filters, device naming, session clearing, and PIN confirmation for sensitive exports, restores, and deletion."],["0.79.1","Added an optional local six-digit privacy lock with PBKDF2 hashing, inactivity/background locking, app-switcher privacy screen, recovery code, cooldown protection, and local lock events."],["0.79.0","Added security-ready schema 4 metadata, stable workspace/user/device identities, local audit history, pending change queue, recoverable deletion, credential-safe exports, and protected restore/reset actions."],["0.67.0","Redesigned Account View around service actions and grouped information, consolidated Settings into five folders, and simplified FireVault Academy and contextual Help for continuous reading."],["0.65.2","Repaired Nearby Sites with GPS inventory counts, imported-coordinate recovery, persistent permission and timeout messages, a standard-accuracy retry, and nearest-site fallback results."],["0.65.1","Added online latitude/longitude calculation, coordinate validation, geocoding progress, unmatched-address review, optional CSV coordinates, and coordinate-safe repeat importing."],["0.65.0","Added preview-first customer CSV importing, Account Id update matching, validation warnings, imported monitoring details, and sync activity tracking."],["0.64.1","Simplified Academy article headers, removed floating metadata badges, and improved continuous scrolling and readability."],["0.64.0","Added Sync Activity, a conflict review center, export/import audit entries, and an automatic OneDrive connection-readiness checklist."],["0.63.1","Overhauled contextual Help and Academy reader formatting, removed overlapping sticky article headers, and restored full scrolling on phones and tablets."],["0.63.0","Added permanent record IDs, audit metadata, local version tracking, pending-sync states, conflict readiness, device identity, and a Team Sync settings workspace."],["0.60.0","Connected major screens and Settings areas directly to matching Academy chapters with return-to-screen navigation."],["0.59.0","Added interactive tutorials, guided orientation, pinned learning, field tips, and documentation tracking."],["0.58.0","Expanded Help & Manual into FireVault Academy with bookmarks, smart search, Quick Start, and reader navigation."],["0.57.0","Added the first complete searchable in-app FireVault User Manual."],["Ongoing review rule","Any change to navigation, labels, storage, workflows, permissions, or supported layouts requires the related manual chapter to be checked."]]],
+  revisions:["📋","Revision History","Application and documentation checkpoints.",[[["0.87.1","Rebuilt Account Directory, Search, account cards, and Account Detail from the stable 0.86.1 baseline and removed the layout gap above the bottom navigation."],["0.86.1","Repaired the Settings startup error and standardized the three-button Nearby, Search, and Settings dock across the app."],["0.86.0","Redesigned Settings as a simplified dark tile dashboard and renamed the bottom Accounts navigation button to Search."],["0.85.0","Removed Tools navigation and the Account Detail Visit action, and rebuilt Settings as a simple grouped menu with clean detail screens."],["0.84.0","Refined Nearby map selection with a fixed details overlay, no marker popup, delayed street-level zoom, and direct account-card navigation."],["0.81.0","Prepared FireVault for App Store review by removing the document scanner, Daily Route and time-tracking controls, theme selection, advanced settings, diagnostics access, and excess instructional copy while preserving account data."]],["0.80.3","Defaulted new Tools scanner documents to the closest GPS-ready account with visible distance, accuracy, retry, and manual override."],["0.80.2","Simplified Document Scanner, added on-device AI Auto Scan with live corner framing and hands-free capture, and repaired mobile keyboard field visibility."],["0.80.1","Moved Document Scanner to Tools, added post-capture account search and matching, and added scanner access inside the full Site Notes workspace."],["0.80.0","Added an account-specific multi-page camera document scanner with automatic edge detection, manual corner correction, rotation, cleanup modes, page ordering, PDF preview/download/share, and account-note activity."],["0.79.14","Restored numbered Nearby Accounts map pins matched to distance-sorted list rows and removed Smart Account Intelligence."],["0.79.13","Repaired startup parsing inherited from 0.79.11 and corrected Building Navigator location-copy syntax."],["0.79.12","Added Building Navigator with exact site locations, GPS/Plus Codes, verification, linked photos, route targets, and timeline events."],["0.79.7","Shortened every Settings summary and removed the colored bar from each Section Overview."],["0.79.6","Added Nearby-style account-list scroll locking so cards settle cleanly at the top while the Accounts controls remain fixed."],["0.79.5","Added separate Personal OneDrive, Work OneDrive, and SharePoint connection profiles with exact photo/document assignments and no-personal-fallback protection."],["0.79.4","Added independent photo and document storage destinations, cloud-provider integration targets, and offline Google Plus Codes for accounts and exact field locations."],["0.79.3","Added backend-neutral provider interfaces for authentication, database, file storage, synchronization, and audit while keeping FireVault fully local."],["0.79.2","Added a unified Security Center with vault integrity validation, backup health, audit filters, device naming, session clearing, and PIN confirmation for sensitive exports, restores, and deletion."],["0.79.1","Added an optional local six-digit privacy lock with PBKDF2 hashing, inactivity/background locking, app-switcher privacy screen, recovery code, cooldown protection, and local lock events."],["0.79.0","Added security-ready schema 4 metadata, stable workspace/user/device identities, local audit history, pending change queue, recoverable deletion, credential-safe exports, and protected restore/reset actions."],["0.67.0","Redesigned Account View around service actions and grouped information, consolidated Settings into five folders, and simplified FireVault Academy and contextual Help for continuous reading."],["0.65.2","Repaired Nearby Sites with GPS inventory counts, imported-coordinate recovery, persistent permission and timeout messages, a standard-accuracy retry, and nearest-site fallback results."],["0.65.1","Added online latitude/longitude calculation, coordinate validation, geocoding progress, unmatched-address review, optional CSV coordinates, and coordinate-safe repeat importing."],["0.65.0","Added preview-first customer CSV importing, Account Id update matching, validation warnings, imported monitoring details, and sync activity tracking."],["0.64.1","Simplified Academy article headers, removed floating metadata badges, and improved continuous scrolling and readability."],["0.64.0","Added Sync Activity, a conflict review center, export/import audit entries, and an automatic OneDrive connection-readiness checklist."],["0.63.1","Overhauled contextual Help and Academy reader formatting, removed overlapping sticky article headers, and restored full scrolling on phones and tablets."],["0.63.0","Added permanent record IDs, audit metadata, local version tracking, pending-sync states, conflict readiness, device identity, and a Team Sync settings workspace."],["0.60.0","Connected major screens and Settings areas directly to matching Academy chapters with return-to-screen navigation."],["0.59.0","Added interactive tutorials, guided orientation, pinned learning, field tips, and documentation tracking."],["0.58.0","Expanded Help & Manual into FireVault Academy with bookmarks, smart search, Quick Start, and reader navigation."],["0.57.0","Added the first complete searchable in-app FireVault User Manual."],["Ongoing review rule","Any change to navigation, labels, storage, workflows, permissions, or supported layouts requires the related manual chapter to be checked."]]],
   trouble:["❓","Troubleshooting","Common problems and safe first checks.",FIREVAULT_MANUAL_058.find(x=>x.id==="trouble")?.topics||[]]
  };
  const [icon,title,note,items]=pages[type]||["ⓘ","Unavailable","This Help section is not available in the installed version.",[["Current status","Return to Help and choose an available chapter or tutorial."]]];
@@ -10153,7 +9998,8 @@ function diagnostics(){
 }
 function showChangelog(){
   const notes = [
-    "Build 0.87.0 repairs Settings navigation and standardizes the three-button Nearby, Search, and Settings dock across main pages.",
+    "Build 0.87.1 rebuilds Account Directory, Search, account cards, and Account Detail from the stable 0.86.1 baseline and removes the black layout gap above the bottom dock.",
+    "Build 0.86.1 repairs Settings navigation and standardizes the three-button Nearby, Search, and Settings dock across main pages.",
     "Build 0.80.3 defaults Tools scanner documents to the closest GPS-ready account while preserving manual search, Site Notes account context, and existing-document account locking.",
     "Build 0.80.2 simplifies Document Scanner, adds on-device AI Auto Scan with live page framing and hands-free capture, and keeps focused fields visible above the mobile keyboard.",
     "Build 0.80.1 moves Document Scanner to Tools, supports post-capture account search and matching, and adds scanner access inside Site Notes.",

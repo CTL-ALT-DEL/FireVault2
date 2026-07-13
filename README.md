@@ -1,8 +1,10 @@
-# FireVault Build 0.87.0
+# FireVault Build 0.87.1
 
-Complete Account Search and Account Detail design overhaul.
+Corrective Account Directory and Account Detail rebuild created from the stable 0.86.1 baseline.
 
-- Search-first customer directory with a modern dark layout
-- Cleaner account cards and quick actions
-- Redesigned account header, command bar, tabs, panels, and information hierarchy
-- Existing account records and storage key preserved
+- Rebuilt Account Directory and Search screen
+- New account cards with clearer identity, status, and quick actions
+- Rebuilt Account Detail shell, action row, tabs, and content layout
+- Removed the empty black layout band above the bottom navigation
+- Removed obsolete scanner copy from the account Files tab
+- Existing account data and storage key preserved
