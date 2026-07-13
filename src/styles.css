@@ -18829,3 +18829,13 @@ hr{border:0;border-top:1px solid var(--fv-border)}
 .settingsDetail0860{background:#0c1014}.settingsDetail0860 .settingsSimpleDetailHeader0850{background:#11161c}
 @media(max-width:390px){.settingsTileGrid0860{gap:8px}.settingsTile0860{border-radius:15px;gap:9px}.settingsTileIcon0860{width:36px;height:36px}.settingsTile0860 span{font-size:.74rem}.settingsDashboardBody0860{padding-left:10px;padding-right:10px}}
 @media(min-width:700px){.settingsTileGrid0860{grid-template-columns:repeat(4,minmax(0,1fr));max-width:760px;margin:0 auto}.settingsDashboardBody0860>h1{max-width:760px;margin-left:auto;margin-right:auto}}
+
+
+/* Build 0.86.1 — consistent three-button navigation */
+#appNav,.nearbyBottomNav069{grid-template-columns:repeat(3,minmax(0,1fr))!important;}
+#appNav.fvNavThree0733,.nearbyBottomNav069.fvNavThree0733{grid-template-columns:repeat(3,minmax(0,1fr))!important;}
+.nearbyBottomNav069{gap:10px!important;padding-left:15px!important;padding-right:15px!important;}
+.nearbyBottomNav069 button{min-height:58px!important;border:1px solid #334155!important;border-radius:17px!important;background:linear-gradient(155deg,#172334,#0d1520)!important;color:#b8c2d0!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.06),0 4px 12px rgba(0,0,0,.28)!important;}
+.nearbyBottomNav069 button.active{background:linear-gradient(145deg,#d53743,#b61e2b)!important;border-color:#ff6670!important;color:#fff!important;box-shadow:0 0 20px rgba(239,45,55,.28),inset 0 1px 0 rgba(255,255,255,.18)!important;}
+.nearbyBottomNav069 .fvNavIcon073,#appNav .fvNavIcon073{width:27px!important;height:27px!important;}
+.nearbyBottomNav069 button span,#appNav button span:last-child{font-size:.78rem!important;font-weight:850!important;letter-spacing:.02em!important;}

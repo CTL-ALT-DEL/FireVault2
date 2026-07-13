@@ -1,8 +1,7 @@
-# Validation
+# Validation — Build 0.86.1
 
-- JavaScript syntax checked
-- Settings dashboard and nested groups verified
-- Accounts navigation renamed Search
-- Storage key preserved
-- Removed features remain unavailable
-- ZIP integrity checked
+- Repaired missing `openSettingsHome572()` navigation function.
+- Standardized three-button bottom navigation: Nearby, Search, Settings.
+- Removed stale Tools and Accounts labels from the Nearby dock.
+- Preserved existing storage key and customer records.
+- JavaScript syntax, JSON structure, service-worker references, and ZIP integrity checked.

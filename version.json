@@ -1,8 +1,8 @@
 {
-  "build": "0.86.0",
+  "build": "0.86.1",
   "released": "2026-07-12",
-  "note": "Redesigned Settings as a simplified dark tile dashboard and renamed Accounts navigation to Search.",
-  "label": "Dark Settings Dashboard",
-  "version": "0.86.0",
-  "name": "App Store Settings Polish"
+  "note": "Repaired Settings navigation and standardized the three-button dock across main pages.",
+  "label": "Navigation Stabilization",
+  "version": "0.86.1",
+  "name": "App Store Navigation Stabilization"
 }
