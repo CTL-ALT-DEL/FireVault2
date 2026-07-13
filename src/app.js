@@ -1,6 +1,6 @@
-import { BUILD, KEY, ACTIVE_JOB_KEY, loadData, saveData, ensureSite, fullAddress, esc, uid, downloadBlob, syncSummary, syncQueue, syncConflicts, syncActivity, createSyncPackage, importSyncPackage, resolveSyncConflict, notePackageExport, deviceIdentity, recordSyncActivity, autoBackupInfo, latestAutoBackup, restoreAutoBackup, isDemoMode, setDemoMode, resetDemoData, securityFoundationSummary, securityAudit, recycleBinInfo, restoreRecycleRecord, purgeRecycleBin, recordSecurityEvent, validateVaultIntegrity } from "./storage.js?v=0.87.3";
-import { backendAdapterSummary, runBackendAdapterDiagnostics, backendAdapterManifest, PROVIDER_CONTRACT_VERSION, FILE_STORAGE_CATALOG, fileStoragePlanSummary, cloudFileStorageManifest, MICROSOFT_STORAGE_TYPES, microsoftStorageAccounts, saveMicrosoftStorageAccounts, createMicrosoftStorageAccount, microsoftStorageAccountById, microsoftAppRegistration, saveMicrosoftAppRegistration, microsoftStorageSummary, microsoftStorageManifest } from "./providers.js?v=0.87.3";
-import { encodePlusCode, isValidFullPlusCode, normalizePlusCode, plusCodePrecisionLabel } from "./open-location-code.js?v=0.87.3";
+import { BUILD, KEY, ACTIVE_JOB_KEY, loadData, saveData, ensureSite, fullAddress, esc, uid, downloadBlob, syncSummary, syncQueue, syncConflicts, syncActivity, createSyncPackage, importSyncPackage, resolveSyncConflict, notePackageExport, deviceIdentity, recordSyncActivity, autoBackupInfo, latestAutoBackup, restoreAutoBackup, isDemoMode, setDemoMode, resetDemoData, securityFoundationSummary, securityAudit, recycleBinInfo, restoreRecycleRecord, purgeRecycleBin, recordSecurityEvent, validateVaultIntegrity } from "./storage.js?v=0.87.4";
+import { backendAdapterSummary, runBackendAdapterDiagnostics, backendAdapterManifest, PROVIDER_CONTRACT_VERSION, FILE_STORAGE_CATALOG, fileStoragePlanSummary, cloudFileStorageManifest, MICROSOFT_STORAGE_TYPES, microsoftStorageAccounts, saveMicrosoftStorageAccounts, createMicrosoftStorageAccount, microsoftStorageAccountById, microsoftAppRegistration, saveMicrosoftAppRegistration, microsoftStorageSummary, microsoftStorageManifest } from "./providers.js?v=0.87.4";
+import { encodePlusCode, isValidFullPlusCode, normalizePlusCode, plusCodePrecisionLabel } from "./open-location-code.js?v=0.87.4";
 window.__FIREVAULT_MODULE_READY = true;
 
 function fvPreferenceStore0739(){
@@ -231,6 +231,7 @@ let selectedSiteId = null;
 let mode = null;
 let settingsTab = "tech";
 let settingsGroup067 = "";
+let settingsSearch0874 = "";
 let settingsRailScroll = 0;
 const SETTINGS_SCROLL_KEY_576 = "firevault_settings_scroll_05076";
 let settingsSubmenuReturn576 = false;
@@ -3795,7 +3796,7 @@ function accountDirectoryRow0759(s,addressCount=1){
   const work=accountDirectoryWork0759(s);
   const panel=[s.panelManufacturer,s.panelModel].filter(Boolean).join(" ");
   const contact=primaryContact477(s);
-  const supporting=panel || contact?.name || "Panel and primary contact not entered";
+  const supporting=panel || contact?.name || "";
   const pinned=isPinnedSite566(s);
   const address=fullAddress(s)||"No address saved";
   const phone=phone069(s);
@@ -3810,15 +3811,15 @@ function accountDirectoryRow0759(s,addressCount=1){
     <div class="accountCardMain0871">
       <div class="accountCardHeading0871">
         <h2>${esc(s.name||"Unnamed Account")}</h2>
-        <button type="button" class="accountFavorite0871 ${pinned?"active":""}" data-account-favorite0761="${esc(s.id)}" aria-pressed="${pinned?"true":"false"}" aria-label="${pinned?"Remove":"Add"} favorite">${pinned?"★":"☆"}</button>
       </div>
       <p class="accountAddress0871">${esc(address)}</p>
       <div class="accountCardIdentity0871">${id?`<span>${esc(id)}</span>`:""}<em>${esc(categoryLabel)}</em>${addressCount>1?`<b>${addressCount} here</b>`:""}</div>
-      <p class="accountSupporting0871">${esc(supporting)}</p>
+      ${supporting?`<p class="accountSupporting0871">${esc(supporting)}</p>`:""}
       ${issueMarkup}
       <div class="accountCardFooter0871">
         <div class="accountCardActions0871">
           <button type="button" data-account-call0762="${esc(s.id)}" ${phone?"":"disabled"}>${fvIcon073("call","accountCardIcon0871")}<span>Call</span></button>
+          <button type="button" class="accountFavorite0871 ${pinned?"active":""}" data-account-favorite0761="${esc(s.id)}" aria-pressed="${pinned?"true":"false"}" aria-label="${pinned?"Remove":"Add"} favorite">${pinned?"★":"☆"}</button>
           <button type="button" data-account-route0762="${esc(s.id)}" ${gpsReady?"":"disabled"}>${fvIcon073("route","accountCardIcon0871")}<span>Route</span></button>
         </div>
         <span class="accountOpen0871">Details <b>›</b></span>
@@ -3978,6 +3979,7 @@ function sites(){
     if(clearBtn)clearBtn.hidden=!query;
     if(noResults)noResults.hidden=shown!==0||allAccounts.length===0;
     if(resetBtn)resetBtn.hidden=!query&&accountsSort0760==="az";
+    requestAnimationFrame(()=>prepareAccountsScrollTail0796(list));
     persistAccountsViewState0761();
   };
   const delayedSearch=debounce0830(applySearch,70);
@@ -4012,9 +4014,33 @@ function sites(){
     if(card)openAccount(card.dataset.id);
   });
   list?.addEventListener("keydown",event=>{const card=event.target.closest("[data-account-card0759]");if(card&&(event.key==="Enter"||event.key===" ")){event.preventDefault();openAccount(card.dataset.id);}});
-  list?.addEventListener("scroll",()=>{accountsScroll0759=list.scrollTop;persistAccountsViewState0761();},{passive:true});
+  if(list){
+    accountsScrollActivated0796=false;
+    list.addEventListener("touchstart",()=>{
+      accountsTouching0796=true;
+      accountsTouchStart0796=list.scrollTop;
+      accountsTouchMoved0796=false;
+      clearTimeout(accountsSnapTimer0796);
+    },{passive:true});
+    list.addEventListener("touchend",()=>{
+      accountsTouching0796=false;
+      if(accountsTouchMoved0796){accountsScrollActivated0796=true;scheduleAccountsSettle0796(list,260);}
+    },{passive:true});
+    list.addEventListener("wheel",()=>{
+      accountsScrollActivated0796=true;
+      accountsTouchMoved0796=true;
+      clearTimeout(accountsSnapTimer0796);
+      scheduleAccountsSettle0796(list,260);
+    },{passive:true});
+    list.addEventListener("scroll",()=>{
+      accountsScroll0759=list.scrollTop;
+      if(accountsTouching0796&&Math.abs(list.scrollTop-accountsTouchStart0796)>4){accountsTouchMoved0796=true;accountsScrollActivated0796=true;}
+      if(!accountsTouching0796&&!accountsScrollLock0796&&accountsScrollActivated0796)scheduleAccountsSettle0796(list,210);
+      persistAccountsViewState0761();
+    },{passive:true});
+  }
   applySearch();
-  requestAnimationFrame(()=>{if(list)list.scrollTop=Math.max(0,accountsScroll0759||0);setActiveNav();});
+  requestAnimationFrame(()=>{if(list){prepareAccountsScrollTail0796(list);list.scrollTop=Math.max(0,accountsScroll0759||0);}setActiveNav();});
 }
 function nearbySites(){
   const radius=nearbyRadiusMiles();
@@ -7549,7 +7575,8 @@ function importedAccountCard065(s={}){
 
 const SETTINGS_GROUPS_067 = [
   {key:"profile",icon:"👤",title:"Profile",tabs:["tech"]},
-  {key:"field",icon:"⌖",title:"Field",tabs:["gps","plusCodes","overlay"]},
+  {key:"maps",icon:"⌖",title:"Maps & GPS",tabs:["gps","plusCodes"]},
+  {key:"photos",icon:"▧",title:"Photo Overlays",tabs:["overlay"]},
   {key:"reports",icon:"▤",title:"Reports",tabs:["reports","email"]},
   {key:"data",icon:"⇅",title:"Data",tabs:["privacy","security","cloudFiles","microsoftStorage","sync","customerImport","categories","backup","updates","about"]}
 ];
@@ -7560,7 +7587,7 @@ function settingsTabs(){
   return [
     ["tech","Technician","Name and company"],
     ["gps","GPS & Maps","Location and navigation"],
-    ["plusCodes","Plus Codes","Offline location codes"],
+    ["plusCodes","Google Plus Codes","Offline location codes"],
     ["overlay","Photo Overlay","Photo labels"],
     ["reports","Reports","Report defaults"],
     ["email","Email","Recipients and signature"],
@@ -7599,25 +7626,23 @@ function openSettingsHome572(){
 function leaveSettingsHome572(){settingsGroup067="";mode=null;settingsTab="tech";route("home");}
 const SETTINGS_DASHBOARD_0860 = [
   {key:"profile",title:"Profile",icon:"user",tabs:["tech"]},
-  {key:"field",title:"Field",icon:"briefcase",tabs:["plusCodes"]},
   {key:"reports",title:"Reports",icon:"document",tabs:["reports","email"]},
   {key:"data",title:"Data & Backup",icon:"database",tabs:["cloudFiles","microsoftStorage","sync","customerImport","categories","backup","updates"]},
-  {key:"maps",title:"Maps & GPS",icon:"pin",tabs:["gps"]},
+  {key:"maps",title:"Maps & GPS",icon:"pin",tabs:["gps","plusCodes"]},
   {key:"photos",title:"Photo Overlays",icon:"camera",tabs:["overlay"]},
   {key:"privacy",title:"Privacy",icon:"shield",tabs:["privacy","security"]},
   {key:"about",title:"About FireVault",icon:"info",tabs:["about"]}
 ];
 const SETTINGS_GROUPED_LIST_0873 = [
   {label:"Account",items:[
-    {key:"profile",subtitle:"Technician and company"},
-    {key:"field",subtitle:"Field defaults and Plus Codes"}
+    {key:"profile",subtitle:"Technician and company"}
   ]},
   {label:"App Settings",items:[
     {key:"reports",subtitle:"Reports and email defaults"},
     {key:"data",subtitle:"Storage, sync, imports, and backup"}
   ]},
   {label:"Preferences",items:[
-    {key:"maps",subtitle:"Location and navigation"},
+    {key:"maps",subtitle:"Maps, GPS, and Google Plus Codes"},
     {key:"photos",subtitle:"Photo labels and overlays"}
   ]},
   {label:"Security",items:[
@@ -7654,6 +7679,20 @@ function settingsDashboardTile0860(item){
 function openSettingsDashboardGroup0860(key){
   settingsGroup067=key; mode="settingsGroup0860"; render();
 }
+function settingsSearchRows0874(query=""){
+  const q=String(query||"").trim().toLowerCase();
+  if(!q) return [];
+  const tabs=settingsTabs();
+  return tabs.map(tab=>{
+    const group=SETTINGS_DASHBOARD_0860.find(item=>item.tabs.includes(tab[0]));
+    const hay=[tab[0],tab[1],tab[2],group?.title||""].join(" ").toLowerCase();
+    return hay.includes(q)?{tab,group}:null;
+  }).filter(Boolean);
+}
+function settingsSearchResultRow0874(result){
+  const [id,title,note]=result.tab;
+  return `<button class="settingsSearchResult0874" data-settings-search-tab0874="${esc(id)}" data-settings-search-group0874="${esc(result.group?.key||"data")}"><span class="settingsGroupIcon0860">${settingsIcon550(id)}</span><span><strong>${esc(title)}</strong><small>${esc(result.group?.title||"")} · ${esc(note)}</small></span><b>›</b></button>`;
+}
 function settings(){
   if(["themes","advanced","demo","homeLayout","visibility","backend","webdav","manual","diagnostics"].includes(settingsTab)) settingsTab="about";
   captureSettingsScroll576(); restoreAppChrome572();
@@ -7661,18 +7700,38 @@ function settings(){
   const active=tabs.find(t=>t[0]===settingsTab)||tabs[0];
   const dashboardItem=SETTINGS_DASHBOARD_0860.find(x=>x.key===settingsGroup067)||SETTINGS_DASHBOARD_0860[0];
   if(mode!=="settingsDetail" && mode!=="settingsGroup0860"){
+    const searchResults=settingsSearchRows0874(settingsSearch0874);
+    const searchActive=Boolean(String(settingsSearch0874||"").trim());
     html(`<div class="screen settingsConcept10873 settingsStable573">
       <div class="settingsConcept1Body0873">
         <h1>Settings</h1>
-        ${SETTINGS_GROUPED_LIST_0873.map(group=>`<section class="settingsListGroup0873"><h2>${esc(group.label)}</h2><div class="settingsListCard0873">${group.items.map(settingsGroupedRow0873).join("")}</div></section>`).join("")}
+        <label class="settingsSearch0874" aria-label="Search settings">
+          ${fvIcon073("search","settingsSearchIcon0874")}
+          <input id="settingsSearchInput0874" type="search" value="${esc(settingsSearch0874)}" placeholder="Search settings" autocomplete="off" autocapitalize="none" spellcheck="false">
+          <button type="button" id="settingsSearchClear0874" aria-label="Clear settings search" ${searchActive?"":"hidden"}>×</button>
+        </label>
+        <div id="settingsHomeContent0874">
+          ${searchActive?`<section class="settingsListGroup0873 settingsSearchGroup0874"><h2>Search Results</h2><div class="settingsSearchResults0874">${searchResults.length?searchResults.map(settingsSearchResultRow0874).join(""):`<div class="settingsSearchEmpty0874"><strong>No settings found</strong><span>Try GPS, Plus Codes, backup, reports, or privacy.</span></div>`}</div></section>`:SETTINGS_GROUPED_LIST_0873.map(group=>`<section class="settingsListGroup0873"><h2>${esc(group.label)}</h2><div class="settingsListCard0873">${group.items.map(settingsGroupedRow0873).join("")}</div></section>`).join("")}
+        </div>
       </div>
     </div>`);
+    const searchInput=document.getElementById("settingsSearchInput0874");
+    const refreshSearch=()=>{settingsSearch0874=String(searchInput?.value||"");settings();requestAnimationFrame(()=>{const next=document.getElementById("settingsSearchInput0874");if(next){next.focus();next.setSelectionRange(next.value.length,next.value.length);}});};
+    searchInput?.addEventListener("input",debounce0830(refreshSearch,90));
+    searchInput?.addEventListener("search",refreshSearch);
+    document.getElementById("settingsSearchClear0874")?.addEventListener("click",()=>{settingsSearch0874="";settings();requestAnimationFrame(()=>document.getElementById("settingsSearchInput0874")?.focus());});
     document.querySelectorAll("[data-settings-group0873]").forEach(b=>b.onclick=()=>{
       const item=SETTINGS_DASHBOARD_0860.find(x=>x.key===b.dataset.settingsGroup0873);
       if(!item) return;
       settingsGroup067=item.key;
       if(item.tabs.length===1){settingsTab=item.tabs[0];mode="settingsDetail";render();}
       else openSettingsDashboardGroup0860(item.key);
+    });
+    document.querySelectorAll("[data-settings-search-tab0874]").forEach(b=>b.onclick=()=>{
+      settingsGroup067=b.dataset.settingsSearchGroup0874||"data";
+      settingsTab=b.dataset.settingsSearchTab0874;
+      mode="settingsDetail";
+      render();
     });
     restoreSettingsScroll576(false); return;
   }
@@ -8267,7 +8326,7 @@ function manualSimplePage058(type){
   quick:["🚀","Quick Start Guide","Get FireVault ready for a normal field day.",[["1. Verify the build","Confirm the green build badge shows 0.67.0 before entering production information."],["2. Complete Technician Profile","Enter your name, company, phone, email, and license or employee identification."],["3. Review permissions","Allow location and photo access only when FireVault requests them and the feature is needed."],["4. Create or open a site","Add the customer name, full address, panel details, contacts, access notes, and GPS location."],["5. Document the visit","Record notes, photos, tasks, deficiencies, equipment changes, and a service visit."],["6. Finish and protect the data","Review the report, send or copy the required summary, then export a current backup."]]],
   new:["🆕","What’s New in 0.67.0","Account View, Settings navigation, and FireVault Academy redesign.",[["Unified visual system","Standardized typography, spacing, card surfaces, borders, controls, and responsive behavior across FireVault."],["Settings cleanup","Improved Settings home cards and every submenu while preserving the preferred Email setup workflow."],["Help readability","Converted contextual Help and Academy articles into one uninterrupted scrolling reading column with no floating metadata."],["Site Detail stability","Reinforced natural-height cards, readable text, and scroll-safe account sections."],["Operational screens","Simplified Customer Import, Team Sync, Conflict Center, and Nearby Sites presentation without changing their workflows."],["Phone and iPad layouts","Added consistent narrow-phone and tablet behavior, bottom-navigation clearance, and overflow protection."],["Nearby scan diagnostics","Nearby Sites now shows total sites, GPS-ready records, missing coordinates, phone-location progress, and persistent error messages."],["Coordinate recovery","FireVault recovers valid latitude and longitude stored in compatible legacy or imported fields and normalizes them into the site GPS record."],["Location retry","If high-accuracy location times out or is unavailable, FireVault retries once using standard accuracy."],["Nearest-site fallback","When no site is inside the selected radius, the nearest GPS-ready sites remain visible instead of presenting an empty result."],["Latitude and longitude","Customer Import can calculate missing coordinates from each usable U.S. street address before saving records."],["Coordinate requirement","The importer requires calculated, supplied, or existing GPS coordinates by default. Unmatched addresses remain in review."],["Census address matching","Only address fields are sent to the U.S. Census Geocoder. The returned point is an address-range calculation, not a guaranteed building entrance."],["Account Id matching","Repeat imports update the matching FireVault site instead of creating duplicates or deleting field history."],["CSV coordinate columns","Files that already contain Latitude and Longitude columns use those values directly."],["Sync-ready changes","Added and updated customer records enter the pending synchronization queue and create a Sync Activity entry."]]],
   tips:["🧰","Field Tips","Short practices that improve the usefulness of FireVault records.",[["Write for the next technician","Include the exact panel, circuit, device, location, symptom, test result, and next action instead of relying on memory."],["Photograph context first","Take one wide photo showing the equipment location before close-up terminal, label, or damage photos."],["Separate facts from follow-up","Use notes for what occurred, deficiencies for code or system problems, and tasks for work that still needs completion."],["Confirm the account","Before using Quick Capture, verify the selected customer site to prevent records from being stored under the wrong account."],["Back up before updates","Download an external backup before a major update or device change and after completing significant field documentation."]]],
-  revisions:["📋","Revision History","Application and documentation checkpoints.",[[["0.87.3","Moved account addresses below site names, placed Account ID and category tags beneath the address, and changed Settings to a dark grouped-list design without a duplicate logo."],["0.87.2","Polished Account Directory cards and removed the default Ready, No Open Work, and GPS status tags so only actionable issues are shown."],["0.87.1","Rebuilt Account Directory, Search, account cards, and Account Detail from the stable 0.86.1 baseline and removed the layout gap above the bottom navigation."],["0.86.1","Repaired the Settings startup error and standardized the three-button Nearby, Search, and Settings dock across the app."],["0.86.0","Redesigned Settings as a simplified dark tile dashboard and renamed the bottom Accounts navigation button to Search."],["0.85.0","Removed Tools navigation and the Account Detail Visit action, and rebuilt Settings as a simple grouped menu with clean detail screens."],["0.84.0","Refined Nearby map selection with a fixed details overlay, no marker popup, delayed street-level zoom, and direct account-card navigation."],["0.81.0","Prepared FireVault for App Store review by removing the document scanner, Daily Route and time-tracking controls, theme selection, advanced settings, diagnostics access, and excess instructional copy while preserving account data."]],["0.80.3","Defaulted new Tools scanner documents to the closest GPS-ready account with visible distance, accuracy, retry, and manual override."],["0.80.2","Simplified Document Scanner, added on-device AI Auto Scan with live corner framing and hands-free capture, and repaired mobile keyboard field visibility."],["0.80.1","Moved Document Scanner to Tools, added post-capture account search and matching, and added scanner access inside the full Site Notes workspace."],["0.80.0","Added an account-specific multi-page camera document scanner with automatic edge detection, manual corner correction, rotation, cleanup modes, page ordering, PDF preview/download/share, and account-note activity."],["0.79.14","Restored numbered Nearby Accounts map pins matched to distance-sorted list rows and removed Smart Account Intelligence."],["0.79.13","Repaired startup parsing inherited from 0.79.11 and corrected Building Navigator location-copy syntax."],["0.79.12","Added Building Navigator with exact site locations, GPS/Plus Codes, verification, linked photos, route targets, and timeline events."],["0.79.7","Shortened every Settings summary and removed the colored bar from each Section Overview."],["0.79.6","Added Nearby-style account-list scroll locking so cards settle cleanly at the top while the Accounts controls remain fixed."],["0.79.5","Added separate Personal OneDrive, Work OneDrive, and SharePoint connection profiles with exact photo/document assignments and no-personal-fallback protection."],["0.79.4","Added independent photo and document storage destinations, cloud-provider integration targets, and offline Google Plus Codes for accounts and exact field locations."],["0.79.3","Added backend-neutral provider interfaces for authentication, database, file storage, synchronization, and audit while keeping FireVault fully local."],["0.79.2","Added a unified Security Center with vault integrity validation, backup health, audit filters, device naming, session clearing, and PIN confirmation for sensitive exports, restores, and deletion."],["0.79.1","Added an optional local six-digit privacy lock with PBKDF2 hashing, inactivity/background locking, app-switcher privacy screen, recovery code, cooldown protection, and local lock events."],["0.79.0","Added security-ready schema 4 metadata, stable workspace/user/device identities, local audit history, pending change queue, recoverable deletion, credential-safe exports, and protected restore/reset actions."],["0.67.0","Redesigned Account View around service actions and grouped information, consolidated Settings into five folders, and simplified FireVault Academy and contextual Help for continuous reading."],["0.65.2","Repaired Nearby Sites with GPS inventory counts, imported-coordinate recovery, persistent permission and timeout messages, a standard-accuracy retry, and nearest-site fallback results."],["0.65.1","Added online latitude/longitude calculation, coordinate validation, geocoding progress, unmatched-address review, optional CSV coordinates, and coordinate-safe repeat importing."],["0.65.0","Added preview-first customer CSV importing, Account Id update matching, validation warnings, imported monitoring details, and sync activity tracking."],["0.64.1","Simplified Academy article headers, removed floating metadata badges, and improved continuous scrolling and readability."],["0.64.0","Added Sync Activity, a conflict review center, export/import audit entries, and an automatic OneDrive connection-readiness checklist."],["0.63.1","Overhauled contextual Help and Academy reader formatting, removed overlapping sticky article headers, and restored full scrolling on phones and tablets."],["0.63.0","Added permanent record IDs, audit metadata, local version tracking, pending-sync states, conflict readiness, device identity, and a Team Sync settings workspace."],["0.60.0","Connected major screens and Settings areas directly to matching Academy chapters with return-to-screen navigation."],["0.59.0","Added interactive tutorials, guided orientation, pinned learning, field tips, and documentation tracking."],["0.58.0","Expanded Help & Manual into FireVault Academy with bookmarks, smart search, Quick Start, and reader navigation."],["0.57.0","Added the first complete searchable in-app FireVault User Manual."],["Ongoing review rule","Any change to navigation, labels, storage, workflows, permissions, or supported layouts requires the related manual chapter to be checked."]]],
+  revisions:["📋","Revision History","Application and documentation checkpoints.",[[["0.87.4","Added spacing and search to Settings, removed the Field category, moved Google Plus Codes under Maps & GPS, enlarged Account ID/category tags, moved Favorite beside Call, removed empty panel/contact text, and restored Nearby-style card scroll locking."],["0.87.3","Moved account addresses below site names, placed Account ID and category tags beneath the address, and changed Settings to a dark grouped-list design without a duplicate logo."],["0.87.2","Polished Account Directory cards and removed the default Ready, No Open Work, and GPS status tags so only actionable issues are shown."],["0.87.1","Rebuilt Account Directory, Search, account cards, and Account Detail from the stable 0.86.1 baseline and removed the layout gap above the bottom navigation."],["0.86.1","Repaired the Settings startup error and standardized the three-button Nearby, Search, and Settings dock across the app."],["0.86.0","Redesigned Settings as a simplified dark tile dashboard and renamed the bottom Accounts navigation button to Search."],["0.85.0","Removed Tools navigation and the Account Detail Visit action, and rebuilt Settings as a simple grouped menu with clean detail screens."],["0.84.0","Refined Nearby map selection with a fixed details overlay, no marker popup, delayed street-level zoom, and direct account-card navigation."],["0.81.0","Prepared FireVault for App Store review by removing the document scanner, Daily Route and time-tracking controls, theme selection, advanced settings, diagnostics access, and excess instructional copy while preserving account data."]],["0.80.3","Defaulted new Tools scanner documents to the closest GPS-ready account with visible distance, accuracy, retry, and manual override."],["0.80.2","Simplified Document Scanner, added on-device AI Auto Scan with live corner framing and hands-free capture, and repaired mobile keyboard field visibility."],["0.80.1","Moved Document Scanner to Tools, added post-capture account search and matching, and added scanner access inside the full Site Notes workspace."],["0.80.0","Added an account-specific multi-page camera document scanner with automatic edge detection, manual corner correction, rotation, cleanup modes, page ordering, PDF preview/download/share, and account-note activity."],["0.79.14","Restored numbered Nearby Accounts map pins matched to distance-sorted list rows and removed Smart Account Intelligence."],["0.79.13","Repaired startup parsing inherited from 0.79.11 and corrected Building Navigator location-copy syntax."],["0.79.12","Added Building Navigator with exact site locations, GPS/Plus Codes, verification, linked photos, route targets, and timeline events."],["0.79.7","Shortened every Settings summary and removed the colored bar from each Section Overview."],["0.79.6","Added Nearby-style account-list scroll locking so cards settle cleanly at the top while the Accounts controls remain fixed."],["0.79.5","Added separate Personal OneDrive, Work OneDrive, and SharePoint connection profiles with exact photo/document assignments and no-personal-fallback protection."],["0.79.4","Added independent photo and document storage destinations, cloud-provider integration targets, and offline Google Plus Codes for accounts and exact field locations."],["0.79.3","Added backend-neutral provider interfaces for authentication, database, file storage, synchronization, and audit while keeping FireVault fully local."],["0.79.2","Added a unified Security Center with vault integrity validation, backup health, audit filters, device naming, session clearing, and PIN confirmation for sensitive exports, restores, and deletion."],["0.79.1","Added an optional local six-digit privacy lock with PBKDF2 hashing, inactivity/background locking, app-switcher privacy screen, recovery code, cooldown protection, and local lock events."],["0.79.0","Added security-ready schema 4 metadata, stable workspace/user/device identities, local audit history, pending change queue, recoverable deletion, credential-safe exports, and protected restore/reset actions."],["0.67.0","Redesigned Account View around service actions and grouped information, consolidated Settings into five folders, and simplified FireVault Academy and contextual Help for continuous reading."],["0.65.2","Repaired Nearby Sites with GPS inventory counts, imported-coordinate recovery, persistent permission and timeout messages, a standard-accuracy retry, and nearest-site fallback results."],["0.65.1","Added online latitude/longitude calculation, coordinate validation, geocoding progress, unmatched-address review, optional CSV coordinates, and coordinate-safe repeat importing."],["0.65.0","Added preview-first customer CSV importing, Account Id update matching, validation warnings, imported monitoring details, and sync activity tracking."],["0.64.1","Simplified Academy article headers, removed floating metadata badges, and improved continuous scrolling and readability."],["0.64.0","Added Sync Activity, a conflict review center, export/import audit entries, and an automatic OneDrive connection-readiness checklist."],["0.63.1","Overhauled contextual Help and Academy reader formatting, removed overlapping sticky article headers, and restored full scrolling on phones and tablets."],["0.63.0","Added permanent record IDs, audit metadata, local version tracking, pending-sync states, conflict readiness, device identity, and a Team Sync settings workspace."],["0.60.0","Connected major screens and Settings areas directly to matching Academy chapters with return-to-screen navigation."],["0.59.0","Added interactive tutorials, guided orientation, pinned learning, field tips, and documentation tracking."],["0.58.0","Expanded Help & Manual into FireVault Academy with bookmarks, smart search, Quick Start, and reader navigation."],["0.57.0","Added the first complete searchable in-app FireVault User Manual."],["Ongoing review rule","Any change to navigation, labels, storage, workflows, permissions, or supported layouts requires the related manual chapter to be checked."]]],
   trouble:["❓","Troubleshooting","Common problems and safe first checks.",FIREVAULT_MANUAL_058.find(x=>x.id==="trouble")?.topics||[]]
  };
  const [icon,title,note,items]=pages[type]||["ⓘ","Unavailable","This Help section is not available in the installed version.",[["Current status","Return to Help and choose an available chapter or tutorial."]]];
@@ -10028,6 +10087,7 @@ function diagnostics(){
 }
 function showChangelog(){
   const notes = [
+    "Build 0.87.4 spaces Settings cards, adds Settings search, moves Google Plus Codes under Maps & GPS, simplifies Account cards, enlarges identity tags, moves Favorite beside Call, and restores Nearby-style scroll locking.",
     "Build 0.87.3 moves the account address directly below the site name, places Account ID and category tags beneath the address, and changes Settings to a dark grouped-list design without duplicating the FireVault logo.",
     "Build 0.87.2 polishes Account Directory cards and removes the Ready, No Open Work, and GPS status tags so the cards show only useful account information and actionable issues.",
     "Build 0.87.1 rebuilds Account Directory, Search, account cards, and Account Detail from the stable 0.86.1 baseline and removes the black layout gap above the bottom dock.",

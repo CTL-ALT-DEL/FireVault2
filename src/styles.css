@@ -16639,7 +16639,7 @@ input[data-fv-phone0758="1"]{font-variant-numeric:tabular-nums;letter-spacing:.0
   min-height:0!important;
   height:auto!important;
   overflow:visible!important;
-  scroll-snap-align:start!important;
+  scroll-snap-align:none!important;
   scroll-snap-stop:normal!important;
   scroll-margin-top:4px!important;
 }
@@ -18933,3 +18933,142 @@ body.app-booted533:not(.homeFullscreen480)>main#app:has(.accountDetail0871){
 .settingsListIcon0873{width:34px;height:34px;padding:7px;border-radius:10px;background:rgba(239,45,45,.11);fill:none;stroke:#f0444f;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
 @media(max-width:390px){.settingsConcept1Body0873{padding-left:10px;padding-right:10px}.settingsConcept1Body0873>h1{font-size:1.8rem;margin-left:3px}.settingsListRow0873{min-height:64px;padding-left:12px;padding-right:12px;grid-template-columns:37px minmax(0,1fr) auto}.settingsListIcon0873{width:32px;height:32px}.settingsListRow0873 strong{font-size:.94rem}.settingsListRow0873 small{font-size:.72rem}}
 @media(min-width:700px){.settingsConcept1Body0873{width:min(720px,100%);margin:0 auto;padding-left:18px;padding-right:18px}}
+
+/* Build 0.87.4 — account-card controls, Settings spacing/search, and scroll lock */
+.accountCardHeading0871{display:block!important}
+.accountCardIdentity0871{margin-top:8px!important;gap:8px!important}
+.accountCardIdentity0871 span,.accountCardIdentity0871 em,.accountCardIdentity0871 b{
+  min-height:27px!important;
+  padding:5px 10px!important;
+  font-size:11px!important;
+  letter-spacing:.065em!important;
+  border-radius:999px!important;
+}
+.accountSupporting0871:empty{display:none!important}
+.accountCardActions0871{align-items:center!important;gap:8px!important}
+.accountCardActions0871 .accountFavorite0871{
+  flex:0 0 38px!important;
+  width:38px!important;
+  height:38px!important;
+  min-width:38px!important;
+  min-height:38px!important;
+  padding:0!important;
+  display:grid!important;
+  place-items:center!important;
+  border-radius:11px!important;
+  font-size:20px!important;
+  line-height:1!important;
+}
+.accountCardActions0871 button:not(.accountFavorite0871){height:38px!important;min-height:38px!important}
+.accountDirectoryList0871{
+  scroll-snap-type:none!important;
+  scroll-padding-top:0!important;
+  overscroll-behavior-y:contain!important;
+  overflow-anchor:none!important;
+}
+.accountDirectoryList0871>[data-account-card0759]{
+  scroll-snap-align:none!important;
+  scroll-snap-stop:normal!important;
+}
+
+.settingsConcept1Body0873{padding-top:16px!important}
+.settingsConcept1Body0873>h1{margin-bottom:14px!important}
+.settingsSearch0874{
+  position:relative;
+  display:grid;
+  grid-template-columns:22px minmax(0,1fr) 34px;
+  align-items:center;
+  gap:9px;
+  min-height:50px;
+  margin:0 2px 24px;
+  padding:0 9px 0 14px;
+  border:1px solid rgba(255,255,255,.11);
+  border-radius:15px;
+  background:linear-gradient(145deg,#171e27,#11171e);
+  box-shadow:0 8px 20px rgba(0,0,0,.2),inset 0 1px rgba(255,255,255,.025);
+}
+.settingsSearch0874:focus-within{border-color:#d8424d;box-shadow:0 0 0 3px rgba(239,61,73,.14),0 8px 20px rgba(0,0,0,.2)}
+.settingsSearchIcon0874{width:20px;height:20px;color:#ef4b57}
+.settingsSearch0874 input{
+  width:100%;
+  min-width:0;
+  height:48px;
+  padding:0!important;
+  border:0!important;
+  outline:0!important;
+  background:transparent!important;
+  color:#f7f9fb!important;
+  font-size:16px!important;
+  box-shadow:none!important;
+}
+.settingsSearch0874 input::placeholder{color:#7e8997}
+.settingsSearch0874>button{
+  width:32px!important;
+  height:32px!important;
+  min-height:32px!important;
+  padding:0!important;
+  border:0!important;
+  border-radius:10px!important;
+  background:#242d38!important;
+  color:#aeb8c5!important;
+  font-size:20px!important;
+}
+.settingsSearch0874>button[hidden]{display:block!important;visibility:hidden!important;pointer-events:none!important}
+.settingsListGroup0873{margin:0 0 28px!important}
+.settingsListGroup0873>h2{margin-bottom:10px!important}
+.settingsListCard0873{
+  display:grid!important;
+  gap:10px!important;
+  overflow:visible!important;
+  border:0!important;
+  border-radius:0!important;
+  background:transparent!important;
+  box-shadow:none!important;
+}
+.settingsListRow0873,
+.settingsSearchResult0874{
+  width:100%;
+  min-height:68px;
+  display:grid;
+  grid-template-columns:39px minmax(0,1fr) auto;
+  align-items:center;
+  gap:12px;
+  padding:10px 14px;
+  border:1px solid rgba(255,255,255,.09)!important;
+  border-radius:16px!important;
+  background:linear-gradient(145deg,#171e27,#11171e)!important;
+  color:#f7f9fb;
+  text-align:left;
+  box-shadow:0 7px 18px rgba(0,0,0,.18),inset 0 1px rgba(255,255,255,.025);
+}
+.settingsListRow0873:last-child{border-bottom:1px solid rgba(255,255,255,.09)!important}
+.settingsListRow0873:active,.settingsSearchResult0874:active{background:linear-gradient(145deg,#202936,#151c25)!important}
+.settingsSearchResults0874{display:grid;gap:10px}
+.settingsSearchResult0874>span:not(.settingsGroupIcon0860){min-width:0;display:flex;flex-direction:column;gap:3px}
+.settingsSearchResult0874 strong{font-size:.98rem;font-weight:780;letter-spacing:-.012em}
+.settingsSearchResult0874 small{color:#8f9ba9;font-size:.76rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.settingsSearchResult0874>b{color:#667280;font-size:1.45rem;font-weight:400;line-height:1}
+.settingsSearchResult0874 .settingsGroupIcon0860{display:grid;place-items:center;width:34px;height:34px;border-radius:10px;background:rgba(239,45,45,.11);color:#f0444f;font-size:17px}
+.settingsSearchEmpty0874{display:grid;gap:5px;padding:24px 16px;border:1px dashed rgba(255,255,255,.14);border-radius:16px;background:#10161d;color:#f3f6f9;text-align:center}
+.settingsSearchEmpty0874 span{color:#8f9ba9;font-size:.8rem}
+@media(max-width:390px){
+  .accountCardIdentity0871 span,.accountCardIdentity0871 em,.accountCardIdentity0871 b{min-height:25px!important;padding:4px 9px!important;font-size:10.2px!important}
+  .settingsSearch0874{margin-left:0;margin-right:0}
+  .settingsListGroup0873{margin-bottom:24px!important}
+  .settingsListRow0873,.settingsSearchResult0874{min-height:64px;padding-left:12px;padding-right:12px;grid-template-columns:37px minmax(0,1fr) auto}
+}
+.settingsGroupList0860{
+  display:grid!important;
+  gap:10px!important;
+  overflow:visible!important;
+  border:0!important;
+  border-radius:0!important;
+  background:transparent!important;
+}
+.settingsGroupRow0860{
+  border:1px solid rgba(255,255,255,.09)!important;
+  border-radius:16px!important;
+  background:linear-gradient(145deg,#171e27,#11171e)!important;
+  box-shadow:0 7px 18px rgba(0,0,0,.18),inset 0 1px rgba(255,255,255,.025)!important;
+}
+.settingsGroupRow0860:last-child{border-bottom:1px solid rgba(255,255,255,.09)!important}

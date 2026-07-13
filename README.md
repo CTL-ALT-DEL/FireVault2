@@ -1,10 +1,13 @@
-# FireVault Build 0.87.3
+# FireVault Build 0.87.4
 
-Account card hierarchy and Settings refinement.
+Account-card and Settings usability polish.
 
-- Moves each account address directly below the site name
-- Places Account ID and category tags below the address
-- Keeps actionable issue indicators separate and conditional
-- Replaces the Settings tile dashboard with a dark grouped-list design based on Concept 1
-- Uses the existing global FireVault header without adding a duplicate logo
+- Adds visible spacing between every Settings option card
+- Adds a Settings search bar with direct results for individual settings
+- Removes the Field category from Settings
+- Moves Google Plus Codes into the Maps & GPS section
+- Removes the empty “Panel and primary contact not entered” message from Account cards
+- Enlarges Account ID and category tags
+- Moves the Favorite star beside the Call button in the lower action row
+- Restores Nearby-style account-list scroll locking after scrolling stops
 - Preserves existing account data and the FireVault storage key
