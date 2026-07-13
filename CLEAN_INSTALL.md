@@ -1,3 +1,3 @@
-# Clean Install — Build 0.87.2
+# Clean Install — Build 0.87.3
 
-Deploy the full package and refresh the installed PWA so the new service-worker cache is activated. Existing FireVault account data remains compatible.
+Deploy the complete package so the updated HTML, JavaScript, CSS, service worker, manifest, and version metadata remain synchronized. Existing FireVault data is preserved because the storage key is unchanged.

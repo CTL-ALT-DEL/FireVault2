@@ -1,10 +1,10 @@
-# FireVault Build 0.87.2
+# FireVault Build 0.87.3
 
-Account Directory card polish.
+Account card hierarchy and Settings refinement.
 
-- Removed the default READY status tag
-- Removed the NO OPEN WORK tag
-- Removed the GPS status tag
-- Cards now show issue tags only when an account actually needs attention
-- Refined spacing, dividers, buttons, and the Details affordance
-- Existing account data and storage key preserved
+- Moves each account address directly below the site name
+- Places Account ID and category tags below the address
+- Keeps actionable issue indicators separate and conditional
+- Replaces the Settings tile dashboard with a dark grouped-list design based on Concept 1
+- Uses the existing global FireVault header without adding a duplicate logo
+- Preserves existing account data and the FireVault storage key

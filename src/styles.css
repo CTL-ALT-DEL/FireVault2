@@ -18901,3 +18901,35 @@ body.app-booted533:not(.homeFullscreen480)>main#app:has(.accountDetail0871){
   .accountCardHeading0871 h2{font-size:15.5px!important}
   .accountCardFooter0871{margin-top:9px!important;padding-top:9px!important}
 }
+
+
+/* Build 0.87.3 — account-card hierarchy and dark Concept 1 Settings */
+.accountCardHeading0871{align-items:center!important}
+.accountCardHeading0871>h2{min-width:0;flex:1;margin:0;color:#fff;font-size:17px;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.accountAddress0871{margin:5px 0 0!important;color:#e7edf4!important;font-size:13.25px!important;font-weight:760!important;line-height:1.35!important}
+.accountCardIdentity0871{margin-top:7px!important;gap:6px!important}
+.accountCardIdentity0871 span,.accountCardIdentity0871 em,.accountCardIdentity0871 b{display:inline-flex;align-items:center;min-height:22px;padding:3px 8px;border:1px solid #314159;border-radius:999px;background:#0b131d;font-size:9px!important;line-height:1;font-style:normal;font-weight:900;letter-spacing:.07em!important;text-transform:uppercase}
+.accountCardIdentity0871 span{border-color:#6f2b37;color:#ff7d87;background:#291219}
+.accountCardIdentity0871 em{border-color:#2c557e;color:#9cccf5;background:#10243a}
+.accountCardIdentity0871 b{border-color:#3c4654;color:#b8c2cf;background:#111821}
+.accountSupporting0871{margin-top:7px!important}
+@media(max-width:390px){.accountCardHeading0871>h2{font-size:15.5px!important}.accountAddress0871{font-size:12.5px!important}.accountCardIdentity0871{margin-top:6px!important}.accountCardIdentity0871 span,.accountCardIdentity0871 em,.accountCardIdentity0871 b{min-height:20px;padding:3px 7px;font-size:8.5px!important}}
+
+.settingsConcept10873{height:100%;min-height:0;display:flex;flex-direction:column;background:linear-gradient(180deg,#0b0f14 0%,#090c10 100%);color:#f7f9fb}
+.settingsConcept1Body0873{flex:1;min-height:0;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:18px 14px calc(96px + env(safe-area-inset-bottom));scrollbar-width:none}
+.settingsConcept1Body0873::-webkit-scrollbar{display:none}
+.settingsConcept1Body0873>h1{margin:0 2px 20px;color:#fff;font-size:2rem;line-height:1.08;letter-spacing:-.045em}
+.settingsListGroup0873{margin:0 0 20px}
+.settingsListGroup0873>h2{margin:0 6px 8px;color:#8f9aa8;font-size:.72rem;font-weight:850;letter-spacing:.12em;text-transform:uppercase}
+.settingsListCard0873{overflow:hidden;border:1px solid rgba(255,255,255,.09);border-radius:17px;background:linear-gradient(145deg,#151b22,#11161c);box-shadow:0 9px 24px rgba(0,0,0,.2),inset 0 1px 0 rgba(255,255,255,.025)}
+.settingsListRow0873{width:100%;min-height:68px;display:grid;grid-template-columns:39px minmax(0,1fr) auto;align-items:center;gap:12px;padding:10px 14px;border:0;border-bottom:1px solid rgba(255,255,255,.07);background:transparent;color:#f7f9fb;text-align:left}
+.settingsListRow0873:last-child{border-bottom:0}
+.settingsListRow0873:active{background:rgba(255,255,255,.055)}
+.settingsListRow0873:focus-visible{outline:2px solid rgba(239,61,73,.72);outline-offset:-2px;background:rgba(239,61,73,.08)}
+.settingsListRow0873>span{min-width:0;display:flex;flex-direction:column;gap:3px}
+.settingsListRow0873 strong{font-size:.98rem;font-weight:780;letter-spacing:-.012em}
+.settingsListRow0873 small{color:#8f9ba9;font-size:.76rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.settingsListRow0873>b{color:#667280;font-size:1.45rem;font-weight:400;line-height:1}
+.settingsListIcon0873{width:34px;height:34px;padding:7px;border-radius:10px;background:rgba(239,45,45,.11);fill:none;stroke:#f0444f;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+@media(max-width:390px){.settingsConcept1Body0873{padding-left:10px;padding-right:10px}.settingsConcept1Body0873>h1{font-size:1.8rem;margin-left:3px}.settingsListRow0873{min-height:64px;padding-left:12px;padding-right:12px;grid-template-columns:37px minmax(0,1fr) auto}.settingsListIcon0873{width:32px;height:32px}.settingsListRow0873 strong{font-size:.94rem}.settingsListRow0873 small{font-size:.72rem}}
+@media(min-width:700px){.settingsConcept1Body0873{width:min(720px,100%);margin:0 auto;padding-left:18px;padding-right:18px}}
