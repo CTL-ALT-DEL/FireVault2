@@ -1,6 +1,6 @@
-import { BUILD, KEY, ACTIVE_JOB_KEY, loadData, saveData, ensureSite, fullAddress, esc, uid, downloadBlob, syncSummary, syncQueue, syncConflicts, syncActivity, createSyncPackage, importSyncPackage, resolveSyncConflict, notePackageExport, deviceIdentity, recordSyncActivity, autoBackupInfo, latestAutoBackup, restoreAutoBackup, isDemoMode, setDemoMode, resetDemoData, securityFoundationSummary, securityAudit, recycleBinInfo, restoreRecycleRecord, purgeRecycleBin, recordSecurityEvent, validateVaultIntegrity } from "./storage.js?v=0.80.2";
-import { backendAdapterSummary, runBackendAdapterDiagnostics, backendAdapterManifest, PROVIDER_CONTRACT_VERSION, FILE_STORAGE_CATALOG, fileStoragePlanSummary, cloudFileStorageManifest, MICROSOFT_STORAGE_TYPES, microsoftStorageAccounts, saveMicrosoftStorageAccounts, createMicrosoftStorageAccount, microsoftStorageAccountById, microsoftAppRegistration, saveMicrosoftAppRegistration, microsoftStorageSummary, microsoftStorageManifest } from "./providers.js?v=0.80.2";
-import { encodePlusCode, isValidFullPlusCode, normalizePlusCode, plusCodePrecisionLabel } from "./open-location-code.js?v=0.80.2";
+import { BUILD, KEY, ACTIVE_JOB_KEY, loadData, saveData, ensureSite, fullAddress, esc, uid, downloadBlob, syncSummary, syncQueue, syncConflicts, syncActivity, createSyncPackage, importSyncPackage, resolveSyncConflict, notePackageExport, deviceIdentity, recordSyncActivity, autoBackupInfo, latestAutoBackup, restoreAutoBackup, isDemoMode, setDemoMode, resetDemoData, securityFoundationSummary, securityAudit, recycleBinInfo, restoreRecycleRecord, purgeRecycleBin, recordSecurityEvent, validateVaultIntegrity } from "./storage.js?v=0.80.4";
+import { backendAdapterSummary, runBackendAdapterDiagnostics, backendAdapterManifest, PROVIDER_CONTRACT_VERSION, FILE_STORAGE_CATALOG, fileStoragePlanSummary, cloudFileStorageManifest, MICROSOFT_STORAGE_TYPES, microsoftStorageAccounts, saveMicrosoftStorageAccounts, createMicrosoftStorageAccount, microsoftStorageAccountById, microsoftAppRegistration, saveMicrosoftAppRegistration, microsoftStorageSummary, microsoftStorageManifest } from "./providers.js?v=0.80.4";
+import { encodePlusCode, isValidFullPlusCode, normalizePlusCode, plusCodePrecisionLabel } from "./open-location-code.js?v=0.80.4";
 window.__FIREVAULT_MODULE_READY = true;
 
 function fvPreferenceStore0739(){
@@ -275,7 +275,8 @@ let scannerReturnView0800 = "siteDocs";
 let scannerBusy0800 = false;
 let scannerTargetSiteId0801 = "";
 let scannerAccountSearch0801 = "";
-let scannerCameraState0802 = {stream:null,raf:0,lastAnalysis:0,lastCorners:null,stableFrames:0,cooldownUntil:0,capturing:false,autoCapture:true,running:false,awaitingPageChange:false,capturedCorners:null,capturedSignature:null,lastSignature:null};
+let scannerCameraState0802 = {stream:null,raf:0,lastAnalysis:0,lastCorners:null,stableFrames:0,cooldownUntil:0,capturing:false,autoCapture:true,running:false,awaitingPageChange:false,capturedCorners:null,capturedSignature:null,lastSignature:null,torch:false,track:null};
+let scannerGpsMatch0803 = {state:"idle",siteId:"",meters:null,accuracy:0,message:"",at:"",requestId:0,source:""};
 let routeReviewId = "";
 let routeHistorySearch = "";
 let simpleToolsOpen = false;
@@ -865,7 +866,7 @@ function val(id){ return document.getElementById(id)?.value?.trim() || ""; }
 function raw(id){ return document.getElementById(id)?.value || ""; }
 function checked(id){ return !!document.getElementById(id)?.checked; }
 function route(v){
-  if(v!=="documentScanner") scannerStopLiveCamera0802(false);
+  if(v!=="documentScanner"){ scannerStopLiveCamera0802(false); if(scannerGpsMatch0803?.state==="checking") scannerCancelGpsMatch0803(); }
   captureRouteScroll0782();
   if(view === "settings") captureSettingsScroll576();
   if(settingsSubmenuReturn576 && ["diagnostics","dataTools"].includes(view) && !["diagnostics","dataTools","settings"].includes(v)) settingsSubmenuReturn576=false;
@@ -5614,6 +5615,68 @@ function scannerSyncFields0800(){
 function scannerTargetSite0801(){
   return (data.sites||[]).find(s=>s.id===scannerTargetSiteId0801)||null;
 }
+function scannerGpsState0803(next={}){
+  scannerGpsMatch0803={...scannerGpsMatch0803,...next};
+  return scannerGpsMatch0803;
+}
+function scannerCancelGpsMatch0803(){
+  scannerGpsState0803({requestId:Number(scannerGpsMatch0803.requestId||0)+1});
+}
+function scannerGpsMatchDetail0803(){
+  const state=scannerGpsMatch0803||{};
+  const bits=[];
+  if(Number.isFinite(Number(state.meters)))bits.push(`${distanceLabel(Number(state.meters))} away`);
+  if(Number(state.accuracy)>0)bits.push(`phone accuracy ±${Math.round(Number(state.accuracy))} m`);
+  return bits.join(" • ");
+}
+function scannerClosestSite0803(lat,lng){
+  normalizeAllSiteGps0652();
+  return gpsSiteDistances(Number(lat),Number(lng))[0]||null;
+}
+function scannerApplyGpsMatch0803(location,requestId,source="GPS"){
+  if(requestId!==scannerGpsMatch0803.requestId||scannerEditingDocId0800||scannerReturnView0800!=="tools")return;
+  const nearest=scannerClosestSite0803(location.lat,location.lng);
+  if(!nearest){
+    scannerGpsState0803({state:"no-sites",siteId:"",meters:null,accuracy:Number(location.accuracy||0),message:"No saved accounts contain usable GPS coordinates.",at:new Date().toISOString(),source});
+    documentScanner0800();return;
+  }
+  scannerTargetSiteId0801=nearest.s.id;
+  scannerAccountSearch0801=nearest.s.name||accountId069(nearest.s)||"";
+  scannerGpsState0803({state:"matched",siteId:nearest.s.id,meters:Math.round(nearest.meters),accuracy:Number(location.accuracy||0),message:`Closest saved account: ${nearest.s.name||"Unnamed Account"}`,at:new Date().toISOString(),source});
+  documentScanner0800();
+  toast(`Closest account selected: ${nearest.s.name||"Unnamed Account"} (${distanceLabel(nearest.meters)}).`);
+}
+function scannerRequestClosestAccount0803(){
+  if(scannerEditingDocId0800||scannerReturnView0800!=="tools"||scannerTargetSiteId0801)return;
+  const requestId=Number(scannerGpsMatch0803.requestId||0)+1;
+  scannerGpsMatch0803={state:"checking",siteId:"",meters:null,accuracy:0,message:"Finding the closest saved account…",at:new Date().toISOString(),requestId,source:"GPS"};
+  documentScanner0800();
+  const inventory=gpsInventory0652();
+  if(!inventory.ready){scannerGpsState0803({state:"no-sites",message:inventory.total?"Saved accounts do not have usable GPS coordinates yet.":"No accounts are saved yet."});documentScanner0800();return;}
+  if(data.settings.gps?.enabled===false){scannerGpsState0803({state:"disabled",message:"GPS tools are disabled in Settings. Scan first, then select an account manually."});documentScanner0800();return;}
+  if(isDemoMode()){
+    scannerApplyGpsMatch0803({lat:43.6150,lng:-116.2023,accuracy:25},requestId,"Demo GPS");return;
+  }
+  if(!navigator.geolocation){scannerGpsState0803({state:"unavailable",message:"Location is unavailable in this browser. Scan first, then select an account manually."});documentScanner0800();return;}
+  const success=location=>scannerApplyGpsMatch0803(location,requestId,"Current GPS");
+  const failed=err=>{
+    if(requestId!==scannerGpsMatch0803.requestId)return;
+    if(Number(err?.code)===2||Number(err?.code)===3){
+      scannerGpsState0803({state:"checking",message:"High-accuracy GPS did not respond. Retrying…"});documentScanner0800();
+      requestCurrentLocation0652(success,finalErr=>{if(requestId!==scannerGpsMatch0803.requestId)return;scannerGpsState0803({state:"error",message:geolocationErrorMessage0652(finalErr)});documentScanner0800();},{enableHighAccuracy:false,timeout:18000,maximumAge:300000});
+      return;
+    }
+    scannerGpsState0803({state:"error",message:geolocationErrorMessage0652(err)});documentScanner0800();
+  };
+  requestCurrentLocation0652(success,failed,{enableHighAccuracy:true,timeout:16000,maximumAge:60000});
+}
+function scannerGpsPreCaptureMarkup0803(){
+  const target=scannerTargetSite0801(),state=scannerGpsMatch0803||{};
+  if(target&&state.state==="matched"&&state.siteId===target.id)return "";
+  if(state.state==="checking")return `<div class="scannerGpsInline0804"><i class="scannerGpsSpinner0803"></i><span>${esc(state.message||"Finding closest account…")}</span></div>`;
+  if(["error","disabled","unavailable","no-sites"].includes(state.state))return `<div class="scannerGpsInline0804 warning"><span>${esc(state.message||"Automatic account match unavailable.")}</span><button class="ghost" id="scannerGpsRetry0803" ${state.state==="no-sites"?"disabled":""}>Retry</button></div>`;
+  return "";
+}
 function scannerAccountSearchText0801(s={}){
   return [s.name,accountId069(s),s.externalAccountId,s.sitePhone,fullAddress(s),s.city,s.state,s.zip].filter(Boolean).join(" ").toLowerCase();
 }
@@ -5636,14 +5699,15 @@ function scannerAccountResultsMarkup0801(query=""){
   return rows.map(s=>`<button class="scannerAccountResult0801 ${target?.id===s.id?"selected":""}" data-scanner-account0801="${esc(s.id)}"><span class="scannerAccountInitial0801">${esc((s.name||"?").slice(0,1).toUpperCase())}</span><div><strong>${esc(s.name||"Unnamed Account")}</strong><small>${esc(accountId069(s)||"No Account ID")} • ${esc(fullAddress(s)||formatPhone0758(s.sitePhone)||"No address saved")}</small></div><em>${target?.id===s.id?"Matched":"Select"}</em></button>`).join("");
 }
 function scannerAccountAssignmentMarkup0801(pageCount=0){
-  const target=scannerTargetSite0801();
+  const target=scannerTargetSite0801(),gps=scannerGpsMatch0803||{},isGps=target&&gps.state==="matched"&&gps.siteId===target.id;
   if(scannerEditingDocId0800&&target)return `<section class="card scannerAccountMatch0801 locked"><div class="scannerAccountMatchHead0801"><div><span>ACCOUNT</span><h2>${esc(target.name||"Account")}</h2><p>${esc(accountId069(target)||fullAddress(target)||"Existing scanned document")}</p></div><b>LOCKED</b></div></section>`;
-  if(!pageCount)return `<section class="card scannerAccountMatch0801 pending"><div class="scannerAccountMatchHead0801"><div><span>ACCOUNT MATCH</span><h2>Capture the document first</h2><p>After the first page is captured, search for the account that should receive the scan.</p></div><b>STEP 3</b></div></section>`;
-  return `<section class="card scannerAccountMatch0801"><div class="scannerAccountMatchHead0801"><div><span>ACCOUNT MATCH</span><h2>${target?`Matched to ${esc(target.name||"Account")}`:"Search for the account"}</h2><p>${target?`${esc(accountId069(target)||"No Account ID")} • ${esc(fullAddress(target)||formatPhone0758(target.sitePhone)||"No address saved")}`:"Search by name, Account ID, address, city, phone, or ZIP code."}</p></div><b class="${target?"matched":""}">${target?"MATCHED":"REQUIRED"}</b></div><div class="scannerAccountSearch0801"><span>⌕</span><input id="scannerAccountSearch0801" type="search" value="${esc(scannerAccountSearch0801)}" placeholder="Search accounts…" autocomplete="off"><button class="ghost" id="scannerAccountClear0801" ${scannerAccountSearch0801?"":"disabled"}>Clear</button></div><div class="scannerAccountResults0801" id="scannerAccountResults0801">${scannerAccountResultsMarkup0801(scannerAccountSearch0801)}</div></section>`;
+  if(!pageCount)return target?`<div class="scannerAccountChip0804 ${isGps?"gps":""}"><span>⌖</span><div><strong>${esc(target.name||"Account")}</strong><small>${esc(isGps?(scannerGpsMatchDetail0803()||"Closest account by GPS"):(accountId069(target)||"Account selected"))}</small></div></div>`:"";
+  const title=isGps?"Closest account by GPS":target?`Matched to ${esc(target.name||"Account")}`:"Search for the account",detail=target?`${esc(accountId069(target)||"No Account ID")} • ${esc(fullAddress(target)||formatPhone0758(target.sitePhone)||"No address saved")}${isGps&&scannerGpsMatchDetail0803()?` • ${esc(scannerGpsMatchDetail0803())}`:""}`:"Search by name, Account ID, address, city, phone, or ZIP code.";
+  return `<section class="card scannerAccountMatch0801 ${isGps?"gpsReady0803":""}"><div class="scannerAccountMatchHead0801"><div><span>${isGps?"CLOSEST ACCOUNT BY GPS":"ACCOUNT MATCH"}</span><h2>${title}</h2><p>${detail}</p></div><b class="${target?"matched":""}">${isGps?"GPS MATCH":target?"MATCHED":"REQUIRED"}</b></div><div class="scannerAccountSearch0801"><span>⌕</span><input id="scannerAccountSearch0801" type="search" value="${esc(scannerAccountSearch0801)}" placeholder="Search accounts…" autocomplete="off"><button class="ghost" id="scannerAccountClear0801" ${scannerAccountSearch0801?"":"disabled"}>Clear</button></div><div class="scannerAccountResults0801" id="scannerAccountResults0801">${scannerAccountResultsMarkup0801(scannerAccountSearch0801)}</div></section>`;
 }
 function wireScannerAccountMatch0801(){
   const input=document.getElementById("scannerAccountSearch0801"),results=document.getElementById("scannerAccountResults0801"),clear=document.getElementById("scannerAccountClear0801");
-  const wireRows=()=>document.querySelectorAll("[data-scanner-account0801]").forEach(b=>b.onclick=()=>{scannerSyncFields0800();scannerTargetSiteId0801=b.dataset.scannerAccount0801;const s=scannerTargetSite0801();scannerAccountSearch0801=s?.name||"";toast(`Scan matched to ${s?.name||"account"}.`);documentScanner0800();});
+  const wireRows=()=>document.querySelectorAll("[data-scanner-account0801]").forEach(b=>b.onclick=()=>{scannerSyncFields0800();scannerCancelGpsMatch0803();scannerTargetSiteId0801=b.dataset.scannerAccount0801;const s=scannerTargetSite0801();scannerAccountSearch0801=s?.name||"";scannerGpsState0803({state:"manual",siteId:s?.id||"",meters:null,accuracy:0,message:"Account selected manually.",source:"Manual"});toast(`Scan matched to ${s?.name||"account"}.`);documentScanner0800();});
   wireRows();
   if(input)input.addEventListener("input",()=>{scannerAccountSearch0801=input.value;if(clear)clear.disabled=!scannerAccountSearch0801;if(results){results.innerHTML=scannerAccountResultsMarkup0801(scannerAccountSearch0801);wireRows();}});
   if(clear)clear.onclick=()=>{scannerAccountSearch0801="";if(input){input.value="";input.focus();}clear.disabled=true;if(results){results.innerHTML=scannerAccountResultsMarkup0801("");wireRows();}};
@@ -5658,6 +5722,7 @@ function scannerStart0800(docId="",returnView="siteDocs",targetSiteId=undefined)
   scannerEditingDocId0800=existing?.id||"";
   scannerReturnView0800=returnView||"siteDocs";
   scannerEditorIndex0800=-1;
+  scannerGpsMatch0803={state:existing?"locked":requested?"account":"idle",siteId:requested?.id||"",meters:null,accuracy:0,message:existing?"Existing document account is locked.":requested?"Opened from this account.":"",at:new Date().toISOString(),requestId:Number(scannerGpsMatch0803.requestId||0)+1,source:existing?"Existing":requested?"Account":""};
   scannerDraft0800={
     title:existing?.title||`Scanned Document - ${new Date().toLocaleDateString()}`,
     date:existing?.date||localDateString(),
@@ -5678,12 +5743,14 @@ function scannerStart0800(docId="",returnView="siteDocs",targetSiteId=undefined)
       updatedAt:p.updatedAt||new Date().toISOString()
     }))
   };
+  const autoMatch=!existing&&!requested&&scannerReturnView0800==="tools";
   route("documentScanner");
+  if(autoMatch)setTimeout(scannerRequestClosestAccount0803,0);
 }
 function scannerDiscard0800(){
   scannerStopLiveCamera0802(false);
   if(scannerDraft0800?.pages?.length && !confirm("Discard this unsaved document scan?"))return;
-  scannerDraft0800=null; scannerEditingDocId0800=""; scannerEditorIndex0800=-1; scannerTargetSiteId0801=""; scannerAccountSearch0801="";
+  scannerCancelGpsMatch0803(); scannerDraft0800=null; scannerEditingDocId0800=""; scannerEditorIndex0800=-1; scannerTargetSiteId0801=""; scannerAccountSearch0801=""; scannerGpsMatch0803={state:"idle",siteId:"",meters:null,accuracy:0,message:"",at:"",requestId:scannerGpsMatch0803.requestId,source:""};
   route(scannerReturnView0800||"siteDocs");
 }
 function scannerReadFile0800(file){
@@ -5722,7 +5789,7 @@ function scannerCornerDistance0802(a=[],b=[]){
   if(!Array.isArray(a)||!Array.isArray(b)||a.length!==4||b.length!==4)return 1;
   return a.reduce((sum,p,i)=>sum+Math.hypot(p.x-b[i].x,p.y-b[i].y),0)/4;
 }
-function scannerAnalyzePixels0802(imageData,w,h){
+function scannerAnalyzePixelsRegion0804(imageData,w,h){
   try{
     const px=imageData?.data||imageData;if(!px||w<40||h<40)return {corners:scannerFullCorners0800(),confidence:0};
     let br=0,bg=0,bb=0,count=0;
@@ -5779,6 +5846,89 @@ function scannerAnalyzePixels0802(imageData,w,h){
     return {corners:padded,confidence};
   }catch(err){console.warn("Smart page analysis failed",err);return {corners:scannerFullCorners0800(),confidence:0};}
 }
+
+function scannerPopcount0804(v){v=v>>>0;v=v-((v>>>1)&0x55555555);v=(v&0x33333333)+((v>>>2)&0x33333333);return (((v+(v>>>4))&0x0F0F0F0F)*0x01010101)>>>24;}
+function scannerPercentile0804(values,p=.86){
+  const hist=new Uint32Array(256);let n=0;
+  for(let i=0;i<values.length;i++){const v=Math.max(0,Math.min(255,Math.round(values[i])));hist[v]++;n++;}
+  const target=Math.max(1,Math.round(n*p));let sum=0;
+  for(let i=0;i<256;i++){sum+=hist[i];if(sum>=target)return i;}
+  return 255;
+}
+function scannerLineCandidates0804(mag,gx,gy,w,h,orientation,side){
+  const slopeCount=25,maxSlope=.52,bins=orientation==="h"?Math.ceil(h+w*maxSlope*2+8):Math.ceil(w+h*maxSlope*2+8),offset=orientation==="h"?Math.ceil(w*maxSlope+4):Math.ceil(h*maxSlope+4),spanBins=12;
+  const acc=new Float32Array(slopeCount*bins),coverage=new Uint16Array(slopeCount*bins),hits=new Uint16Array(slopeCount*bins);
+  const threshold=Math.max(22,scannerPercentile0804(mag,.84));
+  for(let y=2;y<h-2;y++)for(let x=2;x<w-2;x++){
+    const i=y*w+x,strength=mag[i];if(strength<threshold)continue;
+    const ax=Math.abs(gx[i]),ay=Math.abs(gy[i]);if(orientation==="h"){if(ay<ax*1.05)continue;}else if(ax<ay*1.05)continue;
+    const span=orientation==="h"?Math.min(spanBins-1,Math.floor(x/w*spanBins)):Math.min(spanBins-1,Math.floor(y/h*spanBins));
+    for(let si=0;si<slopeCount;si++){
+      const slope=-maxSlope+(2*maxSlope*si)/(slopeCount-1),b=orientation==="h"?y-slope*x:x-slope*y,center=orientation==="h"?slope*(w*.5)+b:slope*(h*.5)+b,dim=orientation==="h"?h:w;
+      if(side==="low"&&center>dim*.58)continue;if(side==="high"&&center<dim*.42)continue;
+      const bi=Math.round(b+offset);if(bi<0||bi>=bins)continue;const idx=si*bins+bi;
+      acc[idx]+=Math.min(255,strength);coverage[idx]|=(1<<span);if(hits[idx]<65535)hits[idx]++;
+    }
+  }
+  const out=[],dim=orientation==="h"?h:w;
+  for(let si=0;si<slopeCount;si++){
+    const slope=-maxSlope+(2*maxSlope*si)/(slopeCount-1);
+    for(let bi=0;bi<bins;bi++){
+      const idx=si*bins+bi;if(!hits[idx])continue;const cov=scannerPopcount0804(coverage[idx])/spanBins;if(cov<.42)continue;
+      const b=bi-offset,center=orientation==="h"?slope*(w*.5)+b:slope*(h*.5)+b,pos=center/dim;if(pos<-.08||pos>1.08)continue;
+      const outer=.72+Math.min(1,Math.abs(pos-.5)*2)*.62,score=acc[idx]*Math.pow(cov,1.85)*outer*(1+Math.min(.45,hits[idx]/Math.max(w,h)*.22));
+      out.push({orientation,side,slope,b,center,pos,coverage:cov,score,support:acc[idx],hits:hits[idx]});
+    }
+  }
+  out.sort((a,b)=>b.score-a.score);const chosen=[];
+  for(const candidate of out){if(chosen.some(x=>Math.abs(x.center-candidate.center)<dim*.035&&Math.abs(x.slope-candidate.slope)<.09))continue;chosen.push(candidate);if(chosen.length>=9)break;}
+  return chosen;
+}
+function scannerLineIntersection0804(horizontal,vertical){
+  const denominator=1-vertical.slope*horizontal.slope;if(Math.abs(denominator)<.12)return null;
+  const x=(vertical.slope*horizontal.b+vertical.b)/denominator,y=horizontal.slope*x+horizontal.b;return {x,y};
+}
+function scannerQuadConvex0804(points){
+  if(!points||points.length!==4)return false;let sign=0;
+  for(let i=0;i<4;i++){const a=points[i],b=points[(i+1)%4],c=points[(i+2)%4],cross=(b.x-a.x)*(c.y-b.y)-(b.y-a.y)*(c.x-b.x);if(Math.abs(cross)<1e-4)return false;const current=Math.sign(cross);if(sign&&current!==sign)return false;sign=current;}
+  return true;
+}
+function scannerQuadCandidate0804(top,bottom,left,right,w,h){
+  const pixels=[scannerLineIntersection0804(top,left),scannerLineIntersection0804(top,right),scannerLineIntersection0804(bottom,right),scannerLineIntersection0804(bottom,left)];if(pixels.some(p=>!p))return null;
+  const points=pixels.map(p=>({x:p.x/w,y:p.y/h}));if(points.some(p=>p.x<-.09||p.x>1.09||p.y<-.09||p.y>1.09)||!scannerQuadConvex0804(points))return null;
+  const area=scannerPolygonArea0802(points);if(area<.16||area>.98)return null;
+  const lengths=points.map((p,i)=>Math.hypot(p.x-points[(i+1)%4].x,p.y-points[(i+1)%4].y));if(Math.min(...lengths)<.22)return null;
+  const center={x:points.reduce((sum,p)=>sum+p.x,0)/4,y:points.reduce((sum,p)=>sum+p.y,0)/4},centerPenalty=Math.min(1,Math.hypot(center.x-.5,center.y-.5)*1.8),lineScore=Math.log1p(top.score+bottom.score+left.score+right.score),coverage=(top.coverage+bottom.coverage+left.coverage+right.coverage)/4,margin=Math.min(...points.flatMap(p=>[p.x,p.y,1-p.x,1-p.y])),edgePenalty=margin<-.01?.5:margin<.008?.14:0;
+  const score=lineScore*(.65+area*1.15)*(.75+coverage*.55)*(1-centerPenalty*.28)*(1-edgePenalty);
+  return {corners:points.map(p=>({x:Math.max(.003,Math.min(.997,p.x)),y:Math.max(.003,Math.min(.997,p.y))})),area,coverage,score,edgeMargin:margin};
+}
+function scannerAnalyzePixelsAdvanced0804(imageData,w,h){
+  const px=imageData?.data||imageData;if(!px||w<50||h<50)return null;
+  const gray=new Float32Array(w*h),blur=new Float32Array(w*h),gx=new Float32Array(w*h),gy=new Float32Array(w*h),mag=new Float32Array(w*h),temporary=new Float32Array(w*h),kernel=[1,4,6,4,1];
+  for(let i=0,p=0;i<gray.length;i++,p+=4)gray[i]=.2126*px[p]+.7152*px[p+1]+.0722*px[p+2];
+  for(let y=0;y<h;y++)for(let x=0;x<w;x++){let sum=0,weight=0;for(let d=-2;d<=2;d++){const xx=Math.max(0,Math.min(w-1,x+d)),k=kernel[d+2];sum+=gray[y*w+xx]*k;weight+=k;}temporary[y*w+x]=sum/weight;}
+  for(let y=0;y<h;y++)for(let x=0;x<w;x++){let sum=0,weight=0;for(let d=-2;d<=2;d++){const yy=Math.max(0,Math.min(h-1,y+d)),k=kernel[d+2];sum+=temporary[yy*w+x]*k;weight+=k;}blur[y*w+x]=sum/weight;}
+  let gradientSum=0,gradientCount=0;
+  for(let y=1;y<h-1;y++)for(let x=1;x<w-1;x++){
+    const i=y*w+x,a=blur[(y-1)*w+x-1],b=blur[(y-1)*w+x],c=blur[(y-1)*w+x+1],d=blur[y*w+x-1],f=blur[y*w+x+1],g=blur[(y+1)*w+x-1],hh=blur[(y+1)*w+x],j=blur[(y+1)*w+x+1],sx=-a+c-2*d+2*f-g+j,sy=-a-2*b-c+g+2*hh+j,m=Math.min(255,Math.hypot(sx,sy)*.34);
+    gx[i]=sx;gy[i]=sy;mag[i]=m;gradientSum+=m;gradientCount++;
+  }
+  const top=scannerLineCandidates0804(mag,gx,gy,w,h,"h","low"),bottom=scannerLineCandidates0804(mag,gx,gy,w,h,"h","high"),left=scannerLineCandidates0804(mag,gx,gy,w,h,"v","low"),right=scannerLineCandidates0804(mag,gx,gy,w,h,"v","high");
+  let best=null;
+  for(const t of top.slice(0,7))for(const b of bottom.slice(0,7)){if(b.center-t.center<h*.28)continue;for(const l of left.slice(0,7))for(const r of right.slice(0,7)){if(r.center-l.center<w*.28)continue;const candidate=scannerQuadCandidate0804(t,b,l,r,w,h);if(candidate&&(!best||candidate.score>best.score))best=candidate;}}
+  if(!best)return null;
+  const sharpness=Math.max(0,Math.min(1,(gradientSum/(gradientCount||1)-5)/32)),confidence=Math.max(0,Math.min(1,.36+best.area*.28+best.coverage*.34+sharpness*.12-(best.edgeMargin<.004?.08:0)));
+  return {...best,confidence,sharpness,method:"edge-lines"};
+}
+function scannerAnalyzePixels0802(imageData,w,h){
+  try{
+    const advanced=scannerAnalyzePixelsAdvanced0804(imageData,w,h);
+    if(advanced&&advanced.confidence>=.5)return advanced;
+    const fallback=scannerAnalyzePixelsRegion0804(imageData,w,h);
+    return {...(fallback||{corners:scannerFullCorners0800(),confidence:0}),sharpness:advanced?.sharpness||0,method:"region-fallback",edgeMargin:Math.min(...scannerCopyCorners0800(fallback?.corners).flatMap(p=>[p.x,p.y,1-p.x,1-p.y]))};
+  }catch(err){console.warn("Advanced document analysis failed",err);return scannerAnalyzePixelsRegion0804(imageData,w,h);}
+}
+
 function scannerAnalyzeCanvas0802(canvas){
   const ctx=canvas.getContext("2d",{willReadFrequently:true});return scannerAnalyzePixels0802(ctx.getImageData(0,0,canvas.width,canvas.height),canvas.width,canvas.height);
 }
@@ -5818,8 +5968,8 @@ async function scannerCaptureLiveFrame0802(manual=false){
   try{
     const canvas=document.createElement("canvas");canvas.width=video.videoWidth;canvas.height=video.videoHeight;canvas.getContext("2d",{alpha:false}).drawImage(video,0,0);
     const source=await scannerNormalizeSource0800(canvas.toDataURL("image/jpeg",.93));
-    let result=state.lastResult;if(manual||!result||result.confidence<.45)result=await scannerDetectDocumentResult0802(source);
-    const page={id:uid(),originalData:source,processedData:"",imageData:"",width:0,height:0,corners:scannerCopyCorners0800(result?.corners),enhancement:scannerDraft0800?.defaultEnhancement||"color",rotation:0,sourceName:`Camera Page ${(scannerDraft0800?.pages?.length||0)+1}`,updatedAt:new Date().toISOString()};
+    const fullResult=await scannerDetectDocumentResult0802(source),liveResult=state.lastResult,result=fullResult?.confidence>=Number(liveResult?.confidence||0)-.04?fullResult:liveResult;
+    const page={id:uid(),originalData:source,processedData:"",imageData:"",width:0,height:0,corners:scannerCopyCorners0800(result?.corners),enhancement:scannerDraft0800?.defaultEnhancement||"color",rotation:0,sourceName:`Camera Page ${(scannerDraft0800?.pages?.length||0)+1}`,updatedAt:new Date().toISOString(),autoCropConfidence:Number(result?.confidence||0),autoCropMethod:result?.method||""};
     await scannerProcessPage0800(page);scannerDraft0800.pages.push(page);
     const count=document.getElementById("scannerLiveCount0802");if(count)count.textContent=`${scannerDraft0800.pages.length} page${scannerDraft0800.pages.length===1?"":"s"}`;
     const flash=document.getElementById("scannerLiveFlash0802");flash?.classList.add("active");setTimeout(()=>flash?.classList.remove("active"),180);
@@ -5830,30 +5980,35 @@ async function scannerCaptureLiveFrame0802(manual=false){
 }
 function scannerLiveLoop0802(){
   const state=scannerCameraState0802;if(!state.running)return;
-  state.raf=requestAnimationFrame(scannerLiveLoop0802);const now=performance.now();if(now-state.lastAnalysis<330||state.capturing)return;state.lastAnalysis=now;
+  state.raf=requestAnimationFrame(scannerLiveLoop0802);const now=performance.now();if(now-state.lastAnalysis<390||state.capturing)return;state.lastAnalysis=now;
   const video=document.getElementById("scannerLiveVideo0802");if(!video?.videoWidth)return;
-  const max=360,scale=Math.min(1,max/Math.max(video.videoWidth,video.videoHeight)),w=Math.max(80,Math.round(video.videoWidth*scale)),h=Math.max(80,Math.round(video.videoHeight*scale));
+  const max=320,scale=Math.min(1,max/Math.max(video.videoWidth,video.videoHeight)),w=Math.max(80,Math.round(video.videoWidth*scale)),h=Math.max(80,Math.round(video.videoHeight*scale));
   const canvas=document.createElement("canvas");canvas.width=w;canvas.height=h;const ctx=canvas.getContext("2d",{willReadFrequently:true});ctx.drawImage(video,0,0,w,h);
   const frame=ctx.getImageData(0,0,w,h),result=scannerAnalyzePixels0802(frame,w,h),signature=scannerFrameSignature0802(frame,w,h);state.lastResult=result;state.lastSignature=signature;scannerLiveRenderFrame0802(result);
   if(state.awaitingPageChange){const moved=scannerCornerDistance0802(state.capturedCorners,result.corners)>.065,changed=scannerSignatureDistance0802(state.capturedSignature,signature)>14;if(result.confidence<.3||moved||changed){state.awaitingPageChange=false;state.capturedCorners=null;state.capturedSignature=null;state.stableFrames=0;state.lastCorners=null;}else{scannerLiveStatus0802("Move to the next page","ready");return;}}
-  const diff=scannerCornerDistance0802(state.lastCorners,result.corners);if(result.confidence>.58&&diff<.022)state.stableFrames++;else state.stableFrames=result.confidence>.62?1:0;state.lastCorners=scannerCopyCorners0800(result.corners);
-  if(result.confidence<.42)scannerLiveStatus0802("Center the full page inside the frame");
-  else if(state.stableFrames<2)scannerLiveStatus0802("Page found — hold steady","found");
-  else if(state.stableFrames<4)scannerLiveStatus0802("Hold steady…","found");
-  else scannerLiveStatus0802(state.autoCapture?"Ready — capturing automatically":"Ready — tap shutter","ready");
-  if(state.autoCapture&&state.stableFrames>=4&&Date.now()>state.cooldownUntil)scannerCaptureLiveFrame0802(false);
+  const diff=scannerCornerDistance0802(state.lastCorners,result.corners),sharpness=Number(result.sharpness||0),margin=Number.isFinite(Number(result.edgeMargin))?Number(result.edgeMargin):.03,usable=result.confidence>.62&&sharpness>.08&&margin>-.012;
+  if(usable&&diff<.018)state.stableFrames++;else state.stableFrames=usable?1:0;state.lastCorners=scannerCopyCorners0800(result.corners);
+  if(result.confidence<.44)scannerLiveStatus0802("Find all four page edges");
+  else if(margin<.012)scannerLiveStatus0802("Move back so the full page is visible","found");
+  else if(sharpness<.08)scannerLiveStatus0802("Hold steady — image is soft","found");
+  else if(state.stableFrames<3)scannerLiveStatus0802("Page found — hold steady","found");
+  else if(state.stableFrames<5)scannerLiveStatus0802("Locking page frame…","found");
+  else scannerLiveStatus0802(state.autoCapture?"Capturing automatically":"Ready — tap shutter","ready");
+  if(state.autoCapture&&state.stableFrames>=5&&Date.now()>state.cooldownUntil)scannerCaptureLiveFrame0802(false);
 }
 async function scannerOpenLiveCamera0802(fallbackInput,importInput){
   scannerSyncFields0800();
   if(!navigator.mediaDevices?.getUserMedia){fallbackInput?.click();return;}
   scannerStopLiveCamera0802(false);
-  const overlay=document.createElement("div");overlay.className="scannerLiveOverlay0802";overlay.innerHTML=`<div class="scannerLiveSheet0802"><div class="scannerLiveHead0802"><button class="ghost" id="scannerLiveCancel0802">Cancel</button><div><strong>AI Auto Scan</strong><span id="scannerLiveCount0802">${scannerDraft0800?.pages?.length||0} page${scannerDraft0800?.pages?.length===1?"":"s"}</span></div><button class="primary" id="scannerLiveDone0802">Done</button></div><div class="scannerLiveStage0802" id="scannerLiveStage0802"><video id="scannerLiveVideo0802" autoplay playsinline muted></video><canvas id="scannerLiveCanvas0802"></canvas><div class="scannerLiveFlash0802" id="scannerLiveFlash0802"></div><div class="scannerLiveStatus0802" id="scannerLiveStatus0802">Starting camera…</div></div><div class="scannerLiveControls0802"><button class="scannerAutoToggle0802 active" id="scannerAutoToggle0802"><span>AI</span><div><strong>Auto Capture</strong><small>Detect, frame, crop, and capture</small></div><b>ON</b></button><button class="scannerShutter0802" id="scannerShutter0802" aria-label="Capture page"><span></span></button><button class="ghost scannerCameraImport0802" id="scannerCameraImport0802">Import</button></div></div>`;document.body.appendChild(overlay);
+  const overlay=document.createElement("div");overlay.className="scannerLiveOverlay0802";overlay.innerHTML=`<div class="scannerLiveSheet0802"><div class="scannerLiveHead0802"><button class="ghost" id="scannerLiveCancel0802">Cancel</button><div><strong>Scan Page</strong><span id="scannerLiveCount0802">${scannerDraft0800?.pages?.length||0} page${scannerDraft0800?.pages?.length===1?"":"s"}</span></div><button class="primary" id="scannerLiveDone0802">Done</button></div><div class="scannerLiveStage0802" id="scannerLiveStage0802"><video id="scannerLiveVideo0802" autoplay playsinline muted></video><canvas id="scannerLiveCanvas0802"></canvas><div class="scannerLiveFlash0802" id="scannerLiveFlash0802"></div><button class="ghost scannerTorch0804" id="scannerTorch0804" hidden>Flash Off</button><div class="scannerLiveStatus0802" id="scannerLiveStatus0802">Starting camera…</div></div><div class="scannerLiveControls0802"><button class="scannerAutoToggle0802 active" id="scannerAutoToggle0802"><span>AUTO</span><b>ON</b></button><button class="scannerShutter0802" id="scannerShutter0802" aria-label="Capture page"><span></span></button><button class="ghost scannerCameraImport0802" id="scannerCameraImport0802">Import</button></div></div>`;document.body.appendChild(overlay);
   const close=()=>scannerStopLiveCamera0802(true);document.getElementById("scannerLiveCancel0802").onclick=close;document.getElementById("scannerLiveDone0802").onclick=close;document.getElementById("scannerShutter0802").onclick=()=>scannerCaptureLiveFrame0802(true);document.getElementById("scannerCameraImport0802").onclick=()=>{scannerStopLiveCamera0802(false);(importInput||fallbackInput)?.click();};
-  document.getElementById("scannerAutoToggle0802").onclick=()=>{scannerCameraState0802.autoCapture=!scannerCameraState0802.autoCapture;const b=document.getElementById("scannerAutoToggle0802");b?.classList.toggle("active",scannerCameraState0802.autoCapture);const label=b?.querySelector("b");if(label)label.textContent=scannerCameraState0802.autoCapture?"ON":"OFF";};
+  document.getElementById("scannerAutoToggle0802").onclick=()=>{scannerCameraState0802.autoCapture=!scannerCameraState0802.autoCapture;const button=document.getElementById("scannerAutoToggle0802");button?.classList.toggle("active",scannerCameraState0802.autoCapture);const label=button?.querySelector("b");if(label)label.textContent=scannerCameraState0802.autoCapture?"ON":"OFF";};
   try{
-    const stream=await navigator.mediaDevices.getUserMedia({audio:false,video:{facingMode:{ideal:"environment"},width:{ideal:1920},height:{ideal:1440}}});
-    scannerCameraState0802={...scannerCameraState0802,stream,running:true,lastAnalysis:0,lastCorners:null,stableFrames:0,cooldownUntil:0,capturing:false,awaitingPageChange:false,capturedCorners:null,capturedSignature:null,lastSignature:null};
-    const video=document.getElementById("scannerLiveVideo0802");video.srcObject=stream;await video.play();scannerLiveStatus0802("Center the full page inside the frame");scannerLiveLoop0802();
+    const stream=await navigator.mediaDevices.getUserMedia({audio:false,video:{facingMode:{ideal:"environment"},width:{ideal:1920},height:{ideal:1440}}}),track=stream.getVideoTracks()[0]||null;
+    scannerCameraState0802={...scannerCameraState0802,stream,track,running:true,lastAnalysis:0,lastCorners:null,stableFrames:0,cooldownUntil:0,capturing:false,awaitingPageChange:false,capturedCorners:null,capturedSignature:null,lastSignature:null,torch:false};
+    const torchButton=document.getElementById("scannerTorch0804"),capabilities=track?.getCapabilities?.()||{};
+    if(torchButton&&capabilities.torch){torchButton.hidden=false;torchButton.onclick=async()=>{try{scannerCameraState0802.torch=!scannerCameraState0802.torch;await track.applyConstraints({advanced:[{torch:scannerCameraState0802.torch}]});torchButton.textContent=scannerCameraState0802.torch?"Flash On":"Flash Off";torchButton.classList.toggle("active",scannerCameraState0802.torch);}catch(err){scannerCameraState0802.torch=false;toast("Camera flash control is unavailable on this device.");}};}
+    const video=document.getElementById("scannerLiveVideo0802");video.srcObject=stream;await video.play();scannerLiveStatus0802("Find all four page edges");scannerLiveLoop0802();
   }catch(err){console.warn("Live camera unavailable",err);scannerStopLiveCamera0802(false);toast("Live camera access was unavailable. Opening the standard camera instead.");fallbackInput?.click();}
 }
 function scannerBilinearPoint0800(c,u,v){
@@ -5972,24 +6127,25 @@ function scannerPageCard0800(page,index){
 function documentScanner0800(){
   if(!scannerDraft0800){scannerStart0800("",scannerReturnView0800||"tools",scannerReturnView0800==="tools"?"":undefined);return;}
   if(scannerEditorIndex0800>=0){scannerPageEditorScreen0800();return;}
-  const pages=scannerDraft0800.pages||[],size=scannerSizeLabel0800(),target=scannerTargetSite0801();
-  html(`<div class="screen scannerScreen0800"><div class="row scannerTop0800"><button class="back ghost" id="scannerBack0800">←</button><div><h1>${scannerEditingDocId0800?"Edit Scan":"Document Scanner"}</h1><p>${target?esc(target.name||"Account"):"Scan first, then match the account"}</p></div><span class="scannerPageCount0800">${pages.length} PAGE${pages.length===1?"":"S"}</span></div>
-    <section class="scannerQuickCapture0802"><button class="primary scannerMainCapture0802" id="scannerCamera0800" ${scannerBusy0800?"disabled":""}><span>▣</span><div><strong>${scannerBusy0800?"Processing…":"Scan a Page"}</strong><small>AI finds the page, frames it, crops it, and takes the picture</small></div></button><button class="ghost scannerImport0802" id="scannerImport0800" ${scannerBusy0800?"disabled":""}>Import Photos</button><input id="scannerCameraInput0800" type="file" accept="image/*" capture="environment" hidden><input id="scannerImportInput0800" type="file" accept="image/*" multiple hidden></section>
-    <section class="card scannerDetails0802"><label>Document Name<input id="scannerTitle0800" value="${esc(scannerDraft0800.title)}" placeholder="Inspection report, permit, programming sheet…"></label><div class="scannerDetailsRow0802"><label>Date<input id="scannerDate0800" type="date" value="${esc(scannerDraft0800.date||localDateString())}"></label><details class="scannerOptions0802"><summary>Options</summary><div><label>Quality<select id="scannerQuality0800"><option value="compact" ${scannerDraft0800.quality==="compact"?"selected":""}>Compact</option><option value="standard" ${scannerDraft0800.quality==="standard"?"selected":""}>Standard</option><option value="high" ${scannerDraft0800.quality==="high"?"selected":""}>High</option></select></label><label>Cleanup<select id="scannerCleanup0800"><option value="color" ${scannerDraft0800.defaultEnhancement==="color"?"selected":""}>Auto Color</option><option value="gray" ${scannerDraft0800.defaultEnhancement==="gray"?"selected":""}>Grayscale</option><option value="bw" ${scannerDraft0800.defaultEnhancement==="bw"?"selected":""}>Black & White</option><option value="original" ${scannerDraft0800.defaultEnhancement==="original"?"selected":""}>Original</option></select></label></div></details></div><label>Notes <span>Optional</span><textarea id="scannerNotes0800" rows="2" placeholder="Brief description or reason for saving…">${esc(scannerDraft0800.notes)}</textarea></label></section>
-    <section class="scannerPages0800">${pages.length?pages.map(scannerPageCard0800).join(""):`<div class="scannerEmptyCompact0802"><span>▤</span><div><strong>Ready to scan</strong><small>Place one page in view and tap Scan a Page.</small></div></div>`}</section>
+  const pages=scannerDraft0800.pages||[],size=scannerSizeLabel0800(),target=scannerTargetSite0801(),hasPages=pages.length>0;
+  html(`<div class="screen scannerScreen0800"><div class="row scannerTop0800"><button class="back ghost" id="scannerBack0800">←</button><div><h1>${scannerEditingDocId0800?"Edit Scan":"Document Scanner"}</h1>${target?`<p>${esc(target.name||"Account")}</p>`:""}</div><span class="scannerPageCount0800">${pages.length} PAGE${pages.length===1?"":"S"}</span></div>
+    <section class="scannerQuickCapture0802"><button class="primary scannerMainCapture0802" id="scannerCamera0800" ${scannerBusy0800?"disabled":""}><span>▣</span><strong>${scannerBusy0800?"Processing…":hasPages?"Add Page":"Scan Page"}</strong></button><button class="ghost scannerImport0802" id="scannerImport0800" ${scannerBusy0800?"disabled":""}>Import</button><input id="scannerCameraInput0800" type="file" accept="image/*" capture="environment" hidden><input id="scannerImportInput0800" type="file" accept="image/*" multiple hidden></section>
+    ${!hasPages?`${scannerGpsPreCaptureMarkup0803()}${scannerAccountAssignmentMarkup0801(0)}`:""}
+    ${hasPages?`<section class="scannerPages0800">${pages.map(scannerPageCard0800).join("")}</section>
+    <section class="card scannerDetails0802"><label>Title<input id="scannerTitle0800" value="${esc(scannerDraft0800.title)}" placeholder="Inspection report, permit, programming sheet…" enterkeyhint="next"></label><div class="scannerDetailsRow0802"><label>Date<input id="scannerDate0800" type="date" value="${esc(scannerDraft0800.date||localDateString())}"></label><details class="scannerOptions0802"><summary>Scan Settings</summary><div><label>Quality<select id="scannerQuality0800"><option value="compact" ${scannerDraft0800.quality==="compact"?"selected":""}>Compact</option><option value="standard" ${scannerDraft0800.quality==="standard"?"selected":""}>Standard</option><option value="high" ${scannerDraft0800.quality==="high"?"selected":""}>High</option></select></label><label>Cleanup<select id="scannerCleanup0800"><option value="color" ${scannerDraft0800.defaultEnhancement==="color"?"selected":""}>Auto Color</option><option value="gray" ${scannerDraft0800.defaultEnhancement==="gray"?"selected":""}>Grayscale</option><option value="bw" ${scannerDraft0800.defaultEnhancement==="bw"?"selected":""}>Black & White</option><option value="original" ${scannerDraft0800.defaultEnhancement==="original"?"selected":""}>Original</option></select></label></div></details></div><label>Notes <span>Optional</span><textarea id="scannerNotes0800" rows="3" placeholder="Add a note…">${esc(scannerDraft0800.notes)}</textarea></label></section>
     ${scannerAccountAssignmentMarkup0801(pages.length)}
-    <section class="card scannerSavePanel0800"><div><strong>${pages.length} page${pages.length===1?"":"s"}${target?` • ${esc(target.name||"Account")}`:""}</strong><span>${target?`${size} estimated storage. The scan will also be logged in Site Notes.`:"Capture a page and select the account before saving."}</span></div><button class="primary" id="scannerSave0800" ${!pages.length||!target||scannerBusy0800?"disabled":""}>${target?"Save Document":"Select Account"}</button></section>
+    <section class="card scannerSavePanel0800"><div><strong>${pages.length} page${pages.length===1?"":"s"}${target?` • ${esc(target.name||"Account")}`:""}</strong><span>${target?`${size} estimated storage. The scan will also be logged in Site Notes.`:"Select the account before saving."}</span></div><button class="primary" id="scannerSave0800" ${!target||scannerBusy0800?"disabled":""}>${target?"Save Document":"Select Account"}</button></section>`:""}
   </div>`);
   document.getElementById("scannerBack0800").onclick=scannerDiscard0800;
   const camera=document.getElementById("scannerCameraInput0800"),imports=document.getElementById("scannerImportInput0800");
   document.getElementById("scannerCamera0800")?.addEventListener("click",()=>scannerOpenLiveCamera0802(camera,imports));
   document.getElementById("scannerImport0800")?.addEventListener("click",()=>{scannerSyncFields0800();imports?.click();});
   if(camera)camera.onchange=e=>scannerImportFiles0800(e.target.files,false);if(imports)imports.onchange=e=>scannerImportFiles0800(e.target.files,false);
-  document.querySelectorAll("[data-scan-edit0800]").forEach(b=>b.onclick=e=>{e.stopPropagation();scannerSyncFields0800();scannerEditorIndex0800=Number(b.dataset.scanEdit0800);documentScanner0800();});
-  document.querySelectorAll("[data-scan-up0800]").forEach(b=>b.onclick=()=>{scannerSyncFields0800();const i=Number(b.dataset.scanUp0800);if(i>0){[pages[i-1],pages[i]]=[pages[i],pages[i-1]];documentScanner0800();}});
-  document.querySelectorAll("[data-scan-down0800]").forEach(b=>b.onclick=()=>{scannerSyncFields0800();const i=Number(b.dataset.scanDown0800);if(i<pages.length-1){[pages[i],pages[i+1]]=[pages[i+1],pages[i]];documentScanner0800();}});
-  document.querySelectorAll("[data-scan-delete0800]").forEach(b=>b.onclick=()=>{const i=Number(b.dataset.scanDelete0800);if(confirm(`Delete page ${i+1}?`)){scannerSyncFields0800();pages.splice(i,1);documentScanner0800();}});
-  wireScannerAccountMatch0801();document.getElementById("scannerSave0800")?.addEventListener("click",scannerSaveDocument0800);
+  document.querySelectorAll("[data-scan-edit0800]").forEach(button=>button.onclick=e=>{e.stopPropagation();scannerSyncFields0800();scannerEditorIndex0800=Number(button.dataset.scanEdit0800);documentScanner0800();});
+  document.querySelectorAll("[data-scan-up0800]").forEach(button=>button.onclick=()=>{scannerSyncFields0800();const i=Number(button.dataset.scanUp0800);if(i>0){[pages[i-1],pages[i]]=[pages[i],pages[i-1]];documentScanner0800();}});
+  document.querySelectorAll("[data-scan-down0800]").forEach(button=>button.onclick=()=>{scannerSyncFields0800();const i=Number(button.dataset.scanDown0800);if(i<pages.length-1){[pages[i],pages[i+1]]=[pages[i+1],pages[i]];documentScanner0800();}});
+  document.querySelectorAll("[data-scan-delete0800]").forEach(button=>button.onclick=()=>{const i=Number(button.dataset.scanDelete0800);if(confirm(`Delete page ${i+1}?`)){scannerSyncFields0800();pages.splice(i,1);documentScanner0800();}});
+  wireScannerAccountMatch0801();document.getElementById("scannerGpsRetry0803")?.addEventListener("click",()=>{scannerCancelGpsMatch0803();scannerTargetSiteId0801="";scannerAccountSearch0801="";scannerRequestClosestAccount0803();});document.getElementById("scannerSave0800")?.addEventListener("click",scannerSaveDocument0800);
 }
 function scannerClampCorner0800(c,index,x,y){
   const gap=.045;x=Math.max(.005,Math.min(.995,x));y=Math.max(.005,Math.min(.995,y));
@@ -6030,7 +6186,7 @@ function scannerPageEditorScreen0800(){
   </div>`);
   document.getElementById("scannerEditorBack0800").onclick=()=>{scannerEditorIndex0800=-1;documentScanner0800();};
   requestAnimationFrame(()=>wireScannerCropCanvas0800(page));
-  document.getElementById("scannerAutoCrop0800").onclick=async()=>{page.corners=await scannerDetectDocument0800(page.originalData);window.__scannerCropRedraw0800?.();toast("Page edges detected. Adjust any corner if needed.");};
+  document.getElementById("scannerAutoCrop0800").onclick=async()=>{const result=await scannerDetectDocumentResult0802(page.originalData);page.corners=scannerCopyCorners0800(result.corners);page.autoCropConfidence=Number(result.confidence||0);page.autoCropMethod=result.method||"";window.__scannerCropRedraw0800?.();toast(result.confidence>.6?"Page frame detected. Adjust any corner if needed.":"A page frame was estimated. Please verify all four corners.");};
   document.getElementById("scannerFullCrop0800").onclick=()=>{page.corners=scannerFullCorners0800();window.__scannerCropRedraw0800?.();};
   document.querySelectorAll("[data-scan-mode0800]").forEach(b=>b.onclick=()=>{page.enhancement=b.dataset.scanMode0800;document.querySelectorAll("[data-scan-mode0800]").forEach(x=>x.classList.toggle("active",x===b));window.__scannerCropRedraw0800?.();});
   document.getElementById("scannerRotateLeft0800").onclick=async()=>{scannerBusy0800=true;toast("Rotating page…");await scannerRotatePage0800(page,-1);scannerBusy0800=false;scannerPageEditorScreen0800();};
@@ -6047,7 +6203,7 @@ async function scannerSaveDocument0800(){
     const bytes=scannerBytes0800();if(bytes>4.6*1024*1024){toast("This scan is too large for reliable local storage. Choose Compact quality or remove pages.");if(btn){btn.disabled=false;btn.textContent="Save to Account";}return;}
     const now=new Date().toISOString(),target=fileStorageTarget0794("document");
     const scanPages=scannerDraft0800.pages.map((p,index)=>({id:p.id||uid(),imageData:p.processedData,width:p.width,height:p.height,enhancement:p.enhancement||"color",rotation:p.rotation||0,sourceName:p.sourceName||`Page ${index+1}`,updatedAt:p.updatedAt||now}));
-    const obj={type:"Scanned Document",title,date:scannerDraft0800.date||localDateString(),notes:scannerDraft0800.notes||"",ref:"",url:"",customerCaption:"",isScannedDocument:true,scanPages,scanPageCount:scanPages.length,scanQuality:scannerDraft0800.quality||"standard",scanDefaultEnhancement:scannerDraft0800.defaultEnhancement||"color",scanCreatedAt:scannerEditingDocId0800?((s.docs||[]).find(d=>d.id===scannerEditingDocId0800)?.scanCreatedAt||now):now,updatedAt:now,mimeType:"application/pdf",storageTargetId:`${target.provider||"local"}:document`,storageProvider:target.provider||"local",storageFolder:target.folder||"FireVault/Documents",storageStatus:(target.provider||"local")==="local"?"local":"pending",remoteFileId:scannerEditingDocId0800?((s.docs||[]).find(d=>d.id===scannerEditingDocId0800)?.remoteFileId||""):"",remoteRevision:scannerEditingDocId0800?((s.docs||[]).find(d=>d.id===scannerEditingDocId0800)?.remoteRevision||""):"",remoteUrl:scannerEditingDocId0800?((s.docs||[]).find(d=>d.id===scannerEditingDocId0800)?.remoteUrl||""):""};
+    const obj={type:"Scanned Document",title,date:scannerDraft0800.date||localDateString(),notes:scannerDraft0800.notes||"",ref:"",url:"",customerCaption:"",isScannedDocument:true,scanPages,scanPageCount:scanPages.length,scanQuality:scannerDraft0800.quality||"standard",scanDefaultEnhancement:scannerDraft0800.defaultEnhancement||"color",scanCreatedAt:scannerEditingDocId0800?((s.docs||[]).find(d=>d.id===scannerEditingDocId0800)?.scanCreatedAt||now):now,updatedAt:now,mimeType:"application/pdf",storageTargetId:`${target.provider||"local"}:document`,storageProvider:target.provider||"local",storageFolder:target.folder||"FireVault/Documents",storageStatus:(target.provider||"local")==="local"?"local":"pending",scannerAccountMatchSource:(scannerGpsMatch0803.state==="matched"&&scannerGpsMatch0803.siteId===s.id)?"Closest account by GPS":scannerGpsMatch0803.state==="manual"?"Manual account selection":"Account context",scannerGpsMatchDistanceMeters:(scannerGpsMatch0803.state==="matched"&&scannerGpsMatch0803.siteId===s.id)?Number(scannerGpsMatch0803.meters||0):null,scannerGpsAccuracyMeters:(scannerGpsMatch0803.state==="matched"&&scannerGpsMatch0803.siteId===s.id)?Number(scannerGpsMatch0803.accuracy||0):null,scannerGpsMatchedAt:(scannerGpsMatch0803.state==="matched"&&scannerGpsMatch0803.siteId===s.id)?(scannerGpsMatch0803.at||now):"",remoteFileId:scannerEditingDocId0800?((s.docs||[]).find(d=>d.id===scannerEditingDocId0800)?.remoteFileId||""):"",remoteRevision:scannerEditingDocId0800?((s.docs||[]).find(d=>d.id===scannerEditingDocId0800)?.remoteRevision||""):"",remoteUrl:scannerEditingDocId0800?((s.docs||[]).find(d=>d.id===scannerEditingDocId0800)?.remoteUrl||""):""};
     let index=-1,backup=null;
     if(scannerEditingDocId0800){index=s.docs.findIndex(d=>d.id===scannerEditingDocId0800);if(index>=0){backup=s.docs[index];s.docs[index]={...backup,...obj,id:backup.id,createdAt:backup.createdAt||now};}}
     if(index<0){const created={...obj,id:uid(),createdAt:now};s.docs.unshift(created);index=0;}
@@ -6060,7 +6216,7 @@ async function scannerSaveDocument0800(){
       s.noteEntries=s.noteEntries.filter(n=>!(n.type==="Scanned Document"&&n.createdAt===now));
       console.error(err);toast("The scan could not be saved because local storage is full. Use Compact quality, fewer pages, or export a backup and remove old photos.");if(btn){btn.disabled=false;btn.textContent="Save to Account";}return;
     }
-    const pagesSaved=scanPages.length,returnView=scannerReturnView0800;selectedSiteId=s.id;scannerDraft0800=null;scannerEditingDocId0800="";scannerEditorIndex0800=-1;scannerTargetSiteId0801="";scannerAccountSearch0801="";toast(`${pagesSaved}-page document saved to ${s.name||"the selected account"}.`);if(returnView==="tools"){accountDetailTab0735="docs";rememberAccountTab0751("docs");route("siteDetail");}else route(returnView||"siteDocs");
+    const pagesSaved=scanPages.length,returnView=scannerReturnView0800;selectedSiteId=s.id;scannerCancelGpsMatch0803();scannerDraft0800=null;scannerEditingDocId0800="";scannerEditorIndex0800=-1;scannerTargetSiteId0801="";scannerAccountSearch0801="";scannerGpsMatch0803={state:"idle",siteId:"",meters:null,accuracy:0,message:"",at:"",requestId:scannerGpsMatch0803.requestId,source:""};toast(`${pagesSaved}-page document saved to ${s.name||"the selected account"}.`);if(returnView==="tools"){accountDetailTab0735="docs";rememberAccountTab0751("docs");route("siteDetail");}else route(returnView||"siteDocs");
   }catch(err){console.error(err);toast(err?.message||"The scanned document could not be saved.");if(btn){btn.disabled=false;btn.textContent="Save to Account";}}
 }
 function scannerDataBytes0800(dataUrl){
@@ -8282,7 +8438,7 @@ function manualSimplePage058(type){
   quick:["🚀","Quick Start Guide","Get FireVault ready for a normal field day.",[["1. Verify the build","Confirm the green build badge shows 0.67.0 before entering production information."],["2. Complete Technician Profile","Enter your name, company, phone, email, and license or employee identification."],["3. Review permissions","Allow location and photo access only when FireVault requests them and the feature is needed."],["4. Create or open a site","Add the customer name, full address, panel details, contacts, access notes, and GPS location."],["5. Document the visit","Record notes, photos, tasks, deficiencies, equipment changes, and a service visit."],["6. Finish and protect the data","Review the report, send or copy the required summary, then export a current backup."]]],
   new:["🆕","What’s New in 0.67.0","Account View, Settings navigation, and FireVault Academy redesign.",[["Unified visual system","Standardized typography, spacing, card surfaces, borders, controls, and responsive behavior across FireVault."],["Settings cleanup","Improved Settings home cards and every submenu while preserving the preferred Email setup workflow."],["Help readability","Converted contextual Help and Academy articles into one uninterrupted scrolling reading column with no floating metadata."],["Site Detail stability","Reinforced natural-height cards, readable text, and scroll-safe account sections."],["Operational screens","Simplified Customer Import, Team Sync, Conflict Center, and Nearby Sites presentation without changing their workflows."],["Phone and iPad layouts","Added consistent narrow-phone and tablet behavior, bottom-navigation clearance, and overflow protection."],["Nearby scan diagnostics","Nearby Sites now shows total sites, GPS-ready records, missing coordinates, phone-location progress, and persistent error messages."],["Coordinate recovery","FireVault recovers valid latitude and longitude stored in compatible legacy or imported fields and normalizes them into the site GPS record."],["Location retry","If high-accuracy location times out or is unavailable, FireVault retries once using standard accuracy."],["Nearest-site fallback","When no site is inside the selected radius, the nearest GPS-ready sites remain visible instead of presenting an empty result."],["Latitude and longitude","Customer Import can calculate missing coordinates from each usable U.S. street address before saving records."],["Coordinate requirement","The importer requires calculated, supplied, or existing GPS coordinates by default. Unmatched addresses remain in review."],["Census address matching","Only address fields are sent to the U.S. Census Geocoder. The returned point is an address-range calculation, not a guaranteed building entrance."],["Account Id matching","Repeat imports update the matching FireVault site instead of creating duplicates or deleting field history."],["CSV coordinate columns","Files that already contain Latitude and Longitude columns use those values directly."],["Sync-ready changes","Added and updated customer records enter the pending synchronization queue and create a Sync Activity entry."]]],
   tips:["🧰","Field Tips","Short practices that improve the usefulness of FireVault records.",[["Write for the next technician","Include the exact panel, circuit, device, location, symptom, test result, and next action instead of relying on memory."],["Photograph context first","Take one wide photo showing the equipment location before close-up terminal, label, or damage photos."],["Separate facts from follow-up","Use notes for what occurred, deficiencies for code or system problems, and tasks for work that still needs completion."],["Confirm the account","Before using Quick Capture, verify the selected customer site to prevent records from being stored under the wrong account."],["Back up before updates","Download an external backup before a major update or device change and after completing significant field documentation."]]],
-  revisions:["📋","Revision History","Application and documentation checkpoints.",[["0.80.2","Simplified Document Scanner, added on-device AI Auto Scan with live corner framing and hands-free capture, and repaired mobile keyboard field visibility."],["0.80.2","Moved Document Scanner to Tools, added post-capture account search and matching, and added scanner access inside the full Site Notes workspace."],["0.80.0","Added an account-specific multi-page camera document scanner with automatic edge detection, manual corner correction, rotation, cleanup modes, page ordering, PDF preview/download/share, and account-note activity."],["0.79.14","Restored numbered Nearby Accounts map pins matched to distance-sorted list rows and removed Smart Account Intelligence."],["0.79.13","Repaired startup parsing inherited from 0.79.11 and corrected Building Navigator location-copy syntax."],["0.79.12","Added Building Navigator with exact site locations, GPS/Plus Codes, verification, linked photos, route targets, and timeline events."],["0.79.7","Shortened every Settings summary and removed the colored bar from each Section Overview."],["0.79.6","Added Nearby-style account-list scroll locking so cards settle cleanly at the top while the Accounts controls remain fixed."],["0.79.5","Added separate Personal OneDrive, Work OneDrive, and SharePoint connection profiles with exact photo/document assignments and no-personal-fallback protection."],["0.79.4","Added independent photo and document storage destinations, cloud-provider integration targets, and offline Google Plus Codes for accounts and exact field locations."],["0.79.3","Added backend-neutral provider interfaces for authentication, database, file storage, synchronization, and audit while keeping FireVault fully local."],["0.79.2","Added a unified Security Center with vault integrity validation, backup health, audit filters, device naming, session clearing, and PIN confirmation for sensitive exports, restores, and deletion."],["0.79.1","Added an optional local six-digit privacy lock with PBKDF2 hashing, inactivity/background locking, app-switcher privacy screen, recovery code, cooldown protection, and local lock events."],["0.79.0","Added security-ready schema 4 metadata, stable workspace/user/device identities, local audit history, pending change queue, recoverable deletion, credential-safe exports, and protected restore/reset actions."],["0.67.0","Redesigned Account View around service actions and grouped information, consolidated Settings into five folders, and simplified FireVault Academy and contextual Help for continuous reading."],["0.65.2","Repaired Nearby Sites with GPS inventory counts, imported-coordinate recovery, persistent permission and timeout messages, a standard-accuracy retry, and nearest-site fallback results."],["0.65.1","Added online latitude/longitude calculation, coordinate validation, geocoding progress, unmatched-address review, optional CSV coordinates, and coordinate-safe repeat importing."],["0.65.0","Added preview-first customer CSV importing, Account Id update matching, validation warnings, imported monitoring details, and sync activity tracking."],["0.64.1","Simplified Academy article headers, removed floating metadata badges, and improved continuous scrolling and readability."],["0.64.0","Added Sync Activity, a conflict review center, export/import audit entries, and an automatic OneDrive connection-readiness checklist."],["0.63.1","Overhauled contextual Help and Academy reader formatting, removed overlapping sticky article headers, and restored full scrolling on phones and tablets."],["0.63.0","Added permanent record IDs, audit metadata, local version tracking, pending-sync states, conflict readiness, device identity, and a Team Sync settings workspace."],["0.60.0","Connected major screens and Settings areas directly to matching Academy chapters with return-to-screen navigation."],["0.59.0","Added interactive tutorials, guided orientation, pinned learning, field tips, and documentation tracking."],["0.58.0","Expanded Help & Manual into FireVault Academy with bookmarks, smart search, Quick Start, and reader navigation."],["0.57.0","Added the first complete searchable in-app FireVault User Manual."],["Ongoing review rule","Any change to navigation, labels, storage, workflows, permissions, or supported layouts requires the related manual chapter to be checked."]]],
+  revisions:["📋","Revision History","Application and documentation checkpoints.",[["0.80.4","Rebuilt scanner page detection with an advanced edge-and-line computer-vision pipeline, full-resolution autocrop, simplified capture screens, post-capture metadata fields, flash control, and stronger keyboard visibility."],["0.80.3","Defaulted new Tools scanner documents to the closest GPS-ready account with visible distance, accuracy, retry, and manual override."],["0.80.2","Simplified Document Scanner, added on-device AI Auto Scan with live corner framing and hands-free capture, and repaired mobile keyboard field visibility."],["0.80.1","Moved Document Scanner to Tools, added post-capture account search and matching, and added scanner access inside the full Site Notes workspace."],["0.80.0","Added an account-specific multi-page camera document scanner with automatic edge detection, manual corner correction, rotation, cleanup modes, page ordering, PDF preview/download/share, and account-note activity."],["0.79.14","Restored numbered Nearby Accounts map pins matched to distance-sorted list rows and removed Smart Account Intelligence."],["0.79.13","Repaired startup parsing inherited from 0.79.11 and corrected Building Navigator location-copy syntax."],["0.79.12","Added Building Navigator with exact site locations, GPS/Plus Codes, verification, linked photos, route targets, and timeline events."],["0.79.7","Shortened every Settings summary and removed the colored bar from each Section Overview."],["0.79.6","Added Nearby-style account-list scroll locking so cards settle cleanly at the top while the Accounts controls remain fixed."],["0.79.5","Added separate Personal OneDrive, Work OneDrive, and SharePoint connection profiles with exact photo/document assignments and no-personal-fallback protection."],["0.79.4","Added independent photo and document storage destinations, cloud-provider integration targets, and offline Google Plus Codes for accounts and exact field locations."],["0.79.3","Added backend-neutral provider interfaces for authentication, database, file storage, synchronization, and audit while keeping FireVault fully local."],["0.79.2","Added a unified Security Center with vault integrity validation, backup health, audit filters, device naming, session clearing, and PIN confirmation for sensitive exports, restores, and deletion."],["0.79.1","Added an optional local six-digit privacy lock with PBKDF2 hashing, inactivity/background locking, app-switcher privacy screen, recovery code, cooldown protection, and local lock events."],["0.79.0","Added security-ready schema 4 metadata, stable workspace/user/device identities, local audit history, pending change queue, recoverable deletion, credential-safe exports, and protected restore/reset actions."],["0.67.0","Redesigned Account View around service actions and grouped information, consolidated Settings into five folders, and simplified FireVault Academy and contextual Help for continuous reading."],["0.65.2","Repaired Nearby Sites with GPS inventory counts, imported-coordinate recovery, persistent permission and timeout messages, a standard-accuracy retry, and nearest-site fallback results."],["0.65.1","Added online latitude/longitude calculation, coordinate validation, geocoding progress, unmatched-address review, optional CSV coordinates, and coordinate-safe repeat importing."],["0.65.0","Added preview-first customer CSV importing, Account Id update matching, validation warnings, imported monitoring details, and sync activity tracking."],["0.64.1","Simplified Academy article headers, removed floating metadata badges, and improved continuous scrolling and readability."],["0.64.0","Added Sync Activity, a conflict review center, export/import audit entries, and an automatic OneDrive connection-readiness checklist."],["0.63.1","Overhauled contextual Help and Academy reader formatting, removed overlapping sticky article headers, and restored full scrolling on phones and tablets."],["0.63.0","Added permanent record IDs, audit metadata, local version tracking, pending-sync states, conflict readiness, device identity, and a Team Sync settings workspace."],["0.60.0","Connected major screens and Settings areas directly to matching Academy chapters with return-to-screen navigation."],["0.59.0","Added interactive tutorials, guided orientation, pinned learning, field tips, and documentation tracking."],["0.58.0","Expanded Help & Manual into FireVault Academy with bookmarks, smart search, Quick Start, and reader navigation."],["0.57.0","Added the first complete searchable in-app FireVault User Manual."],["Ongoing review rule","Any change to navigation, labels, storage, workflows, permissions, or supported layouts requires the related manual chapter to be checked."]]],
   trouble:["❓","Troubleshooting","Common problems and safe first checks.",FIREVAULT_MANUAL_058.find(x=>x.id==="trouble")?.topics||[]]
  };
  const [icon,title,note,items]=pages[type]||["ⓘ","Unavailable","This Help section is not available in the installed version.",[["Current status","Return to Help and choose an available chapter or tutorial."]]];
@@ -10058,8 +10214,10 @@ function diagnostics(){
 }
 function showChangelog(){
   const notes = [
+    "Build 0.80.4 upgrades Document Scanner with stronger four-edge detection, full-resolution autocrop, steady hands-free capture, a simpler screen, post-capture title/date/notes, camera flash support, and improved keyboard visibility.",
+    "Build 0.80.3 defaults Tools scanner documents to the closest GPS-ready account while preserving manual search, Site Notes account context, and existing-document account locking.",
     "Build 0.80.2 simplifies Document Scanner, adds on-device AI Auto Scan with live page framing and hands-free capture, and keeps focused fields visible above the mobile keyboard.",
-    "Build 0.80.2 moves Document Scanner to Tools, supports post-capture account search and matching, and adds scanner access inside Site Notes.",
+    "Build 0.80.1 moves Document Scanner to Tools, supports post-capture account search and matching, and adds scanner access inside Site Notes.",
     "Build 0.80.0 adds a built-in multi-page account document scanner with camera capture, page-edge adjustment, cleanup modes, page ordering, and PDF download or sharing.",
     "Build 0.79.14 restores numbered Nearby Accounts map pins matched to the distance-sorted list and removes Smart Account Intelligence.",
     "Build 0.79.13 repairs the 0.79.11 Revision History syntax error and the 0.79.12 Building Navigator copy-newline error.",
@@ -10159,9 +10317,21 @@ let keyboardGuardInstalled0802=false;
 let keyboardBaseHeight0802=Math.max(window.innerHeight||0,window.visualViewport?.height||0,document.documentElement.clientHeight||0);
 function editableField0802(el){return !!el&&el.matches?.('input:not([type="button"]):not([type="submit"]):not([type="checkbox"]):not([type="radio"]),textarea,select,[contenteditable="true"]');}
 function keyboardOffset0802(){const vv=window.visualViewport;if(!vv)return 0;const current=Math.max(vv.height||0,window.innerHeight||0);if(!editableField0802(document.activeElement)&&current>keyboardBaseHeight0802*.86)keyboardBaseHeight0802=Math.max(keyboardBaseHeight0802,current);return Math.max(0,Math.round(keyboardBaseHeight0802-vv.height-(vv.offsetTop||0)));}
+function scannerScrollParent0804(el){
+  for(let node=el?.parentElement;node&&node!==document.body;node=node.parentElement){const style=getComputedStyle(node),overflow=style.overflowY;if((overflow==="auto"||overflow==="scroll")&&node.scrollHeight>node.clientHeight+4)return node;}
+  return document.scrollingElement||document.documentElement;
+}
 function revealFocusedField0802(el=document.activeElement){
   if(!editableField0802(el))return;const offset=keyboardOffset0802();document.documentElement.style.setProperty("--fv-keyboard-offset0802",`${offset}px`);document.body.classList.toggle("fvKeyboardOpen0802",offset>80);
-  const reveal=()=>{try{el.scrollIntoView({behavior:"smooth",block:"center",inline:"nearest"});}catch{}};setTimeout(reveal,80);setTimeout(reveal,320);
+  const reveal=()=>{
+    try{
+      const viewport=window.visualViewport,top=(viewport?.offsetTop||0)+Math.max(74,Number(document.documentElement.style.getPropertyValue("--fv0785-header-h")?.replace("px","")||0)+12),bottom=(viewport?.offsetTop||0)+(viewport?.height||window.innerHeight)-22,rect=el.getBoundingClientRect();let delta=0;
+      if(rect.bottom>bottom)delta=rect.bottom-bottom+18;else if(rect.top<top)delta=rect.top-top-18;
+      if(Math.abs(delta)>2){const parent=scannerScrollParent0804(el);if(parent===document.scrollingElement||parent===document.documentElement||parent===document.body)window.scrollBy({top:delta,behavior:"smooth"});else parent.scrollBy({top:delta,behavior:"smooth"});}
+      else el.scrollIntoView({behavior:"smooth",block:"nearest",inline:"nearest"});
+    }catch{}
+  };
+  requestAnimationFrame(reveal);setTimeout(reveal,90);setTimeout(reveal,260);setTimeout(reveal,520);
 }
 function installKeyboardGuard0802(){
   if(keyboardGuardInstalled0802)return;keyboardGuardInstalled0802=true;

@@ -1,8 +1,8 @@
 {
-  "build": "0.80.2",
+  "build": "0.80.4",
   "released": "2026-07-12",
-  "note": "Simplified AI Auto Scan document scanner and keyboard visibility repair",
-  "label": "Live corner detection, auto crop, hands-free capture, and keyboard-safe editing",
-  "version": "0.80.2",
-  "name": "AI Auto Scan"
+  "note": "Advanced four-edge detection, full-resolution autocrop, simplified capture, and keyboard-safe post-capture editing",
+  "label": "Advanced Auto-Crop Scanner",
+  "version": "0.80.4",
+  "name": "Advanced Auto-Crop Scanner"
 }

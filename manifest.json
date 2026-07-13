@@ -8,7 +8,7 @@
   "orientation": "portrait-primary",
   "background_color": "#0b0d10",
   "theme_color": "#101216",
-  "description": "Field knowledge system for fire alarm technicians. Build 0.80.2 simplifies the document scanner, adds on-device AI Auto Scan with live corner framing and hands-free capture, and repairs mobile keyboard field visibility.",
+  "description": "Field knowledge system for fire alarm technicians. Build 0.80.4 adds advanced four-edge document detection, full-resolution autocrop, simplified scanner screens, and closest-account GPS matching.",
   "icons": [
     {
       "src": "assets/icon-192.png",
@@ -49,5 +49,5 @@
       "description": "Open FireVault settings"
     }
   ],
-  "version": "0.80.2"
+  "version": "0.80.4"
 }
