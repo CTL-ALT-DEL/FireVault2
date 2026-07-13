@@ -18722,3 +18722,64 @@ body.fvKeyboardOpen0802 .scannerScreen0800{padding-bottom:calc(var(--fv-keyboard
 .paneNote,.settingsKicker540,.settingsInfo540,.toolsSafety0735,.scannerHero0800,.accountScannerPanel0800{display:none!important}
 .toolTile0734 small,.settingsGroupCard067 p,.settingsGroupSummary067,.pageIntro,.featureIntro,.introText{display:none!important}
 .toolTile0734{min-height:74px}.toolTile0734 span{align-self:center}.settingsGroupCard067{min-height:84px}
+
+
+/* Build 0.82.0 — App Store visual polish */
+:root{
+  --fv-bg:#07101c;--fv-surface:#0d1827;--fv-surface-2:#111f31;--fv-border:rgba(148,163,184,.18);
+  --fv-text:#f8fafc;--fv-muted:#9eafc4;--fv-red:#ef4444;--fv-red-strong:#dc2626;
+  --fv-blue:#38bdf8;--fv-green:#34d399;--fv-radius:16px;--fv-shadow:0 12px 32px rgba(0,0,0,.24);
+}
+html{background:var(--fv-bg)!important}
+body{background:radial-gradient(circle at 50% -20%,rgba(30,64,175,.14),transparent 38%),var(--fv-bg)!important;color:var(--fv-text)!important;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+button,input,select,textarea{font:inherit}
+button{touch-action:manipulation}
+.appShell,.shell,.screen,.page{min-width:0}
+.topbar,.topBar,.appHeader{background:rgba(7,16,28,.94)!important;border-bottom:1px solid var(--fv-border)!important;backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);box-shadow:0 6px 24px rgba(0,0,0,.18)!important}
+.brand small,.fireVaultWordmark575+small{letter-spacing:.06em!important;color:#91a3b8!important;font-size:9px!important;text-transform:uppercase}
+.fireVaultWordmark575{letter-spacing:.035em!important}
+.pageTitle,.screenTitle,h1{letter-spacing:-.025em!important;line-height:1.08!important}
+h2,h3{letter-spacing:-.012em!important}
+p{line-height:1.5}
+.card,.panel,.pane,.accountPanel0735,.settingsGroupCard067,.toolTile0734,.accountCard0759,.nearbyCard0652{
+  border:1px solid var(--fv-border)!important;border-radius:var(--fv-radius)!important;
+  background:linear-gradient(145deg,rgba(17,31,49,.94),rgba(9,20,34,.96))!important;
+  box-shadow:0 1px 0 rgba(255,255,255,.025),var(--fv-shadow)!important;
+}
+.card,.panel,.pane,.accountPanel0735{padding:16px!important}
+.paneHead,.accountPanelHead0735{gap:10px!important;margin-bottom:12px!important}
+.paneHead h2,.paneHead h3,.accountPanelHead0735 h2{margin:0!important;font-size:1rem!important}
+button,.btn,.button{border-radius:12px!important;min-height:44px;font-weight:800!important;letter-spacing:.005em;transition:transform .12s ease,filter .12s ease,border-color .12s ease,background .12s ease}
+button:active,.btn:active,.button:active{transform:scale(.98)}
+button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:3px solid rgba(56,189,248,.28)!important;outline-offset:2px!important}
+.primary,.primaryBtn,.btnPrimary,[data-primary="true"]{background:linear-gradient(180deg,#f05252,#dc2626)!important;border-color:rgba(255,255,255,.12)!important;color:white!important;box-shadow:0 7px 18px rgba(220,38,38,.24)!important}
+.secondary,.secondaryBtn,.btnSecondary{background:#142238!important;border-color:rgba(148,163,184,.22)!important;color:#eef5ff!important}
+input,select,textarea{min-height:46px!important;border:1px solid rgba(148,163,184,.24)!important;border-radius:12px!important;background:#081523!important;color:#f8fafc!important;padding:11px 12px!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.02)!important}
+textarea{min-height:112px!important;line-height:1.48!important;resize:vertical}
+input::placeholder,textarea::placeholder{color:#71839a!important}
+label{color:#c9d4e2!important;font-weight:800!important;font-size:.78rem!important;letter-spacing:.015em}
+.bottomNav,.bottomBar,.navBar{background:rgba(6,14,25,.96)!important;border-top:1px solid var(--fv-border)!important;backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);box-shadow:0 -10px 28px rgba(0,0,0,.22)!important}
+.bottomNav button,.bottomBar button,.navBar button{min-height:54px!important;border-radius:12px!important}
+.bottomNav button.active,.bottomBar button.active,.navBar button.active{background:rgba(239,68,68,.12)!important;color:#fff!important}
+.accountTabs0735{gap:8px!important;padding:7px 10px 9px!important;background:rgba(7,16,28,.76)!important;border-bottom:1px solid var(--fv-border)!important}
+.accountTabs0735>button{min-height:42px!important;border:1px solid transparent!important;background:transparent!important;color:#9fb0c4!important}
+.accountTabs0735>button.active,.accountTabs0735>button[aria-selected="true"]{background:#16253a!important;color:#fff!important;border-color:rgba(148,163,184,.2)!important}
+.toolTile0734{min-height:72px!important;padding:14px!important;gap:12px!important;box-shadow:none!important}
+.toolTile0734:hover{border-color:rgba(56,189,248,.32)!important}
+.settingsGroupCard067{min-height:74px!important;padding:14px 15px!important;box-shadow:none!important}
+.accountCard0759{padding:14px!important;box-shadow:none!important}
+.accountCard0759:active,.toolTile0734:active,.settingsGroupCard067:active{transform:scale(.992)}
+.accountCard0759 .accountName0759{font-size:1rem!important;line-height:1.2!important}
+.accountCard0759 .accountAddress0759{color:#9eb0c4!important;line-height:1.35!important}
+.badge,.chip,.pill{border-radius:999px!important;font-weight:850!important}
+.emptyState,.empty,.noResults{padding:28px 18px!important;border:1px dashed rgba(148,163,184,.22)!important;border-radius:16px!important;background:rgba(15,23,42,.35)!important;text-align:center!important;color:#a9b7c8!important}
+.modal,.dialog,.sheet{border:1px solid rgba(148,163,184,.2)!important;border-radius:20px 20px 0 0!important;background:#0b1726!important;box-shadow:0 -24px 60px rgba(0,0,0,.48)!important}
+hr{border:0;border-top:1px solid var(--fv-border)}
+::-webkit-scrollbar{width:7px;height:7px}::-webkit-scrollbar-thumb{background:rgba(148,163,184,.24);border-radius:999px}::-webkit-scrollbar-track{background:transparent}
+@media(max-width:600px){
+  .card,.panel,.pane,.accountPanel0735{padding:14px!important}
+  .pageContent,.screenContent,.content{padding-left:12px!important;padding-right:12px!important}
+  .topbar,.topBar,.appHeader{padding-left:12px!important;padding-right:12px!important}
+  button,.btn,.button{min-height:46px}
+}
+@media(prefers-reduced-motion:reduce){*{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;scroll-behavior:auto!important}}

@@ -1,9 +1,6 @@
-# FireVault Build 0.81.0 — Deployment Notes
+# FireVault Build 0.82.0 — Deployment Notes
 
-1. Replace the previous GitHub Pages files with the contents of this ZIP.
-2. Commit and push every changed file.
-3. Open FireVault once while online so the new service worker can cache Build 0.81.0.
-4. Reload or reopen the installed Home Screen app.
-5. Allow camera access for live automatic scanning and location access for closest-account matching.
-
-The scanner is fully client-side and requires HTTPS for live camera and GPS access. GitHub Pages provides HTTPS. The existing `firevault_vault_build_030` data key is preserved.
+1. Replace the currently hosted FireVault files with this package.
+2. Preserve the existing browser/site data; the storage key is unchanged.
+3. Open FireVault once online so the service worker caches Build 0.82.0.
+4. On iPhone, close and reopen the installed app after deployment.
