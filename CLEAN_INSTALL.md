@@ -1,3 +1,3 @@
-# FireVault 0.84.0 Installation
+# FireVault 0.85.0 Installation
 
-Replace the previously deployed files with the complete contents of this package. Open FireVault once while online so the 0.84.0 application shell is cached. Existing customer data uses the same storage key and remains in place.
+Replace the deployed FireVault files with this complete package. Open once online to refresh the cached application shell. Existing customer data remains under the same storage key.

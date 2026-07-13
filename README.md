@@ -1,10 +1,7 @@
-# FireVault Build 0.84.0 — Nearby Map Interaction
+# FireVault Build 0.85.0 — Simplified Navigation and Settings
 
-Build 0.84.0 refines Nearby Accounts without changing the focused App Store feature set.
-
-- Keeps the selected-account details box fixed at the top-left of the map.
-- Removes the separate black marker popup.
-- After account-list scrolling settles, waits five seconds and then zooms to street level.
-- Cancels the pending zoom immediately when scrolling resumes.
-- Tapping an account card opens that account’s detail page.
-- Tapping a numbered map marker selects and focuses that account without showing a popup.
+- Removed the Tools section and bottom navigation button.
+- Removed the Visit quick-action button from Account Detail.
+- Rebuilt Settings as a simple grouped list with clean detail pages.
+- Removed tab strips, section overview banners, and repeated Settings instructions.
+- Preserved customer records and the existing FireVault storage key.

@@ -1,14 +1,9 @@
-# Build 0.84.0 Validation
+# Build 0.85.0 Validation
 
-Validated:
-
-- JavaScript module syntax
-- fixed top-left selected-account details overlay
-- black marker-popup removal
-- five-second delayed street-level zoom after scrolling settles
-- pending zoom cancellation when scrolling resumes
-- account-card navigation to Account Detail
-- numbered-marker selection behavior
-- storage-key preservation
-- build and service-worker references
-- ZIP archive integrity
+- JavaScript syntax checked.
+- Tools navigation and route removed from the visible application.
+- Account Detail Visit quick action removed.
+- Settings grouped-menu and detail navigation checked.
+- Storage key preserved.
+- Service-worker and build references updated.
+- ZIP integrity checked.

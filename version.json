@@ -1,8 +1,8 @@
 {
-  "build": "0.84.0",
+  "build": "0.85.0",
   "released": "2026-07-12",
-  "note": "Faster startup, responsive account search, reduced off-screen rendering, deferred GPS work, and improved offline shell caching.",
-  "label": "Performance and Reliability",
-  "version": "0.84.0",
-  "name": "App Store Performance Pass"
+  "note": "Removed Tools navigation and Account Detail Visit action; rebuilt Settings with a simple grouped design.",
+  "label": "Simplified Navigation and Settings",
+  "version": "0.85.0",
+  "name": "App Store Interface Cleanup"
 }
