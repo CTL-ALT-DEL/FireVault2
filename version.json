@@ -1,8 +1,8 @@
 {
-  "build": "0.83.0",
+  "build": "0.84.0",
   "released": "2026-07-12",
   "note": "Faster startup, responsive account search, reduced off-screen rendering, deferred GPS work, and improved offline shell caching.",
   "label": "Performance and Reliability",
-  "version": "0.83.0",
+  "version": "0.84.0",
   "name": "App Store Performance Pass"
 }
