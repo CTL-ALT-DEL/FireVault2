@@ -1,23 +1,23 @@
-# FireVault Build 0.80.1 — Scanner Account Matching
+# FireVault Build 0.80.2 — AI Auto Scan
 
-## Scanner workflow upgrade
+Build 0.80.2 simplifies the built-in document scanner and upgrades camera capture.
 
-- Moves the primary **Document Scanner** entry point to the **Tools** section.
-- Allows scanning to begin without first opening an account.
-- After the first page is captured, provides an account search and match step.
-- Searches account name, Account ID, address, city, state, ZIP code, and site phone.
-- Shows recent accounts before a search is entered.
-- Clearly identifies the selected account before Save is enabled.
-- Saves the scanned document into the matched account and logs it in that account’s Site Notes activity.
-- Opens the matched account’s Files tab after a scan started from Tools is saved.
-- Adds **Scan Document** directly to the full Site Notes workspace.
-- Keeps scanner access on the account Notes tab.
-- Removes scanner capture buttons from the Files/Photo Vault areas; existing scans remain visible and editable there.
+## Scanner changes
 
-## Scanner capabilities preserved
+- Removed the large scanner introduction/help tile.
+- Reorganized the screen around one primary **Scan a Page** action.
+- Added a full-screen live camera instead of relying only on the standard browser camera picker.
+- Added on-device smart page-corner detection with a visible live crop frame.
+- Added hands-free automatic capture after the page is detected and held steady.
+- Automatically crops and cleans each captured page before adding it to the document.
+- Keeps the camera open for fast multi-page scanning.
+- Keeps manual shutter capture and standard camera/import fallback available.
+- Retains page adjustment, rotation, cleanup modes, ordering, deletion, PDF preview/download/share, account matching, and Site Notes access.
 
-Multi-page camera capture, photo import, automatic edge detection, four-corner correction, rotation, Auto Color, Grayscale, Black & White, Original mode, page reordering, local storage safeguards, PDF preview, PDF download, native sharing, and editing of existing scans remain intact.
+## Mobile editing repair
 
-## Preserved from earlier builds
+Focused text fields now scroll into the visible area when the iPhone or Android keyboard opens. The bottom navigation temporarily hides while typing so it cannot cover the active field.
 
-Numbered Nearby Accounts map pins remain matched to the distance-sorted list. Smart Account Intelligence remains removed. Building Navigator, Plus Codes, security, backups, cloud-storage profiles, and the existing `firevault_vault_build_030` storage key remain intact.
+## Data compatibility
+
+The existing `firevault_vault_build_030` storage key is unchanged. Existing accounts, notes, files, scans, Building Navigator locations, settings, and security metadata remain compatible.

@@ -1,13 +1,9 @@
-# FireVault Build 0.80.1 — Deployment Notes
+# FireVault Build 0.80.2 — Deployment Notes
 
-## Update procedure
+1. Commit every file in this package to the FireVault repository.
+2. Wait for GitHub Pages deployment to finish.
+3. Open FireVault once while online so the service worker can cache Build 0.80.2.
+4. Close and reopen the installed PWA if the previous build remains visible.
+5. On the first AI Auto Scan, allow camera permission when prompted.
 
-Deploy this package over the existing FireVault GitHub Pages files. Do not delete the current FireVault Home Screen app or clear browser storage before updating.
-
-## Data preservation
-
-Build 0.80.1 preserves the existing `firevault_vault_build_030` storage key. Existing accounts, notes, photos, scanned documents, Building Navigator locations, settings, backups, and security metadata remain in place.
-
-## After deployment
-
-Open FireVault while online once so the service worker can download Build 0.80.1. If the older build remains visible, close FireVault completely and reopen it. Use Tools → Backup & Data before any future reinstall or device migration.
+Build 0.80.2 preserves the existing `firevault_vault_build_030` storage key and all existing records. Live camera scanning requires HTTPS, which GitHub Pages provides. If live camera access is unavailable or denied, FireVault falls back to the standard device camera picker.

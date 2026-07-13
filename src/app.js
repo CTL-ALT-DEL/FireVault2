@@ -1,6 +1,6 @@
-import { BUILD, KEY, ACTIVE_JOB_KEY, loadData, saveData, ensureSite, fullAddress, esc, uid, downloadBlob, syncSummary, syncQueue, syncConflicts, syncActivity, createSyncPackage, importSyncPackage, resolveSyncConflict, notePackageExport, deviceIdentity, recordSyncActivity, autoBackupInfo, latestAutoBackup, restoreAutoBackup, isDemoMode, setDemoMode, resetDemoData, securityFoundationSummary, securityAudit, recycleBinInfo, restoreRecycleRecord, purgeRecycleBin, recordSecurityEvent, validateVaultIntegrity } from "./storage.js?v=0.80.1";
-import { backendAdapterSummary, runBackendAdapterDiagnostics, backendAdapterManifest, PROVIDER_CONTRACT_VERSION, FILE_STORAGE_CATALOG, fileStoragePlanSummary, cloudFileStorageManifest, MICROSOFT_STORAGE_TYPES, microsoftStorageAccounts, saveMicrosoftStorageAccounts, createMicrosoftStorageAccount, microsoftStorageAccountById, microsoftAppRegistration, saveMicrosoftAppRegistration, microsoftStorageSummary, microsoftStorageManifest } from "./providers.js?v=0.80.1";
-import { encodePlusCode, isValidFullPlusCode, normalizePlusCode, plusCodePrecisionLabel } from "./open-location-code.js?v=0.80.1";
+import { BUILD, KEY, ACTIVE_JOB_KEY, loadData, saveData, ensureSite, fullAddress, esc, uid, downloadBlob, syncSummary, syncQueue, syncConflicts, syncActivity, createSyncPackage, importSyncPackage, resolveSyncConflict, notePackageExport, deviceIdentity, recordSyncActivity, autoBackupInfo, latestAutoBackup, restoreAutoBackup, isDemoMode, setDemoMode, resetDemoData, securityFoundationSummary, securityAudit, recycleBinInfo, restoreRecycleRecord, purgeRecycleBin, recordSecurityEvent, validateVaultIntegrity } from "./storage.js?v=0.80.2";
+import { backendAdapterSummary, runBackendAdapterDiagnostics, backendAdapterManifest, PROVIDER_CONTRACT_VERSION, FILE_STORAGE_CATALOG, fileStoragePlanSummary, cloudFileStorageManifest, MICROSOFT_STORAGE_TYPES, microsoftStorageAccounts, saveMicrosoftStorageAccounts, createMicrosoftStorageAccount, microsoftStorageAccountById, microsoftAppRegistration, saveMicrosoftAppRegistration, microsoftStorageSummary, microsoftStorageManifest } from "./providers.js?v=0.80.2";
+import { encodePlusCode, isValidFullPlusCode, normalizePlusCode, plusCodePrecisionLabel } from "./open-location-code.js?v=0.80.2";
 window.__FIREVAULT_MODULE_READY = true;
 
 function fvPreferenceStore0739(){
@@ -275,6 +275,7 @@ let scannerReturnView0800 = "siteDocs";
 let scannerBusy0800 = false;
 let scannerTargetSiteId0801 = "";
 let scannerAccountSearch0801 = "";
+let scannerCameraState0802 = {stream:null,raf:0,lastAnalysis:0,lastCorners:null,stableFrames:0,cooldownUntil:0,capturing:false,autoCapture:true,running:false,awaitingPageChange:false,capturedCorners:null,capturedSignature:null,lastSignature:null};
 let routeReviewId = "";
 let routeHistorySearch = "";
 let simpleToolsOpen = false;
@@ -864,6 +865,7 @@ function val(id){ return document.getElementById(id)?.value?.trim() || ""; }
 function raw(id){ return document.getElementById(id)?.value || ""; }
 function checked(id){ return !!document.getElementById(id)?.checked; }
 function route(v){
+  if(v!=="documentScanner") scannerStopLiveCamera0802(false);
   captureRouteScroll0782();
   if(view === "settings") captureSettingsScroll576();
   if(settingsSubmenuReturn576 && ["diagnostics","dataTools"].includes(view) && !["diagnostics","dataTools","settings"].includes(v)) settingsSubmenuReturn576=false;
@@ -5585,7 +5587,7 @@ function siteDocForm(){
   const del=document.getElementById("deleteDocBtn"); if(del) del.onclick=()=>{ if(confirm("Delete this document reference?")){ s.docs=s.docs.filter(x=>x.id!==mode); save(); toast("Document deleted."); route("siteDocs"); } };
 }
 
-/* Build 0.80.1 — Tools scanner with post-capture account matching */
+/* Build 0.80.2 — simplified scanner, AI Auto Scan, and keyboard repair */
 function docIsScan0800(d={}){
   return d.isScannedDocument===true && Array.isArray(d.scanPages) && d.scanPages.length>0;
 }
@@ -5679,6 +5681,7 @@ function scannerStart0800(docId="",returnView="siteDocs",targetSiteId=undefined)
   route("documentScanner");
 }
 function scannerDiscard0800(){
+  scannerStopLiveCamera0802(false);
   if(scannerDraft0800?.pages?.length && !confirm("Discard this unsaved document scan?"))return;
   scannerDraft0800=null; scannerEditingDocId0800=""; scannerEditorIndex0800=-1; scannerTargetSiteId0801=""; scannerAccountSearch0801="";
   route(scannerReturnView0800||"siteDocs");
@@ -5711,41 +5714,147 @@ async function scannerNormalizeSource0800(src){
   ctx.drawImage(img,0,0,canvas.width,canvas.height);
   return canvas.toDataURL("image/jpeg",.88);
 }
-async function scannerDetectDocument0800(src){
+function scannerPolygonArea0802(corners=[]){
+  if(!Array.isArray(corners)||corners.length!==4)return 0;
+  let area=0;for(let i=0;i<4;i++){const a=corners[i],b=corners[(i+1)%4];area+=a.x*b.y-b.x*a.y;}return Math.abs(area)/2;
+}
+function scannerCornerDistance0802(a=[],b=[]){
+  if(!Array.isArray(a)||!Array.isArray(b)||a.length!==4||b.length!==4)return 1;
+  return a.reduce((sum,p,i)=>sum+Math.hypot(p.x-b[i].x,p.y-b[i].y),0)/4;
+}
+function scannerAnalyzePixels0802(imageData,w,h){
   try{
-    const img=await scannerLoadImage0800(src);
-    const max=460,scale=Math.min(1,max/Math.max(img.width,img.height));
-    const w=Math.max(40,Math.round(img.width*scale)),h=Math.max(40,Math.round(img.height*scale));
-    const canvas=document.createElement("canvas");canvas.width=w;canvas.height=h;
-    const ctx=canvas.getContext("2d",{willReadFrequently:true});ctx.drawImage(img,0,0,w,h);
-    const px=ctx.getImageData(0,0,w,h).data;
+    const px=imageData?.data||imageData;if(!px||w<40||h<40)return {corners:scannerFullCorners0800(),confidence:0};
     let br=0,bg=0,bb=0,count=0;
-    const border=Math.max(2,Math.round(Math.min(w,h)*.025));
+    const border=Math.max(3,Math.round(Math.min(w,h)*.045));
     for(let y=0;y<h;y+=2){for(let x=0;x<w;x+=2){if(x<border||x>=w-border||y<border||y>=h-border){const i=(y*w+x)*4;br+=px[i];bg+=px[i+1];bb+=px[i+2];count++;}}}
     br/=count||1;bg/=count||1;bb/=count||1;
     const bgLum=.2126*br+.7152*bg+.0722*bb;
-    const rows=new Uint32Array(h),cols=new Uint32Array(w);
+    let variance=0,samples=0;
+    for(let y=0;y<h;y+=4){for(let x=0;x<w;x+=4){if(x<border||x>=w-border||y<border||y>=h-border){const i=(y*w+x)*4;variance+=Math.hypot(px[i]-br,px[i+1]-bg,px[i+2]-bb);samples++;}}}
+    const threshold=Math.max(28,Math.min(70,(variance/(samples||1))*1.7+18));
+    const mask=new Uint8Array(w*h);
     for(let y=1;y<h-1;y++){
       for(let x=1;x<w-1;x++){
         const i=(y*w+x)*4,r=px[i],g=px[i+1],b=px[i+2],lum=.2126*r+.7152*g+.0722*b;
         const diff=Math.hypot(r-br,g-bg,b-bb);
-        const il=(y*w+x-1)*4,iu=((y-1)*w+x)*4;
-        const edge=Math.abs(lum-(.2126*px[il]+.7152*px[il+1]+.0722*px[il+2]))+Math.abs(lum-(.2126*px[iu]+.7152*px[iu+1]+.0722*px[iu+2]));
-        const pageLike=diff>44 || (bgLum<145&&lum>bgLum+34) || (bgLum>185&&lum<bgLum-34) || edge>95;
-        if(pageLike){rows[y]++;cols[x]++;}
+        const il=(y*w+x-1)*4,ir=(y*w+x+1)*4,iu=((y-1)*w+x)*4,id=((y+1)*w+x)*4;
+        const l=.2126*px[il]+.7152*px[il+1]+.0722*px[il+2],rr=.2126*px[ir]+.7152*px[ir+1]+.0722*px[ir+2],u=.2126*px[iu]+.7152*px[iu+1]+.0722*px[iu+2],d=.2126*px[id]+.7152*px[id+1]+.0722*px[id+2];
+        const edge=Math.abs(rr-l)+Math.abs(d-u);
+        const pageTone=(bgLum<145&&lum>bgLum+22)||(bgLum>175&&lum<bgLum-22);
+        if(diff>threshold||pageTone||edge>115)mask[y*w+x]=1;
       }
     }
-    const rowThreshold=Math.max(5,Math.round(w*.12)),colThreshold=Math.max(5,Math.round(h*.12));
-    let top=Math.round(h*.02),bottom=Math.round(h*.98),left=Math.round(w*.02),right=Math.round(w*.98);
-    for(let y=Math.round(h*.015);y<h*.48;y++){if(rows[y]>=rowThreshold){top=y;break;}}
-    for(let y=Math.round(h*.985);y>h*.52;y--){if(rows[y]>=rowThreshold){bottom=y;break;}}
-    for(let x=Math.round(w*.015);x<w*.48;x++){if(cols[x]>=colThreshold){left=x;break;}}
-    for(let x=Math.round(w*.985);x>w*.52;x--){if(cols[x]>=colThreshold){right=x;break;}}
-    if(right-left<w*.42||bottom-top<h*.42)return scannerFullCorners0800();
-    const pad=Math.max(2,Math.round(Math.min(w,h)*.012));
-    left=Math.max(0,left-pad);right=Math.min(w-1,right+pad);top=Math.max(0,top-pad);bottom=Math.min(h-1,bottom+pad);
-    return [{x:left/w,y:top/h},{x:right/w,y:top/h},{x:right/w,y:bottom/h},{x:left/w,y:bottom/h}];
-  }catch(err){console.warn("Document edge detection failed",err);return scannerFullCorners0800();}
+    // Close small gaps so text and shadows remain part of the page region.
+    const smooth=new Uint8Array(mask.length);
+    for(let y=1;y<h-1;y++)for(let x=1;x<w-1;x++){
+      let n=0;for(let yy=-1;yy<=1;yy++)for(let xx=-1;xx<=1;xx++)n+=mask[(y+yy)*w+x+xx];
+      if(n>=4)smooth[y*w+x]=1;
+    }
+    const seen=new Uint8Array(mask.length),queue=new Int32Array(mask.length);
+    let best=null;
+    for(let sy=2;sy<h-2;sy+=2){for(let sx=2;sx<w-2;sx+=2){
+      const seed=sy*w+sx;if(!smooth[seed]||seen[seed])continue;
+      let head=0,tail=0;queue[tail++]=seed;seen[seed]=1;
+      let area=0,minX=w,maxX=0,minY=h,maxY=0,touch=0;
+      let tl=null,tr=null,brp=null,bl=null,tlScore=1e9,trScore=-1e9,brScore=-1e9,blScore=1e9;
+      while(head<tail){const p=queue[head++],y=Math.floor(p/w),x=p-y*w;area++;minX=Math.min(minX,x);maxX=Math.max(maxX,x);minY=Math.min(minY,y);maxY=Math.max(maxY,y);if(x<3||x>w-4||y<3||y>h-4)touch++;
+        const sum=x+y,diff=x-y;if(sum<tlScore){tlScore=sum;tl={x,y};}if(diff>trScore){trScore=diff;tr={x,y};}if(sum>brScore){brScore=sum;brp={x,y};}if(diff<blScore){blScore=diff;bl={x,y};}
+        const neighbors=[p-1,p+1,p-w,p+w];for(const n of neighbors){if(n>=0&&n<smooth.length&&!seen[n]&&smooth[n]){seen[n]=1;queue[tail++]=n;}}
+      }
+      const boxArea=Math.max(1,(maxX-minX+1)*(maxY-minY+1)),coverage=area/(w*h),boxCoverage=boxArea/(w*h),solidity=area/boxArea;
+      if(coverage<.10||coverage>.93||boxCoverage<.18||maxX-minX<w*.34||maxY-minY<h*.34||!tl||!tr||!brp||!bl)continue;
+      const corners=[tl,tr,brp,bl].map(p=>({x:p.x/w,y:p.y/h}));
+      const polyArea=scannerPolygonArea0802(corners);if(polyArea<.16)continue;
+      const centerX=(minX+maxX)/2/w,centerY=(minY+maxY)/2/h,centerPenalty=Math.min(1,Math.hypot(centerX-.5,centerY-.5)*1.5);
+      const touchPenalty=Math.min(1,touch/Math.max(1,area*.08));
+      const score=area*(.8+solidity)*Math.max(.35,1-centerPenalty*.45)*Math.max(.3,1-touchPenalty*.55);
+      if(!best||score>best.score)best={score,corners,coverage,solidity,touchPenalty};
+    }}
+    if(!best)return {corners:scannerFullCorners0800(),confidence:0};
+    const center=best.corners.reduce((o,p)=>({x:o.x+p.x/4,y:o.y+p.y/4}),{x:0,y:0});
+    const padded=best.corners.map(p=>({x:Math.max(.005,Math.min(.995,center.x+(p.x-center.x)*1.025)),y:Math.max(.005,Math.min(.995,center.y+(p.y-center.y)*1.025))}));
+    const rectangularity=Math.min(1,scannerPolygonArea0802(padded)/Math.max(.001,best.coverage));
+    const confidence=Math.max(0,Math.min(1,.3+best.coverage*.65+best.solidity*.22+rectangularity*.12-best.touchPenalty*.28));
+    return {corners:padded,confidence};
+  }catch(err){console.warn("Smart page analysis failed",err);return {corners:scannerFullCorners0800(),confidence:0};}
+}
+function scannerAnalyzeCanvas0802(canvas){
+  const ctx=canvas.getContext("2d",{willReadFrequently:true});return scannerAnalyzePixels0802(ctx.getImageData(0,0,canvas.width,canvas.height),canvas.width,canvas.height);
+}
+function scannerFrameSignature0802(imageData,w,h){
+  const px=imageData?.data||imageData,out=[];if(!px)return out;const cols=8,rows=6;for(let gy=0;gy<rows;gy++)for(let gx=0;gx<cols;gx++){const x=Math.min(w-1,Math.round((gx+.5)*w/cols)),y=Math.min(h-1,Math.round((gy+.5)*h/rows)),i=(y*w+x)*4;out.push(Math.round(.2126*px[i]+.7152*px[i+1]+.0722*px[i+2]));}return out;
+}
+function scannerSignatureDistance0802(a=[],b=[]){if(!a?.length||a.length!==b?.length)return 255;return a.reduce((sum,v,i)=>sum+Math.abs(v-b[i]),0)/a.length;}
+async function scannerDetectDocumentResult0802(src){
+  try{
+    const img=await scannerLoadImage0800(src),max=520,scale=Math.min(1,max/Math.max(img.width,img.height));
+    const w=Math.max(60,Math.round(img.width*scale)),h=Math.max(60,Math.round(img.height*scale)),canvas=document.createElement("canvas");canvas.width=w;canvas.height=h;
+    const ctx=canvas.getContext("2d",{willReadFrequently:true});ctx.drawImage(img,0,0,w,h);return scannerAnalyzeCanvas0802(canvas);
+  }catch(err){console.warn("Document edge detection failed",err);return {corners:scannerFullCorners0800(),confidence:0};}
+}
+async function scannerDetectDocument0800(src){return (await scannerDetectDocumentResult0802(src)).corners;}
+function scannerStopLiveCamera0802(refresh=false){
+  const state=scannerCameraState0802;state.running=false;state.capturing=false;cancelAnimationFrame(state.raf);state.raf=0;
+  if(state.stream){state.stream.getTracks().forEach(track=>{try{track.stop();}catch{}});state.stream=null;}
+  document.querySelector(".scannerLiveOverlay0802")?.remove();
+  if(refresh&&view==="documentScanner")documentScanner0800();
+}
+function scannerLiveRenderFrame0802(result){
+  const overlay=document.getElementById("scannerLiveCanvas0802"),video=document.getElementById("scannerLiveVideo0802"),stage=document.getElementById("scannerLiveStage0802");if(!overlay||!video||!stage)return;
+  const rect=stage.getBoundingClientRect(),dpr=Math.min(2,window.devicePixelRatio||1);overlay.width=Math.max(1,Math.round(rect.width*dpr));overlay.height=Math.max(1,Math.round(rect.height*dpr));overlay.style.width=`${rect.width}px`;overlay.style.height=`${rect.height}px`;
+  const ctx=overlay.getContext("2d");ctx.setTransform(dpr,0,0,dpr,0,0);ctx.clearRect(0,0,rect.width,rect.height);
+  const vw=video.videoWidth||rect.width,vh=video.videoHeight||rect.height,scale=Math.min(rect.width/vw,rect.height/vh),rw=vw*scale,rh=vh*scale,ox=(rect.width-rw)/2,oy=(rect.height-rh)/2;
+  let corners=result?.corners||scannerFullCorners0800(),conf=Number(result?.confidence)||0;
+  const points=corners.map(p=>({x:ox+p.x*rw,y:oy+p.y*rh}));
+  ctx.lineWidth=conf>.58?4:2.5;ctx.strokeStyle=conf>.58?"#39f06f":"rgba(255,255,255,.74)";ctx.fillStyle=conf>.58?"rgba(34,197,94,.10)":"rgba(255,255,255,.035)";
+  ctx.beginPath();ctx.moveTo(points[0].x,points[0].y);points.slice(1).forEach(p=>ctx.lineTo(p.x,p.y));ctx.closePath();ctx.fill();ctx.stroke();
+  points.forEach(p=>{ctx.beginPath();ctx.arc(p.x,p.y,7,0,Math.PI*2);ctx.fillStyle=conf>.58?"#39f06f":"#fff";ctx.fill();});
+}
+function scannerLiveStatus0802(text,tone=""){const el=document.getElementById("scannerLiveStatus0802");if(el){el.textContent=text;el.dataset.tone=tone;}}
+async function scannerCaptureLiveFrame0802(manual=false){
+  const state=scannerCameraState0802,video=document.getElementById("scannerLiveVideo0802");if(!state.running||state.capturing||!video?.videoWidth)return;
+  state.capturing=true;state.cooldownUntil=Date.now()+1900;scannerLiveStatus0802("Capturing…","ready");
+  try{
+    const canvas=document.createElement("canvas");canvas.width=video.videoWidth;canvas.height=video.videoHeight;canvas.getContext("2d",{alpha:false}).drawImage(video,0,0);
+    const source=await scannerNormalizeSource0800(canvas.toDataURL("image/jpeg",.93));
+    let result=state.lastResult;if(manual||!result||result.confidence<.45)result=await scannerDetectDocumentResult0802(source);
+    const page={id:uid(),originalData:source,processedData:"",imageData:"",width:0,height:0,corners:scannerCopyCorners0800(result?.corners),enhancement:scannerDraft0800?.defaultEnhancement||"color",rotation:0,sourceName:`Camera Page ${(scannerDraft0800?.pages?.length||0)+1}`,updatedAt:new Date().toISOString()};
+    await scannerProcessPage0800(page);scannerDraft0800.pages.push(page);
+    const count=document.getElementById("scannerLiveCount0802");if(count)count.textContent=`${scannerDraft0800.pages.length} page${scannerDraft0800.pages.length===1?"":"s"}`;
+    const flash=document.getElementById("scannerLiveFlash0802");flash?.classList.add("active");setTimeout(()=>flash?.classList.remove("active"),180);
+    state.awaitingPageChange=true;state.capturedCorners=scannerCopyCorners0800(result?.corners);state.capturedSignature=state.lastSignature?.slice?.()||null;
+    toast(`Page ${scannerDraft0800.pages.length} captured and cropped.`);scannerLiveStatus0802("Move to the next page","ready");
+  }catch(err){console.error(err);scannerLiveStatus0802("Capture failed — tap the shutter","error");toast("The page could not be captured.");}
+  finally{state.capturing=false;state.stableFrames=0;state.lastCorners=null;}
+}
+function scannerLiveLoop0802(){
+  const state=scannerCameraState0802;if(!state.running)return;
+  state.raf=requestAnimationFrame(scannerLiveLoop0802);const now=performance.now();if(now-state.lastAnalysis<330||state.capturing)return;state.lastAnalysis=now;
+  const video=document.getElementById("scannerLiveVideo0802");if(!video?.videoWidth)return;
+  const max=360,scale=Math.min(1,max/Math.max(video.videoWidth,video.videoHeight)),w=Math.max(80,Math.round(video.videoWidth*scale)),h=Math.max(80,Math.round(video.videoHeight*scale));
+  const canvas=document.createElement("canvas");canvas.width=w;canvas.height=h;const ctx=canvas.getContext("2d",{willReadFrequently:true});ctx.drawImage(video,0,0,w,h);
+  const frame=ctx.getImageData(0,0,w,h),result=scannerAnalyzePixels0802(frame,w,h),signature=scannerFrameSignature0802(frame,w,h);state.lastResult=result;state.lastSignature=signature;scannerLiveRenderFrame0802(result);
+  if(state.awaitingPageChange){const moved=scannerCornerDistance0802(state.capturedCorners,result.corners)>.065,changed=scannerSignatureDistance0802(state.capturedSignature,signature)>14;if(result.confidence<.3||moved||changed){state.awaitingPageChange=false;state.capturedCorners=null;state.capturedSignature=null;state.stableFrames=0;state.lastCorners=null;}else{scannerLiveStatus0802("Move to the next page","ready");return;}}
+  const diff=scannerCornerDistance0802(state.lastCorners,result.corners);if(result.confidence>.58&&diff<.022)state.stableFrames++;else state.stableFrames=result.confidence>.62?1:0;state.lastCorners=scannerCopyCorners0800(result.corners);
+  if(result.confidence<.42)scannerLiveStatus0802("Center the full page inside the frame");
+  else if(state.stableFrames<2)scannerLiveStatus0802("Page found — hold steady","found");
+  else if(state.stableFrames<4)scannerLiveStatus0802("Hold steady…","found");
+  else scannerLiveStatus0802(state.autoCapture?"Ready — capturing automatically":"Ready — tap shutter","ready");
+  if(state.autoCapture&&state.stableFrames>=4&&Date.now()>state.cooldownUntil)scannerCaptureLiveFrame0802(false);
+}
+async function scannerOpenLiveCamera0802(fallbackInput,importInput){
+  scannerSyncFields0800();
+  if(!navigator.mediaDevices?.getUserMedia){fallbackInput?.click();return;}
+  scannerStopLiveCamera0802(false);
+  const overlay=document.createElement("div");overlay.className="scannerLiveOverlay0802";overlay.innerHTML=`<div class="scannerLiveSheet0802"><div class="scannerLiveHead0802"><button class="ghost" id="scannerLiveCancel0802">Cancel</button><div><strong>AI Auto Scan</strong><span id="scannerLiveCount0802">${scannerDraft0800?.pages?.length||0} page${scannerDraft0800?.pages?.length===1?"":"s"}</span></div><button class="primary" id="scannerLiveDone0802">Done</button></div><div class="scannerLiveStage0802" id="scannerLiveStage0802"><video id="scannerLiveVideo0802" autoplay playsinline muted></video><canvas id="scannerLiveCanvas0802"></canvas><div class="scannerLiveFlash0802" id="scannerLiveFlash0802"></div><div class="scannerLiveStatus0802" id="scannerLiveStatus0802">Starting camera…</div></div><div class="scannerLiveControls0802"><button class="scannerAutoToggle0802 active" id="scannerAutoToggle0802"><span>AI</span><div><strong>Auto Capture</strong><small>Detect, frame, crop, and capture</small></div><b>ON</b></button><button class="scannerShutter0802" id="scannerShutter0802" aria-label="Capture page"><span></span></button><button class="ghost scannerCameraImport0802" id="scannerCameraImport0802">Import</button></div></div>`;document.body.appendChild(overlay);
+  const close=()=>scannerStopLiveCamera0802(true);document.getElementById("scannerLiveCancel0802").onclick=close;document.getElementById("scannerLiveDone0802").onclick=close;document.getElementById("scannerShutter0802").onclick=()=>scannerCaptureLiveFrame0802(true);document.getElementById("scannerCameraImport0802").onclick=()=>{scannerStopLiveCamera0802(false);(importInput||fallbackInput)?.click();};
+  document.getElementById("scannerAutoToggle0802").onclick=()=>{scannerCameraState0802.autoCapture=!scannerCameraState0802.autoCapture;const b=document.getElementById("scannerAutoToggle0802");b?.classList.toggle("active",scannerCameraState0802.autoCapture);const label=b?.querySelector("b");if(label)label.textContent=scannerCameraState0802.autoCapture?"ON":"OFF";};
+  try{
+    const stream=await navigator.mediaDevices.getUserMedia({audio:false,video:{facingMode:{ideal:"environment"},width:{ideal:1920},height:{ideal:1440}}});
+    scannerCameraState0802={...scannerCameraState0802,stream,running:true,lastAnalysis:0,lastCorners:null,stableFrames:0,cooldownUntil:0,capturing:false,awaitingPageChange:false,capturedCorners:null,capturedSignature:null,lastSignature:null};
+    const video=document.getElementById("scannerLiveVideo0802");video.srcObject=stream;await video.play();scannerLiveStatus0802("Center the full page inside the frame");scannerLiveLoop0802();
+  }catch(err){console.warn("Live camera unavailable",err);scannerStopLiveCamera0802(false);toast("Live camera access was unavailable. Opening the standard camera instead.");fallbackInput?.click();}
 }
 function scannerBilinearPoint0800(c,u,v){
   const top={x:c[0].x+(c[1].x-c[0].x)*u,y:c[0].y+(c[1].y-c[0].y)*u};
@@ -5864,26 +5973,23 @@ function documentScanner0800(){
   if(!scannerDraft0800){scannerStart0800("",scannerReturnView0800||"tools",scannerReturnView0800==="tools"?"":undefined);return;}
   if(scannerEditorIndex0800>=0){scannerPageEditorScreen0800();return;}
   const pages=scannerDraft0800.pages||[],size=scannerSizeLabel0800(),target=scannerTargetSite0801();
-  html(`<div class="screen scannerScreen0800"><div class="row scannerTop0800"><button class="back ghost" id="scannerBack0800">←</button><div><h1>${scannerEditingDocId0800?"Edit Scan":"Document Scanner"}</h1><p>${target?esc(target.name||"Account"):"Unassigned — capture first, then match to an account"}</p></div><span class="scannerPageCount0800">${pages.length} PAGE${pages.length===1?"":"S"}</span></div>
-    <section class="card scannerHero0800"><div><span>FIREVAULT DOCUMENT SCANNER</span><h2>Capture, clean up, and match paperwork to the correct account</h2><p>Photograph each page, correct its edges, enhance readability, arrange the pages, then search for the account that should receive the document.</p></div><div class="scannerHeroSteps0800"><span><b>1</b>Capture</span><span><b>2</b>Adjust</span><span><b>3</b>Match</span><span><b>4</b>Save</span></div></section>
-    <section class="card scannerFields0800"><label>Document Name<input id="scannerTitle0800" value="${esc(scannerDraft0800.title)}" placeholder="Inspection report, programming sheet, permit..."></label><div class="scannerFieldGrid0800"><label>Date<input id="scannerDate0800" type="date" value="${esc(scannerDraft0800.date||localDateString())}"></label><label>Scan Quality<select id="scannerQuality0800"><option value="compact" ${scannerDraft0800.quality==="compact"?"selected":""}>Compact — more pages</option><option value="standard" ${scannerDraft0800.quality==="standard"?"selected":""}>Standard — recommended</option><option value="high" ${scannerDraft0800.quality==="high"?"selected":""}>High — larger file</option></select></label><label>Default Cleanup<select id="scannerCleanup0800"><option value="color" ${scannerDraft0800.defaultEnhancement==="color"?"selected":""}>Auto Color</option><option value="gray" ${scannerDraft0800.defaultEnhancement==="gray"?"selected":""}>Grayscale</option><option value="bw" ${scannerDraft0800.defaultEnhancement==="bw"?"selected":""}>Black & White</option><option value="original" ${scannerDraft0800.defaultEnhancement==="original"?"selected":""}>Original</option></select></label></div><label>Document Notes<textarea id="scannerNotes0800" rows="3" placeholder="What this document is, where it came from, and why it matters...">${esc(scannerDraft0800.notes)}</textarea></label></section>
-    <section class="scannerCaptureBar0800"><button class="primary" id="scannerCamera0800" ${scannerBusy0800?"disabled":""}>▣ ${scannerBusy0800?"Processing…":"Scan Next Page"}</button><button class="ghost" id="scannerImport0800" ${scannerBusy0800?"disabled":""}>Import Photos</button><input id="scannerCameraInput0800" type="file" accept="image/*" capture="environment" hidden><input id="scannerImportInput0800" type="file" accept="image/*" multiple hidden></section>
-    <section class="scannerPages0800">${pages.length?pages.map(scannerPageCard0800).join(""):`<div class="scannerEmpty0800"><span>▤</span><strong>No pages captured</strong><p>Lay the document on a contrasting surface with good light. Keep all four corners visible, then tap Scan Next Page.</p><button class="primary" id="scannerEmptyCamera0800">Open Camera</button></div>`}</section>
+  html(`<div class="screen scannerScreen0800"><div class="row scannerTop0800"><button class="back ghost" id="scannerBack0800">←</button><div><h1>${scannerEditingDocId0800?"Edit Scan":"Document Scanner"}</h1><p>${target?esc(target.name||"Account"):"Scan first, then match the account"}</p></div><span class="scannerPageCount0800">${pages.length} PAGE${pages.length===1?"":"S"}</span></div>
+    <section class="scannerQuickCapture0802"><button class="primary scannerMainCapture0802" id="scannerCamera0800" ${scannerBusy0800?"disabled":""}><span>▣</span><div><strong>${scannerBusy0800?"Processing…":"Scan a Page"}</strong><small>AI finds the page, frames it, crops it, and takes the picture</small></div></button><button class="ghost scannerImport0802" id="scannerImport0800" ${scannerBusy0800?"disabled":""}>Import Photos</button><input id="scannerCameraInput0800" type="file" accept="image/*" capture="environment" hidden><input id="scannerImportInput0800" type="file" accept="image/*" multiple hidden></section>
+    <section class="card scannerDetails0802"><label>Document Name<input id="scannerTitle0800" value="${esc(scannerDraft0800.title)}" placeholder="Inspection report, permit, programming sheet…"></label><div class="scannerDetailsRow0802"><label>Date<input id="scannerDate0800" type="date" value="${esc(scannerDraft0800.date||localDateString())}"></label><details class="scannerOptions0802"><summary>Options</summary><div><label>Quality<select id="scannerQuality0800"><option value="compact" ${scannerDraft0800.quality==="compact"?"selected":""}>Compact</option><option value="standard" ${scannerDraft0800.quality==="standard"?"selected":""}>Standard</option><option value="high" ${scannerDraft0800.quality==="high"?"selected":""}>High</option></select></label><label>Cleanup<select id="scannerCleanup0800"><option value="color" ${scannerDraft0800.defaultEnhancement==="color"?"selected":""}>Auto Color</option><option value="gray" ${scannerDraft0800.defaultEnhancement==="gray"?"selected":""}>Grayscale</option><option value="bw" ${scannerDraft0800.defaultEnhancement==="bw"?"selected":""}>Black & White</option><option value="original" ${scannerDraft0800.defaultEnhancement==="original"?"selected":""}>Original</option></select></label></div></details></div><label>Notes <span>Optional</span><textarea id="scannerNotes0800" rows="2" placeholder="Brief description or reason for saving…">${esc(scannerDraft0800.notes)}</textarea></label></section>
+    <section class="scannerPages0800">${pages.length?pages.map(scannerPageCard0800).join(""):`<div class="scannerEmptyCompact0802"><span>▤</span><div><strong>Ready to scan</strong><small>Place one page in view and tap Scan a Page.</small></div></div>`}</section>
     ${scannerAccountAssignmentMarkup0801(pages.length)}
-    <section class="card scannerSavePanel0800"><div><strong>${pages.length} page${pages.length===1?"":"s"} ready${target?` for ${esc(target.name||"account")}`:""}</strong><span>${target?`Estimated stored size: ${size}. The document will be saved to this account and logged in Site Notes.`:"Select an account before saving. A PDF is generated whenever you preview, download, or share the scan."}</span></div><button class="primary" id="scannerSave0800" ${!pages.length||!target||scannerBusy0800?"disabled":""}>${target?"Save to Account":"Match an Account to Save"}</button></section>
+    <section class="card scannerSavePanel0800"><div><strong>${pages.length} page${pages.length===1?"":"s"}${target?` • ${esc(target.name||"Account")}`:""}</strong><span>${target?`${size} estimated storage. The scan will also be logged in Site Notes.`:"Capture a page and select the account before saving."}</span></div><button class="primary" id="scannerSave0800" ${!pages.length||!target||scannerBusy0800?"disabled":""}>${target?"Save Document":"Select Account"}</button></section>
   </div>`);
   document.getElementById("scannerBack0800").onclick=scannerDiscard0800;
   const camera=document.getElementById("scannerCameraInput0800"),imports=document.getElementById("scannerImportInput0800");
-  const openCamera=()=>{scannerSyncFields0800();camera?.click();};
-  document.getElementById("scannerCamera0800")?.addEventListener("click",openCamera);document.getElementById("scannerEmptyCamera0800")?.addEventListener("click",openCamera);
+  document.getElementById("scannerCamera0800")?.addEventListener("click",()=>scannerOpenLiveCamera0802(camera,imports));
   document.getElementById("scannerImport0800")?.addEventListener("click",()=>{scannerSyncFields0800();imports?.click();});
-  if(camera)camera.onchange=e=>scannerImportFiles0800(e.target.files,true);if(imports)imports.onchange=e=>scannerImportFiles0800(e.target.files,false);
+  if(camera)camera.onchange=e=>scannerImportFiles0800(e.target.files,false);if(imports)imports.onchange=e=>scannerImportFiles0800(e.target.files,false);
   document.querySelectorAll("[data-scan-edit0800]").forEach(b=>b.onclick=e=>{e.stopPropagation();scannerSyncFields0800();scannerEditorIndex0800=Number(b.dataset.scanEdit0800);documentScanner0800();});
   document.querySelectorAll("[data-scan-up0800]").forEach(b=>b.onclick=()=>{scannerSyncFields0800();const i=Number(b.dataset.scanUp0800);if(i>0){[pages[i-1],pages[i]]=[pages[i],pages[i-1]];documentScanner0800();}});
   document.querySelectorAll("[data-scan-down0800]").forEach(b=>b.onclick=()=>{scannerSyncFields0800();const i=Number(b.dataset.scanDown0800);if(i<pages.length-1){[pages[i],pages[i+1]]=[pages[i+1],pages[i]];documentScanner0800();}});
   document.querySelectorAll("[data-scan-delete0800]").forEach(b=>b.onclick=()=>{const i=Number(b.dataset.scanDelete0800);if(confirm(`Delete page ${i+1}?`)){scannerSyncFields0800();pages.splice(i,1);documentScanner0800();}});
-  wireScannerAccountMatch0801();
-  document.getElementById("scannerSave0800")?.addEventListener("click",scannerSaveDocument0800);
+  wireScannerAccountMatch0801();document.getElementById("scannerSave0800")?.addEventListener("click",scannerSaveDocument0800);
 }
 function scannerClampCorner0800(c,index,x,y){
   const gap=.045;x=Math.max(.005,Math.min(.995,x));y=Math.max(.005,Math.min(.995,y));
@@ -5932,6 +6038,7 @@ function scannerPageEditorScreen0800(){
   document.getElementById("scannerApplyPage0800").onclick=async()=>{const btn=document.getElementById("scannerApplyPage0800");btn.disabled=true;btn.textContent="Processing Page…";try{await scannerProcessPage0800(page);scannerEditorIndex0800=-1;toast("Page adjusted.");documentScanner0800();}catch(err){console.error(err);toast("Page processing failed.");btn.disabled=false;btn.textContent="Apply Crop & Cleanup";}};
 }
 async function scannerSaveDocument0800(){
+  scannerStopLiveCamera0802(false);
   scannerSyncFields0800();const s=scannerTargetSite0801();if(!scannerDraft0800?.pages?.length)return;if(!s){toast("Search for and select the account that should receive this document.");document.getElementById("scannerAccountSearch0801")?.focus();return;}ensureSite(s);
   const title=String(scannerDraft0800.title||"").trim();if(!title){toast("Enter a document name.");document.getElementById("scannerTitle0800")?.focus();return;}
   const btn=document.getElementById("scannerSave0800");if(btn){btn.disabled=true;btn.textContent="Preparing Pages…";}
@@ -8045,7 +8152,7 @@ const FIREVAULT_MANUAL_058 = [
   ]},
   {id:"photos",title:"Photos & Photo Overlay",icon:"▧",status:"Current",summary:"Capture, label, organize, and preserve site photographs.",topics:[
     ["Add a photo","Open the account photo or document area and choose the camera or photo library. Confirm the correct account before saving."],
-    ["Scan a document","Open Tools → Document Scanner to capture paperwork without choosing an account first. After the first page is captured, search by account name, Account ID, address, city, phone, or ZIP code and select the matching account. You can also open the scanner directly from an account’s Site Notes workspace. Adjust corners, rotate, choose a cleanup mode, reorder pages, and save. FireVault stores the scan with the matched account and creates a PDF for preview, download, or sharing."],
+    ["Scan a document","Open Tools → Document Scanner and tap Scan a Page. The live AI Auto Scan camera detects the page corners, draws the crop frame, waits for the page to be steady, and takes the picture automatically. Keep the camera open for additional pages, then tap Done. Search by account name, Account ID, address, city, phone, or ZIP code and select the matching account. The scanner is also available from an account’s Site Notes workspace. Manual corner adjustment, rotation, cleanup modes, page ordering, PDF preview, download, and sharing remain available."],
     ["Useful photo notes","Describe the device, room, floor, circuit, condition, and reason the photo matters. Avoid relying on an image alone."],
     ["Overlay settings","Settings → Photo Overlay controls the template fields, alignment, font size, colors, background, opacity, logo, and tagline."],
     ["Storage caution","Photos and scanned pages can increase local browser storage quickly. Standard quality is recommended; use Compact for long documents. Export backups and remove unnecessary duplicates."],
@@ -8175,7 +8282,7 @@ function manualSimplePage058(type){
   quick:["🚀","Quick Start Guide","Get FireVault ready for a normal field day.",[["1. Verify the build","Confirm the green build badge shows 0.67.0 before entering production information."],["2. Complete Technician Profile","Enter your name, company, phone, email, and license or employee identification."],["3. Review permissions","Allow location and photo access only when FireVault requests them and the feature is needed."],["4. Create or open a site","Add the customer name, full address, panel details, contacts, access notes, and GPS location."],["5. Document the visit","Record notes, photos, tasks, deficiencies, equipment changes, and a service visit."],["6. Finish and protect the data","Review the report, send or copy the required summary, then export a current backup."]]],
   new:["🆕","What’s New in 0.67.0","Account View, Settings navigation, and FireVault Academy redesign.",[["Unified visual system","Standardized typography, spacing, card surfaces, borders, controls, and responsive behavior across FireVault."],["Settings cleanup","Improved Settings home cards and every submenu while preserving the preferred Email setup workflow."],["Help readability","Converted contextual Help and Academy articles into one uninterrupted scrolling reading column with no floating metadata."],["Site Detail stability","Reinforced natural-height cards, readable text, and scroll-safe account sections."],["Operational screens","Simplified Customer Import, Team Sync, Conflict Center, and Nearby Sites presentation without changing their workflows."],["Phone and iPad layouts","Added consistent narrow-phone and tablet behavior, bottom-navigation clearance, and overflow protection."],["Nearby scan diagnostics","Nearby Sites now shows total sites, GPS-ready records, missing coordinates, phone-location progress, and persistent error messages."],["Coordinate recovery","FireVault recovers valid latitude and longitude stored in compatible legacy or imported fields and normalizes them into the site GPS record."],["Location retry","If high-accuracy location times out or is unavailable, FireVault retries once using standard accuracy."],["Nearest-site fallback","When no site is inside the selected radius, the nearest GPS-ready sites remain visible instead of presenting an empty result."],["Latitude and longitude","Customer Import can calculate missing coordinates from each usable U.S. street address before saving records."],["Coordinate requirement","The importer requires calculated, supplied, or existing GPS coordinates by default. Unmatched addresses remain in review."],["Census address matching","Only address fields are sent to the U.S. Census Geocoder. The returned point is an address-range calculation, not a guaranteed building entrance."],["Account Id matching","Repeat imports update the matching FireVault site instead of creating duplicates or deleting field history."],["CSV coordinate columns","Files that already contain Latitude and Longitude columns use those values directly."],["Sync-ready changes","Added and updated customer records enter the pending synchronization queue and create a Sync Activity entry."]]],
   tips:["🧰","Field Tips","Short practices that improve the usefulness of FireVault records.",[["Write for the next technician","Include the exact panel, circuit, device, location, symptom, test result, and next action instead of relying on memory."],["Photograph context first","Take one wide photo showing the equipment location before close-up terminal, label, or damage photos."],["Separate facts from follow-up","Use notes for what occurred, deficiencies for code or system problems, and tasks for work that still needs completion."],["Confirm the account","Before using Quick Capture, verify the selected customer site to prevent records from being stored under the wrong account."],["Back up before updates","Download an external backup before a major update or device change and after completing significant field documentation."]]],
-  revisions:["📋","Revision History","Application and documentation checkpoints.",[["0.80.1","Moved Document Scanner to Tools, added post-capture account search and matching, and added scanner access inside the full Site Notes workspace."],["0.80.0","Added an account-specific multi-page camera document scanner with automatic edge detection, manual corner correction, rotation, cleanup modes, page ordering, PDF preview/download/share, and account-note activity."],["0.79.14","Restored numbered Nearby Accounts map pins matched to distance-sorted list rows and removed Smart Account Intelligence."],["0.79.13","Repaired startup parsing inherited from 0.79.11 and corrected Building Navigator location-copy syntax."],["0.79.12","Added Building Navigator with exact site locations, GPS/Plus Codes, verification, linked photos, route targets, and timeline events."],["0.79.7","Shortened every Settings summary and removed the colored bar from each Section Overview."],["0.79.6","Added Nearby-style account-list scroll locking so cards settle cleanly at the top while the Accounts controls remain fixed."],["0.79.5","Added separate Personal OneDrive, Work OneDrive, and SharePoint connection profiles with exact photo/document assignments and no-personal-fallback protection."],["0.79.4","Added independent photo and document storage destinations, cloud-provider integration targets, and offline Google Plus Codes for accounts and exact field locations."],["0.79.3","Added backend-neutral provider interfaces for authentication, database, file storage, synchronization, and audit while keeping FireVault fully local."],["0.79.2","Added a unified Security Center with vault integrity validation, backup health, audit filters, device naming, session clearing, and PIN confirmation for sensitive exports, restores, and deletion."],["0.79.1","Added an optional local six-digit privacy lock with PBKDF2 hashing, inactivity/background locking, app-switcher privacy screen, recovery code, cooldown protection, and local lock events."],["0.79.0","Added security-ready schema 4 metadata, stable workspace/user/device identities, local audit history, pending change queue, recoverable deletion, credential-safe exports, and protected restore/reset actions."],["0.67.0","Redesigned Account View around service actions and grouped information, consolidated Settings into five folders, and simplified FireVault Academy and contextual Help for continuous reading."],["0.65.2","Repaired Nearby Sites with GPS inventory counts, imported-coordinate recovery, persistent permission and timeout messages, a standard-accuracy retry, and nearest-site fallback results."],["0.65.1","Added online latitude/longitude calculation, coordinate validation, geocoding progress, unmatched-address review, optional CSV coordinates, and coordinate-safe repeat importing."],["0.65.0","Added preview-first customer CSV importing, Account Id update matching, validation warnings, imported monitoring details, and sync activity tracking."],["0.64.1","Simplified Academy article headers, removed floating metadata badges, and improved continuous scrolling and readability."],["0.64.0","Added Sync Activity, a conflict review center, export/import audit entries, and an automatic OneDrive connection-readiness checklist."],["0.63.1","Overhauled contextual Help and Academy reader formatting, removed overlapping sticky article headers, and restored full scrolling on phones and tablets."],["0.63.0","Added permanent record IDs, audit metadata, local version tracking, pending-sync states, conflict readiness, device identity, and a Team Sync settings workspace."],["0.60.0","Connected major screens and Settings areas directly to matching Academy chapters with return-to-screen navigation."],["0.59.0","Added interactive tutorials, guided orientation, pinned learning, field tips, and documentation tracking."],["0.58.0","Expanded Help & Manual into FireVault Academy with bookmarks, smart search, Quick Start, and reader navigation."],["0.57.0","Added the first complete searchable in-app FireVault User Manual."],["Ongoing review rule","Any change to navigation, labels, storage, workflows, permissions, or supported layouts requires the related manual chapter to be checked."]]],
+  revisions:["📋","Revision History","Application and documentation checkpoints.",[["0.80.2","Simplified Document Scanner, added on-device AI Auto Scan with live corner framing and hands-free capture, and repaired mobile keyboard field visibility."],["0.80.2","Moved Document Scanner to Tools, added post-capture account search and matching, and added scanner access inside the full Site Notes workspace."],["0.80.0","Added an account-specific multi-page camera document scanner with automatic edge detection, manual corner correction, rotation, cleanup modes, page ordering, PDF preview/download/share, and account-note activity."],["0.79.14","Restored numbered Nearby Accounts map pins matched to distance-sorted list rows and removed Smart Account Intelligence."],["0.79.13","Repaired startup parsing inherited from 0.79.11 and corrected Building Navigator location-copy syntax."],["0.79.12","Added Building Navigator with exact site locations, GPS/Plus Codes, verification, linked photos, route targets, and timeline events."],["0.79.7","Shortened every Settings summary and removed the colored bar from each Section Overview."],["0.79.6","Added Nearby-style account-list scroll locking so cards settle cleanly at the top while the Accounts controls remain fixed."],["0.79.5","Added separate Personal OneDrive, Work OneDrive, and SharePoint connection profiles with exact photo/document assignments and no-personal-fallback protection."],["0.79.4","Added independent photo and document storage destinations, cloud-provider integration targets, and offline Google Plus Codes for accounts and exact field locations."],["0.79.3","Added backend-neutral provider interfaces for authentication, database, file storage, synchronization, and audit while keeping FireVault fully local."],["0.79.2","Added a unified Security Center with vault integrity validation, backup health, audit filters, device naming, session clearing, and PIN confirmation for sensitive exports, restores, and deletion."],["0.79.1","Added an optional local six-digit privacy lock with PBKDF2 hashing, inactivity/background locking, app-switcher privacy screen, recovery code, cooldown protection, and local lock events."],["0.79.0","Added security-ready schema 4 metadata, stable workspace/user/device identities, local audit history, pending change queue, recoverable deletion, credential-safe exports, and protected restore/reset actions."],["0.67.0","Redesigned Account View around service actions and grouped information, consolidated Settings into five folders, and simplified FireVault Academy and contextual Help for continuous reading."],["0.65.2","Repaired Nearby Sites with GPS inventory counts, imported-coordinate recovery, persistent permission and timeout messages, a standard-accuracy retry, and nearest-site fallback results."],["0.65.1","Added online latitude/longitude calculation, coordinate validation, geocoding progress, unmatched-address review, optional CSV coordinates, and coordinate-safe repeat importing."],["0.65.0","Added preview-first customer CSV importing, Account Id update matching, validation warnings, imported monitoring details, and sync activity tracking."],["0.64.1","Simplified Academy article headers, removed floating metadata badges, and improved continuous scrolling and readability."],["0.64.0","Added Sync Activity, a conflict review center, export/import audit entries, and an automatic OneDrive connection-readiness checklist."],["0.63.1","Overhauled contextual Help and Academy reader formatting, removed overlapping sticky article headers, and restored full scrolling on phones and tablets."],["0.63.0","Added permanent record IDs, audit metadata, local version tracking, pending-sync states, conflict readiness, device identity, and a Team Sync settings workspace."],["0.60.0","Connected major screens and Settings areas directly to matching Academy chapters with return-to-screen navigation."],["0.59.0","Added interactive tutorials, guided orientation, pinned learning, field tips, and documentation tracking."],["0.58.0","Expanded Help & Manual into FireVault Academy with bookmarks, smart search, Quick Start, and reader navigation."],["0.57.0","Added the first complete searchable in-app FireVault User Manual."],["Ongoing review rule","Any change to navigation, labels, storage, workflows, permissions, or supported layouts requires the related manual chapter to be checked."]]],
   trouble:["❓","Troubleshooting","Common problems and safe first checks.",FIREVAULT_MANUAL_058.find(x=>x.id==="trouble")?.topics||[]]
  };
  const [icon,title,note,items]=pages[type]||["ⓘ","Unavailable","This Help section is not available in the installed version.",[["Current status","Return to Help and choose an available chapter or tutorial."]]];
@@ -9951,7 +10058,8 @@ function diagnostics(){
 }
 function showChangelog(){
   const notes = [
-    "Build 0.80.1 moves Document Scanner to Tools, supports post-capture account search and matching, and adds scanner access inside Site Notes.",
+    "Build 0.80.2 simplifies Document Scanner, adds on-device AI Auto Scan with live page framing and hands-free capture, and keeps focused fields visible above the mobile keyboard.",
+    "Build 0.80.2 moves Document Scanner to Tools, supports post-capture account search and matching, and adds scanner access inside Site Notes.",
     "Build 0.80.0 adds a built-in multi-page account document scanner with camera capture, page-edge adjustment, cleanup modes, page ordering, and PDF download or sharing.",
     "Build 0.79.14 restores numbered Nearby Accounts map pins matched to the distance-sorted list and removes Smart Account Intelligence.",
     "Build 0.79.13 repairs the 0.79.11 Revision History syntax error and the 0.79.12 Building Navigator copy-newline error.",
@@ -9997,7 +10105,7 @@ function showChangelog(){
   overlay.className="releaseOverlay";
   overlay.innerHTML=`<div class="releaseSheet" role="dialog" aria-modal="true" aria-label="FireVault release notes">
     <div class="releaseHead"><div><strong>${fireVaultBrand575()}</strong><span>Build ${BUILD}</span></div><button class="ghost iconBtn" id="closeRelease" aria-label="Close release notes">×</button></div>
-    <div class="releaseBody"><h2>Release Notes</h2><p class="releaseIntro">Scan paper documents directly into an account with multi-page capture, corner correction, cleanup, page ordering, and PDF export.</p><ul>${notes.map(n=>`<li>${esc(n)}</li>`).join("")}</ul></div>
+    <div class="releaseBody"><h2>Release Notes</h2><p class="releaseIntro">Use the simplified scanner with live page detection, automatic framing, hands-free capture, account matching, and multi-page PDF storage.</p><ul>${notes.map(n=>`<li>${esc(n)}</li>`).join("")}</ul></div>
   </div>`;
   document.body.appendChild(overlay);
   const close=()=>overlay.remove();
@@ -10046,6 +10154,22 @@ window.addEventListener("orientationchange",()=>setTimeout(scheduleLayoutMetrics
 window.visualViewport?.addEventListener("resize",scheduleLayoutMetrics0785,{passive:true});
 window.visualViewport?.addEventListener("scroll",scheduleLayoutMetrics0785,{passive:true});
 
+/* Build 0.80.2 — keep focused fields visible above mobile keyboards. */
+let keyboardGuardInstalled0802=false;
+let keyboardBaseHeight0802=Math.max(window.innerHeight||0,window.visualViewport?.height||0,document.documentElement.clientHeight||0);
+function editableField0802(el){return !!el&&el.matches?.('input:not([type="button"]):not([type="submit"]):not([type="checkbox"]):not([type="radio"]),textarea,select,[contenteditable="true"]');}
+function keyboardOffset0802(){const vv=window.visualViewport;if(!vv)return 0;const current=Math.max(vv.height||0,window.innerHeight||0);if(!editableField0802(document.activeElement)&&current>keyboardBaseHeight0802*.86)keyboardBaseHeight0802=Math.max(keyboardBaseHeight0802,current);return Math.max(0,Math.round(keyboardBaseHeight0802-vv.height-(vv.offsetTop||0)));}
+function revealFocusedField0802(el=document.activeElement){
+  if(!editableField0802(el))return;const offset=keyboardOffset0802();document.documentElement.style.setProperty("--fv-keyboard-offset0802",`${offset}px`);document.body.classList.toggle("fvKeyboardOpen0802",offset>80);
+  const reveal=()=>{try{el.scrollIntoView({behavior:"smooth",block:"center",inline:"nearest"});}catch{}};setTimeout(reveal,80);setTimeout(reveal,320);
+}
+function installKeyboardGuard0802(){
+  if(keyboardGuardInstalled0802)return;keyboardGuardInstalled0802=true;
+  document.addEventListener("focusin",e=>{if(editableField0802(e.target))revealFocusedField0802(e.target);});
+  document.addEventListener("focusout",()=>setTimeout(()=>{if(!editableField0802(document.activeElement)){document.body.classList.remove("fvKeyboardOpen0802");document.documentElement.style.setProperty("--fv-keyboard-offset0802","0px");}},180));
+  window.visualViewport?.addEventListener("resize",()=>revealFocusedField0802(),{passive:true});window.visualViewport?.addEventListener("scroll",()=>revealFocusedField0802(),{passive:true});
+}
+installKeyboardGuard0802();
 
 function bootFireVault518(){
   try{

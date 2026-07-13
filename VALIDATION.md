@@ -1,15 +1,19 @@
-# FireVault Build 0.80.1 Validation
+# FireVault Build 0.80.2 Validation
 
-- JavaScript syntax checked for app, storage, providers, and Plus Code modules.
-- CSS parsed without stylesheet errors.
-- Existing storage key preserved: `firevault_vault_build_030`.
-- Tools includes the Document Scanner entry point.
-- Tools scanner starts without inheriting a previously selected account.
-- Account search matches name, Account ID, address, city, state, ZIP, and phone; exact-ID, name, address, phone, and multi-term searches passed a source-level unit test.
-- Save remains disabled until at least one page and a matched account are present.
-- Scans save into the selected account and create a Site Notes activity entry.
-- Full Site Notes workspace includes direct scanner access.
-- Files and Photo Vault continue to display, preview, edit, download, share, and delete existing scans.
-- Numbered Nearby Accounts behavior and Building Navigator remain present.
-- Smart Account Intelligence remains removed.
-- Service-worker and asset cache references updated to Build 0.80.1.
+- [x] JavaScript module syntax validated.
+- [x] CSS brace balance validated.
+- [x] Build references updated to 0.80.2.
+- [x] Existing storage key preserved.
+- [x] Large scanner introduction tile removed.
+- [x] Simplified scanner layout present.
+- [x] Live `getUserMedia` camera workflow present with standard camera fallback.
+- [x] On-device page analysis returns four normalized corners and a confidence value.
+- [x] Live crop-frame drawing and page-stability detection present.
+- [x] Hands-free automatic capture and manual shutter capture present.
+- [x] Captured pages are automatically cropped and processed.
+- [x] Multi-page camera session remains open until Done is selected.
+- [x] Account matching and Site Notes scanner entry remain present.
+- [x] Focused-field keyboard visibility guard installed.
+- [x] Service-worker and asset cache references updated.
+
+Camera permission, live auto-capture behavior, and keyboard movement should be confirmed on the target iPhone after GitHub Pages deployment.

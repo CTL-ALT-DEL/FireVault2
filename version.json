@@ -1,8 +1,8 @@
 {
-  "build": "0.80.1",
+  "build": "0.80.2",
   "released": "2026-07-12",
-  "note": "Tools document scanner with account matching",
-  "label": "Capture first, search and match to an account, plus Site Notes access",
-  "version": "0.80.1",
-  "name": "Scanner Account Matching"
+  "note": "Simplified AI Auto Scan document scanner and keyboard visibility repair",
+  "label": "Live corner detection, auto crop, hands-free capture, and keyboard-safe editing",
+  "version": "0.80.2",
+  "name": "AI Auto Scan"
 }
