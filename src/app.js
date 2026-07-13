@@ -1,6 +1,6 @@
-import { BUILD, KEY, ACTIVE_JOB_KEY, loadData, saveData, ensureSite, fullAddress, esc, uid, downloadBlob, syncSummary, syncQueue, syncConflicts, syncActivity, createSyncPackage, importSyncPackage, resolveSyncConflict, notePackageExport, deviceIdentity, recordSyncActivity, autoBackupInfo, latestAutoBackup, restoreAutoBackup, isDemoMode, setDemoMode, resetDemoData, securityFoundationSummary, securityAudit, recycleBinInfo, restoreRecycleRecord, purgeRecycleBin, recordSecurityEvent, validateVaultIntegrity } from "./storage.js?v=0.87.4";
-import { backendAdapterSummary, runBackendAdapterDiagnostics, backendAdapterManifest, PROVIDER_CONTRACT_VERSION, FILE_STORAGE_CATALOG, fileStoragePlanSummary, cloudFileStorageManifest, MICROSOFT_STORAGE_TYPES, microsoftStorageAccounts, saveMicrosoftStorageAccounts, createMicrosoftStorageAccount, microsoftStorageAccountById, microsoftAppRegistration, saveMicrosoftAppRegistration, microsoftStorageSummary, microsoftStorageManifest } from "./providers.js?v=0.87.4";
-import { encodePlusCode, isValidFullPlusCode, normalizePlusCode, plusCodePrecisionLabel } from "./open-location-code.js?v=0.87.4";
+import { BUILD, KEY, ACTIVE_JOB_KEY, loadData, saveData, ensureSite, fullAddress, esc, uid, downloadBlob, syncSummary, syncQueue, syncConflicts, syncActivity, createSyncPackage, importSyncPackage, resolveSyncConflict, notePackageExport, deviceIdentity, recordSyncActivity, autoBackupInfo, latestAutoBackup, restoreAutoBackup, isDemoMode, setDemoMode, resetDemoData, securityFoundationSummary, securityAudit, recycleBinInfo, restoreRecycleRecord, purgeRecycleBin, recordSecurityEvent, validateVaultIntegrity } from "./storage.js?v=0.87.5";
+import { backendAdapterSummary, runBackendAdapterDiagnostics, backendAdapterManifest, PROVIDER_CONTRACT_VERSION, FILE_STORAGE_CATALOG, fileStoragePlanSummary, cloudFileStorageManifest, MICROSOFT_STORAGE_TYPES, microsoftStorageAccounts, saveMicrosoftStorageAccounts, createMicrosoftStorageAccount, microsoftStorageAccountById, microsoftAppRegistration, saveMicrosoftAppRegistration, microsoftStorageSummary, microsoftStorageManifest } from "./providers.js?v=0.87.5";
+import { encodePlusCode, isValidFullPlusCode, normalizePlusCode, plusCodePrecisionLabel } from "./open-location-code.js?v=0.87.5";
 window.__FIREVAULT_MODULE_READY = true;
 
 function fvPreferenceStore0739(){
@@ -1596,6 +1596,7 @@ function applyTheme(){
   const body=document.body;
   [...body.classList].forEach(cls=>{if(cls.startsWith("theme-") || ["large-text","compact-layout","square-buttons","solid-cards","demoMode0738"].includes(cls)) body.classList.remove(cls);});
   body.classList.add("theme-midnight");
+  body.classList.toggle("demoMode0738",isDemoMode());
   body.style.removeProperty("--accent");
   const meta=document.querySelector('meta[name="theme-color"]');
   if(meta) meta.setAttribute("content","#07111f");
@@ -7600,11 +7601,12 @@ function settingsTabs(){
     ["categories","Categories","Automatic account tags"],
     ["backup","Backup & Restore","Protect your data"],
     ["updates","App Updates","Refresh application files"],
+    ["demo","Demo Mode","Fictional accounts for presentations and testing"],
     ["about","About FireVault","Version and information"]
   ];
 }
 function settingsIcon550(tab){
-  return ({tech:"👤",gps:"⌖",plusCodes:"＋",reports:"▤",email:"✉",overlay:"▧",privacy:"▣",security:"⌾",cloudFiles:"☁",microsoftStorage:"M",sync:"↔",customerImport:"⇩",categories:"◇",backup:"⇅",updates:"↻",about:"ⓘ"})[tab]||"•";
+  return ({tech:"👤",gps:"⌖",plusCodes:"＋",reports:"▤",email:"✉",overlay:"▧",privacy:"▣",security:"⌾",cloudFiles:"☁",microsoftStorage:"M",sync:"↔",customerImport:"⇩",categories:"◇",backup:"⇅",updates:"↻",demo:"D",about:"ⓘ"})[tab]||"•";
 }
 function restoreAppChrome572(){
   document.body.classList.remove("homeFullscreen480","homeLayoutFixed570");
@@ -7631,6 +7633,7 @@ const SETTINGS_DASHBOARD_0860 = [
   {key:"maps",title:"Maps & GPS",icon:"pin",tabs:["gps","plusCodes"]},
   {key:"photos",title:"Photo Overlays",icon:"camera",tabs:["overlay"]},
   {key:"privacy",title:"Privacy",icon:"shield",tabs:["privacy","security"]},
+  {key:"demo",title:"Demo Mode",icon:"demo",tabs:["demo"]},
   {key:"about",title:"About FireVault",icon:"info",tabs:["about"]}
 ];
 const SETTINGS_GROUPED_LIST_0873 = [
@@ -7649,6 +7652,7 @@ const SETTINGS_GROUPED_LIST_0873 = [
     {key:"privacy",subtitle:"Privacy lock and vault protection"}
   ]},
   {label:"About",items:[
+    {key:"demo",subtitle:"Fictional accounts for presentations and testing"},
     {key:"about",subtitle:"Version and application information"}
   ]}
 ];
@@ -7658,7 +7662,8 @@ function settingsListIcon0873(name){
 function settingsGroupedRow0873(item){
   const dashboardItem=SETTINGS_DASHBOARD_0860.find(x=>x.key===item.key);
   if(!dashboardItem) return "";
-  return `<button class="settingsListRow0873" data-settings-group0873="${esc(item.key)}">${settingsListIcon0873(dashboardItem.icon)}<span><strong>${esc(dashboardItem.title)}</strong><small>${esc(item.subtitle||"")}</small></span><b>›</b></button>`;
+  const subtitle=item.key==="demo" && isDemoMode()?"Active · fictional Boise accounts":(item.subtitle||"");
+  return `<button class="settingsListRow0873 ${item.key==="demo"&&isDemoMode()?"isActiveDemo0875":""}" data-settings-group0873="${esc(item.key)}">${settingsListIcon0873(dashboardItem.icon)}<span><strong>${esc(dashboardItem.title)}</strong><small>${esc(subtitle)}</small></span><b>›</b></button>`;
 }
 function settingsSvg0860(name){
   const icons={
@@ -7669,6 +7674,7 @@ function settingsSvg0860(name){
     pin:'<path d="M20 10c0 5-8 12-8 12S4 15 4 10a8 8 0 1 1 16 0z"/><circle cx="12" cy="10" r="2.5"/>',
     camera:'<path d="M4 7h4l1.5-2h5L16 7h4v13H4z"/><circle cx="12" cy="13" r="4"/>',
     shield:'<path d="M12 2l8 3v6c0 5.2-3.3 9-8 11-4.7-2-8-5.8-8-11V5z"/><path d="M8.5 12l2.2 2.2 4.8-5"/>',
+    demo:'<rect x="3" y="4" width="18" height="14" rx="2"/><path d="M8 22h8M12 18v4"/><path d="M10 8.5l5 2.5-5 2.5z"/>',
     info:'<circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7h.01"/>'
   };
   return `<svg class="settingsTileIcon0860" viewBox="0 0 24 24" aria-hidden="true">${icons[name]||icons.info}</svg>`;
@@ -7694,7 +7700,7 @@ function settingsSearchResultRow0874(result){
   return `<button class="settingsSearchResult0874" data-settings-search-tab0874="${esc(id)}" data-settings-search-group0874="${esc(result.group?.key||"data")}"><span class="settingsGroupIcon0860">${settingsIcon550(id)}</span><span><strong>${esc(title)}</strong><small>${esc(result.group?.title||"")} · ${esc(note)}</small></span><b>›</b></button>`;
 }
 function settings(){
-  if(["themes","advanced","demo","homeLayout","visibility","backend","webdav","manual","diagnostics"].includes(settingsTab)) settingsTab="about";
+  if(["themes","advanced","homeLayout","visibility","backend","webdav","manual","diagnostics"].includes(settingsTab)) settingsTab="about";
   captureSettingsScroll576(); restoreAppChrome572();
   const tabs=settingsTabs();
   const active=tabs.find(t=>t[0]===settingsTab)||tabs[0];
@@ -7745,7 +7751,7 @@ function settings(){
     document.querySelectorAll(".settingsGroupRow0860[data-tab]").forEach(b=>b.onclick=()=>{settingsTab=b.dataset.tab;mode="settingsDetail";render();});
     restoreSettingsScroll576(false); return;
   }
-  const saveable=!['privacy','cloudFiles','microsoftStorage','customerImport','categories','backup','updates','about'].includes(settingsTab);
+  const saveable=!['privacy','cloudFiles','microsoftStorage','customerImport','categories','backup','updates','demo','about'].includes(settingsTab);
   html(`<div class="screen settingsSimpleDetail0850 settingsDetail0860 settingsStable573 settingsTab-${settingsTab}" data-settings-tab="${settingsTab}">
     <header class="settingsSimpleDetailHeader0850"><button class="ghost" id="settingsBackBtn" aria-label="Back">←</button><div><h1>${esc(active[1])}</h1></div>${saveable?`<button class="primary" id="saveSettingsTop">Save</button>`:`<button class="ghost" id="settingsDoneBtn">Done</button>`}</header>
     <div class="settingsSimpleDetailBody0850 settingsDetailBody488 settingsContent448">${settingsPanel()}</div>
@@ -10087,6 +10093,7 @@ function diagnostics(){
 }
 function showChangelog(){
   const notes = [
+    "Build 0.87.5 restores Demo Mode to the visible Settings page, keeps its fictional Boise workspace isolated from the real vault, and restores the header DEMO MODE indicator while active.",
     "Build 0.87.4 spaces Settings cards, adds Settings search, moves Google Plus Codes under Maps & GPS, simplifies Account cards, enlarges identity tags, moves Favorite beside Call, and restores Nearby-style scroll locking.",
     "Build 0.87.3 moves the account address directly below the site name, places Account ID and category tags beneath the address, and changes Settings to a dark grouped-list design without duplicating the FireVault logo.",
     "Build 0.87.2 polishes Account Directory cards and removes the Ready, No Open Work, and GPS status tags so the cards show only useful account information and actionable issues.",

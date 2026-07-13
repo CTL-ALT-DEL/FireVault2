@@ -19072,3 +19072,9 @@ body.app-booted533:not(.homeFullscreen480)>main#app:has(.accountDetail0871){
   box-shadow:0 7px 18px rgba(0,0,0,.18),inset 0 1px rgba(255,255,255,.025)!important;
 }
 .settingsGroupRow0860:last-child{border-bottom:1px solid rgba(255,255,255,.09)!important}
+
+
+/* Build 0.87.5 — restored Demo Mode entry and active-state visibility */
+.settingsListRow0873.isActiveDemo0875{border-color:rgba(250,204,21,.34);background:linear-gradient(145deg,rgba(77,52,8,.32),rgba(20,22,25,.98))}
+.settingsListRow0873.isActiveDemo0875 .settingsListIcon0873{color:#facc15;stroke:#facc15}
+.settingsListRow0873.isActiveDemo0875 small{color:#facc15}
