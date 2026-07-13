@@ -1,11 +1,12 @@
-# FireVault Build 0.87.5
+# FireVault Build 0.87.6
 
-Demo Mode restoration and visibility repair.
+Account Directory scrolling and toolbar polish.
 
-- Restores Demo Mode as a visible row under the About section of Settings
-- Provides Enter Demo Mode, Exit Demo Mode, and Restore Demo Defaults controls
-- Keeps the fictional 20-account Boise workspace separate from the real customer vault
-- Restores the DEMO MODE indicator in the existing top header while Demo Mode is active
-- Shows an Active status on the Settings row while using demo data
-- Adds Demo Mode to Settings search
-- Preserves the existing FireVault storage key and real account records
+- Repairs Account Directory card locking while scrolling both up and down
+- Adds scroll-end handling and an iPhone momentum safeguard
+- Uses exact card boundaries and enforces the selected snap position after motion settles
+- Adds native vertical snap support as a browser-level fallback
+- Redesigns Nearby and Sort as two equal-width horizontal controls
+- Gives both controls clearer icons, labels, selected-state information, and larger touch targets
+- Keeps Reset search and sort available only when needed
+- Preserves the existing account cards, account data, Settings, Demo Mode, and FireVault storage key

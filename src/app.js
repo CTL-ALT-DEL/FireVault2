@@ -1,6 +1,6 @@
-import { BUILD, KEY, ACTIVE_JOB_KEY, loadData, saveData, ensureSite, fullAddress, esc, uid, downloadBlob, syncSummary, syncQueue, syncConflicts, syncActivity, createSyncPackage, importSyncPackage, resolveSyncConflict, notePackageExport, deviceIdentity, recordSyncActivity, autoBackupInfo, latestAutoBackup, restoreAutoBackup, isDemoMode, setDemoMode, resetDemoData, securityFoundationSummary, securityAudit, recycleBinInfo, restoreRecycleRecord, purgeRecycleBin, recordSecurityEvent, validateVaultIntegrity } from "./storage.js?v=0.87.5";
-import { backendAdapterSummary, runBackendAdapterDiagnostics, backendAdapterManifest, PROVIDER_CONTRACT_VERSION, FILE_STORAGE_CATALOG, fileStoragePlanSummary, cloudFileStorageManifest, MICROSOFT_STORAGE_TYPES, microsoftStorageAccounts, saveMicrosoftStorageAccounts, createMicrosoftStorageAccount, microsoftStorageAccountById, microsoftAppRegistration, saveMicrosoftAppRegistration, microsoftStorageSummary, microsoftStorageManifest } from "./providers.js?v=0.87.5";
-import { encodePlusCode, isValidFullPlusCode, normalizePlusCode, plusCodePrecisionLabel } from "./open-location-code.js?v=0.87.5";
+import { BUILD, KEY, ACTIVE_JOB_KEY, loadData, saveData, ensureSite, fullAddress, esc, uid, downloadBlob, syncSummary, syncQueue, syncConflicts, syncActivity, createSyncPackage, importSyncPackage, resolveSyncConflict, notePackageExport, deviceIdentity, recordSyncActivity, autoBackupInfo, latestAutoBackup, restoreAutoBackup, isDemoMode, setDemoMode, resetDemoData, securityFoundationSummary, securityAudit, recycleBinInfo, restoreRecycleRecord, purgeRecycleBin, recordSecurityEvent, validateVaultIntegrity } from "./storage.js?v=0.87.6";
+import { backendAdapterSummary, runBackendAdapterDiagnostics, backendAdapterManifest, PROVIDER_CONTRACT_VERSION, FILE_STORAGE_CATALOG, fileStoragePlanSummary, cloudFileStorageManifest, MICROSOFT_STORAGE_TYPES, microsoftStorageAccounts, saveMicrosoftStorageAccounts, createMicrosoftStorageAccount, microsoftStorageAccountById, microsoftAppRegistration, saveMicrosoftAppRegistration, microsoftStorageSummary, microsoftStorageManifest } from "./providers.js?v=0.87.6";
+import { encodePlusCode, isValidFullPlusCode, normalizePlusCode, plusCodePrecisionLabel } from "./open-location-code.js?v=0.87.6";
 window.__FIREVAULT_MODULE_READY = true;
 
 function fvPreferenceStore0739(){
@@ -263,6 +263,9 @@ let accountsTouchStart0796=0;
 let accountsTouchMoved0796=false;
 let accountsScrollLock0796=false;
 let accountsScrollActivated0796=false;
+let accountsLastScrollTop0876=accountsScroll0759;
+let accountsScrollDirection0876=0;
+let accountsScrollEndTimer0876=0;
 let dailySummaryDate569 = fvSafeGet0739("firevault_daily_summary_date","");
 let dailyPickerMonth571 = localDateString().slice(0,7);
 let libraryFolder = "all";
@@ -454,6 +457,7 @@ function fvIcon073(name, extraClass=""){
     tools:'<path d="M4 9h16v10H4z"/><path d="M9 9V6h6v3M4 13h16M10 13v2h4v-2"/>',
     settings:'<path d="M4 6h10M18 6h2M4 12h3M11 12h9M4 18h8M16 18h4"/><circle cx="16" cy="6" r="2"/><circle cx="9" cy="12" r="2"/><circle cx="14" cy="18" r="2"/>',
     search:'<circle cx="11" cy="11" r="7"/><path d="m16.5 16.5 4 4"/>',
+    sort:'<path d="M4 7h10M18 7h2M4 12h4M12 12h8M4 17h8M16 17h4"/><circle cx="16" cy="7" r="2"/><circle cx="10" cy="12" r="2"/><circle cx="14" cy="17" r="2"/>',
     info:'<circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7h.01"/>',
     map:'<path d="m3 6 6-3 6 3 6-3v15l-6 3-6-3-6 3z"/><path d="M9 3v15M15 6v15"/>',
     list:'<path d="M8 6h13M8 12h13M8 18h13"/><circle cx="4" cy="6" r="1"/><circle cx="4" cy="12" r="1"/><circle cx="4" cy="18" r="1"/>',
@@ -3859,15 +3863,18 @@ function accountsCardTop0796(list,card){
   const lr=list.getBoundingClientRect(),cr=card.getBoundingClientRect();
   return Math.max(0,list.scrollTop+(cr.top-lr.top));
 }
+function visibleAccountCards0876(list){
+  return list?[...list.querySelectorAll("[data-account-card0759]")].filter(card=>!card.hidden):[];
+}
 function closestVisibleAccountCard0796(list){
-  if(!list)return null;
-  const cards=[...list.querySelectorAll("[data-account-card0759]")].filter(card=>!card.hidden);
+  const cards=visibleAccountCards0876(list);
   if(!cards.length)return null;
-  const top=list.getBoundingClientRect().top;
+  const current=Math.max(0,list.scrollTop);
   let best=cards[0],distance=Infinity;
   for(const card of cards){
-    const current=Math.abs(card.getBoundingClientRect().top-top);
-    if(current<distance){distance=current;best=card;}
+    const top=accountsCardTop0796(list,card);
+    const next=Math.abs(top-current);
+    if(next<distance){distance=next;best=card;}
   }
   return best;
 }
@@ -3880,15 +3887,17 @@ function prepareAccountsScrollTail0796(list){
     tail.setAttribute("aria-hidden","true");
     list.appendChild(tail);
   }
-  const visible=[...list.querySelectorAll("[data-account-card0759]")].filter(card=>!card.hidden);
+  const visible=visibleAccountCards0876(list);
   const last=visible[visible.length-1];
   const height=last?Math.max(0,list.clientHeight-last.offsetHeight-8):0;
   tail.style.flexBasis=`${height}px`;
   tail.style.height=`${height}px`;
 }
-function scheduleAccountsSettle0796(list,delay=190){
+function scheduleAccountsSettle0796(list,delay=210){
   clearTimeout(accountsSnapTimer0796);
-  accountsSnapTimer0796=setTimeout(()=>{if(!accountsTouching0796)settleAccountsList0796(list);},delay);
+  accountsSnapTimer0796=setTimeout(()=>{
+    if(!accountsTouching0796&&!accountsScrollLock0796)settleAccountsList0796(list);
+  },delay);
 }
 function settleAccountsList0796(list){
   if(!list||accountsScrollLock0796||accountsTouching0796||!accountsScrollActivated0796)return;
@@ -3897,20 +3906,29 @@ function settleAccountsList0796(list){
   prepareAccountsScrollTail0796(list);
   const maxTop=Math.max(0,list.scrollHeight-list.clientHeight);
   const target=Math.min(maxTop,accountsCardTop0796(list,card));
-  accountsScrollActivated0796=false;
   if(Math.abs(list.scrollTop-target)<2){
     list.scrollTop=target;
     accountsScroll0759=target;
+    accountsLastScrollTop0876=target;
+    accountsScrollDirection0876=0;
+    accountsScrollActivated0796=false;
     persistAccountsViewState0761(true);
     return;
   }
   accountsScrollLock0796=true;
+  clearTimeout(accountsScrollEndTimer0876);
   list.scrollTo({top:target,behavior:"smooth"});
-  window.setTimeout(()=>{
+  accountsScrollEndTimer0876=window.setTimeout(()=>{
+    // iOS momentum can occasionally override an upward programmatic snap.
+    // Enforce the final card boundary after the smooth movement completes.
+    if(Math.abs(list.scrollTop-target)>2)list.scrollTop=target;
     accountsScrollLock0796=false;
-    accountsScroll0759=list.scrollTop;
+    accountsScrollActivated0796=false;
+    accountsScrollDirection0876=0;
+    accountsScroll0759=target;
+    accountsLastScrollTop0876=target;
     persistAccountsViewState0761(true);
-  },360);
+  },430);
 }
 function sites(){
   restoreAppChrome572();
@@ -3929,10 +3947,10 @@ function sites(){
       <input id="siteSearch0759" type="search" placeholder="Name, address, Account ID, panel…" value="${esc(siteSearch)}" autocomplete="off" autocapitalize="none" spellcheck="false">
       <button type="button" id="clearSiteSearch0759" aria-label="Clear search" ${siteSearch?"":"hidden"}>×</button>
     </section>
-    <section class="accountDirectoryTools0871">
-      <button type="button" id="nearBtn0759">${fvIcon073("nearby","accountToolIcon0871")}<span>Nearby</span></button>
-      <label><span>Sort</span><select id="accountsSort0871" aria-label="Sort accounts"><option value="az" ${accountsSort0760==="az"?"selected":""}>A–Z</option><option value="favorites" ${accountsSort0760==="favorites"?"selected":""}>Favorites</option><option value="recent" ${accountsSort0760==="recent"?"selected":""}>Recent</option><option value="attention" ${accountsSort0760==="attention"?"selected":""}>Priority</option></select></label>
-      <button type="button" id="resetAccounts0871" ${(!siteSearch&&accountsSort0760==="az")?"hidden":""}>Reset</button>
+    <section class="accountDirectoryTools0871 accountDirectoryTools0876">
+      <button type="button" class="accountDirectoryTool0876" id="nearBtn0759">${fvIcon073("nearby","accountToolIcon0871")}<span><strong>Nearby</strong><small>GPS accounts</small></span><b>›</b></button>
+      <label class="accountDirectoryTool0876 accountDirectorySort0876">${fvIcon073("sort","accountToolIcon0871")}<span><strong>Sort</strong><small>${esc(accountsSortLabel0760())}</small></span><b>⌄</b><select id="accountsSort0871" aria-label="Sort accounts"><option value="az" ${accountsSort0760==="az"?"selected":""}>A–Z</option><option value="favorites" ${accountsSort0760==="favorites"?"selected":""}>Favorites</option><option value="recent" ${accountsSort0760==="recent"?"selected":""}>Recent</option><option value="attention" ${accountsSort0760==="attention"?"selected":""}>Priority</option></select></label>
+      <button type="button" class="accountDirectoryReset0876" id="resetAccounts0871" ${(!siteSearch&&accountsSort0760==="az")?"hidden":""}>Reset search and sort</button>
     </section>
     <section class="accountDirectoryListShell0871">
       <div class="accountDirectoryList0871" id="accountsList0759">
@@ -4017,28 +4035,53 @@ function sites(){
   list?.addEventListener("keydown",event=>{const card=event.target.closest("[data-account-card0759]");if(card&&(event.key==="Enter"||event.key===" ")){event.preventDefault();openAccount(card.dataset.id);}});
   if(list){
     accountsScrollActivated0796=false;
+    accountsLastScrollTop0876=list.scrollTop;
+    const finishAccountGesture0876=()=>{
+      accountsTouching0796=false;
+      if(accountsTouchMoved0796){
+        accountsScrollActivated0796=true;
+        scheduleAccountsSettle0796(list,300);
+      }
+    };
     list.addEventListener("touchstart",()=>{
       accountsTouching0796=true;
       accountsTouchStart0796=list.scrollTop;
+      accountsLastScrollTop0876=list.scrollTop;
       accountsTouchMoved0796=false;
       clearTimeout(accountsSnapTimer0796);
+      clearTimeout(accountsScrollEndTimer0876);
+      // A new gesture must be able to interrupt an in-progress programmatic lock.
+      accountsScrollLock0796=false;
     },{passive:true});
-    list.addEventListener("touchend",()=>{
-      accountsTouching0796=false;
-      if(accountsTouchMoved0796){accountsScrollActivated0796=true;scheduleAccountsSettle0796(list,260);}
-    },{passive:true});
-    list.addEventListener("wheel",()=>{
+    list.addEventListener("touchend",finishAccountGesture0876,{passive:true});
+    list.addEventListener("touchcancel",finishAccountGesture0876,{passive:true});
+    list.addEventListener("wheel",event=>{
+      clearTimeout(accountsScrollEndTimer0876);
+      accountsScrollLock0796=false;
+      accountsScrollDirection0876=Math.sign(event.deltaY||0);
       accountsScrollActivated0796=true;
       accountsTouchMoved0796=true;
       clearTimeout(accountsSnapTimer0796);
       scheduleAccountsSettle0796(list,260);
     },{passive:true});
     list.addEventListener("scroll",()=>{
-      accountsScroll0759=list.scrollTop;
-      if(accountsTouching0796&&Math.abs(list.scrollTop-accountsTouchStart0796)>4){accountsTouchMoved0796=true;accountsScrollActivated0796=true;}
-      if(!accountsTouching0796&&!accountsScrollLock0796&&accountsScrollActivated0796)scheduleAccountsSettle0796(list,210);
+      const current=list.scrollTop;
+      const delta=current-accountsLastScrollTop0876;
+      if(Math.abs(delta)>.5)accountsScrollDirection0876=Math.sign(delta);
+      accountsLastScrollTop0876=current;
+      accountsScroll0759=current;
+      if(accountsTouching0796&&Math.abs(current-accountsTouchStart0796)>4){
+        accountsTouchMoved0796=true;
+        accountsScrollActivated0796=true;
+      }
+      if(!accountsTouching0796&&!accountsScrollLock0796&&accountsScrollActivated0796)scheduleAccountsSettle0796(list,190);
       persistAccountsViewState0761();
     },{passive:true});
+    if("onscrollend" in list){
+      list.addEventListener("scrollend",()=>{
+        if(!accountsTouching0796&&!accountsScrollLock0796&&accountsScrollActivated0796)scheduleAccountsSettle0796(list,20);
+      },{passive:true});
+    }
   }
   applySearch();
   requestAnimationFrame(()=>{if(list){prepareAccountsScrollTail0796(list);list.scrollTop=Math.max(0,accountsScroll0759||0);}setActiveNav();});
@@ -10093,6 +10136,7 @@ function diagnostics(){
 }
 function showChangelog(){
   const notes = [
+    "Build 0.87.6 repairs Account Directory scroll locking in both directions and gives the Nearby and Sort controls a wider, cleaner two-button layout.",
     "Build 0.87.5 restores Demo Mode to the visible Settings page, keeps its fictional Boise workspace isolated from the real vault, and restores the header DEMO MODE indicator while active.",
     "Build 0.87.4 spaces Settings cards, adds Settings search, moves Google Plus Codes under Maps & GPS, simplifies Account cards, enlarges identity tags, moves Favorite beside Call, and restores Nearby-style scroll locking.",
     "Build 0.87.3 moves the account address directly below the site name, places Account ID and category tags beneath the address, and changes Settings to a dark grouped-list design without duplicating the FireVault logo.",

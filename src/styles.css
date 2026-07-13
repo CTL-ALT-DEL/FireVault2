@@ -19078,3 +19078,132 @@ body.app-booted533:not(.homeFullscreen480)>main#app:has(.accountDetail0871){
 .settingsListRow0873.isActiveDemo0875{border-color:rgba(250,204,21,.34);background:linear-gradient(145deg,rgba(77,52,8,.32),rgba(20,22,25,.98))}
 .settingsListRow0873.isActiveDemo0875 .settingsListIcon0873{color:#facc15;stroke:#facc15}
 .settingsListRow0873.isActiveDemo0875 small{color:#facc15}
+
+/* Build 0.87.6 — bidirectional Account Directory lock and wider controls */
+.accountDirectoryTools0876{
+  grid-template-columns:repeat(2,minmax(0,1fr))!important;
+  align-items:stretch!important;
+  gap:10px!important;
+  padding:2px 14px 12px!important;
+}
+.accountDirectoryTools0876>.accountDirectoryTool0876{
+  position:relative;
+  width:100%;
+  min-width:0;
+  height:54px!important;
+  min-height:54px!important;
+  display:grid!important;
+  grid-template-columns:24px minmax(0,1fr) auto!important;
+  align-items:center!important;
+  gap:10px!important;
+  margin:0!important;
+  padding:0 13px!important;
+  border:1px solid #30425a!important;
+  border-radius:15px!important;
+  background:linear-gradient(150deg,#182536,#111a27)!important;
+  color:#f1f5f9!important;
+  box-shadow:0 7px 17px rgba(0,0,0,.2),inset 0 1px rgba(255,255,255,.05)!important;
+  text-align:left!important;
+  cursor:pointer;
+  overflow:hidden;
+}
+.accountDirectoryTools0876>.accountDirectoryTool0876:active{
+  transform:scale(.985);
+  border-color:#d94a55!important;
+  background:linear-gradient(150deg,#202e40,#151f2d)!important;
+}
+.accountDirectoryTools0876>.accountDirectoryTool0876:focus-within,
+.accountDirectoryTools0876>.accountDirectoryTool0876:focus-visible{
+  outline:0;
+  border-color:#ef5360!important;
+  box-shadow:0 0 0 3px rgba(239,61,73,.15),0 7px 17px rgba(0,0,0,.22)!important;
+}
+.accountDirectoryTools0876 .accountToolIcon0871{
+  width:23px!important;
+  height:23px!important;
+  color:#ef5964!important;
+}
+.accountDirectoryTools0876>.accountDirectoryTool0876>span{
+  min-width:0;
+  display:flex!important;
+  flex-direction:column;
+  justify-content:center;
+  gap:2px;
+  letter-spacing:0!important;
+}
+.accountDirectoryTools0876>.accountDirectoryTool0876>span strong{
+  color:#f8fafc;
+  font-size:13.5px;
+  font-weight:900;
+  line-height:1.05;
+  letter-spacing:.005em;
+}
+.accountDirectoryTools0876>.accountDirectoryTool0876>span small{
+  color:#8fa0b5;
+  font-size:10px;
+  font-weight:750;
+  line-height:1.1;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+.accountDirectoryTools0876>.accountDirectoryTool0876>b{
+  color:#718198;
+  font-size:20px;
+  font-weight:500;
+  line-height:1;
+}
+.accountDirectorySort0876 select{
+  position:absolute!important;
+  inset:0!important;
+  z-index:3;
+  width:100%!important;
+  height:100%!important;
+  min-height:100%!important;
+  margin:0!important;
+  padding:0!important;
+  border:0!important;
+  opacity:0;
+  cursor:pointer;
+}
+.accountDirectoryTools0876>.accountDirectoryReset0876{
+  grid-column:1/-1;
+  width:100%;
+  height:36px!important;
+  min-height:36px!important;
+  padding:0 12px!important;
+  border:1px solid #2a394e!important;
+  border-radius:12px!important;
+  background:#101923!important;
+  color:#aeb9c8!important;
+  font-size:11px!important;
+  font-weight:850!important;
+  letter-spacing:.025em;
+}
+.accountDirectoryTools0876>.accountDirectoryReset0876[hidden]{display:none!important}
+.accountDirectoryList0871{
+  scroll-snap-type:y mandatory!important;
+  scroll-padding-top:0!important;
+}
+.accountDirectoryList0871>[data-account-card0759]{
+  scroll-snap-align:start!important;
+  scroll-snap-stop:normal!important;
+}
+@media(max-width:390px){
+  .accountDirectoryTools0876{
+    grid-template-columns:repeat(2,minmax(0,1fr))!important;
+    gap:8px!important;
+    padding-left:10px!important;
+    padding-right:10px!important;
+  }
+  .accountDirectoryTools0876>.accountDirectoryTool0876{
+    height:52px!important;
+    min-height:52px!important;
+    grid-template-columns:21px minmax(0,1fr) auto!important;
+    gap:8px!important;
+    padding:0 10px!important;
+  }
+  .accountDirectoryTools0876 .accountToolIcon0871{width:20px!important;height:20px!important}
+  .accountDirectoryTools0876>.accountDirectoryTool0876>span strong{font-size:12.5px}
+  .accountDirectoryTools0876>.accountDirectoryTool0876>span small{font-size:9.2px}
+}

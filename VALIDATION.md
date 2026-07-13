@@ -1,12 +1,12 @@
-# Validation — Build 0.87.5
+# Validation — Build 0.87.6
 
 - JavaScript syntax checked
-- Demo Mode is no longer redirected to About
-- Visible Demo Mode Settings row verified under About
-- Settings search includes Demo Mode
-- Enter, exit, and reset controls remain wired
-- Active Demo row state verified
-- Top-header DEMO MODE body-state class restored
-- Demo and real-vault storage separation preserved
+- Bidirectional Account Directory settle logic verified
+- Touch end and touch cancel handling verified
+- Wheel, scroll-idle, and supported scrollend handling verified
+- Final snap-position enforcement verified for iPhone momentum scrolling
+- Native vertical scroll snap fallback verified in CSS
+- Nearby and Sort controls verified as equal-width actions
+- Sort selection and Reset behavior remain wired
 - Existing FireVault storage key preserved
 - JSON files and ZIP archive integrity checked

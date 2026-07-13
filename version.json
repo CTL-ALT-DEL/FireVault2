@@ -1,8 +1,8 @@
 {
-  "build": "0.87.5",
+  "build": "0.87.6",
   "released": "2026-07-13",
-  "note": "Restored visible Demo Mode controls and the active demo header indicator while preserving complete separation from the real customer vault.",
-  "label": "Demo Mode Restoration",
-  "version": "0.87.5",
-  "name": "Demo Mode Restoration"
+  "note": "Repaired Account Directory card locking in both scroll directions and redesigned the Nearby and Sort controls as wider, balanced actions.",
+  "label": "Account Directory Scroll and Controls",
+  "version": "0.87.6",
+  "name": "Account Directory Scroll and Controls"
 }
