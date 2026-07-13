@@ -1,8 +1,16 @@
-# FireVault Build 0.80.4 Validation
+# Build 0.81.0 Validation
+
+- Scanner and Daily Route removed from navigation and account workflows.
+- Time-tracking timers disabled.
+- Theme settings removed; fixed FireVault appearance enforced.
+- Advanced settings and diagnostics removed from Settings navigation.
+- Existing customer and historical data structures preserved.
+
+# FireVault Build 0.81.0 Validation
 
 - [x] JavaScript module syntax validated.
 - [x] CSS brace balance validated.
-- [x] Build, manifest, service-worker, and cache references updated to 0.80.4.
+- [x] Build, manifest, service-worker, and cache references updated to 0.81.0.
 - [x] Existing `firevault_vault_build_030` storage key preserved.
 - [x] Advanced edge-and-line detector finds four corners on straight and perspective test documents.
 - [x] Camera capture reruns page detection on the normalized full-resolution image.

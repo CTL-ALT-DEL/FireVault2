@@ -1,8 +1,8 @@
 {
-  "build": "0.80.4",
+  "build": "0.81.0",
   "released": "2026-07-12",
   "note": "Advanced four-edge detection, full-resolution autocrop, simplified capture, and keyboard-safe post-capture editing",
   "label": "Advanced Auto-Crop Scanner",
-  "version": "0.80.4",
+  "version": "0.81.0",
   "name": "Advanced Auto-Crop Scanner"
 }

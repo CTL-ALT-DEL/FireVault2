@@ -1,6 +1,6 @@
-import { BUILD, KEY, ACTIVE_JOB_KEY, loadData, saveData, ensureSite, fullAddress, esc, uid, downloadBlob, syncSummary, syncQueue, syncConflicts, syncActivity, createSyncPackage, importSyncPackage, resolveSyncConflict, notePackageExport, deviceIdentity, recordSyncActivity, autoBackupInfo, latestAutoBackup, restoreAutoBackup, isDemoMode, setDemoMode, resetDemoData, securityFoundationSummary, securityAudit, recycleBinInfo, restoreRecycleRecord, purgeRecycleBin, recordSecurityEvent, validateVaultIntegrity } from "./storage.js?v=0.80.4";
-import { backendAdapterSummary, runBackendAdapterDiagnostics, backendAdapterManifest, PROVIDER_CONTRACT_VERSION, FILE_STORAGE_CATALOG, fileStoragePlanSummary, cloudFileStorageManifest, MICROSOFT_STORAGE_TYPES, microsoftStorageAccounts, saveMicrosoftStorageAccounts, createMicrosoftStorageAccount, microsoftStorageAccountById, microsoftAppRegistration, saveMicrosoftAppRegistration, microsoftStorageSummary, microsoftStorageManifest } from "./providers.js?v=0.80.4";
-import { encodePlusCode, isValidFullPlusCode, normalizePlusCode, plusCodePrecisionLabel } from "./open-location-code.js?v=0.80.4";
+import { BUILD, KEY, ACTIVE_JOB_KEY, loadData, saveData, ensureSite, fullAddress, esc, uid, downloadBlob, syncSummary, syncQueue, syncConflicts, syncActivity, createSyncPackage, importSyncPackage, resolveSyncConflict, notePackageExport, deviceIdentity, recordSyncActivity, autoBackupInfo, latestAutoBackup, restoreAutoBackup, isDemoMode, setDemoMode, resetDemoData, securityFoundationSummary, securityAudit, recycleBinInfo, restoreRecycleRecord, purgeRecycleBin, recordSecurityEvent, validateVaultIntegrity } from "./storage.js?v=0.81.0";
+import { backendAdapterSummary, runBackendAdapterDiagnostics, backendAdapterManifest, PROVIDER_CONTRACT_VERSION, FILE_STORAGE_CATALOG, fileStoragePlanSummary, cloudFileStorageManifest, MICROSOFT_STORAGE_TYPES, microsoftStorageAccounts, saveMicrosoftStorageAccounts, createMicrosoftStorageAccount, microsoftStorageAccountById, microsoftAppRegistration, saveMicrosoftAppRegistration, microsoftStorageSummary, microsoftStorageManifest } from "./providers.js?v=0.81.0";
+import { encodePlusCode, isValidFullPlusCode, normalizePlusCode, plusCodePrecisionLabel } from "./open-location-code.js?v=0.81.0";
 window.__FIREVAULT_MODULE_READY = true;
 
 function fvPreferenceStore0739(){
@@ -351,10 +351,10 @@ let routeScrollRestoreFrame0782 = 0;
 function routeTitle0782(routeName=view){
   const titles={
     home:"Nearby Accounts",tools:"Tools",dashboard068:"Dashboard",dailySummary:"Daily Summary",
-    routeLog:"Daily Route",actionCenter:"Action Center",pinnedSites:"Pinned Accounts",sites:"Accounts",
+    actionCenter:"Action Center",pinnedSites:"Pinned Accounts",sites:"Accounts",
     nearbySites:"Nearby Accounts",attention:"Attention Queue",siteDetail:"Account Detail",visits:"Visits",
     visitDetail:"Visit Detail",checklist:"Checklist",siteForm:selectedSiteId?"Edit Account":"Add Account",
-    contactsList:"Contacts",contactForm:"Contact",siteDocs:"Documents",siteDocForm:"Document",documentScanner:"Document Scanner",
+    contactsList:"Contacts",contactForm:"Contact",siteDocs:"Documents",siteDocForm:"Document",
     equipmentList:"Equipment",equipmentForm:"Equipment Item",tasks:"Tasks",taskForm:"Task",
     deficiencies:"Deficiencies",deficiencyForm:"Deficiency",report:"Report",library:"Library",
     resourceForm:"Library Item",jobMode:"Job Mode",serviceVisit:"Service Visit",settings:"Settings",
@@ -636,9 +636,8 @@ const themePresets = {
   "amoled-black": {label:"AMOLED Black", accentColor:"#ef4444"}
 };
 
-const FEATURE_DEFAULTS = {dailyRoute:true, fieldFocus:true, dataSafeHome:true, siteBrief:true, siteTimeline:true, pinnedSites:true, importantSiteInfo:true, library:false, reports:false, equipment:false, diagnostics:false, advancedGps:true, attention:false, routeReview:false, csvExports:false, backupRepair:false};
+const FEATURE_DEFAULTS = {dailyRoute:false, fieldFocus:true, dataSafeHome:true, siteBrief:true, siteTimeline:true, pinnedSites:true, importantSiteInfo:true, library:false, reports:false, equipment:false, diagnostics:false, advancedGps:true, attention:false, routeReview:false, csvExports:false, backupRepair:false};
 const FEATURE_LABELS = [
-  ["dailyRoute","Daily Route","Route day logging, active route card, waypoint tools, and saved route days."],
   ["fieldFocus","Field Focus","Home dashboard for attention sites, open tasks, deficiencies, photos, due-today items, overdue items, and Action Center shortcuts."],
   ["dataSafeHome","Data Safe Home Card","Compact Home card that opens Data Tools for backup, restore, diagnostics, and repair."],
   ["siteBrief","Site Brief","Compact account summary with tasks, deficiencies, photos, visits, panel, contact, access, and last visit."],
@@ -650,7 +649,6 @@ const FEATURE_LABELS = [
   ["library","Library","Global library tab for manuals, links, forms, codes, and folders."],
   ["reports","Report Center","Site report tools, report delivery actions, and generated report packages."],
   ["equipment","Equipment Vault","Panel, communicator, power supply, and equipment inventory screens."],
-  ["routeReview","Route Review Panels","Expandable saved Daily Route review panels and compact waypoint timelines."],
   ["csvExports","CSV / Export Tools","CSV route exports and advanced export buttons."],
   ["diagnostics","Diagnostics","Stability checkpoint, repair tools, and technical vault health details."],
   ["backupRepair","Backup / Repair","Backup center, import/export, repair, and danger-zone tools."]
@@ -679,7 +677,6 @@ function setViewMode(mode){ data.settings.app={...(data.settings.app||{}),viewMo
 function hiddenFeatureCount473(){ return FEATURE_LABELS.filter(([key])=>!featureOn(key)).length; }
 function simpleToolRows473(){
   return [
-    ["dailyRoute","Daily Route","routeLog","Route day logging and saved route reports."],
     ["advancedGps","GPS / Nearby","sites","GPS capture, map links, and nearby site detection."],
     ["attention","Attention Queue","attention","Priority review list for sites needing attention."],
     ["library","Library","library","Manuals, links, forms, codes, and folders."],
@@ -714,11 +711,11 @@ function featureLabel473(feature){ return (FEATURE_LABELS.find(([k])=>k===featur
 
 
 const FEATURE_PRESETS_474 = {
-  minimal:{label:"Minimal Daily", mode:"simple", icon:"◯", note:"Clean dashboard for basic sites and today’s route.", features:{dailyRoute:true, fieldFocus:true, dataSafeHome:true, siteBrief:true, siteTimeline:true, pinnedSites:true, importantSiteInfo:true, advancedGps:false, attention:false, library:false, reports:false, equipment:false, routeReview:false, csvExports:false, diagnostics:false, backupRepair:false}},
-  route:{label:"Route Logger", mode:"simple", icon:"◇", note:"Daily Route plus GPS / nearby tools.", features:{dailyRoute:true, fieldFocus:true, dataSafeHome:true, siteBrief:true, siteTimeline:true, pinnedSites:true, importantSiteInfo:true, advancedGps:true, attention:false, library:false, reports:false, equipment:false, routeReview:true, csvExports:false, diagnostics:false, backupRepair:false}},
-  service:{label:"Service Tech", mode:"advanced", icon:"▣", note:"Sites, reports, equipment, GPS, and attention tools.", features:{dailyRoute:true, fieldFocus:true, dataSafeHome:true, siteBrief:true, siteTimeline:true, pinnedSites:true, importantSiteInfo:true, advancedGps:true, attention:true, library:false, reports:true, equipment:true, routeReview:false, csvExports:false, diagnostics:false, backupRepair:false}},
-  inspection:{label:"Inspector", mode:"advanced", icon:"▤", note:"Reports, equipment, route review, library, and export tools.", features:{dailyRoute:true, fieldFocus:true, dataSafeHome:true, siteBrief:true, siteTimeline:true, pinnedSites:true, importantSiteInfo:true, advancedGps:true, attention:true, library:true, reports:true, equipment:true, routeReview:true, csvExports:true, diagnostics:false, backupRepair:false}},
-  power:{label:"Power Mode", mode:"power", icon:"⚡", note:"Show every FireVault module and advanced control.", features:{dailyRoute:true, fieldFocus:true, dataSafeHome:true, siteBrief:true, siteTimeline:true, pinnedSites:true, importantSiteInfo:true, advancedGps:true, attention:true, library:true, reports:true, equipment:true, routeReview:true, csvExports:true, diagnostics:true, backupRepair:true}}
+  minimal:{label:"Minimal Daily", mode:"simple", icon:"◯", note:"Clean dashboard for basic sites and today’s route.", features:{dailyRoute:false, fieldFocus:true, dataSafeHome:true, siteBrief:true, siteTimeline:true, pinnedSites:true, importantSiteInfo:true, advancedGps:false, attention:false, library:false, reports:false, equipment:false, routeReview:false, csvExports:false, diagnostics:false, backupRepair:false}},
+  route:{label:"Route Logger", mode:"simple", icon:"◇", note:"Daily Route plus GPS / nearby tools.", features:{dailyRoute:false, fieldFocus:true, dataSafeHome:true, siteBrief:true, siteTimeline:true, pinnedSites:true, importantSiteInfo:true, advancedGps:true, attention:false, library:false, reports:false, equipment:false, routeReview:false, csvExports:false, diagnostics:false, backupRepair:false}},
+  service:{label:"Service Tech", mode:"advanced", icon:"▣", note:"Sites, reports, equipment, GPS, and attention tools.", features:{dailyRoute:false, fieldFocus:true, dataSafeHome:true, siteBrief:true, siteTimeline:true, pinnedSites:true, importantSiteInfo:true, advancedGps:true, attention:true, library:false, reports:true, equipment:true, routeReview:false, csvExports:false, diagnostics:false, backupRepair:false}},
+  inspection:{label:"Inspector", mode:"advanced", icon:"▤", note:"Reports, equipment, route review, library, and export tools.", features:{dailyRoute:false, fieldFocus:true, dataSafeHome:true, siteBrief:true, siteTimeline:true, pinnedSites:true, importantSiteInfo:true, advancedGps:true, attention:true, library:true, reports:true, equipment:true, routeReview:false, csvExports:true, diagnostics:false, backupRepair:false}},
+  power:{label:"Power Mode", mode:"power", icon:"⚡", note:"Show every FireVault module and advanced control.", features:{dailyRoute:false, fieldFocus:true, dataSafeHome:true, siteBrief:true, siteTimeline:true, pinnedSites:true, importantSiteInfo:true, advancedGps:true, attention:true, library:true, reports:true, equipment:true, routeReview:false, csvExports:true, diagnostics:true, backupRepair:true}}
 };
 function activeFeaturePresetKey575(){
   const mode=appMode();
@@ -866,6 +863,7 @@ function val(id){ return document.getElementById(id)?.value?.trim() || ""; }
 function raw(id){ return document.getElementById(id)?.value || ""; }
 function checked(id){ return !!document.getElementById(id)?.checked; }
 function route(v){
+  if(v==="documentScanner" || v==="routeLog"){ toast("This feature is not included in FireVault 1.0."); v=v==="routeLog"?"home":"tools"; }
   if(v!=="documentScanner"){ scannerStopLiveCamera0802(false); if(scannerGpsMatch0803?.state==="checking") scannerCancelGpsMatch0803(); }
   captureRouteScroll0782();
   if(view === "settings") captureSettingsScroll576();
@@ -1581,26 +1579,13 @@ function detectNearbySites(){
 }
 
 function applyTheme(){
-  const t = data.settings.theme || {};
-  const body = document.body;
-  /* Theme changes must never erase structural app classes such as app-booted,
-     app-chrome-ready, route layout modes, or Settings/Home chrome. */
-  [...body.classList].forEach(cls=>{
-    if(cls.startsWith("theme-") || ["large-text","compact-layout","square-buttons","solid-cards","demoMode0738"].includes(cls)) body.classList.remove(cls);
-  });
-  if(isDemoMode()) body.classList.add("demoMode0738");
-  const preset = t.name || "firevault-dark";
-  body.classList.add("theme-" + preset);
-  if(t.largeText) body.classList.add("large-text");
-  if(t.compactLayout) body.classList.add("compact-layout");
-  if(t.buttonStyle === "squared") body.classList.add("square-buttons");
-  if(t.cardStyle === "solid") body.classList.add("solid-cards");
-  if(t.accentColor) body.style.setProperty("--accent", t.accentColor);
-  const meta = document.querySelector('meta[name="theme-color"]');
-  if(meta) meta.setAttribute("content", t.accentColor || "#101216");
-  applyFeatureVisibility();
+  const body=document.body;
+  [...body.classList].forEach(cls=>{if(cls.startsWith("theme-") || ["large-text","compact-layout","square-buttons","solid-cards","demoMode0738"].includes(cls)) body.classList.remove(cls);});
+  body.classList.add("theme-midnight");
+  body.style.removeProperty("--accent");
+  const meta=document.querySelector('meta[name="theme-color"]');
+  if(meta) meta.setAttribute("content","#07111f");
 }
-
 function activeJobStorageKey0738(){ return isDemoMode()?DEMO_ACTIVE_JOB_KEY_0738:ACTIVE_JOB_KEY; }
 function loadActiveJob(){ try{ const raw=fvSafeGet0739(activeJobStorageKey0738(),""); return raw ? JSON.parse(raw) : null; } catch{ return null; } }
 function saveActiveJob(){ const key=activeJobStorageKey0738(); activeJob ? fvSafeSet0739(key,JSON.stringify(activeJob)) : fvSafeRemove0739(key); }
@@ -2208,12 +2193,11 @@ function addServiceFollowUp(kind="Follow-up"){
   toast(`${kind} task added.`);
   render();
 }
-function startJobTimer(){ stopJobTimer(); jobTimer=setInterval(()=>{ const el=document.getElementById("jobElapsed"); if(el && activeJob) el.textContent=elapsedText(activeJob.startedAt); },1000); }
+function startJobTimer(){ stopJobTimer(); }
 function stopJobTimer(){ if(jobTimer){ clearInterval(jobTimer); jobTimer=null; } }
 function setActiveNav(){
   document.querySelectorAll("#appNav button").forEach(b=>{b.classList.remove("active");b.removeAttribute("aria-current");});
-  const scannerSection=view==="documentScanner"?(scannerReturnView0800==="tools"?"tools":"sites"):"";
-  const section=scannerSection||(["routeLog","dailySummary","actionCenter","pinnedSites","dashboard068"].includes(view)?"home":(["siteDetail","visits","visitDetail","checklist","siteForm","contactsList","contactForm","siteDocs","siteDocForm","equipmentList","equipmentForm","tasks","taskForm","deficiencies","deficiencyForm","report","jobMode","serviceVisit","nearbySites","attention"].includes(view)?"sites":view));
+  const section=(["dailySummary","actionCenter","pinnedSites","dashboard068"].includes(view)?"home":(["siteDetail","visits","visitDetail","checklist","siteForm","contactsList","contactForm","siteDocs","siteDocForm","equipmentList","equipmentForm","tasks","taskForm","deficiencies","deficiencyForm","report","jobMode","serviceVisit","nearbySites","attention"].includes(view)?"sites":view));
   const active=document.getElementById("nav-"+section);
   if(active){active.classList.add("active");active.setAttribute("aria-current","page");}
 }
@@ -2231,7 +2215,7 @@ window.addEventListener("orientationchange",()=>setTimeout(syncGlobalHeaderClear
 function contextualHelpInfo060(){
   if(view!=="settings") return CONTEXT_HELP_060[view]||null;
   if(settingsTab==="manual") return null;
-  const tabMap={tech:["settings","Technician Profile"],gps:["route","GPS / Maps"],reports:["reports","Report Settings"],email:["reports","Email Settings"],overlay:["photos","Photo Overlay"],themes:["settings","Theme Settings"],homeLayout:["home","Home Layout"],visibility:["settings","Modules / Simple View"],advanced:["settings","Advanced Settings"],privacy:["settings","Privacy Lock"],security:["settings","Security Center"],customerImport:["sites","Customer Import"],categories:["sites","Categories"],backup:["backup","Backup & Restore"],about:["release","About FireVault"]};
+  const tabMap={tech:["settings","Technician Profile"],gps:["route","GPS / Maps"],reports:["reports","Report Settings"],email:["reports","Email Settings"],overlay:["photos","Photo Overlay"],privacy:["settings","Privacy Lock"],security:["settings","Security Center"],customerImport:["sites","Customer Import"],categories:["sites","Categories"],backup:["backup","Backup & Restore"],about:["release","About FireVault"]};
   const item=tabMap[settingsTab]||["settings","Settings"];
   return {chapter:item[0],label:item[1],suggestions:settingsTab==="email"?["Recipients","Subject tags","Signature preview"]:settingsTab==="backup"?["Export backup","Restore safely","Clean update"]:["What this controls","Recommended setup","Related features"]};
 }
@@ -2270,7 +2254,7 @@ function render(){
     document.body.classList.toggle("homeLayoutFixed570", isHomeView);
     document.body.classList.toggle("settingsChrome572", view === "settings");
     if(!isHomeView) restoreAppChrome572();
-    const routes = {home, tools:tools0734, dashboard068, dailySummary, routeLog, actionCenter, pinnedSites:pinnedSitesManager567, sites, nearbySites, attention:attentionQueue, siteDetail, visits, visitDetail, checklist, siteForm, contactsList, contactForm, siteDocs, siteDocForm, documentScanner:documentScanner0800, equipmentList, equipmentForm, tasks, taskForm, deficiencies, deficiencyForm, report, library, resourceForm, jobMode, serviceVisit, settings, diagnostics, dataTools};
+    const routes = {home, tools:tools0734, dashboard068, dailySummary, actionCenter, pinnedSites:pinnedSitesManager567, sites, nearbySites, attention:attentionQueue, siteDetail, visits, visitDetail, checklist, siteForm, contactsList, contactForm, siteDocs, siteDocForm, equipmentList, equipmentForm, tasks, taskForm, deficiencies, deficiencyForm, report, library, resourceForm, jobMode, serviceVisit, settings, dataTools};
     (routes[view] || home)();
     document.body.classList.toggle("homeFullscreen480", isHomeView);
     document.body.classList.toggle("homeLayoutFixed570", isHomeView);
@@ -2541,8 +2525,6 @@ function wireFieldDashboard560(){
   const note=document.getElementById("quickAccountNote500"); if(note) note.onclick=()=>openQuickCapture560("note");
   const notes=document.getElementById("dashNotes500"); if(notes) notes.onclick=()=>{ setDailySummaryDay569(localDateString()); route("dailySummary"); };
   const accounts=document.getElementById("dashAccounts500"); if(accounts) accounts.onclick=()=>{ setDailySummaryDay569(localDateString()); route("dailySummary"); };
-  const routePoints=document.getElementById("dashRoute500"); if(routePoints) routePoints.onclick=()=>route("routeLog");
-  const routeBtn=document.getElementById("openRoute500"); if(routeBtn) routeBtn.onclick=()=>route("routeLog");
   const copy=document.getElementById("copySummary500"); if(copy) copy.onclick=copyDailySummary499;
   const all=document.getElementById("allTodayAccounts500"); if(all) all.onclick=()=>route("sites");
 }
@@ -2791,21 +2773,13 @@ function tools0734(){
 
     <div class="toolsSectionTitle0734"><strong>FireVault Utilities</strong><span>Quick access</span></div>
     <div class="toolsGrid0734 toolsGridClean0735">
-      <button class="card toolTile0734 toolScanner0801" id="toolsScanner0801">${fvIcon073("note","toolIcon0734")}<span><strong>Document Scanner</strong><small>Capture paperwork, then search and match it to an account</small></span></button>
-      <button class="card toolTile0734" id="toolsRoute0734">${fvIcon073("nearby","toolIcon0734")}<span><strong>Daily Route</strong><small>Waypoints, stops, and travel history</small></span></button>
       <button class="card toolTile0734" id="toolsData0734">${fvIcon073("settings","toolIcon0734")}<span><strong>Backup &amp; Data</strong><small>Snapshots, restore, imports, and updates</small></span></button>
       ${featureOn("library")?`<button class="card toolTile0734" id="toolsLibrary0734">${fvIcon073("library","toolIcon0734")}<span><strong>Library</strong><small>Manuals, documents, and reference files</small></span></button>`:""}
-      ${featureOn("diagnostics")?`<button class="card toolTile0734" id="toolsDiagnostics0734">${fvIcon073("tools","toolIcon0734")}<span><strong>Diagnostics</strong><small>Startup, storage, and vault health</small></span></button>`:""}
     </div>
-    <section class="card toolsSafety0735"><span>DATA SAFETY</span><strong>Automatic snapshots are active</strong><p>Download an external backup before deleting or reinstalling the Home Screen app.</p><button class="ghost" id="toolsBackup0735">Open Backup Controls</button></section>
     <div class="buildRevisionSpacer475" aria-hidden="true"></div>
   </div>`);
-  document.getElementById("toolsScanner0801")?.addEventListener("click",()=>scannerStart0800("","tools",""));
-  document.getElementById("toolsRoute0734")?.addEventListener("click",()=>route("routeLog"));
   document.getElementById("toolsData0734")?.addEventListener("click",()=>route("dataTools"));
   document.getElementById("toolsLibrary0734")?.addEventListener("click",()=>route("library"));
-  document.getElementById("toolsDiagnostics0734")?.addEventListener("click",()=>route("diagnostics"));
-  document.getElementById("toolsBackup0735")?.addEventListener("click",()=>{settingsTab="backup";mode="settingsDetail";view="settings";render();});
   document.getElementById("toolsRelease0734")?.addEventListener("click",showChangelog);
 }
 
@@ -2852,7 +2826,6 @@ function dashboard068(){
       </div>
       <div class="fieldDashActions500">
         <button class="primary" id="quickAccountNote500">＋ Site Note</button>
-        <button class="ghost" id="openRoute500">Daily Route</button>
         <button class="ghost" id="copySummary500">Copy Summary</button>
       </div>
     </div>
@@ -2872,9 +2845,7 @@ function dashboard068(){
         <button class="card tile statTile478" id="tasksCard"><strong>${openTasks}</strong><span>Open Tasks</span><em>${taskCounts.overdue ? `${taskCounts.overdue} overdue` : taskCounts.today ? `${taskCounts.today} due soon` : "Due Soon"}</em></button>
       </div>
     </div>
-
-    ${activeRoute ? `<div class="card activeRouteMini468 activeRouteMini476 activeRouteMini478 ${activeRoute.paused?"activeRoutePaused470":""}"><div class="activeRouteHead468"><div><h2><span class="${activeRoute.paused?"routeLed470 routeLedPaused470":"routeLed463"} miniLed468"></span>${activeRoute.paused?"Daily Route Paused":"Daily Route Recording"}</h2><p>${esc(routeSummaryLine(activeRoute))}</p></div><button class="primary smallBtn" id="openRouteMiniBtn">Open</button></div><div class="activeRouteStats468"><div><strong>${(activeRoute.events||[]).length}</strong><span>Waypoints</span></div><div><strong>${routeDuration(activeRoute.startedAt)}</strong><span>Time</span></div><div><strong>${esc(routeDistanceLabel(activeRoute))}</strong><span>Distance</span></div></div><div class="activeRouteActions468"><button class="ghost smallBtn" id="homeRoutePointBtn" ${activeRoute.paused?"disabled":""}>Waypoint</button><button class="ghost smallBtn" id="homeRouteNearestBtn" ${activeRoute.paused?"disabled":""}>Nearest</button><button class="${activeRoute.paused?"primary":"ghost"} smallBtn" id="homeRoutePauseBtn">${activeRoute.paused?"Resume":"Pause"}</button><button class="danger smallBtn" id="homeRouteEndBtn">End / Save</button></div></div>` : ""}
-    ${activeJob ? `<div class="card activeJobMini activeJobMini478"><div class="row"><div><h2>Service Call Active</h2><p>${esc(activeJob.siteName)} • <span id="jobElapsed">${elapsedText(activeJob.startedAt)}</span></p></div><button class="primary" id="resumeJobBtn">Open</button></div></div>` : ""}
+    ${activeJob ? `<div class="card activeJobMini activeJobMini478"><div class="row"><div><h2>Service Call Active</h2><p>${esc(activeJob.siteName)} • <span id="jobElapsed">Service call active</span></p></div><button class="primary" id="resumeJobBtn">Open</button></div></div>` : ""}
 
     ${homeCardVisible550("recentAccounts")?`<div class="recentAccountsPanel478 homeCollapsible5100 ${homeCardCollapsed5100("recentAccounts")?"homeCollapsed5100":""}" data-home-collapsible="recentAccounts">
       <div class="recentHead478"><div><strong>Recent Accounts</strong><span>${recentAccounts476(5).length} account${recentAccounts476(5).length===1?"":"s"}</span></div><div class="homeHeaderActions5100"><button class="ghost smallBtn" id="allAccountsBtn478">See All</button>${homeCollapseButton5100("recentAccounts","Recent Accounts")}</div></div>
@@ -4728,7 +4699,7 @@ function accountDocsTab0735(s){
     </section>
     <section class="accountPanel0735 accountScannerPanel0800"><div class="accountPanelHead0735"><div><span>SCANNED DOCUMENTS</span><h2>${scans.length} Scanned Document${scans.length===1?"":"s"}</h2></div></div>
       <p>New scans are captured from Tools or Site Notes, then stored here after they are matched to this account.</p>
-      ${scans.length?`<div class="accountScanStrip0800">${scans.slice(0,4).map(d=>`<button data-account-scan0800="${esc(d.id)}">${scannerThumb0800(d)}<strong>${esc(d.title||"Scanned Document")}</strong></button>`).join("")}</div>`:`<div class="accountEmptyState0735"><strong>No scanned documents</strong><span>Open Tools → Document Scanner, or scan directly from this account’s Site Notes workspace.</span></div>`}
+      
     </section>
     <section class="accountPanel0735"><div class="accountPanelHead0735"><div><span>DOCUMENTS</span><h2>${docs.length} Total File${docs.length===1?"":"s"}</h2></div><button class="ghost" id="manageDocsBtn">Manage</button></div>
       <div class="accountDocActions0735"><button id="reportBtn"><span>▤</span><strong>Report</strong><small>Customer closeout</small></button><button id="checklistBtn"><span>✓</span><strong>Checklist</strong><small>Inspection workflow</small></button><button id="qaCloseout544"><span>↗</span><strong>Copy Closeout</strong><small>Customer packet</small></button></div>
@@ -4738,7 +4709,7 @@ function accountDocsTab0735(s){
 function accountNotesTab0735(s,ctx){
   const {health,lastVisit,def,open}=ctx;
   return `<div class="accountTabPanel0735">
-    <section class="accountPanel0735"><div class="accountPanelHead0735"><div><span>SITE NOTES</span><h2>Technician Notes</h2></div><button class="primary" id="addSiteNoteBtn491">＋ Add Note</button></div><div class="accountNotesBody0735">${esc(s.notes||"No notes entered.")}</div><div class="accountNoteDocActions0800"><button class="ghost accountWideButton0735" id="openSiteNotesBtn494">Open Full Notes Workspace</button><button class="primary accountWideButton0735" id="scanDocNoteBtn0800">▣ Open Document Scanner</button></div></section>
+    <section class="accountPanel0735"><div class="accountPanelHead0735"><div><span>SITE NOTES</span><h2>Technician Notes</h2></div><button class="primary" id="addSiteNoteBtn491">＋ Add Note</button></div><div class="accountNotesBody0735">${esc(s.notes||"No notes entered.")}</div><div class="accountNoteDocActions0800"><button class="ghost accountWideButton0735" id="openSiteNotesBtn494">Open Full Notes Workspace</button></div></section>
     <section class="accountMetricCards0735 accountWorkMetrics0735"><button id="taskBtn"><span>OPEN TASKS</span><strong>${open}</strong></button><button id="defBtn" class="metricDanger0735"><span>DEFICIENCIES</span><strong>${def}</strong></button><button id="visitsMini477"><span>LAST VISIT</span><strong>${esc(lastVisit?visitDateLabel(lastVisit):"None")}</strong></button></section>
     <section class="accountQuickBar0735 accountWorkActions0735"><button id="qaAddTask544"><span>□</span><strong>Task</strong></button><button id="qaAddDef544"><span>!</span><strong>Deficiency</strong></button><button id="qaAddPhoto544"><span>▣</span><strong>Photo</strong></button><button id="qaReport544"><span>▤</span><strong>Report</strong></button></section>
     <section class="accountPanel0735"><div class="accountPanelHead0735"><div><span>RECENT VISIT</span><h2>${esc(lastVisit?visitDateLabel(lastVisit):"No completed visits")}</h2></div>${lastVisit?`<button class="ghost" id="allVisitsBtn">History</button>`:""}</div>${lastVisit?`<p class="accountVisitPreview0735">${esc(visitNotesPreview(lastVisit,3))}</p>`:`<div class="accountEmptyState0735"><span>Start a service visit to create an account history.</span></div>`}</section>
@@ -7184,7 +7155,7 @@ function serviceVisit(){
   if(!s){ activeJob=null; saveActiveJob(); route("sites"); return; }
   html(`<div class="screen serviceVisitScreen610">
     <div class="row serviceVisitTop610"><button class="back ghost" id="backBtn">←</button><div><h1>Service Visit</h1><p>${esc(s.name||"Customer Account")}</p></div><button class="ghost smallBtn contextHelp537" data-help="workflow">Help</button></div>
-    <div class="card serviceVisitHero610"><div><span>ACTIVE VISIT</span><strong id="jobElapsed">${elapsedText(activeJob.startedAt)}</strong><p>Started ${esc(eventTime(activeJob.startedAt))} • ${esc(fullAddress(s)||"No address entered")}</p></div><button class="primary" id="endVisit610">End & Save</button></div>
+    <div class="card serviceVisitHero610"><div><span>ACTIVE VISIT</span><strong id="jobElapsed">Service call active</strong><p>Started ${esc(eventTime(activeJob.startedAt))} • ${esc(fullAddress(s)||"No address entered")}</p></div><button class="primary" id="endVisit610">End & Save</button></div>
     <div class="card serviceVisitComposer610"><div class="row"><div><h2>Work Summary</h2><p>Keep a running description of testing, repairs, customer updates, and site status.</p></div><button class="ghost smallBtn" id="addTimeline610">＋ Timeline</button></div><textarea id="serviceVisitNotes610" rows="7" placeholder="Work performed, findings, devices tested, repairs, system status, parts needed...">${esc(activeJob.draft||"")}</textarea><div class="serviceVisitSaveState610">Draft saves automatically on this device.</div></div>
     <div class="serviceVisitActionGrid610">
       <button class="card" id="visitCustomer610"><strong>Customer Update</strong><span>Add timeline note</span></button>
@@ -7700,11 +7671,10 @@ function importedAccountCard065(s={}){
 
 
 const SETTINGS_GROUPS_067 = [
-  {key:"profile",icon:"👤",title:"Profile & Organization",note:"Your technician and company details.",tone:"blue",tabs:["tech"]},
-  {key:"appearance",icon:"◐",title:"App & Home",note:"Theme, Demo Mode, Home, and modules.",tone:"violet",tabs:["demo","themes","homeLayout","visibility"]},
-  {key:"field",icon:"🧰",title:"Field Tools",note:"GPS, Plus Codes, overlays, and services.",tone:"cyan",tabs:["gps","plusCodes","overlay","advanced"]},
-  {key:"reports",icon:"▤",title:"Reports & Communication",note:"Report defaults and email.",tone:"amber",tabs:["reports","email"]},
-  {key:"data",icon:"☁",title:"Data, Sync & Support",note:"Security, storage, sync, backups, and support.",tone:"red",tabs:["privacy","security","cloudFiles","microsoftStorage","backend","sync","webdav","customerImport","categories","backup","updates","manual","about","diagnostics"]}
+  {key:"profile",icon:"👤",title:"Profile",note:"Technician and company details.",tone:"blue",tabs:["tech"]},
+  {key:"field",icon:"🧰",title:"Field",note:"GPS, Plus Codes, and photo overlays.",tone:"cyan",tabs:["gps","plusCodes","overlay"]},
+  {key:"reports",icon:"▤",title:"Reports",note:"Report and email defaults.",tone:"amber",tabs:["reports","email"]},
+  {key:"data",icon:"☁",title:"Data & Support",note:"Storage, backup, importing, and app information.",tone:"red",tabs:["privacy","security","cloudFiles","microsoftStorage","sync","customerImport","categories","backup","updates","about"]}
 ];
 function settingsGroupForTab067(tab){ return SETTINGS_GROUPS_067.find(g=>g.tabs.includes(tab))?.key || "data"; }
 function settingsGroup067ByKey(key){ return SETTINGS_GROUPS_067.find(g=>g.key===key) || SETTINGS_GROUPS_067[0]; }
@@ -7796,6 +7766,7 @@ function settingsIcon550(tab){
   return ({tech:"👤",gps:"⌖",plusCodes:"＋",reports:"▤",email:"✉",overlay:"▧",demo:"D",themes:"◐",homeLayout:"⌂",visibility:"☰",advanced:"⚡",privacy:"▣",security:"⌾",cloudFiles:"☁",microsoftStorage:"M",sync:"☁",customerImport:"⇩",categories:"◇",backup:"⇅",updates:"↻",manual:"?",about:"ⓘ"})[tab]||"•";
 }
 function settings(){
+  if(["themes","advanced","demo","homeLayout","visibility","backend","webdav","manual","diagnostics"].includes(settingsTab)) settingsTab="about";
   captureSettingsScroll576();
   restoreAppChrome572();
   const tabs=settingsTabs();
@@ -8438,7 +8409,7 @@ function manualSimplePage058(type){
   quick:["🚀","Quick Start Guide","Get FireVault ready for a normal field day.",[["1. Verify the build","Confirm the green build badge shows 0.67.0 before entering production information."],["2. Complete Technician Profile","Enter your name, company, phone, email, and license or employee identification."],["3. Review permissions","Allow location and photo access only when FireVault requests them and the feature is needed."],["4. Create or open a site","Add the customer name, full address, panel details, contacts, access notes, and GPS location."],["5. Document the visit","Record notes, photos, tasks, deficiencies, equipment changes, and a service visit."],["6. Finish and protect the data","Review the report, send or copy the required summary, then export a current backup."]]],
   new:["🆕","What’s New in 0.67.0","Account View, Settings navigation, and FireVault Academy redesign.",[["Unified visual system","Standardized typography, spacing, card surfaces, borders, controls, and responsive behavior across FireVault."],["Settings cleanup","Improved Settings home cards and every submenu while preserving the preferred Email setup workflow."],["Help readability","Converted contextual Help and Academy articles into one uninterrupted scrolling reading column with no floating metadata."],["Site Detail stability","Reinforced natural-height cards, readable text, and scroll-safe account sections."],["Operational screens","Simplified Customer Import, Team Sync, Conflict Center, and Nearby Sites presentation without changing their workflows."],["Phone and iPad layouts","Added consistent narrow-phone and tablet behavior, bottom-navigation clearance, and overflow protection."],["Nearby scan diagnostics","Nearby Sites now shows total sites, GPS-ready records, missing coordinates, phone-location progress, and persistent error messages."],["Coordinate recovery","FireVault recovers valid latitude and longitude stored in compatible legacy or imported fields and normalizes them into the site GPS record."],["Location retry","If high-accuracy location times out or is unavailable, FireVault retries once using standard accuracy."],["Nearest-site fallback","When no site is inside the selected radius, the nearest GPS-ready sites remain visible instead of presenting an empty result."],["Latitude and longitude","Customer Import can calculate missing coordinates from each usable U.S. street address before saving records."],["Coordinate requirement","The importer requires calculated, supplied, or existing GPS coordinates by default. Unmatched addresses remain in review."],["Census address matching","Only address fields are sent to the U.S. Census Geocoder. The returned point is an address-range calculation, not a guaranteed building entrance."],["Account Id matching","Repeat imports update the matching FireVault site instead of creating duplicates or deleting field history."],["CSV coordinate columns","Files that already contain Latitude and Longitude columns use those values directly."],["Sync-ready changes","Added and updated customer records enter the pending synchronization queue and create a Sync Activity entry."]]],
   tips:["🧰","Field Tips","Short practices that improve the usefulness of FireVault records.",[["Write for the next technician","Include the exact panel, circuit, device, location, symptom, test result, and next action instead of relying on memory."],["Photograph context first","Take one wide photo showing the equipment location before close-up terminal, label, or damage photos."],["Separate facts from follow-up","Use notes for what occurred, deficiencies for code or system problems, and tasks for work that still needs completion."],["Confirm the account","Before using Quick Capture, verify the selected customer site to prevent records from being stored under the wrong account."],["Back up before updates","Download an external backup before a major update or device change and after completing significant field documentation."]]],
-  revisions:["📋","Revision History","Application and documentation checkpoints.",[["0.80.4","Rebuilt scanner page detection with an advanced edge-and-line computer-vision pipeline, full-resolution autocrop, simplified capture screens, post-capture metadata fields, flash control, and stronger keyboard visibility."],["0.80.3","Defaulted new Tools scanner documents to the closest GPS-ready account with visible distance, accuracy, retry, and manual override."],["0.80.2","Simplified Document Scanner, added on-device AI Auto Scan with live corner framing and hands-free capture, and repaired mobile keyboard field visibility."],["0.80.1","Moved Document Scanner to Tools, added post-capture account search and matching, and added scanner access inside the full Site Notes workspace."],["0.80.0","Added an account-specific multi-page camera document scanner with automatic edge detection, manual corner correction, rotation, cleanup modes, page ordering, PDF preview/download/share, and account-note activity."],["0.79.14","Restored numbered Nearby Accounts map pins matched to distance-sorted list rows and removed Smart Account Intelligence."],["0.79.13","Repaired startup parsing inherited from 0.79.11 and corrected Building Navigator location-copy syntax."],["0.79.12","Added Building Navigator with exact site locations, GPS/Plus Codes, verification, linked photos, route targets, and timeline events."],["0.79.7","Shortened every Settings summary and removed the colored bar from each Section Overview."],["0.79.6","Added Nearby-style account-list scroll locking so cards settle cleanly at the top while the Accounts controls remain fixed."],["0.79.5","Added separate Personal OneDrive, Work OneDrive, and SharePoint connection profiles with exact photo/document assignments and no-personal-fallback protection."],["0.79.4","Added independent photo and document storage destinations, cloud-provider integration targets, and offline Google Plus Codes for accounts and exact field locations."],["0.79.3","Added backend-neutral provider interfaces for authentication, database, file storage, synchronization, and audit while keeping FireVault fully local."],["0.79.2","Added a unified Security Center with vault integrity validation, backup health, audit filters, device naming, session clearing, and PIN confirmation for sensitive exports, restores, and deletion."],["0.79.1","Added an optional local six-digit privacy lock with PBKDF2 hashing, inactivity/background locking, app-switcher privacy screen, recovery code, cooldown protection, and local lock events."],["0.79.0","Added security-ready schema 4 metadata, stable workspace/user/device identities, local audit history, pending change queue, recoverable deletion, credential-safe exports, and protected restore/reset actions."],["0.67.0","Redesigned Account View around service actions and grouped information, consolidated Settings into five folders, and simplified FireVault Academy and contextual Help for continuous reading."],["0.65.2","Repaired Nearby Sites with GPS inventory counts, imported-coordinate recovery, persistent permission and timeout messages, a standard-accuracy retry, and nearest-site fallback results."],["0.65.1","Added online latitude/longitude calculation, coordinate validation, geocoding progress, unmatched-address review, optional CSV coordinates, and coordinate-safe repeat importing."],["0.65.0","Added preview-first customer CSV importing, Account Id update matching, validation warnings, imported monitoring details, and sync activity tracking."],["0.64.1","Simplified Academy article headers, removed floating metadata badges, and improved continuous scrolling and readability."],["0.64.0","Added Sync Activity, a conflict review center, export/import audit entries, and an automatic OneDrive connection-readiness checklist."],["0.63.1","Overhauled contextual Help and Academy reader formatting, removed overlapping sticky article headers, and restored full scrolling on phones and tablets."],["0.63.0","Added permanent record IDs, audit metadata, local version tracking, pending-sync states, conflict readiness, device identity, and a Team Sync settings workspace."],["0.60.0","Connected major screens and Settings areas directly to matching Academy chapters with return-to-screen navigation."],["0.59.0","Added interactive tutorials, guided orientation, pinned learning, field tips, and documentation tracking."],["0.58.0","Expanded Help & Manual into FireVault Academy with bookmarks, smart search, Quick Start, and reader navigation."],["0.57.0","Added the first complete searchable in-app FireVault User Manual."],["Ongoing review rule","Any change to navigation, labels, storage, workflows, permissions, or supported layouts requires the related manual chapter to be checked."]]],
+  revisions:["📋","Revision History","Application and documentation checkpoints.",[[["0.81.0","Prepared FireVault for App Store review by removing the document scanner, Daily Route and time-tracking controls, theme selection, advanced settings, diagnostics access, and excess instructional copy while preserving account data."],"0.81.0","Rebuilt scanner page detection with an advanced edge-and-line computer-vision pipeline, full-resolution autocrop, simplified capture screens, post-capture metadata fields, flash control, and stronger keyboard visibility."],["0.80.3","Defaulted new Tools scanner documents to the closest GPS-ready account with visible distance, accuracy, retry, and manual override."],["0.80.2","Simplified Document Scanner, added on-device AI Auto Scan with live corner framing and hands-free capture, and repaired mobile keyboard field visibility."],["0.80.1","Moved Document Scanner to Tools, added post-capture account search and matching, and added scanner access inside the full Site Notes workspace."],["0.80.0","Added an account-specific multi-page camera document scanner with automatic edge detection, manual corner correction, rotation, cleanup modes, page ordering, PDF preview/download/share, and account-note activity."],["0.79.14","Restored numbered Nearby Accounts map pins matched to distance-sorted list rows and removed Smart Account Intelligence."],["0.79.13","Repaired startup parsing inherited from 0.79.11 and corrected Building Navigator location-copy syntax."],["0.79.12","Added Building Navigator with exact site locations, GPS/Plus Codes, verification, linked photos, route targets, and timeline events."],["0.79.7","Shortened every Settings summary and removed the colored bar from each Section Overview."],["0.79.6","Added Nearby-style account-list scroll locking so cards settle cleanly at the top while the Accounts controls remain fixed."],["0.79.5","Added separate Personal OneDrive, Work OneDrive, and SharePoint connection profiles with exact photo/document assignments and no-personal-fallback protection."],["0.79.4","Added independent photo and document storage destinations, cloud-provider integration targets, and offline Google Plus Codes for accounts and exact field locations."],["0.79.3","Added backend-neutral provider interfaces for authentication, database, file storage, synchronization, and audit while keeping FireVault fully local."],["0.79.2","Added a unified Security Center with vault integrity validation, backup health, audit filters, device naming, session clearing, and PIN confirmation for sensitive exports, restores, and deletion."],["0.79.1","Added an optional local six-digit privacy lock with PBKDF2 hashing, inactivity/background locking, app-switcher privacy screen, recovery code, cooldown protection, and local lock events."],["0.79.0","Added security-ready schema 4 metadata, stable workspace/user/device identities, local audit history, pending change queue, recoverable deletion, credential-safe exports, and protected restore/reset actions."],["0.67.0","Redesigned Account View around service actions and grouped information, consolidated Settings into five folders, and simplified FireVault Academy and contextual Help for continuous reading."],["0.65.2","Repaired Nearby Sites with GPS inventory counts, imported-coordinate recovery, persistent permission and timeout messages, a standard-accuracy retry, and nearest-site fallback results."],["0.65.1","Added online latitude/longitude calculation, coordinate validation, geocoding progress, unmatched-address review, optional CSV coordinates, and coordinate-safe repeat importing."],["0.65.0","Added preview-first customer CSV importing, Account Id update matching, validation warnings, imported monitoring details, and sync activity tracking."],["0.64.1","Simplified Academy article headers, removed floating metadata badges, and improved continuous scrolling and readability."],["0.64.0","Added Sync Activity, a conflict review center, export/import audit entries, and an automatic OneDrive connection-readiness checklist."],["0.63.1","Overhauled contextual Help and Academy reader formatting, removed overlapping sticky article headers, and restored full scrolling on phones and tablets."],["0.63.0","Added permanent record IDs, audit metadata, local version tracking, pending-sync states, conflict readiness, device identity, and a Team Sync settings workspace."],["0.60.0","Connected major screens and Settings areas directly to matching Academy chapters with return-to-screen navigation."],["0.59.0","Added interactive tutorials, guided orientation, pinned learning, field tips, and documentation tracking."],["0.58.0","Expanded Help & Manual into FireVault Academy with bookmarks, smart search, Quick Start, and reader navigation."],["0.57.0","Added the first complete searchable in-app FireVault User Manual."],["Ongoing review rule","Any change to navigation, labels, storage, workflows, permissions, or supported layouts requires the related manual chapter to be checked."]]],
   trouble:["❓","Troubleshooting","Common problems and safe first checks.",FIREVAULT_MANUAL_058.find(x=>x.id==="trouble")?.topics||[]]
  };
  const [icon,title,note,items]=pages[type]||["ⓘ","Unavailable","This Help section is not available in the installed version.",[["Current status","Return to Help and choose an available chapter or tutorial."]]];
@@ -9168,13 +9139,6 @@ function settingsPanel(){
   if(settingsTab==="demo") return demoModePanel0738();
 
   if(settingsTab==="webdav") return webdavPanel0757();
-
-  if(settingsTab==="themes") return `<div class="settingsStack settingsStack540">
-    ${settingsSection540("One-tap styles","Quick Themes","Apply a coordinated accent and contrast preset without changing your stored field data.",`<div class="presetGrid settingsPresetGrid540">${Object.entries(themePresets).map(([key,p])=>`<button class="ghost presetBtn" data-preset="${key}"><span class="themeSwatch" style="background:${p.accentColor}"></span><span>${p.label}</span></button>`).join("")}</div>`,"violet",saveButton("Apply"))}
-    ${settingsSection540("Appearance","Interface Style","Fine-tune the color and shape of FireVault controls.",`<div class="settingsGrid settingsGrid540">${fieldBlock("Theme",`<select id="themeName">${Object.entries(themePresets).map(([key,p])=>`<option value="${key}" ${t.name===key?"selected":""}>${p.label}</option>`).join("")}</select>`)}${fieldBlock("Accent color",`<input id="themeAccent" type="color" value="${esc(t.accentColor||"#ef4444")}">`)}${fieldBlock("Button shape",`<select id="buttonStyle"><option value="rounded" ${t.buttonStyle!=="squared"?"selected":""}>Rounded</option><option value="squared" ${t.buttonStyle==="squared"?"selected":""}>Squared</option></select>`)}${fieldBlock("Card style",`<select id="cardStyle"><option value="glass" ${t.cardStyle!=="solid"?"selected":""}>Glass</option><option value="solid" ${t.cardStyle==="solid"?"selected":""}>Solid</option></select>`)}</div>`,"pink")}
-    ${settingsSection540("Comfort","Readability & Feedback","Adjust contrast, text density, and tactile feedback for field use.",`<div class="settingsList settingsToggleList540 twoCol">${checkBlock("themeHighContrast","High contrast support",t.highContrast)}${checkBlock("themeLargeText","Larger text",t.largeText)}${checkBlock("themeCompact","Compact layout",t.compactLayout)}${checkBlock("themeHaptics","Haptic button feedback",s.app?.haptics!==false)}</div>`,"blue")}
-  </div>`;
-
   if(settingsTab==="homeLayout") return homeLayoutPanel550();
 
   if(settingsTab==="visibility") {
@@ -9186,11 +9150,6 @@ function settingsPanel(){
       <div class="card settingGroup compactPane settingsSection540 tone-amber modulesList540"><div class="paneHead settingsPaneHead540"><div><span class="settingsKicker540">Individual controls</span><h2>Module Visibility</h2><p class="paneNote">Turn off anything you do not use. Hidden modules remain available to enable again here.</p></div></div><div class="settingsSectionBody540"><div class="settingsList featureList472">${FEATURE_LABELS.map(([key,label,note])=>`<label class="checkRow featureCheck472"><input type="checkbox" id="vis_${key}" ${v[key]?"checked":""}><span><strong>${esc(label)}</strong><small>${esc(note)}</small></span></label>`).join("")}</div></div></div>
     </div>`;
   }
-
-  if(settingsTab==="advanced") return `<div class="settingsStack settingsStack540">
-    ${settingsSection540("Optional services","Advanced Features","Enable only the integrations used in your workflow. Some require permissions, APIs, subscriptions, or external services.",`<div class="settingsInfo540 warning"><strong><span class="featureStar">*</span> External service required</strong><span>Enabling a control does not connect or purchase an outside service.</span></div><div class="settingsList twoCol advancedGrid540">${[["advAi","aiTechnician","AI Technician"],["advReverse","reverseAddressLookup","Reverse Address Lookup *"],["advCloud","cloudBackup","Cloud Backup *"],["advVoice","voiceTranscription","Voice Transcription *"],["advOcr","ocrReader","OCR Reader *"],["advEmail","emailGateway","Email Gateway *"],["advWeather","weather","Weather Context *"],["advTraffic","traffic","Traffic / Routing *"]].map(x=>checkBlock(x[0],x[2],a[x[1]])).join("")}</div>`,"amber",saveButton())}
-  </div>`;
-
   if(settingsTab==="privacy") return privacyLockPanel0791();
 
   if(settingsTab==="security") return securityFoundationPanel0790();
@@ -9283,7 +9242,6 @@ function wireSettingsPanel(){
   ["emailSubject","emailSig"].forEach(id=>{ const el=document.getElementById(id); if(el){ el.addEventListener("focus",()=>lastEmailTemplateField=id); el.addEventListener("input",updateEmailPreview); } });
   [["emailTo","emailPreviewTo530","Customer email added when sending"],["emailCc","emailPreviewCc530","None"]].forEach(([inputId,previewId,fallback])=>{ const input=document.getElementById(inputId); const preview=document.getElementById(previewId); if(input&&preview) input.addEventListener("input",()=>preview.textContent=input.value.trim()||fallback); });
   document.querySelectorAll(".emailTagChip").forEach(b=>b.onclick=()=>{ const target=document.getElementById(lastEmailTemplateField) || document.getElementById("emailSubject"); insertAtCursor(target, b.dataset.emailTag || ""); });
-  document.querySelectorAll(".presetBtn").forEach(b=>b.onclick=()=>{ const p=themePresets[b.dataset.preset]; data.settings.theme.name=b.dataset.preset; data.settings.theme.accentColor=p.accentColor; if(p.highContrast) data.settings.theme.highContrast=true; save(); settings(); toast("Theme applied."); });
   document.querySelectorAll("[data-view-mode]").forEach(b=>b.onclick=()=>setViewMode(b.dataset.viewMode));
   document.querySelectorAll("[data-feature-preset]").forEach(b=>b.onclick=()=>applyFeaturePreset474(b.dataset.featurePreset));
   document.querySelectorAll("[data-layout-preset]").forEach(b=>b.onclick=()=>applyLayoutPreset565(b.dataset.layoutPreset));
@@ -9318,14 +9276,12 @@ function saveSettings(){
   if(settingsTab==="email") s.email={...s.email,defaultTo:val("emailTo"),cc:val("emailCc"),defaultSubject:val("emailSubject"),signature:raw("emailSig")};
   if(settingsTab==="overlay") s.overlay={...s.overlay,...collectOverlayFromInputs510()};
   if(settingsTab==="gps") s.gps={enabled:checked("gpsEnabled"),mapProvider:val("gpsMapProvider")||"apple",highAccuracy:val("gpsHighAccuracy")!=="false",includeInReports:checked("gpsReports"),nearbyRadiusMiles:Number(val("gpsNearbyRadius"))||1};
-  if(settingsTab==="themes") { s.theme={name:val("themeName"),accentColor:val("themeAccent"),highContrast:checked("themeHighContrast"),largeText:checked("themeLargeText"),compactLayout:checked("themeCompact"),buttonStyle:val("buttonStyle"),cardStyle:val("cardStyle")}; s.app={...(s.app||{}),haptics:checked("themeHaptics"),viewMode:s.app?.viewMode||"simple"}; }
   if(settingsTab==="homeLayout") {
     const cards={};
     HOME_LAYOUT_CARDS_550.forEach(card=>cards[card.key]={visible:checked(`homeVisible_${card.key}`),behavior:val(`homeBehavior_${card.key}`)||"remember"});
     s.homeLayout={preset:"custom",cards};
   }
   if(settingsTab==="visibility") { s.app={...(s.app||{}),viewMode:val("viewMode")||"simple",activeFeaturePreset575:"",activeLayoutPreset575:""}; const next={...visibility()}; FEATURE_LABELS.forEach(([key])=>next[key]=checked("vis_"+key)); s.visibility=next; }
-  if(settingsTab==="advanced") s.advanced={aiTechnician:checked("advAi"),reverseAddressLookup:checked("advReverse"),cloudBackup:checked("advCloud"),voiceTranscription:checked("advVoice"),ocrReader:checked("advOcr"),emailGateway:checked("advEmail"),weather:checked("advWeather"),traffic:checked("advTraffic")};
   if(settingsTab==="sync") s.sync={...(s.sync||{}),provider:val("syncProvider")||"onedrive",organization:val("syncOrganization"),workspace:val("syncWorkspace")||"FireVault Shared Vault",conflictPolicy:val("syncConflict")||"review",enabled:false};
   save(); toast("Settings saved."); view="settings"; mode="settingsDetail"; render();
 }
@@ -10214,7 +10170,7 @@ function diagnostics(){
 }
 function showChangelog(){
   const notes = [
-    "Build 0.80.4 upgrades Document Scanner with stronger four-edge detection, full-resolution autocrop, steady hands-free capture, a simpler screen, post-capture title/date/notes, camera flash support, and improved keyboard visibility.",
+    "Build 0.81.0 upgrades Document Scanner with stronger four-edge detection, full-resolution autocrop, steady hands-free capture, a simpler screen, post-capture title/date/notes, camera flash support, and improved keyboard visibility.",
     "Build 0.80.3 defaults Tools scanner documents to the closest GPS-ready account while preserving manual search, Site Notes account context, and existing-document account locking.",
     "Build 0.80.2 simplifies Document Scanner, adds on-device AI Auto Scan with live page framing and hands-free capture, and keeps focused fields visible above the mobile keyboard.",
     "Build 0.80.1 moves Document Scanner to Tools, supports post-capture account search and matching, and adds scanner access inside Site Notes.",

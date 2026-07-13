@@ -18716,3 +18716,9 @@ body.fvKeyboardOpen0802 #appNav{visibility:hidden!important;pointer-events:none!
 body.fvKeyboardOpen0802 .scannerScreen0800{padding-bottom:calc(var(--fv-keyboard-offset0802,0px) + 230px)!important}.fvKeyboardOpen0802 .scannerDetails0802{scroll-margin-bottom:calc(var(--fv-keyboard-offset0802,0px) + 160px)}.fvKeyboardOpen0802 .scannerDetails0802 label:focus-within{position:relative;z-index:3}.fvKeyboardOpen0802 input:focus,.fvKeyboardOpen0802 textarea:focus,.fvKeyboardOpen0802 select:focus{scroll-margin-top:110px!important;scroll-margin-bottom:calc(var(--fv-keyboard-offset0802,0px) + 190px)!important}
 @media(max-width:560px){.scannerQuickCapture0802{grid-template-columns:minmax(0,1fr) 92px}.scannerImport0802{width:auto}.scannerLiveControls0802{grid-template-columns:minmax(80px,1fr) 72px minmax(70px,.7fr)}.scannerCameraImport0802{grid-column:auto;grid-row:auto}.scannerShutter0802{width:66px;height:66px;min-height:66px}.scannerShutter0802 span{width:49px;height:49px}}
 @media(max-width:370px){.scannerQuickCapture0802{grid-template-columns:1fr}.scannerImport0802{width:100%}.scannerLiveControls0802{grid-template-columns:minmax(70px,1fr) 66px minmax(64px,.65fr);gap:8px;padding-left:8px;padding-right:8px}.scannerAutoToggle0802{padding:7px 8px}.scannerShutter0802{width:62px;height:62px;min-height:62px}.scannerShutter0802 span{width:46px;height:46px}}
+
+/* Build 0.81.0 — App Store cleanup */
+.scannerScreen0800,.scannerEditor0800,.scanCameraModal0802,.toolScanner0801,#toolsScanner0801,#toolsRoute0734,#scanDocNoteBtn0800,#openRoute500,.activeRouteMini468{display:none!important}
+.paneNote,.settingsKicker540,.settingsInfo540,.toolsSafety0735,.scannerHero0800,.accountScannerPanel0800{display:none!important}
+.toolTile0734 small,.settingsGroupCard067 p,.settingsGroupSummary067,.pageIntro,.featureIntro,.introText{display:none!important}
+.toolTile0734{min-height:74px}.toolTile0734 span{align-self:center}.settingsGroupCard067{min-height:84px}

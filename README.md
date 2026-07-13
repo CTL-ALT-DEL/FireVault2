@@ -1,6 +1,10 @@
-# FireVault Build 0.80.4 — Advanced Auto-Crop Scanner
+# FireVault Build 0.81.0 — App Store Cleanup
 
-Build 0.80.4 rebuilds the scanner around a simpler capture-first workflow and a stronger on-device document-detection engine.
+This release removes the document scanner, Daily Route/time-tracking controls, theme selection, advanced settings, diagnostics access, and excess introductory copy. Core account records, Site Notes, Nearby Accounts, Building Navigator, files, photos, field tools, reports, backup, and imported data remain preserved.
+
+# FireVault Build 0.81.0 — Advanced Auto-Crop Scanner
+
+Build 0.81.0 rebuilds the scanner around a simpler capture-first workflow and a stronger on-device document-detection engine.
 
 ## Scanner workflow
 
