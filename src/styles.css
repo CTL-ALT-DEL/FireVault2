@@ -18724,7 +18724,7 @@ body.fvKeyboardOpen0802 .scannerScreen0800{padding-bottom:calc(var(--fv-keyboard
 .toolTile0734{min-height:74px}.toolTile0734 span{align-self:center}.settingsGroupCard067{min-height:84px}
 
 
-/* Build 0.82.0 — App Store visual polish */
+/* Build 0.83.0 — App Store visual polish */
 :root{
   --fv-bg:#07101c;--fv-surface:#0d1827;--fv-surface-2:#111f31;--fv-border:rgba(148,163,184,.18);
   --fv-text:#f8fafc;--fv-muted:#9eafc4;--fv-red:#ef4444;--fv-red-strong:#dc2626;
@@ -18783,3 +18783,16 @@ hr{border:0;border-top:1px solid var(--fv-border)}
   button,.btn,.button{min-height:46px}
 }
 @media(prefers-reduced-motion:reduce){*{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;scroll-behavior:auto!important}}
+
+
+/* Build 0.83.0 — performance and reliability */
+.accountsList0759>[data-account-card0759],
+.nearbyList069 .nearbyRow069,
+.libraryGrid .card,
+.filesList .card,
+.photoGrid .card{
+  content-visibility:auto;
+  contain-intrinsic-size:auto 88px;
+}
+.accountsList0759>[data-account-card0759]{contain:layout paint style;}
+@media (prefers-reduced-motion:reduce){html:focus-within{scroll-behavior:auto!important;}}

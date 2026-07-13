@@ -1,6 +1,3 @@
-# FireVault Build 0.82.0 — Deployment Notes
+# FireVault 0.83.0 Installation
 
-1. Replace the currently hosted FireVault files with this package.
-2. Preserve the existing browser/site data; the storage key is unchanged.
-3. Open FireVault once online so the service worker caches Build 0.82.0.
-4. On iPhone, close and reopen the installed app after deployment.
+Replace the prior deployed files with the complete contents of this package. After deployment, open FireVault once while online so the new 0.83.0 application shell can be cached. Existing customer data uses the same storage key and remains in place.

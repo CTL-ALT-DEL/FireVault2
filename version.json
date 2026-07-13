@@ -1,8 +1,8 @@
 {
-  "build": "0.82.0",
+  "build": "0.83.0",
   "released": "2026-07-12",
-  "note": "Advanced four-edge detection, full-resolution autocrop, simplified capture, and keyboard-safe post-capture editing",
-  "label": "Advanced Auto-Crop Scanner",
-  "version": "0.82.0",
-  "name": "App Store Visual Polish"
+  "note": "Faster startup, responsive account search, reduced off-screen rendering, deferred GPS work, and improved offline shell caching.",
+  "label": "Performance and Reliability",
+  "version": "0.83.0",
+  "name": "App Store Performance Pass"
 }
