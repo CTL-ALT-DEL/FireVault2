@@ -1,11 +1,7 @@
-# Clean Install — Build 0.87.8
+# Clean Install — Build 0.87.9
 
-1. Replace the deployed files with this build.
-2. Commit and push all files, including `sw.js`, `version.json`, and `manifest.json`.
-3. Wait for GitHub Pages deployment to finish.
-4. Open FireVault and accept the update, or fully close and reopen the installed app.
-5. Test Account Directory scrolling both upward and downward on iPhone.
-6. On iPad, test portrait, landscape, and Split View.
-7. Confirm Account Search, Account Detail tabs, and the three-button navigation remain usable.
-
-Existing FireVault customer data uses the same storage key and is preserved.
+1. Extract the ZIP archive.
+2. Upload the complete contents to the FireVault hosting location, replacing the previous build files.
+3. Open FireVault while online once so the new application shell can be cached.
+4. If an older interface remains visible, close every FireVault window and reopen the installed app or browser page.
+5. Existing account data remains under the same FireVault storage key.

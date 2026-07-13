@@ -1,14 +1,13 @@
-# Validation — Build 0.87.8
+# Validation — Build 0.87.9
 
 - JavaScript syntax checked
-- Slow smooth-scroll correction removed from Account Directory
-- Scroll state persistence removed from the high-frequency scroll handler
-- Fast nearest-card candidate selection verified
-- Bidirectional post-momentum card settling retained
-- Account Directory moving-shadow optimization verified
-- iPad portrait, landscape, and Split View media queries checked
-- Account Detail six-tab iPad layout checked
-- Tablet information-grid and photo-grid breakpoints checked
-- Web app manifest orientation changed from portrait-only to any
+- CSS brace and comment structure checked
+- Build references updated consistently
+- Service-worker shell references updated
 - Existing FireVault storage key preserved
-- JSON files and ZIP archive integrity checked
+- Account Directory card markup and actions preserved
+- Account Directory scroll-performance class retained
+- Moving-shadow reduction retained during scrolling
+- iPhone and iPad responsive rules retained
+- JSON files parsed successfully
+- ZIP archive integrity checked

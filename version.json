@@ -1,8 +1,8 @@
 {
-  "build": "0.87.8",
+  "build": "0.87.9",
   "released": "2026-07-13",
   "note": "Improved Account Directory scrolling responsiveness and added iPad portrait, landscape, and Split View layout refinements.",
   "label": "Fluid Scrolling and iPad Layout",
-  "version": "0.87.8",
+  "version": "0.87.9",
   "name": "Fluid Scrolling and iPad Layout"
 }
