@@ -1,3 +1,3 @@
-# Clean Install — Build 0.86.1
+# Clean Install — Build 0.87.0
 
-Deploy every file in this package together. After GitHub Pages updates, close FireVault completely and reopen it. If an older cached build appears, use Settings → Data & Backup → App Updates to refresh application files. Existing account data is preserved.
+Deploy all files together. If an older interface remains cached, close FireVault, refresh GitHub Pages, and reopen the installed Home Screen app. Existing local account data uses the same FireVault storage key.

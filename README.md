@@ -1,3 +1,8 @@
-# FireVault Build 0.86.1
+# FireVault Build 0.87.0
 
-Stabilization build that repairs the Settings navigation exception and standardizes the Nearby, Search, and Settings bottom dock across all main pages. Existing FireVault data remains under the same storage key.
+Complete Account Search and Account Detail design overhaul.
+
+- Search-first customer directory with a modern dark layout
+- Cleaner account cards and quick actions
+- Redesigned account header, command bar, tabs, panels, and information hierarchy
+- Existing account records and storage key preserved
