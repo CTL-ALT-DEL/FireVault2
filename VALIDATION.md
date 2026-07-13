@@ -1,9 +1,8 @@
-# Build 0.85.0 Validation
+# Validation
 
-- JavaScript syntax checked.
-- Tools navigation and route removed from the visible application.
-- Account Detail Visit quick action removed.
-- Settings grouped-menu and detail navigation checked.
-- Storage key preserved.
-- Service-worker and build references updated.
-- ZIP integrity checked.
+- JavaScript syntax checked
+- Settings dashboard and nested groups verified
+- Accounts navigation renamed Search
+- Storage key preserved
+- Removed features remain unavailable
+- ZIP integrity checked

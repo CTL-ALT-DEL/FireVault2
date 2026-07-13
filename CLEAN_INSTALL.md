@@ -1,3 +1,3 @@
-# FireVault 0.85.0 Installation
+# Clean Install
 
-Replace the deployed FireVault files with this complete package. Open once online to refresh the cached application shell. Existing customer data remains under the same storage key.
+Deploy all Build 0.86.0 files together and refresh the installed PWA. Existing FireVault data remains under the same storage key.

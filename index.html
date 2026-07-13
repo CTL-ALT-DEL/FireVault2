@@ -15,17 +15,17 @@
       if(cfg&&cfg.enabled&&!unlocked) document.documentElement.classList.add("fv-lock-pending0791");
     } catch(e) {}
   </script>
-  <link rel="manifest" href="manifest.json?v=0.85.0" />
-  <link rel="apple-touch-icon" href="assets/apple-touch-icon.png?v=0.85.0" />
-  <link rel="icon" type="image/png" href="assets/favicon.png?v=0.85.0" />
-  <link rel="modulepreload" href="src/storage.js?v=0.85.0" />
-  <link rel="modulepreload" href="src/providers.js?v=0.85.0" />
-  <link rel="modulepreload" href="src/open-location-code.js?v=0.85.0" />
-  <link rel="stylesheet" href="src/styles.css?v=0.85.0" />
+  <link rel="manifest" href="manifest.json?v=0.86.0" />
+  <link rel="apple-touch-icon" href="assets/apple-touch-icon.png?v=0.86.0" />
+  <link rel="icon" type="image/png" href="assets/favicon.png?v=0.86.0" />
+  <link rel="modulepreload" href="src/storage.js?v=0.86.0" />
+  <link rel="modulepreload" href="src/providers.js?v=0.86.0" />
+  <link rel="modulepreload" href="src/open-location-code.js?v=0.86.0" />
+  <link rel="stylesheet" href="src/styles.css?v=0.86.0" />
 </head>
 <body class="app-loading533">
   <header id="appHeader" class="appHeader537" style="display:none">
-    <div class="brand"><img class="brandMark" src="assets/favicon.png?v=0.85.0" alt=""><div><div class="fireVaultWordmark575"><span>FIRE</span><b>VAULT</b></div><small>Field Vault System</small></div></div>
+    <div class="brand"><img class="brandMark" src="assets/favicon.png?v=0.86.0" alt=""><div><div class="fireVaultWordmark575"><span>FIRE</span><b>VAULT</b></div><small>Field Vault System</small></div></div>
     <div class="demoHeaderMode0740" id="demoHeaderMode0740" aria-label="Demo Mode">DEMO MODE</div>
     <div class="globalToday071" id="globalToday071" aria-label="Today"></div>
   </header>
@@ -35,7 +35,7 @@
       <div class="splashAura492"></div>
       <div class="splashOrb457 splashOrb492">
         <span class="splashRing492"></span>
-        <img src="assets/favicon.png?v=0.85.0" alt="FireVault">
+        <img src="assets/favicon.png?v=0.86.0" alt="FireVault">
       </div>
       <div class="splashText457 splashText492">
         <h1 class="fireVaultWordmark575"><span>FIRE</span><b>VAULT</b></h1>
@@ -49,13 +49,13 @@
         </div>
       </div>
       <div class="splashMeter457 splashMeter492"><span></span></div>
-      <small class="splashBuild492">0.85.0</small>
+      <small class="splashBuild492">0.86.0</small>
     </div>
   </main>
 
   <nav id="appNav" style="display:none">
     <button id="nav-home" data-route="home" aria-label="Nearby Accounts"><svg class="fvIcon073 fvNavIcon073" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="6"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/><circle cx="12" cy="12" r="1.4"/></svg><span>Nearby</span></button>
-    <button id="nav-sites" data-route="sites" aria-label="Accounts"><svg class="fvIcon073 fvNavIcon073" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="4" width="6" height="6" rx="1"/><rect x="14" y="4" width="6" height="6" rx="1"/><rect x="4" y="14" width="6" height="6" rx="1"/><rect x="14" y="14" width="6" height="6" rx="1"/></svg><span>Accounts</span></button>
+    <button id="nav-sites" data-route="sites" aria-label="Search"><svg class="fvIcon073 fvNavIcon073" viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5L21 21"/></svg><span>Search</span></button>
     <button id="nav-settings" data-route="settings"><svg class="fvIcon073 fvNavIcon073" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h10M18 6h2M4 12h3M11 12h9M4 18h8M16 18h4"/><circle cx="16" cy="6" r="2"/><circle cx="9" cy="12" r="2"/><circle cx="14" cy="18" r="2"/></svg><span>Settings</span></button>
   </nav>
 
@@ -148,7 +148,7 @@
   </script>
 
   <script>
-    window.FIREVAULT_BUILD = "0.85.0";
+    window.FIREVAULT_BUILD = "0.86.0";
     window.FIREVAULT_UPDATE = { registration:null, waiting:null, checking:false };
     window.fireVaultCheckForUpdates = async function(options){
       options = options || {};
@@ -203,9 +203,9 @@
       window.addEventListener("load", async function(){
         try {
           await window.fireVaultLockPortrait0723();
-          const reg=await navigator.serviceWorker.register("sw.js?v=0.85.0", {scope:"./", updateViaCache:"none"});
+          const reg=await navigator.serviceWorker.register("sw.js?v=0.86.0", {scope:"./", updateViaCache:"none"});
           window.FIREVAULT_UPDATE.registration=reg;
-          if (reg.waiting) window.fireVaultShowUpdate(reg.waiting,"0.85.0");
+          if (reg.waiting) window.fireVaultShowUpdate(reg.waiting,"0.86.0");
           reg.addEventListener("updatefound", function(){
             const worker=reg.installing; if(!worker)return;
             worker.addEventListener("statechange", function(){
@@ -224,6 +224,6 @@
       window.addEventListener("load",function(){ window.fireVaultSplashVersionReady0732("BROWSER MODE"); });
     }
   </script>
-  <script type="module" src="src/app.js?v=0.85.0"></script>
+  <script type="module" src="src/app.js?v=0.86.0"></script>
 </body>
 </html>

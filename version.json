@@ -1,8 +1,8 @@
 {
-  "build": "0.85.0",
+  "build": "0.86.0",
   "released": "2026-07-12",
-  "note": "Removed Tools navigation and Account Detail Visit action; rebuilt Settings with a simple grouped design.",
-  "label": "Simplified Navigation and Settings",
-  "version": "0.85.0",
-  "name": "App Store Interface Cleanup"
+  "note": "Redesigned Settings as a simplified dark tile dashboard and renamed Accounts navigation to Search.",
+  "label": "Dark Settings Dashboard",
+  "version": "0.86.0",
+  "name": "App Store Settings Polish"
 }
