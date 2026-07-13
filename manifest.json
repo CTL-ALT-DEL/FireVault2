@@ -5,7 +5,7 @@
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
-  "orientation": "portrait-primary",
+  "orientation": "any",
   "background_color": "#0b0d10",
   "theme_color": "#101216",
   "description": "Professional field knowledge and account documentation system for fire alarm technicians.",
@@ -49,5 +49,5 @@
       "description": "Open FireVault settings"
     }
   ],
-  "version": "0.87.7"
+  "version": "0.87.8"
 }

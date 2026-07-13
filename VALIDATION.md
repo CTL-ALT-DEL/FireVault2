@@ -1,11 +1,14 @@
-# Validation — Build 0.87.7
+# Validation — Build 0.87.8
 
 - JavaScript syntax checked
-- Account Directory Add Note action verified to preserve the selected account context
-- Card Call, Favorite, Add Note, Route, and card-open click separation verified
-- Nearby return origin verified for Search-to-Nearby navigation
-- Last Visit, Open Tasks, and Deficiencies metric-card markup removed from Account Detail
-- Account Detail tab count badges removed
-- Enlarged action-icon and compact tab CSS verified
+- Slow smooth-scroll correction removed from Account Directory
+- Scroll state persistence removed from the high-frequency scroll handler
+- Fast nearest-card candidate selection verified
+- Bidirectional post-momentum card settling retained
+- Account Directory moving-shadow optimization verified
+- iPad portrait, landscape, and Split View media queries checked
+- Account Detail six-tab iPad layout checked
+- Tablet information-grid and photo-grid breakpoints checked
+- Web app manifest orientation changed from portrait-only to any
 - Existing FireVault storage key preserved
 - JSON files and ZIP archive integrity checked

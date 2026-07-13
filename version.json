@@ -1,8 +1,8 @@
 {
-  "build": "0.87.7",
+  "build": "0.87.8",
   "released": "2026-07-13",
-  "note": "Simplified Account Detail and tabs, removed metric boxes, enlarged action icons, added Add Note to Account Directory cards, and fixed Search-to-Nearby back navigation.",
-  "label": "Account Detail and Notes Cleanup",
-  "version": "0.87.7",
-  "name": "Account Detail and Notes Cleanup"
+  "note": "Improved Account Directory scrolling responsiveness and added iPad portrait, landscape, and Split View layout refinements.",
+  "label": "Fluid Scrolling and iPad Layout",
+  "version": "0.87.8",
+  "name": "Fluid Scrolling and iPad Layout"
 }

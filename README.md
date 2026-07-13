@@ -1,12 +1,16 @@
-# FireVault Build 0.87.7
+# FireVault Build 0.87.8
 
-Account Detail and Account Directory workflow cleanup.
+Account Directory performance and iPad responsive-layout release.
 
-- Simplifies the Account Detail identity area and tab navigation
-- Removes Last Visit, Open Tasks, and Deficiencies metric boxes from Account Detail
-- Removes count badges from Account Detail tabs
-- Enlarges primary Account Detail action icons and supporting workflow icons
-- Adds an Add Note action directly to every Account Directory card
-- Keeps Call, Favorite, Add Note, and Route in one balanced card action row
-- Makes a Nearby page opened from Search return to Search with its back arrow
-- Preserves existing account data, notes, Nearby behavior, Settings, Demo Mode, and the FireVault storage key
+- Removes the slow 430 ms animated card correction that fought iPhone momentum scrolling
+- Lets touch momentum finish before making one small card-boundary correction
+- Avoids writing Account Directory view state during every scroll frame
+- Uses a faster nearest-card lookup instead of measuring every visible account card
+- Reduces moving card shadows and fixed blur effects while the Account Directory scrolls
+- Keeps card locking functional in both scrolling directions
+- Adds responsive iPad portrait, landscape, and Split View sizing
+- Keeps Account Directory and Account Detail content centered at readable tablet widths
+- Expands Account Detail tabs across the available iPad width
+- Improves tablet spacing, typography, action targets, information grids, and photo grids
+- Allows installed FireVault to rotate on iPad by changing the manifest orientation to `any`
+- Preserves account data, Demo Mode, Settings, navigation, and the FireVault storage key
