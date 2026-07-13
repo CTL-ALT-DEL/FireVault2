@@ -1,12 +1,11 @@
-# Validation — Build 0.87.6
+# Validation — Build 0.87.7
 
 - JavaScript syntax checked
-- Bidirectional Account Directory settle logic verified
-- Touch end and touch cancel handling verified
-- Wheel, scroll-idle, and supported scrollend handling verified
-- Final snap-position enforcement verified for iPhone momentum scrolling
-- Native vertical scroll snap fallback verified in CSS
-- Nearby and Sort controls verified as equal-width actions
-- Sort selection and Reset behavior remain wired
+- Account Directory Add Note action verified to preserve the selected account context
+- Card Call, Favorite, Add Note, Route, and card-open click separation verified
+- Nearby return origin verified for Search-to-Nearby navigation
+- Last Visit, Open Tasks, and Deficiencies metric-card markup removed from Account Detail
+- Account Detail tab count badges removed
+- Enlarged action-icon and compact tab CSS verified
 - Existing FireVault storage key preserved
 - JSON files and ZIP archive integrity checked

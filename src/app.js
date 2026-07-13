@@ -1,6 +1,6 @@
-import { BUILD, KEY, ACTIVE_JOB_KEY, loadData, saveData, ensureSite, fullAddress, esc, uid, downloadBlob, syncSummary, syncQueue, syncConflicts, syncActivity, createSyncPackage, importSyncPackage, resolveSyncConflict, notePackageExport, deviceIdentity, recordSyncActivity, autoBackupInfo, latestAutoBackup, restoreAutoBackup, isDemoMode, setDemoMode, resetDemoData, securityFoundationSummary, securityAudit, recycleBinInfo, restoreRecycleRecord, purgeRecycleBin, recordSecurityEvent, validateVaultIntegrity } from "./storage.js?v=0.87.6";
-import { backendAdapterSummary, runBackendAdapterDiagnostics, backendAdapterManifest, PROVIDER_CONTRACT_VERSION, FILE_STORAGE_CATALOG, fileStoragePlanSummary, cloudFileStorageManifest, MICROSOFT_STORAGE_TYPES, microsoftStorageAccounts, saveMicrosoftStorageAccounts, createMicrosoftStorageAccount, microsoftStorageAccountById, microsoftAppRegistration, saveMicrosoftAppRegistration, microsoftStorageSummary, microsoftStorageManifest } from "./providers.js?v=0.87.6";
-import { encodePlusCode, isValidFullPlusCode, normalizePlusCode, plusCodePrecisionLabel } from "./open-location-code.js?v=0.87.6";
+import { BUILD, KEY, ACTIVE_JOB_KEY, loadData, saveData, ensureSite, fullAddress, esc, uid, downloadBlob, syncSummary, syncQueue, syncConflicts, syncActivity, createSyncPackage, importSyncPackage, resolveSyncConflict, notePackageExport, deviceIdentity, recordSyncActivity, autoBackupInfo, latestAutoBackup, restoreAutoBackup, isDemoMode, setDemoMode, resetDemoData, securityFoundationSummary, securityAudit, recycleBinInfo, restoreRecycleRecord, purgeRecycleBin, recordSecurityEvent, validateVaultIntegrity } from "./storage.js?v=0.87.7";
+import { backendAdapterSummary, runBackendAdapterDiagnostics, backendAdapterManifest, PROVIDER_CONTRACT_VERSION, FILE_STORAGE_CATALOG, fileStoragePlanSummary, cloudFileStorageManifest, MICROSOFT_STORAGE_TYPES, microsoftStorageAccounts, saveMicrosoftStorageAccounts, createMicrosoftStorageAccount, microsoftStorageAccountById, microsoftAppRegistration, saveMicrosoftAppRegistration, microsoftStorageSummary, microsoftStorageManifest } from "./providers.js?v=0.87.7";
+import { encodePlusCode, isValidFullPlusCode, normalizePlusCode, plusCodePrecisionLabel } from "./open-location-code.js?v=0.87.7";
 window.__FIREVAULT_MODULE_READY = true;
 
 function fvPreferenceStore0739(){
@@ -266,6 +266,7 @@ let accountsScrollActivated0796=false;
 let accountsLastScrollTop0876=accountsScroll0759;
 let accountsScrollDirection0876=0;
 let accountsScrollEndTimer0876=0;
+let nearbyReturnView0877="home";
 let dailySummaryDate569 = fvSafeGet0739("firevault_daily_summary_date","");
 let dailyPickerMonth571 = localDateString().slice(0,7);
 let libraryFolder = "all";
@@ -1592,6 +1593,7 @@ function siteSearchBlob(s){
 }
 function detectNearbySites(){
   if(!featureOn("advancedGps")){ toast("Advanced GPS is hidden in Simple View."); return; }
+  nearbyReturnView0877=view==="sites"?"sites":"home";
   route("nearbySites");
   setTimeout(()=>runNearbyScan0652("nearbySites"),30);
 }
@@ -3824,10 +3826,10 @@ function accountDirectoryRow0759(s,addressCount=1){
       <div class="accountCardFooter0871">
         <div class="accountCardActions0871">
           <button type="button" data-account-call0762="${esc(s.id)}" ${phone?"":"disabled"}>${fvIcon073("call","accountCardIcon0871")}<span>Call</span></button>
-          <button type="button" class="accountFavorite0871 ${pinned?"active":""}" data-account-favorite0761="${esc(s.id)}" aria-pressed="${pinned?"true":"false"}" aria-label="${pinned?"Remove":"Add"} favorite">${pinned?"★":"☆"}</button>
+          <button type="button" class="accountFavorite0871 ${pinned?"active":""}" data-account-favorite0761="${esc(s.id)}" aria-pressed="${pinned?"true":"false"}" aria-label="${pinned?"Remove":"Add"} favorite">${pinned?"★":"☆"}<span>Favorite</span></button>
+          <button type="button" data-account-note0877="${esc(s.id)}">${fvIcon073("note","accountCardIcon0871")}<span>Add Note</span></button>
           <button type="button" data-account-route0762="${esc(s.id)}" ${gpsReady?"":"disabled"}>${fvIcon073("route","accountCardIcon0871")}<span>Route</span></button>
         </div>
-        <span class="accountOpen0871">Details <b>›</b></span>
       </div>
     </div>
   </article>`;
@@ -4020,6 +4022,16 @@ function sites(){
     if(call){event.preventDefault();event.stopPropagation();const target=(data.sites||[]).find(s=>s.id===call.dataset.accountCall0762);const phone=phone069(target);if(!phone){toast("No phone number is saved for this account.");return;}location.href=`tel:${phone.replace(/[^+\d]/g,"")}`;return;}
     const routeButton=event.target.closest("[data-account-route0762]");
     if(routeButton){event.preventDefault();event.stopPropagation();const target=(data.sites||[]).find(s=>s.id===routeButton.dataset.accountRoute0762);if(!target||!hasGps(target)){toast("GPS coordinates are not saved for this account.");return;}window.open(mapRouteUrl071(target),"_blank","noopener");return;}
+    const noteButton=event.target.closest("[data-account-note0877]");
+    if(noteButton){
+      event.preventDefault();event.stopPropagation();
+      const target=(data.sites||[]).find(s=>s.id===noteButton.dataset.accountNote0877);
+      if(!target){toast("That account is no longer available.");return;}
+      accountsScroll0759=list?.scrollTop||0;persistAccountsViewState0761(true);
+      selectedSiteId=target.id;
+      addSiteNotePrompt();
+      return;
+    }
     const favorite=event.target.closest("[data-account-favorite0761]");
     if(favorite){
       event.preventDefault();event.stopPropagation();
@@ -4110,7 +4122,7 @@ function nearbySites(){
     ${message}
     <div class="list grow nearbyResults0652">${nearbyState && shown.length ? `${nearby.length?"":`<div class="nearbyFallbackNote0652">No account is inside the ${radius}-mile radius. Showing the nearest saved sites instead.</div>`}${shown.map(r=>`<div class="card siteItem nearbyItem ${r.meters <= radius*1609.344 ? "nearMatch" : "nearFallback"}" data-id="${r.s.id}"><div class="row"><div><h2>${esc(r.s.name||"Unnamed Site")}</h2><p>${esc(fullAddress(r.s))}</p><p>${esc(gpsLine(r.s))}</p></div><span class="pill gpsPill">${distanceLabel(r.meters)}</span></div></div>`).join("")}` : !nearbyState?`<div class="empty">Run a scan to display nearest sites.</div>`:""}</div>
   </div>`);
-  document.getElementById("backBtn").onclick=()=>route("home");
+  document.getElementById("backBtn").onclick=()=>route(nearbyReturnView0877==="sites"?"sites":"home");
   const scan=document.getElementById("scanNearbyBtn"); if(scan) scan.onclick=()=>runNearbyScan0652("nearbySites");
   const retry=document.getElementById("nearbyRetry0652"); if(retry) retry.onclick=()=>runNearbyScan0652("nearbySites");
   const gpsSettings=document.getElementById("nearbyGpsSettings0652"); if(gpsSettings) gpsSettings.onclick=()=>{settingsTab="gps";mode="settingsDetail";route("settings");};
@@ -4597,11 +4609,6 @@ function accountOverviewTab0735(s,ctx){
       <div><span>Category</span><strong>${esc(accountCategoryLabel0735(s))}</strong></div>
       <div><span>Account Since</span><strong>${esc(accountSince0735(s))}</strong></div>
     </section>
-    <section class="accountMetricCards0735 accountMetrics0786">
-      <button id="visitsMini477"><span>LAST VISIT</span><strong>${esc(lastVisit?visitDateLabel(lastVisit):"None")}</strong><small>Service history</small></button>
-      <button id="taskBtn" class="metricBlue0735"><span>OPEN TASKS</span><strong>${open}</strong><small>Next due ${esc(accountNextDue0735(s))}</small></button>
-      <button id="defBtn" class="metricDanger0735"><span>DEFICIENCIES</span><strong>${def}</strong><small>${def?"Needs review":"None open"}</small></button>
-    </section>
     <section class="accountPanel0735 accountTimeline0786"><div class="accountPanelHead0735"><div><span>RECENT ACTIVITY</span><h2>Account Timeline</h2></div><button class="ghost" id="allVisitsBtn">View All</button></div>${accountRecentMarkup0735(s)}</section>
   </div>`;
 }
@@ -4616,7 +4623,6 @@ function accountDetailsTab0735(s,ctx){
         <div><span>Access</span><strong>${esc(access||"No access notes")}</strong></div>
         <div><span>Account ID</span><strong>${esc(accountId069(s)||"Not assigned")}</strong></div>
         <div><span>Site Phone</span><strong>${esc(formatPhone0758(s.sitePhone)||s.sitePhone||"Not entered")}</strong></div>
-        <div><span>Health</span><strong>${esc(siteHealthLine(s))}</strong></div>
       </div>
       <div class="accountInlineActions067"><button class="ghost" id="copyImportantInfo568">Copy Site Info</button><button class="ghost" id="snapshotBtn">Copy Snapshot</button><button class="ghost" id="contactsQuick477">Contacts</button></div>
     </section>
@@ -4652,7 +4658,6 @@ function accountNotesTab0735(s,ctx){
   const {health,lastVisit,def,open}=ctx;
   return `<div class="accountTabPanel0735">
     <section class="accountPanel0735"><div class="accountPanelHead0735"><div><span>SITE NOTES</span><h2>Technician Notes</h2></div><button class="primary" id="addSiteNoteBtn491">＋ Add Note</button></div><div class="accountNotesBody0735">${esc(s.notes||"No notes entered.")}</div><div class="accountNoteDocActions0800"><button class="ghost accountWideButton0735" id="openSiteNotesBtn494">Open Full Notes Workspace</button></div></section>
-    <section class="accountMetricCards0735 accountWorkMetrics0735"><button id="taskBtn"><span>OPEN TASKS</span><strong>${open}</strong></button><button id="defBtn" class="metricDanger0735"><span>DEFICIENCIES</span><strong>${def}</strong></button><button id="visitsMini477"><span>LAST VISIT</span><strong>${esc(lastVisit?visitDateLabel(lastVisit):"None")}</strong></button></section>
     <section class="accountQuickBar0735 accountWorkActions0735"><button id="qaAddTask544"><span>□</span><strong>Task</strong></button><button id="qaAddDef544"><span>!</span><strong>Deficiency</strong></button><button id="qaAddPhoto544"><span>▣</span><strong>Photo</strong></button><button id="qaReport544"><span>▤</span><strong>Report</strong></button></section>
     <section class="accountPanel0735"><div class="accountPanelHead0735"><div><span>RECENT VISIT</span><h2>${esc(lastVisit?visitDateLabel(lastVisit):"No completed visits")}</h2></div>${lastVisit?`<button class="ghost" id="allVisitsBtn">History</button>`:""}</div>${lastVisit?`<p class="accountVisitPreview0735">${esc(visitNotesPreview(lastVisit,3))}</p>`:`<div class="accountEmptyState0735"><span>Start a service visit to create an account history.</span></div>`}</section>
     ${featureOn("siteTimeline")?siteActivityTimelineMarkup557(s):""}
@@ -4679,7 +4684,7 @@ function siteDetail(){
   const locations=locationPoints071(s);
   const phone=formatPhone0758(primary?.phone||s.sitePhone)||"";
   const address=fullAddress(s)||"No address saved";
-  const tabs=[["overview","Overview",null],["details","Details",null],["locations","Locations",locations.length],["equipment","Equipment",equipment.length],["docs","Files",docs.length],["notes","Notes",open+def]];
+  const tabs=[["overview","Overview"],["details","Details"],["locations","Locations"],["equipment","Equipment"],["docs","Files"],["notes","Notes"]];
   const panelMarkup=accountDetailTab0735==="details"?accountDetailsTab0735(s,ctx):accountDetailTab0735==="locations"?accountLocationsTab07912(s):accountDetailTab0735==="equipment"?accountEquipmentTab0735(s):accountDetailTab0735==="docs"?accountDocsTab0735(s):accountDetailTab0735==="notes"?accountNotesTab0735(s,ctx):accountOverviewTab0735(s,ctx);
   html(`<div class="screen accountDetail0871">
     <header class="accountDetailTop0871">
@@ -4689,7 +4694,7 @@ function siteDetail(){
       <div class="accountIdentityMeta0871"><span>${esc(accountCategoryLabel0735(s))}</span><b>${esc(accountId)}</b></div>
       <h1>${esc(s.name||"Unnamed Account")}</h1>
       <p>${esc(address)}</p>
-      <div class="accountIdentityStatus0871"><span class="status-${esc(health.cls)}">${esc(health.label)}</span>${open?`<span>${open} task${open===1?"":"s"}</span>`:""}${def?`<span class="danger">${def} deficienc${def===1?"y":"ies"}</span>`:""}${hasGps(s)?`<span>GPS ready</span>`:`<span class="muted">No GPS</span>`}</div>
+      ${(open||def)?`<div class="accountIdentityStatus0871">${open?`<span>${open} open task${open===1?"":"s"}</span>`:""}${def?`<span class="danger">${def} open deficienc${def===1?"y":"ies"}</span>`:""}</div>`:""}
     </section>
     ${accountTagChips0737(s,8)?`<div class="accountTags0871">${accountTagChips0737(s,8)}</div>`:""}
     <section class="accountActionGrid0871" aria-label="Account actions">
@@ -4698,7 +4703,7 @@ function siteDetail(){
       <button id="detailNote0871">${fvIcon073("note","accountActionIcon0871")}<span>Add Note</span></button>
       <button id="detailInfo0871">${fvIcon073("info","accountActionIcon0871")}<span>Site Info</span></button>
     </section>
-    <nav class="accountTabs0871" aria-label="Account sections">${tabs.map(([key,label,count])=>`<button class="${accountDetailTab0735===key?"active":""}" data-account-tab0735="${key}" aria-current="${accountDetailTab0735===key?"page":"false"}"><span>${label}</span>${Number.isFinite(count)&&count>0?`<b>${count}</b>`:""}</button>`).join("")}</nav>
+    <nav class="accountTabs0871" aria-label="Account sections">${tabs.map(([key,label])=>`<button class="${accountDetailTab0735===key?"active":""}" data-account-tab0735="${key}" aria-current="${accountDetailTab0735===key?"page":"false"}"><span>${label}</span></button>`).join("")}</nav>
     <div class="accountDetailContent0871">${panelMarkup}</div>
   </div>`);
 
@@ -10136,6 +10141,7 @@ function diagnostics(){
 }
 function showChangelog(){
   const notes = [
+    "Build 0.87.7 simplifies Account Detail and tabs, removes the Last Visit/Open Tasks/Deficiencies metric boxes, enlarges action icons, adds Add Note to Account Directory cards, and returns Nearby back to Search when opened there.",
     "Build 0.87.6 repairs Account Directory scroll locking in both directions and gives the Nearby and Sort controls a wider, cleaner two-button layout.",
     "Build 0.87.5 restores Demo Mode to the visible Settings page, keeps its fictional Boise workspace isolated from the real vault, and restores the header DEMO MODE indicator while active.",
     "Build 0.87.4 spaces Settings cards, adds Settings search, moves Google Plus Codes under Maps & GPS, simplifies Account cards, enlarges identity tags, moves Favorite beside Call, and restores Nearby-style scroll locking.",

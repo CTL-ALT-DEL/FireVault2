@@ -19207,3 +19207,116 @@ body.app-booted533:not(.homeFullscreen480)>main#app:has(.accountDetail0871){
   .accountDirectoryTools0876>.accountDirectoryTool0876>span strong{font-size:12.5px}
   .accountDirectoryTools0876>.accountDirectoryTool0876>span small{font-size:9.2px}
 }
+
+
+/* Build 0.87.7 — simplified Account Detail, larger actions, and Directory Add Note */
+.accountCardFooter0871{
+  display:block!important;
+  margin-top:11px!important;
+  padding-top:10px!important;
+}
+.accountCardActions0871{
+  width:100%!important;
+  display:grid!important;
+  grid-template-columns:repeat(4,minmax(0,1fr))!important;
+  gap:7px!important;
+}
+.accountCardActions0871 button,
+.accountCardActions0871 .accountFavorite0871{
+  width:100%!important;
+  min-width:0!important;
+  height:46px!important;
+  min-height:46px!important;
+  padding:0 4px!important;
+  display:flex!important;
+  flex-direction:column!important;
+  align-items:center!important;
+  justify-content:center!important;
+  gap:2px!important;
+  border-radius:12px!important;
+  font-size:9px!important;
+  line-height:1!important;
+}
+.accountCardActions0871 .accountFavorite0871{
+  font-size:21px!important;
+}
+.accountCardActions0871 .accountFavorite0871 span{
+  color:#aab6c5;
+  font-size:8.7px;
+  font-weight:850;
+}
+.accountCardIcon0871{width:20px!important;height:20px!important}
+.accountOpen0871{display:none!important}
+
+.accountDetail0871 .accountIdentity0871{
+  margin-bottom:7px!important;
+  padding-top:13px!important;
+  padding-bottom:13px!important;
+}
+.accountDetail0871 .accountIdentityStatus0871{margin-top:8px!important}
+.accountDetail0871 .accountActionGrid0871{
+  gap:8px!important;
+  padding-bottom:10px!important;
+}
+.accountDetail0871 .accountActionGrid0871 button{
+  min-height:72px!important;
+  gap:7px!important;
+  font-size:10.5px!important;
+}
+.accountDetail0871 .accountActionIcon0871{
+  width:30px!important;
+  height:30px!important;
+  stroke-width:1.9!important;
+}
+.accountDetail0871 .accountTabs0871{
+  margin:0 11px 8px!important;
+  padding:5px!important;
+  gap:4px!important;
+  border:1px solid #26364a!important;
+  border-radius:14px!important;
+  background:#0d1621!important;
+  box-shadow:inset 0 1px rgba(255,255,255,.025)!important;
+}
+.accountDetail0871 .accountTabs0871 button{
+  min-width:76px!important;
+  min-height:40px!important;
+  height:40px!important;
+  padding:0 11px!important;
+  border-radius:10px!important;
+  color:#91a0b2!important;
+  font-size:11px!important;
+  font-weight:850!important;
+}
+.accountDetail0871 .accountTabs0871 button.active{
+  border-color:rgba(239,83,96,.45)!important;
+  background:rgba(222,48,62,.18)!important;
+  color:#fff!important;
+  box-shadow:none!important;
+}
+.accountDetail0871 .accountTabs0871 button b{display:none!important}
+.accountDetail0871 .accountMetricCards0735{display:none!important}
+.accountDetail0871 .accountQuickBar0735 span,
+.accountDetail0871 .accountDocActions0735 span{
+  width:38px!important;
+  height:38px!important;
+  font-size:22px!important;
+}
+.accountDetail0871 .accountQuickBar0735 button,
+.accountDetail0871 .accountDocActions0735 button{
+  min-height:74px!important;
+}
+.accountDetail0871 .accountPanelHead0735 button svg,
+.accountDetail0871 .accountInlineActions067 button svg{
+  width:20px!important;
+  height:20px!important;
+}
+@media(max-width:390px){
+  .accountCardActions0871{gap:5px!important}
+  .accountCardActions0871 button,.accountCardActions0871 .accountFavorite0871{height:44px!important;min-height:44px!important;font-size:8.3px!important}
+  .accountCardIcon0871{width:18px!important;height:18px!important}
+  .accountDetail0871 .accountActionGrid0871{gap:5px!important}
+  .accountDetail0871 .accountActionGrid0871 button{min-height:68px!important;font-size:9.5px!important}
+  .accountDetail0871 .accountActionIcon0871{width:27px!important;height:27px!important}
+  .accountDetail0871 .accountTabs0871{margin-left:8px!important;margin-right:8px!important}
+  .accountDetail0871 .accountTabs0871 button{min-width:70px!important;padding-left:9px!important;padding-right:9px!important;font-size:10.5px!important}
+}

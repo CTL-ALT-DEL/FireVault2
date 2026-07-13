@@ -1,6 +1,6 @@
-const BUILD="0.87.6";
+const BUILD="0.87.7";
 const CACHE=`firevault-${BUILD}`;
-const SHELL=["./","./index.html","./manifest.json","./version.json","./src/app.js?v=0.87.6","./src/storage.js?v=0.87.6","./src/providers.js?v=0.87.6","./src/open-location-code.js?v=0.87.6","./src/styles.css?v=0.87.6","./assets/favicon.png","./assets/apple-touch-icon.png","./assets/icon-192.png","./assets/icon-512.png"];
+const SHELL=["./","./index.html","./manifest.json","./version.json","./src/app.js?v=0.87.7","./src/storage.js?v=0.87.7","./src/providers.js?v=0.87.7","./src/open-location-code.js?v=0.87.7","./src/styles.css?v=0.87.7","./assets/favicon.png","./assets/apple-touch-icon.png","./assets/icon-192.png","./assets/icon-512.png"];
 self.addEventListener("install",event=>{event.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(SHELL)).then(()=>self.skipWaiting()));});
 self.addEventListener("activate",event=>{event.waitUntil((async()=>{if(self.registration.navigationPreload)await self.registration.navigationPreload.enable();const keys=await caches.keys();await Promise.all(keys.filter(k=>k.startsWith("firevault-")&&k!==CACHE).map(k=>caches.delete(k)));await self.clients.claim();})());});
 self.addEventListener("message",event=>{if(event.data&&event.data.type==="SKIP_WAITING")self.skipWaiting();});
