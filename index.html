@@ -15,19 +15,19 @@
       if(cfg&&cfg.enabled&&!unlocked) document.documentElement.classList.add("fv-lock-pending0791");
     } catch(e) {}
   </script>
-  <link rel="manifest" href="manifest.json?v=0.92.0" />
-  <link rel="apple-touch-icon" href="assets/apple-touch-icon.png?v=0.92.0" />
-  <link rel="icon" type="image/png" href="assets/favicon.png?v=0.92.0" />
-  <link rel="modulepreload" href="src/storage.js?v=0.92.0" />
-  <link rel="modulepreload" href="src/providers.js?v=0.92.0" />
-  <link rel="modulepreload" href="src/open-location-code.js?v=0.92.0" />
-  <link rel="modulepreload" href="src/media-store.js?v=0.92.0" />
-  <link rel="stylesheet" href="src/styles.css?v=0.92.0" />
-  <link rel="stylesheet" href="src/design-system.css?v=0.92.0" />
+  <link rel="manifest" href="manifest.json?v=0.93.0" />
+  <link rel="apple-touch-icon" href="assets/apple-touch-icon.png?v=0.93.0" />
+  <link rel="icon" type="image/png" href="assets/favicon.png?v=0.93.0" />
+  <link rel="modulepreload" href="src/storage.js?v=0.93.0" />
+  <link rel="modulepreload" href="src/providers.js?v=0.93.0" />
+  <link rel="modulepreload" href="src/open-location-code.js?v=0.93.0" />
+  <link rel="modulepreload" href="src/media-store.js?v=0.93.0" />
+  <link rel="stylesheet" href="src/styles.css?v=0.93.0" />
+  <link rel="stylesheet" href="src/design-system.css?v=0.93.0" />
 </head>
 <body class="app-loading533">
   <header id="appHeader" class="appHeader537" style="display:none">
-    <div class="brand"><img class="brandMark" src="assets/favicon.png?v=0.92.0" alt=""><div><div class="fireVaultWordmark575"><span>FIRE</span><b>VAULT</b></div><small>Field Vault System</small></div></div>
+    <div class="brand"><img class="brandMark" src="assets/favicon.png?v=0.93.0" alt=""><div><div class="fireVaultWordmark575"><span>FIRE</span><b>VAULT</b></div><small>Field Vault System</small></div></div>
     <div class="demoHeaderMode0740" id="demoHeaderMode0740" aria-label="Demo Mode">DEMO MODE</div>
     <div class="globalToday071" id="globalToday071" aria-label="Today"></div>
   </header>
@@ -37,14 +37,14 @@
       <div class="splashAura492"></div>
       <div class="splashOrb457 splashOrb492">
         <span class="splashRing492"></span>
-        <img src="assets/favicon.png?v=0.92.0" alt="FireVault">
+        <img src="assets/favicon.png?v=0.93.0" alt="FireVault">
       </div>
       <div class="splashText457 splashText492">
         <h1 class="fireVaultWordmark575"><span>FIRE</span><b>VAULT</b></h1>
         <div id="splashStatus0900" class="splashStatus0900" role="status" aria-live="polite">Opening local vault…</div>
       </div>
       <div class="splashMeter457 splashMeter492"><span></span></div>
-      <small class="splashBuild492">0.92.0</small>
+      <small class="splashBuild492">0.93.0</small>
     </div>
   </main>
 
@@ -59,12 +59,12 @@
     window.__FIREVAULT_BOOTED = false;
     window.__FIREVAULT_MODULE_READY = false;
     window.__FIREVAULT_SPLASH_STARTED = Date.now();
-    window.__FIREVAULT_MIN_SPLASH_MS = 450;
+    window.__FIREVAULT_MIN_SPLASH_MS = 2200;
     window.__FIREVAULT_SUPPORT_ERROR_KEY = "firevault_support_error_0900";
     window.fireVaultRecordSupportError0900 = function(error, context){
       try {
         var detail = error && (error.stack || error.message) ? (error.stack || error.message) : String(error || "Unknown error");
-        var payload = {at:new Date().toISOString(), build:"0.92.0", context:context || "runtime", detail:detail.slice(0,12000)};
+        var payload = {at:new Date().toISOString(), build:"0.93.0", context:context || "runtime", detail:detail.slice(0,12000)};
         localStorage.setItem(window.__FIREVAULT_SUPPORT_ERROR_KEY, JSON.stringify(payload));
       } catch(e) {}
     };
@@ -84,11 +84,11 @@
       if(!window.__FIREVAULT_BOOTED && app && stillOnSplash){
         app.innerHTML='<div class="screen"><div class="card errorBox fvReleaseError0900"><h1>Something went wrong</h1><p>FireVault could not finish opening. Your account data remains stored on this device.</p><div class="grid2"><button class="primary" onclick="location.reload()">Reload</button><button class="ghost" onclick="if(caches){caches.keys().then(k=>Promise.all(k.map(x=>caches.delete(x)))).then(()=>location.reload())}">Repair App Files</button></div></div></div>';
       }
-    }, 6000);
+    }, 9000);
   </script>
 
   <script>
-    window.FIREVAULT_BUILD = "0.92.0";
+    window.FIREVAULT_BUILD = "0.93.0";
     window.FIREVAULT_UPDATE = { registration:null, waiting:null, checking:false };
     window.fireVaultCheckForUpdates = async function(options){
       options = options || {};
@@ -129,9 +129,9 @@
       });
       window.addEventListener("load", async function(){
         try {
-          const reg=await navigator.serviceWorker.register("sw.js?v=0.92.0", {scope:"./", updateViaCache:"none"});
+          const reg=await navigator.serviceWorker.register("sw.js?v=0.93.0", {scope:"./", updateViaCache:"none"});
           window.FIREVAULT_UPDATE.registration=reg;
-          if (reg.waiting) window.fireVaultShowUpdate(reg.waiting,"0.92.0");
+          if (reg.waiting) window.fireVaultShowUpdate(reg.waiting,"0.93.0");
           reg.addEventListener("updatefound", function(){
             const worker=reg.installing; if(!worker)return;
             worker.addEventListener("statechange", function(){
@@ -150,6 +150,6 @@
       window.addEventListener("load",function(){ window.fireVaultSplashVersionReady0732("BROWSER MODE"); });
     }
   </script>
-  <script type="module" src="src/app.js?v=0.92.0"></script>
+  <script type="module" src="src/app.js?v=0.93.0"></script>
 </body>
 </html>

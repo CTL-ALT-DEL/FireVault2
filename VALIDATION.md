@@ -1,29 +1,34 @@
-# Validation — Build 0.92.0
+# Validation — Build 0.93.0
 
 ## Passed
 
-- JavaScript syntax: `app.js`, `storage.js`, `providers.js`, `media-store.js`, and `sw.js`
+- JavaScript syntax: `app.js`, `storage.js`, `providers.js`, `media-store.js`, `open-location-code.js`, and `sw.js`
 - JSON parsing: `manifest.json` and `version.json`
-- Build consistency across index, manifest, version file, storage module, and service worker
-- Service-worker shell contains the new `src/design-system.css` file and every cached local path exists
-- The canonical design layer loads after the legacy stylesheet
-- CSS brace and quoted-string balance for `src/design-system.css`
+- Build consistency across index, manifest, version file, storage module, source imports, and service worker
+- Service-worker shell paths exist and include the canonical design system
+- Visible minimum splash duration set to 2.2 seconds; startup recovery timeout extended to 9 seconds
+- Unsaved-change protection is wired to account, document, contact, equipment, task, deficiency, library, Site Notes, and saveable Settings forms
+- Save operations clear the dirty state; navigation and browser close protect unsaved edits
+- Primary and destructive buttons include rapid double-tap protection
+- Nearby views correctly activate Nearby in the bottom navigation; account workflows activate Search
+- Keyboard-safe scroll padding, sticky form headers, field focus rings, validation states, and reduced route motion are present
+- Natural Account Directory momentum scrolling remains enabled
 - Existing storage key `firevault_vault_build_030` preserved
-- IndexedDB media module and Build 0.91.0 media workflow preserved
+- IndexedDB media storage and complete-media backup workflow preserved
+- WebDAV, Demo Mode, Google Plus Codes, Photo Overlay, Nearby, and Building Navigator remain present
 - Three-button Nearby / Search / Settings navigation preserved
-- Removed Tools and Scanner navigation remain absent
-- Account Directory action order remains Call / Route / Add Note / Favorite
-- Responsive rules included for narrow iPhone, standard iPhone, iPad portrait, iPad landscape, and Split View widths
-- Reduced-motion handling and minimum touch-target rules included
 - ZIP archive integrity
 
 ## Physical-device checks still required
 
-- Installed-PWA update from 0.91.1 to 0.92.0
-- Account Directory momentum scrolling and card settling on iPhone
-- iPad portrait, landscape, Split View, and Stage Manager window sizing
-- Settings keyboard behavior and sticky search
-- Nearby map overlays and bottom navigation
-- WebDAV, GPS permission prompts, Photo Overlay export, and first-run media migration
+- Installed-PWA update from 0.92.0 to 0.93.0
+- Splash timing on a warm and cold iPhone/iPad launch
+- Unsaved-change confirmation from every edited form
+- Rapid double-tap testing on Save, Delete, export, and restore controls
+- Keyboard behavior with Notes, Settings, and account forms
+- Account Directory scrolling on iPhone and iPad
+- Nearby map/list active navigation state
+- iPad portrait, landscape, Split View, and Stage Manager sizing
+- WebDAV, GPS permissions, Photo Overlay export, and backup/restore
 
-The automated Chromium renderer available in the build environment could not complete a browser screenshot because the sandbox blocks required browser process resources. Static validation passed; final visual confirmation remains a physical-device task.
+Static validation passed. Camera, GPS, WebDAV, installed-PWA caching, and physical keyboard/viewport behavior still require device testing.

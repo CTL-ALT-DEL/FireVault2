@@ -522,3 +522,58 @@ label{color:#aebccd!important;font-size:.72rem!important;letter-spacing:.055em!i
 @media(prefers-reduced-motion:reduce){
   *,*::before,*::after{scroll-behavior:auto!important;transition-duration:.01ms!important;animation-duration:.01ms!important;animation-iteration-count:1!important}
 }
+
+
+/* FireVault 0.93.0 — Interaction & Field Reliability */
+:root{
+  --fv0930-keyboard-gap:24px;
+  --fv0930-focus:0 0 0 3px rgba(78,180,245,.25),0 0 0 1px rgba(78,180,245,.75);
+}
+/* Keep route changes quick and avoid the sluggish translated-page feeling on field devices. */
+#app.fvRouteEnter0781 > .screen,
+#app.fvRouteEnter0781 > .homeScreen069,
+#app.fvRouteEnter0781 > .nearbyScreen069,
+#app.fvRouteEnter0781 > .siteDetail0735{animation-duration:150ms!important}
+@keyframes fvRouteEnter0781{from{opacity:.76}to{opacity:1}}
+/* Make unsaved screens visibly distinct without adding a banner. */
+body.fv-unsaved0930 .settingsDetailHeader0880,
+body.fv-unsaved0930 .accountFormTop0760{
+  box-shadow:inset 0 -2px 0 rgba(245,158,11,.72)!important;
+}
+body.fv-unsaved0930 .settingsDetailTitle0880 h1::after,
+body.fv-unsaved0930 .accountFormTop0760 h1::after{
+  content:" • Unsaved";color:#f6b84a;font-size:.62em;font-weight:800;white-space:nowrap;
+}
+/* Clear, consistent field validation and keyboard-safe editing. */
+input:invalid:not(:placeholder-shown),textarea:invalid:not(:placeholder-shown),select:invalid,
+.fieldError0760{
+  border-color:rgba(248,113,113,.82)!important;
+  box-shadow:0 0 0 3px rgba(248,113,113,.14)!important;
+}
+input:focus-visible,textarea:focus-visible,select:focus-visible,button:focus-visible,[tabindex]:focus-visible{
+  outline:none!important;box-shadow:var(--fv0930-focus)!important;
+}
+.settingsDetailBody488,.accountDetailContent0871,.form,.list,.accountsList0759,.accountDirectoryList0871{
+  scroll-padding-top:74px!important;
+  scroll-padding-bottom:calc(var(--navH) + var(--fv-keyboard-offset0802,0px) + var(--fv0930-keyboard-gap))!important;
+}
+body.fvKeyboardOpen0802 .settingsDetailHeader0880{
+  position:sticky!important;top:0!important;z-index:18!important;background:rgba(7,16,26,.98)!important;
+}
+body.fvKeyboardOpen0802 #appNav{pointer-events:none!important;opacity:0!important;transform:translateY(105%)!important}
+/* Consistent busy state and duplicate-action feedback. */
+button[aria-busy="true"],button.fvButtonBusy0781{cursor:wait!important;opacity:.78!important;pointer-events:none!important}
+button[data-fv-tap-locked0930="1"]{filter:saturate(.88)}
+/* Natural scrolling wins; snap correction runs only after momentum settles. */
+.accountDirectoryList0871,.accountsList0759{
+  scroll-behavior:auto!important;-webkit-overflow-scrolling:touch!important;overscroll-behavior-y:contain!important;
+}
+/* Keep action bars and Save controls reachable on iPad and Split View. */
+.settingsDetailHeader0880,.accountFormTop0760{position:sticky!important;top:0!important;z-index:16!important}
+@media(min-width:768px){
+  .settingsDetailHeader0880,.accountFormTop0760{border-radius:0 0 16px 16px!important}
+  .settingsDetailBody488,.accountDetailContent0871{scroll-padding-bottom:calc(var(--navH) + 36px)!important}
+}
+@media(max-width:430px){
+  .settingsDetailHeader0880 .primary{min-width:72px!important;padding-inline:12px!important}
+}

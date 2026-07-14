@@ -1,8 +1,8 @@
 {
-  "build": "0.92.0",
+  "build": "0.93.0",
   "released": "2026-07-14",
-  "note": "Canonical visual system: unified global chrome, Account Directory, Account Detail, Settings, Nearby, forms, cards, controls, and responsive iPhone/iPad layouts.",
-  "label": "Unified Design System",
-  "version": "0.92.0",
-  "name": "Unified Design System"
+  "note": "Interaction and field reliability: visible splash timing, unsaved-change protection, duplicate-action prevention, corrected navigation states, keyboard-safe forms, and consistent feedback.",
+  "label": "Interaction & Field Reliability",
+  "version": "0.93.0",
+  "name": "Interaction & Field Reliability"
 }

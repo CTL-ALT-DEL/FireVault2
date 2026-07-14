@@ -1,4 +1,4 @@
-# FireVault 0.92.0 Design System
+# FireVault 0.93.0 Design System
 
 `src/design-system.css` is the canonical release-facing visual layer.
 
@@ -21,3 +21,13 @@
 - Forms, buttons, cards, pills, empty states, toasts, and recovery screens
 
 Future visual changes should be made in this file instead of adding another build-numbered patch to `styles.css`.
+
+
+## Build 0.93.0 interaction layer
+
+- Visible launch presentation with a 2.2-second minimum splash duration
+- Unsaved-change indicators and navigation confirmation
+- Duplicate primary/destructive action protection
+- Keyboard-safe scroll padding and sticky form headers
+- Correct Nearby/Search navigation state mapping
+- Short, opacity-only route transitions
