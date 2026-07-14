@@ -50,3 +50,8 @@
 ## Build 0.94.5 Photo Overlay field builder
 
 Photo Overlay data fields use a button-first ordered list. The editor auto-saves, avoids raw-template keyboard editing, and supports drag plus explicit move controls for touch accessibility.
+
+
+## Build 0.94.7 Technician Info template
+
+Photo Overlay field controls use larger iPhone touch targets. Settings → Profile contains a reusable Technician Overlay Template whose order, line breaks, and left/right alignment are applied by the Technician Info quick choice in Photo Overlay.

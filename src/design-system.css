@@ -1516,3 +1516,91 @@ main,
   .overlayFieldActions0944 button{width:22px!important;min-width:22px!important}
   .overlayBreakButton0944{width:25px!important;min-width:25px!important}
 }
+
+
+/* FireVault 0.94.7 — larger Photo Overlay controls and reusable Technician Info template */
+.overlayQuickAlign0945{
+  min-height:48px!important;
+  grid-template-columns:28px minmax(0,1fr)!important;
+  column-gap:9px!important;
+  padding:7px 11px!important;
+  border-radius:13px!important;
+}
+.overlayQuickAlign0945>span{width:28px!important;height:28px!important;font-size:.92rem!important}
+.overlayQuickAlign0945 strong{font-size:.75rem!important;letter-spacing:.025em;white-space:normal!important}
+.overlayQuickAlign0945 small{font-size:.62rem!important;white-space:normal!important}
+.overlayActiveField0944{
+  min-height:50px!important;
+  grid-template-columns:22px minmax(64px,1fr) 90px 34px 102px!important;
+  gap:6px!important;
+  padding:6px 7px!important;
+}
+.overlayDragHandle0944{width:22px!important;height:36px!important;font-size:15px!important}
+.overlayActiveFieldText0944 strong{font-size:.76rem!important}
+.overlayFieldAlign0945{border-radius:10px!important}
+.overlayFieldAlign0945 button{min-height:36px!important;font-size:.63rem!important;padding-inline:5px!important}
+.overlayBreakButton0944{width:34px!important;min-width:34px!important;min-height:36px!important;font-size:.8rem!important}
+.overlayFieldActions0944{grid-template-columns:repeat(3,32px)!important;gap:3px!important}
+.overlayFieldActions0944 button{width:32px!important;min-width:32px!important;min-height:36px!important;font-size:.86rem!important}
+.overlayFieldBuilder0944 .overlayFieldChip510{min-height:50px!important;padding:9px 10px!important}
+.overlayFieldBuilder0944 .overlayFieldChip510 strong{font-size:.73rem!important}
+.technicianOverlayTemplate0946{display:grid;gap:12px}
+.technicianOverlayTemplateHead0946{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.technicianOverlayTemplateHead0946>div{display:grid;gap:3px;min-width:0}
+.technicianOverlayTemplateHead0946 strong{color:#f5f8fc;font-size:.88rem}
+.technicianOverlayTemplateHead0946 small{color:#91a2b7;font-size:.66rem;line-height:1.25}
+.technicianOverlayPreview0946{
+  display:grid;
+  gap:5px;
+  min-height:72px;
+  padding:13px 15px;
+  border:1px solid rgba(134,164,203,.24);
+  border-left:4px solid #ef4444;
+  border-radius:14px;
+  background:linear-gradient(135deg,rgba(5,10,16,.96),rgba(22,34,49,.96));
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.055),0 9px 22px rgba(0,0,0,.22);
+}
+.technicianOverlayPreview0946>div{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);align-items:start;gap:12px;min-height:18px}
+.technicianOverlayPreview0946 span,.technicianOverlayPreview0946 b{overflow-wrap:anywhere;color:#f7f9fc;font-size:.74rem;line-height:1.25}
+.technicianOverlayPreview0946 b{text-align:right}
+.technicianOverlayReset0946{min-height:40px!important;padding-inline:13px!important}
+.technicianOverlayTemplate0946 .overlayBuilderTitle0944>strong{align-self:center}
+@media(max-width:620px){
+  .overlayActiveField0944{
+    grid-template-columns:20px minmax(48px,1fr) 82px 34px 100px!important;
+    gap:5px!important;
+    padding-inline:6px!important;
+  }
+  .overlayFieldAlign0945 button{font-size:.59rem!important;padding-inline:3px!important}
+  .overlayFieldActions0944{grid-template-columns:repeat(3,31px)!important}
+  .overlayFieldActions0944 button{width:31px!important;min-width:31px!important}
+  .technicianOverlayTemplateHead0946{align-items:flex-start;flex-direction:column}
+  .technicianOverlayTemplateHead0946 .overlayAutoSave0944{align-self:flex-start}
+}
+@media(max-width:370px){
+  .overlayActiveField0944{grid-template-columns:18px minmax(38px,1fr) 74px 32px 91px!important;gap:3px!important;padding-inline:4px!important}
+  .overlayFieldAlign0945 button{font-size:.55rem!important;padding-inline:1px!important}
+  .overlayFieldActions0944{grid-template-columns:repeat(3,29px)!important;gap:2px!important}
+  .overlayFieldActions0944 button{width:29px!important;min-width:29px!important}
+  .overlayBreakButton0944{width:32px!important;min-width:32px!important}
+}
+
+
+/* Build 0.94.7 — Technician profile photo and completion-aware sections */
+.technicianSettingsStack0947{gap:12px!important}
+.technicianSettingsSection0947{padding:0!important;border:1px solid rgba(255,255,255,.1)!important;border-radius:18px!important;background:linear-gradient(145deg,#1b2530,#111820)!important;overflow:hidden;box-shadow:0 12px 28px rgba(0,0,0,.24),inset 0 1px 0 rgba(255,255,255,.055)!important}
+.technicianSettingsSection0947>summary{list-style:none}.technicianSettingsSection0947>summary::-webkit-details-marker{display:none}
+.technicianSettingsSummary0947{display:grid;grid-template-columns:42px minmax(0,1fr) auto 24px;align-items:center;gap:11px;min-height:78px;padding:13px 14px;cursor:pointer;user-select:none;-webkit-tap-highlight-color:transparent}
+.technicianSettingsSummary0947:active{background:rgba(255,255,255,.035)}
+.technicianSectionMark0947{display:grid;place-items:center;width:42px;height:42px;border-radius:13px;background:color-mix(in srgb,var(--settingsAccent0880,#ef4444) 18%,#25313e);border:1px solid color-mix(in srgb,var(--settingsAccent0880,#ef4444) 36%,transparent);color:#fff;font-size:.8rem;font-weight:900;letter-spacing:.03em}
+.technicianSectionCopy0947{min-width:0}.technicianSectionCopy0947 small{display:block;color:#8f9aaa;font-size:.66rem;font-weight:850;text-transform:uppercase;letter-spacing:.1em}.technicianSectionCopy0947 strong{display:block;margin-top:3px;color:#fff;font-size:1rem;line-height:1.2}.technicianSectionCopy0947 em{display:block;margin-top:4px;color:#aab4c1;font-size:.72rem;font-style:normal;line-height:1.35}
+.technicianSectionStatus0947{padding:6px 8px;border-radius:999px;background:rgba(245,158,11,.12);border:1px solid rgba(245,158,11,.25);color:#ffd38a;font-size:.63rem;font-weight:850;white-space:nowrap}.technicianSettingsSection0947.isComplete0947 .technicianSectionStatus0947{background:rgba(34,197,94,.11);border-color:rgba(34,197,94,.24);color:#9becb6}
+.technicianSectionChevron0947{color:#8995a4;font-size:1.15rem;line-height:1;transition:transform .16s ease}.technicianSettingsSection0947[open] .technicianSectionChevron0947{transform:rotate(180deg)}
+.technicianSettingsBody0947{padding:0 14px 15px;border-top:1px solid rgba(255,255,255,.075)}
+.technicianSettingsBody0947>.settingsGrid{padding-top:14px}
+.technicianSectionActions0947{display:flex;justify-content:flex-end;padding-top:12px}.technicianSectionActions0947 .primary{min-width:150px}
+.technicianPhotoEditor0947{display:grid;grid-template-columns:112px minmax(0,1fr);gap:15px;align-items:center;padding-top:15px}
+.technicianPhotoPreview0947{display:grid;place-items:center;width:112px;aspect-ratio:1;border-radius:20px;overflow:hidden;background:linear-gradient(145deg,#2c3947,#151c24);border:1px solid rgba(255,255,255,.13);box-shadow:0 10px 22px rgba(0,0,0,.28),inset 0 1px 0 rgba(255,255,255,.08)}
+.technicianPhotoPreview0947 img{width:100%;height:100%;object-fit:cover;display:block}.technicianPhotoPreview0947 span{color:#dce7f4;font-size:1rem;font-weight:900;letter-spacing:.08em}
+.technicianPhotoActions0947 strong{display:block;color:#fff;font-size:.94rem}.technicianPhotoActions0947 small{display:block;margin-top:5px;color:#a8b2bf;font-size:.72rem;line-height:1.4}.technicianPhotoActions0947>div{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}.technicianPhotoActions0947 .technicianPhotoChoose0947,.technicianPhotoActions0947 button{display:inline-flex;align-items:center;justify-content:center;min-height:44px;padding:0 14px;text-decoration:none}
+@media(max-width:520px){.technicianSettingsSummary0947{grid-template-columns:40px minmax(0,1fr) 22px;padding:12px}.technicianSectionStatus0947{grid-column:2/3;justify-self:start;margin-top:2px}.technicianSectionChevron0947{grid-column:3;grid-row:1/3}.technicianSectionCopy0947 em{font-size:.69rem}.technicianPhotoEditor0947{grid-template-columns:88px minmax(0,1fr);gap:12px}.technicianPhotoPreview0947{width:88px;border-radius:16px}.technicianPhotoActions0947>div{gap:7px}.technicianPhotoActions0947 .technicianPhotoChoose0947,.technicianPhotoActions0947 button{flex:1 1 110px}}

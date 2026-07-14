@@ -1,8 +1,8 @@
 {
-  "build": "0.94.5",
+  "build": "0.94.7",
   "released": "2026-07-14",
-  "note": "Compact Photo Overlay field rows with per-field left/right alignment and a one-tap Technician + Phone flush-right option.",
-  "label": "Photo Overlay Alignment",
-  "version": "0.94.5",
-  "name": "Photo Overlay Alignment"
+  "note": "Technician photo upload with automatic resizing and completion-aware collapsible profile sections.",
+  "label": "Technician Profile Completion",
+  "version": "0.94.7",
+  "name": "Technician Profile Completion"
 }
