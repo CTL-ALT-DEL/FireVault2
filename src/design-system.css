@@ -1604,3 +1604,89 @@ main,
 .technicianPhotoPreview0947 img{width:100%;height:100%;object-fit:cover;display:block}.technicianPhotoPreview0947 span{color:#dce7f4;font-size:1rem;font-weight:900;letter-spacing:.08em}
 .technicianPhotoActions0947 strong{display:block;color:#fff;font-size:.94rem}.technicianPhotoActions0947 small{display:block;margin-top:5px;color:#a8b2bf;font-size:.72rem;line-height:1.4}.technicianPhotoActions0947>div{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}.technicianPhotoActions0947 .technicianPhotoChoose0947,.technicianPhotoActions0947 button{display:inline-flex;align-items:center;justify-content:center;min-height:44px;padding:0 14px;text-decoration:none}
 @media(max-width:520px){.technicianSettingsSummary0947{grid-template-columns:40px minmax(0,1fr) 22px;padding:12px}.technicianSectionStatus0947{grid-column:2/3;justify-self:start;margin-top:2px}.technicianSectionChevron0947{grid-column:3;grid-row:1/3}.technicianSectionCopy0947 em{font-size:.69rem}.technicianPhotoEditor0947{grid-template-columns:88px minmax(0,1fr);gap:12px}.technicianPhotoPreview0947{width:88px;border-radius:16px}.technicianPhotoActions0947>div{gap:7px}.technicianPhotoActions0947 .technicianPhotoChoose0947,.technicianPhotoActions0947 button{flex:1 1 110px}}
+
+/* Build 0.94.8 — Technician Overlay Template fitting and group alignment */
+.technicianOverlayPreview0946{
+  overflow:hidden;
+}
+.technicianOverlayPreview0946>div{
+  display:block!important;
+  width:100%;
+  min-width:0;
+  min-height:18px;
+}
+.technicianOverlayPreview0946 span{
+  display:block;
+  width:100%;
+  min-width:0;
+  color:#f7f9fc;
+  font-size:clamp(.62rem,2.7vw,.78rem);
+  line-height:1.3;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  overflow-wrap:normal!important;
+  word-break:normal!important;
+}
+.technicianOverlayPreview0946.align-left span{text-align:left}
+.technicianOverlayPreview0946.align-center span{text-align:center}
+.technicianOverlayPreview0946.align-right span{text-align:right}
+.technicianOverlayAlignmentCard0948{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) auto;
+  align-items:center;
+  gap:12px;
+  padding:12px 13px;
+  border:1px solid rgba(134,164,203,.2);
+  border-radius:14px;
+  background:linear-gradient(180deg,rgba(28,41,58,.82),rgba(13,22,34,.88));
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.045),0 8px 18px rgba(0,0,0,.18);
+}
+.technicianOverlayAlignmentCard0948>div:first-child{display:grid;gap:3px;min-width:0}
+.technicianOverlayAlignmentCard0948 strong{color:#f5f8fc;font-size:.8rem}
+.technicianOverlayAlignmentCard0948 small{color:#91a2b7;font-size:.64rem;line-height:1.3}
+.technicianOverlayGroupAlign0948{
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  min-width:180px;
+  padding:3px;
+  border:1px solid rgba(134,164,203,.24);
+  border-radius:12px;
+  background:rgba(2,8,16,.62);
+}
+.technicianOverlayGroupAlign0948 button{
+  min-height:40px!important;
+  padding:0 10px!important;
+  border:0!important;
+  border-radius:9px!important;
+  background:transparent!important;
+  color:#9fb1c6!important;
+  font-size:.69rem!important;
+  font-weight:850!important;
+  box-shadow:none!important;
+}
+.technicianOverlayGroupAlign0948 button.active{
+  background:linear-gradient(180deg,rgba(239,68,68,.28),rgba(153,27,27,.34))!important;
+  color:#fff!important;
+  box-shadow:inset 0 0 0 1px rgba(248,113,113,.5),0 5px 12px rgba(0,0,0,.2)!important;
+}
+.technicianOverlayField0946{
+  grid-template-columns:22px minmax(90px,1fr) 40px 112px!important;
+}
+.overlayFieldAlign0945{
+  grid-template-columns:repeat(3,minmax(0,1fr))!important;
+  min-width:96px!important;
+}
+.overlayFieldAlign0945 button{
+  min-width:0!important;
+  padding-inline:3px!important;
+}
+@media(max-width:620px){
+  .technicianOverlayAlignmentCard0948{grid-template-columns:1fr;gap:9px}
+  .technicianOverlayGroupAlign0948{width:100%;min-width:0}
+  .technicianOverlayField0946{grid-template-columns:20px minmax(72px,1fr) 38px 103px!important}
+}
+@media(max-width:370px){
+  .technicianOverlayField0946{grid-template-columns:18px minmax(55px,1fr) 34px 93px!important}
+  .technicianOverlayGroupAlign0948 button{padding-inline:5px!important;font-size:.64rem!important}
+}

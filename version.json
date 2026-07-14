@@ -1,8 +1,8 @@
 {
-  "build": "0.94.7",
+  "build": "0.94.8",
   "released": "2026-07-14",
-  "note": "Technician photo upload with automatic resizing and completion-aware collapsible profile sections.",
-  "label": "Technician Profile Completion",
-  "version": "0.94.7",
-  "name": "Technician Profile Completion"
+  "note": "Technician Overlay Template text fitting and group-level left, center, or right alignment.",
+  "label": "Technician Overlay Alignment",
+  "version": "0.94.8",
+  "name": "Technician Overlay Alignment"
 }

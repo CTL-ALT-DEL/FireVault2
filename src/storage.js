@@ -1,5 +1,5 @@
-import { stageVaultMedia, stripPersistedMediaForStorage, hydrateVaultMediaFromCache } from "./media-store.js?v=0.94.7";
-export const BUILD = "0.94.7";
+import { stageVaultMedia, stripPersistedMediaForStorage, hydrateVaultMediaFromCache } from "./media-store.js?v=0.94.8";
+export const BUILD = "0.94.8";
 export const SECURITY_SCHEMA_VERSION = 4;
 export const KEY = "firevault_vault_build_030";
 export const DEVICE_KEY = "firevault_device_identity_062";
@@ -887,17 +887,25 @@ export function normalize(data){
   data.settings.technician.photoUpdatedAt=String(data.settings.technician.photoUpdatedAt||"");
   const technicianOverlayAllowed0946=new Set(["{technician}","{company}","{phone}","{email}","{license}"]);
   const technicianOverlaySeen0946=new Set();
-  const technicianOverlaySource0946=Array.isArray(data.settings.technicianOverlay?.fields)?data.settings.technicianOverlay.fields:[];
+  const technicianOverlayRaw0948=data.settings.technicianOverlay||{};
+  const technicianOverlaySource0946=Array.isArray(technicianOverlayRaw0948.fields)?technicianOverlayRaw0948.fields:[];
   const technicianOverlayFields0946=technicianOverlaySource0946.flatMap(item=>{
     const tag=String(item?.tag||"");
     if(!technicianOverlayAllowed0946.has(tag)||technicianOverlaySeen0946.has(tag))return [];
     technicianOverlaySeen0946.add(tag);
-    return [{tag,breakBefore:Boolean(item?.breakBefore),align:item?.align==="left"?"left":"right"}];
+    return [{tag,breakBefore:Boolean(item?.breakBefore)}];
   });
-  data.settings.technicianOverlay={fields:technicianOverlayFields0946.length?technicianOverlayFields0946:[
-    {tag:"{technician}",breakBefore:false,align:"right"},
-    {tag:"{phone}",breakBefore:false,align:"right"}
-  ]};
+  const technicianOverlayLegacyAlign0948=technicianOverlaySource0946.map(item=>item?.align).filter(Boolean);
+  const technicianOverlayAlignment0948=["left","center","right"].includes(technicianOverlayRaw0948.alignment)
+    ? technicianOverlayRaw0948.alignment
+    : (technicianOverlayLegacyAlign0948.length&&technicianOverlayLegacyAlign0948.every(value=>value==="left")?"left":"right");
+  data.settings.technicianOverlay={
+    fields:technicianOverlayFields0946.length?technicianOverlayFields0946:[
+      {tag:"{technician}",breakBefore:false},
+      {tag:"{phone}",breakBefore:false}
+    ],
+    alignment:technicianOverlayAlignment0948
+  };
   if(data.settings.technicianOverlay.fields[0])data.settings.technicianOverlay.fields[0].breakBefore=false;
   data.settings.notifications = data.settings.notifications || {dailyReminder:false, reminderTime:"07:30", taskAlerts:true, inspectionAlerts:true, gpsPrompts:true};
   data.settings.reports = data.settings.reports || {title:"FireVault Service Report", includeTechnician:true, includePhotos:true, includeMapLink:true, includeDeficiencies:true, includeTasks:true, format:"detailed"};

@@ -55,3 +55,10 @@ Photo Overlay data fields use a button-first ordered list. The editor auto-saves
 ## Build 0.94.7 Technician Info template
 
 Photo Overlay field controls use larger iPhone touch targets. Settings → Profile contains a reusable Technician Overlay Template whose order, line breaks, and left/right alignment are applied by the Technician Info quick choice in Photo Overlay.
+
+## Build 0.94.8 Technician Overlay alignment
+
+- Technician Overlay Template uses one group alignment control: Left, Center, or Right.
+- Template preview rows use the full available width and never break inside long words.
+- Technician Info uses no-wrap canvas rows and fits text to the export width.
+- Center alignment is supported by the shared Photo Overlay preview/export renderer.
