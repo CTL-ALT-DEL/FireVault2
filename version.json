@@ -1,8 +1,8 @@
 {
-  "build": "0.93.1",
+  "build": "0.94.0",
   "released": "2026-07-14",
-  "note": "Settings repair: removed the three shortcut buttons and prevented horizontal page dragging on iPhone and iPad.",
-  "label": "Settings Overflow Repair",
-  "version": "0.93.1",
-  "name": "Settings Overflow Repair"
+  "note": "Comprehensive UI polish for Settings hierarchy, Account Directory search, navigation, forms, tabs, and active-screen consistency.",
+  "label": "Comprehensive UI Polish",
+  "version": "0.94.0",
+  "name": "Comprehensive UI Polish"
 }

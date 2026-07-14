@@ -653,3 +653,244 @@ main,
     grid-template-columns:repeat(2,minmax(0,1fr))!important;
   }
 }
+
+/* FireVault 0.94.0 — comprehensive UI polish */
+
+/* Settings: stronger section hierarchy and breathing room */
+.settingsListGroup0873.tone-blue{--settingsSectionAccent0940:#5ca9ff}
+.settingsListGroup0873.tone-green{--settingsSectionAccent0940:#44c78a}
+.settingsListGroup0873.tone-violet{--settingsSectionAccent0940:#a985ff}
+.settingsListGroup0873.tone-cyan{--settingsSectionAccent0940:#45c8db}
+.settingsListGroup0873.tone-amber{--settingsSectionAccent0940:#f0aa45}
+.settingsListGroup0873.tone-red{--settingsSectionAccent0940:#ef5965}
+.settingsListGroup0873.tone-gold{--settingsSectionAccent0940:#e8c24f}
+.settingsListGroup0873.tone-slate{--settingsSectionAccent0940:#9caabd}
+.settingsListGroup0873{
+  --settingsSectionAccent0940:#9caabd;
+  display:grid!important;
+  gap:0!important;
+  margin:0 0 30px!important;
+}
+.settingsSectionHeading0940{
+  min-height:26px;
+  display:flex;
+  align-items:center;
+  gap:10px;
+  margin:0 6px 12px;
+}
+.settingsSectionHeading0940>span{
+  flex:0 0 4px;
+  width:4px;
+  height:22px;
+  border-radius:999px;
+  background:linear-gradient(180deg,color-mix(in srgb,var(--settingsSectionAccent0940) 88%,white),var(--settingsSectionAccent0940));
+  box-shadow:0 0 12px color-mix(in srgb,var(--settingsSectionAccent0940) 42%,transparent);
+}
+.settingsSectionHeading0940>h2,
+.settingsListGroup0873>h2{
+  margin:0!important;
+  color:#dce6f2!important;
+  font-size:.86rem!important;
+  line-height:1.2!important;
+  font-weight:900!important;
+  letter-spacing:.085em!important;
+  text-transform:uppercase!important;
+}
+.settingsListCard0873,
+.settingsSearchResults0874{
+  display:grid!important;
+  gap:6px!important;
+  padding:6px!important;
+}
+.settingsListRow0873,
+.settingsSearchResult0874{
+  min-height:72px!important;
+  padding:11px 12px!important;
+  border:1px solid rgba(151,170,194,.10)!important;
+  border-radius:14px!important;
+  background:linear-gradient(145deg,rgba(26,38,52,.82),rgba(13,22,32,.88))!important;
+}
+.settingsListRow0873+.settingsListRow0873,
+.settingsSearchResult0874+.settingsSearchResult0874{
+  margin-top:0!important;
+  border-top:1px solid rgba(151,170,194,.10)!important;
+  border-radius:14px!important;
+}
+.settingsListCopy0880{display:grid!important;gap:4px!important;align-content:center!important}
+.settingsListCopy0880 strong{font-size:.94rem!important;line-height:1.15!important;color:#f3f7fb!important}
+.settingsListCopy0880 small{font-size:.72rem!important;line-height:1.32!important;color:#8f9daf!important}
+.settingsRowTail0880{gap:8px!important}
+.settingsRowTail0880 em{font-size:.68rem!important;line-height:1.15!important}
+.settingsGroupTitle0880 h1,.settingsDetailTitle0880 h1{font-size:1.18rem!important;line-height:1.1!important}
+.settingsGroupTitle0880 small,.settingsDetailTitle0880 small{display:block!important;margin-top:4px!important;font-size:.72rem!important;line-height:1.25!important;color:#91a0b2!important}
+.settingsDetailBody488 .paneHead,
+.settingsDetailBody488 .settingsSectionHead530{
+  gap:12px!important;
+  margin-bottom:13px!important;
+  padding-bottom:11px!important;
+  border-bottom:1px solid rgba(151,170,194,.12)!important;
+}
+.settingsDetailBody488 .paneHead h2,
+.settingsDetailBody488 .settingsSectionHead530 h2{font-size:1.04rem!important;line-height:1.18!important}
+.settingsDetailBody488 .settingField>label,
+.settingsDetailBody488 .emailControl530>label{
+  display:block!important;
+  margin:0 0 7px!important;
+  color:#d7e1ec!important;
+  font-size:.78rem!important;
+  font-weight:850!important;
+  letter-spacing:.015em!important;
+}
+.settingsSearch0874>button{width:42px!important;height:42px!important;min-height:42px!important}
+
+/* Search / Account Directory: clearer top bar and primary search control */
+.accountDirectoryTop0940{
+  flex:0 0 auto;
+  overflow:hidden;
+  border:1px solid rgba(137,159,186,.17);
+  border-radius:0 0 22px 22px;
+  background:
+    radial-gradient(circle at 88% -25%,rgba(239,75,88,.16),transparent 38%),
+    linear-gradient(180deg,#182638 0%,#101b29 58%,#0c1621 100%);
+  box-shadow:0 14px 28px rgba(0,0,0,.28),inset 0 1px 0 rgba(255,255,255,.055);
+}
+.accountDirectoryHeader0940{
+  min-height:76px!important;
+  padding:13px 14px 7px!important;
+  align-items:center!important;
+  background:transparent!important;
+  border:0!important;
+  box-shadow:none!important;
+}
+.accountDirectoryHeading0940{min-width:0;display:grid;gap:5px}
+.accountDirectoryHeading0940>span{
+  color:#ef6570!important;
+  font-size:.67rem!important;
+  font-weight:950!important;
+  letter-spacing:.17em!important;
+}
+.accountDirectoryTitleLine0940{min-width:0;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.accountDirectoryTitleLine0940 h1{
+  min-width:0;
+  margin:0!important;
+  color:#fff!important;
+  font-size:clamp(1.55rem,7vw,2rem)!important;
+  line-height:1!important;
+  letter-spacing:-.045em!important;
+}
+.accountDirectoryCount0940{
+  min-height:27px;
+  display:inline-flex!important;
+  align-items:center;
+  margin:0!important;
+  padding:4px 9px;
+  border:1px solid rgba(151,170,194,.20);
+  border-radius:999px;
+  background:rgba(7,16,27,.55);
+  color:#aab8c8!important;
+  font-size:.69rem!important;
+  font-weight:850!important;
+  white-space:nowrap;
+}
+.accountAdd0940{
+  flex:0 0 auto!important;
+  width:auto!important;
+  min-width:72px!important;
+  height:48px!important;
+  min-height:48px!important;
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  gap:6px!important;
+  padding:0 13px!important;
+  border-radius:14px!important;
+}
+.accountAdd0940>span{font-size:1.35rem;line-height:1;font-weight:650}
+.accountAdd0940>b{font-size:.78rem;line-height:1;font-weight:900}
+.accountSearch0940{
+  min-height:58px!important;
+  margin:8px 14px 10px!important;
+  padding:0 8px 0 14px!important;
+  grid-template-columns:26px minmax(0,1fr) 44px!important;
+  gap:8px!important;
+  border-radius:16px!important;
+  border-color:rgba(114,142,177,.43)!important;
+  background:linear-gradient(180deg,#1c2d42 0%,#132235 55%,#0f1b29 100%)!important;
+  box-shadow:0 10px 21px rgba(0,0,0,.28),inset 0 1px 0 rgba(255,255,255,.08)!important;
+}
+.accountSearch0940 .accountSearchIcon0871{width:24px!important;height:24px!important;color:#f16b75!important}
+.accountSearch0940 input{
+  height:56px!important;
+  min-height:56px!important;
+  font-size:16px!important;
+  font-weight:700!important;
+  letter-spacing:0!important;
+}
+.accountSearch0940 input::placeholder{color:#8796a9!important;font-weight:600!important}
+.accountSearch0940>button{
+  width:42px!important;
+  height:42px!important;
+  min-height:42px!important;
+  border:1px solid rgba(151,170,194,.16)!important;
+  background:linear-gradient(180deg,#2a3b52,#1a293c)!important;
+  color:#e0e8f1!important;
+}
+.accountDirectoryTop0940 .accountDirectoryTools0876{
+  padding:0 14px 14px!important;
+  gap:10px!important;
+}
+.accountDirectoryTop0940 .accountDirectoryTool0876{
+  min-height:56px!important;
+  border-radius:15px!important;
+}
+.accountDirectoryTop0940 .accountDirectoryTool0876>span strong{font-size:.88rem!important}
+.accountDirectoryTop0940 .accountDirectoryTool0876>span small{font-size:.68rem!important}
+
+/* Other active-screen polish found during the pass */
+.accountCardActions0871 .accountCardIcon0871{width:20px!important;height:20px!important}
+.accountCardActions0871 button span{font-size:.69rem!important;font-weight:850!important}
+.accountActionGrid0871 button{min-height:62px!important;font-size:.74rem!important}
+.accountActionIcon0871{width:26px!important;height:26px!important}
+.accountTabs0871{padding:5px!important;gap:6px!important}
+.accountTabs0871 button{min-height:46px!important;font-size:.74rem!important;font-weight:830!important}
+.accountTabs0871 button.active{box-shadow:inset 0 0 0 1px rgba(239,77,89,.38),0 5px 12px rgba(0,0,0,.14)!important}
+#appNav button,.nearbyBottomNav069 button{position:relative!important}
+#appNav button.active::after,#appNav button[aria-current="page"]::after,
+.nearbyBottomNav069 button.active::after,.nearbyBottomNav069 button[aria-current="page"]::after{
+  content:"";
+  position:absolute;
+  left:50%;
+  bottom:3px;
+  width:28px;
+  height:3px;
+  border-radius:999px;
+  background:#ef5965;
+  transform:translateX(-50%);
+  box-shadow:0 0 10px rgba(239,89,101,.48);
+}
+.empty,.accountEmpty0871,.accountNoResults0871{
+  border-color:rgba(127,151,181,.30)!important;
+  background:linear-gradient(145deg,rgba(20,34,51,.92),rgba(9,19,31,.96))!important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.035)!important;
+}
+
+@media(max-width:390px){
+  .accountDirectoryHeader0940{padding-left:11px!important;padding-right:11px!important}
+  .accountDirectoryTitleLine0940{gap:7px}
+  .accountDirectoryTitleLine0940 h1{font-size:1.55rem!important}
+  .accountDirectoryCount0940{font-size:.64rem!important;padding-inline:7px}
+  .accountAdd0940{min-width:62px!important;padding-inline:10px!important}
+  .accountSearch0940{margin-left:10px!important;margin-right:10px!important}
+  .accountDirectoryTop0940 .accountDirectoryTools0876{padding-left:10px!important;padding-right:10px!important;gap:7px!important}
+  .settingsSectionHeading0940{margin-left:4px;margin-right:4px}
+  .settingsSectionHeading0940>h2{font-size:.81rem!important}
+  .settingsListCopy0880 strong{font-size:.9rem!important}
+}
+@media(min-width:700px){
+  .accountDirectoryTop0940{border-radius:20px;margin:0 2px}
+  .accountDirectoryHeader0940{padding:16px 20px 8px!important}
+  .accountSearch0940{margin-left:20px!important;margin-right:20px!important}
+  .accountDirectoryTop0940 .accountDirectoryTools0876{padding-left:20px!important;padding-right:20px!important;padding-bottom:18px!important}
+  .settingsSectionHeading0940>h2{font-size:.9rem!important}
+}
+.accountAdd0940>span{display:block!important;color:#fff!important;letter-spacing:0!important;text-transform:none!important}

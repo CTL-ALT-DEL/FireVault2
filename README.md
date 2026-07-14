@@ -1,29 +1,22 @@
-# FireVault Build 0.93.1
+# FireVault Build 0.94.0
 
-Interaction & Field Reliability release built from the 0.92.0 Unified Design System baseline.
+Comprehensive interface-polish release built from the 0.93.1 Settings Overflow Repair baseline.
 
 ## What changed
 
-- Restored a visible 2.2-second minimum splash-screen presentation while allowing initialization to continue underneath it.
-- Added unsaved-change protection for account, document, contact, equipment, task, deficiency, library, Site Notes, and saveable Settings forms.
-- Added a visible Unsaved state to active form headers.
-- Added accidental duplicate-action protection for Save, Delete, and other primary/destructive buttons.
-- Corrected bottom-navigation highlighting so Nearby views highlight Nearby and account workflows highlight Search.
-- Improved keyboard-safe scrolling, sticky form headers, focus rings, validation feedback, and reachable Save controls.
-- Shortened route-entry motion so screen changes feel responsive rather than heavy.
-- Preserved natural Account Directory momentum scrolling and delayed settling behavior.
-- Preserved all 0.92.0 design-system, IndexedDB media, WebDAV, Demo Mode, Plus Codes, Nearby, and Building Navigator behavior.
+- Enlarged Settings section names and added clear spacing between each section heading and its related controls.
+- Added restrained color accents to Settings section headings so categories are easier to scan without adding clutter.
+- Improved Settings rows, descriptions, status text, detail-page titles, form labels, and section headers.
+- Rebuilt the Account Directory top area with a clearer Search heading, visible account count, and a labeled Add control.
+- Enlarged and refined the account search field, clear control, Nearby control, and Sort control.
+- Improved Account Directory action icons and labels while preserving the Call, Route, Add Note, Favorite order.
+- Refined Account Detail actions and tab touch targets.
+- Added a clearer active indicator to the three-button Nearby, Search, and Settings navigation.
+- Standardized empty-state surfaces and spacing across active screens.
+- Preserved Settings horizontal-overflow protection, the visible splash screen, IndexedDB media, WebDAV, Demo Mode, Plus Codes, backups, and existing account records.
 
 ## Compatibility
 
 - Existing customer records remain on storage key `firevault_vault_build_030`.
 - Existing IndexedDB photos and documents remain unchanged.
-- No feature or data migration is required for this build.
-
-
-## Build 0.93.1
-
-- Removed the three shortcut/status buttons from the top of Settings.
-- Prevented the Settings page from moving horizontally on iPhone and iPad.
-- Removed negative-width and horizontal-scroll behavior from the Settings shell.
-- Preserved Settings search, grouped sections, WebDAV, Demo Mode, Plus Codes, backups, security, and Photo Overlay.
+- No data migration is required.
