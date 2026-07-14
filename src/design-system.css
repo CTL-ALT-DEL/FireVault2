@@ -1168,7 +1168,7 @@ main,
   .overlayTemplateAssist0943{align-items:flex-start}
 }
 
-/* FireVault 0.94.4 — button-first Photo Overlay field builder */
+/* FireVault 0.94.5 — button-first Photo Overlay field builder */
 .overlayFieldBuilder0944 .overlayCardHead0890{
   align-items:center;
   margin-bottom:14px;
@@ -1387,4 +1387,132 @@ main,
 @media(max-width:360px){
   .overlayFieldBuilder0944 .overlayFieldGrid510{grid-template-columns:1fr 1fr!important}
   .overlayBreakButton0944{padding-inline:6px!important;font-size:.57rem!important}
+}
+
+
+/* FireVault 0.94.5 — compact Photo Overlay rows and per-field alignment */
+.overlayBuilderTitle0944{
+  align-items:center!important;
+}
+.overlayBuilderTitle0944>div{
+  min-width:0;
+  display:grid;
+  gap:3px;
+}
+.overlayBuilderTitle0944>div small{
+  display:block;
+  color:#8f9eb1;
+  font-size:.64rem;
+  line-height:1.25;
+}
+.overlayQuickAlign0945{
+  flex:0 0 auto;
+  min-height:38px!important;
+  display:grid!important;
+  grid-template-columns:22px auto!important;
+  grid-template-rows:auto auto!important;
+  column-gap:7px!important;
+  align-items:center!important;
+  padding:5px 9px!important;
+  border:1px solid rgba(83,172,255,.32)!important;
+  border-radius:12px!important;
+  color:#e8f3ff!important;
+  background:linear-gradient(180deg,rgba(40,111,172,.22),rgba(25,73,119,.13))!important;
+  text-align:left!important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.055)!important;
+}
+.overlayQuickAlign0945>span{
+  grid-row:1/3;
+  display:grid;
+  place-items:center;
+  width:22px;
+  height:22px;
+  border-radius:7px;
+  color:#9ed0ff;
+  background:rgba(83,172,255,.12);
+  font-size:.8rem;
+  font-weight:950;
+}
+.overlayQuickAlign0945 strong{font-size:.68rem;line-height:1.05;white-space:nowrap}
+.overlayQuickAlign0945 small{font-size:.56rem;line-height:1;color:#9fb7cf;white-space:nowrap}
+.overlayActiveFields0944{gap:5px!important}
+.overlayActiveField0944{
+  min-height:42px!important;
+  grid-template-columns:18px minmax(58px,1fr) 78px 28px 82px!important;
+  grid-template-areas:none!important;
+  gap:5px!important;
+  padding:4px 6px!important;
+  border-radius:11px!important;
+}
+.overlayDragHandle0944{
+  grid-area:auto!important;
+  width:18px!important;
+  height:30px!important;
+  font-size:13px!important;
+}
+.overlayActiveFieldText0944{grid-area:auto!important;gap:0!important}
+.overlayActiveFieldText0944 strong{font-size:.71rem!important}
+.overlayActiveFieldText0944 small{display:none!important}
+.overlayFieldAlign0945{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  overflow:hidden;
+  border:1px solid rgba(132,156,187,.22);
+  border-radius:9px;
+  background:#0d1621;
+}
+.overlayFieldAlign0945 button{
+  min-width:0!important;
+  min-height:30px!important;
+  padding:0 4px!important;
+  border:0!important;
+  border-radius:0!important;
+  color:#8f9eb1!important;
+  background:transparent!important;
+  font-size:.56rem!important;
+  font-weight:900!important;
+}
+.overlayFieldAlign0945 button+button{border-left:1px solid rgba(132,156,187,.18)!important}
+.overlayFieldAlign0945 button.active{
+  color:#dff1ff!important;
+  background:rgba(40,111,172,.24)!important;
+  box-shadow:inset 0 0 0 1px rgba(83,172,255,.28)!important;
+}
+.overlayBreakButton0944{
+  grid-area:auto!important;
+  width:28px!important;
+  min-width:28px!important;
+  min-height:30px!important;
+  padding:0!important;
+  font-size:.72rem!important;
+}
+.overlayFieldActions0944{
+  grid-area:auto!important;
+  grid-template-columns:repeat(3,25px)!important;
+  gap:3px!important;
+  justify-content:end!important;
+}
+.overlayFieldActions0944 button{
+  width:25px!important;
+  min-width:25px!important;
+  min-height:30px!important;
+  border-radius:8px!important;
+  font-size:.74rem!important;
+}
+@media(max-width:620px){
+  .overlayBuilderTitle0944{align-items:stretch!important;flex-direction:column!important;gap:8px!important}
+  .overlayQuickAlign0945{width:100%!important;grid-template-columns:22px 1fr!important}
+  .overlayActiveField0944{
+    grid-template-columns:17px minmax(46px,1fr) 72px 27px 79px!important;
+    grid-template-areas:none!important;
+  }
+  .overlayDragHandle0944,.overlayActiveFieldText0944,.overlayBreakButton0944,.overlayFieldActions0944{grid-area:auto!important}
+  .overlayFieldAlign0945 button{font-size:.53rem!important;padding-inline:2px!important}
+}
+@media(max-width:370px){
+  .overlayActiveField0944{grid-template-columns:15px minmax(38px,1fr) 64px 25px 70px!important;gap:3px!important;padding-inline:4px!important}
+  .overlayFieldAlign0945 button{font-size:.49rem!important}
+  .overlayFieldActions0944{grid-template-columns:repeat(3,22px)!important;gap:2px!important}
+  .overlayFieldActions0944 button{width:22px!important;min-width:22px!important}
+  .overlayBreakButton0944{width:25px!important;min-width:25px!important}
 }

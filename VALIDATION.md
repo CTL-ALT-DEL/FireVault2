@@ -1,12 +1,9 @@
-# Validation — Build 0.94.4
+# FireVault 0.94.5 validation
 
-- JavaScript module syntax checked with Node.
-- Photo Overlay field parsing and template reconstruction checked.
-- One-tap add, remove, reorder, and line-break controls wired.
-- Photo Overlay changes auto-save without unsaved-change confirmation.
-- Existing overlay templates migrate into ordered fields without changing the storage key.
-- Service-worker cache references match Build 0.94.4.
-- JSON files parse successfully.
+- JavaScript syntax checked.
+- Per-field alignment is stored in the existing Photo Overlay settings object.
+- Legacy templates migrate to flush-left fields automatically.
+- Preview and exported photos use the same left/right renderer.
+- Technician + Phone quick action adds both fields on one flush-right line.
+- Existing storage key and customer data remain unchanged.
 - ZIP archive integrity checked.
-
-Physical iPhone testing is still recommended for touch scrolling and the absence of the prior keyboard/confirmation interruption.

@@ -1,4 +1,4 @@
-# FireVault 0.94.4 Design System
+# FireVault 0.94.5 Design System
 
 `src/design-system.css` is the canonical release-facing visual layer.
 
@@ -47,6 +47,6 @@
 - A compact floating Back control replaces the removed header navigation.
 - Field chips insert at the last stored textarea selection and immediately update the canvas.
 
-## Build 0.94.4 Photo Overlay field builder
+## Build 0.94.5 Photo Overlay field builder
 
 Photo Overlay data fields use a button-first ordered list. The editor auto-saves, avoids raw-template keyboard editing, and supports drag plus explicit move controls for touch accessibility.

@@ -1,6 +1,3 @@
-# Clean Install — Build 0.94.4
+# Clean install
 
-1. Replace the deployed FireVault files with this build.
-2. Open FireVault online once so the service worker caches Build 0.94.4.
-3. If the prior build remains visible, use Settings → App Updates → Repair App Files, then reopen FireVault.
-4. Confirm Settings → Photo Overlays shows the new field builder and live preview.
+Deploy all Build 0.94.5 files together. Existing FireVault records and the `firevault_vault_build_030` storage key remain compatible. Refresh the installed PWA after deployment so the new service worker activates.
