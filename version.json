@@ -1,8 +1,8 @@
 {
-  "build": "0.91.1",
+  "build": "0.92.0",
   "released": "2026-07-14",
-  "note": "Settings shortcut repair: equal-width Location, Backup, and Demo Mode controls with responsive iPhone and iPad alignment.",
-  "label": "Settings Shortcut Repair",
-  "version": "0.91.1",
-  "name": "Settings Shortcut Repair"
+  "note": "Canonical visual system: unified global chrome, Account Directory, Account Detail, Settings, Nearby, forms, cards, controls, and responsive iPhone/iPad layouts.",
+  "label": "Unified Design System",
+  "version": "0.92.0",
+  "name": "Unified Design System"
 }

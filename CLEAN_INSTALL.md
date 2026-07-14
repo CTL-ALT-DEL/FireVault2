@@ -1,11 +1,10 @@
-# Clean Install — Build 0.91.1
+# Clean Install — Build 0.92.0
 
-1. Back up FireVault before replacing the published files.
-2. Replace the previously published FireVault files with this complete package.
-3. Commit and publish the full folder.
-4. Open FireVault online once so the updated service worker installs.
-5. Reload the installed Home Screen app.
-6. Open Settings and confirm Location, Backup, and Demo Mode appear as three equal-width buttons above the settings list.
-7. Test each button on iPhone and iPad to confirm it opens the correct Settings detail page.
+1. Back up FireVault from Settings before replacing hosted files.
+2. Replace the deployed application files with the contents of this ZIP.
+3. Confirm that `src/design-system.css` is uploaded with the other source files.
+4. Open FireVault while online once so the new service worker can cache Build 0.92.0.
+5. Tap **Update Now** if FireVault displays an update banner.
+6. If the old appearance remains, close the installed app completely and reopen it. Use the built-in Repair App Files option only if the cached build does not update.
 
-The main storage key remains `firevault_vault_build_030`. Existing accounts, photos, documents, backups, and settings are preserved.
+Existing account data and IndexedDB media are not removed by this update.
