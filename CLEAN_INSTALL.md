@@ -1,9 +1,12 @@
-# Clean Install — Build 0.90.0
+# Clean Install — Build 0.91.0
 
-1. Replace the previously published FireVault files with this package.
-2. Commit and publish the complete folder.
-3. Open FireVault online once so the new service worker installs.
-4. Reload the installed Home Screen app.
-5. Confirm Nearby, Search, Settings, Account Detail, Site Notes, photos, WebDAV, Demo Mode, and backup.
+1. Back up FireVault before replacing the published files.
+2. Replace the previously published FireVault files with this complete package, including `src/media-store.js`.
+3. Commit and publish the full folder.
+4. Open FireVault online once so the new service worker installs.
+5. Reload the installed Home Screen app.
+6. Allow the first launch to finish migrating existing photos and legacy scanned pages.
+7. Open Settings → Data & Backup → File Storage and verify the Media Storage Health card.
+8. Confirm existing account photos, Building Navigator linked photos, old scanned PDFs, manual backup, and WebDAV backup.
 
-The storage key remains unchanged. Existing accounts and legacy scan records are preserved.
+The main storage key remains `firevault_vault_build_030`. Do not clear Safari website data during migration.

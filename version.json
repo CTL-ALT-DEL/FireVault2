@@ -1,8 +1,8 @@
 {
-  "build": "0.90.0",
-  "released": "2026-07-14",
-  "note": "Core cleanup: faster startup, retired feature removal, iPad orientation repair, Account terminology, safer release errors, and legacy data archiving.",
-  "label": "Core Cleanup",
-  "version": "0.90.0",
-  "name": "Core Cleanup"
+  "build": "0.91.0",
+  "released": "2026-07-13",
+  "note": "Media storage reliability: IndexedDB photos and scanned pages, storage health, complete-media backups, and safe legacy migration.",
+  "label": "Media Storage Reliability",
+  "version": "0.91.0",
+  "name": "Media Storage Reliability"
 }

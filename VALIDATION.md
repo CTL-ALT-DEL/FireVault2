@@ -1,22 +1,26 @@
-# Validation — Build 0.90.0
+# Validation — Build 0.91.0
 
 Validated during packaging:
-- JavaScript syntax for all application modules and service worker
-- JSON, manifest, and HTML structure
-- CSS parsing and required asset references
-- Build/version references
-- Service-worker shell references
+- JavaScript syntax for `app.js`, `storage.js`, `media-store.js`, providers, and the service worker
+- JSON structure for manifest and version metadata
+- Service-worker shell includes the new IndexedDB media module
 - Existing `firevault_vault_build_030` storage key preserved
-- Retired scanner capture, Daily Route, service-timer, Tools, diagnostics, and Data Tools implementations removed
-- Historical route records migrated into a protected legacy archive
-- Existing scanned documents remain readable and exportable as PDFs
-- No global orientation lock; iPad portrait, landscape, and Split View remain available
-- Startup delay reduced from five seconds to approximately 450 ms minimum
-- Friendly release error recovery stores technical details privately
-- ZIP archive integrity
+- Legacy inline `imageData`, `photoData`, and scanned-page payloads receive stable media references
+- Media payloads are retained in localStorage until the IndexedDB write succeeds, then compacted safely
+- Subsequent synchronous vault reloads hydrate media from the runtime cache
+- Manual and WebDAV exports restore complete media into the backup copy
+- New account photos are staged to IndexedDB before the record save completes
+- Storage Health UI includes media count, payload size, quota estimate, persistence state, and orphan cleanup
+- Automatic snapshots remain metadata-focused to avoid duplicating large photos in localStorage
+- Existing Account, Nearby, Building Navigator, Demo Mode, WebDAV, Photo Overlay, and three-button navigation code retained
+- ZIP archive integrity and required-file inventory
 
-Source cleanup compared with Build 0.89.0:
-- `app.js`: 10,492 lines → 8,888 lines
-- `styles.css`: 20,015 lines → 19,530 lines
+Automated Chromium rendering could not complete in the container environment. Physical iPhone and iPad testing remains required for first-run media migration, Safari storage persistence, photo preview, old scan PDF export, WebDAV transfer size, and installed-PWA updates.
 
-Automated browser startup could not run because the execution environment blocks local-address navigation. Physical iPhone/iPad testing remains required for GPS, map behavior, keyboard movement, WebDAV, rotation, Split View, and installed-PWA updates.
+Additional automated module tests passed with an in-memory IndexedDB implementation:
+- Two legacy payloads migrated and compacted
+- Photo and scanned-page hydration after metadata reload
+- Complete-media export reconstruction
+- Media count and byte summary
+- Orphan detection and removal
+- `saveData()` localStorage compaction followed by synchronous runtime-cache hydration

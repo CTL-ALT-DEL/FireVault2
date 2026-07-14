@@ -1,4 +1,5 @@
-export const BUILD = "0.90.0";
+import { stageVaultMedia, stripPersistedMediaForStorage, hydrateVaultMediaFromCache } from "./media-store.js?v=0.91.0";
+export const BUILD = "0.91.0";
 export const SECURITY_SCHEMA_VERSION = 4;
 export const KEY = "firevault_vault_build_030";
 export const DEVICE_KEY = "firevault_device_identity_062";
@@ -179,7 +180,8 @@ function createAutoBackupSnapshot(value,reason="automatic"){
   if(latest && !["before-restore","restored"].includes(reason) && now-Number(latest.timestamp||0)<AUTO_BACKUP_MIN_INTERVAL && Number(latest.siteCount||0)===vaultCount(value)) return latest;
   const stamp=new Date(now).toISOString();
   const key=`${AUTO_BACKUP_PREFIX}${now}`;
-  const payload={format:"firevault-auto-backup",formatVersion:1,build:BUILD,createdAt:stamp,reason,siteCount:vaultCount(value),data:value};
+  const snapshotValue=stripPersistedMediaForStorage(value);
+  const payload={format:"firevault-auto-backup",formatVersion:2,build:BUILD,createdAt:stamp,reason,siteCount:vaultCount(snapshotValue),mediaBackend:"indexeddb",data:snapshotValue};
   try{
     localStorage.setItem(key,JSON.stringify(payload));
     index=[{key,timestamp:now,createdAt:stamp,reason,siteCount:payload.siteCount,build:BUILD},...index.filter(x=>x.key!==key)];
@@ -356,9 +358,16 @@ function queueChange0790(data,operation,row,details={}){
   });
   data.syncState.changeQueue=data.syncState.changeQueue.slice(0,SECURITY_CHANGE_QUEUE_LIMIT_0790);
 }
+function removeMediaPayloads0910(value){
+  if(Array.isArray(value)){value.forEach(removeMediaPayloads0910);return value;}
+  if(!value||typeof value!=="object")return value;
+  delete value.imageData;delete value.photoData;
+  Object.values(value).forEach(removeMediaPayloads0910);
+  return value;
+}
 function auditComparable0790(record){
   if(!record||typeof record!=="object") return "";
-  const clone=JSON.parse(JSON.stringify(record));
+  const clone=removeMediaPayloads0910(JSON.parse(JSON.stringify(record)));
   ["sync","createdAt","modifiedAt","createdBy","modifiedBy","createdByUserId","modifiedByUserId","recordVersion","changeId","workspaceId","deletedAt","deletedBy","deletedByUserId"].forEach(k=>delete clone[k]);
   CHILD_ARRAYS.forEach(k=>delete clone[k]);
   return JSON.stringify(clone);
@@ -651,7 +660,7 @@ export function createSyncPackage(data){
 }
 function contentKey(record){
   if(!record || typeof record!=="object") return "";
-  const clone=JSON.parse(JSON.stringify(record));
+  const clone=removeMediaPayloads0910(JSON.parse(JSON.stringify(record)));
   delete clone.sync; delete clone.modifiedAt; delete clone.modifiedBy; delete clone.recordVersion;
   CHILD_ARRAYS.forEach(k=>delete clone[k]);
   return JSON.stringify(clone);
@@ -765,6 +774,7 @@ export function loadData(){
     const sourceSchema=Number(best.value?.securityFoundation?.schemaVersion||best.value?.syncState?.schemaVersion||0);
     if(sourceSchema<SECURITY_SCHEMA_VERSION) createAutoBackupSnapshot(best.value,"before-security-migration");
     const loaded=normalize(best.value);
+    hydrateVaultMediaFromCache(loaded);
     if(sourceSchema<SECURITY_SCHEMA_VERSION){
       loaded.securityFoundation.migratedAt=nowIso();
       loaded.securityFoundation.lastValidatedAt=nowIso();
@@ -784,7 +794,9 @@ export function loadData(){
     }else createAutoBackupSnapshot(loaded,"startup");
     return loaded;
   }
-  return normalize({sites:[], resources:[], breadcrumbs:[]});
+  const empty=normalize({sites:[], resources:[], breadcrumbs:[]});
+  hydrateVaultMediaFromCache(empty);
+  return empty;
 }
 export function saveData(data){
   if(isDemoMode()){
@@ -824,7 +836,9 @@ export function saveData(data){
   data.securityFoundation.device.lastSeenAt=nowIso();
   data.securityFoundation.lastValidatedAt=nowIso();
   data.syncState={...(data.syncState||{}),schemaVersion:SECURITY_SCHEMA_VERSION,deviceId:deviceIdentity(),provider:data.settings?.sync?.provider||"onedrive",lastLocalSave:nowIso(),lastSuccessfulSync:data.syncState?.lastSuccessfulSync||""};
-  const serialized=JSON.stringify(data);
+  const mediaWrite=stageVaultMedia(data);
+  const storageSafe=stripPersistedMediaForStorage(data);
+  const serialized=JSON.stringify(storageSafe);
   try{
     localStorage.setItem(KEY,serialized);
   }catch(err){
@@ -833,7 +847,18 @@ export function saveData(data){
     writeAutoBackupIndex([]);
     localStorage.setItem(KEY,serialized);
   }
-  createAutoBackupSnapshot(data,"automatic");
+  createAutoBackupSnapshot(storageSafe,"automatic");
+  mediaWrite.then(()=>{
+    // Compact any inline payloads that were retained for crash safety until
+    // their IndexedDB write completed. This metadata-only rewrite does not
+    // create another audit event or automatic snapshot.
+    try{
+      const current=JSON.parse(localStorage.getItem(KEY)||"null");
+      if(current&&Array.isArray(current.sites)) localStorage.setItem(KEY,JSON.stringify(stripPersistedMediaForStorage(current)));
+      const recovery=JSON.parse(localStorage.getItem(RECOVERY_KEY)||"null");
+      if(recovery&&Array.isArray(recovery.sites)) localStorage.setItem(RECOVERY_KEY,JSON.stringify(stripPersistedMediaForStorage(recovery)));
+    }catch(err){console.warn("FireVault media compaction will retry on the next save.",err);}
+  }).catch(err=>console.error("FireVault media could not be moved to IndexedDB.",err));
 }
 export function normalize(data){
   data.sites = Array.isArray(data.sites) ? data.sites : [];
@@ -946,6 +971,7 @@ export function normalize(data){
   });
   data.sites.forEach(site=>migrateRecordTree(site,data,null));
   data.resources.forEach(item=>migrateRecordTree(item,data,null));
+  hydrateVaultMediaFromCache(data);
   return data;
 }
 export function ensureSite(s){

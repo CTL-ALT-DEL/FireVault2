@@ -1,14 +1,14 @@
-# FireVault Build 0.90.0
+# FireVault Build 0.91.0
 
-Core cleanup release preparing FireVault for release-candidate testing.
+Media-storage reliability release built from the 0.90.0 core-cleanup baseline.
 
 ## Included
-- Faster cached startup with no forced five-second delay
-- Retired scanner capture and service-visit timers removed
-- Existing scanned documents remain readable and exportable
-- Global iPad portrait lock removed
-- Account terminology applied to manifest shortcuts and key screens
-- Release-safe error recovery without exposing source-code details
-- Retired route/theme/advanced state archived without deleting customer records
+- Account photos and legacy scanned-page images are moved from the main localStorage vault into IndexedDB.
+- Existing inline Base64 photos migrate automatically without changing account IDs or the FireVault storage key.
+- Runtime media cache keeps photos available after normal account and Settings saves.
+- Manual backup, Shared Vault package export, and WebDAV backup include complete photo and scanned-page payloads.
+- Settings → Data & Backup → File Storage now includes media size, device quota, persistent-storage status, and orphan cleanup.
+- New photos are written to IndexedDB before the account record is finalized.
+- Automatic local snapshots remain lightweight metadata snapshots that reference the on-device media store.
 
-Open `index.html` through HTTPS or deploy the folder to GitHub Pages.
+Open `index.html` through HTTPS or deploy the complete folder to GitHub Pages.
