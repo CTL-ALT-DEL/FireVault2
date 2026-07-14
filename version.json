@@ -1,8 +1,8 @@
 {
-  "build": "0.94.2",
+  "build": "0.94.3",
   "released": "2026-07-14",
-  "note": "Keep the Photo Overlay example visible while controls scroll and remove the visible sample-photo attribution line.",
-  "label": "Photo Overlay Live Preview",
-  "version": "0.94.2",
-  "name": "Photo Overlay Live Preview"
+  "note": "Enlarge the Photo Overlay live preview, remove the bulky detail header, and repair overlay field insertion and text fitting.",
+  "label": "Photo Overlay Editing Repair",
+  "version": "0.94.3",
+  "name": "Photo Overlay Editing Repair"
 }

@@ -1,10 +1,7 @@
-# Clean Install — Build 0.94.2
+# Clean Install — Build 0.94.3
 
-1. Export a FireVault backup before replacing application files.
-2. Replace the previous GitHub Pages files with the contents of this package.
-3. Open FireVault while online once so the service worker can cache Build 0.94.2.
-4. When the update banner appears, choose **Update Now**.
-5. Open **Settings → Photo Overlays** and confirm the Field Photo preview remains visible while the controls scroll beneath or beside it.
-6. Change overlay position, text size, opacity, or colors and confirm the preview updates without scrolling back to the top.
-
-The existing `firevault_vault_build_030` customer vault and IndexedDB media store are preserved.
+1. Export a FireVault backup before replacing files.
+2. Replace the published application files with this package.
+3. Open FireVault online once so the service worker can cache Build 0.94.3.
+4. Reload or reopen the installed Home Screen app if the previous build remains visible.
+5. Verify Photo Overlay field insertion, live preview, Save, and Back behavior on the device.
