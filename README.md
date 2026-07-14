@@ -1,9 +1,11 @@
-# FireVault Build 0.87.10
+# FireVault Build 0.87.11
 
-Account Directory card-action alignment release.
+WebDAV Settings restoration release.
 
-- Moves the action row across the full horizontal width of every account card
-- Uses four equal-width action buttons
-- Sets the requested order: Call, Route, Add Note, Favorite
-- Preserves button icons, disabled states, favorite state, card depth, fluid scrolling, and iPad layouts
+- Restores **WebDAV Backup** to **Settings → Data & Backup**
+- Restores WebDAV to Settings search
+- Supports searches for WebDAV, remote backup, server, upload, and restore
+- Preserves the existing WebDAV server URL, username, remote folder, backup filename, status, and history
+- Keeps the app password session-only for safety
+- Restores Test Connection, Upload Backup, and Restore from Server controls
 - Preserves existing account records and the FireVault storage key
