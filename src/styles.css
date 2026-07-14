@@ -19691,3 +19691,325 @@ body.fv-route-sites #appNav{
   .settingsConcept1Body0873{width:min(900px,100%)!important;padding-left:22px!important;padding-right:22px!important}.settingsStickyHead0880{margin-left:-22px;margin-right:-22px;padding-left:22px;padding-right:22px}.settingsGroupsGrid0880{grid-template-columns:repeat(2,minmax(0,1fr));column-gap:16px;align-items:start}.settingsListGroup0873{break-inside:avoid}.settingsStatusRail0880{gap:12px}.settingsStatusCard0880{min-height:84px}.settingsListRow0873,.settingsSearchResult0874{min-height:80px!important}
 }
 @media(prefers-reduced-motion:reduce){.settingsListRow0873,.settingsSearchResult0874,.settingsStatusCard0880{transition:none!important}}
+
+/* Build 0.89.0 — Photo Overlay Studio redesign */
+.overlayStudio0890{
+  display:grid;
+  gap:14px;
+  width:min(100%,980px);
+  margin:0 auto;
+}
+.overlayStudioHero0890{
+  display:grid;
+  grid-template-columns:minmax(0,1.15fr) minmax(270px,.85fr);
+  gap:14px;
+  align-items:start;
+}
+.overlayPreviewCard0890,
+.overlayQuickCard0890,
+.overlaySection0890{
+  position:relative;
+  overflow:hidden;
+  border:1px solid rgba(148,163,184,.17);
+  border-radius:22px;
+  background:
+    radial-gradient(circle at 12% 0%,rgba(59,130,246,.10),transparent 38%),
+    linear-gradient(165deg,#182233 0%,#111925 52%,#0c121b 100%);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.07),0 18px 40px rgba(0,0,0,.28);
+  padding:14px;
+}
+.overlayQuickCard0890{
+  background:
+    radial-gradient(circle at 86% 0%,rgba(239,68,68,.13),transparent 36%),
+    linear-gradient(165deg,#1b202b,#10161f 68%,#0b1017);
+}
+.overlaySection0890{
+  padding:16px;
+}
+.overlayCardHead0890{
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:12px;
+  margin-bottom:12px;
+}
+.overlayCardHead0890 span{
+  display:block;
+  margin-bottom:3px;
+  color:#f87171;
+  font-size:10px;
+  font-weight:950;
+  letter-spacing:.12em;
+}
+.overlayCardHead0890 h2{
+  margin:0;
+  color:#f8fafc;
+  font-size:18px;
+  line-height:1.1;
+}
+.overlayCardHead0890>b{
+  align-self:center;
+  color:#94a3b8;
+  font-size:10px;
+  font-weight:850;
+  text-align:right;
+}
+.overlayPreviewFrame0890{
+  position:relative;
+  width:min(100%,360px);
+  margin:0 auto;
+  aspect-ratio:3/2;
+  overflow:hidden;
+  border-radius:17px;
+  border:1px solid rgba(255,255,255,.14);
+  background:#05070a;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.08),0 14px 28px rgba(0,0,0,.3);
+}
+.overlayPreviewFrame0890 canvas{
+  display:block;
+  width:100%;
+  height:100%;
+  object-fit:cover;
+}
+.overlayPreviewFrame0890>div{
+  position:absolute;
+  inset:0;
+  display:grid;
+  place-items:center;
+  color:#cbd5e1;
+  font-size:12px;
+  font-weight:850;
+  background:rgba(3,7,12,.62);
+  backdrop-filter:blur(5px);
+}
+.overlayPreviewFrame0890>div[hidden]{display:none}
+.overlaySampleCaption0890{
+  display:grid;
+  gap:3px;
+  margin-top:10px;
+  padding:0 2px;
+}
+.overlaySampleCaption0890 strong{
+  color:#e2e8f0;
+  font-size:11px;
+  line-height:1.3;
+}
+.overlaySampleCaption0890 small{
+  color:#8492a6;
+  font-size:9.5px;
+  line-height:1.3;
+}
+.overlaySampleCaption0890 a{color:#93c5fd;text-decoration:none}
+.overlayPresetGrid0890{
+  display:grid;
+  gap:8px;
+}
+.overlayPresetGrid0890 button{
+  position:relative;
+  min-height:68px;
+  display:grid;
+  grid-template-columns:40px minmax(0,1fr);
+  grid-template-rows:auto auto;
+  column-gap:10px;
+  align-items:center;
+  padding:10px 12px;
+  border:1px solid rgba(148,163,184,.16);
+  border-radius:16px;
+  color:#e5edf8;
+  background:linear-gradient(180deg,rgba(255,255,255,.055),rgba(255,255,255,.025));
+  text-align:left;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.05);
+}
+.overlayPresetGrid0890 button>span{
+  grid-row:1/3;
+  width:40px;
+  height:40px;
+  display:grid;
+  place-items:center;
+  border-radius:13px;
+  color:#f87171;
+  background:rgba(239,68,68,.1);
+  font-size:23px;
+}
+.overlayPresetGrid0890 button strong{font-size:13px;line-height:1.05}
+.overlayPresetGrid0890 button small{color:#94a3b8;font-size:10px;line-height:1.15}
+.overlayPresetGrid0890 button em{
+  position:absolute;
+  right:9px;
+  top:8px;
+  color:#fecaca;
+  font-size:8px;
+  font-style:normal;
+  font-weight:950;
+  letter-spacing:.06em;
+  text-transform:uppercase;
+}
+.overlayPresetGrid0890 button.active,
+.overlayPresetGrid0890 button:active{
+  border-color:rgba(248,113,113,.68);
+  background:linear-gradient(180deg,rgba(239,68,68,.16),rgba(239,68,68,.07));
+  transform:translateY(1px);
+}
+.overlayQuickToggles0890{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:8px;
+  margin-top:11px;
+}
+.overlayQuickToggles0890 .checkRow{
+  min-height:48px;
+  margin:0!important;
+  border:1px solid rgba(148,163,184,.14);
+  border-radius:14px;
+  background:rgba(255,255,255,.035);
+}
+.overlayTemplateField0890{
+  display:grid;
+  gap:7px;
+}
+.overlayTemplateField0890>span,
+.overlayControlBlock0890>label{
+  color:#dbe6f4;
+  font-size:11px;
+  font-weight:900;
+}
+.overlayTemplateField0890>small{
+  color:#7f8ca0;
+  font-size:10px;
+}
+.overlayTemplate510{
+  min-height:100px!important;
+  resize:vertical;
+  border-radius:15px!important;
+  background:rgba(2,6,12,.54)!important;
+}
+.overlayFieldGrid510{
+  display:flex!important;
+  flex-wrap:wrap;
+  gap:7px!important;
+  margin-top:11px;
+}
+.overlayFieldChip510{
+  min-height:38px!important;
+  width:auto!important;
+  display:flex!important;
+  align-items:center!important;
+  gap:7px!important;
+  padding:8px 10px!important;
+  border-radius:999px!important;
+  text-align:left!important;
+  background:linear-gradient(180deg,#202a39,#141c27)!important;
+  border:1px solid rgba(148,163,184,.18)!important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.05)!important;
+}
+.overlayFieldChip510 span{
+  color:#f8fafc!important;
+  font-size:10.5px!important;
+  font-weight:900!important;
+}
+.overlayFieldChip510 strong{
+  color:#93c5fd!important;
+  font-size:9px!important;
+  font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace!important;
+}
+.overlayFieldChip510 small{display:none!important}
+.overlayLayout0890{
+  display:grid;
+  gap:14px;
+}
+.overlayControlBlock0890{
+  display:grid;
+  gap:7px;
+}
+.overlayChoiceGrid0890{
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:7px;
+}
+.overlayChoice0890{
+  min-height:58px;
+  display:grid;
+  place-items:center;
+  gap:3px;
+  padding:7px;
+  border:1px solid rgba(148,163,184,.15);
+  border-radius:14px;
+  color:#dbe6f4;
+  background:linear-gradient(180deg,rgba(255,255,255,.05),rgba(255,255,255,.018));
+}
+.overlayChoice0890 span{color:#f87171;font-size:20px;line-height:1}
+.overlayChoice0890 strong{font-size:10px;line-height:1.1;text-align:center}
+.overlayChoice0890.active{
+  border-color:rgba(248,113,113,.72);
+  background:linear-gradient(180deg,rgba(239,68,68,.18),rgba(239,68,68,.07));
+  box-shadow:0 0 0 1px rgba(239,68,68,.12),inset 0 1px 0 rgba(255,255,255,.08);
+}
+.overlayChoiceGrid0890 [data-overlay-control="ovSize"]:nth-of-type(1) span{font-size:14px}
+.overlayChoiceGrid0890 [data-overlay-control="ovSize"]:nth-of-type(2) span{font-size:19px}
+.overlayChoiceGrid0890 [data-overlay-control="ovSize"]:nth-of-type(3) span{font-size:24px}
+.overlayRange0890{
+  display:grid;
+  gap:7px;
+  padding:11px 12px;
+  border-radius:15px;
+  border:1px solid rgba(148,163,184,.14);
+  background:rgba(255,255,255,.03);
+}
+.overlayRange0890>span{display:flex;justify-content:space-between;gap:10px;color:#dbe6f4;font-size:11px}
+.overlayRange0890 em{color:#fca5a5;font-style:normal;font-weight:950}
+.overlayRange0890 input{padding:0!important;min-height:26px!important}
+.overlayColorGrid0890{
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:9px;
+  margin-bottom:12px;
+}
+.overlayColorGrid0890 .fieldBlock,
+.overlayColorGrid0890>div{
+  min-width:0;
+}
+.overlayColorGrid0890 input[type="color"]{
+  width:100%;
+  min-height:48px;
+  padding:5px;
+  border-radius:13px;
+}
+.overlayColorGrid0890 select{min-height:48px}
+.overlayBrand0890 .overlayLogoCard511{
+  margin-top:2px;
+  background:linear-gradient(180deg,rgba(255,255,255,.045),rgba(255,255,255,.018));
+}
+.settingsDetailScreen488.settingsStable573.settingsTab-overlay .settingsDetailBody0736{
+  padding-bottom:calc(108px + env(safe-area-inset-bottom));
+}
+@media(max-width:760px){
+  .overlayStudioHero0890{grid-template-columns:1fr}
+  .overlayQuickCard0890{order:2}
+  .overlayPreviewFrame0890{width:min(100%,320px)}
+  .overlayColorGrid0890{grid-template-columns:1fr 1fr}
+  .overlayColorGrid0890>div:last-child{grid-column:1/-1}
+}
+@media(max-width:430px){
+  .overlayPreviewCard0890,.overlayQuickCard0890,.overlaySection0890{border-radius:18px;padding:12px}
+  .overlayCardHead0890 h2{font-size:16px}
+  .overlayQuickToggles0890{grid-template-columns:1fr 1fr!important}
+  .overlayFieldGrid510{display:flex!important;grid-template-columns:none!important}
+  .overlayFieldChip510{min-height:36px!important;padding:7px 9px!important}
+  .overlayChoice0890{min-height:54px}
+  .overlayPreviewFrame0890{width:min(100%,300px)}
+  .overlaySampleCaption0890 strong{font-size:10px}
+}
+@media(min-width:900px){
+  .overlayStudio0890{grid-template-columns:minmax(0,1.08fr) minmax(300px,.92fr)}
+  .overlayStudioHero0890{grid-column:1/-1}
+  .overlayContent0890{grid-column:1}
+  .overlayLayout0890{grid-column:2}
+  .overlayBrand0890{grid-column:1/-1}
+  .overlayPreviewFrame0890{width:min(100%,400px)}
+}
+
+/* Build 0.89.0 — exact in-account overlay preview */
+.docPhotoOverlayCanvasScene0890{height:auto;min-height:180px;max-height:none;aspect-ratio:auto}
+.docPhotoOverlayCanvasScene0890 canvas{display:block;width:100%;height:auto;object-fit:contain;background:#020617}
+.docPhotoOverlayCanvasScene0890>div{position:absolute;inset:0;display:grid;place-items:center;color:#dbe6f4;font-size:12px;font-weight:900;background:rgba(2,6,12,.58);backdrop-filter:blur(4px);z-index:3}
+.docPhotoOverlayCanvasScene0890>div[hidden]{display:none}

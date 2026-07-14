@@ -1,6 +1,6 @@
-import { BUILD, KEY, ACTIVE_JOB_KEY, loadData, saveData, ensureSite, fullAddress, esc, uid, downloadBlob, syncSummary, syncQueue, syncConflicts, syncActivity, createSyncPackage, importSyncPackage, resolveSyncConflict, notePackageExport, deviceIdentity, recordSyncActivity, autoBackupInfo, latestAutoBackup, restoreAutoBackup, isDemoMode, setDemoMode, resetDemoData, securityFoundationSummary, securityAudit, recycleBinInfo, restoreRecycleRecord, purgeRecycleBin, recordSecurityEvent, validateVaultIntegrity } from "./storage.js?v=0.88.0";
-import { backendAdapterSummary, runBackendAdapterDiagnostics, backendAdapterManifest, PROVIDER_CONTRACT_VERSION, FILE_STORAGE_CATALOG, fileStoragePlanSummary, cloudFileStorageManifest, MICROSOFT_STORAGE_TYPES, microsoftStorageAccounts, saveMicrosoftStorageAccounts, createMicrosoftStorageAccount, microsoftStorageAccountById, microsoftAppRegistration, saveMicrosoftAppRegistration, microsoftStorageSummary, microsoftStorageManifest } from "./providers.js?v=0.88.0";
-import { encodePlusCode, isValidFullPlusCode, normalizePlusCode, plusCodePrecisionLabel } from "./open-location-code.js?v=0.88.0";
+import { BUILD, KEY, ACTIVE_JOB_KEY, loadData, saveData, ensureSite, fullAddress, esc, uid, downloadBlob, syncSummary, syncQueue, syncConflicts, syncActivity, createSyncPackage, importSyncPackage, resolveSyncConflict, notePackageExport, deviceIdentity, recordSyncActivity, autoBackupInfo, latestAutoBackup, restoreAutoBackup, isDemoMode, setDemoMode, resetDemoData, securityFoundationSummary, securityAudit, recycleBinInfo, restoreRecycleRecord, purgeRecycleBin, recordSecurityEvent, validateVaultIntegrity } from "./storage.js?v=0.89.0";
+import { backendAdapterSummary, runBackendAdapterDiagnostics, backendAdapterManifest, PROVIDER_CONTRACT_VERSION, FILE_STORAGE_CATALOG, fileStoragePlanSummary, cloudFileStorageManifest, MICROSOFT_STORAGE_TYPES, microsoftStorageAccounts, saveMicrosoftStorageAccounts, createMicrosoftStorageAccount, microsoftStorageAccountById, microsoftAppRegistration, saveMicrosoftAppRegistration, microsoftStorageSummary, microsoftStorageManifest } from "./providers.js?v=0.89.0";
+import { encodePlusCode, isValidFullPlusCode, normalizePlusCode, plusCodePrecisionLabel } from "./open-location-code.js?v=0.89.0";
 window.__FIREVAULT_MODULE_READY = true;
 
 function fvPreferenceStore0739(){
@@ -243,6 +243,8 @@ const HOME_CARD_STATE_KEY_5100 = "firevault_home_card_state_05100";
 let homeCardState5100 = loadHomeCardState5100();
 let lastEmailTemplateField = "emailSubject";
 let overlayLogoDraftDataUrl = "";
+let overlayPreviewRenderToken0890 = 0;
+let overlayPreviewTimer0890 = 0;
 let docPhotoDraftDataUrl512 = "";
 let docPhotoDraftName512 = "";
 let docPhotoClearRequested512 = false;
@@ -319,18 +321,21 @@ const EMAIL_TAGS = [
 ];
 const OVERLAY_TAGS_510 = [
   ["{site_name}","Site Name","Customer / site record name"],
+  ["{account_id}","Account ID","Imported or assigned account identifier"],
+  ["{category}","Category","Basic, CLSS, AlarmNet, or IPDACT"],
   ["{address}","Address","Full site address"],
-  ["{city}","City","Site city"],
-  ["{state}","State","Site state"],
-  ["{zip}","ZIP","Site ZIP code"],
+  ["{panel}","Panel","Panel manufacturer and model"],
   ["{date}","Date","Current date"],
   ["{time}","Time","Current time"],
   ["{technician}","Technician","Technician profile name"],
   ["{company}","Company","Technician profile company"],
+  ["{city}","City","Site city"],
+  ["{state}","State","Site state"],
+  ["{zip}","ZIP","Site ZIP code"],
   ["{phone}","Phone","Technician profile phone"],
   ["{email}","Email","Technician profile email"],
   ["{license}","License","Technician license / ID"],
-  ["{gps}","GPS","Sample saved GPS coordinates"],
+  ["{gps}","GPS","Saved GPS coordinates"],
   ["{build}","Build","Current FireVault build number"]
 ];
 const PHOTO_CATEGORIES_524 = ["Panel","NAC","Device","Communicator","Battery","Deficiency","Before","After","Other"];
@@ -5163,25 +5168,29 @@ function docPhotoPreviewMarkup512(d={}){
 function docPhotoOverlayPreviewMarkup513(d={}){
   const src=docPhotoDraftDataUrl512 || d.imageData || "";
   if(!src) return `<div class="empty overlayEmpty513">No photo selected for overlay preview.</div>`;
-  const set=overlayCleanSetting510(data.settings.overlay||{});
-  const lines=esc(renderTemplate(set.template, site()||{}) || "FireVault Field Photo").replaceAll("\n","<br>");
-  const style=`--ovAccent:${esc(set.accentColor)};--ovText:${esc(set.textColor)};--ovAlpha:${Math.max(20,Math.min(100,Number(set.opacity)||85))/100}`;
-  const logoSrc=overlayLogoSrc510(set);
-  return `<div class="docOverlayCard513" style="${style}">
-    <div class="docOverlayHead513"><strong>Overlay Preview</strong><span>This is the stamp layout that will be used for Download With Overlay.</span></div>
-    <div class="docPhotoOverlayScene513">
-      <img src="${esc(src)}" alt="Photo with overlay preview">
-      <div class="photoStamp510 align-${esc(set.alignment)} size-${esc(set.fontSize)} style-${esc(set.backgroundStyle)}">
-        ${set.showLogo?`<div class="photoStampLogo510">${logoSrc?`<img src="${esc(logoSrc)}" alt="Overlay logo">`:`<span class="photoStampLogoPlaceholder511">Logo</span>`}</div>`:""}
-        <div class="photoStampText510"><div>${lines}</div>${set.showTagline?`<small>FireVault Field Photo Overlay</small>`:""}</div>
-      </div>
-    </div>
+  return `<div class="docOverlayCard513">
+    <div class="docOverlayHead513"><strong>Actual Overlay Preview</strong><span>Uses the same renderer as Download With Overlay.</span></div>
+    <div class="docPhotoOverlayScene513 docPhotoOverlayCanvasScene0890"><canvas id="docOverlayCanvas0890" width="900" height="600" aria-label="Exact photo overlay preview"></canvas><div id="docOverlayStatus0890">Rendering overlay…</div></div>
   </div>`;
 }
-function showDocOverlayPreview513(d={}){
+async function showDocOverlayPreview513(d={}){
   const holder=document.getElementById("docPhotoOverlayPreview513");
   if(!holder) return;
+  const source=docPhotoDraftDataUrl512 || d.imageData || "";
   holder.innerHTML=docPhotoOverlayPreviewMarkup513(d);
+  if(!source) return;
+  const canvas=document.getElementById("docOverlayCanvas0890");
+  const status=document.getElementById("docOverlayStatus0890");
+  if(!canvas) return;
+  try{
+    const composed=await renderOverlayComposite0890(source,overlayCleanSetting510(data.settings.overlay||{}),site()||{},1200);
+    if(!canvas.isConnected) return;
+    canvas.width=composed.width;canvas.height=composed.height;
+    canvas.getContext("2d").drawImage(composed,0,0);
+    if(status)status.hidden=true;
+  }catch(err){
+    if(status)status.textContent="Preview unavailable";
+  }
 }
 function clearDocOverlayPreview513(){
   const holder=document.getElementById("docPhotoOverlayPreview513");
@@ -5246,88 +5255,8 @@ async function downloadPhotoWithOverlay512(doc={}){
   if(!source){ toast("Choose or save a photo first."); return; }
   try{
     toast("Building overlay photo...");
-    const photo=await loadImage512(source);
-    const maxW=1800;
-    const scale=Math.min(1, maxW/(photo.naturalWidth||photo.width||maxW));
-    const w=Math.max(1,Math.round((photo.naturalWidth||photo.width)*scale));
-    const h=Math.max(1,Math.round((photo.naturalHeight||photo.height)*scale));
-    const canvas=document.createElement("canvas");
-    canvas.width=w; canvas.height=h;
-    const ctx=canvas.getContext("2d");
-    ctx.drawImage(photo,0,0,w,h);
     const set=overlayCleanSetting510(data.settings.overlay||{});
-    const accent=hexToRgb512(set.accentColor);
-    const alpha=Math.max(.2,Math.min(1,(Number(set.opacity)||85)/100));
-    const baseFont=set.fontSize==="large"?Math.round(w*0.032):set.fontSize==="small"?Math.round(w*0.022):Math.round(w*0.027);
-    const fontSize=Math.max(18,Math.min(54,baseFont));
-    const pad=Math.max(18,Math.round(w*0.018));
-    const logoSize=set.showLogo?Math.max(48,Math.min(100,Math.round(w*0.065))):0;
-    const rawLines=String(renderTemplate(set.template,s||{})||"FireVault Field Photo").split(/\n/);
-    ctx.font=`800 ${fontSize}px Arial, sans-serif`;
-    const textMax=set.backgroundStyle==="card"?Math.round(w*.68):w-(pad*5)-logoSize;
-    const lines=rawLines.flatMap(line=>wrapCanvasText512(ctx,line,textMax));
-    const tagline=set.showTagline ? "FireVault Field Photo Overlay" : "";
-    const lineHeight=Math.round(fontSize*1.24);
-    const tagHeight=tagline?Math.round(fontSize*.86):0;
-    const textH=(lines.length*lineHeight)+tagHeight;
-    let stampW=set.backgroundStyle==="card"?Math.min(w-pad*2,Math.max(Math.round(w*.42), Math.max(...lines.map(l=>ctx.measureText(l).width),0)+logoSize+pad*4)):w-pad*2;
-    let stampH=Math.max(logoSize+pad*1.4, textH+pad*1.7);
-    let x=pad;
-    let y=set.alignment==="top"?pad:set.alignment==="middle"?Math.round((h-stampH)/2):h-stampH-pad;
-    ctx.save();
-    if(set.backgroundStyle==="minimal"){
-      ctx.fillStyle=`rgba(0,0,0,${Math.min(.76,alpha)})`;
-      ctx.fillRect(x,y,stampW,stampH);
-      ctx.fillStyle=`rgba(${accent.r},${accent.g},${accent.b},.95)`;
-      ctx.fillRect(x,y,Math.max(8,Math.round(w*.006)),stampH);
-    }else{
-      roundRect512(ctx,x,y,stampW,stampH,Math.max(18,Math.round(w*.012)));
-      ctx.fillStyle=`rgba(0,0,0,${alpha})`;
-      ctx.fill();
-      ctx.strokeStyle=`rgba(${accent.r},${accent.g},${accent.b},.95)`;
-      ctx.lineWidth=Math.max(3,Math.round(w*.003));
-      ctx.stroke();
-      if(set.backgroundStyle==="bar"){
-        const grd=ctx.createLinearGradient(x,y,x+stampW,y);
-        grd.addColorStop(0,`rgba(0,0,0,${alpha})`);
-        grd.addColorStop(1,`rgba(${accent.r},${accent.g},${accent.b},${Math.min(.82,alpha*.72)})`);
-        roundRect512(ctx,x,y,stampW,stampH,Math.max(18,Math.round(w*.012)));
-        ctx.fillStyle=grd; ctx.fill();
-      }else{
-        ctx.fillStyle=`rgba(${accent.r},${accent.g},${accent.b},.95)`;
-        ctx.fillRect(x,y,Math.max(8,Math.round(w*.006)),stampH);
-      }
-    }
-    let tx=x+pad;
-    if(set.showLogo){
-      const logoSrc=overlayLogoSrc510(set);
-      if(logoSrc){
-        try{
-          const logo=await loadImage512(logoSrc);
-          const lx=x+pad, ly=y+(stampH-logoSize)/2;
-          ctx.save();
-          roundRect512(ctx,lx,ly,logoSize,logoSize,Math.round(logoSize*.22));
-          ctx.clip();
-          ctx.drawImage(logo,lx,ly,logoSize,logoSize);
-          ctx.restore();
-        }catch{}
-      }
-      tx+=logoSize+pad;
-    }
-    ctx.fillStyle=set.textColor||"#ffffff";
-    ctx.textBaseline="top";
-    ctx.font=`900 ${fontSize}px Arial, sans-serif`;
-    let ty=y+Math.max(pad*.75,(stampH-textH)/2);
-    lines.forEach(line=>{
-      ctx.fillText(line,tx,ty);
-      ty+=lineHeight;
-    });
-    if(tagline){
-      ctx.font=`800 ${Math.max(12,Math.round(fontSize*.62))}px Arial, sans-serif`;
-      ctx.fillStyle="rgba(255,255,255,.78)";
-      ctx.fillText(tagline,tx,ty+Math.round(fontSize*.1));
-    }
-    ctx.restore();
+    const canvas=await renderOverlayComposite0890(source,set,s||{},1800);
     canvas.toBlob(blob=>{
       if(!blob){ toast("Could not create overlay photo."); return; }
       const a=document.createElement("a");
@@ -5337,10 +5266,10 @@ async function downloadPhotoWithOverlay512(doc={}){
       setTimeout(()=>URL.revokeObjectURL(a.href),1500);
       if(doc && doc.id){ doc.imageStampedAt=new Date().toISOString(); save(); }
       toast("Overlay photo downloaded.");
-    },"image/jpeg",0.92);
+    },"image/jpeg",.92);
   }catch(err){
     console.error(err);
-    toast("Overlay photo failed.");
+    toast("Could not create overlay photo.");
   }
 }
 function wireDocPhotoControls512(d={}){
@@ -6700,6 +6629,9 @@ function renderTemplate(t,s={}){
   const gps=hasGps(s) ? `${Number(s.gps.lat).toFixed(6)}, ${Number(s.gps.lng).toFixed(6)}` : "No GPS saved";
   const tokens={
     "{site_name}":s.name||"",
+    "{account_id}":accountId069(s)||"",
+    "{category}":accountCategoryLabel0735(s)||"",
+    "{panel}":[s.panelManufacturer,s.panelModel].filter(Boolean).join(" ")||"No panel saved",
     "{address}":fullAddress(s),
     "{city}":s.city||"",
     "{state}":s.state||"",
@@ -8081,8 +8013,11 @@ function updateEmailPreview(){
 function overlayDefaultTemplate510(){ return "{site_name} • {date} • {time}\n{technician} • {company}"; }
 function overlaySampleSite510(){
   return {
-    name:"Acme Fire Panel",
-    street:"123 Main St",
+    name:"West Ridge Medical Plaza",
+    externalAccountId:"G7C0241",
+    panelManufacturer:"Notifier",
+    panelModel:"NFS2-3030",
+    street:"1550 E 2nd St",
     city:"Casper",
     state:"WY",
     zip:"82601",
@@ -8105,77 +8040,161 @@ function overlayCleanSetting510(o={}){
   };
 }
 function overlayTagButtons510(){
-  return OVERLAY_TAGS_510.map(([tag,label,note])=>`<button type="button" class="overlayFieldChip510" data-overlay-tag="${esc(tag)}"><strong>${esc(tag)}</strong><span>${esc(label)}</span><small>${esc(note)}</small></button>`).join("");
+  return OVERLAY_TAGS_510.map(([tag,label,note])=>`<button type="button" class="overlayFieldChip510" data-overlay-tag="${esc(tag)}" title="${esc(note)}"><span>${esc(label)}</span><strong>${esc(tag)}</strong></button>`).join("");
 }
 function overlayLogoSrc510(set){
   if(set.logoMode === "custom") return set.customLogoData || "";
   return `assets/firevault-logo-master.png?v=${BUILD}`;
 }
 function overlayLogoStatus510(set){
-  if(set.logoMode === "custom" && set.customLogoData) return "Using custom logo";
-  if(set.logoMode === "custom") return "Custom logo selected but no image uploaded yet";
-  return "Using FireVault logo";
+  if(set.logoMode === "custom" && set.customLogoData) return "Custom logo ready";
+  if(set.logoMode === "custom") return "Upload a custom logo";
+  return "FireVault logo";
 }
-function overlayPreviewMarkup510(o){
-  const set=overlayCleanSetting510(o);
-  const lines=esc(renderTemplate(set.template, overlaySampleSite510()) || "FireVault overlay preview").replaceAll("\n","<br>");
-  const style=`--ovAccent:${esc(set.accentColor)};--ovText:${esc(set.textColor)};--ovAlpha:${Math.max(20,Math.min(100,Number(set.opacity)||85))/100}`;
-  const logoSrc=overlayLogoSrc510(set);
-  return `<div class="photoOverlayPreview510" style="${style}">
-    <div class="photoSampleScene510" aria-label="Sample field photo preview with overlay">
-      <img class="photoSampleImg510" src="assets/overlay-sample-photo.jpg?v=${BUILD}" alt="Sample fire alarm field photo">
-      <div id="overlayLivePreview510" class="photoStamp510 align-${esc(set.alignment)} size-${esc(set.fontSize)} style-${esc(set.backgroundStyle)}">
-        ${set.showLogo?`<div class="photoStampLogo510">${logoSrc?`<img src="${esc(logoSrc)}" alt="Overlay logo">`:`<span class="photoStampLogoPlaceholder511">Logo</span>`}</div>`:""}
-        <div class="photoStampText510"><div>${lines}</div>${set.showTagline?`<small>FireVault Field Photo Overlay</small>`:""}</div>
-      </div>
-    </div>
+function overlayChoiceButtons0890(id,value,choices){
+  return `<input type="hidden" id="${id}" value="${esc(value)}"><div class="overlayChoiceGrid0890">${choices.map(([key,label,icon])=>`<button type="button" class="overlayChoice0890 ${value===key?"active":""}" data-overlay-control="${id}" data-overlay-value="${key}" aria-pressed="${value===key?"true":"false"}"><span>${icon}</span><strong>${esc(label)}</strong></button>`).join("")}</div>`;
+}
+function overlayPresetButtons0890(){
+  return `<div class="overlayPresetGrid0890">
+    <button type="button" data-overlay-preset="compact"><span>▤</span><strong>Compact</strong><small>Site and date only</small></button>
+    <button type="button" data-overlay-preset="standard" class="recommended"><span>▣</span><strong>Standard</strong><small>Balanced field stamp</small><em>Recommended</em></button>
+    <button type="button" data-overlay-preset="detailed"><span>▦</span><strong>Detailed</strong><small>Account and address</small></button>
   </div>`;
+}
+async function drawOverlayStamp0890(ctx,w,h,set,siteData){
+  const accent=hexToRgb512(set.accentColor);
+  const alpha=Math.max(.2,Math.min(1,(Number(set.opacity)||85)/100));
+  const baseFont=set.fontSize==="large"?Math.round(w*0.032):set.fontSize==="small"?Math.round(w*0.022):Math.round(w*0.027);
+  const fontSize=Math.max(18,Math.min(54,baseFont));
+  const pad=Math.max(18,Math.round(w*0.018));
+  const logoSize=set.showLogo?Math.max(48,Math.min(100,Math.round(w*0.065))):0;
+  const rawLines=String(renderTemplate(set.template,siteData||{})||"FireVault Field Photo").split(/\n/);
+  ctx.font=`800 ${fontSize}px Arial, sans-serif`;
+  const textMax=set.backgroundStyle==="card"?Math.round(w*.68):w-(pad*5)-logoSize;
+  const lines=rawLines.flatMap(line=>wrapCanvasText512(ctx,line,textMax));
+  const tagline=set.showTagline ? "FireVault Field Photo Overlay" : "";
+  const lineHeight=Math.round(fontSize*1.24);
+  const tagHeight=tagline?Math.round(fontSize*.86):0;
+  const textH=(lines.length*lineHeight)+tagHeight;
+  let stampW=set.backgroundStyle==="card"?Math.min(w-pad*2,Math.max(Math.round(w*.42), Math.max(...lines.map(l=>ctx.measureText(l).width),0)+logoSize+pad*4)):w-pad*2;
+  let stampH=Math.max(logoSize+pad*1.4, textH+pad*1.7);
+  let x=pad;
+  let y=set.alignment==="top"?pad:set.alignment==="middle"?Math.round((h-stampH)/2):h-stampH-pad;
+  ctx.save();
+  if(set.backgroundStyle==="minimal"){
+    ctx.fillStyle=`rgba(0,0,0,${Math.min(.76,alpha)})`;
+    ctx.fillRect(x,y,stampW,stampH);
+    ctx.fillStyle=`rgba(${accent.r},${accent.g},${accent.b},.95)`;
+    ctx.fillRect(x,y,Math.max(8,Math.round(w*.006)),stampH);
+  }else{
+    roundRect512(ctx,x,y,stampW,stampH,Math.max(18,Math.round(w*.012)));
+    ctx.fillStyle=`rgba(0,0,0,${alpha})`;
+    ctx.fill();
+    ctx.strokeStyle=`rgba(${accent.r},${accent.g},${accent.b},.95)`;
+    ctx.lineWidth=Math.max(3,Math.round(w*.003));
+    ctx.stroke();
+    if(set.backgroundStyle==="bar"){
+      const grd=ctx.createLinearGradient(x,y,x+stampW,y);
+      grd.addColorStop(0,`rgba(0,0,0,${alpha})`);
+      grd.addColorStop(1,`rgba(${accent.r},${accent.g},${accent.b},${Math.min(.82,alpha*.72)})`);
+      roundRect512(ctx,x,y,stampW,stampH,Math.max(18,Math.round(w*.012)));
+      ctx.fillStyle=grd; ctx.fill();
+    }else{
+      ctx.fillStyle=`rgba(${accent.r},${accent.g},${accent.b},.95)`;
+      ctx.fillRect(x,y,Math.max(8,Math.round(w*.006)),stampH);
+    }
+  }
+  let tx=x+pad;
+  if(set.showLogo){
+    const logoSrc=overlayLogoSrc510(set);
+    if(logoSrc){
+      try{
+        const logo=await loadImage512(logoSrc);
+        const lx=x+pad, ly=y+(stampH-logoSize)/2;
+        ctx.save();
+        roundRect512(ctx,lx,ly,logoSize,logoSize,Math.round(logoSize*.22));
+        ctx.clip();
+        ctx.drawImage(logo,lx,ly,logoSize,logoSize);
+        ctx.restore();
+      }catch{}
+    }
+    tx+=logoSize+pad;
+  }
+  ctx.fillStyle=set.textColor||"#ffffff";
+  ctx.textBaseline="top";
+  ctx.font=`900 ${fontSize}px Arial, sans-serif`;
+  let ty=y+Math.max(pad*.75,(stampH-textH)/2);
+  lines.forEach(line=>{ctx.fillText(line,tx,ty);ty+=lineHeight;});
+  if(tagline){
+    ctx.font=`800 ${Math.max(12,Math.round(fontSize*.62))}px Arial, sans-serif`;
+    ctx.fillStyle="rgba(255,255,255,.78)";
+    ctx.fillText(tagline,tx,ty+Math.round(fontSize*.1));
+  }
+  ctx.restore();
+}
+async function renderOverlayComposite0890(source,set,siteData,maxW=1800){
+  const photo=await loadImage512(source);
+  const scale=Math.min(1,maxW/(photo.naturalWidth||photo.width||maxW));
+  const w=Math.max(1,Math.round((photo.naturalWidth||photo.width)*scale));
+  const h=Math.max(1,Math.round((photo.naturalHeight||photo.height)*scale));
+  const canvas=document.createElement("canvas");
+  canvas.width=w; canvas.height=h;
+  const ctx=canvas.getContext("2d");
+  ctx.drawImage(photo,0,0,w,h);
+  await drawOverlayStamp0890(ctx,w,h,set,siteData);
+  return canvas;
+}
+function overlayPreviewMarkup510(){
+  return `<section class="overlayPreviewCard0890">
+    <div class="overlayCardHead0890"><div><span>LIVE PREVIEW</span><h2>Field Photo</h2></div><b id="overlayPreviewScale0890">Actual export rendering</b></div>
+    <div class="overlayPreviewFrame0890"><canvas id="overlayPreviewCanvas0890" width="900" height="600" aria-label="Photo overlay preview"></canvas><div id="overlayPreviewStatus0890">Rendering preview…</div></div>
+    <div class="overlaySampleCaption0890"><strong>Example issue: notification appliance hanging from conduit</strong><small>Photo by Ben Schumin · <a href="https://commons.wikimedia.org/wiki/File:Fire_alarm_hanging_by_conduit_(50433872558).png" target="_blank" rel="noopener">CC BY-SA 2.0</a></small></div>
+  </section>`;
 }
 function overlaySettingsPanel510(o){
   const set=overlayCleanSetting510(o);
-  return `<div class="settingsStack overlaySettings510">
-    <div class="card settingGroup compactPane overlayEditor510">
-      <div class="paneHead"><div><h2>Photo Overlay</h2><p class="paneNote">Preview now uses a cleaner sample field photo and the real FireVault logo. You can also upload a custom logo for the overlay.</p></div><button class="primary saveMini" id="saveSettings">Save</button></div>
-      ${overlayPreviewMarkup510(set)}
-      <div class="overlayControlGrid510">
-        ${fieldBlock("Overlay Text",`<textarea id="ovTemplate" class="overlayTemplate510" rows="4" placeholder="{site_name} • {date} • {time}">${esc(set.template)}</textarea>`,`Tap fields below to insert them into the overlay.`)}
-        <div class="overlayMiniControls510">
-          ${fieldBlock("Position",`<select id="ovAlign"><option value="bottom" ${set.alignment==="bottom"?"selected":""}>bottom</option><option value="top" ${set.alignment==="top"?"selected":""}>top</option><option value="middle" ${set.alignment==="middle"?"selected":""}>middle</option></select>`)}
-          ${fieldBlock("Font Size",`<select id="ovSize"><option value="small" ${set.fontSize==="small"?"selected":""}>small</option><option value="medium" ${set.fontSize==="medium"?"selected":""}>medium</option><option value="large" ${set.fontSize==="large"?"selected":""}>large</option></select>`)}
-          ${fieldBlock("Background",`<select id="ovBg"><option value="bar" ${set.backgroundStyle==="bar"?"selected":""}>bar</option><option value="card" ${set.backgroundStyle==="card"?"selected":""}>card</option><option value="minimal" ${set.backgroundStyle==="minimal"?"selected":""}>minimal</option></select>`)}
-          ${fieldBlock("Opacity",`<input id="ovOpacity" type="range" min="35" max="100" value="${esc(set.opacity)}">`,`Stamp background strength`)}
-          ${fieldBlock("Accent Color",`<input id="ovAccent" type="color" value="${esc(set.accentColor)}">`)}
-          ${fieldBlock("Text Color",`<input id="ovText" type="color" value="${esc(set.textColor)}">`)}
-          ${fieldBlock("Logo Source",`<select id="ovLogoMode"><option value="firevault" ${set.logoMode==="firevault"?"selected":""}>FireVault logo</option><option value="custom" ${set.logoMode==="custom"?"selected":""}>Custom logo</option></select>`,`Change which logo appears on the overlay.`)}
+  return `<div class="overlayStudio0890">
+    <div class="overlayStudioHero0890">
+      ${overlayPreviewMarkup510()}
+      <section class="overlayQuickCard0890">
+        <div class="overlayCardHead0890"><div><span>QUICK SETUP</span><h2>Choose a starting point</h2></div><button type="button" class="ghost" id="ovReset0890">Reset</button></div>
+        ${overlayPresetButtons0890()}
+        <div class="overlayQuickToggles0890">
+          ${checkBlock("ovLogo","Show logo",set.showLogo)}
+          ${checkBlock("ovTagline","Show tagline",set.showTagline)}
         </div>
-      </div>
-      <div class="overlayLogoManager511">
-        <div class="overlayLogoCard511">
-          <div class="overlayLogoPreview511">${set.showLogo ? (overlayLogoSrc510(set)?`<img src="${esc(overlayLogoSrc510(set))}" alt="Current overlay logo preview">`:`<span>No logo image</span>`) : `<span>Logo hidden</span>`}</div>
-          <div class="overlayLogoMeta511">
-            <strong>Overlay Logo</strong>
-            <p id="ovLogoStatus">${esc(overlayLogoStatus510(set))}</p>
-            <label class="overlayUploadLabel511">
-              <span>Upload custom logo</span>
-              <input id="ovCustomLogo" type="file" accept="image/*">
-            </label>
-            <div class="overlayLogoActions511">
-              <button type="button" class="ghost" id="ovUseFireVault">Use FireVault Logo</button>
-              <button type="button" class="ghost" id="ovClearCustomLogo">Clear Custom Logo</button>
-            </div>
-            <small class="fieldNote">Custom logo is saved locally on this device/browser. Best results: square PNG with transparent background.</small>
-          </div>
-        </div>
-      </div>
-      <div class="settingsList twoCol overlayToggles510">
-        ${checkBlock("ovLogo","Show overlay logo",set.showLogo)}
-        ${checkBlock("ovTagline","Show FireVault tagline",set.showTagline)}
-      </div>
+      </section>
     </div>
-    <div class="card compactPane overlayFieldsCard510">
-      <div class="paneHead"><div><h2>Available Overlay Fields</h2><p class="paneNote">Tap a field to insert it into the overlay text box.</p></div></div>
+    <section class="overlaySection0890 overlayContent0890">
+      <div class="overlayCardHead0890"><div><span>CONTENT</span><h2>What the photo says</h2></div><button class="primary saveMini" id="saveSettings">Save</button></div>
+      <label class="overlayTemplateField0890"><span>Overlay text</span><textarea id="ovTemplate" class="overlayTemplate510" rows="4" placeholder="{site_name} • {date} • {time}">${esc(set.template)}</textarea><small>Tap a field below to insert it at the cursor.</small></label>
       <div class="overlayFieldGrid510">${overlayTagButtons510()}</div>
-    </div>
+    </section>
+    <section class="overlaySection0890 overlayLayout0890">
+      <div class="overlayCardHead0890"><div><span>LAYOUT</span><h2>Placement and shape</h2></div></div>
+      <div class="overlayControlBlock0890"><label>Position</label>${overlayChoiceButtons0890("ovAlign",set.alignment,[["top","Top","↑"],["middle","Center","↕"],["bottom","Bottom","↓"]])}</div>
+      <div class="overlayControlBlock0890"><label>Style</label>${overlayChoiceButtons0890("ovBg",set.backgroundStyle,[["bar","Full Bar","▰"],["card","Compact Card","▣"],["minimal","Minimal","▏"]])}</div>
+      <div class="overlayControlBlock0890"><label>Text size</label>${overlayChoiceButtons0890("ovSize",set.fontSize,[["small","Small","A"],["medium","Medium","A"],["large","Large","A"]])}</div>
+      <label class="overlayRange0890"><span><b>Background opacity</b><em id="ovOpacityValue0890">${esc(set.opacity)}%</em></span><input id="ovOpacity" type="range" min="35" max="100" value="${esc(set.opacity)}"></label>
+    </section>
+    <section class="overlaySection0890 overlayBrand0890">
+      <div class="overlayCardHead0890"><div><span>BRANDING</span><h2>Logo and colors</h2></div></div>
+      <div class="overlayColorGrid0890">
+        ${fieldBlock("Accent",`<input id="ovAccent" type="color" value="${esc(set.accentColor)}">`,`Border and highlight color`)}
+        ${fieldBlock("Text",`<input id="ovText" type="color" value="${esc(set.textColor)}">`,`Overlay text color`)}
+        ${fieldBlock("Logo",`<select id="ovLogoMode"><option value="firevault" ${set.logoMode==="firevault"?"selected":""}>FireVault logo</option><option value="custom" ${set.logoMode==="custom"?"selected":""}>Custom logo</option></select>`,`Select the logo source`)}
+      </div>
+      <div class="overlayLogoCard511">
+        <div class="overlayLogoPreview511">${set.showLogo ? (overlayLogoSrc510(set)?`<img src="${esc(overlayLogoSrc510(set))}" alt="Current overlay logo preview">`:`<span>No logo image</span>`) : `<span>Logo hidden</span>`}</div>
+        <div class="overlayLogoMeta511">
+          <strong>Overlay logo</strong>
+          <p id="ovLogoStatus">${esc(overlayLogoStatus510(set))}</p>
+          <label class="overlayUploadLabel511"><span>Upload custom logo</span><input id="ovCustomLogo" type="file" accept="image/*"></label>
+          <div class="overlayLogoActions511"><button type="button" class="ghost" id="ovUseFireVault">Use FireVault</button><button type="button" class="ghost" id="ovClearCustomLogo">Clear custom</button></div>
+          <small class="fieldNote">Square transparent PNG files work best.</small>
+        </div>
+      </div>
+    </section>
   </div>`;
 }
 function collectOverlayFromInputs510(){
@@ -8193,21 +8212,35 @@ function collectOverlayFromInputs510(){
     customLogoData:overlayLogoDraftDataUrl || data.settings.overlay?.customLogoData || ""
   });
 }
-function updateOverlayPreview510(){
-  const holder=document.querySelector(".photoOverlayPreview510");
-  if(!holder) return;
-  const nextSet=collectOverlayFromInputs510();
-  const next=overlayPreviewMarkup510(nextSet);
-  const wrap=document.createElement("div");
-  wrap.innerHTML=next;
-  holder.replaceWith(wrap.firstElementChild);
+function scheduleOverlayPreview0890(delay=70){
+  if(overlayPreviewTimer0890) clearTimeout(overlayPreviewTimer0890);
+  overlayPreviewTimer0890=setTimeout(()=>{overlayPreviewTimer0890=0;updateOverlayPreview510();},Math.max(0,delay));
+}
+async function updateOverlayPreview510(){
+  const canvas=document.getElementById("overlayPreviewCanvas0890");
+  if(!canvas) return;
+  const token=++overlayPreviewRenderToken0890;
+  const status=document.getElementById("overlayPreviewStatus0890");
+  if(status){status.hidden=false;status.textContent="Rendering preview…";}
+  const set=collectOverlayFromInputs510();
+  const opacityValue=document.getElementById("ovOpacityValue0890");
+  if(opacityValue) opacityValue.textContent=`${set.opacity}%`;
+  try{
+    const composed=await renderOverlayComposite0890("assets/overlay-sample-fire-alarm-issue.png",set,overlaySampleSite510(),900);
+    if(token!==overlayPreviewRenderToken0890 || !canvas.isConnected) return;
+    canvas.width=composed.width;canvas.height=composed.height;
+    canvas.getContext("2d").drawImage(composed,0,0);
+    if(status) status.hidden=true;
+  }catch(err){
+    if(status){status.hidden=false;status.textContent="Preview unavailable";}
+  }
   const miniPreview=document.querySelector('.overlayLogoPreview511');
   if(miniPreview){
-    const logoSrc=overlayLogoSrc510(nextSet);
-    miniPreview.innerHTML = !nextSet.showLogo ? '<span>Logo hidden</span>' : (logoSrc ? `<img src="${esc(logoSrc)}" alt="Current overlay logo preview">` : '<span>No logo image</span>');
+    const logoSrc=overlayLogoSrc510(set);
+    miniPreview.innerHTML = !set.showLogo ? '<span>Logo hidden</span>' : (logoSrc ? `<img src="${esc(logoSrc)}" alt="Current overlay logo preview">` : '<span>No logo image</span>');
   }
   const stat=document.getElementById('ovLogoStatus');
-  if(stat) stat.textContent=overlayLogoStatus510(nextSet);
+  if(stat) stat.textContent=overlayLogoStatus510(set);
 }
 function insertOverlayTag510(tag){
   const target=document.getElementById("ovTemplate");
@@ -8218,14 +8251,44 @@ function insertOverlayTag510(tag){
   target.focus();
   target.dispatchEvent(new Event("input",{bubbles:true}));
 }
+function setOverlayChoice0890(id,value,render=true){
+  const input=document.getElementById(id);if(!input)return;
+  input.value=value;
+  document.querySelectorAll(`[data-overlay-control="${id}"]`).forEach(btn=>{
+    const active=btn.dataset.overlayValue===value;
+    btn.classList.toggle("active",active);btn.setAttribute("aria-pressed",active?"true":"false");
+  });
+  if(render) scheduleOverlayPreview0890(0);
+}
+function applyOverlayPreset0890(name){
+  const presets={
+    compact:{template:"{site_name} • {date}",alignment:"bottom",fontSize:"small",backgroundStyle:"minimal",opacity:"72",showLogo:false,showTagline:false},
+    standard:{template:"{site_name} • {account_id}\n{date} • {time}",alignment:"bottom",fontSize:"medium",backgroundStyle:"bar",opacity:"82",showLogo:true,showTagline:false},
+    detailed:{template:"{site_name} • {account_id} • {category}\n{address}\n{date} • {time} • {technician}",alignment:"bottom",fontSize:"small",backgroundStyle:"card",opacity:"90",showLogo:true,showTagline:false}
+  };
+  const p=presets[name]||presets.standard;
+  const template=document.getElementById("ovTemplate");if(template)template.value=p.template;
+  const opacity=document.getElementById("ovOpacity");if(opacity)opacity.value=p.opacity;
+  const logo=document.getElementById("ovLogo");if(logo)logo.checked=p.showLogo;
+  const tagline=document.getElementById("ovTagline");if(tagline)tagline.checked=p.showTagline;
+  setOverlayChoice0890("ovAlign",p.alignment,false);
+  setOverlayChoice0890("ovSize",p.fontSize,false);
+  setOverlayChoice0890("ovBg",p.backgroundStyle,false);
+  document.querySelectorAll("[data-overlay-preset]").forEach(btn=>btn.classList.toggle("active",btn.dataset.overlayPreset===name));
+  scheduleOverlayPreview0890(0);
+}
 function wireOverlaySettings510(){
   overlayLogoDraftDataUrl = data.settings.overlay?.customLogoData || "";
-  ["ovTemplate","ovAlign","ovSize","ovBg","ovOpacity","ovAccent","ovText","ovLogo","ovTagline","ovLogoMode"].forEach(id=>{
+  ["ovTemplate","ovOpacity","ovAccent","ovText","ovLogo","ovTagline","ovLogoMode"].forEach(id=>{
     const el=document.getElementById(id);
-    if(el) el.addEventListener(el.type==="checkbox"?"change":"input", updateOverlayPreview510);
-    if(el && el.tagName === "SELECT") el.addEventListener("change", updateOverlayPreview510);
+    if(!el)return;
+    const event=(el.type==="checkbox"||el.tagName==="SELECT")?"change":"input";
+    el.addEventListener(event,()=>scheduleOverlayPreview0890(event==="input"?80:0));
   });
+  document.querySelectorAll("[data-overlay-control]").forEach(btn=>btn.onclick=()=>setOverlayChoice0890(btn.dataset.overlayControl,btn.dataset.overlayValue));
+  document.querySelectorAll("[data-overlay-preset]").forEach(btn=>btn.onclick=()=>applyOverlayPreset0890(btn.dataset.overlayPreset));
   document.querySelectorAll(".overlayFieldChip510").forEach(b=>b.onclick=()=>insertOverlayTag510(b.dataset.overlayTag||""));
+  document.getElementById("ovReset0890")?.addEventListener("click",()=>applyOverlayPreset0890("standard"));
   const upload=document.getElementById('ovCustomLogo');
   if(upload) upload.addEventListener('change', e=>{
     const file=e.target.files && e.target.files[0];
@@ -8234,31 +8297,19 @@ function wireOverlaySettings510(){
     const reader=new FileReader();
     reader.onload=()=>{
       overlayLogoDraftDataUrl=String(reader.result||'');
-      const select=document.getElementById('ovLogoMode');
-      if(select) select.value='custom';
-      const showLogo=document.getElementById('ovLogo');
-      if(showLogo) showLogo.checked=true;
-      updateOverlayPreview510();
-      toast('Custom overlay logo loaded. Save settings to keep it.');
+      const select=document.getElementById('ovLogoMode');if(select)select.value='custom';
+      const showLogo=document.getElementById('ovLogo');if(showLogo)showLogo.checked=true;
+      scheduleOverlayPreview0890(0);toast('Custom overlay logo loaded. Save settings to keep it.');
     };
     reader.readAsDataURL(file);
   });
-  const useFireVault=document.getElementById('ovUseFireVault');
-  if(useFireVault) useFireVault.onclick=()=>{
-    const select=document.getElementById('ovLogoMode');
-    if(select) select.value='firevault';
-    updateOverlayPreview510();
-  };
-  const clearCustom=document.getElementById('ovClearCustomLogo');
-  if(clearCustom) clearCustom.onclick=()=>{
-    overlayLogoDraftDataUrl='';
-    const upload=document.getElementById('ovCustomLogo');
-    if(upload) upload.value='';
-    const select=document.getElementById('ovLogoMode');
-    if(select && select.value==='custom') select.value='firevault';
-    updateOverlayPreview510();
-    toast('Custom overlay logo cleared.');
-  };
+  document.getElementById('ovUseFireVault')?.addEventListener('click',()=>{const select=document.getElementById('ovLogoMode');if(select)select.value='firevault';scheduleOverlayPreview0890(0);});
+  document.getElementById('ovClearCustomLogo')?.addEventListener('click',()=>{
+    overlayLogoDraftDataUrl='';const upload=document.getElementById('ovCustomLogo');if(upload)upload.value='';
+    const select=document.getElementById('ovLogoMode');if(select&&select.value==='custom')select.value='firevault';
+    scheduleOverlayPreview0890(0);toast('Custom overlay logo cleared.');
+  });
+  updateOverlayPreview510();
 }
 
 
@@ -8490,7 +8541,7 @@ function manualSimplePage058(type){
   quick:["🚀","Quick Start Guide","Get FireVault ready for a normal field day.",[["1. Verify the build","Confirm the green build badge shows 0.67.0 before entering production information."],["2. Complete Technician Profile","Enter your name, company, phone, email, and license or employee identification."],["3. Review permissions","Allow location and photo access only when FireVault requests them and the feature is needed."],["4. Create or open a site","Add the customer name, full address, panel details, contacts, access notes, and GPS location."],["5. Document the visit","Record notes, photos, tasks, deficiencies, equipment changes, and a service visit."],["6. Finish and protect the data","Review the report, send or copy the required summary, then export a current backup."]]],
   new:["🆕","What’s New in 0.67.0","Account View, Settings navigation, and FireVault Academy redesign.",[["Unified visual system","Standardized typography, spacing, card surfaces, borders, controls, and responsive behavior across FireVault."],["Settings cleanup","Improved Settings home cards and every submenu while preserving the preferred Email setup workflow."],["Help readability","Converted contextual Help and Academy articles into one uninterrupted scrolling reading column with no floating metadata."],["Site Detail stability","Reinforced natural-height cards, readable text, and scroll-safe account sections."],["Operational screens","Simplified Customer Import, Team Sync, Conflict Center, and Nearby Sites presentation without changing their workflows."],["Phone and iPad layouts","Added consistent narrow-phone and tablet behavior, bottom-navigation clearance, and overflow protection."],["Nearby scan diagnostics","Nearby Sites now shows total sites, GPS-ready records, missing coordinates, phone-location progress, and persistent error messages."],["Coordinate recovery","FireVault recovers valid latitude and longitude stored in compatible legacy or imported fields and normalizes them into the site GPS record."],["Location retry","If high-accuracy location times out or is unavailable, FireVault retries once using standard accuracy."],["Nearest-site fallback","When no site is inside the selected radius, the nearest GPS-ready sites remain visible instead of presenting an empty result."],["Latitude and longitude","Customer Import can calculate missing coordinates from each usable U.S. street address before saving records."],["Coordinate requirement","The importer requires calculated, supplied, or existing GPS coordinates by default. Unmatched addresses remain in review."],["Census address matching","Only address fields are sent to the U.S. Census Geocoder. The returned point is an address-range calculation, not a guaranteed building entrance."],["Account Id matching","Repeat imports update the matching FireVault site instead of creating duplicates or deleting field history."],["CSV coordinate columns","Files that already contain Latitude and Longitude columns use those values directly."],["Sync-ready changes","Added and updated customer records enter the pending synchronization queue and create a Sync Activity entry."]]],
   tips:["🧰","Field Tips","Short practices that improve the usefulness of FireVault records.",[["Write for the next technician","Include the exact panel, circuit, device, location, symptom, test result, and next action instead of relying on memory."],["Photograph context first","Take one wide photo showing the equipment location before close-up terminal, label, or damage photos."],["Separate facts from follow-up","Use notes for what occurred, deficiencies for code or system problems, and tasks for work that still needs completion."],["Confirm the account","Before using Quick Capture, verify the selected customer site to prevent records from being stored under the wrong account."],["Back up before updates","Download an external backup before a major update or device change and after completing significant field documentation."]]],
-  revisions:["📋","Revision History","Application and documentation checkpoints.",[[["0.88.0","Overhauled Settings with sticky search, live status summaries, richer grouped cards, consistent detail screens, and improved iPad layout while preserving every release-critical setting."],["0.87.11","Restored WebDAV Backup to Data & Backup and Settings search while preserving saved connection settings and transfer tools."],["0.87.10","Aligned the four Account Directory card actions across the full card width in Call, Route, Add Note, Favorite order."],["0.87.9","Cleaned up the Account Directory with layered depth, raised controls, dimensional account cards, and category-accented shading while preserving fluid scrolling."],["0.87.8","Improved Account Directory scrolling performance and added iPad portrait, landscape, and split-view layout refinements."],["0.87.4","Added spacing and search to Settings, removed the Field category, moved Google Plus Codes under Maps & GPS, enlarged Account ID/category tags, moved Favorite beside Call, removed empty panel/contact text, and restored Nearby-style card scroll locking."],["0.87.3","Moved account addresses below site names, placed Account ID and category tags beneath the address, and changed Settings to a dark grouped-list design without a duplicate logo."],["0.87.2","Polished Account Directory cards and removed the default Ready, No Open Work, and GPS status tags so only actionable issues are shown."],["0.87.1","Rebuilt Account Directory, Search, account cards, and Account Detail from the stable 0.86.1 baseline and removed the layout gap above the bottom navigation."],["0.86.1","Repaired the Settings startup error and standardized the three-button Nearby, Search, and Settings dock across the app."],["0.86.0","Redesigned Settings as a simplified dark tile dashboard and renamed the bottom Accounts navigation button to Search."],["0.85.0","Removed Tools navigation and the Account Detail Visit action, and rebuilt Settings as a simple grouped menu with clean detail screens."],["0.84.0","Refined Nearby map selection with a fixed details overlay, no marker popup, delayed street-level zoom, and direct account-card navigation."],["0.81.0","Prepared FireVault for App Store review by removing the document scanner, Daily Route and time-tracking controls, theme selection, advanced settings, diagnostics access, and excess instructional copy while preserving account data."]],["0.80.3","Defaulted new Tools scanner documents to the closest GPS-ready account with visible distance, accuracy, retry, and manual override."],["0.80.2","Simplified Document Scanner, added on-device AI Auto Scan with live corner framing and hands-free capture, and repaired mobile keyboard field visibility."],["0.80.1","Moved Document Scanner to Tools, added post-capture account search and matching, and added scanner access inside the full Site Notes workspace."],["0.80.0","Added an account-specific multi-page camera document scanner with automatic edge detection, manual corner correction, rotation, cleanup modes, page ordering, PDF preview/download/share, and account-note activity."],["0.79.14","Restored numbered Nearby Accounts map pins matched to distance-sorted list rows and removed Smart Account Intelligence."],["0.79.13","Repaired startup parsing inherited from 0.79.11 and corrected Building Navigator location-copy syntax."],["0.79.12","Added Building Navigator with exact site locations, GPS/Plus Codes, verification, linked photos, route targets, and timeline events."],["0.79.7","Shortened every Settings summary and removed the colored bar from each Section Overview."],["0.79.6","Added Nearby-style account-list scroll locking so cards settle cleanly at the top while the Accounts controls remain fixed."],["0.79.5","Added separate Personal OneDrive, Work OneDrive, and SharePoint connection profiles with exact photo/document assignments and no-personal-fallback protection."],["0.79.4","Added independent photo and document storage destinations, cloud-provider integration targets, and offline Google Plus Codes for accounts and exact field locations."],["0.79.3","Added backend-neutral provider interfaces for authentication, database, file storage, synchronization, and audit while keeping FireVault fully local."],["0.79.2","Added a unified Security Center with vault integrity validation, backup health, audit filters, device naming, session clearing, and PIN confirmation for sensitive exports, restores, and deletion."],["0.79.1","Added an optional local six-digit privacy lock with PBKDF2 hashing, inactivity/background locking, app-switcher privacy screen, recovery code, cooldown protection, and local lock events."],["0.79.0","Added security-ready schema 4 metadata, stable workspace/user/device identities, local audit history, pending change queue, recoverable deletion, credential-safe exports, and protected restore/reset actions."],["0.67.0","Redesigned Account View around service actions and grouped information, consolidated Settings into five folders, and simplified FireVault Academy and contextual Help for continuous reading."],["0.65.2","Repaired Nearby Sites with GPS inventory counts, imported-coordinate recovery, persistent permission and timeout messages, a standard-accuracy retry, and nearest-site fallback results."],["0.65.1","Added online latitude/longitude calculation, coordinate validation, geocoding progress, unmatched-address review, optional CSV coordinates, and coordinate-safe repeat importing."],["0.65.0","Added preview-first customer CSV importing, Account Id update matching, validation warnings, imported monitoring details, and sync activity tracking."],["0.64.1","Simplified Academy article headers, removed floating metadata badges, and improved continuous scrolling and readability."],["0.64.0","Added Sync Activity, a conflict review center, export/import audit entries, and an automatic OneDrive connection-readiness checklist."],["0.63.1","Overhauled contextual Help and Academy reader formatting, removed overlapping sticky article headers, and restored full scrolling on phones and tablets."],["0.63.0","Added permanent record IDs, audit metadata, local version tracking, pending-sync states, conflict readiness, device identity, and a Team Sync settings workspace."],["0.60.0","Connected major screens and Settings areas directly to matching Academy chapters with return-to-screen navigation."],["0.59.0","Added interactive tutorials, guided orientation, pinned learning, field tips, and documentation tracking."],["0.58.0","Expanded Help & Manual into FireVault Academy with bookmarks, smart search, Quick Start, and reader navigation."],["0.57.0","Added the first complete searchable in-app FireVault User Manual."],["Ongoing review rule","Any change to navigation, labels, storage, workflows, permissions, or supported layouts requires the related manual chapter to be checked."]]],
+  revisions:["📋","Revision History","Application and documentation checkpoints.",[[["0.89.0","Rebuilt Photo Overlay as a compact visual studio with an exact canvas preview, quick presets, reorganized content/layout/branding controls, expanded account fields, and a real fire-alarm deficiency sample photo with attribution."],["0.88.0","Overhauled Settings with sticky search, live status summaries, richer grouped cards, consistent detail screens, and improved iPad layout while preserving every release-critical setting."],["0.87.11","Restored WebDAV Backup to Data & Backup and Settings search while preserving saved connection settings and transfer tools."],["0.87.10","Aligned the four Account Directory card actions across the full card width in Call, Route, Add Note, Favorite order."],["0.87.9","Cleaned up the Account Directory with layered depth, raised controls, dimensional account cards, and category-accented shading while preserving fluid scrolling."],["0.87.8","Improved Account Directory scrolling performance and added iPad portrait, landscape, and split-view layout refinements."],["0.87.4","Added spacing and search to Settings, removed the Field category, moved Google Plus Codes under Maps & GPS, enlarged Account ID/category tags, moved Favorite beside Call, removed empty panel/contact text, and restored Nearby-style card scroll locking."],["0.87.3","Moved account addresses below site names, placed Account ID and category tags beneath the address, and changed Settings to a dark grouped-list design without a duplicate logo."],["0.87.2","Polished Account Directory cards and removed the default Ready, No Open Work, and GPS status tags so only actionable issues are shown."],["0.87.1","Rebuilt Account Directory, Search, account cards, and Account Detail from the stable 0.86.1 baseline and removed the layout gap above the bottom navigation."],["0.86.1","Repaired the Settings startup error and standardized the three-button Nearby, Search, and Settings dock across the app."],["0.86.0","Redesigned Settings as a simplified dark tile dashboard and renamed the bottom Accounts navigation button to Search."],["0.85.0","Removed Tools navigation and the Account Detail Visit action, and rebuilt Settings as a simple grouped menu with clean detail screens."],["0.84.0","Refined Nearby map selection with a fixed details overlay, no marker popup, delayed street-level zoom, and direct account-card navigation."],["0.81.0","Prepared FireVault for App Store review by removing the document scanner, Daily Route and time-tracking controls, theme selection, advanced settings, diagnostics access, and excess instructional copy while preserving account data."]],["0.80.3","Defaulted new Tools scanner documents to the closest GPS-ready account with visible distance, accuracy, retry, and manual override."],["0.80.2","Simplified Document Scanner, added on-device AI Auto Scan with live corner framing and hands-free capture, and repaired mobile keyboard field visibility."],["0.80.1","Moved Document Scanner to Tools, added post-capture account search and matching, and added scanner access inside the full Site Notes workspace."],["0.80.0","Added an account-specific multi-page camera document scanner with automatic edge detection, manual corner correction, rotation, cleanup modes, page ordering, PDF preview/download/share, and account-note activity."],["0.79.14","Restored numbered Nearby Accounts map pins matched to distance-sorted list rows and removed Smart Account Intelligence."],["0.79.13","Repaired startup parsing inherited from 0.79.11 and corrected Building Navigator location-copy syntax."],["0.79.12","Added Building Navigator with exact site locations, GPS/Plus Codes, verification, linked photos, route targets, and timeline events."],["0.79.7","Shortened every Settings summary and removed the colored bar from each Section Overview."],["0.79.6","Added Nearby-style account-list scroll locking so cards settle cleanly at the top while the Accounts controls remain fixed."],["0.79.5","Added separate Personal OneDrive, Work OneDrive, and SharePoint connection profiles with exact photo/document assignments and no-personal-fallback protection."],["0.79.4","Added independent photo and document storage destinations, cloud-provider integration targets, and offline Google Plus Codes for accounts and exact field locations."],["0.79.3","Added backend-neutral provider interfaces for authentication, database, file storage, synchronization, and audit while keeping FireVault fully local."],["0.79.2","Added a unified Security Center with vault integrity validation, backup health, audit filters, device naming, session clearing, and PIN confirmation for sensitive exports, restores, and deletion."],["0.79.1","Added an optional local six-digit privacy lock with PBKDF2 hashing, inactivity/background locking, app-switcher privacy screen, recovery code, cooldown protection, and local lock events."],["0.79.0","Added security-ready schema 4 metadata, stable workspace/user/device identities, local audit history, pending change queue, recoverable deletion, credential-safe exports, and protected restore/reset actions."],["0.67.0","Redesigned Account View around service actions and grouped information, consolidated Settings into five folders, and simplified FireVault Academy and contextual Help for continuous reading."],["0.65.2","Repaired Nearby Sites with GPS inventory counts, imported-coordinate recovery, persistent permission and timeout messages, a standard-accuracy retry, and nearest-site fallback results."],["0.65.1","Added online latitude/longitude calculation, coordinate validation, geocoding progress, unmatched-address review, optional CSV coordinates, and coordinate-safe repeat importing."],["0.65.0","Added preview-first customer CSV importing, Account Id update matching, validation warnings, imported monitoring details, and sync activity tracking."],["0.64.1","Simplified Academy article headers, removed floating metadata badges, and improved continuous scrolling and readability."],["0.64.0","Added Sync Activity, a conflict review center, export/import audit entries, and an automatic OneDrive connection-readiness checklist."],["0.63.1","Overhauled contextual Help and Academy reader formatting, removed overlapping sticky article headers, and restored full scrolling on phones and tablets."],["0.63.0","Added permanent record IDs, audit metadata, local version tracking, pending-sync states, conflict readiness, device identity, and a Team Sync settings workspace."],["0.60.0","Connected major screens and Settings areas directly to matching Academy chapters with return-to-screen navigation."],["0.59.0","Added interactive tutorials, guided orientation, pinned learning, field tips, and documentation tracking."],["0.58.0","Expanded Help & Manual into FireVault Academy with bookmarks, smart search, Quick Start, and reader navigation."],["0.57.0","Added the first complete searchable in-app FireVault User Manual."],["Ongoing review rule","Any change to navigation, labels, storage, workflows, permissions, or supported layouts requires the related manual chapter to be checked."]]],
   trouble:["❓","Troubleshooting","Common problems and safe first checks.",FIREVAULT_MANUAL_058.find(x=>x.id==="trouble")?.topics||[]]
  };
  const [icon,title,note,items]=pages[type]||["ⓘ","Unavailable","This Help section is not available in the installed version.",[["Current status","Return to Help and choose an available chapter or tutorial."]]];
@@ -10251,6 +10302,7 @@ function diagnostics(){
 }
 function showChangelog(){
   const notes = [
+    "Build 0.89.0 rebuilds Photo Overlay as a compact visual studio with exact preview-to-export rendering, presets, reorganized controls, expanded account fields, and a real fire-alarm deficiency sample photo.",
     "Build 0.88.0 overhauls Settings with sticky search, live status summaries, richer grouped cards, and consistent detail screens while preserving WebDAV, Demo Mode, Plus Codes, backup, import/export, and security.",
     "Build 0.87.11 restores WebDAV Backup to Data & Backup and Settings search while preserving saved connection settings and transfer tools.",
     "Build 0.87.10 aligns the four Account Directory card actions across the full card width in Call, Route, Add Note, Favorite order.",

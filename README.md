@@ -1,13 +1,14 @@
-# FireVault Build 0.88.0
+# FireVault Build 0.89.0
 
-Settings experience overhaul release.
+Photo Overlay Studio redesign.
 
-- Adds a sticky Settings search bar
-- Adds compact live status cards for Location, Backup, and Demo Mode
-- Reorganizes the main Settings page into Profile, Maps & Location, Reports & Communication, Data & Backup, Security, Testing, and About
-- Adds dynamic status summaries to main rows, search results, submenus, and detail headers
-- Adds richer layered dark surfaces, subtle category colors, clearer icons, and improved touch feedback
-- Standardizes Settings detail pages, cards, inputs, toggles, headers, and save controls
-- Improves iPad presentation with a centered two-column Settings index and readable detail widths
-- Preserves WebDAV, Demo Mode, Google Plus Codes, backup/restore, import/export, privacy, and security
-- Preserves existing account records and the FireVault storage key
+- Rebuilds Photo Overlay as a compact visual editor instead of one long settings form
+- Adds a smaller live preview that uses the exact same canvas renderer as exported overlay photos
+- Updates the account-photo Preview Overlay action to use that same exact renderer
+- Uses a real fire-alarm deficiency photo showing a notification appliance hanging from conduit
+- Adds Compact, Standard, and Detailed starting presets
+- Reorganizes controls into Quick Setup, Content, Layout, and Branding
+- Adds visual controls for overlay position, shape, text size, opacity, colors, and logo source
+- Expands overlay fields to include Account ID, account category, panel, address, GPS, technician, company, and other saved information
+- Preserves existing saved overlay templates, colors, logo settings, and customer records
+- Includes photo attribution and license information in the app and THIRD_PARTY_NOTICES.md

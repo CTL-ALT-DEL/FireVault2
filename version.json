@@ -1,8 +1,8 @@
 {
-  "build": "0.88.0",
+  "build": "0.89.0",
   "released": "2026-07-13",
-  "note": "Dedicated Settings polish release with sticky search, live status summaries, richer grouped cards, and consistent detail-screen styling while preserving WebDAV, Demo Mode, Plus Codes, backup, import/export, and security.",
-  "label": "Settings Experience Overhaul",
-  "version": "0.88.0",
-  "name": "Settings Experience Overhaul"
+  "note": "Photo Overlay Studio redesign with a smaller exact canvas preview, quick presets, reorganized content/layout/branding controls, expanded account fields, and a real fire-alarm deficiency sample photo.",
+  "label": "Photo Overlay Studio",
+  "version": "0.89.0",
+  "name": "Photo Overlay Studio"
 }
