@@ -894,3 +894,57 @@ main,
   .settingsSectionHeading0940>h2{font-size:.9rem!important}
 }
 .accountAdd0940>span{display:block!important;color:#fff!important;letter-spacing:0!important;text-transform:none!important}
+
+
+/* FireVault 0.94.1 — bottom navigation alignment and active-indicator cleanup */
+#appNav,
+.nearbyBottomNav069{
+  box-sizing:border-box!important;
+  position:fixed!important;
+  left:0!important;
+  right:0!important;
+  bottom:0!important;
+  width:100%!important;
+  height:var(--navH)!important;
+  min-height:var(--navH)!important;
+  max-height:var(--navH)!important;
+  display:grid!important;
+  grid-template-columns:repeat(3,minmax(0,1fr))!important;
+  align-items:start!important;
+  justify-items:stretch!important;
+  gap:8px!important;
+  margin:0!important;
+  padding:7px max(10px,env(safe-area-inset-left,0px)) calc(7px + env(safe-area-inset-bottom,0px)) max(10px,env(safe-area-inset-right,0px))!important;
+  transform:none!important;
+}
+#appNav button,
+.nearbyBottomNav069 button{
+  box-sizing:border-box!important;
+  width:100%!important;
+  height:52px!important;
+  min-height:52px!important;
+  max-height:52px!important;
+  align-self:start!important;
+  justify-self:stretch!important;
+  margin:0!important;
+  padding:6px 5px!important;
+}
+#appNav button.active::after,
+#appNav button[aria-current="page"]::after,
+.nearbyBottomNav069 button.active::after,
+.nearbyBottomNav069 button[aria-current="page"]::after{
+  content:none!important;
+  display:none!important;
+  width:0!important;
+  height:0!important;
+  background:transparent!important;
+  box-shadow:none!important;
+}
+@media(max-width:390px){
+  #appNav,
+  .nearbyBottomNav069{
+    gap:6px!important;
+    padding-left:max(7px,env(safe-area-inset-left,0px))!important;
+    padding-right:max(7px,env(safe-area-inset-right,0px))!important;
+  }
+}

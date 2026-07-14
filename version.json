@@ -1,8 +1,8 @@
 {
-  "build": "0.94.0",
+  "build": "0.94.1",
   "released": "2026-07-14",
-  "note": "Comprehensive UI polish for Settings hierarchy, Account Directory search, navigation, forms, tabs, and active-screen consistency.",
-  "label": "Comprehensive UI Polish",
-  "version": "0.94.0",
-  "name": "Comprehensive UI Polish"
+  "note": "Align Nearby bottom navigation with Search and Settings and remove the red active-button underline.",
+  "label": "Navigation Alignment Repair",
+  "version": "0.94.1",
+  "name": "Navigation Alignment Repair"
 }

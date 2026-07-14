@@ -1,19 +1,14 @@
-# FireVault Build 0.94.0
+# FireVault Build 0.94.1
 
-Comprehensive interface-polish release built from the 0.93.1 Settings Overflow Repair baseline.
+Bottom-navigation consistency repair built from the 0.94.0 Comprehensive UI Polish baseline.
 
 ## What changed
 
-- Enlarged Settings section names and added clear spacing between each section heading and its related controls.
-- Added restrained color accents to Settings section headings so categories are easier to scan without adding clutter.
-- Improved Settings rows, descriptions, status text, detail-page titles, form labels, and section headers.
-- Rebuilt the Account Directory top area with a clearer Search heading, visible account count, and a labeled Add control.
-- Enlarged and refined the account search field, clear control, Nearby control, and Sort control.
-- Improved Account Directory action icons and labels while preserving the Call, Route, Add Note, Favorite order.
-- Refined Account Detail actions and tab touch targets.
-- Added a clearer active indicator to the three-button Nearby, Search, and Settings navigation.
-- Standardized empty-state surfaces and spacing across active screens.
-- Preserved Settings horizontal-overflow protection, the visible splash screen, IndexedDB media, WebDAV, Demo Mode, Plus Codes, backups, and existing account records.
+- Aligned the Nearby Accounts bottom navigation to the exact same fixed position, height, safe-area padding, and button geometry used by Search and Settings.
+- Removed the red underline/bar beneath the active Nearby, Search, or Settings button.
+- Preserved the active button background, border, icon, and text treatment so the current section remains clear.
+- Preserved the three-button Nearby, Search, Settings navigation and all existing route behavior.
+- Preserved Settings, Account Directory, Account Detail, IndexedDB media, WebDAV, Demo Mode, Plus Codes, backups, and existing account records.
 
 ## Compatibility
 

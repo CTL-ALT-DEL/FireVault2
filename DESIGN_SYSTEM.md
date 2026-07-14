@@ -1,4 +1,4 @@
-# FireVault 0.94.0 Design System
+# FireVault 0.94.1 Design System
 
 `src/design-system.css` is the canonical release-facing visual layer.
 
@@ -27,3 +27,9 @@
 - Search controls must use the full available width without clipping or horizontal movement.
 - Active bottom-navigation sections must be immediately recognizable.
 - New visual changes should be added here rather than as another large patch in `styles.css`.
+
+
+## Build 0.94.1 navigation rules
+
+- Nearby and the global app dock use identical fixed geometry and safe-area padding.
+- The selected route is communicated by the button surface, border, icon, and label—not an underline bar.
