@@ -1167,3 +1167,224 @@ main,
   .overlayPreviewIdentity0943{top:9px;right:9px;padding:6px 8px;max-width:64%}
   .overlayTemplateAssist0943{align-items:flex-start}
 }
+
+/* FireVault 0.94.4 — button-first Photo Overlay field builder */
+.overlayFieldBuilder0944 .overlayCardHead0890{
+  align-items:center;
+  margin-bottom:14px;
+}
+.overlayFieldBuilder0944 .overlayCardHead0890 p{
+  margin:5px 0 0;
+  color:#98a8bc;
+  font-size:.74rem;
+  line-height:1.35;
+}
+.overlayAutoSave0944{
+  flex:0 0 auto;
+  display:inline-flex;
+  align-items:center;
+  min-height:30px;
+  padding:6px 9px;
+  border:1px solid rgba(86,206,147,.28);
+  border-radius:999px;
+  color:#8fe1b8;
+  background:rgba(48,146,99,.12);
+  font-size:.66rem;
+  font-style:normal;
+  font-weight:900;
+  white-space:nowrap;
+}
+.overlayAutoSave0944[data-state="saving"]{
+  border-color:rgba(244,185,72,.3);
+  color:#f6cf7a;
+  background:rgba(164,112,32,.13);
+}
+.overlayBuilderGroup0944{
+  display:grid;
+  gap:10px;
+  padding:12px;
+  border:1px solid rgba(145,165,191,.16);
+  border-radius:17px;
+  background:linear-gradient(180deg,rgba(255,255,255,.04),rgba(255,255,255,.018));
+}
+.overlayBuilderGroup0944 + .overlayBuilderGroup0944{margin-top:12px}
+.overlayBuilderTitle0944{
+  display:flex;
+  align-items:flex-end;
+  justify-content:space-between;
+  gap:12px;
+}
+.overlayBuilderTitle0944 strong{
+  color:#f6f9fd;
+  font-size:.85rem;
+}
+.overlayBuilderTitle0944 small{
+  color:#8f9eb1;
+  font-size:.65rem;
+  line-height:1.25;
+  text-align:right;
+}
+.overlayActiveFields0944{
+  display:grid;
+  gap:8px;
+}
+.overlayActiveField0944{
+  min-width:0;
+  display:grid;
+  grid-template-columns:25px minmax(95px,1fr) auto auto;
+  align-items:center;
+  gap:8px;
+  padding:9px;
+  border:1px solid rgba(132,156,187,.2);
+  border-radius:14px;
+  background:linear-gradient(180deg,#202c3c,#151e2a);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.055),0 5px 13px rgba(0,0,0,.19);
+  touch-action:pan-y;
+}
+.overlayActiveField0944.isDragging0944{
+  opacity:.56;
+  border-color:rgba(248,113,113,.65);
+}
+.overlayDragHandle0944{
+  display:grid;
+  place-items:center;
+  width:25px;
+  height:34px;
+  color:#8495aa;
+  font-size:15px;
+  cursor:grab;
+  user-select:none;
+}
+.overlayActiveFieldText0944{
+  min-width:0;
+  display:grid;
+  gap:2px;
+}
+.overlayActiveFieldText0944 strong{
+  overflow:hidden;
+  color:#f5f8fc;
+  font-size:.78rem;
+  line-height:1.1;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+.overlayActiveFieldText0944 small{
+  overflow:hidden;
+  color:#8f9db0;
+  font-size:.61rem;
+  line-height:1.15;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+.overlayBreakButton0944{
+  min-height:34px!important;
+  padding:5px 8px!important;
+  border:1px solid rgba(132,156,187,.2)!important;
+  border-radius:10px!important;
+  color:#aebdd0!important;
+  background:#111a26!important;
+  font-size:.62rem!important;
+  font-weight:900!important;
+  white-space:nowrap;
+}
+.overlayBreakButton0944.active{
+  border-color:rgba(83,172,255,.45)!important;
+  color:#9ed0ff!important;
+  background:rgba(40,111,172,.16)!important;
+}
+.overlayBreakButton0944:disabled{opacity:.28!important}
+.overlayFieldActions0944{
+  display:grid;
+  grid-template-columns:repeat(3,34px);
+  gap:4px;
+}
+.overlayFieldActions0944 button{
+  width:34px!important;
+  min-width:34px!important;
+  min-height:34px!important;
+  padding:0!important;
+  border-radius:10px!important;
+  color:#c7d3e2!important;
+  background:#111a26!important;
+  border:1px solid rgba(132,156,187,.18)!important;
+  font-size:.88rem!important;
+}
+.overlayFieldActions0944 button.danger{
+  color:#ff9ca5!important;
+  border-color:rgba(248,113,113,.3)!important;
+  background:rgba(112,34,42,.22)!important;
+}
+.overlayFieldActions0944 button:disabled{opacity:.25!important}
+.overlayFieldEmpty0944{
+  display:grid;
+  gap:4px;
+  padding:16px;
+  border:1px dashed rgba(132,156,187,.25);
+  border-radius:13px;
+  color:#dce6f2;
+  text-align:center;
+}
+.overlayFieldEmpty0944 small{color:#8f9db0;font-size:.68rem}
+.overlayFieldBuilder0944 .overlayFieldGrid510{
+  display:grid!important;
+  grid-template-columns:repeat(3,minmax(0,1fr))!important;
+  gap:7px!important;
+  margin:0!important;
+}
+.overlayFieldBuilder0944 .overlayFieldChip510{
+  width:100%!important;
+  min-height:45px!important;
+  justify-content:flex-start!important;
+  gap:7px!important;
+  padding:8px 9px!important;
+  border-radius:12px!important;
+}
+.overlayFieldBuilder0944 .overlayFieldChip510 span{
+  flex:0 0 auto;
+  width:20px;
+  height:20px;
+  display:grid;
+  place-items:center;
+  border-radius:7px;
+  color:#ff9098!important;
+  background:rgba(239,68,68,.12);
+  font-size:.8rem!important;
+}
+.overlayFieldBuilder0944 .overlayFieldChip510 strong{
+  min-width:0;
+  overflow:hidden;
+  color:#eef4fb!important;
+  font-family:inherit!important;
+  font-size:.68rem!important;
+  line-height:1.12;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+.overlayFieldBuilder0944 .overlayFieldChip510.isAdded0944{
+  opacity:.52;
+  border-color:rgba(73,201,139,.28)!important;
+  background:rgba(40,125,85,.12)!important;
+}
+.overlayFieldBuilder0944 .overlayFieldChip510.isAdded0944 span{
+  color:#8fe1b8!important;
+  background:rgba(48,146,99,.16);
+}
+@media(max-width:620px){
+  .overlayFieldBuilder0944 .overlayCardHead0890{align-items:flex-start}
+  .overlayAutoSave0944{font-size:.6rem;padding:5px 7px}
+  .overlayBuilderTitle0944{align-items:flex-start;flex-direction:column;gap:3px}
+  .overlayBuilderTitle0944 small{text-align:left}
+  .overlayActiveField0944{
+    grid-template-columns:22px minmax(80px,1fr) auto;
+    grid-template-areas:"drag text break" "drag actions actions";
+  }
+  .overlayDragHandle0944{grid-area:drag;height:100%}
+  .overlayActiveFieldText0944{grid-area:text}
+  .overlayBreakButton0944{grid-area:break}
+  .overlayFieldActions0944{grid-area:actions;justify-content:end}
+  .overlayFieldBuilder0944 .overlayFieldGrid510{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+}
+@media(max-width:360px){
+  .overlayFieldBuilder0944 .overlayFieldGrid510{grid-template-columns:1fr 1fr!important}
+  .overlayBreakButton0944{padding-inline:6px!important;font-size:.57rem!important}
+}

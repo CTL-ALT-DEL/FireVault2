@@ -1,8 +1,8 @@
 {
-  "build": "0.94.3",
+  "build": "0.94.4",
   "released": "2026-07-14",
-  "note": "Enlarge the Photo Overlay live preview, remove the bulky detail header, and repair overlay field insertion and text fitting.",
-  "label": "Photo Overlay Editing Repair",
-  "version": "0.94.3",
-  "name": "Photo Overlay Editing Repair"
+  "note": "Replace raw Photo Overlay text editing with an auto-saving field builder for one-tap add, reorder, line breaks, and removal.",
+  "label": "Photo Overlay Field Builder",
+  "version": "0.94.4",
+  "name": "Photo Overlay Field Builder"
 }
