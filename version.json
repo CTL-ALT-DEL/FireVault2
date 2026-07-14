@@ -1,8 +1,8 @@
 {
-  "build": "0.87.9",
+  "build": "0.87.10",
   "released": "2026-07-13",
-  "note": "Improved Account Directory scrolling responsiveness and added iPad portrait, landscape, and Split View layout refinements.",
-  "label": "Fluid Scrolling and iPad Layout",
-  "version": "0.87.9",
-  "name": "Fluid Scrolling and iPad Layout"
+  "note": "Aligned the four Account Directory card actions evenly across the full card width in Call, Route, Add Note, Favorite order.",
+  "label": "Full-Width Account Card Actions",
+  "version": "0.87.10",
+  "name": "Full-Width Account Card Actions"
 }

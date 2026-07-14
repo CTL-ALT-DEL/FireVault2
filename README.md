@@ -1,11 +1,9 @@
-# FireVault Build 0.87.9
+# FireVault Build 0.87.10
 
-Account Directory visual cleanup and depth release.
+Account Directory card-action alignment release.
 
-- Replaces the flat all-black Account Directory appearance with layered charcoal and blue-black surfaces
-- Adds subtle 3D shading to the directory header, search field, Nearby and Sort controls, and account cards
-- Gives account cards stronger separation through raised borders, top highlights, lower shadows, and restrained category accents
-- Adds dimensional account avatars and identity tags without adding new information or clutter
-- Refines action buttons with clearer raised and pressed states
-- Reduces expensive shadows while the list is moving to preserve Build 0.87.8 scrolling performance
-- Preserves account-card order, Add Note, Call, Favorite, Route, scroll settling, iPad layouts, Demo Mode, and stored account data
+- Moves the action row across the full horizontal width of every account card
+- Uses four equal-width action buttons
+- Sets the requested order: Call, Route, Add Note, Favorite
+- Preserves button icons, disabled states, favorite state, card depth, fluid scrolling, and iPad layouts
+- Preserves existing account records and the FireVault storage key
