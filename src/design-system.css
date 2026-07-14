@@ -577,3 +577,79 @@ button[data-fv-tap-locked0930="1"]{filter:saturate(.88)}
 @media(max-width:430px){
   .settingsDetailHeader0880 .primary{min-width:72px!important;padding-inline:12px!important}
 }
+
+
+/* FireVault 0.93.1 — Settings shortcut removal and horizontal overflow repair */
+html,
+body,
+main,
+#app,
+.screen{
+  max-width:100%!important;
+  overflow-x:hidden!important;
+  overscroll-behavior-x:none!important;
+}
+.settingsConcept10873,
+.settingsConcept1Body0873,
+.settingsStickyHead0880,
+.settingsGroupsGrid0880,
+.settingsListGroup0873,
+.settingsListCard0873,
+.settingsSearchResults0874,
+.settingsGroupScreen0860,
+.settingsSimpleDetail0850,
+.settingsGroupBody0860,
+.settingsDetailBody488{
+  width:100%!important;
+  max-width:100%!important;
+  min-width:0!important;
+  box-sizing:border-box!important;
+}
+.settingsConcept10873,
+.settingsConcept1Body0873,
+.settingsGroupScreen0860,
+.settingsSimpleDetail0850{
+  overflow-x:hidden!important;
+  overscroll-behavior-x:none!important;
+  touch-action:pan-y!important;
+}
+.settingsConcept1Body0873{
+  padding-inline:max(10px,min(14px,3.5vw))!important;
+}
+.settingsStickyHead0880{
+  margin-left:0!important;
+  margin-right:0!important;
+  padding-left:0!important;
+  padding-right:0!important;
+}
+.settingsGroupsGrid0880{
+  grid-template-columns:minmax(0,1fr)!important;
+}
+.settingsListRow0873,
+.settingsGroupedRow0873,
+.settingsSearchResult0874,
+.settingsGroupRow0860,
+.settingsSearch0874,
+.settingsSection540,
+.settingGroup{
+  width:100%!important;
+  max-width:100%!important;
+  min-width:0!important;
+}
+.settingsListCopy0880,
+.settingsRowTail0880,
+.settingsGroupTitle0880,
+.settingsDetailTitle0880{
+  min-width:0!important;
+  max-width:100%!important;
+}
+@media(min-width:700px){
+  .settingsConcept1Body0873{
+    width:min(900px,100%)!important;
+    padding-left:22px!important;
+    padding-right:22px!important;
+  }
+  .settingsGroupsGrid0880{
+    grid-template-columns:repeat(2,minmax(0,1fr))!important;
+  }
+}

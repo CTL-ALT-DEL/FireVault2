@@ -1,4 +1,4 @@
-# FireVault 0.93.0 Design System
+# FireVault 0.93.1 Design System
 
 `src/design-system.css` is the canonical release-facing visual layer.
 
@@ -31,3 +31,8 @@ Future visual changes should be made in this file instead of adding another buil
 - Keyboard-safe scroll padding and sticky form headers
 - Correct Nearby/Search navigation state mapping
 - Short, opacity-only route transitions
+
+
+## Build 0.93.1 Settings containment
+
+The Settings shortcut rail was removed. The Settings shell now enforces vertical-only scrolling, clamps all child widths to the viewport, removes negative sticky-header margins, and preserves one- or two-column grouped layouts without horizontal overflow.

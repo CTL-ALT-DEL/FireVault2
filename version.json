@@ -1,8 +1,8 @@
 {
-  "build": "0.93.0",
+  "build": "0.93.1",
   "released": "2026-07-14",
-  "note": "Interaction and field reliability: visible splash timing, unsaved-change protection, duplicate-action prevention, corrected navigation states, keyboard-safe forms, and consistent feedback.",
-  "label": "Interaction & Field Reliability",
-  "version": "0.93.0",
-  "name": "Interaction & Field Reliability"
+  "note": "Settings repair: removed the three shortcut buttons and prevented horizontal page dragging on iPhone and iPad.",
+  "label": "Settings Overflow Repair",
+  "version": "0.93.1",
+  "name": "Settings Overflow Repair"
 }

@@ -1,4 +1,4 @@
-# FireVault Build 0.93.0
+# FireVault Build 0.93.1
 
 Interaction & Field Reliability release built from the 0.92.0 Unified Design System baseline.
 
@@ -19,3 +19,11 @@ Interaction & Field Reliability release built from the 0.92.0 Unified Design Sys
 - Existing customer records remain on storage key `firevault_vault_build_030`.
 - Existing IndexedDB photos and documents remain unchanged.
 - No feature or data migration is required for this build.
+
+
+## Build 0.93.1
+
+- Removed the three shortcut/status buttons from the top of Settings.
+- Prevented the Settings page from moving horizontally on iPhone and iPad.
+- Removed negative-width and horizontal-scroll behavior from the Settings shell.
+- Preserved Settings search, grouped sections, WebDAV, Demo Mode, Plus Codes, backups, security, and Photo Overlay.
