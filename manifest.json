@@ -8,7 +8,7 @@
   "orientation": "any",
   "background_color": "#0b0d10",
   "theme_color": "#101216",
-  "description": "Professional field knowledge and account documentation system for fire alarm technicians.",
+  "description": "Professional account documentation and field reference system for fire alarm technicians.",
   "icons": [
     {
       "src": "assets/icon-192.png",
@@ -25,22 +25,22 @@
   ],
   "shortcuts": [
     {
-      "name": "Add Site",
-      "short_name": "Add Site",
+      "name": "Add Account",
+      "short_name": "Add Account",
       "url": "./?route=siteForm",
-      "description": "Create a FireVault site"
+      "description": "Create a FireVault account"
     },
     {
-      "name": "Nearby Sites",
+      "name": "Nearby Accounts",
       "short_name": "Nearby",
       "url": "./?route=nearbySites",
-      "description": "Detect saved sites near your current location"
+      "description": "Find saved accounts near your current location"
     },
     {
-      "name": "GPS / Maps",
-      "short_name": "GPS",
+      "name": "Search Accounts",
+      "short_name": "Search",
       "url": "./?route=sites",
-      "description": "Open site GPS and map tools"
+      "description": "Search the Account Directory"
     },
     {
       "name": "Settings",
@@ -49,5 +49,5 @@
       "description": "Open FireVault settings"
     }
   ],
-  "version": "0.89.0"
+  "version": "0.90.0"
 }

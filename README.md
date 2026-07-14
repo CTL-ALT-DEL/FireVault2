@@ -1,14 +1,14 @@
-# FireVault Build 0.89.0
+# FireVault Build 0.90.0
 
-Photo Overlay Studio redesign.
+Core cleanup release preparing FireVault for release-candidate testing.
 
-- Rebuilds Photo Overlay as a compact visual editor instead of one long settings form
-- Adds a smaller live preview that uses the exact same canvas renderer as exported overlay photos
-- Updates the account-photo Preview Overlay action to use that same exact renderer
-- Uses a real fire-alarm deficiency photo showing a notification appliance hanging from conduit
-- Adds Compact, Standard, and Detailed starting presets
-- Reorganizes controls into Quick Setup, Content, Layout, and Branding
-- Adds visual controls for overlay position, shape, text size, opacity, colors, and logo source
-- Expands overlay fields to include Account ID, account category, panel, address, GPS, technician, company, and other saved information
-- Preserves existing saved overlay templates, colors, logo settings, and customer records
-- Includes photo attribution and license information in the app and THIRD_PARTY_NOTICES.md
+## Included
+- Faster cached startup with no forced five-second delay
+- Retired scanner capture and service-visit timers removed
+- Existing scanned documents remain readable and exportable
+- Global iPad portrait lock removed
+- Account terminology applied to manifest shortcuts and key screens
+- Release-safe error recovery without exposing source-code details
+- Retired route/theme/advanced state archived without deleting customer records
+
+Open `index.html` through HTTPS or deploy the folder to GitHub Pages.

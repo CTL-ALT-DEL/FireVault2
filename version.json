@@ -1,8 +1,8 @@
 {
-  "build": "0.89.0",
-  "released": "2026-07-13",
-  "note": "Photo Overlay Studio redesign with a smaller exact canvas preview, quick presets, reorganized content/layout/branding controls, expanded account fields, and a real fire-alarm deficiency sample photo.",
-  "label": "Photo Overlay Studio",
-  "version": "0.89.0",
-  "name": "Photo Overlay Studio"
+  "build": "0.90.0",
+  "released": "2026-07-14",
+  "note": "Core cleanup: faster startup, retired feature removal, iPad orientation repair, Account terminology, safer release errors, and legacy data archiving.",
+  "label": "Core Cleanup",
+  "version": "0.90.0",
+  "name": "Core Cleanup"
 }

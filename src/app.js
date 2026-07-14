@@ -1,6 +1,6 @@
-import { BUILD, KEY, ACTIVE_JOB_KEY, loadData, saveData, ensureSite, fullAddress, esc, uid, downloadBlob, syncSummary, syncQueue, syncConflicts, syncActivity, createSyncPackage, importSyncPackage, resolveSyncConflict, notePackageExport, deviceIdentity, recordSyncActivity, autoBackupInfo, latestAutoBackup, restoreAutoBackup, isDemoMode, setDemoMode, resetDemoData, securityFoundationSummary, securityAudit, recycleBinInfo, restoreRecycleRecord, purgeRecycleBin, recordSecurityEvent, validateVaultIntegrity } from "./storage.js?v=0.89.0";
-import { backendAdapterSummary, runBackendAdapterDiagnostics, backendAdapterManifest, PROVIDER_CONTRACT_VERSION, FILE_STORAGE_CATALOG, fileStoragePlanSummary, cloudFileStorageManifest, MICROSOFT_STORAGE_TYPES, microsoftStorageAccounts, saveMicrosoftStorageAccounts, createMicrosoftStorageAccount, microsoftStorageAccountById, microsoftAppRegistration, saveMicrosoftAppRegistration, microsoftStorageSummary, microsoftStorageManifest } from "./providers.js?v=0.89.0";
-import { encodePlusCode, isValidFullPlusCode, normalizePlusCode, plusCodePrecisionLabel } from "./open-location-code.js?v=0.89.0";
+import { BUILD, KEY, loadData, saveData, ensureSite, fullAddress, esc, uid, downloadBlob, syncSummary, syncQueue, syncConflicts, syncActivity, createSyncPackage, importSyncPackage, resolveSyncConflict, notePackageExport, deviceIdentity, recordSyncActivity, autoBackupInfo, latestAutoBackup, restoreAutoBackup, isDemoMode, setDemoMode, resetDemoData, securityFoundationSummary, securityAudit, recycleBinInfo, restoreRecycleRecord, purgeRecycleBin, recordSecurityEvent, validateVaultIntegrity } from "./storage.js?v=0.90.0";
+import { backendAdapterSummary, runBackendAdapterDiagnostics, backendAdapterManifest, PROVIDER_CONTRACT_VERSION, FILE_STORAGE_CATALOG, fileStoragePlanSummary, cloudFileStorageManifest, MICROSOFT_STORAGE_TYPES, microsoftStorageAccounts, saveMicrosoftStorageAccounts, createMicrosoftStorageAccount, microsoftStorageAccountById, microsoftAppRegistration, saveMicrosoftAppRegistration, microsoftStorageSummary, microsoftStorageManifest } from "./providers.js?v=0.90.0";
+import { encodePlusCode, isValidFullPlusCode, normalizePlusCode, plusCodePrecisionLabel } from "./open-location-code.js?v=0.90.0";
 window.__FIREVAULT_MODULE_READY = true;
 
 function fvPreferenceStore0739(){
@@ -221,8 +221,6 @@ function resetAccountsViewState0761(){
   try{sessionStorage.removeItem(ACCOUNTS_VIEW_STATE_KEY_0761);}catch{}
 }
 
-const DEMO_ACTIVE_JOB_KEY_0738 = `${ACTIVE_JOB_KEY}_demo`;
-const DEMO_ACTIVE_ROUTE_KEY_0738 = "firevault_active_route_day_demo";
 
 let data = loadData();
 if(typeof window.fireVaultSplashDatabaseReady0732 === "function") window.fireVaultSplashDatabaseReady0732(Array.isArray(data?.sites)?data.sites.length:0);
@@ -251,7 +249,6 @@ let docPhotoClearRequested512 = false;
 let taskFilter = "open";
 let deficiencyFilter = "open";
 let actionCenterFilter562 = "all";
-let activeJob = loadActiveJob();
 const NEARBY_STATE_KEY_0652 = "firevault_nearby_state_0652";
 let nearbyState = loadNearbyState0652();
 let nearbyScanStatus0652 = {state:"idle",message:"",attempt:"",at:""};
@@ -275,24 +272,13 @@ let libraryFolder = "all";
 let docVaultFilter516 = "all";
 let docVaultSearch521 = "";
 let docVaultSort522 = "recent";
-let scannerDraft0800 = null;
-let scannerEditingDocId0800 = "";
-let scannerEditorIndex0800 = -1;
-let scannerReturnView0800 = "siteDocs";
-let scannerBusy0800 = false;
-let scannerTargetSiteId0801 = "";
-let scannerAccountSearch0801 = "";
-let scannerCameraState0802 = {stream:null,raf:0,lastAnalysis:0,lastCorners:null,stableFrames:0,cooldownUntil:0,capturing:false,autoCapture:true,running:false,awaitingPageChange:false,capturedCorners:null,capturedSignature:null,lastSignature:null,torch:false,track:null};
-let scannerGpsMatch0803 = {state:"idle",siteId:"",meters:null,accuracy:0,message:"",at:"",requestId:0,source:""};
 let routeReviewId = "";
 let routeHistorySearch = "";
 let simpleToolsOpen = false;
 let accountDetailTab0735 = "overview";
 let accountDetailSite0735 = "";
 let homeInstallTipHidden = fvSafeGet0739("firevault_home_install_tip_hidden","") === "1";
-let jobTimer = null;
-const ACTIVE_ROUTE_KEY = "firevault_active_route_day";
-let activeRoute = loadActiveRoute();
+try{localStorage.removeItem("firevault_active_route_day");sessionStorage.removeItem("firevault_active_route_day_demo");}catch{}
 const QUICK_EVENTS = ["Arrived on site","Opened panel","Panel normal","Trouble active","Ground fault active","Device tested","Customer update","Parts needed"];
 const DEFAULT_CHECKLIST = [
   ["Panel", "Panel normal / no active troubles"],
@@ -367,14 +353,13 @@ function routeTitle0782(routeName=view){
     contactsList:"Contacts",contactForm:"Contact",siteDocs:"Documents",siteDocForm:"Document",
     equipmentList:"Equipment",equipmentForm:"Equipment Item",tasks:"Tasks",taskForm:"Task",
     deficiencies:"Deficiencies",deficiencyForm:"Deficiency",report:"Report",library:"Library",
-    resourceForm:"Library Item",jobMode:"Job Mode",serviceVisit:"Service Visit",settings:"Settings",
-    diagnostics:"Diagnostics",dataTools:"Data Tools"
+    resourceForm:"Library Item",jobMode:"Site Notes",settings:"Settings",
   };
   return titles[routeName]||"FireVault";
 }
 function routeScrollKey0782(){
   const parts=[String(view||"home")];
-  if(selectedSiteId && ["siteDetail","visits","visitDetail","checklist","contactsList","contactForm","siteDocs","siteDocForm","equipmentList","equipmentForm","tasks","taskForm","deficiencies","deficiencyForm","report","jobMode","serviceVisit","siteForm"].includes(view)) parts.push(String(selectedSiteId));
+  if(selectedSiteId && ["siteDetail","visits","visitDetail","checklist","contactsList","contactForm","siteDocs","siteDocForm","equipmentList","equipmentForm","tasks","taskForm","deficiencies","deficiencyForm","report","jobMode","siteForm"].includes(view)) parts.push(String(selectedSiteId));
   if(view==="siteDetail") parts.push(String(accountDetailTab0735||"overview"));
   if(view==="settings") parts.push(String(mode||"home"),String(settingsTab||"tech"));
   return parts.join("|");
@@ -760,7 +745,7 @@ function currentPresetName474(){
 const LAYOUT_PRESETS_565 = {
   clean:{label:"Clean Home", icon:"◯", note:"Hide priority and backup cards; keep account screens compact.", values:{fieldFocus:false,dataSafeHome:false,siteBrief:true,siteTimeline:false,pinnedSites:true,importantSiteInfo:true}},
   field:{label:"Field Focused", icon:"▣", note:"Show field priorities and data safety, keep site screens useful.", values:{fieldFocus:true,dataSafeHome:true,siteBrief:true,siteTimeline:true,pinnedSites:true,importantSiteInfo:true}},
-  site:{label:"Site Detail", icon:"▤", note:"Home stays clean while account screens show brief and timeline.", values:{fieldFocus:false,dataSafeHome:false,siteBrief:true,siteTimeline:true,pinnedSites:true,importantSiteInfo:true}},
+  site:{label:"Account Detail", icon:"▤", note:"Home stays clean while account screens show brief and timeline.", values:{fieldFocus:false,dataSafeHome:false,siteBrief:true,siteTimeline:true,pinnedSites:true,importantSiteInfo:true}},
   minimal:{label:"Minimal", icon:"—", note:"Hide optional Home and site-detail cards for the simplest view.", values:{fieldFocus:false,dataSafeHome:false,siteBrief:false,siteTimeline:false,pinnedSites:false,importantSiteInfo:false}}
 };
 function activeLayoutPresetKey575(){
@@ -876,18 +861,17 @@ function val(id){ return document.getElementById(id)?.value?.trim() || ""; }
 function raw(id){ return document.getElementById(id)?.value || ""; }
 function checked(id){ return !!document.getElementById(id)?.checked; }
 function route(v){
-  if(v === "tools") v = "home";
-  if(v==="documentScanner" || v==="routeLog"){ toast("This feature is not included in FireVault 1.0."); v=v==="routeLog"?"home":"tools"; }
-  if(v!=="documentScanner"){ scannerStopLiveCamera0802(false); if(scannerGpsMatch0803?.state==="checking") scannerCancelGpsMatch0803(); }
+  const retiredRoutes0900=new Set(["tools","documentScanner","routeLog","serviceVisit","diagnostics","dataTools"]);
+  if(retiredRoutes0900.has(v)){
+    toast("That retired workspace is not included in FireVault 1.0.");
+    v = selectedSiteId && ["serviceVisit","documentScanner"].includes(v) ? "siteDetail" : "home";
+  }
   captureRouteScroll0782();
   if(view === "settings") captureSettingsScroll576();
-  if(settingsSubmenuReturn576 && ["diagnostics","dataTools"].includes(view) && !["diagnostics","dataTools","settings"].includes(v)) settingsSubmenuReturn576=false;
   if(v === "library" && !featureOn("library")){ toast("Library is hidden in Simple View. Turn it on in Settings → Modules."); v="home"; }
-  if(v === "diagnostics" && !featureOn("diagnostics")){ toast("Diagnostics is hidden in Simple View. Turn it on in Settings → Modules."); v="settings"; }
   if((v === "report") && !featureOn("reports")){ toast("Reports are hidden in Simple View."); v="siteDetail"; }
   if(["equipmentList","equipmentForm"].includes(v) && !featureOn("equipment")){ toast("Equipment Vault is hidden in Simple View."); v="siteDetail"; }
   if((v === "nearbySites") && !featureOn("advancedGps")){ toast("Advanced GPS is hidden in Simple View."); v="home"; }
-  if((v === "routeLog") && !activeRoute && !featureOn("dailyRoute")){ toast("Daily Route is hidden in Simple View."); v="home"; }
   if(settingsSubmenuReturn576 && v === "settings") settingsSubmenuReturn576=false;
   const previousView=view;
   if(v === "siteDetail" && previousView !== "siteDetail") accountDetailSite0735="";
@@ -1612,376 +1596,6 @@ function applyTheme(){
   const meta=document.querySelector('meta[name="theme-color"]');
   if(meta) meta.setAttribute("content","#07111f");
 }
-function activeJobStorageKey0738(){ return isDemoMode()?DEMO_ACTIVE_JOB_KEY_0738:ACTIVE_JOB_KEY; }
-function loadActiveJob(){ try{ const raw=fvSafeGet0739(activeJobStorageKey0738(),""); return raw ? JSON.parse(raw) : null; } catch{ return null; } }
-function saveActiveJob(){ const key=activeJobStorageKey0738(); activeJob ? fvSafeSet0739(key,JSON.stringify(activeJob)) : fvSafeRemove0739(key); }
-
-function activeRouteStorageKey0738(){ return isDemoMode()?DEMO_ACTIVE_ROUTE_KEY_0738:ACTIVE_ROUTE_KEY; }
-function loadActiveRoute(){ try{ const raw=fvSafeGet0739(activeRouteStorageKey0738(),""); return raw ? JSON.parse(raw) : null; } catch{ return null; } }
-function saveActiveRoute(){ const key=activeRouteStorageKey0738(); activeRoute ? fvSafeSet0739(key,JSON.stringify(activeRoute)) : fvSafeRemove0739(key); }
-function routeEventTime(iso){ try{return new Date(iso).toLocaleTimeString([], {hour:"numeric",minute:"2-digit"});}catch{return "";} }
-function routeDateLabel(iso){ try{return new Date(iso).toLocaleDateString([], {weekday:"short",month:"short",day:"numeric",year:"numeric"});}catch{return "";} }
-function routeDuration(start,end){
-  if(!start) return "Not started";
-  const a=new Date(start).getTime(), b=end?new Date(end).getTime():Date.now();
-  if(!Number.isFinite(a)||!Number.isFinite(b)||b<a) return "0 min";
-  const m=Math.round((b-a)/60000);
-  if(m<60) return `${m} min`;
-  return `${Math.floor(m/60)}h ${m%60}m`;
-}
-function routePointEvents(log=activeRoute){
-  return (log?.events||[]).filter(e=>Number.isFinite(Number(e.lat)) && Number.isFinite(Number(e.lng)));
-}
-function routeDistanceMetersTotal(log=activeRoute){
-  const pts=routePointEvents(log);
-  let total=0;
-  for(let i=1;i<pts.length;i++) total += distanceMeters(Number(pts[i-1].lat),Number(pts[i-1].lng),Number(pts[i].lat),Number(pts[i].lng));
-  return total;
-}
-function routeDistanceLabel(log=activeRoute){
-  const pts=routePointEvents(log);
-  if(pts.length<2) return "Not enough GPS points";
-  return distanceLabel(routeDistanceMetersTotal(log));
-}
-function routeDirectionsLink(log=activeRoute){
-  const pts=routePointEvents(log);
-  if(pts.length<2) return "";
-  const trimmed=pts.length>10 ? pts.filter((_,i)=>i===0||i===pts.length-1||i%Math.ceil(pts.length/8)===0).slice(0,10) : pts;
-  const origin=`${Number(trimmed[0].lat).toFixed(6)},${Number(trimmed[0].lng).toFixed(6)}`;
-  const dest=`${Number(trimmed[trimmed.length-1].lat).toFixed(6)},${Number(trimmed[trimmed.length-1].lng).toFixed(6)}`;
-  const mids=trimmed.slice(1,-1).map(e=>`${Number(e.lat).toFixed(6)},${Number(e.lng).toFixed(6)}`);
-  if(data.settings.gps?.mapProvider==="google"){
-    let url=`https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent(origin)}&destination=${encodeURIComponent(dest)}&travelmode=driving`;
-    if(mids.length) url += `&waypoints=${encodeURIComponent(mids.join("|"))}`;
-    return url;
-  }
-  return `https://maps.apple.com/?saddr=${encodeURIComponent(origin)}&daddr=${encodeURIComponent(dest)}`;
-}
-function routeOdometerMiles(log=activeRoute){
-  const start=Number(log?.startOdometer);
-  const end=Number(log?.endOdometer);
-  if(!Number.isFinite(start) || !Number.isFinite(end) || end < start) return null;
-  return end-start;
-}
-function routeOdometerLabel(log=activeRoute){
-  const miles=routeOdometerMiles(log);
-  if(miles===null) return "Odometer not entered";
-  return `${miles>=100?miles.toFixed(0):miles.toFixed(1)} mi odometer`;
-}
-function routeOdometerReportLines(log=activeRoute){
-  const lines=[];
-  if(log?.vehicle) lines.push(`Vehicle: ${log.vehicle}`);
-  if(log?.startOdometer!==undefined && log?.startOdometer!=="") lines.push(`Start Odometer: ${log.startOdometer}`);
-  if(log?.endOdometer!==undefined && log?.endOdometer!=="") lines.push(`End Odometer: ${log.endOdometer}`);
-  const miles=routeOdometerMiles(log);
-  if(miles!==null) lines.push(`Odometer Miles: ${miles>=100?miles.toFixed(0):miles.toFixed(1)} mi`);
-  if(log?.dayNotes) lines.push(`Day Notes: ${String(log.dayNotes).replaceAll("\n"," | ")}`);
-  return lines;
-}
-function routeSummaryLine(log=activeRoute){
-  if(!log) return "No route day selected.";
-  const events=log.events||[];
-  const siteCount=[...new Set(events.filter(e=>e.siteName).map(e=>e.siteName))].length;
-  const odo=routeOdometerMiles(log);
-  return `${events.length} waypoint${events.length===1?"":"s"} • ${siteCount} site${siteCount===1?"":"s"} • ${routeDuration(log.startedAt,log.endedAt)} • ${routeDistanceLabel(log)}${odo!==null?` • ${routeOdometerLabel(log)}`:""}`;
-}
-function saveRouteDetails469(){
-  if(!activeRoute){ toast("Start a route day first."); return; }
-  activeRoute.vehicle=val("routeVehicle");
-  const start=val("routeStartOdo");
-  const end=val("routeEndOdo");
-  activeRoute.startOdometer=start===""?"":Number(start);
-  activeRoute.endOdometer=end===""?"":Number(end);
-  activeRoute.dayNotes=raw("routeDayNotes").trim();
-  saveActiveRoute();
-  toast("Route details saved.");
-  routeLog();
-}
-
-function routePauseStatusLine(log=activeRoute){
-  if(!log) return "No route active";
-  if(log.endedAt) return "Saved";
-  return log.paused ? "Paused" : "Recording";
-}
-function pauseRouteDay(){
-  if(!activeRoute){ toast("Start Daily Route first."); return; }
-  if(activeRoute.paused){ toast("Route is already paused."); return; }
-  const now=new Date().toISOString();
-  activeRoute.paused=true;
-  activeRoute.pausedAt=now;
-  activeRoute.events=activeRoute.events||[];
-  activeRoute.events.push({id:uid(),type:"Paused",label:"Route Paused",notes:"Recording paused.",at:now});
-  saveActiveRoute();
-  toast("Daily Route paused.");
-  if(view === "routeLog") routeLog(); else render();
-}
-function resumeRouteDay(){
-  if(!activeRoute){ toast("Start Daily Route first."); return; }
-  if(!activeRoute.paused){ toast("Route is already recording."); return; }
-  const now=new Date().toISOString();
-  activeRoute.paused=false;
-  activeRoute.resumedAt=now;
-  activeRoute.events=activeRoute.events||[];
-  activeRoute.events.push({id:uid(),type:"Resumed",label:"Route Resumed",notes:"Recording resumed.",at:now});
-  saveActiveRoute();
-  toast("Daily Route resumed.");
-  if(view === "routeLog") routeLog(); else render();
-}
-function routeGpsText(ev){
-  if(!ev || !Number.isFinite(Number(ev.lat)) || !Number.isFinite(Number(ev.lng))) return "No GPS";
-  const acc=Number.isFinite(Number(ev.accuracy)) && Number(ev.accuracy)>0 ? ` ±${Math.round(Number(ev.accuracy))}m` : "";
-  return `${Number(ev.lat).toFixed(6)}, ${Number(ev.lng).toFixed(6)}${acc}`;
-}
-function routeMapLink(ev){
-  if(!ev || !Number.isFinite(Number(ev.lat)) || !Number.isFinite(Number(ev.lng))) return "";
-  const q=encodeURIComponent(`${Number(ev.lat).toFixed(6)},${Number(ev.lng).toFixed(6)}`);
-  return (data.settings.gps?.mapProvider==="google") ? `https://www.google.com/maps/search/?api=1&query=${q}` : `https://maps.apple.com/?q=${q}`;
-}
-function getGpsPosition(){
-  return new Promise((resolve)=>{
-    if(data.settings.gps?.enabled===false || !navigator.geolocation){ resolve(null); return; }
-    navigator.geolocation.getCurrentPosition(pos=>resolve({
-      lat:Number(pos.coords.latitude.toFixed(6)),
-      lng:Number(pos.coords.longitude.toFixed(6)),
-      accuracy:Math.round(pos.coords.accuracy||0)
-    }),()=>resolve(null),gpsOptions());
-  });
-}
-function ensureActiveRoute(){
-  if(activeRoute) return activeRoute;
-  activeRoute={id:uid(),date:localDateString(),startedAt:new Date().toISOString(),endedAt:null,vehicle:"",startOdometer:"",endOdometer:"",dayNotes:"",events:[]};
-  saveActiveRoute();
-  return activeRoute;
-}
-async function addRouteEvent(type,label,siteId="",notes=""){
-  const route=ensureActiveRoute();
-  const allowedWhilePaused=["Paused","Resumed","End Day"];
-  if(route.paused && !allowedWhilePaused.includes(type)){
-    toast("Daily Route is paused. Resume recording first.");
-    return;
-  }
-  toast("Capturing route point...");
-  const gps=await getGpsPosition();
-  const s=siteId?data.sites.find(x=>x.id===siteId):null;
-  const ev={id:uid(),type,label:label||type,siteId:siteId||"",siteName:s?.name||"",address:s?fullAddress(s):"",notes:notes||"",at:new Date().toISOString(),...(gps||{})};
-  if(gps && data.sites.some(hasGps)){
-    const nearest=gpsSiteDistances(gps.lat,gps.lng)[0];
-    if(nearest){
-      ev.nearestSite=nearest.s.name||"Unnamed Site";
-      ev.nearestDistance=distanceLabel(nearest.meters);
-    }
-  }
-  route.events.push(ev);
-  if(route.nearbySuggestion && siteId && route.nearbySuggestion.siteId===siteId) delete route.nearbySuggestion;
-  saveActiveRoute();
-  toast(`${label||type} added.`);
-  if(view === "routeLog") routeLog(); else render();
-}
-function editRouteEvent(id){
-  if(!activeRoute){ toast("No active route day."); return; }
-  const ev=(activeRoute.events||[]).find(x=>x.id===id);
-  if(!ev){ toast("Waypoint not found."); return; }
-  const label=prompt("Edit waypoint title", ev.label||ev.type||"Waypoint");
-  if(label===null) return;
-  const notes=prompt("Edit waypoint notes", ev.notes||"");
-  if(notes===null) return;
-  ev.label=(label.trim()||ev.label||ev.type||"Waypoint");
-  ev.notes=notes.trim();
-  saveActiveRoute();
-  toast("Waypoint updated.");
-  routeLog();
-}
-function deleteRouteEvent(id){
-  if(!activeRoute){ toast("No active route day."); return; }
-  const ev=(activeRoute.events||[]).find(x=>x.id===id);
-  if(!ev){ toast("Waypoint not found."); return; }
-  if(!confirm(`Delete waypoint "${ev.label||ev.type||"Waypoint"}"?`)) return;
-  activeRoute.events=(activeRoute.events||[]).filter(x=>x.id!==id);
-  saveActiveRoute();
-  toast("Waypoint deleted.");
-  routeLog();
-}
-function undoLastRouteEvent(){
-  if(!activeRoute || !(activeRoute.events||[]).length){ toast("No waypoint to remove."); return; }
-  const ev=activeRoute.events[activeRoute.events.length-1];
-  if(!confirm(`Remove last waypoint "${ev.label||ev.type||"Waypoint"}"?`)) return;
-  activeRoute.events.pop();
-  saveActiveRoute();
-  toast("Last waypoint removed.");
-  routeLog();
-}
-function routeSuggestion(){
-  if(!activeRoute?.nearbySuggestion) return null;
-  const n=activeRoute.nearbySuggestion;
-  const s=data.sites.find(x=>x.id===n.siteId);
-  if(!s) return null;
-  return {n,s};
-}
-async function checkRouteNearestSite(){
-  if(!activeRoute){ toast("Start Daily Route first."); return; }
-  if(activeRoute.paused){ toast("Daily Route is paused. Resume recording first."); return; }
-  if(!data.sites.some(hasGps)){ toast("No saved GPS sites yet."); return; }
-  toast("Checking nearest saved site...");
-  const gps=await getGpsPosition();
-  if(!gps){ toast("GPS check unavailable."); return; }
-  const nearest=gpsSiteDistances(gps.lat,gps.lng)[0];
-  if(!nearest){ toast("No nearby site match found."); return; }
-  activeRoute.nearbySuggestion={
-    siteId:nearest.s.id,
-    siteName:nearest.s.name||"Unnamed Site",
-    address:fullAddress(nearest.s),
-    meters:Math.round(nearest.meters),
-    distance:distanceLabel(nearest.meters),
-    lat:gps.lat,
-    lng:gps.lng,
-    accuracy:gps.accuracy||0,
-    checkedAt:new Date().toISOString()
-  };
-  saveActiveRoute();
-  toast(`Nearest site: ${activeRoute.nearbySuggestion.siteName}`);
-  if(view === "routeLog") routeLog(); else render();
-}
-function clearRouteSuggestion(){
-  if(!activeRoute) return;
-  delete activeRoute.nearbySuggestion;
-  saveActiveRoute();
-  routeLog();
-}
-function routeUseSuggestion(kind){
-  const found=routeSuggestion();
-  if(!found){ toast("No suggested site available."); return; }
-  const label=kind==="Left Site" ? `Left: ${found.s.name||"Site"}` : `Arrived: ${found.s.name||"Site"}`;
-  addRouteEvent(kind,label,found.s.id);
-}
-async function startRouteDay(){
-  if(activeRoute){ route("routeLog"); return; }
-  activeRoute={id:uid(),date:localDateString(),startedAt:new Date().toISOString(),endedAt:null,vehicle:"",startOdometer:"",endOdometer:"",dayNotes:"",events:[]};
-  saveActiveRoute();
-  await addRouteEvent("Start Day","Start Day");
-}
-async function endRouteDay(){
-  if(!activeRoute){ toast("No active route day."); return; }
-  await addRouteEvent("End Day","End Day");
-  activeRoute.paused=false;
-  activeRoute.endedAt=new Date().toISOString();
-  data.routeLogs=data.routeLogs||[];
-  data.routeLogs.unshift(activeRoute);
-  data.routeLogs=data.routeLogs.slice(0,90);
-  activeRoute=null;
-  saveActiveRoute();
-  save();
-  toast("Daily route saved.");
-  if(view === "routeLog") routeLog(); else render();
-}
-function routeReportText(log=activeRoute){
-  if(!log) return "No active route log.";
-  const stops=log.events||[];
-  const siteStops=stops.filter(e=>e.siteName).length;
-  const lines=[
-    `FIREVAULT DAILY ROUTE REPORT`,
-    `Date: ${routeDateLabel(log.startedAt||new Date())}`,
-    `Start: ${log.startedAt?routeEventTime(log.startedAt):"Not started"}`,
-    `End: ${log.endedAt?routeEventTime(log.endedAt):"Active"}`,
-    `Status: ${routePauseStatusLine(log)}`,
-    `Duration: ${routeDuration(log.startedAt,log.endedAt)}`,
-    `Estimated Route Distance: ${routeDistanceLabel(log)}`,
-    ...routeOdometerReportLines(log),
-    `Waypoints: ${stops.length}`,
-    `Site Stops: ${siteStops}`,
-    ``,
-    routeDirectionsLink(log) ? `Route Directions: ${routeDirectionsLink(log)}` : `Route Directions: Not enough GPS points`,
-    ``,
-    `STOPS / WAYPOINTS`
-  ];
-  if(!stops.length) lines.push("- No waypoints recorded.");
-  stops.forEach((e,i)=>{
-    lines.push(`${i+1}. ${routeEventTime(e.at)} - ${e.label||e.type}${e.siteName?` - ${e.siteName}`:""}`);
-    if(e.address) lines.push(`   Address: ${e.address}`);
-    lines.push(`   GPS: ${routeGpsText(e)}`);
-    const link=routeMapLink(e); if(link) lines.push(`   Map: ${link}`);
-    if(e.nearestSite) lines.push(`   Nearby: ${e.nearestSite} (${e.nearestDistance})`);
-    if(e.notes) lines.push(`   Notes: ${e.notes}`);
-  });
-  lines.push(``, `Generated by FireVault Build ${BUILD} on ${new Date().toLocaleString()}`);
-  return lines.join("\n");
-}
-function copyRouteReport(log=activeRoute){
-  const text=routeReportText(log);
-  if(navigator.clipboard?.writeText){
-    navigator.clipboard.writeText(text).then(()=>toast("Route report copied."),()=>toast("Clipboard unavailable."));
-  }else toast("Clipboard unavailable.");
-}
-function downloadRouteReport(log=activeRoute){
-  const name=`firevault-route-${(log?.date||localDateString())}.txt`;
-  downloadBlob(name, routeReportText(log));
-}
-
-function routeCsvEscape(v){
-  const s=String(v ?? "");
-  return /[",\n]/.test(s) ? `"${s.replace(/"/g,'""')}"` : s;
-}
-function routeCsvText(log=activeRoute){
-  if(!log) return "Vehicle,Start Odometer,End Odometer,Odometer Miles,Day Notes,Time,Type,Label,Site,Address,Latitude,Longitude,Accuracy,Nearest Site,Nearest Distance,Notes,Map Link\n";
-  const header=["Vehicle","Start Odometer","End Odometer","Odometer Miles","Day Notes","Time","Type","Label","Site","Address","Latitude","Longitude","Accuracy","Nearest Site","Nearest Distance","Notes","Map Link"];
-  const odo=routeOdometerMiles(log);
-  const rows=(log.events||[]).map(e=>[
-    log.vehicle||"",
-    log.startOdometer??"",
-    log.endOdometer??"",
-    odo===null?"":(odo>=100?odo.toFixed(0):odo.toFixed(1)),
-    log.dayNotes||"",
-    e.at ? new Date(e.at).toLocaleString() : "",
-    e.type||"",
-    e.label||"",
-    e.siteName||"",
-    e.address||"",
-    Number.isFinite(Number(e.lat)) ? Number(e.lat).toFixed(6) : "",
-    Number.isFinite(Number(e.lng)) ? Number(e.lng).toFixed(6) : "",
-    Number.isFinite(Number(e.accuracy)) ? Math.round(Number(e.accuracy)) : "",
-    e.nearestSite||"",
-    e.nearestDistance||"",
-    e.notes||"",
-    routeMapLink(e)||""
-  ]);
-  return [header, ...rows].map(r=>r.map(routeCsvEscape).join(",")).join("\n");
-}
-function downloadRouteCsv(log=activeRoute){
-  const name=`firevault-route-${(log?.date||localDateString())}.csv`;
-  downloadBlob(name, routeCsvText(log), "text/csv");
-  toast("Route CSV downloaded.");
-}
-function routeCustomerSummaryText(log=activeRoute){
-  if(!log) return "No route day selected.";
-  const events=log.events||[];
-  const siteNames=[...new Set(events.filter(e=>e.siteName).map(e=>e.siteName))];
-  const lines=[
-    `FireVault Daily Work Route Summary`,
-    `Date: ${routeDateLabel(log.startedAt||new Date())}`,
-    `Time: ${log.startedAt?routeEventTime(log.startedAt):"Not started"} - ${log.endedAt?routeEventTime(log.endedAt):"Active"}`,
-    `Duration: ${routeDuration(log.startedAt,log.endedAt)}`,
-    `Stops Recorded: ${events.length}`,
-    `Sites Visited: ${siteNames.length ? siteNames.join(", ") : "None recorded"}`,
-    `Estimated Route Distance: ${routeDistanceLabel(log)}`,
-    ...routeOdometerReportLines(log),
-    ``,
-    `Stop Timeline:`
-  ];
-  if(!events.length) lines.push(`- No stops recorded.`);
-  events.forEach((e,i)=>{
-    const stopName=e.siteName ? `${e.label||e.type} - ${e.siteName}` : (e.label||e.type||"Stop");
-    lines.push(`${i+1}. ${routeEventTime(e.at)} - ${stopName}`);
-    if(e.notes) lines.push(`   Notes: ${e.notes}`);
-  });
-  lines.push(``, `Generated from FireVault Build ${BUILD}`);
-  return lines.join("\n");
-}
-function copyRouteCustomerSummary(log=activeRoute){
-  const text=routeCustomerSummaryText(log);
-  if(navigator.clipboard?.writeText){
-    navigator.clipboard.writeText(text).then(()=>toast("Customer summary copied."),()=>toast("Clipboard unavailable."));
-  }else toast("Clipboard unavailable.");
-}
-
 function fmtDate(d=new Date()){ return d.toLocaleDateString([], {month:"short", day:"numeric", year:"numeric"}); }
 function todayIso(){ return new Date().toISOString().slice(0,10); }
 function localDateString(d=new Date()){
@@ -2019,11 +1633,6 @@ function dailySummaryActivityDates571(){
     (s.tasks||[]).forEach(t=>{ if(t?.createdAt) days.add(localDateString(new Date(t.createdAt))); });
     (s.deficiencies||[]).forEach(d=>{ if(d?.createdAt) days.add(localDateString(new Date(d.createdAt))); });
   });
-  (data.routeLogs||[]).forEach(r=>{
-    if(r?.date) days.add(r.date);
-    else if(r?.startedAt) days.add(localDateString(new Date(r.startedAt)));
-  });
-  if(activeRoute?.startedAt) days.add(localDateString(new Date(activeRoute.startedAt)));
   return days;
 }
 function dailySummaryHasActivity571(day){
@@ -2189,41 +1798,9 @@ function visitNotesPreview(v, lines=2){
 function visitReportBlock(v){
   return `${visitDateLabel(v)} • ${visitTimeRange(v)} • ${durationText(v.startedAt,v.endedAt)}\n${v.notes || "No visit notes saved."}`;
 }
-function addJobEvent(note){
-  if(!activeJob) return;
-  activeJob.events = Array.isArray(activeJob.events) ? activeJob.events : [];
-  activeJob.events.unshift({time:new Date().toISOString(), note});
-  saveActiveJob();
-}
-function addServiceFollowUp(kind="Follow-up"){
-  const s=site();
-  if(!s || !activeJob){ toast("Start a job first."); return; }
-  const defaultTitle = kind === "Parts Needed" ? "Parts needed" : "Follow up from service call";
-  const title = prompt(`${kind} task title:`, defaultTitle);
-  if(!title) return;
-  const notes = prompt("Task notes:", `${kind} created during service call on ${fmtDate()} for ${s.name || "site"}.`) || "";
-  s.tasks = Array.isArray(s.tasks) ? s.tasks : [];
-  s.tasks.unshift({
-    id:uid(),
-    title: kind === "Parts Needed" && !title.toLowerCase().startsWith("parts") ? `Parts needed: ${title}` : title,
-    status:"Open",
-    due:"",
-    notes,
-    source:"Service Call",
-    sourceStartedAt:activeJob.startedAt,
-    createdAt:new Date().toISOString()
-  });
-  addJobEvent(`${kind}: ${title}`);
-  save();
-  saveActiveJob();
-  toast(`${kind} task added.`);
-  render();
-}
-function startJobTimer(){ stopJobTimer(); }
-function stopJobTimer(){ if(jobTimer){ clearInterval(jobTimer); jobTimer=null; } }
 function setActiveNav(){
   document.querySelectorAll("#appNav button").forEach(b=>{b.classList.remove("active");b.removeAttribute("aria-current");});
-  const section=(["dailySummary","actionCenter","pinnedSites","dashboard068"].includes(view)?"home":(["siteDetail","visits","visitDetail","checklist","siteForm","contactsList","contactForm","siteDocs","siteDocForm","equipmentList","equipmentForm","tasks","taskForm","deficiencies","deficiencyForm","report","jobMode","serviceVisit","nearbySites","attention"].includes(view)?"sites":view));
+  const section=(["dailySummary","actionCenter","pinnedSites","dashboard068"].includes(view)?"home":(["siteDetail","visits","visitDetail","checklist","siteForm","contactsList","contactForm","siteDocs","siteDocForm","equipmentList","equipmentForm","tasks","taskForm","deficiencies","deficiencyForm","report","jobMode","nearbySites","attention"].includes(view)?"sites":view));
   const active=document.getElementById("nav-"+section);
   if(active){active.classList.add("active");active.setAttribute("aria-current","page");}
 }
@@ -2280,13 +1857,12 @@ function render(){
     document.body.classList.toggle("homeLayoutFixed570", isHomeView);
     document.body.classList.toggle("settingsChrome572", view === "settings");
     if(!isHomeView) restoreAppChrome572();
-    const routes = {home, dashboard068, dailySummary, actionCenter, pinnedSites:pinnedSitesManager567, sites, nearbySites, attention:attentionQueue, siteDetail, visits, visitDetail, checklist, siteForm, contactsList, contactForm, siteDocs, siteDocForm, equipmentList, equipmentForm, tasks, taskForm, deficiencies, deficiencyForm, report, library, resourceForm, jobMode, serviceVisit, settings, dataTools};
+    const routes = {home, dashboard068, dailySummary, actionCenter, pinnedSites:pinnedSitesManager567, sites, nearbySites, attention:attentionQueue, siteDetail, visits, visitDetail, checklist, siteForm, contactsList, contactForm, siteDocs, siteDocForm, equipmentList, equipmentForm, tasks, taskForm, deficiencies, deficiencyForm, report, library, resourceForm, jobMode, settings};
     (routes[view] || home)();
     document.body.classList.toggle("homeFullscreen480", isHomeView);
     document.body.classList.toggle("homeLayoutFixed570", isHomeView);
     document.body.classList.toggle("settingsChrome572", view === "settings");
     if(view !== "settings") document.body.classList.remove("settingsChrome572");
-    stopJobTimer();
     applyFeatureVisibility();
     setActiveNav();
     injectContextualHelp060();
@@ -2299,7 +1875,10 @@ function render(){
 
 function showError(err){
   console.error(err);
-  html(`<div class="screen"><div class="card errorBox"><h1>${fireVaultBrand575()} Diagnostics</h1><p>The app caught an error instead of going black.</p><p>${esc(err?.stack || err?.message || err)}</p><button class="primary" onclick="location.reload()">Reload App</button></div></div>`);
+  try{window.fireVaultRecordSupportError0900?.(err,"render");}catch{}
+  html(`<div class="screen"><div class="card errorBox fvReleaseError0900"><h1>Something went wrong</h1><p>FireVault could not finish opening this screen. Your saved account data has not been removed.</p><div class="grid2"><button class="primary" id="fvReload0900">Reload</button><button class="ghost" id="fvHome0900">Return to Nearby</button></div></div></div>`);
+  document.getElementById("fvReload0900")?.addEventListener("click",()=>location.reload());
+  document.getElementById("fvHome0900")?.addEventListener("click",()=>{view="home";mode=null;render();});
 }
 
 
@@ -2406,25 +1985,14 @@ function todayNoteRows500(){
   return rows.sort((a,b)=>String(a.s.name||"").localeCompare(String(b.s.name||"")));
 }
 function todayAccounts500(){
-  const map=new Map();
-  todayNoteRows500().forEach(r=>map.set(r.s.id,{s:r.s,reason:`${r.notes.length} note${r.notes.length===1?"":"s"}`}));
-  const today=localDateString();
-  const routeEvents=[...(activeRoute?.events||[]), ...((data.routeLogs||[]).filter(l=>(l.date||"")===today || (l.startedAt||"").slice(0,10)===today).flatMap(l=>l.events||[]))];
-  routeEvents.forEach(e=>{
-    if(e.siteId){
-      const s=data.sites.find(x=>x.id===e.siteId);
-      if(s && !map.has(s.id)) map.set(s.id,{s,reason:"Route stop"});
-    }
-  });
-  return [...map.values()].slice(0,5);
+  return todayNoteRows500().map(r=>({s:r.s,reason:`${r.notes.length} note${r.notes.length===1?"":"s"}`})).slice(0,5);
 }
 function dashboardSummary500(){
   const notes=todayNoteRows500();
   const noteCount=notes.reduce((n,r)=>n+r.notes.length,0);
-  const routeCount=(activeRoute?.events||[]).length;
   const openTasks=allTaskRows().filter(r=>!taskIsDone(r.t)).length;
   const openDef=data.sites.reduce((n,s)=>n+(s.deficiencies||[]).filter(d=>(d.status||"Open")!=="Closed").length,0);
-  return {notes:noteCount,noteSites:notes.length,route:routeCount,tasks:openTasks,def:openDef};
+  return {notes:noteCount,noteSites:notes.length,tasks:openTasks,def:openDef};
 }
 function todayAccountsMarkup500(){
   const rows=todayAccounts500();
@@ -2440,7 +2008,7 @@ const QUICK_CAPTURE_TYPES_560 = {
   deficiency:{label:"Deficiency", short:"Deficiency", icon:"!", accent:"red", help:"Record an open deficiency and optionally create a matching follow-up task."}
 };
 function quickCaptureDefaultSite560(){
-  const ids=[activeJob?.siteId,selectedSiteId,...todayAccounts500().map(r=>r.s.id),...recentAccounts476(8).map(s=>s.id)];
+  const ids=[selectedSiteId,...todayAccounts500().map(r=>r.s.id),...recentAccounts476(8).map(s=>s.id)];
   return ids.map(id=>(data.sites||[]).find(s=>s.id===id)).find(Boolean) || data.sites?.[0] || null;
 }
 function quickCaptureSiteOptions560(activeId=""){
@@ -2551,6 +2119,7 @@ function wireFieldDashboard560(){
   const note=document.getElementById("quickAccountNote500"); if(note) note.onclick=()=>openQuickCapture560("note");
   const notes=document.getElementById("dashNotes500"); if(notes) notes.onclick=()=>{ setDailySummaryDay569(localDateString()); route("dailySummary"); };
   const accounts=document.getElementById("dashAccounts500"); if(accounts) accounts.onclick=()=>{ setDailySummaryDay569(localDateString()); route("dailySummary"); };
+  const dashTasks=document.getElementById("dashTasks500"); if(dashTasks) dashTasks.onclick=()=>route("tasks");
   const copy=document.getElementById("copySummary500"); if(copy) copy.onclick=copyDailySummary499;
   const all=document.getElementById("allTodayAccounts500"); if(all) all.onclick=()=>route("sites");
 }
@@ -2790,25 +2359,6 @@ function pinnedSitesManager567(){
 
 
 
-function tools0734(){
-  html(`<div class="screen toolsScreen0734">
-    <div class="toolsHero0734">
-      <div><span>FIELD UTILITIES</span><h1>Tools</h1><p>FireVault utilities for document scanning, route records, reference material, backups, and diagnostics.</p></div>
-      <button class="homeBuildPill481 toolsBuild0734" id="toolsRelease0734" aria-label="Release notes">${BUILD}</button>
-    </div>
-
-    <div class="toolsSectionTitle0734"><strong>FireVault Utilities</strong><span>Quick access</span></div>
-    <div class="toolsGrid0734 toolsGridClean0735">
-      <button class="card toolTile0734" id="toolsData0734">${fvIcon073("settings","toolIcon0734")}<span><strong>Backup &amp; Data</strong><small>Snapshots, restore, imports, and updates</small></span></button>
-      ${featureOn("library")?`<button class="card toolTile0734" id="toolsLibrary0734">${fvIcon073("library","toolIcon0734")}<span><strong>Library</strong><small>Manuals, documents, and reference files</small></span></button>`:""}
-    </div>
-    <div class="buildRevisionSpacer475" aria-hidden="true"></div>
-  </div>`);
-  document.getElementById("toolsData0734")?.addEventListener("click",()=>route("dataTools"));
-  document.getElementById("toolsLibrary0734")?.addEventListener("click",()=>route("library"));
-  document.getElementById("toolsRelease0734")?.addEventListener("click",showChangelog);
-}
-
 function dashboard068(){
   const taskRows = allTaskRows();
   const taskCounts = taskFilterCounts(taskRows);
@@ -2830,8 +2380,8 @@ function dashboard068(){
     ${homeInstallTip482()}
 
     <div class="todayBlock478 todayBlock551 todayBlock569">
-      <button class="todayRouteWrap478 todayDateButton569" id="todayDatePickerBtn569" aria-label="Open Daily Summary date picker">${activeRoute?`<span class="${activeRoute.paused?"routeLed470 routeLedPaused470":"routeLed463"}" aria-label="${activeRoute.paused?"Daily route paused":"Daily route recording"}"></span>`:""}<div><h1>Today</h1><p>${esc(dateLine)}</p><em>Tap for past daily reports</em></div></button>
-      <button class="todayAddSite551" id="addSiteBtn" aria-label="Add Site">＋</button>
+      <button class="todayRouteWrap478 todayDateButton569" id="todayDatePickerBtn569" aria-label="Open Daily Summary date picker"><div><h1>Today</h1><p>${esc(dateLine)}</p><em>Tap for past daily reports</em></div></button>
+      <button class="todayAddSite551" id="addSiteBtn" aria-label="Add Account">＋</button>
     </div>
 
     <div class="appleSearchCard478">
@@ -2844,11 +2394,11 @@ function dashboard068(){
     ${!siteSearch && homeCardVisible550("fieldFocus")?fieldFocusMarkup561():""}
 
     ${!siteSearch?`<div class="fieldDashboard500">
-      <div class="fieldDashHead500"><div><strong>Field Dashboard</strong><span>Site notes, route, and daily summary</span></div><button class="ghost smallBtn" id="dailySummaryBtn500">Summary</button></div>
+      <div class="fieldDashHead500"><div><strong>Field Dashboard</strong><span>Site notes, follow-ups, and daily summary</span></div><button class="ghost smallBtn" id="dailySummaryBtn500">Summary</button></div>
       <div class="fieldDashStats500">
         <button class="fieldStat500" id="dashNotes500"><strong>${dashboardSummary500().notes}</strong><span>Notes Today</span></button>
         <button class="fieldStat500" id="dashAccounts500"><strong>${dashboardSummary500().noteSites}</strong><span>Note Sites</span></button>
-        <button class="fieldStat500" id="dashRoute500"><strong>${dashboardSummary500().route}</strong><span>Route Points</span></button>
+        <button class="fieldStat500" id="dashTasks500"><strong>${dashboardSummary500().tasks}</strong><span>Open Tasks</span></button>
       </div>
       <div class="fieldDashActions500">
         <button class="primary" id="quickAccountNote500">＋ Site Note</button>
@@ -2856,7 +2406,7 @@ function dashboard068(){
       </div>
     </div>
     <div class="todayAccountsPanel500">
-      <div class="recentHead478"><div><strong>Today’s Accounts</strong><span>Notes and route activity</span></div><button class="ghost smallBtn" id="allTodayAccounts500">All Sites</button></div>
+      <div class="recentHead478"><div><strong>Today’s Accounts</strong><span>Notes saved today</span></div><button class="ghost smallBtn" id="allTodayAccounts500">Account Directory</button></div>
       <div class="todayAccountsList500">${todayAccountsMarkup500()}</div>
     </div>`:""}
 
@@ -2871,7 +2421,6 @@ function dashboard068(){
         <button class="card tile statTile478" id="tasksCard"><strong>${openTasks}</strong><span>Open Tasks</span><em>${taskCounts.overdue ? `${taskCounts.overdue} overdue` : taskCounts.today ? `${taskCounts.today} due soon` : "Due Soon"}</em></button>
       </div>
     </div>
-    ${activeJob ? `<div class="card activeJobMini activeJobMini478"><div class="row"><div><h2>Service Call Active</h2><p>${esc(activeJob.siteName)} • <span id="jobElapsed">Service call active</span></p></div><button class="primary" id="resumeJobBtn">Open</button></div></div>` : ""}
 
     ${homeCardVisible550("recentAccounts")?`<div class="recentAccountsPanel478 homeCollapsible5100 ${homeCardCollapsed5100("recentAccounts")?"homeCollapsed5100":""}" data-home-collapsible="recentAccounts">
       <div class="recentHead478"><div><strong>Recent Accounts</strong><span>${recentAccounts476(5).length} account${recentAccounts476(5).length===1?"":"s"}</span></div><div class="homeHeaderActions5100"><button class="ghost smallBtn" id="allAccountsBtn478">See All</button>${homeCollapseButton5100("recentAccounts","Recent Accounts")}</div></div>
@@ -2907,16 +2456,9 @@ function dashboard068(){
   document.getElementById('tasksCard').onclick=()=>{selectedSiteId=null; route('tasks');};
   document.getElementById('defCard').onclick=()=>{selectedSiteId=null; route('deficiencies');};
   document.getElementById('addSiteBtn').onclick=()=>{selectedSiteId=null; mode=null; route('siteForm');};
-  const dataToolsHome560=document.getElementById('dataToolsHome560'); if(dataToolsHome560) dataToolsHome560.onclick=()=>route('dataTools');
   const copyPins566=document.getElementById('copyPinnedSites566'); if(copyPins566) copyPins566.onclick=copyPinnedSites566;
   const openPins567=document.getElementById('openPinnedSites567'); if(openPins567) openPins567.onclick=()=>route('pinnedSites');
   wireFieldFocus561();
-  const openRouteMini=document.getElementById('openRouteMiniBtn'); if(openRouteMini) openRouteMini.onclick=()=>route('routeLog');
-  const homeRoutePoint=document.getElementById('homeRoutePointBtn'); if(homeRoutePoint) homeRoutePoint.onclick=()=>{ const note=prompt('Waypoint note', 'Manual waypoint')||'Manual waypoint'; addRouteEvent('Waypoint', note); };
-  const homeRouteNearest=document.getElementById('homeRouteNearestBtn'); if(homeRouteNearest) homeRouteNearest.onclick=checkRouteNearestSite;
-  const homeRoutePause=document.getElementById('homeRoutePauseBtn'); if(homeRoutePause) homeRoutePause.onclick=()=> activeRoute?.paused ? resumeRouteDay() : pauseRouteDay();
-  const homeRouteEnd=document.getElementById('homeRouteEndBtn'); if(homeRouteEnd) homeRouteEnd.onclick=()=>{ if(confirm('End and save today’s route?')) endRouteDay(); };
-  const rb=document.getElementById('resumeJobBtn'); if(rb) rb.onclick=()=>{selectedSiteId=activeJob.siteId; route('serviceVisit');};
 }
 
 
@@ -3406,21 +2948,14 @@ function sameLocalDay499(iso, day=localDateString()){
   if(!iso) return false;
   try{return localDateString(new Date(iso))===day;}catch{return false;}
 }
-function todayRouteLogs499(day=localDateString()){
-  const saved=(data.routeLogs||[]).filter(log=>(log.date===day)||sameLocalDay499(log.startedAt,day));
-  return (activeRoute && day===localDateString()) ? [activeRoute, ...saved.filter(log=>log.id!==activeRoute.id)] : saved;
-}
 function dailySummaryStats499(day=selectedDailySummaryDay569()){
-  const noteRows=(data.sites||[]).map(s=>({s,notes:todaySiteNoteEntries506(s,day)})).filter(r=>r.notes.length);
-  const notesSites=noteRows.map(r=>r.s);
+  const noteRows=todaySiteNoteEntriesForAll506(day);
   const noteCount=noteRows.reduce((n,r)=>n+r.notes.length,0);
+  const notesSites=[...new Set(noteRows.map(r=>r.s.id))];
+  const tasksToday=allTaskRows().filter(r=>sameLocalDay499(r.t.createdAt||r.t.date,day));
+  const defsToday=(data.sites||[]).flatMap(s=>(s.deficiencies||[]).map(d=>({s,d}))).filter(r=>sameLocalDay499(r.d.createdAt||r.d.date,day));
   const openTasks=allTaskRows().filter(r=>!taskIsDone(r.t));
-  const tasksToday=allTaskRows().filter(r=>sameLocalDay499(r.t.createdAt,day));
-  const defsToday=(data.sites||[]).flatMap(s=>(s.deficiencies||[]).map(d=>({s,d}))).filter(r=>sameLocalDay499(r.d.createdAt,day));
-  const routes=todayRouteLogs499(day);
-  const routePoints=routes.reduce((n,r)=>n+(r.events||[]).length,0);
-  const routeSites=[...new Set(routes.flatMap(r=>(r.events||[]).map(e=>e.siteName).filter(Boolean)))];
-  return {day,noteRows,noteCount,notesSites,openTasks,tasksToday,defsToday,routes,routePoints,routeSites};
+  return {day,noteRows,noteCount,notesSites,tasksToday,defsToday,openTasks};
 }
 function dailyReportReadyItems508(st){
   const drafts=siteNoteDraftRows508();
@@ -3429,9 +2964,7 @@ function dailyReportReadyItems508(st){
   else items.push({kind:"warn",label:"No site notes yet",detail:"Add quick site notes before copying the final daily report."});
   if(drafts.length) items.push({kind:"warn",label:"Unsaved note drafts",detail:`${drafts.length} site draft${drafts.length===1?"":"s"} should be saved or cleared.`});
   else items.push({kind:"ok",label:"No unsaved drafts",detail:"Site note composer drafts are clear."});
-  if(activeRoute) items.push({kind:"warn",label:"Route still active",detail:"Save the Daily Route when the day is complete."});
-  else if(st.routes.length) items.push({kind:"ok",label:"Route activity captured",detail:`${st.routePoints} route point${st.routePoints===1?"":"s"} available for the report.`});
-  else items.push({kind:"info",label:"No route activity",detail:"Daily Report can still be copied with site notes only."});
+  items.push({kind:"ok",label:"Daily report ready",detail:"Saved notes, tasks, and deficiencies are included automatically."});
   if(st.defsToday.length) items.push({kind:"info",label:"Deficiencies added",detail:`Review ${st.defsToday.length} new deficienc${st.defsToday.length===1?"y":"ies"} before sending a customer copy.`});
   return items;
 }
@@ -3450,7 +2983,6 @@ function dailySummaryLine499(day=selectedDailySummaryDay569()){
   const parts=[];
   parts.push(`${st.noteCount} site note${st.noteCount===1?"":"s"}`);
   if(st.notesSites.length) parts.push(`${st.notesSites.length} site${st.notesSites.length===1?"":"s"}`);
-  if(st.routePoints) parts.push(`${st.routePoints} route point${st.routePoints===1?"":"s"}`);
   if(st.tasksToday.length) parts.push(`${st.tasksToday.length} new task${st.tasksToday.length===1?"":"s"}`);
   if(st.defsToday.length) parts.push(`${st.defsToday.length} deficienc${st.defsToday.length===1?"y":"ies"}`);
   return parts.join(" • ") || "No site notes yet today";
@@ -3465,7 +2997,6 @@ function dailySummaryText499(day=selectedDailySummaryDay569()){
     `DAY SNAPSHOT`,
     `- Site notes: ${st.noteCount}`,
     `- Sites with notes: ${st.notesSites.length}`,
-    `- Route points: ${st.routePoints}`,
     `- New tasks: ${st.tasksToday.length}`,
     `- Deficiencies added: ${st.defsToday.length}`,
     ``,
@@ -3478,10 +3009,6 @@ function dailySummaryText499(day=selectedDailySummaryDay569()){
       if(notes.length>4) lines.push(`  • +${notes.length-4} more note${notes.length-4===1?"":"s"}`);
     });
   }else lines.push(`- No site notes saved today.`);
-  lines.push(``, `ROUTE ACTIVITY`);
-  if(st.routes.length){
-    st.routes.forEach(r=>lines.push(`- ${r.endedAt?"Saved":"Active"}: ${routeSummaryLine(r)}${routeOdometerMiles(r)?` • Odometer ${routeOdometerMiles(r).toFixed(1)} mi`:""}`));
-  }else lines.push(`- No route activity recorded today.`);
   lines.push(``, `TASKS / DEFICIENCIES`);
   lines.push(`- Open tasks: ${st.openTasks.length}`);
   lines.push(`- New tasks today: ${st.tasksToday.length}`);
@@ -3537,7 +3064,6 @@ function dailyCustomerSummaryText505(day=selectedDailySummaryDay569()){
     ``,
     `Sites with notes: ${st.notesSites.length}`,
     `Site notes: ${st.noteCount}`,
-    `Route points: ${st.routePoints}`,
     `New deficiencies: ${st.defsToday.length}`,
     ``
   ];
@@ -3591,7 +3117,7 @@ function dailySummary(){
   html(`<div class="screen dailySummaryScreen499 dailySummaryScreen505 dailyReportScreen506 dailyReportScreen508 dailyReportScreen509 dailySummaryScreen569">
     <div class="row dailySummaryTop499 dailySummaryTop505 dailySummaryTop569"><button class="back ghost" id="backBtn">←</button><div><h1>Daily Report</h1><p>${esc(dailySummaryDateLabel569(day,{weekday:"long",month:"long",day:"numeric",year:"numeric"}))}${isToday?" • Today":""}</p></div></div>
     <div class="card dailyDatePickerCard569">
-      <div><strong>Report Date</strong><span>Pick any past day with saved notes, route activity, tasks, or deficiencies.</span></div>
+      <div><strong>Report Date</strong><span>Pick any past day with saved notes, tasks, or deficiencies.</span></div>
       <div class="dailyDateControls569">
         <button class="ghost smallBtn" id="prevDailyDate569">‹ Previous</button>
         <input id="dailySummaryDateInput569" type="date" value="${esc(day)}">
@@ -3609,7 +3135,7 @@ function dailySummary(){
     <div class="dailySummaryGrid499 dailySummaryGrid505 dailySummaryGrid506">
       <div class="card"><strong>${st.noteCount}</strong><span>Site Notes</span></div>
       <div class="card"><strong>${st.notesSites.length}</strong><span>Note Sites</span></div>
-      <div class="card"><strong>${st.routePoints}</strong><span>Route Points</span></div>
+      <div class="card"><strong>${st.tasksToday.length}</strong><span>New Tasks</span></div>
       <div class="card"><strong>${followUps}</strong><span>Follow-Ups</span></div>
     </div>
     ${isToday?dailyReportReadyMarkup508(st):""}
@@ -3620,8 +3146,6 @@ function dailySummary(){
     </div>
     <div class="card dailyReportPreview505"><div class="routeSectionTitle462"><strong>Report Preview</strong><span>TXT</span></div><pre>${esc(dailyReportPreview505(day))}</pre></div>
     <div class="list grow dailySummaryList499 dailySummaryList505 dailySummaryList506">
-      <div class="routeSectionTitle462"><strong>Route Activity</strong><span>${st.routes.length}</span></div>
-      ${st.routes.length?st.routes.map(r=>`<div class="card dailySummaryRoute499 dailySummaryRoute505"><h2>${r.endedAt?"Saved Route":"Active Route"}</h2><p>${esc(routeSummaryLine(r))}</p></div>`).join(""):`<div class="empty">No route activity recorded for this day.</div>`}
       <div class="routeSectionTitle462"><strong>Tasks / Deficiencies</strong><span>${followUps}</span></div>
       <div class="card dailySummaryText499 dailySummaryText505"><p>Open tasks: ${st.openTasks.length}</p><p>New tasks on selected day: ${st.tasksToday.length}</p><p>Deficiencies added on selected day: ${st.defsToday.length}</p></div>
     </div>
@@ -3638,112 +3162,6 @@ function dailySummary(){
   const today=document.getElementById("todayDailyDate569"); if(today) today.onclick=()=>{ setDailySummaryDay569(localDateString()); dailySummary(); };
   document.querySelectorAll("[data-summary-site]").forEach(b=>b.onclick=()=>{selectedSiteId=b.dataset.summarySite; route("jobMode");});
   document.querySelectorAll("[data-draft-site]").forEach(b=>b.onclick=()=>{selectedSiteId=b.dataset.draftSite; route("jobMode");});
-}
-
-function routeLog(){
-  const saved=(data.routeLogs||[]);
-  const active=activeRoute;
-  const siteOptions=data.sites.map(s=>`<option value="${esc(s.id)}">${esc(s.name||"Unnamed Site")}</option>`).join("");
-  const events=active?.events||[];
-  const paused=!!active?.paused;
-  const suggestion=active?routeSuggestion():null;
-  html(`<div class="screen routeLogScreen462">
-    <div class="row"><button class="back ghost" id="backBtn">←</button><h1>Daily Route</h1></div>
-    <div class="card routeHero462 ${active?(paused?"paused470":"active"):"idle"}">
-      <div><strong>${active?(paused?"Route Paused":"Route Active"):"No Active Route"}</strong><span>${active?routeSummaryLine(active):`${saved.length} saved day${saved.length===1?"":"s"}`}</span></div>
-      <p>${active?(paused?"Recording is paused. Resume when you want FireVault to capture the next stop or waypoint.":"Track stops, site arrivals, breaks, and manual GPS waypoints while the app is open."):"Start a route day to record sites visited and waypoints for a daily report."}</p>
-    </div>
-    <div class="routeControls462">
-      ${active?`<button class="danger" id="endRouteBtn">End Day / Save</button><button class="${paused?"primary":"ghost"}" id="${paused?"resumeRouteBtn":"pauseRouteBtn"}">${paused?"Resume Route":"Pause Route"}</button>`:`<button class="primary" id="startRouteBtn">Start Day</button>`}
-      <button class="ghost" id="copyRouteBtn" ${active||saved[0]?"":"disabled"}>Copy Report</button>
-      <button class="ghost" id="downloadRouteBtn" ${active||saved[0]?"":"disabled"}>Download Report</button>
-      <button class="ghost ${featureOn("csvExports")?"":"featureHidden472"}" id="csvRouteBtn" ${active||saved[0]?"":"disabled"}>CSV Export</button>
-      <button class="ghost" id="summaryRouteBtn" ${active||saved[0]?"":"disabled"}>Customer Summary</button>
-      ${active?`<button class="ghost" id="undoRouteBtn" ${events.length?"":"disabled"}>Undo Last Point</button>`:""}
-    </div>
-    ${(active||saved[0])?`<div class="card routeReportPreview464 routeReportPreview467"><div><h2>Daily Report Summary</h2><p>${esc(routeSummaryLine(active||saved[0]))}</p><p class="fieldNote">Export as TXT${featureOn("csvExports")?", CSV":""}, or copy a cleaner customer summary.</p></div>${routeDirectionsLink(active||saved[0])?`<a class="btn ghost" href="${esc(routeDirectionsLink(active||saved[0]))}" target="_blank" rel="noopener">Open Route Map</a>`:""}</div>`:""}
-    ${active?`<div class="card routeDetails469"><div class="routeDetailsHead469"><div><h2>Vehicle / Mileage</h2><p>${esc(routeOdometerLabel(active))}</p></div><button class="primary smallBtn" id="saveRouteDetailsBtn">Save Details</button></div><div class="routeOdoGrid469"><div><label>Vehicle</label><input id="routeVehicle" value="${esc(active.vehicle||"")}" placeholder="Truck / van / unit #"></div><div><label>Start Odometer</label><input id="routeStartOdo" type="number" inputmode="decimal" step="0.1" value="${esc(active.startOdometer??"")}" placeholder="Optional"></div><div><label>End Odometer</label><input id="routeEndOdo" type="number" inputmode="decimal" step="0.1" value="${esc(active.endOdometer??"")}" placeholder="Optional"></div></div><label>Day Notes</label><textarea id="routeDayNotes" placeholder="General notes for today’s route report...">${esc(active.dayNotes||"")}</textarea></div>`:""}
-    ${active?`<div class="card routeQuick462 ${paused?"routeQuickPaused470":""}">
-      <div class="routeSitePick462"><label>Site Stop</label><select id="routeSiteSelect"><option value="">Select saved site...</option>${siteOptions}</select></div>
-      <div class="grid2">
-        <button class="primary" id="arrivedBtn" ${paused?"disabled":""}>Arrived Site</button>
-        <button class="ghost" id="leftBtn" ${paused?"disabled":""}>Left Site</button>
-        <button class="ghost" id="waypointBtn" ${paused?"disabled":""}>Manual Waypoint</button>
-        <button class="ghost" id="breakBtn" ${paused?"disabled":""}>Break / Fuel / Parts</button>
-        <button class="ghost routeNearestBtn466" id="nearestBtn" ${paused?"disabled":""}>Check Nearest Site</button>
-      </div>
-      <p class="fieldNote">${paused?"Route is paused. Resume to add site stops, waypoints, or nearest-site checks.":"GPS capture works while FireVault is open. iPhone home-screen web apps may limit background tracking."}</p>
-    </div>`:""}
-    ${suggestion?`<div class="card routeSuggestion466"><div><h2>Suggested Site Stop</h2><p><strong>${esc(suggestion.s.name||"Unnamed Site")}</strong> • ${esc(suggestion.n.distance)} away</p><p>${esc(suggestion.n.address||"No address saved")}</p><p class="fieldNote">Checked ${routeEventTime(suggestion.n.checkedAt)} • GPS accuracy ±${Math.round(Number(suggestion.n.accuracy)||0)} m</p></div><div class="grid3 routeSuggestionActions466"><button class="primary" id="suggestArriveBtn">Arrived</button><button class="ghost" id="suggestLeftBtn">Left</button><button class="ghost" id="clearSuggestionBtn">Clear</button></div></div>`:""}
-    <div class="list grow routeList462">
-      ${active?`<div class="routeSectionTitle462"><strong>Today</strong><span>${routeDateLabel(active.startedAt)}</span></div>${events.length?events.map(e=>routeEventCard(e,true)).join(""):`<div class="empty">No route points yet. Add a waypoint or site stop.</div>`}`:(()=>{const filtered=saved.filter(log=>routeReviewMatches(log,routeHistorySearch));return `<div class="routeHistoryTools471"><input id="routeHistorySearch" type="search" value="${esc(routeHistorySearch)}" placeholder="Search route history, site, vehicle, notes..."><button class="ghost" id="clearRouteSearchBtn" ${routeHistorySearch?"":"disabled"}>Clear</button></div><div class="routeSectionTitle462"><strong>Saved Route Days</strong><span>${filtered.length} of ${saved.length}</span></div>${filtered.length?filtered.map(routeHistoryCard).join(""):(saved.length?`<div class="empty">No saved route days match this search.</div>`:`<div class="empty">No saved route days yet.</div>`)} `})()}
-    </div>
-  </div>`);
-  document.getElementById("backBtn").onclick=()=>route("home");
-  const routeSearch=document.getElementById("routeHistorySearch"); if(routeSearch) routeSearch.oninput=()=>{routeHistorySearch=routeSearch.value; routeLog();};
-  const routeSearchClear=document.getElementById("clearRouteSearchBtn"); if(routeSearchClear) routeSearchClear.onclick=()=>{routeHistorySearch=""; routeLog();};
-  const start=document.getElementById("startRouteBtn"); if(start) start.onclick=startRouteDay;
-  const end=document.getElementById("endRouteBtn"); if(end) end.onclick=endRouteDay;
-  const pause=document.getElementById("pauseRouteBtn"); if(pause) pause.onclick=pauseRouteDay;
-  const resume=document.getElementById("resumeRouteBtn"); if(resume) resume.onclick=resumeRouteDay;
-  const copy=document.getElementById("copyRouteBtn"); if(copy) copy.onclick=()=>copyRouteReport(activeRoute||saved[0]);
-  const download=document.getElementById("downloadRouteBtn"); if(download) download.onclick=()=>downloadRouteReport(activeRoute||saved[0]);
-  const csv=document.getElementById("csvRouteBtn"); if(csv) csv.onclick=()=>downloadRouteCsv(activeRoute||saved[0]);
-  const summary=document.getElementById("summaryRouteBtn"); if(summary) summary.onclick=()=>copyRouteCustomerSummary(activeRoute||saved[0]);
-  const undo=document.getElementById("undoRouteBtn"); if(undo) undo.onclick=undoLastRouteEvent;
-  const saveDetails=document.getElementById("saveRouteDetailsBtn"); if(saveDetails) saveDetails.onclick=saveRouteDetails469;
-  const arrived=document.getElementById("arrivedBtn"); if(arrived) arrived.onclick=()=>{ const id=val("routeSiteSelect"); if(!id){toast("Select a site first."); return;} const s=data.sites.find(x=>x.id===id); addRouteEvent("Arrived",`Arrived: ${s?.name||"Site"}`,id); };
-  const left=document.getElementById("leftBtn"); if(left) left.onclick=()=>{ const id=val("routeSiteSelect"); if(!id){toast("Select a site first."); return;} const s=data.sites.find(x=>x.id===id); addRouteEvent("Left Site",`Left: ${s?.name||"Site"}`,id); };
-  const waypoint=document.getElementById("waypointBtn"); if(waypoint) waypoint.onclick=()=>{ const note=prompt("Waypoint note", "Manual waypoint")||"Manual waypoint"; addRouteEvent("Waypoint",note); };
-  const br=document.getElementById("breakBtn"); if(br) br.onclick=()=>{ const note=prompt("Stop note", "Break / Fuel / Parts")||"Break / Fuel / Parts"; addRouteEvent("Stop",note); };
-  const nearest=document.getElementById("nearestBtn"); if(nearest) nearest.onclick=checkRouteNearestSite;
-  const sugArr=document.getElementById("suggestArriveBtn"); if(sugArr) sugArr.onclick=()=>routeUseSuggestion("Arrived");
-  const sugLeft=document.getElementById("suggestLeftBtn"); if(sugLeft) sugLeft.onclick=()=>routeUseSuggestion("Left Site");
-  const sugClear=document.getElementById("clearSuggestionBtn"); if(sugClear) sugClear.onclick=clearRouteSuggestion;
-  document.querySelectorAll("[data-review-route]").forEach(b=>b.onclick=()=>{ routeReviewId = routeReviewId===b.dataset.reviewRoute ? "" : b.dataset.reviewRoute; routeLog(); });
-  document.querySelectorAll("[data-copy-route]").forEach(b=>b.onclick=()=>{ const log=saved.find(x=>x.id===b.dataset.copyRoute); if(log) copyRouteReport(log); });
-  document.querySelectorAll("[data-download-route]").forEach(b=>b.onclick=()=>{ const log=saved.find(x=>x.id===b.dataset.downloadRoute); if(log) downloadRouteReport(log); });
-  document.querySelectorAll("[data-csv-route]").forEach(b=>b.onclick=()=>{ const log=saved.find(x=>x.id===b.dataset.csvRoute); if(log) downloadRouteCsv(log); });
-  document.querySelectorAll("[data-summary-route]").forEach(b=>b.onclick=()=>{ const log=saved.find(x=>x.id===b.dataset.summaryRoute); if(log) copyRouteCustomerSummary(log); });
-  document.querySelectorAll("[data-delete-route]").forEach(b=>b.onclick=()=>{ const id=b.dataset.deleteRoute; if(confirm("Delete this saved route day?")){ data.routeLogs=(data.routeLogs||[]).filter(x=>x.id!==id); save(); routeLog(); } });
-  document.querySelectorAll("[data-edit-route-event]").forEach(b=>b.onclick=()=>editRouteEvent(b.dataset.editRouteEvent));
-  document.querySelectorAll("[data-delete-route-event]").forEach(b=>b.onclick=()=>deleteRouteEvent(b.dataset.deleteRouteEvent));
-}
-
-function routeSiteSequence(log){
-  const names=(log?.events||[]).filter(e=>e.siteName).map(e=>e.siteName);
-  const seq=[];
-  names.forEach(n=>{ if(seq[seq.length-1]!==n) seq.push(n); });
-  return seq;
-}
-function routeReviewMatches(log, q){
-  if(!q) return true;
-  const hay=[log.date, log.vehicle, log.dayNotes, routeDateLabel(log.startedAt||log.date), routeSummaryLine(log), routeSiteSequence(log).join(" "), ...(log.events||[]).flatMap(e=>[e.label,e.type,e.siteName,e.address,e.notes,e.nearestSite])].join(" ").toLowerCase();
-  return hay.includes(q.toLowerCase());
-}
-function routeReviewStats(log){
-  const events=log?.events||[];
-  const seq=routeSiteSequence(log);
-  const start=events[0], end=events[events.length-1];
-  return {events,seq,start,end};
-}
-function routeReviewMiniEvent(e,i){
-  const link=routeMapLink(e);
-  return `<div class="routeReviewMiniEvent471"><span>${i+1}</span><div><strong>${esc(routeEventTime(e.at))} • ${esc(e.label||e.type)}</strong><small>${esc(e.siteName||e.notes||routeGpsText(e))}</small></div>${link?`<a href="${esc(link)}" target="_blank" rel="noopener">Map</a>`:""}</div>`;
-}
-function routeReviewPanel(log){
-  const st=routeReviewStats(log);
-  return `<div class="routeReviewPanel471"><div class="routeReviewStats471"><div><strong>${st.events.length}</strong><span>Points</span></div><div><strong>${st.seq.length}</strong><span>Sites</span></div><div><strong>${esc(routeDistanceLabel(log))}</strong><span>GPS Miles</span></div><div><strong>${esc(routeOdometerMiles(log)===null?"—":String(routeOdometerMiles(log)))}</strong><span>Odo Miles</span></div></div><div class="routeReviewStops471"><strong>Stop Sequence</strong><p>${st.seq.length?esc(st.seq.join(" → ")):"No site stop sequence recorded."}</p></div><div class="routeReviewTimeline471">${st.events.length?st.events.map(routeReviewMiniEvent).join(""):`<div class="empty">No saved points.</div>`}</div></div>`;
-}
-function routeEventCard(e,editable=false){
-  const link=routeMapLink(e);
-  return `<div class="card routeEventCard462 routeEventCard465"><div class="routeEventTop462"><div><h2>${esc(e.label||e.type)}</h2><p>${routeEventTime(e.at)}${e.siteName?` • ${esc(e.siteName)}`:""}</p></div><span class="pill">${esc(e.type||"Stop")}</span></div><p>${esc(routeGpsText(e))}</p>${e.address?`<p>${esc(e.address)}</p>`:""}${e.nearestSite?`<p class="fieldNote">Nearest saved site: ${esc(e.nearestSite)} (${esc(e.nearestDistance)})</p>`:""}${e.notes?`<p class="routeNote465">${esc(e.notes)}</p>`:""}<div class="routeEventFooter465">${link?`<a class="btn ghost routeMapBtn462" href="${esc(link)}" target="_blank" rel="noopener">Open Map</a>`:""}${editable?`<button class="ghost" data-edit-route-event="${esc(e.id)}">Edit</button><button class="danger" data-delete-route-event="${esc(e.id)}">Delete</button>`:""}</div></div>`;
-}
-function routeHistoryCard(log){
-  const events=log.events||[];
-  const unique=routeSiteSequence(log);
-  const reviewOpen=routeReviewId===log.id;
-  return `<div class="card routeHistoryCard462 routeHistoryCard471 ${reviewOpen?"openReview471":""}"><div class="routeEventTop462"><div><h2>${routeDateLabel(log.startedAt||log.date)}</h2><p>${routeSummaryLine(log)}</p></div><span class="pill">${log.endedAt?"Saved":"Active"}</span></div><p>${unique.length?esc(unique.slice(0,5).join(" → ")):"No site stops recorded."}</p>${routeOdometerMiles(log)!==null?`<p class="fieldNote">${esc(routeOdometerLabel(log))}${log.vehicle?` • ${esc(log.vehicle)}`:""}</p>`:""}<div class="routeHistoryActions462 routeHistoryActions467 routeHistoryActions471"><button class="primary ${featureOn("routeReview")?"":"featureHidden472"}" data-review-route="${esc(log.id)}">${reviewOpen?"Hide":"Review"}</button><button class="ghost" data-copy-route="${esc(log.id)}">Copy</button><button class="ghost" data-download-route="${esc(log.id)}">TXT</button><button class="ghost ${featureOn("csvExports")?"":"featureHidden472"}" data-csv-route="${esc(log.id)}">CSV</button><button class="ghost" data-summary-route="${esc(log.id)}">Summary</button><button class="danger" data-delete-route="${esc(log.id)}">Delete</button></div>${routeDirectionsLink(log)?`<a class="btn ghost routeMapBtn462" href="${esc(routeDirectionsLink(log))}" target="_blank" rel="noopener">Open Route Map</a>`:""}${(reviewOpen&&featureOn("routeReview"))?routeReviewPanel(log):""}</div>`;
 }
 
 function attentionQueue(){
@@ -4139,7 +3557,7 @@ function nearbySites(){
           ? ``
           : `<div class="card nearbyScanMessage0652"><strong>Ready to scan</strong><p>Tap Scan to compare your current phone location with saved customer accounts.</p></div>`;
   html(`<div class="screen nearbyScreen nearbyScreen0652"><div class="row nearbyTop0652"><button class="back ghost" id="backBtn">←</button><button class="primary smallBtn" id="scanNearbyBtn" ${isScanning||noSites?'disabled':''}>${isScanning?"Scanning…":nearbyState?"Refresh":"Scan"}</button></div>
-    <div class="card nearbyHero"><h1>Nearby Sites</h1><p>${esc(status)}</p></div>
+    <div class="card nearbyHero"><h1>Nearby Accounts</h1><p>${esc(status)}</p></div>
     ${message}
     <div class="list grow nearbyResults0652">${nearbyState && shown.length ? `${nearby.length?"":`<div class="nearbyFallbackNote0652">No account is inside the ${radius}-mile radius. Showing the nearest saved sites instead.</div>`}${shown.map(r=>`<div class="card siteItem nearbyItem ${r.meters <= radius*1609.344 ? "nearMatch" : "nearFallback"}" data-id="${r.s.id}"><div class="row"><div><h2>${esc(r.s.name||"Unnamed Site")}</h2><p>${esc(fullAddress(r.s))}</p><p>${esc(gpsLine(r.s))}</p></div><span class="pill gpsPill">${distanceLabel(r.meters)}</span></div></div>`).join("")}` : !nearbyState?`<div class="empty">Run a scan to display nearest sites.</div>`:""}</div>
   </div>`);
@@ -4699,7 +4117,6 @@ function siteDetail(){
   const panel=[s.panelManufacturer,s.panelModel].filter(Boolean).join(" ")||"Panel not entered";
   const primary=primaryContact477(s);
   const access=accessSummary477(s);
-  const activeHere=activeJob&&activeJob.siteId===s.id;
   const ctx={open,def,siteVisits,equipment,docs,health,lastVisit,panel,primary,access,activeHere};
   const accountId=accountId069(s)||"No Account ID";
   const locations=locationPoints071(s);
@@ -5382,7 +4799,7 @@ function siteDocs(){
   const filteredDocs=sortedDocs522(docs.filter(docMatchesVaultFilter516).filter(docMatchesSearch521));
   const docListHtml = filteredDocs.length ? filteredDocs.map(siteDocCard519).join("") : `<div class="empty">No ${esc(docVaultFilterLabel516(docVaultFilter516).toLowerCase())} records found${docVaultSearch521?` for “${esc(docVaultSearch521)}”`:""}. Tap + to add a document, link, or field photo.</div>`;
   html(`<div class="screen docsScreen docsScreen512 docsScreen516"><div class="row"><button class="back ghost" id="backBtn">←</button><div><h1>Documents / Photos</h1><p>${esc(s.name||"Site")}</p></div><button class="primary" id="addDocBtn">＋</button></div>
-    <div class="card docsHero docsHero516 docsHero521"><h2>Site Documents / Photo Vault</h2><p>Keep customer-specific references, links, field photos, and scanned paperwork assigned from Tools or Site Notes.</p><div class="docHeroActions523 docHeroActions0800"><button class="primary" id="addPhotoBtn523">＋ Add Photo</button><button class="ghost" id="addRegularDocBtn523">＋ Add Document / Link</button></div><div class="docStats docStats0800"><span><strong>${docs.length}</strong>Total</span><span><strong>${scans}</strong>Scans</span><span><strong>${photos}</strong>Photos</span><span><strong>${linked}</strong>Links</span></div>${docVaultSearchBar521()}${docVaultSortControls522()}${docVaultFilterBar516(docs)}</div>
+    <div class="card docsHero docsHero516 docsHero521"><h2>Account Documents / Photo Vault</h2><p>Keep customer-specific references, links, field photos, and scanned paperwork stored with this account.</p><div class="docHeroActions523 docHeroActions0800"><button class="primary" id="addPhotoBtn523">＋ Add Photo</button><button class="ghost" id="addRegularDocBtn523">＋ Add Document / Link</button></div><div class="docStats docStats0800"><span><strong>${docs.length}</strong>Total</span><span><strong>${scans}</strong>Scans</span><span><strong>${photos}</strong>Photos</span><span><strong>${linked}</strong>Links</span></div>${docVaultSearchBar521()}${docVaultSortControls522()}${docVaultFilterBar516(docs)}</div>
     <div class="list grow docsList">${docListHtml}</div>
   </div>`);
   document.getElementById("backBtn").onclick=()=>route("siteDetail");
@@ -5420,7 +4837,7 @@ function siteDocForm(){
   docPhotoDraftDataUrl512 = d?.imageData || "";
   docPhotoDraftName512 = d?.imageName || "";
   docPhotoClearRequested512 = false;
-  const types=["Scanned Document","Panel Manual","Permit","Inspection Form","Monitoring Account","Contract","Photo Set","Map / Drawing","Code Reference","Other"];
+  const types=["Panel Manual","Permit","Inspection Form","Monitoring Account","Contract","Photo Set","Map / Drawing","Code Reference","Other"];
   const formTitle523 = mode && !isNewPhoto523 ? "Edit Document / Photo" : isDefPhoto525 ? "Add Deficiency Photo" : isNewPhoto523 ? "Add Account Photo" : "Add Document / Link";
   const defaultType523 = isNewPhoto523 ? "Photo Set" : "Panel Manual";
   const defaultTitle523 = isDefPhoto525 ? `Deficiency Photo - ${linkedDef525?.title||"Issue"}` : isNewPhoto523 ? "Site Photo" : "";
@@ -5456,636 +4873,9 @@ function siteDocForm(){
   const del=document.getElementById("deleteDocBtn"); if(del) del.onclick=()=>{ if(confirm("Delete this document reference?")){ s.docs=s.docs.filter(x=>x.id!==mode); save(); toast("Document deleted."); route("siteDocs"); } };
 }
 
-/* Build 0.80.2 — simplified scanner, AI Auto Scan, and keyboard repair */
+/* Build 0.90.0 — retired scanner capture removed. Existing scans remain readable and exportable. */
 function docIsScan0800(d={}){
   return d.isScannedDocument===true && Array.isArray(d.scanPages) && d.scanPages.length>0;
-}
-function scannerFullCorners0800(){
-  return [{x:.025,y:.025},{x:.975,y:.025},{x:.975,y:.975},{x:.025,y:.975}];
-}
-function scannerCopyCorners0800(corners){
-  const source=Array.isArray(corners)&&corners.length===4?corners:scannerFullCorners0800();
-  return source.map(p=>({x:Math.max(0,Math.min(1,Number(p?.x)||0)),y:Math.max(0,Math.min(1,Number(p?.y)||0))}));
-}
-function scannerSyncFields0800(){
-  if(!scannerDraft0800)return;
-  const title=document.getElementById("scannerTitle0800");
-  const date=document.getElementById("scannerDate0800");
-  const notes=document.getElementById("scannerNotes0800");
-  const quality=document.getElementById("scannerQuality0800");
-  const cleanup=document.getElementById("scannerCleanup0800");
-  if(title)scannerDraft0800.title=title.value;
-  if(date)scannerDraft0800.date=date.value;
-  if(notes)scannerDraft0800.notes=notes.value;
-  if(quality)scannerDraft0800.quality=quality.value||"standard";
-  if(cleanup)scannerDraft0800.defaultEnhancement=cleanup.value||"color";
-}
-function scannerTargetSite0801(){
-  return (data.sites||[]).find(s=>s.id===scannerTargetSiteId0801)||null;
-}
-function scannerGpsState0803(next={}){
-  scannerGpsMatch0803={...scannerGpsMatch0803,...next};
-  return scannerGpsMatch0803;
-}
-function scannerCancelGpsMatch0803(){
-  scannerGpsState0803({requestId:Number(scannerGpsMatch0803.requestId||0)+1});
-}
-function scannerGpsMatchDetail0803(){
-  const state=scannerGpsMatch0803||{};
-  const bits=[];
-  if(Number.isFinite(Number(state.meters)))bits.push(`${distanceLabel(Number(state.meters))} away`);
-  if(Number(state.accuracy)>0)bits.push(`phone accuracy ±${Math.round(Number(state.accuracy))} m`);
-  return bits.join(" • ");
-}
-function scannerClosestSite0803(lat,lng){
-  normalizeAllSiteGps0652();
-  return gpsSiteDistances(Number(lat),Number(lng))[0]||null;
-}
-function scannerApplyGpsMatch0803(location,requestId,source="GPS"){
-  if(requestId!==scannerGpsMatch0803.requestId||scannerEditingDocId0800||scannerReturnView0800!=="tools")return;
-  const nearest=scannerClosestSite0803(location.lat,location.lng);
-  if(!nearest){
-    scannerGpsState0803({state:"no-sites",siteId:"",meters:null,accuracy:Number(location.accuracy||0),message:"No saved accounts contain usable GPS coordinates.",at:new Date().toISOString(),source});
-    documentScanner0800();return;
-  }
-  scannerTargetSiteId0801=nearest.s.id;
-  scannerAccountSearch0801=nearest.s.name||accountId069(nearest.s)||"";
-  scannerGpsState0803({state:"matched",siteId:nearest.s.id,meters:Math.round(nearest.meters),accuracy:Number(location.accuracy||0),message:`Closest saved account: ${nearest.s.name||"Unnamed Account"}`,at:new Date().toISOString(),source});
-  documentScanner0800();
-  toast(`Closest account selected: ${nearest.s.name||"Unnamed Account"} (${distanceLabel(nearest.meters)}).`);
-}
-function scannerRequestClosestAccount0803(){
-  if(scannerEditingDocId0800||scannerReturnView0800!=="tools"||scannerTargetSiteId0801)return;
-  const requestId=Number(scannerGpsMatch0803.requestId||0)+1;
-  scannerGpsMatch0803={state:"checking",siteId:"",meters:null,accuracy:0,message:"Finding the closest saved account…",at:new Date().toISOString(),requestId,source:"GPS"};
-  documentScanner0800();
-  const inventory=gpsInventory0652();
-  if(!inventory.ready){scannerGpsState0803({state:"no-sites",message:inventory.total?"Saved accounts do not have usable GPS coordinates yet.":"No accounts are saved yet."});documentScanner0800();return;}
-  if(data.settings.gps?.enabled===false){scannerGpsState0803({state:"disabled",message:"GPS tools are disabled in Settings. Scan first, then select an account manually."});documentScanner0800();return;}
-  if(isDemoMode()){
-    scannerApplyGpsMatch0803({lat:43.6150,lng:-116.2023,accuracy:25},requestId,"Demo GPS");return;
-  }
-  if(!navigator.geolocation){scannerGpsState0803({state:"unavailable",message:"Location is unavailable in this browser. Scan first, then select an account manually."});documentScanner0800();return;}
-  const success=location=>scannerApplyGpsMatch0803(location,requestId,"Current GPS");
-  const failed=err=>{
-    if(requestId!==scannerGpsMatch0803.requestId)return;
-    if(Number(err?.code)===2||Number(err?.code)===3){
-      scannerGpsState0803({state:"checking",message:"High-accuracy GPS did not respond. Retrying…"});documentScanner0800();
-      requestCurrentLocation0652(success,finalErr=>{if(requestId!==scannerGpsMatch0803.requestId)return;scannerGpsState0803({state:"error",message:geolocationErrorMessage0652(finalErr)});documentScanner0800();},{enableHighAccuracy:false,timeout:18000,maximumAge:300000});
-      return;
-    }
-    scannerGpsState0803({state:"error",message:geolocationErrorMessage0652(err)});documentScanner0800();
-  };
-  requestCurrentLocation0652(success,failed,{enableHighAccuracy:true,timeout:16000,maximumAge:60000});
-}
-function scannerGpsPreCaptureMarkup0803(){
-  const target=scannerTargetSite0801(),state=scannerGpsMatch0803||{};
-  if(target&&state.state==="matched"&&state.siteId===target.id)return "";
-  if(state.state==="checking")return `<div class="scannerGpsInline0804"><i class="scannerGpsSpinner0803"></i><span>${esc(state.message||"Finding closest account…")}</span></div>`;
-  if(["error","disabled","unavailable","no-sites"].includes(state.state))return `<div class="scannerGpsInline0804 warning"><span>${esc(state.message||"Automatic account match unavailable.")}</span><button class="ghost" id="scannerGpsRetry0803" ${state.state==="no-sites"?"disabled":""}>Retry</button></div>`;
-  return "";
-}
-function scannerAccountSearchText0801(s={}){
-  return [s.name,accountId069(s),s.externalAccountId,s.sitePhone,fullAddress(s),s.city,s.state,s.zip].filter(Boolean).join(" ").toLowerCase();
-}
-function scannerAccountMatches0801(query=""){
-  const q=String(query||"").trim().toLowerCase();
-  const rows=[...(data.sites||[])];
-  if(!q)return rows.sort((a,b)=>new Date(b.lastOpenedAt||b.updatedAt||0)-new Date(a.lastOpenedAt||a.updatedAt||0)||(a.name||"").localeCompare(b.name||"")).slice(0,8);
-  const terms=q.split(/\s+/).filter(Boolean);
-  return rows.filter(s=>terms.every(term=>scannerAccountSearchText0801(s).includes(term))).sort((a,b)=>{
-    const an=String(a.name||"").toLowerCase(),bn=String(b.name||"").toLowerCase(),aid=String(accountId069(a)||"").toLowerCase(),bid=String(accountId069(b)||"").toLowerCase();
-    const ar=an===q?0:aid===q?1:an.startsWith(q)?2:aid.startsWith(q)?3:4;
-    const br=bn===q?0:bid===q?1:bn.startsWith(q)?2:bid.startsWith(q)?3:4;
-    return ar-br||an.localeCompare(bn);
-  }).slice(0,20);
-}
-function scannerAccountResultsMarkup0801(query=""){
-  const rows=scannerAccountMatches0801(query),target=scannerTargetSite0801();
-  if(!(data.sites||[]).length)return `<div class="scannerAccountEmpty0801"><strong>No accounts exist yet</strong><span>Create an account before this scan can be saved.</span></div>`;
-  if(!rows.length)return `<div class="scannerAccountEmpty0801"><strong>No matching accounts</strong><span>Try the account name, Account ID, street, city, phone, or ZIP code.</span></div>`;
-  return rows.map(s=>`<button class="scannerAccountResult0801 ${target?.id===s.id?"selected":""}" data-scanner-account0801="${esc(s.id)}"><span class="scannerAccountInitial0801">${esc((s.name||"?").slice(0,1).toUpperCase())}</span><div><strong>${esc(s.name||"Unnamed Account")}</strong><small>${esc(accountId069(s)||"No Account ID")} • ${esc(fullAddress(s)||formatPhone0758(s.sitePhone)||"No address saved")}</small></div><em>${target?.id===s.id?"Matched":"Select"}</em></button>`).join("");
-}
-function scannerAccountAssignmentMarkup0801(pageCount=0){
-  const target=scannerTargetSite0801(),gps=scannerGpsMatch0803||{},isGps=target&&gps.state==="matched"&&gps.siteId===target.id;
-  if(scannerEditingDocId0800&&target)return `<section class="card scannerAccountMatch0801 locked"><div class="scannerAccountMatchHead0801"><div><span>ACCOUNT</span><h2>${esc(target.name||"Account")}</h2><p>${esc(accountId069(target)||fullAddress(target)||"Existing scanned document")}</p></div><b>LOCKED</b></div></section>`;
-  if(!pageCount)return target?`<div class="scannerAccountChip0804 ${isGps?"gps":""}"><span>⌖</span><div><strong>${esc(target.name||"Account")}</strong><small>${esc(isGps?(scannerGpsMatchDetail0803()||"Closest account by GPS"):(accountId069(target)||"Account selected"))}</small></div></div>`:"";
-  const title=isGps?"Closest account by GPS":target?`Matched to ${esc(target.name||"Account")}`:"Search for the account",detail=target?`${esc(accountId069(target)||"No Account ID")} • ${esc(fullAddress(target)||formatPhone0758(target.sitePhone)||"No address saved")}${isGps&&scannerGpsMatchDetail0803()?` • ${esc(scannerGpsMatchDetail0803())}`:""}`:"Search by name, Account ID, address, city, phone, or ZIP code.";
-  return `<section class="card scannerAccountMatch0801 ${isGps?"gpsReady0803":""}"><div class="scannerAccountMatchHead0801"><div><span>${isGps?"CLOSEST ACCOUNT BY GPS":"ACCOUNT MATCH"}</span><h2>${title}</h2><p>${detail}</p></div><b class="${target?"matched":""}">${isGps?"GPS MATCH":target?"MATCHED":"REQUIRED"}</b></div><div class="scannerAccountSearch0801"><span>⌕</span><input id="scannerAccountSearch0801" type="search" value="${esc(scannerAccountSearch0801)}" placeholder="Search accounts…" autocomplete="off"><button class="ghost" id="scannerAccountClear0801" ${scannerAccountSearch0801?"":"disabled"}>Clear</button></div><div class="scannerAccountResults0801" id="scannerAccountResults0801">${scannerAccountResultsMarkup0801(scannerAccountSearch0801)}</div></section>`;
-}
-function wireScannerAccountMatch0801(){
-  const input=document.getElementById("scannerAccountSearch0801"),results=document.getElementById("scannerAccountResults0801"),clear=document.getElementById("scannerAccountClear0801");
-  const wireRows=()=>document.querySelectorAll("[data-scanner-account0801]").forEach(b=>b.onclick=()=>{scannerSyncFields0800();scannerCancelGpsMatch0803();scannerTargetSiteId0801=b.dataset.scannerAccount0801;const s=scannerTargetSite0801();scannerAccountSearch0801=s?.name||"";scannerGpsState0803({state:"manual",siteId:s?.id||"",meters:null,accuracy:0,message:"Account selected manually.",source:"Manual"});toast(`Scan matched to ${s?.name||"account"}.`);documentScanner0800();});
-  wireRows();
-  if(input)input.addEventListener("input",()=>{scannerAccountSearch0801=input.value;if(clear)clear.disabled=!scannerAccountSearch0801;if(results){results.innerHTML=scannerAccountResultsMarkup0801(scannerAccountSearch0801);wireRows();}});
-  if(clear)clear.onclick=()=>{scannerAccountSearch0801="";if(input){input.value="";input.focus();}clear.disabled=true;if(results){results.innerHTML=scannerAccountResultsMarkup0801("");wireRows();}};
-}
-function scannerStart0800(docId="",returnView="siteDocs",targetSiteId=undefined){
-  const requestedId=targetSiteId===undefined?(selectedSiteId||""):String(targetSiteId||"");
-  const requested=(data.sites||[]).find(s=>s.id===requestedId)||null;
-  const existing=docId?(requested?.docs||[]).find(d=>d.id===docId&&docIsScan0800(d)):null;
-  if(docId&&!existing){toast("Scanned document not found.");route(returnView||"siteDocs");return;}
-  scannerTargetSiteId0801=existing?requested.id:(requested?.id||"");
-  scannerAccountSearch0801=requested?.name||"";
-  scannerEditingDocId0800=existing?.id||"";
-  scannerReturnView0800=returnView||"siteDocs";
-  scannerEditorIndex0800=-1;
-  scannerGpsMatch0803={state:existing?"locked":requested?"account":"idle",siteId:requested?.id||"",meters:null,accuracy:0,message:existing?"Existing document account is locked.":requested?"Opened from this account.":"",at:new Date().toISOString(),requestId:Number(scannerGpsMatch0803.requestId||0)+1,source:existing?"Existing":requested?"Account":""};
-  scannerDraft0800={
-    title:existing?.title||`Scanned Document - ${new Date().toLocaleDateString()}`,
-    date:existing?.date||localDateString(),
-    notes:existing?.notes||"",
-    quality:existing?.scanQuality||"standard",
-    defaultEnhancement:existing?.scanDefaultEnhancement||"color",
-    pages:(existing?.scanPages||[]).map((p,index)=>({
-      id:p.id||uid(),
-      originalData:p.imageData,
-      processedData:p.imageData,
-      imageData:p.imageData,
-      width:Number(p.width)||0,
-      height:Number(p.height)||0,
-      corners:scannerFullCorners0800(),
-      enhancement:p.enhancement||"color",
-      rotation:Number(p.rotation)||0,
-      sourceName:p.sourceName||`Page ${index+1}`,
-      updatedAt:p.updatedAt||new Date().toISOString()
-    }))
-  };
-  const autoMatch=!existing&&!requested&&scannerReturnView0800==="tools";
-  route("documentScanner");
-  if(autoMatch)setTimeout(scannerRequestClosestAccount0803,0);
-}
-function scannerDiscard0800(){
-  scannerStopLiveCamera0802(false);
-  if(scannerDraft0800?.pages?.length && !confirm("Discard this unsaved document scan?"))return;
-  scannerCancelGpsMatch0803(); scannerDraft0800=null; scannerEditingDocId0800=""; scannerEditorIndex0800=-1; scannerTargetSiteId0801=""; scannerAccountSearch0801=""; scannerGpsMatch0803={state:"idle",siteId:"",meters:null,accuracy:0,message:"",at:"",requestId:scannerGpsMatch0803.requestId,source:""};
-  route(scannerReturnView0800||"siteDocs");
-}
-function scannerReadFile0800(file){
-  return new Promise((resolve,reject)=>{
-    const reader=new FileReader();
-    reader.onload=()=>resolve(String(reader.result||""));
-    reader.onerror=()=>reject(reader.error||new Error("Photo could not be read."));
-    reader.readAsDataURL(file);
-  });
-}
-function scannerLoadImage0800(src){
-  return new Promise((resolve,reject)=>{
-    const img=new Image();
-    img.onload=()=>resolve(img);
-    img.onerror=()=>reject(new Error("Document image could not be opened."));
-    img.src=src;
-  });
-}
-async function scannerNormalizeSource0800(src){
-  const img=await scannerLoadImage0800(src);
-  const max=2400;
-  const scale=Math.min(1,max/Math.max(img.naturalWidth||img.width,img.naturalHeight||img.height));
-  const canvas=document.createElement("canvas");
-  canvas.width=Math.max(1,Math.round((img.naturalWidth||img.width)*scale));
-  canvas.height=Math.max(1,Math.round((img.naturalHeight||img.height)*scale));
-  const ctx=canvas.getContext("2d",{alpha:false});
-  ctx.fillStyle="#fff";ctx.fillRect(0,0,canvas.width,canvas.height);
-  ctx.drawImage(img,0,0,canvas.width,canvas.height);
-  return canvas.toDataURL("image/jpeg",.88);
-}
-function scannerPolygonArea0802(corners=[]){
-  if(!Array.isArray(corners)||corners.length!==4)return 0;
-  let area=0;for(let i=0;i<4;i++){const a=corners[i],b=corners[(i+1)%4];area+=a.x*b.y-b.x*a.y;}return Math.abs(area)/2;
-}
-function scannerCornerDistance0802(a=[],b=[]){
-  if(!Array.isArray(a)||!Array.isArray(b)||a.length!==4||b.length!==4)return 1;
-  return a.reduce((sum,p,i)=>sum+Math.hypot(p.x-b[i].x,p.y-b[i].y),0)/4;
-}
-function scannerAnalyzePixelsRegion0804(imageData,w,h){
-  try{
-    const px=imageData?.data||imageData;if(!px||w<40||h<40)return {corners:scannerFullCorners0800(),confidence:0};
-    let br=0,bg=0,bb=0,count=0;
-    const border=Math.max(3,Math.round(Math.min(w,h)*.045));
-    for(let y=0;y<h;y+=2){for(let x=0;x<w;x+=2){if(x<border||x>=w-border||y<border||y>=h-border){const i=(y*w+x)*4;br+=px[i];bg+=px[i+1];bb+=px[i+2];count++;}}}
-    br/=count||1;bg/=count||1;bb/=count||1;
-    const bgLum=.2126*br+.7152*bg+.0722*bb;
-    let variance=0,samples=0;
-    for(let y=0;y<h;y+=4){for(let x=0;x<w;x+=4){if(x<border||x>=w-border||y<border||y>=h-border){const i=(y*w+x)*4;variance+=Math.hypot(px[i]-br,px[i+1]-bg,px[i+2]-bb);samples++;}}}
-    const threshold=Math.max(28,Math.min(70,(variance/(samples||1))*1.7+18));
-    const mask=new Uint8Array(w*h);
-    for(let y=1;y<h-1;y++){
-      for(let x=1;x<w-1;x++){
-        const i=(y*w+x)*4,r=px[i],g=px[i+1],b=px[i+2],lum=.2126*r+.7152*g+.0722*b;
-        const diff=Math.hypot(r-br,g-bg,b-bb);
-        const il=(y*w+x-1)*4,ir=(y*w+x+1)*4,iu=((y-1)*w+x)*4,id=((y+1)*w+x)*4;
-        const l=.2126*px[il]+.7152*px[il+1]+.0722*px[il+2],rr=.2126*px[ir]+.7152*px[ir+1]+.0722*px[ir+2],u=.2126*px[iu]+.7152*px[iu+1]+.0722*px[iu+2],d=.2126*px[id]+.7152*px[id+1]+.0722*px[id+2];
-        const edge=Math.abs(rr-l)+Math.abs(d-u);
-        const pageTone=(bgLum<145&&lum>bgLum+22)||(bgLum>175&&lum<bgLum-22);
-        if(diff>threshold||pageTone||edge>115)mask[y*w+x]=1;
-      }
-    }
-    // Close small gaps so text and shadows remain part of the page region.
-    const smooth=new Uint8Array(mask.length);
-    for(let y=1;y<h-1;y++)for(let x=1;x<w-1;x++){
-      let n=0;for(let yy=-1;yy<=1;yy++)for(let xx=-1;xx<=1;xx++)n+=mask[(y+yy)*w+x+xx];
-      if(n>=4)smooth[y*w+x]=1;
-    }
-    const seen=new Uint8Array(mask.length),queue=new Int32Array(mask.length);
-    let best=null;
-    for(let sy=2;sy<h-2;sy+=2){for(let sx=2;sx<w-2;sx+=2){
-      const seed=sy*w+sx;if(!smooth[seed]||seen[seed])continue;
-      let head=0,tail=0;queue[tail++]=seed;seen[seed]=1;
-      let area=0,minX=w,maxX=0,minY=h,maxY=0,touch=0;
-      let tl=null,tr=null,brp=null,bl=null,tlScore=1e9,trScore=-1e9,brScore=-1e9,blScore=1e9;
-      while(head<tail){const p=queue[head++],y=Math.floor(p/w),x=p-y*w;area++;minX=Math.min(minX,x);maxX=Math.max(maxX,x);minY=Math.min(minY,y);maxY=Math.max(maxY,y);if(x<3||x>w-4||y<3||y>h-4)touch++;
-        const sum=x+y,diff=x-y;if(sum<tlScore){tlScore=sum;tl={x,y};}if(diff>trScore){trScore=diff;tr={x,y};}if(sum>brScore){brScore=sum;brp={x,y};}if(diff<blScore){blScore=diff;bl={x,y};}
-        const neighbors=[p-1,p+1,p-w,p+w];for(const n of neighbors){if(n>=0&&n<smooth.length&&!seen[n]&&smooth[n]){seen[n]=1;queue[tail++]=n;}}
-      }
-      const boxArea=Math.max(1,(maxX-minX+1)*(maxY-minY+1)),coverage=area/(w*h),boxCoverage=boxArea/(w*h),solidity=area/boxArea;
-      if(coverage<.10||coverage>.93||boxCoverage<.18||maxX-minX<w*.34||maxY-minY<h*.34||!tl||!tr||!brp||!bl)continue;
-      const corners=[tl,tr,brp,bl].map(p=>({x:p.x/w,y:p.y/h}));
-      const polyArea=scannerPolygonArea0802(corners);if(polyArea<.16)continue;
-      const centerX=(minX+maxX)/2/w,centerY=(minY+maxY)/2/h,centerPenalty=Math.min(1,Math.hypot(centerX-.5,centerY-.5)*1.5);
-      const touchPenalty=Math.min(1,touch/Math.max(1,area*.08));
-      const score=area*(.8+solidity)*Math.max(.35,1-centerPenalty*.45)*Math.max(.3,1-touchPenalty*.55);
-      if(!best||score>best.score)best={score,corners,coverage,solidity,touchPenalty};
-    }}
-    if(!best)return {corners:scannerFullCorners0800(),confidence:0};
-    const center=best.corners.reduce((o,p)=>({x:o.x+p.x/4,y:o.y+p.y/4}),{x:0,y:0});
-    const padded=best.corners.map(p=>({x:Math.max(.005,Math.min(.995,center.x+(p.x-center.x)*1.025)),y:Math.max(.005,Math.min(.995,center.y+(p.y-center.y)*1.025))}));
-    const rectangularity=Math.min(1,scannerPolygonArea0802(padded)/Math.max(.001,best.coverage));
-    const confidence=Math.max(0,Math.min(1,.3+best.coverage*.65+best.solidity*.22+rectangularity*.12-best.touchPenalty*.28));
-    return {corners:padded,confidence};
-  }catch(err){console.warn("Smart page analysis failed",err);return {corners:scannerFullCorners0800(),confidence:0};}
-}
-
-function scannerPopcount0804(v){v=v>>>0;v=v-((v>>>1)&0x55555555);v=(v&0x33333333)+((v>>>2)&0x33333333);return (((v+(v>>>4))&0x0F0F0F0F)*0x01010101)>>>24;}
-function scannerPercentile0804(values,p=.86){
-  const hist=new Uint32Array(256);let n=0;
-  for(let i=0;i<values.length;i++){const v=Math.max(0,Math.min(255,Math.round(values[i])));hist[v]++;n++;}
-  const target=Math.max(1,Math.round(n*p));let sum=0;
-  for(let i=0;i<256;i++){sum+=hist[i];if(sum>=target)return i;}
-  return 255;
-}
-function scannerLineCandidates0804(mag,gx,gy,w,h,orientation,side){
-  const slopeCount=25,maxSlope=.52,bins=orientation==="h"?Math.ceil(h+w*maxSlope*2+8):Math.ceil(w+h*maxSlope*2+8),offset=orientation==="h"?Math.ceil(w*maxSlope+4):Math.ceil(h*maxSlope+4),spanBins=12;
-  const acc=new Float32Array(slopeCount*bins),coverage=new Uint16Array(slopeCount*bins),hits=new Uint16Array(slopeCount*bins);
-  const threshold=Math.max(22,scannerPercentile0804(mag,.84));
-  for(let y=2;y<h-2;y++)for(let x=2;x<w-2;x++){
-    const i=y*w+x,strength=mag[i];if(strength<threshold)continue;
-    const ax=Math.abs(gx[i]),ay=Math.abs(gy[i]);if(orientation==="h"){if(ay<ax*1.05)continue;}else if(ax<ay*1.05)continue;
-    const span=orientation==="h"?Math.min(spanBins-1,Math.floor(x/w*spanBins)):Math.min(spanBins-1,Math.floor(y/h*spanBins));
-    for(let si=0;si<slopeCount;si++){
-      const slope=-maxSlope+(2*maxSlope*si)/(slopeCount-1),b=orientation==="h"?y-slope*x:x-slope*y,center=orientation==="h"?slope*(w*.5)+b:slope*(h*.5)+b,dim=orientation==="h"?h:w;
-      if(side==="low"&&center>dim*.58)continue;if(side==="high"&&center<dim*.42)continue;
-      const bi=Math.round(b+offset);if(bi<0||bi>=bins)continue;const idx=si*bins+bi;
-      acc[idx]+=Math.min(255,strength);coverage[idx]|=(1<<span);if(hits[idx]<65535)hits[idx]++;
-    }
-  }
-  const out=[],dim=orientation==="h"?h:w;
-  for(let si=0;si<slopeCount;si++){
-    const slope=-maxSlope+(2*maxSlope*si)/(slopeCount-1);
-    for(let bi=0;bi<bins;bi++){
-      const idx=si*bins+bi;if(!hits[idx])continue;const cov=scannerPopcount0804(coverage[idx])/spanBins;if(cov<.42)continue;
-      const b=bi-offset,center=orientation==="h"?slope*(w*.5)+b:slope*(h*.5)+b,pos=center/dim;if(pos<-.08||pos>1.08)continue;
-      const outer=.72+Math.min(1,Math.abs(pos-.5)*2)*.62,score=acc[idx]*Math.pow(cov,1.85)*outer*(1+Math.min(.45,hits[idx]/Math.max(w,h)*.22));
-      out.push({orientation,side,slope,b,center,pos,coverage:cov,score,support:acc[idx],hits:hits[idx]});
-    }
-  }
-  out.sort((a,b)=>b.score-a.score);const chosen=[];
-  for(const candidate of out){if(chosen.some(x=>Math.abs(x.center-candidate.center)<dim*.035&&Math.abs(x.slope-candidate.slope)<.09))continue;chosen.push(candidate);if(chosen.length>=9)break;}
-  return chosen;
-}
-function scannerLineIntersection0804(horizontal,vertical){
-  const denominator=1-vertical.slope*horizontal.slope;if(Math.abs(denominator)<.12)return null;
-  const x=(vertical.slope*horizontal.b+vertical.b)/denominator,y=horizontal.slope*x+horizontal.b;return {x,y};
-}
-function scannerQuadConvex0804(points){
-  if(!points||points.length!==4)return false;let sign=0;
-  for(let i=0;i<4;i++){const a=points[i],b=points[(i+1)%4],c=points[(i+2)%4],cross=(b.x-a.x)*(c.y-b.y)-(b.y-a.y)*(c.x-b.x);if(Math.abs(cross)<1e-4)return false;const current=Math.sign(cross);if(sign&&current!==sign)return false;sign=current;}
-  return true;
-}
-function scannerQuadCandidate0804(top,bottom,left,right,w,h){
-  const pixels=[scannerLineIntersection0804(top,left),scannerLineIntersection0804(top,right),scannerLineIntersection0804(bottom,right),scannerLineIntersection0804(bottom,left)];if(pixels.some(p=>!p))return null;
-  const points=pixels.map(p=>({x:p.x/w,y:p.y/h}));if(points.some(p=>p.x<-.09||p.x>1.09||p.y<-.09||p.y>1.09)||!scannerQuadConvex0804(points))return null;
-  const area=scannerPolygonArea0802(points);if(area<.16||area>.98)return null;
-  const lengths=points.map((p,i)=>Math.hypot(p.x-points[(i+1)%4].x,p.y-points[(i+1)%4].y));if(Math.min(...lengths)<.22)return null;
-  const center={x:points.reduce((sum,p)=>sum+p.x,0)/4,y:points.reduce((sum,p)=>sum+p.y,0)/4},centerPenalty=Math.min(1,Math.hypot(center.x-.5,center.y-.5)*1.8),lineScore=Math.log1p(top.score+bottom.score+left.score+right.score),coverage=(top.coverage+bottom.coverage+left.coverage+right.coverage)/4,margin=Math.min(...points.flatMap(p=>[p.x,p.y,1-p.x,1-p.y])),edgePenalty=margin<-.01?.5:margin<.008?.14:0;
-  const score=lineScore*(.65+area*1.15)*(.75+coverage*.55)*(1-centerPenalty*.28)*(1-edgePenalty);
-  return {corners:points.map(p=>({x:Math.max(.003,Math.min(.997,p.x)),y:Math.max(.003,Math.min(.997,p.y))})),area,coverage,score,edgeMargin:margin};
-}
-function scannerAnalyzePixelsAdvanced0804(imageData,w,h){
-  const px=imageData?.data||imageData;if(!px||w<50||h<50)return null;
-  const gray=new Float32Array(w*h),blur=new Float32Array(w*h),gx=new Float32Array(w*h),gy=new Float32Array(w*h),mag=new Float32Array(w*h),temporary=new Float32Array(w*h),kernel=[1,4,6,4,1];
-  for(let i=0,p=0;i<gray.length;i++,p+=4)gray[i]=.2126*px[p]+.7152*px[p+1]+.0722*px[p+2];
-  for(let y=0;y<h;y++)for(let x=0;x<w;x++){let sum=0,weight=0;for(let d=-2;d<=2;d++){const xx=Math.max(0,Math.min(w-1,x+d)),k=kernel[d+2];sum+=gray[y*w+xx]*k;weight+=k;}temporary[y*w+x]=sum/weight;}
-  for(let y=0;y<h;y++)for(let x=0;x<w;x++){let sum=0,weight=0;for(let d=-2;d<=2;d++){const yy=Math.max(0,Math.min(h-1,y+d)),k=kernel[d+2];sum+=temporary[yy*w+x]*k;weight+=k;}blur[y*w+x]=sum/weight;}
-  let gradientSum=0,gradientCount=0;
-  for(let y=1;y<h-1;y++)for(let x=1;x<w-1;x++){
-    const i=y*w+x,a=blur[(y-1)*w+x-1],b=blur[(y-1)*w+x],c=blur[(y-1)*w+x+1],d=blur[y*w+x-1],f=blur[y*w+x+1],g=blur[(y+1)*w+x-1],hh=blur[(y+1)*w+x],j=blur[(y+1)*w+x+1],sx=-a+c-2*d+2*f-g+j,sy=-a-2*b-c+g+2*hh+j,m=Math.min(255,Math.hypot(sx,sy)*.34);
-    gx[i]=sx;gy[i]=sy;mag[i]=m;gradientSum+=m;gradientCount++;
-  }
-  const top=scannerLineCandidates0804(mag,gx,gy,w,h,"h","low"),bottom=scannerLineCandidates0804(mag,gx,gy,w,h,"h","high"),left=scannerLineCandidates0804(mag,gx,gy,w,h,"v","low"),right=scannerLineCandidates0804(mag,gx,gy,w,h,"v","high");
-  let best=null;
-  for(const t of top.slice(0,7))for(const b of bottom.slice(0,7)){if(b.center-t.center<h*.28)continue;for(const l of left.slice(0,7))for(const r of right.slice(0,7)){if(r.center-l.center<w*.28)continue;const candidate=scannerQuadCandidate0804(t,b,l,r,w,h);if(candidate&&(!best||candidate.score>best.score))best=candidate;}}
-  if(!best)return null;
-  const sharpness=Math.max(0,Math.min(1,(gradientSum/(gradientCount||1)-5)/32)),confidence=Math.max(0,Math.min(1,.36+best.area*.28+best.coverage*.34+sharpness*.12-(best.edgeMargin<.004?.08:0)));
-  return {...best,confidence,sharpness,method:"edge-lines"};
-}
-function scannerAnalyzePixels0802(imageData,w,h){
-  try{
-    const advanced=scannerAnalyzePixelsAdvanced0804(imageData,w,h);
-    if(advanced&&advanced.confidence>=.5)return advanced;
-    const fallback=scannerAnalyzePixelsRegion0804(imageData,w,h);
-    return {...(fallback||{corners:scannerFullCorners0800(),confidence:0}),sharpness:advanced?.sharpness||0,method:"region-fallback",edgeMargin:Math.min(...scannerCopyCorners0800(fallback?.corners).flatMap(p=>[p.x,p.y,1-p.x,1-p.y]))};
-  }catch(err){console.warn("Advanced document analysis failed",err);return scannerAnalyzePixelsRegion0804(imageData,w,h);}
-}
-
-function scannerAnalyzeCanvas0802(canvas){
-  const ctx=canvas.getContext("2d",{willReadFrequently:true});return scannerAnalyzePixels0802(ctx.getImageData(0,0,canvas.width,canvas.height),canvas.width,canvas.height);
-}
-function scannerFrameSignature0802(imageData,w,h){
-  const px=imageData?.data||imageData,out=[];if(!px)return out;const cols=8,rows=6;for(let gy=0;gy<rows;gy++)for(let gx=0;gx<cols;gx++){const x=Math.min(w-1,Math.round((gx+.5)*w/cols)),y=Math.min(h-1,Math.round((gy+.5)*h/rows)),i=(y*w+x)*4;out.push(Math.round(.2126*px[i]+.7152*px[i+1]+.0722*px[i+2]));}return out;
-}
-function scannerSignatureDistance0802(a=[],b=[]){if(!a?.length||a.length!==b?.length)return 255;return a.reduce((sum,v,i)=>sum+Math.abs(v-b[i]),0)/a.length;}
-async function scannerDetectDocumentResult0802(src){
-  try{
-    const img=await scannerLoadImage0800(src),max=520,scale=Math.min(1,max/Math.max(img.width,img.height));
-    const w=Math.max(60,Math.round(img.width*scale)),h=Math.max(60,Math.round(img.height*scale)),canvas=document.createElement("canvas");canvas.width=w;canvas.height=h;
-    const ctx=canvas.getContext("2d",{willReadFrequently:true});ctx.drawImage(img,0,0,w,h);return scannerAnalyzeCanvas0802(canvas);
-  }catch(err){console.warn("Document edge detection failed",err);return {corners:scannerFullCorners0800(),confidence:0};}
-}
-async function scannerDetectDocument0800(src){return (await scannerDetectDocumentResult0802(src)).corners;}
-function scannerStopLiveCamera0802(refresh=false){
-  const state=scannerCameraState0802;state.running=false;state.capturing=false;cancelAnimationFrame(state.raf);state.raf=0;
-  if(state.stream){state.stream.getTracks().forEach(track=>{try{track.stop();}catch{}});state.stream=null;}
-  document.querySelector(".scannerLiveOverlay0802")?.remove();
-  if(refresh&&view==="documentScanner")documentScanner0800();
-}
-function scannerLiveRenderFrame0802(result){
-  const overlay=document.getElementById("scannerLiveCanvas0802"),video=document.getElementById("scannerLiveVideo0802"),stage=document.getElementById("scannerLiveStage0802");if(!overlay||!video||!stage)return;
-  const rect=stage.getBoundingClientRect(),dpr=Math.min(2,window.devicePixelRatio||1);overlay.width=Math.max(1,Math.round(rect.width*dpr));overlay.height=Math.max(1,Math.round(rect.height*dpr));overlay.style.width=`${rect.width}px`;overlay.style.height=`${rect.height}px`;
-  const ctx=overlay.getContext("2d");ctx.setTransform(dpr,0,0,dpr,0,0);ctx.clearRect(0,0,rect.width,rect.height);
-  const vw=video.videoWidth||rect.width,vh=video.videoHeight||rect.height,scale=Math.min(rect.width/vw,rect.height/vh),rw=vw*scale,rh=vh*scale,ox=(rect.width-rw)/2,oy=(rect.height-rh)/2;
-  let corners=result?.corners||scannerFullCorners0800(),conf=Number(result?.confidence)||0;
-  const points=corners.map(p=>({x:ox+p.x*rw,y:oy+p.y*rh}));
-  ctx.lineWidth=conf>.58?4:2.5;ctx.strokeStyle=conf>.58?"#39f06f":"rgba(255,255,255,.74)";ctx.fillStyle=conf>.58?"rgba(34,197,94,.10)":"rgba(255,255,255,.035)";
-  ctx.beginPath();ctx.moveTo(points[0].x,points[0].y);points.slice(1).forEach(p=>ctx.lineTo(p.x,p.y));ctx.closePath();ctx.fill();ctx.stroke();
-  points.forEach(p=>{ctx.beginPath();ctx.arc(p.x,p.y,7,0,Math.PI*2);ctx.fillStyle=conf>.58?"#39f06f":"#fff";ctx.fill();});
-}
-function scannerLiveStatus0802(text,tone=""){const el=document.getElementById("scannerLiveStatus0802");if(el){el.textContent=text;el.dataset.tone=tone;}}
-async function scannerCaptureLiveFrame0802(manual=false){
-  const state=scannerCameraState0802,video=document.getElementById("scannerLiveVideo0802");if(!state.running||state.capturing||!video?.videoWidth)return;
-  state.capturing=true;state.cooldownUntil=Date.now()+1900;scannerLiveStatus0802("Capturing…","ready");
-  try{
-    const canvas=document.createElement("canvas");canvas.width=video.videoWidth;canvas.height=video.videoHeight;canvas.getContext("2d",{alpha:false}).drawImage(video,0,0);
-    const source=await scannerNormalizeSource0800(canvas.toDataURL("image/jpeg",.93));
-    const fullResult=await scannerDetectDocumentResult0802(source),liveResult=state.lastResult,result=fullResult?.confidence>=Number(liveResult?.confidence||0)-.04?fullResult:liveResult;
-    const page={id:uid(),originalData:source,processedData:"",imageData:"",width:0,height:0,corners:scannerCopyCorners0800(result?.corners),enhancement:scannerDraft0800?.defaultEnhancement||"color",rotation:0,sourceName:`Camera Page ${(scannerDraft0800?.pages?.length||0)+1}`,updatedAt:new Date().toISOString(),autoCropConfidence:Number(result?.confidence||0),autoCropMethod:result?.method||""};
-    await scannerProcessPage0800(page);scannerDraft0800.pages.push(page);
-    const count=document.getElementById("scannerLiveCount0802");if(count)count.textContent=`${scannerDraft0800.pages.length} page${scannerDraft0800.pages.length===1?"":"s"}`;
-    const flash=document.getElementById("scannerLiveFlash0802");flash?.classList.add("active");setTimeout(()=>flash?.classList.remove("active"),180);
-    state.awaitingPageChange=true;state.capturedCorners=scannerCopyCorners0800(result?.corners);state.capturedSignature=state.lastSignature?.slice?.()||null;
-    toast(`Page ${scannerDraft0800.pages.length} captured and cropped.`);scannerLiveStatus0802("Move to the next page","ready");
-  }catch(err){console.error(err);scannerLiveStatus0802("Capture failed — tap the shutter","error");toast("The page could not be captured.");}
-  finally{state.capturing=false;state.stableFrames=0;state.lastCorners=null;}
-}
-function scannerLiveLoop0802(){
-  const state=scannerCameraState0802;if(!state.running)return;
-  state.raf=requestAnimationFrame(scannerLiveLoop0802);const now=performance.now();if(now-state.lastAnalysis<390||state.capturing)return;state.lastAnalysis=now;
-  const video=document.getElementById("scannerLiveVideo0802");if(!video?.videoWidth)return;
-  const max=320,scale=Math.min(1,max/Math.max(video.videoWidth,video.videoHeight)),w=Math.max(80,Math.round(video.videoWidth*scale)),h=Math.max(80,Math.round(video.videoHeight*scale));
-  const canvas=document.createElement("canvas");canvas.width=w;canvas.height=h;const ctx=canvas.getContext("2d",{willReadFrequently:true});ctx.drawImage(video,0,0,w,h);
-  const frame=ctx.getImageData(0,0,w,h),result=scannerAnalyzePixels0802(frame,w,h),signature=scannerFrameSignature0802(frame,w,h);state.lastResult=result;state.lastSignature=signature;scannerLiveRenderFrame0802(result);
-  if(state.awaitingPageChange){const moved=scannerCornerDistance0802(state.capturedCorners,result.corners)>.065,changed=scannerSignatureDistance0802(state.capturedSignature,signature)>14;if(result.confidence<.3||moved||changed){state.awaitingPageChange=false;state.capturedCorners=null;state.capturedSignature=null;state.stableFrames=0;state.lastCorners=null;}else{scannerLiveStatus0802("Move to the next page","ready");return;}}
-  const diff=scannerCornerDistance0802(state.lastCorners,result.corners),sharpness=Number(result.sharpness||0),margin=Number.isFinite(Number(result.edgeMargin))?Number(result.edgeMargin):.03,usable=result.confidence>.62&&sharpness>.08&&margin>-.012;
-  if(usable&&diff<.018)state.stableFrames++;else state.stableFrames=usable?1:0;state.lastCorners=scannerCopyCorners0800(result.corners);
-  if(result.confidence<.44)scannerLiveStatus0802("Find all four page edges");
-  else if(margin<.012)scannerLiveStatus0802("Move back so the full page is visible","found");
-  else if(sharpness<.08)scannerLiveStatus0802("Hold steady — image is soft","found");
-  else if(state.stableFrames<3)scannerLiveStatus0802("Page found — hold steady","found");
-  else if(state.stableFrames<5)scannerLiveStatus0802("Locking page frame…","found");
-  else scannerLiveStatus0802(state.autoCapture?"Capturing automatically":"Ready — tap shutter","ready");
-  if(state.autoCapture&&state.stableFrames>=5&&Date.now()>state.cooldownUntil)scannerCaptureLiveFrame0802(false);
-}
-async function scannerOpenLiveCamera0802(fallbackInput,importInput){
-  scannerSyncFields0800();
-  if(!navigator.mediaDevices?.getUserMedia){fallbackInput?.click();return;}
-  scannerStopLiveCamera0802(false);
-  const overlay=document.createElement("div");overlay.className="scannerLiveOverlay0802";overlay.innerHTML=`<div class="scannerLiveSheet0802"><div class="scannerLiveHead0802"><button class="ghost" id="scannerLiveCancel0802">Cancel</button><div><strong>Scan Page</strong><span id="scannerLiveCount0802">${scannerDraft0800?.pages?.length||0} page${scannerDraft0800?.pages?.length===1?"":"s"}</span></div><button class="primary" id="scannerLiveDone0802">Done</button></div><div class="scannerLiveStage0802" id="scannerLiveStage0802"><video id="scannerLiveVideo0802" autoplay playsinline muted></video><canvas id="scannerLiveCanvas0802"></canvas><div class="scannerLiveFlash0802" id="scannerLiveFlash0802"></div><button class="ghost scannerTorch0804" id="scannerTorch0804" hidden>Flash Off</button><div class="scannerLiveStatus0802" id="scannerLiveStatus0802">Starting camera…</div></div><div class="scannerLiveControls0802"><button class="scannerAutoToggle0802 active" id="scannerAutoToggle0802"><span>AUTO</span><b>ON</b></button><button class="scannerShutter0802" id="scannerShutter0802" aria-label="Capture page"><span></span></button><button class="ghost scannerCameraImport0802" id="scannerCameraImport0802">Import</button></div></div>`;document.body.appendChild(overlay);
-  const close=()=>scannerStopLiveCamera0802(true);document.getElementById("scannerLiveCancel0802").onclick=close;document.getElementById("scannerLiveDone0802").onclick=close;document.getElementById("scannerShutter0802").onclick=()=>scannerCaptureLiveFrame0802(true);document.getElementById("scannerCameraImport0802").onclick=()=>{scannerStopLiveCamera0802(false);(importInput||fallbackInput)?.click();};
-  document.getElementById("scannerAutoToggle0802").onclick=()=>{scannerCameraState0802.autoCapture=!scannerCameraState0802.autoCapture;const button=document.getElementById("scannerAutoToggle0802");button?.classList.toggle("active",scannerCameraState0802.autoCapture);const label=button?.querySelector("b");if(label)label.textContent=scannerCameraState0802.autoCapture?"ON":"OFF";};
-  try{
-    const stream=await navigator.mediaDevices.getUserMedia({audio:false,video:{facingMode:{ideal:"environment"},width:{ideal:1920},height:{ideal:1440}}}),track=stream.getVideoTracks()[0]||null;
-    scannerCameraState0802={...scannerCameraState0802,stream,track,running:true,lastAnalysis:0,lastCorners:null,stableFrames:0,cooldownUntil:0,capturing:false,awaitingPageChange:false,capturedCorners:null,capturedSignature:null,lastSignature:null,torch:false};
-    const torchButton=document.getElementById("scannerTorch0804"),capabilities=track?.getCapabilities?.()||{};
-    if(torchButton&&capabilities.torch){torchButton.hidden=false;torchButton.onclick=async()=>{try{scannerCameraState0802.torch=!scannerCameraState0802.torch;await track.applyConstraints({advanced:[{torch:scannerCameraState0802.torch}]});torchButton.textContent=scannerCameraState0802.torch?"Flash On":"Flash Off";torchButton.classList.toggle("active",scannerCameraState0802.torch);}catch(err){scannerCameraState0802.torch=false;toast("Camera flash control is unavailable on this device.");}};}
-    const video=document.getElementById("scannerLiveVideo0802");video.srcObject=stream;await video.play();scannerLiveStatus0802("Find all four page edges");scannerLiveLoop0802();
-  }catch(err){console.warn("Live camera unavailable",err);scannerStopLiveCamera0802(false);toast("Live camera access was unavailable. Opening the standard camera instead.");fallbackInput?.click();}
-}
-function scannerBilinearPoint0800(c,u,v){
-  const top={x:c[0].x+(c[1].x-c[0].x)*u,y:c[0].y+(c[1].y-c[0].y)*u};
-  const bottom={x:c[3].x+(c[2].x-c[3].x)*u,y:c[3].y+(c[2].y-c[3].y)*u};
-  return {x:top.x+(bottom.x-top.x)*v,y:top.y+(bottom.y-top.y)*v};
-}
-function scannerAffine0800(s0,s1,s2,d0,d1,d2){
-  const den=s0.x*(s1.y-s2.y)+s1.x*(s2.y-s0.y)+s2.x*(s0.y-s1.y);
-  if(Math.abs(den)<.000001)return null;
-  const a=(d0.x*(s1.y-s2.y)+d1.x*(s2.y-s0.y)+d2.x*(s0.y-s1.y))/den;
-  const c=(d0.x*(s2.x-s1.x)+d1.x*(s0.x-s2.x)+d2.x*(s1.x-s0.x))/den;
-  const e=(d0.x*(s1.x*s2.y-s2.x*s1.y)+d1.x*(s2.x*s0.y-s0.x*s2.y)+d2.x*(s0.x*s1.y-s1.x*s0.y))/den;
-  const b=(d0.y*(s1.y-s2.y)+d1.y*(s2.y-s0.y)+d2.y*(s0.y-s1.y))/den;
-  const d=(d0.y*(s2.x-s1.x)+d1.y*(s0.x-s2.x)+d2.y*(s1.x-s0.x))/den;
-  const f=(d0.y*(s1.x*s2.y-s2.x*s1.y)+d1.y*(s2.x*s0.y-s0.x*s2.y)+d2.y*(s0.x*s1.y-s1.x*s0.y))/den;
-  return {a,b,c,d,e,f};
-}
-function scannerDrawTriangle0800(ctx,img,s0,s1,s2,d0,d1,d2){
-  const m=scannerAffine0800(s0,s1,s2,d0,d1,d2);if(!m)return;
-  ctx.save();ctx.beginPath();ctx.moveTo(d0.x,d0.y);ctx.lineTo(d1.x,d1.y);ctx.lineTo(d2.x,d2.y);ctx.closePath();ctx.clip();
-  ctx.setTransform(m.a,m.b,m.c,m.d,m.e,m.f);ctx.drawImage(img,0,0);ctx.restore();
-}
-function scannerDistance0800(a,b){return Math.hypot(a.x-b.x,a.y-b.y);}
-function scannerOtsu0800(hist,total){
-  let sum=0;for(let i=0;i<256;i++)sum+=i*hist[i];
-  let sumB=0,wB=0,best=0,threshold=168;
-  for(let i=0;i<256;i++){
-    wB+=hist[i];if(!wB)continue;const wF=total-wB;if(!wF)break;
-    sumB+=i*hist[i];const mB=sumB/wB,mF=(sum-sumB)/wF,between=wB*wF*(mB-mF)*(mB-mF);
-    if(between>best){best=between;threshold=i;}
-  }
-  return threshold;
-}
-function scannerEnhanceCanvas0800(canvas,mode){
-  if(mode==="original")return;
-  const ctx=canvas.getContext("2d",{willReadFrequently:true});const image=ctx.getImageData(0,0,canvas.width,canvas.height),p=image.data;
-  const hist=new Uint32Array(256);let total=0;
-  for(let i=0;i<p.length;i+=4){const y=Math.max(0,Math.min(255,Math.round(.2126*p[i]+.7152*p[i+1]+.0722*p[i+2])));hist[y]++;total++;}
-  let low=0,high=255,acc=0;const cut=Math.max(1,total*.012);
-  for(let i=0;i<256;i++){acc+=hist[i];if(acc>=cut){low=i;break;}}
-  acc=0;for(let i=255;i>=0;i--){acc+=hist[i];if(acc>=cut){high=i;break;}}
-  if(high-low<65){low=Math.max(0,low-28);high=Math.min(255,high+28);}
-  const span=Math.max(1,high-low);const bwThreshold=scannerOtsu0800(hist,total);
-  for(let i=0;i<p.length;i+=4){
-    const r=p[i],g=p[i+1],b=p[i+2],lum=.2126*r+.7152*g+.0722*b;
-    const adjusted=Math.max(0,Math.min(255,(lum-low)*255/span));
-    if(mode==="bw"){
-      const threshold=Math.max(118,Math.min(210,(bwThreshold-low)*255/span));const v=adjusted>threshold?255:0;p[i]=p[i+1]=p[i+2]=v;
-    }else if(mode==="gray"){
-      const v=Math.max(0,Math.min(255,adjusted*1.03));p[i]=p[i+1]=p[i+2]=v;
-    }else{
-      const factor=lum>1?adjusted/lum:1;
-      p[i]=Math.max(0,Math.min(255,(r*factor-128)*1.04+128));
-      p[i+1]=Math.max(0,Math.min(255,(g*factor-128)*1.04+128));
-      p[i+2]=Math.max(0,Math.min(255,(b*factor-128)*1.04+128));
-    }
-  }
-  ctx.putImageData(image,0,0);
-}
-async function scannerProcessPage0800(page){
-  const img=await scannerLoadImage0800(page.originalData||page.processedData);
-  const c=scannerCopyCorners0800(page.corners);
-  const src=c.map(p=>({x:p.x*img.width,y:p.y*img.height}));
-  const width=(scannerDistance0800(src[0],src[1])+scannerDistance0800(src[3],src[2]))/2;
-  const height=(scannerDistance0800(src[0],src[3])+scannerDistance0800(src[1],src[2]))/2;
-  const quality=scannerDraft0800?.quality||"standard";
-  const max=quality==="high"?1800:quality==="compact"?1000:1400;
-  const scale=Math.min(1,max/Math.max(width,height));
-  const outW=Math.max(320,Math.round(width*scale)),outH=Math.max(320,Math.round(height*scale));
-  const canvas=document.createElement("canvas");canvas.width=outW;canvas.height=outH;
-  const ctx=canvas.getContext("2d",{alpha:false});ctx.fillStyle="#fff";ctx.fillRect(0,0,outW,outH);
-  const grid=10;
-  for(let gy=0;gy<grid;gy++)for(let gx=0;gx<grid;gx++){
-    const u0=gx/grid,u1=(gx+1)/grid,v0=gy/grid,v1=(gy+1)/grid;
-    const q00=scannerBilinearPoint0800(c,u0,v0),q10=scannerBilinearPoint0800(c,u1,v0),q11=scannerBilinearPoint0800(c,u1,v1),q01=scannerBilinearPoint0800(c,u0,v1);
-    const s00={x:q00.x*img.width,y:q00.y*img.height},s10={x:q10.x*img.width,y:q10.y*img.height},s11={x:q11.x*img.width,y:q11.y*img.height},s01={x:q01.x*img.width,y:q01.y*img.height};
-    const d00={x:u0*outW,y:v0*outH},d10={x:u1*outW,y:v0*outH},d11={x:u1*outW,y:v1*outH},d01={x:u0*outW,y:v1*outH};
-    scannerDrawTriangle0800(ctx,img,s00,s10,s11,d00,d10,d11);scannerDrawTriangle0800(ctx,img,s00,s11,s01,d00,d11,d01);
-  }
-  scannerEnhanceCanvas0800(canvas,page.enhancement||scannerDraft0800?.defaultEnhancement||"color");
-  const jpegQuality=quality==="high"?.9:quality==="compact"?.68:.8;
-  page.processedData=canvas.toDataURL("image/jpeg",jpegQuality);page.imageData=page.processedData;page.width=canvas.width;page.height=canvas.height;page.updatedAt=new Date().toISOString();
-  return page;
-}
-async function scannerRotatePage0800(page,direction){
-  const img=await scannerLoadImage0800(page.originalData||page.processedData);const canvas=document.createElement("canvas");canvas.width=img.height;canvas.height=img.width;
-  const ctx=canvas.getContext("2d",{alpha:false});ctx.fillStyle="#fff";ctx.fillRect(0,0,canvas.width,canvas.height);ctx.translate(canvas.width/2,canvas.height/2);ctx.rotate((direction>0?1:-1)*Math.PI/2);ctx.drawImage(img,-img.width/2,-img.height/2);
-  page.originalData=canvas.toDataURL("image/jpeg",.9);page.rotation=((Number(page.rotation)||0)+(direction>0?90:270))%360;page.corners=await scannerDetectDocument0800(page.originalData);await scannerProcessPage0800(page);
-}
-async function scannerImportFiles0800(fileList,openEditor=false){
-  scannerSyncFields0800();const files=[...(fileList||[])].filter(f=>f?.type?.startsWith("image/"));if(!files.length){toast("Choose a document photo.");return;}
-  if((scannerDraft0800?.pages?.length||0)+files.length>20){toast("A scan can contain up to 20 pages. Save this document and begin another scan.");return;}
-  scannerBusy0800=true;documentScanner0800();
-  try{
-    let firstIndex=-1;
-    for(const file of files){
-      const raw=await scannerReadFile0800(file),source=await scannerNormalizeSource0800(raw),corners=await scannerDetectDocument0800(source);
-      const page={id:uid(),originalData:source,processedData:"",imageData:"",width:0,height:0,corners,enhancement:scannerDraft0800.defaultEnhancement||"color",rotation:0,sourceName:file.name||`Page ${(scannerDraft0800.pages.length||0)+1}`,updatedAt:new Date().toISOString()};
-      await scannerProcessPage0800(page);scannerDraft0800.pages.push(page);if(firstIndex<0)firstIndex=scannerDraft0800.pages.length-1;
-    }
-    scannerEditorIndex0800=openEditor&&files.length===1?firstIndex:-1;toast(`${files.length} page${files.length===1?"":"s"} added.`);
-  }catch(err){console.error(err);toast(err?.message||"The document page could not be added.");}
-  finally{scannerBusy0800=false;documentScanner0800();}
-}
-function scannerBytes0800(){
-  return (scannerDraft0800?.pages||[]).reduce((sum,p)=>sum+Math.max(0,Math.round(String(p.processedData||"").length*.75)),0);
-}
-function scannerSizeLabel0800(bytes=scannerBytes0800()){
-  if(bytes<1024*1024)return `${Math.max(1,Math.round(bytes/1024))} KB`;
-  return `${(bytes/1024/1024).toFixed(1)} MB`;
-}
-function scannerPageCard0800(page,index){
-  return `<article class="scannerPageCard0800"><button class="scannerPagePreview0800" data-scan-edit0800="${index}"><img src="${esc(page.processedData||page.originalData)}" alt="Scanned page ${index+1}"><span>${index+1}</span></button><div><strong>Page ${index+1}</strong><small>${esc(({color:"Auto Color",gray:"Grayscale",bw:"Black & White",original:"Original"})[page.enhancement]||"Auto Color")} • ${page.width||"—"} × ${page.height||"—"}</small><div class="scannerPageActions0800"><button class="ghost" data-scan-edit0800="${index}">Adjust</button><button class="ghost" data-scan-up0800="${index}" ${index===0?"disabled":""}>↑</button><button class="ghost" data-scan-down0800="${index}" ${index===scannerDraft0800.pages.length-1?"disabled":""}>↓</button><button class="danger" data-scan-delete0800="${index}">Delete</button></div></div></article>`;
-}
-function documentScanner0800(){
-  if(!scannerDraft0800){scannerStart0800("",scannerReturnView0800||"tools",scannerReturnView0800==="tools"?"":undefined);return;}
-  if(scannerEditorIndex0800>=0){scannerPageEditorScreen0800();return;}
-  const pages=scannerDraft0800.pages||[],size=scannerSizeLabel0800(),target=scannerTargetSite0801(),hasPages=pages.length>0;
-  html(`<div class="screen scannerScreen0800"><div class="row scannerTop0800"><button class="back ghost" id="scannerBack0800">←</button><div><h1>${scannerEditingDocId0800?"Edit Scan":"Document Scanner"}</h1>${target?`<p>${esc(target.name||"Account")}</p>`:""}</div><span class="scannerPageCount0800">${pages.length} PAGE${pages.length===1?"":"S"}</span></div>
-    <section class="scannerQuickCapture0802"><button class="primary scannerMainCapture0802" id="scannerCamera0800" ${scannerBusy0800?"disabled":""}><span>▣</span><strong>${scannerBusy0800?"Processing…":hasPages?"Add Page":"Scan Page"}</strong></button><button class="ghost scannerImport0802" id="scannerImport0800" ${scannerBusy0800?"disabled":""}>Import</button><input id="scannerCameraInput0800" type="file" accept="image/*" capture="environment" hidden><input id="scannerImportInput0800" type="file" accept="image/*" multiple hidden></section>
-    ${!hasPages?`${scannerGpsPreCaptureMarkup0803()}${scannerAccountAssignmentMarkup0801(0)}`:""}
-    ${hasPages?`<section class="scannerPages0800">${pages.map(scannerPageCard0800).join("")}</section>
-    <section class="card scannerDetails0802"><label>Title<input id="scannerTitle0800" value="${esc(scannerDraft0800.title)}" placeholder="Inspection report, permit, programming sheet…" enterkeyhint="next"></label><div class="scannerDetailsRow0802"><label>Date<input id="scannerDate0800" type="date" value="${esc(scannerDraft0800.date||localDateString())}"></label><details class="scannerOptions0802"><summary>Scan Settings</summary><div><label>Quality<select id="scannerQuality0800"><option value="compact" ${scannerDraft0800.quality==="compact"?"selected":""}>Compact</option><option value="standard" ${scannerDraft0800.quality==="standard"?"selected":""}>Standard</option><option value="high" ${scannerDraft0800.quality==="high"?"selected":""}>High</option></select></label><label>Cleanup<select id="scannerCleanup0800"><option value="color" ${scannerDraft0800.defaultEnhancement==="color"?"selected":""}>Auto Color</option><option value="gray" ${scannerDraft0800.defaultEnhancement==="gray"?"selected":""}>Grayscale</option><option value="bw" ${scannerDraft0800.defaultEnhancement==="bw"?"selected":""}>Black & White</option><option value="original" ${scannerDraft0800.defaultEnhancement==="original"?"selected":""}>Original</option></select></label></div></details></div><label>Notes <span>Optional</span><textarea id="scannerNotes0800" rows="3" placeholder="Add a note…">${esc(scannerDraft0800.notes)}</textarea></label></section>
-    ${scannerAccountAssignmentMarkup0801(pages.length)}
-    <section class="card scannerSavePanel0800"><div><strong>${pages.length} page${pages.length===1?"":"s"}${target?` • ${esc(target.name||"Account")}`:""}</strong><span>${target?`${size} estimated storage. The scan will also be logged in Site Notes.`:"Select the account before saving."}</span></div><button class="primary" id="scannerSave0800" ${!target||scannerBusy0800?"disabled":""}>${target?"Save Document":"Select Account"}</button></section>`:""}
-  </div>`);
-  document.getElementById("scannerBack0800").onclick=scannerDiscard0800;
-  const camera=document.getElementById("scannerCameraInput0800"),imports=document.getElementById("scannerImportInput0800");
-  document.getElementById("scannerCamera0800")?.addEventListener("click",()=>scannerOpenLiveCamera0802(camera,imports));
-  document.getElementById("scannerImport0800")?.addEventListener("click",()=>{scannerSyncFields0800();imports?.click();});
-  if(camera)camera.onchange=e=>scannerImportFiles0800(e.target.files,false);if(imports)imports.onchange=e=>scannerImportFiles0800(e.target.files,false);
-  document.querySelectorAll("[data-scan-edit0800]").forEach(button=>button.onclick=e=>{e.stopPropagation();scannerSyncFields0800();scannerEditorIndex0800=Number(button.dataset.scanEdit0800);documentScanner0800();});
-  document.querySelectorAll("[data-scan-up0800]").forEach(button=>button.onclick=()=>{scannerSyncFields0800();const i=Number(button.dataset.scanUp0800);if(i>0){[pages[i-1],pages[i]]=[pages[i],pages[i-1]];documentScanner0800();}});
-  document.querySelectorAll("[data-scan-down0800]").forEach(button=>button.onclick=()=>{scannerSyncFields0800();const i=Number(button.dataset.scanDown0800);if(i<pages.length-1){[pages[i],pages[i+1]]=[pages[i+1],pages[i]];documentScanner0800();}});
-  document.querySelectorAll("[data-scan-delete0800]").forEach(button=>button.onclick=()=>{const i=Number(button.dataset.scanDelete0800);if(confirm(`Delete page ${i+1}?`)){scannerSyncFields0800();pages.splice(i,1);documentScanner0800();}});
-  wireScannerAccountMatch0801();document.getElementById("scannerGpsRetry0803")?.addEventListener("click",()=>{scannerCancelGpsMatch0803();scannerTargetSiteId0801="";scannerAccountSearch0801="";scannerRequestClosestAccount0803();});document.getElementById("scannerSave0800")?.addEventListener("click",scannerSaveDocument0800);
-}
-function scannerClampCorner0800(c,index,x,y){
-  const gap=.045;x=Math.max(.005,Math.min(.995,x));y=Math.max(.005,Math.min(.995,y));
-  let point;
-  if(index===0)point={x:Math.min(x,c[1].x-gap),y:Math.min(y,c[3].y-gap)};
-  else if(index===1)point={x:Math.max(x,c[0].x+gap),y:Math.min(y,c[2].y-gap)};
-  else if(index===2)point={x:Math.max(x,c[3].x+gap),y:Math.max(y,c[1].y+gap)};
-  else point={x:Math.min(x,c[2].x-gap),y:Math.max(y,c[0].y+gap)};
-  return {x:Math.max(.005,Math.min(.995,point.x)),y:Math.max(.005,Math.min(.995,point.y))};
-}
-function scannerDrawCropCanvas0800(canvas,img,page){
-  const host=canvas.parentElement,width=Math.max(270,Math.min(760,host?.clientWidth||360)),maxH=Math.max(330,Math.min(620,(window.visualViewport?.height||window.innerHeight)*.57));
-  const cssScale=Math.min(width/img.width,maxH/img.height),cssW=Math.max(250,Math.round(img.width*cssScale)),cssH=Math.max(250,Math.round(img.height*cssScale)),dpr=Math.min(2,window.devicePixelRatio||1);
-  canvas.style.width=`${cssW}px`;canvas.style.height=`${cssH}px`;canvas.width=Math.round(cssW*dpr);canvas.height=Math.round(cssH*dpr);
-  const ctx=canvas.getContext("2d");ctx.setTransform(dpr,0,0,dpr,0,0);ctx.clearRect(0,0,cssW,cssH);
-  ctx.save();if(page.enhancement==="gray")ctx.filter="grayscale(1) contrast(1.12)";if(page.enhancement==="bw")ctx.filter="grayscale(1) contrast(1.85)";ctx.drawImage(img,0,0,cssW,cssH);ctx.restore();
-  const p=scannerCopyCorners0800(page.corners).map(q=>({x:q.x*cssW,y:q.y*cssH}));
-  ctx.fillStyle="rgba(0,0,0,.58)";ctx.beginPath();ctx.rect(0,0,cssW,cssH);ctx.moveTo(p[0].x,p[0].y);ctx.lineTo(p[3].x,p[3].y);ctx.lineTo(p[2].x,p[2].y);ctx.lineTo(p[1].x,p[1].y);ctx.closePath();ctx.fill("evenodd");
-  ctx.strokeStyle="#38d46a";ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(p[0].x,p[0].y);p.slice(1).forEach(q=>ctx.lineTo(q.x,q.y));ctx.closePath();ctx.stroke();
-  p.forEach((q,i)=>{ctx.fillStyle="#fff";ctx.strokeStyle="#13b94a";ctx.lineWidth=4;ctx.beginPath();ctx.arc(q.x,q.y,11,0,Math.PI*2);ctx.fill();ctx.stroke();ctx.fillStyle="#06170d";ctx.font="900 10px Arial";ctx.textAlign="center";ctx.textBaseline="middle";ctx.fillText(String(i+1),q.x,q.y);});
-  return {cssW,cssH,points:p};
-}
-async function wireScannerCropCanvas0800(page){
-  const canvas=document.getElementById("scannerCropCanvas0800");if(!canvas)return;const img=await scannerLoadImage0800(page.originalData||page.processedData);let geometry=scannerDrawCropCanvas0800(canvas,img,page),drag=-1;
-  const redraw=()=>{geometry=scannerDrawCropCanvas0800(canvas,img,page);};
-  canvas.onpointerdown=e=>{const r=canvas.getBoundingClientRect(),x=e.clientX-r.left,y=e.clientY-r.top;let best=Infinity;geometry.points.forEach((p,i)=>{const d=Math.hypot(x-p.x,y-p.y);if(d<best){best=d;drag=i;}});if(best>38)drag=-1;if(drag>=0){canvas.setPointerCapture(e.pointerId);e.preventDefault();}};
-  canvas.onpointermove=e=>{if(drag<0)return;const r=canvas.getBoundingClientRect(),x=(e.clientX-r.left)/r.width,y=(e.clientY-r.top)/r.height;const c=scannerCopyCorners0800(page.corners);c[drag]=scannerClampCorner0800(c,drag,x,y);page.corners=c;redraw();e.preventDefault();};
-  const stop=()=>{drag=-1;};canvas.onpointerup=stop;canvas.onpointercancel=stop;
-  window.__scannerCropRedraw0800=redraw;
-}
-function scannerPageEditorScreen0800(){
-  const page=scannerDraft0800?.pages?.[scannerEditorIndex0800];if(!page){scannerEditorIndex0800=-1;documentScanner0800();return;}
-  const modes=[["color","Auto Color"],["gray","Grayscale"],["bw","B&W"],["original","Original"]];
-  html(`<div class="screen scannerEditor0800"><div class="row scannerTop0800"><button class="back ghost" id="scannerEditorBack0800">←</button><div><h1>Adjust Page ${scannerEditorIndex0800+1}</h1><p>Drag the four numbered corners to the paper edges</p></div><span class="scannerPageCount0800">${scannerEditorIndex0800+1}/${scannerDraft0800.pages.length}</span></div>
-    <section class="scannerCropStage0800"><canvas id="scannerCropCanvas0800" aria-label="Document crop editor"></canvas></section>
-    <section class="card scannerEditorTools0800"><div class="scannerToolRow0800"><button class="ghost" id="scannerAutoCrop0800">Auto Detect</button><button class="ghost" id="scannerFullCrop0800">Use Full Page</button><button class="ghost" id="scannerRotateLeft0800">↶ Rotate</button><button class="ghost" id="scannerRotateRight0800">Rotate ↷</button></div><div class="scannerEnhance0800">${modes.map(([key,label])=>`<button class="${page.enhancement===key?"active":""}" data-scan-mode0800="${key}">${label}</button>`).join("")}</div><p>Auto Color improves contrast while preserving color. Black & White is best for forms, typed pages, and handwritten notes.</p></section>
-    <button class="primary scannerApply0800" id="scannerApplyPage0800">Apply Crop &amp; Cleanup</button>
-  </div>`);
-  document.getElementById("scannerEditorBack0800").onclick=()=>{scannerEditorIndex0800=-1;documentScanner0800();};
-  requestAnimationFrame(()=>wireScannerCropCanvas0800(page));
-  document.getElementById("scannerAutoCrop0800").onclick=async()=>{const result=await scannerDetectDocumentResult0802(page.originalData);page.corners=scannerCopyCorners0800(result.corners);page.autoCropConfidence=Number(result.confidence||0);page.autoCropMethod=result.method||"";window.__scannerCropRedraw0800?.();toast(result.confidence>.6?"Page frame detected. Adjust any corner if needed.":"A page frame was estimated. Please verify all four corners.");};
-  document.getElementById("scannerFullCrop0800").onclick=()=>{page.corners=scannerFullCorners0800();window.__scannerCropRedraw0800?.();};
-  document.querySelectorAll("[data-scan-mode0800]").forEach(b=>b.onclick=()=>{page.enhancement=b.dataset.scanMode0800;document.querySelectorAll("[data-scan-mode0800]").forEach(x=>x.classList.toggle("active",x===b));window.__scannerCropRedraw0800?.();});
-  document.getElementById("scannerRotateLeft0800").onclick=async()=>{scannerBusy0800=true;toast("Rotating page…");await scannerRotatePage0800(page,-1);scannerBusy0800=false;scannerPageEditorScreen0800();};
-  document.getElementById("scannerRotateRight0800").onclick=async()=>{scannerBusy0800=true;toast("Rotating page…");await scannerRotatePage0800(page,1);scannerBusy0800=false;scannerPageEditorScreen0800();};
-  document.getElementById("scannerApplyPage0800").onclick=async()=>{const btn=document.getElementById("scannerApplyPage0800");btn.disabled=true;btn.textContent="Processing Page…";try{await scannerProcessPage0800(page);scannerEditorIndex0800=-1;toast("Page adjusted.");documentScanner0800();}catch(err){console.error(err);toast("Page processing failed.");btn.disabled=false;btn.textContent="Apply Crop & Cleanup";}};
-}
-async function scannerSaveDocument0800(){
-  scannerStopLiveCamera0802(false);
-  scannerSyncFields0800();const s=scannerTargetSite0801();if(!scannerDraft0800?.pages?.length)return;if(!s){toast("Search for and select the account that should receive this document.");document.getElementById("scannerAccountSearch0801")?.focus();return;}ensureSite(s);
-  const title=String(scannerDraft0800.title||"").trim();if(!title){toast("Enter a document name.");document.getElementById("scannerTitle0800")?.focus();return;}
-  const btn=document.getElementById("scannerSave0800");if(btn){btn.disabled=true;btn.textContent="Preparing Pages…";}
-  try{
-    for(const page of scannerDraft0800.pages)await scannerProcessPage0800(page);
-    const bytes=scannerBytes0800();if(bytes>4.6*1024*1024){toast("This scan is too large for reliable local storage. Choose Compact quality or remove pages.");if(btn){btn.disabled=false;btn.textContent="Save to Account";}return;}
-    const now=new Date().toISOString(),target=fileStorageTarget0794("document");
-    const scanPages=scannerDraft0800.pages.map((p,index)=>({id:p.id||uid(),imageData:p.processedData,width:p.width,height:p.height,enhancement:p.enhancement||"color",rotation:p.rotation||0,sourceName:p.sourceName||`Page ${index+1}`,updatedAt:p.updatedAt||now}));
-    const obj={type:"Scanned Document",title,date:scannerDraft0800.date||localDateString(),notes:scannerDraft0800.notes||"",ref:"",url:"",customerCaption:"",isScannedDocument:true,scanPages,scanPageCount:scanPages.length,scanQuality:scannerDraft0800.quality||"standard",scanDefaultEnhancement:scannerDraft0800.defaultEnhancement||"color",scanCreatedAt:scannerEditingDocId0800?((s.docs||[]).find(d=>d.id===scannerEditingDocId0800)?.scanCreatedAt||now):now,updatedAt:now,mimeType:"application/pdf",storageTargetId:`${target.provider||"local"}:document`,storageProvider:target.provider||"local",storageFolder:target.folder||"FireVault/Documents",storageStatus:(target.provider||"local")==="local"?"local":"pending",scannerAccountMatchSource:(scannerGpsMatch0803.state==="matched"&&scannerGpsMatch0803.siteId===s.id)?"Closest account by GPS":scannerGpsMatch0803.state==="manual"?"Manual account selection":"Account context",scannerGpsMatchDistanceMeters:(scannerGpsMatch0803.state==="matched"&&scannerGpsMatch0803.siteId===s.id)?Number(scannerGpsMatch0803.meters||0):null,scannerGpsAccuracyMeters:(scannerGpsMatch0803.state==="matched"&&scannerGpsMatch0803.siteId===s.id)?Number(scannerGpsMatch0803.accuracy||0):null,scannerGpsMatchedAt:(scannerGpsMatch0803.state==="matched"&&scannerGpsMatch0803.siteId===s.id)?(scannerGpsMatch0803.at||now):"",remoteFileId:scannerEditingDocId0800?((s.docs||[]).find(d=>d.id===scannerEditingDocId0800)?.remoteFileId||""):"",remoteRevision:scannerEditingDocId0800?((s.docs||[]).find(d=>d.id===scannerEditingDocId0800)?.remoteRevision||""):"",remoteUrl:scannerEditingDocId0800?((s.docs||[]).find(d=>d.id===scannerEditingDocId0800)?.remoteUrl||""):""};
-    let index=-1,backup=null;
-    if(scannerEditingDocId0800){index=s.docs.findIndex(d=>d.id===scannerEditingDocId0800);if(index>=0){backup=s.docs[index];s.docs[index]={...backup,...obj,id:backup.id,createdAt:backup.createdAt||now};}}
-    if(index<0){const created={...obj,id:uid(),createdAt:now};s.docs.unshift(created);index=0;}
-    try{
-      s.noteEntries=Array.isArray(s.noteEntries)?s.noteEntries:[];
-      s.noteEntries.unshift({id:uid(),type:"Scanned Document",text:`Saved ${scanPages.length}-page scan: ${title}`,createdAt:now,at:now,technician:data.settings?.technician?.name||""});
-      save();
-    }catch(err){
-      if(backup)s.docs[index]=backup;else s.docs.splice(index,1);
-      s.noteEntries=s.noteEntries.filter(n=>!(n.type==="Scanned Document"&&n.createdAt===now));
-      console.error(err);toast("The scan could not be saved because local storage is full. Use Compact quality, fewer pages, or export a backup and remove old photos.");if(btn){btn.disabled=false;btn.textContent="Save to Account";}return;
-    }
-    const pagesSaved=scanPages.length,returnView=scannerReturnView0800;selectedSiteId=s.id;scannerCancelGpsMatch0803();scannerDraft0800=null;scannerEditingDocId0800="";scannerEditorIndex0800=-1;scannerTargetSiteId0801="";scannerAccountSearch0801="";scannerGpsMatch0803={state:"idle",siteId:"",meters:null,accuracy:0,message:"",at:"",requestId:scannerGpsMatch0803.requestId,source:""};toast(`${pagesSaved}-page document saved to ${s.name||"the selected account"}.`);if(returnView==="tools"){accountDetailTab0735="docs";rememberAccountTab0751("docs");route("siteDetail");}else route(returnView||"siteDocs");
-  }catch(err){console.error(err);toast(err?.message||"The scanned document could not be saved.");if(btn){btn.disabled=false;btn.textContent="Save to Account";}}
 }
 function scannerDataBytes0800(dataUrl){
   const base64=String(dataUrl||"").split(",")[1]||"";const binary=atob(base64),bytes=new Uint8Array(binary.length);for(let i=0;i<binary.length;i++)bytes[i]=binary.charCodeAt(i);return bytes;
@@ -6120,8 +4910,8 @@ async function scannerSharePdf0800(d){
 }
 function scannerThumb0800(d){const first=d.scanPages?.[0];return first?.imageData?`<div class="docScanThumb0800"><img src="${esc(first.imageData)}" alt="First page of scanned document"><span>${d.scanPageCount||d.scanPages.length} pages</span></div>`:"";}
 function scannedDocumentModal0800(d){
-  if(!docIsScan0800(d)){toast("Scanned document not found.");return;}const overlay=document.createElement("div");overlay.className="scanModalOverlay0800";overlay.innerHTML=`<div class="scanModalSheet0800"><div class="scanModalHead0800"><div><span>SCANNED DOCUMENT</span><strong>${esc(d.title||"Scanned Document")}</strong><small>${d.scanPageCount||d.scanPages.length} pages • ${esc(d.date||new Date(d.scanCreatedAt||Date.now()).toLocaleDateString())}</small></div><button class="ghost" id="scanModalClose0800">Close</button></div>${d.notes?`<p class="scanModalNotes0800">${esc(d.notes)}</p>`:""}<div class="scanModalPages0800">${d.scanPages.map((p,i)=>`<article><span>Page ${i+1}</span><img src="${esc(p.imageData)}" alt="Scanned document page ${i+1}"></article>`).join("")}</div><div class="scanModalActions0800"><button class="primary" id="scanModalPdf0800">Download PDF</button><button class="primary" id="scanModalShare0800">Share PDF</button><button class="ghost" id="scanModalEdit0800">Edit Scan</button><button class="danger" id="scanModalDelete0800">Delete</button></div></div>`;document.body.appendChild(overlay);
-  const close=()=>overlay.remove();overlay.onclick=e=>{if(e.target===overlay)close();};document.getElementById("scanModalClose0800").onclick=close;document.getElementById("scanModalPdf0800").onclick=()=>scannerDownloadPdf0800(d);document.getElementById("scanModalShare0800").onclick=()=>scannerSharePdf0800(d);document.getElementById("scanModalEdit0800").onclick=()=>{const returnView=view==="siteDetail"?"siteDetail":"siteDocs";close();scannerStart0800(d.id,returnView);};document.getElementById("scanModalDelete0800").onclick=()=>{if(confirm(`Delete “${d.title||"this scanned document"}”?`)){const s=site();s.docs=s.docs.filter(x=>x.id!==d.id);save();close();toast("Scanned document deleted.");if(view==="siteDetail")render();else siteDocs();}};
+  if(!docIsScan0800(d)){toast("Scanned document not found.");return;}const overlay=document.createElement("div");overlay.className="scanModalOverlay0800";overlay.innerHTML=`<div class="scanModalSheet0800"><div class="scanModalHead0800"><div><span>SCANNED DOCUMENT</span><strong>${esc(d.title||"Scanned Document")}</strong><small>${d.scanPageCount||d.scanPages.length} pages • ${esc(d.date||new Date(d.scanCreatedAt||Date.now()).toLocaleDateString())}</small></div><button class="ghost" id="scanModalClose0800">Close</button></div>${d.notes?`<p class="scanModalNotes0800">${esc(d.notes)}</p>`:""}<div class="scanModalPages0800">${d.scanPages.map((p,i)=>`<article><span>Page ${i+1}</span><img src="${esc(p.imageData)}" alt="Scanned document page ${i+1}"></article>`).join("")}</div><div class="scanModalActions0800"><button class="primary" id="scanModalPdf0800">Download PDF</button><button class="primary" id="scanModalShare0800">Share PDF</button><button class="danger" id="scanModalDelete0800">Delete</button></div></div>`;document.body.appendChild(overlay);
+  const close=()=>overlay.remove();overlay.onclick=e=>{if(e.target===overlay)close();};document.getElementById("scanModalClose0800").onclick=close;document.getElementById("scanModalPdf0800").onclick=()=>scannerDownloadPdf0800(d);document.getElementById("scanModalShare0800").onclick=()=>scannerSharePdf0800(d);document.getElementById("scanModalDelete0800").onclick=()=>{if(confirm(`Delete “${d.title||"this scanned document"}”?`)){const s=site();s.docs=s.docs.filter(x=>x.id!==d.id);save();close();toast("Scanned document deleted.");if(view==="siteDetail")render();else siteDocs();}};
 }
 
 function contactTitle(c){ return [c.name,c.role].filter(Boolean).join(" • ") || c.type || "Contact"; }
@@ -6149,7 +4939,7 @@ function contactsList(){
     afterHours:contacts.filter(c=>c.afterHours).length
   };
   html(`<div class="screen contactsScreen"><div class="row"><button class="back ghost" id="backBtn">←</button><div><h1>Contacts & Access</h1><p>${esc(s.name||"Site")}</p></div><button class="primary" id="addContactBtn">＋</button></div>
-    <div class="card contactsHero"><h2>Site Contacts</h2><p>Keep customer contacts, gate/lockbox notes, monitoring details, and after-hours access in one field-ready vault.</p><div class="contactStats"><span><strong>${counts.total}</strong>Total</span><span><strong>${counts.access}</strong>Access</span><span><strong>${counts.afterHours}</strong>After Hours</span></div></div>
+    <div class="card contactsHero"><h2>Account Contacts</h2><p>Keep customer contacts, gate/lockbox notes, monitoring details, and after-hours access in one field-ready vault.</p><div class="contactStats"><span><strong>${counts.total}</strong>Total</span><span><strong>${counts.access}</strong>Access</span><span><strong>${counts.afterHours}</strong>After Hours</span></div></div>
     <div class="list grow contactList">${contacts.length?contacts.map(c=>`<div class="card contactItem" data-contact="${esc(c.id)}"><div class="row contactItemTop"><div><h2>${esc(contactTitle(c))}</h2><p>${esc(contactMeta(c))}</p></div><span class="pill">${esc(c.type||"Contact")}</span></div>${c.accessNotes?`<p class="accessNotes">${esc(c.accessNotes)}</p>`:""}${c.notes?`<p class="contactNotes">${esc(c.notes)}</p>`:""}<div class="contactQuickActions">${c.phone?`<button class="ghost smallBtn contactCallBtn" data-phone="${esc(c.phone)}">Call</button>`:""}${c.email?`<button class="ghost smallBtn contactEmailBtn" data-email="${esc(c.email)}">Email</button>`:""}<button class="ghost smallBtn contactEditBtn" data-contact="${esc(c.id)}">Edit</button></div></div>`).join(""):`<div class="empty">No contacts saved yet. Add a customer, property manager, gate code, or monitoring contact.</div>`}</div>
   </div>`);
   document.getElementById("backBtn").onclick=()=>route("siteDetail");
@@ -6229,7 +5019,7 @@ function equipmentList(){
     replaced:equipment.filter(e=>(e.status||"")==="Replaced").length
   };
   html(`<div class="screen equipmentScreen"><div class="row"><button class="back ghost" id="backBtn">←</button><div><h1>Equipment Vault</h1><p>${esc(s.name||"Site")}</p></div><button class="primary" id="addEquipmentBtn">＋</button></div>
-    <div class="card equipmentHero equipmentHero429"><h2>Site Equipment</h2><p>Quickly mark hardware checked, flag attention items, and create equipment follow-up tasks from the field.</p><div class="equipmentStats"><span><strong>${equipment.length}</strong>Total</span><span><strong>${counts.active}</strong>Active</span><span><strong>${counts.attention}</strong>Attention</span></div></div>
+    <div class="card equipmentHero equipmentHero429"><h2>Account Equipment</h2><p>Quickly mark hardware checked, flag attention items, and create equipment follow-up tasks from the field.</p><div class="equipmentStats"><span><strong>${equipment.length}</strong>Total</span><span><strong>${counts.active}</strong>Active</span><span><strong>${counts.attention}</strong>Attention</span></div></div>
     <div class="list grow equipmentList">${equipment.length?equipment.map(e=>`<div class="card equipmentItem equipmentItem429" data-eq="${esc(e.id)}"><div class="row equipmentItemTop"><div><h2>${esc(equipmentTitle(e))}</h2><p>${esc(equipmentMeta(e))}</p></div><span class="pill equipmentStatusPill ${equipmentStatusClass(e)}">${esc(e.status||"Active")}</span></div>${e.notes?`<p class="equipmentNotes">${esc(e.notes)}</p>`:""}<div class="equipmentQuickActions"><button class="ghost smallBtn eqQuickBtn eqOkBtn" data-eq="${esc(e.id)}" data-status="Active">Checked OK</button><button class="ghost smallBtn eqQuickBtn eqIssueBtn" data-eq="${esc(e.id)}" data-status="Needs Attention">Flag Issue</button><button class="ghost smallBtn eqQuickBtn eqReplacedBtn" data-eq="${esc(e.id)}" data-status="Replaced">Replaced</button></div></div>`).join(""):`<div class="empty">No equipment saved yet. Add the panel or communicator first.</div>`}</div>
   </div>`);
   document.getElementById("backBtn").onclick=()=>route("siteDetail");
@@ -6269,11 +5059,10 @@ function visits(){
   const s=site(); if(!s){ route("sites"); return; }
   const siteVisits=Array.isArray(s.visits) ? s.visits : [];
   html(`<div class="screen visitLogScreen"><div class="row"><button class="back ghost" id="backBtn">←</button><h1>Visit Log</h1></div>
-    <div class="card visitLogHero"><h2>${esc(s.name)}</h2><p>${siteVisits.length ? `${siteVisits.length} saved visit${siteVisits.length===1?"":"s"}` : "No completed visits yet."}</p><button class="primary smallBtn" id="startVisitBtn">Start New Visit</button></div>
+    <div class="card visitLogHero"><h2>${esc(s.name)}</h2><p>${siteVisits.length ? `${siteVisits.length} saved visit${siteVisits.length===1?"":"s"}` : "No completed visits yet."}</p></div>
     <div class="list grow">${siteVisits.length?siteVisits.map(v=>`<button class="card visitLogItem" data-visit="${esc(v.id)}"><div class="row"><div><h2>${esc(visitDateLabel(v))}</h2><p>${esc(visitTimeRange(v))} • ${esc(durationText(v.startedAt,v.endedAt))}</p></div><span class="pill">${esc(v.type||"Visit")}</span></div><p>${esc(visitNotesPreview(v,3))}</p></button>`).join(""):`<div class="empty">Use Add Note on the customer screen to create site notes for this account.</div>`}</div>
   </div>`);
   document.getElementById("backBtn").onclick=()=>route("siteDetail");
-  document.getElementById("startVisitBtn").onclick=startServiceVisit610;
   document.querySelectorAll(".visitLogItem").forEach(b=>b.onclick=()=>{mode=b.dataset.visit; route("visitDetail");});
 }
 
@@ -6987,103 +5776,6 @@ function addSiteNotePrompt(defaultText=""){
 function startJob(){ addSiteNotePrompt(); }
 
 
-function startServiceVisit610(){
-  const s=site();
-  if(!s){ route("sites"); return; }
-  if(activeJob && activeJob.siteId!==s.id){
-    const other=data.sites.find(x=>x.id===activeJob.siteId);
-    if(!confirm(`A service visit is already active for ${other?.name||activeJob.siteName||"another site"}. End or discard that visit before starting a new one?`)) return;
-    activeJob=null; saveActiveJob();
-  }
-  if(!activeJob){
-    const now=new Date().toISOString();
-    activeJob={siteId:s.id,siteName:s.name||"Customer Account",startedAt:now,events:[{time:now,note:"Service visit started"}],draft:""};
-    saveActiveJob();
-    toast("Service visit started.");
-  }
-  selectedSiteId=s.id;
-  route("serviceVisit");
-}
-function serviceVisitEventRows610(){
-  return (activeJob?.events||[]).slice().reverse().map(e=>`<div class="serviceVisitEvent610"><span>${esc(eventTime(e.time))}</span><p>${esc(e.note||"Visit event")}</p></div>`).join("");
-}
-function saveServiceVisitDraft610(value){
-  if(!activeJob) return;
-  activeJob.draft=value||"";
-  saveActiveJob();
-}
-function addServiceVisitEvent610(defaultText=""){
-  if(!activeJob) return;
-  const note=prompt("Visit timeline note:",defaultText);
-  if(!note?.trim()) return;
-  addJobEvent(note.trim());
-  toast("Timeline note added.");
-  serviceVisit();
-}
-function endServiceVisit610(){
-  const s=site();
-  if(!s || !activeJob) return;
-  const draft=(document.getElementById("serviceVisitNotes610")?.value||activeJob.draft||"").trim();
-  const defaultSummary=draft || "Service visit completed. Site status and follow-up items documented in FireVault.";
-  const summary=prompt("Final visit summary:",defaultSummary);
-  if(summary===null) return;
-  const endedAt=new Date().toISOString();
-  const events=(activeJob.events||[]).slice();
-  events.push({time:endedAt,note:"Service visit completed"});
-  const timeline=events.map(e=>`${eventTime(e.time)} — ${e.note}`).join("\n");
-  const notes=[summary.trim()||defaultSummary, timeline?`\nService Timeline\n${timeline}`:""].filter(Boolean).join("\n");
-  s.visits=Array.isArray(s.visits)?s.visits:[];
-  const visit={id:uid(),type:"Service Visit",startedAt:activeJob.startedAt,endedAt,notes,events,createdAt:endedAt};
-  s.visits.unshift(visit);
-  mode=visit.id;
-  activeJob=null;
-  saveActiveJob();
-  save();
-  stopJobTimer();
-  toast("Service visit saved.");
-  route("visitDetail");
-}
-function discardServiceVisit610(){
-  if(!activeJob) return;
-  if(!confirm("Discard this active service visit? Unsaved timer and timeline information will be removed.")) return;
-  activeJob=null; saveActiveJob(); stopJobTimer(); toast("Active visit discarded."); route("siteDetail");
-}
-function serviceVisit(){
-  if(!activeJob){ route("siteDetail"); return; }
-  selectedSiteId=activeJob.siteId;
-  const s=site();
-  if(!s){ activeJob=null; saveActiveJob(); route("sites"); return; }
-  html(`<div class="screen serviceVisitScreen610">
-    <div class="row serviceVisitTop610"><button class="back ghost" id="backBtn">←</button><div><h1>Service Visit</h1><p>${esc(s.name||"Customer Account")}</p></div><button class="ghost smallBtn contextHelp537" data-help="workflow">Help</button></div>
-    <div class="card serviceVisitHero610"><div><span>ACTIVE VISIT</span><strong id="jobElapsed">Service call active</strong><p>Started ${esc(eventTime(activeJob.startedAt))} • ${esc(fullAddress(s)||"No address entered")}</p></div><button class="primary" id="endVisit610">End & Save</button></div>
-    <div class="card serviceVisitComposer610"><div class="row"><div><h2>Work Summary</h2><p>Keep a running description of testing, repairs, customer updates, and site status.</p></div><button class="ghost smallBtn" id="addTimeline610">＋ Timeline</button></div><textarea id="serviceVisitNotes610" rows="7" placeholder="Work performed, findings, devices tested, repairs, system status, parts needed...">${esc(activeJob.draft||"")}</textarea><div class="serviceVisitSaveState610">Draft saves automatically on this device.</div></div>
-    <div class="serviceVisitActionGrid610">
-      <button class="card" id="visitCustomer610"><strong>Customer Update</strong><span>Add timeline note</span></button>
-      <button class="card" id="visitTesting610"><strong>Testing</strong><span>Add testing note</span></button>
-      <button class="card" id="visitParts610"><strong>Parts Needed</strong><span>Create follow-up task</span></button>
-      <button class="card" id="visitDef610"><strong>Deficiency</strong><span>Document problem</span></button>
-      <button class="card" id="visitPhoto610"><strong>Photo</strong><span>Add site photo</span></button>
-      <button class="card" id="visitReport610"><strong>Report</strong><span>Review account report</span></button>
-    </div>
-    <div class="card serviceVisitTimeline610"><div class="row"><div><h2>Visit Timeline</h2><p>${(activeJob.events||[]).length} saved event${(activeJob.events||[]).length===1?"":"s"}</p></div></div><div>${serviceVisitEventRows610()||'<div class="empty">No timeline entries yet.</div>'}</div></div>
-    <button class="danger" id="discardVisit610">Discard Active Visit</button>
-  </div>`);
-  document.getElementById("backBtn").onclick=()=>route("siteDetail");
-  document.getElementById("endVisit610").onclick=endServiceVisit610;
-  document.getElementById("discardVisit610").onclick=discardServiceVisit610;
-  document.getElementById("addTimeline610").onclick=()=>addServiceVisitEvent610();
-  document.getElementById("visitCustomer610").onclick=()=>addServiceVisitEvent610("Customer update: ");
-  document.getElementById("visitTesting610").onclick=()=>addServiceVisitEvent610("Testing performed: ");
-  document.getElementById("visitParts610").onclick=()=>addServiceFollowUp("Parts Needed");
-  document.getElementById("visitDef610").onclick=()=>{mode=null; route("deficiencyForm");};
-  document.getElementById("visitPhoto610").onclick=()=>{mode="newPhoto"; route("siteDocForm");};
-  document.getElementById("visitReport610").onclick=()=>route("report");
-  const notes=document.getElementById("serviceVisitNotes610");
-  if(notes) notes.addEventListener("input",()=>saveServiceVisitDraft610(notes.value));
-  wireContextHelp537();
-  startJobTimer();
-}
-
 function jobMode(){
   const s=site();
   if(!s){ route("sites"); return; }
@@ -7093,7 +5785,7 @@ function jobMode(){
   const lastNote=s.lastNoteAt ? new Date(s.lastNoteAt).toLocaleString([], {month:"short",day:"numeric",hour:"numeric",minute:"2-digit"}) : "No notes yet";
   html(`<div class="screen siteNotesScreen491 siteNotesScreen494 siteNotesScreen506 siteNotesScreen508 siteNotesScreen509">
     <div class="row jobTop490 siteNotesTop494"><button class="back ghost" id="backBtn">←</button><div><h1>Site Notes</h1><p>${esc(s.name||"Customer Account")}</p></div><button class="ghost smallBtn" id="copyNotesBtn494" ${noteEntries.length?"":"disabled"}>Copy</button></div>
-    <div class="card jobHero490 idle siteNotesHero491 siteNotesHero494 siteNotesHero506"><div class="jobHeroHead490"><div><strong>Site Notes Only</strong><span>${noteEntries.length} note${noteEntries.length===1?"":"s"} • Last: ${esc(lastNote)}</span></div><div class="siteNotesHeroActions0801"><button class="primary smallBtn" id="scanFromSiteNotes0801">▣ Scan Document</button><button class="ghost smallBtn" id="openDailyReport506">Daily Report</button></div></div><p>${esc(fullAddress(s)||"No address entered.")}</p></div>
+    <div class="card jobHero490 idle siteNotesHero491 siteNotesHero494 siteNotesHero506"><div class="jobHeroHead490"><div><strong>Site Notes Only</strong><span>${noteEntries.length} note${noteEntries.length===1?"":"s"} • Last: ${esc(lastNote)}</span></div><div class="siteNotesHeroActions0801"><button class="ghost smallBtn" id="openDailyReport506">Daily Report</button></div></div><p>${esc(fullAddress(s)||"No address entered.")}</p></div>
     <div class="card siteNoteComposer506">
       <div class="siteNoteComposerHead506 siteNoteComposerHead508 siteNoteComposerHead509"><div><h2>Quick Site Note</h2><p>Type once, use templates, then save it into today’s Daily Report.</p></div><div class="siteNoteHeadActions508 siteNoteHeadActions509"><button class="ghost smallBtn" id="clearSiteDraft508" ${draft508.trim()?"":"disabled"}>Clear Draft</button><button class="primary smallBtn" id="saveSiteNoteBtn506">Save Note</button><button class="ghost smallBtn" id="saveSiteNoteReportBtn509">Save + Report</button></div></div>
       <textarea id="siteNoteText" placeholder="Add what happened, what you found, customer update, parts needed, or follow-up..." rows="5">${esc(draft508)}</textarea>
@@ -7114,7 +5806,6 @@ function jobMode(){
     </div>
   </div>`);
   document.getElementById("backBtn").onclick=()=>route("siteDetail");
-  document.getElementById("scanFromSiteNotes0801").onclick=()=>scannerStart0800("","jobMode",s.id);
   document.getElementById("openDailyReport506").onclick=()=>route("dailySummary");
   document.getElementById("quickNoteBtn").onclick=()=>{ const target=document.getElementById("siteNoteText"); if(target){ target.value=""; target.dispatchEvent(new Event("input",{bubbles:true})); } clearSiteNoteDraft508(s); setSiteNoteDraft506(); };
   document.getElementById("custUpdateBtn").onclick=()=>setSiteNoteDraft506("Customer update: ");
@@ -8374,28 +7065,28 @@ const FIREVAULT_MANUAL_058 = [
     ["Home cards","Pinned Sites, Field Focus, Nearby Accounts, and Recent Accounts can be shown, hidden, expanded, or collapsed. Their behavior is controlled in Settings → Home Layout."],
     ["Search","Use the Home search field to locate an account by site name, address, panel information, contacts, notes, or equipment."],
     ["Quick Capture","Tap Site Note to create a timestamped note, follow-up task, or deficiency without leaving Today. Confirm the selected account before saving."],
-    ["Field Dashboard","Notes Today opens the Daily Report, Route Points opens Daily Route, Copy Summary copies the day summary, and All Sites opens the full customer list."],
+    ["Field Dashboard","Notes Today opens the Daily Report, Open Tasks shows current follow-ups, Copy Summary copies the day summary, and Account Directory opens the full customer list."],
     ["Pinned Sites","Pin frequently used or high-priority customer accounts for one-tap access from Today."]
   ]},
   {id:"sites",title:"Customer Database",icon:"▦",status:"Current",summary:"Create, find, edit, and organize customer accounts.",topics:[
     ["Create a site","Open Sites and tap the add control. Enter the customer name, complete address, panel information, notes, and any available GPS coordinates, then save."],
-    ["Open and edit","Tap an account to open Site Detail. Use Edit for core customer information. Changes are saved to the local vault."],
+    ["Open and edit","Tap an account to open Account Detail. Use Edit for core customer information. Changes are saved to the local vault."],
     ["Contacts","Store customer contacts, roles, phone numbers, email addresses, and access notes under the account."],
     ["GPS","Capture GPS while physically at the site for the best nearby-account results. Location permission and HTTPS are required."],
     ["Search and recent use","FireVault searches multiple account fields, including imported Account Id and monitoring information, and tracks recently opened sites for faster daily access."],
     ["Customer CSV Import","Open Settings → Customer Import, choose a compatible CSV file, review New, Update, Review, and No Change counts, then import ready records. The complete Account Id is the duplicate-safe update key. Shared addresses and repeated names do not merge separate buildings. Flagged rows can be left out until corrected."],
     ["Repeat imports","Reimporting the same source file does not duplicate an exact Account ID. Different Account IDs at the same address—including CLSS IDs with different dash suffixes—remain separate buildings. Changed source fields are updated while visits, photos, notes, tasks, deficiencies, contacts, documents, and other FireVault-created history are preserved."]
   ]},
-  {id:"detail",title:"Site Detail",icon:"▤",status:"Current",summary:"Understand every card and action on an individual customer account.",topics:[
+  {id:"detail",title:"Account Detail",icon:"▤",status:"Current",summary:"Understand every card and action on an individual customer account.",topics:[
     ["Important Site Info","Provides fast access to contact, access, panel, and GPS information. Use it before beginning work."],
     ["Site Brief","Summarizes open tasks, deficiencies, photos, visits, panel information, contact data, access notes, and last activity."],
     ["Activity Timeline","Shows recent visits, photos, documents, tasks, and deficiencies in chronological order."],
     ["Field Card","Use the Field Card for important condensed site information needed during testing or service."],
     ["Quick Actions","Open notes, visits, tasks, deficiencies, contacts, equipment, documents, reports, maps, and service-call tools from the account."],
-    ["Collapsible sections","Site Detail cards keep their natural height and may be opened or closed without compressing their contents."]
+    ["Collapsible sections","Account Detail cards keep their natural height and may be opened or closed without compressing their contents."]
   ]},
   {id:"workflow",title:"Daily Field Workflow",icon:"✓",status:"Current",summary:"A recommended start-to-finish process for a normal service day.",topics:[
-    ["1. Start the day","Open Today, review Field Focus, open tasks, deficiencies, and the Daily Route status."],
+    
     ["2. Select the customer","Use Nearby Accounts, Recent Accounts, Pinned Sites, or Search to open the correct site."],
     ["3. Review history","Read Important Site Info, Site Brief, recent activity, open tasks, previous visits, and access notes before beginning work."],
     ["4. Document work","Add a service visit, notes, photos, tasks, deficiencies, equipment updates, and documents as work is performed."],
@@ -8411,19 +7102,17 @@ const FIREVAULT_MANUAL_058 = [
   ]},
   {id:"photos",title:"Photos & Photo Overlay",icon:"▧",status:"Current",summary:"Capture, label, organize, and preserve site photographs.",topics:[
     ["Add a photo","Open the account photo or document area and choose the camera or photo library. Confirm the correct account before saving."],
-    ["Scan a document","Open Tools → Document Scanner and tap Scan a Page. The live AI Auto Scan camera detects the page corners, draws the crop frame, waits for the page to be steady, and takes the picture automatically. Keep the camera open for additional pages, then tap Done. Search by account name, Account ID, address, city, phone, or ZIP code and select the matching account. The scanner is also available from an account’s Site Notes workspace. Manual corner adjustment, rotation, cleanup modes, page ordering, PDF preview, download, and sharing remain available."],
+    
     ["Useful photo notes","Describe the device, room, floor, circuit, condition, and reason the photo matters. Avoid relying on an image alone."],
     ["Overlay settings","Settings → Photo Overlay controls the template fields, alignment, font size, colors, background, opacity, logo, and tagline."],
     ["Storage caution","Photos and scanned pages can increase local browser storage quickly. Standard quality is recommended; use Compact for long documents. Export backups and remove unnecessary duplicates."],
     ["Photo review","Confirm the saved photo, caption, and overlay are readable before leaving the account."]
   ]},
-  {id:"route",title:"GPS, Nearby Sites & Daily Route",icon:"⌖",status:"Current",summary:"Capture site coordinates and document the technician's daily route.",topics:[
-    ["GPS permission","Allow location access when prompted. GPS features require a secure HTTPS deployment and may be limited by device privacy settings."],
-    ["Save site coordinates","Capture GPS while at the customer site. FireVault stores latitude, longitude, accuracy, and capture time."],
-    ["Imported address coordinates","Settings → Customer Import can calculate latitude and longitude from a usable U.S. street address. Review unmatched addresses and verify critical sites on the map or while on location."],
-    ["Nearby Accounts","FireVault compares the current location to saved site coordinates using the radius selected in Settings → GPS / Maps."],
-    ["Daily Route","Start route logging at the beginning of the workday, add or review waypoints, pause when appropriate, and finish the route at day end."],
-    ["Background limitation","Browser and PWA location tracking can be paused by iOS when the app is closed, suspended, or the phone sleeps. Route records should be reviewed for completeness."]
+  {id:"nearby",title:"GPS & Nearby Accounts",icon:"⌖",status:"Current",summary:"Use saved coordinates to find, select, and navigate to nearby customer accounts.",topics:[
+    ["Nearby Accounts","Open Nearby to compare your phone location with accounts that have valid coordinates."],
+    ["Numbered Map","Map markers match the numbered nearby list so accounts are easy to identify."],
+    ["Directions","Use Route from an account card or Account Detail to open the selected map provider."],
+    ["Location Privacy","FireVault uses phone location only when a location-based action is requested."]
   ]},
   {id:"reports",title:"Reports & Email",icon:"✉",status:"Current",summary:"Configure report content, preview email formatting, and document delivery.",topics:[
     ["Report defaults","Settings → Reports controls the default report title, format, technician profile, tasks, and deficiencies."],
@@ -8438,7 +7127,6 @@ const FIREVAULT_MANUAL_058 = [
     ["GPS / Maps","Controls the map provider, accuracy preference, nearby radius, GPS capture buttons, and report coordinates."],
     ["Reports and Email","Sets report defaults, recipients, subject templates, signature templates, and email preview behavior."],
     ["Photo Overlay","Controls the information and branding stamped onto exported or saved field photos."],
-    ["Theme","Controls the theme preset, accent, card and button appearance, contrast, text size, compact layout, and haptics."],
     ["Home Layout","Shows or hides optional Home cards and chooses whether each remembers, opens, or collapses by default."],
     ["Modules","Simple, Advanced, and Power modes determine which optional FireVault tools are visible. Disabling a module does not delete its data."],
     ["Advanced","Controls optional integrations that may require permissions, APIs, subscriptions, or external services."],
@@ -8479,11 +7167,11 @@ let contextualHelpReturn060=null;
 const CONTEXT_HELP_060={
   home:{chapter:"home",label:"Today / Home",suggestions:["Quick Capture","Home cards","Field Dashboard"]},
   sites:{chapter:"sites",label:"Customer Database",suggestions:["Create a site","Search accounts","Save GPS"]},
-  nearbySites:{chapter:"route",label:"Nearby Sites",suggestions:["GPS permission","Nearby radius","Save coordinates"]},
-  siteDetail:{chapter:"detail",label:"Site Detail",suggestions:["Important Site Info","Quick Actions","Activity Timeline"]},
+  nearbySites:{chapter:"route",label:"Nearby Accounts",suggestions:["GPS permission","Nearby radius","Save coordinates"]},
+  siteDetail:{chapter:"detail",label:"Account Detail",suggestions:["Important Site Info","Quick Actions","Activity Timeline"]},
   siteDocs:{chapter:"photos",label:"Photos & Documents",suggestions:["Add a photo","Photo notes","Storage caution"]},
   siteDocForm:{chapter:"photos",label:"Add Photo / Document",suggestions:["Photo categories","Overlay settings","Useful notes"]},
-  documentScanner:{chapter:"photos",label:"Document Scanner",suggestions:["Capture pages","Adjust corners","Save and share PDF"]},
+  
   jobMode:{chapter:"notes",label:"Site Notes",suggestions:["Save notes","Templates","Daily Report"]},
   tasks:{chapter:"notes",label:"Task Center",suggestions:["Create tasks","Due dates","Mark complete"]},
   taskForm:{chapter:"notes",label:"Task Editor",suggestions:["Task title","Status","Follow-up notes"]},
@@ -8491,7 +7179,6 @@ const CONTEXT_HELP_060={
   deficiencyForm:{chapter:"notes",label:"Deficiency Editor",suggestions:["Location","Impact","Recommended correction"]},
   report:{chapter:"reports",label:"Site Report",suggestions:["Report defaults","Email report","Final verification"]},
   dailySummary:{chapter:"reports",label:"Daily Report",suggestions:["Daily summary","Copy report","Email settings"]},
-  routeLog:{chapter:"route",label:"Daily Route",suggestions:["Start route","Waypoints","iPhone limitations"]},
   settings:{chapter:"settings",label:"Settings",suggestions:["Recommended settings","Modules","Backup"]}
 };
 function loadManualBookmarks058(){ try{return JSON.parse(localStorage.getItem(MANUAL_BOOKMARKS_KEY_058)||"[]")}catch{return []} }
@@ -8539,9 +7226,9 @@ function manualChapterView058(){
 function manualSimplePage058(type){
  const pages={
   quick:["🚀","Quick Start Guide","Get FireVault ready for a normal field day.",[["1. Verify the build","Confirm the green build badge shows 0.67.0 before entering production information."],["2. Complete Technician Profile","Enter your name, company, phone, email, and license or employee identification."],["3. Review permissions","Allow location and photo access only when FireVault requests them and the feature is needed."],["4. Create or open a site","Add the customer name, full address, panel details, contacts, access notes, and GPS location."],["5. Document the visit","Record notes, photos, tasks, deficiencies, equipment changes, and a service visit."],["6. Finish and protect the data","Review the report, send or copy the required summary, then export a current backup."]]],
-  new:["🆕","What’s New in 0.67.0","Account View, Settings navigation, and FireVault Academy redesign.",[["Unified visual system","Standardized typography, spacing, card surfaces, borders, controls, and responsive behavior across FireVault."],["Settings cleanup","Improved Settings home cards and every submenu while preserving the preferred Email setup workflow."],["Help readability","Converted contextual Help and Academy articles into one uninterrupted scrolling reading column with no floating metadata."],["Site Detail stability","Reinforced natural-height cards, readable text, and scroll-safe account sections."],["Operational screens","Simplified Customer Import, Team Sync, Conflict Center, and Nearby Sites presentation without changing their workflows."],["Phone and iPad layouts","Added consistent narrow-phone and tablet behavior, bottom-navigation clearance, and overflow protection."],["Nearby scan diagnostics","Nearby Sites now shows total sites, GPS-ready records, missing coordinates, phone-location progress, and persistent error messages."],["Coordinate recovery","FireVault recovers valid latitude and longitude stored in compatible legacy or imported fields and normalizes them into the site GPS record."],["Location retry","If high-accuracy location times out or is unavailable, FireVault retries once using standard accuracy."],["Nearest-site fallback","When no site is inside the selected radius, the nearest GPS-ready sites remain visible instead of presenting an empty result."],["Latitude and longitude","Customer Import can calculate missing coordinates from each usable U.S. street address before saving records."],["Coordinate requirement","The importer requires calculated, supplied, or existing GPS coordinates by default. Unmatched addresses remain in review."],["Census address matching","Only address fields are sent to the U.S. Census Geocoder. The returned point is an address-range calculation, not a guaranteed building entrance."],["Account Id matching","Repeat imports update the matching FireVault site instead of creating duplicates or deleting field history."],["CSV coordinate columns","Files that already contain Latitude and Longitude columns use those values directly."],["Sync-ready changes","Added and updated customer records enter the pending synchronization queue and create a Sync Activity entry."]]],
+  new:["🆕","What’s New in 0.67.0","Account View, Settings navigation, and FireVault Academy redesign.",[["Unified visual system","Standardized typography, spacing, card surfaces, borders, controls, and responsive behavior across FireVault."],["Settings cleanup","Improved Settings home cards and every submenu while preserving the preferred Email setup workflow."],["Help readability","Converted contextual Help and Academy articles into one uninterrupted scrolling reading column with no floating metadata."],["Account Detail stability","Reinforced natural-height cards, readable text, and scroll-safe account sections."],["Operational screens","Simplified Customer Import, Team Sync, Conflict Center, and Nearby Accounts presentation without changing their workflows."],["Phone and iPad layouts","Added consistent narrow-phone and tablet behavior, bottom-navigation clearance, and overflow protection."],["Nearby scan diagnostics","Nearby Accounts now shows total sites, GPS-ready records, missing coordinates, phone-location progress, and persistent error messages."],["Coordinate recovery","FireVault recovers valid latitude and longitude stored in compatible legacy or imported fields and normalizes them into the site GPS record."],["Location retry","If high-accuracy location times out or is unavailable, FireVault retries once using standard accuracy."],["Nearest-site fallback","When no site is inside the selected radius, the nearest GPS-ready sites remain visible instead of presenting an empty result."],["Latitude and longitude","Customer Import can calculate missing coordinates from each usable U.S. street address before saving records."],["Coordinate requirement","The importer requires calculated, supplied, or existing GPS coordinates by default. Unmatched addresses remain in review."],["Census address matching","Only address fields are sent to the U.S. Census Geocoder. The returned point is an address-range calculation, not a guaranteed building entrance."],["Account Id matching","Repeat imports update the matching FireVault site instead of creating duplicates or deleting field history."],["CSV coordinate columns","Files that already contain Latitude and Longitude columns use those values directly."],["Sync-ready changes","Added and updated customer records enter the pending synchronization queue and create a Sync Activity entry."]]],
   tips:["🧰","Field Tips","Short practices that improve the usefulness of FireVault records.",[["Write for the next technician","Include the exact panel, circuit, device, location, symptom, test result, and next action instead of relying on memory."],["Photograph context first","Take one wide photo showing the equipment location before close-up terminal, label, or damage photos."],["Separate facts from follow-up","Use notes for what occurred, deficiencies for code or system problems, and tasks for work that still needs completion."],["Confirm the account","Before using Quick Capture, verify the selected customer site to prevent records from being stored under the wrong account."],["Back up before updates","Download an external backup before a major update or device change and after completing significant field documentation."]]],
-  revisions:["📋","Revision History","Application and documentation checkpoints.",[[["0.89.0","Rebuilt Photo Overlay as a compact visual studio with an exact canvas preview, quick presets, reorganized content/layout/branding controls, expanded account fields, and a real fire-alarm deficiency sample photo with attribution."],["0.88.0","Overhauled Settings with sticky search, live status summaries, richer grouped cards, consistent detail screens, and improved iPad layout while preserving every release-critical setting."],["0.87.11","Restored WebDAV Backup to Data & Backup and Settings search while preserving saved connection settings and transfer tools."],["0.87.10","Aligned the four Account Directory card actions across the full card width in Call, Route, Add Note, Favorite order."],["0.87.9","Cleaned up the Account Directory with layered depth, raised controls, dimensional account cards, and category-accented shading while preserving fluid scrolling."],["0.87.8","Improved Account Directory scrolling performance and added iPad portrait, landscape, and split-view layout refinements."],["0.87.4","Added spacing and search to Settings, removed the Field category, moved Google Plus Codes under Maps & GPS, enlarged Account ID/category tags, moved Favorite beside Call, removed empty panel/contact text, and restored Nearby-style card scroll locking."],["0.87.3","Moved account addresses below site names, placed Account ID and category tags beneath the address, and changed Settings to a dark grouped-list design without a duplicate logo."],["0.87.2","Polished Account Directory cards and removed the default Ready, No Open Work, and GPS status tags so only actionable issues are shown."],["0.87.1","Rebuilt Account Directory, Search, account cards, and Account Detail from the stable 0.86.1 baseline and removed the layout gap above the bottom navigation."],["0.86.1","Repaired the Settings startup error and standardized the three-button Nearby, Search, and Settings dock across the app."],["0.86.0","Redesigned Settings as a simplified dark tile dashboard and renamed the bottom Accounts navigation button to Search."],["0.85.0","Removed Tools navigation and the Account Detail Visit action, and rebuilt Settings as a simple grouped menu with clean detail screens."],["0.84.0","Refined Nearby map selection with a fixed details overlay, no marker popup, delayed street-level zoom, and direct account-card navigation."],["0.81.0","Prepared FireVault for App Store review by removing the document scanner, Daily Route and time-tracking controls, theme selection, advanced settings, diagnostics access, and excess instructional copy while preserving account data."]],["0.80.3","Defaulted new Tools scanner documents to the closest GPS-ready account with visible distance, accuracy, retry, and manual override."],["0.80.2","Simplified Document Scanner, added on-device AI Auto Scan with live corner framing and hands-free capture, and repaired mobile keyboard field visibility."],["0.80.1","Moved Document Scanner to Tools, added post-capture account search and matching, and added scanner access inside the full Site Notes workspace."],["0.80.0","Added an account-specific multi-page camera document scanner with automatic edge detection, manual corner correction, rotation, cleanup modes, page ordering, PDF preview/download/share, and account-note activity."],["0.79.14","Restored numbered Nearby Accounts map pins matched to distance-sorted list rows and removed Smart Account Intelligence."],["0.79.13","Repaired startup parsing inherited from 0.79.11 and corrected Building Navigator location-copy syntax."],["0.79.12","Added Building Navigator with exact site locations, GPS/Plus Codes, verification, linked photos, route targets, and timeline events."],["0.79.7","Shortened every Settings summary and removed the colored bar from each Section Overview."],["0.79.6","Added Nearby-style account-list scroll locking so cards settle cleanly at the top while the Accounts controls remain fixed."],["0.79.5","Added separate Personal OneDrive, Work OneDrive, and SharePoint connection profiles with exact photo/document assignments and no-personal-fallback protection."],["0.79.4","Added independent photo and document storage destinations, cloud-provider integration targets, and offline Google Plus Codes for accounts and exact field locations."],["0.79.3","Added backend-neutral provider interfaces for authentication, database, file storage, synchronization, and audit while keeping FireVault fully local."],["0.79.2","Added a unified Security Center with vault integrity validation, backup health, audit filters, device naming, session clearing, and PIN confirmation for sensitive exports, restores, and deletion."],["0.79.1","Added an optional local six-digit privacy lock with PBKDF2 hashing, inactivity/background locking, app-switcher privacy screen, recovery code, cooldown protection, and local lock events."],["0.79.0","Added security-ready schema 4 metadata, stable workspace/user/device identities, local audit history, pending change queue, recoverable deletion, credential-safe exports, and protected restore/reset actions."],["0.67.0","Redesigned Account View around service actions and grouped information, consolidated Settings into five folders, and simplified FireVault Academy and contextual Help for continuous reading."],["0.65.2","Repaired Nearby Sites with GPS inventory counts, imported-coordinate recovery, persistent permission and timeout messages, a standard-accuracy retry, and nearest-site fallback results."],["0.65.1","Added online latitude/longitude calculation, coordinate validation, geocoding progress, unmatched-address review, optional CSV coordinates, and coordinate-safe repeat importing."],["0.65.0","Added preview-first customer CSV importing, Account Id update matching, validation warnings, imported monitoring details, and sync activity tracking."],["0.64.1","Simplified Academy article headers, removed floating metadata badges, and improved continuous scrolling and readability."],["0.64.0","Added Sync Activity, a conflict review center, export/import audit entries, and an automatic OneDrive connection-readiness checklist."],["0.63.1","Overhauled contextual Help and Academy reader formatting, removed overlapping sticky article headers, and restored full scrolling on phones and tablets."],["0.63.0","Added permanent record IDs, audit metadata, local version tracking, pending-sync states, conflict readiness, device identity, and a Team Sync settings workspace."],["0.60.0","Connected major screens and Settings areas directly to matching Academy chapters with return-to-screen navigation."],["0.59.0","Added interactive tutorials, guided orientation, pinned learning, field tips, and documentation tracking."],["0.58.0","Expanded Help & Manual into FireVault Academy with bookmarks, smart search, Quick Start, and reader navigation."],["0.57.0","Added the first complete searchable in-app FireVault User Manual."],["Ongoing review rule","Any change to navigation, labels, storage, workflows, permissions, or supported layouts requires the related manual chapter to be checked."]]],
+  revisions:["📋","Revision History","Application and documentation checkpoints.",[[["0.90.0","Core cleanup removed retired scanner capture and service timers, shortened startup, removed the global portrait lock, standardized Account terminology, and added release-safe error recovery."],["0.89.0","Rebuilt Photo Overlay as a compact visual studio with an exact canvas preview, quick presets, reorganized content/layout/branding controls, expanded account fields, and a real fire-alarm deficiency sample photo with attribution."],["0.88.0","Overhauled Settings with sticky search, live status summaries, richer grouped cards, consistent detail screens, and improved iPad layout while preserving every release-critical setting."],["0.87.11","Restored WebDAV Backup to Data & Backup and Settings search while preserving saved connection settings and transfer tools."],["0.87.10","Aligned the four Account Directory card actions across the full card width in Call, Route, Add Note, Favorite order."],["0.87.9","Cleaned up the Account Directory with layered depth, raised controls, dimensional account cards, and category-accented shading while preserving fluid scrolling."],["0.87.8","Improved Account Directory scrolling performance and added iPad portrait, landscape, and split-view layout refinements."],["0.87.4","Added spacing and search to Settings, removed the Field category, moved Google Plus Codes under Maps & GPS, enlarged Account ID/category tags, moved Favorite beside Call, removed empty panel/contact text, and restored Nearby-style card scroll locking."],["0.87.3","Moved account addresses below site names, placed Account ID and category tags beneath the address, and changed Settings to a dark grouped-list design without a duplicate logo."],["0.87.2","Polished Account Directory cards and removed the default Ready, No Open Work, and GPS status tags so only actionable issues are shown."],["0.87.1","Rebuilt Account Directory, Search, account cards, and Account Detail from the stable 0.86.1 baseline and removed the layout gap above the bottom navigation."],["0.86.1","Repaired the Settings startup error and standardized the three-button Nearby, Search, and Settings dock across the app."],["0.86.0","Redesigned Settings as a simplified dark tile dashboard and renamed the bottom Accounts navigation button to Search."],["0.85.0","Removed Tools navigation and the Account Detail Visit action, and rebuilt Settings as a simple grouped menu with clean detail screens."],["0.84.0","Refined Nearby map selection with a fixed details overlay, no marker popup, delayed street-level zoom, and direct account-card navigation."],["0.81.0","Prepared FireVault for App Store review by removing the document scanner, Daily Route and time-tracking controls, theme selection, advanced settings, diagnostics access, and excess instructional copy while preserving account data."]],["0.80.3","Defaulted new Tools scanner documents to the closest GPS-ready account with visible distance, accuracy, retry, and manual override."],["0.80.2","Simplified Document Scanner, added on-device AI Auto Scan with live corner framing and hands-free capture, and repaired mobile keyboard field visibility."],["0.80.1","Moved Document Scanner to Tools, added post-capture account search and matching, and added scanner access inside the full Site Notes workspace."],["0.80.0","Added an account-specific multi-page camera document scanner with automatic edge detection, manual corner correction, rotation, cleanup modes, page ordering, PDF preview/download/share, and account-note activity."],["0.79.14","Restored numbered Nearby Accounts map pins matched to distance-sorted list rows and removed Smart Account Intelligence."],["0.79.13","Repaired startup parsing inherited from 0.79.11 and corrected Building Navigator location-copy syntax."],["0.79.12","Added Building Navigator with exact site locations, GPS/Plus Codes, verification, linked photos, route targets, and timeline events."],["0.79.7","Shortened every Settings summary and removed the colored bar from each Section Overview."],["0.79.6","Added Nearby-style account-list scroll locking so cards settle cleanly at the top while the Accounts controls remain fixed."],["0.79.5","Added separate Personal OneDrive, Work OneDrive, and SharePoint connection profiles with exact photo/document assignments and no-personal-fallback protection."],["0.79.4","Added independent photo and document storage destinations, cloud-provider integration targets, and offline Google Plus Codes for accounts and exact field locations."],["0.79.3","Added backend-neutral provider interfaces for authentication, database, file storage, synchronization, and audit while keeping FireVault fully local."],["0.79.2","Added a unified Security Center with vault integrity validation, backup health, audit filters, device naming, session clearing, and PIN confirmation for sensitive exports, restores, and deletion."],["0.79.1","Added an optional local six-digit privacy lock with PBKDF2 hashing, inactivity/background locking, app-switcher privacy screen, recovery code, cooldown protection, and local lock events."],["0.79.0","Added security-ready schema 4 metadata, stable workspace/user/device identities, local audit history, pending change queue, recoverable deletion, credential-safe exports, and protected restore/reset actions."],["0.67.0","Redesigned Account View around service actions and grouped information, consolidated Settings into five folders, and simplified FireVault Academy and contextual Help for continuous reading."],["0.65.2","Repaired Nearby Accounts with GPS inventory counts, imported-coordinate recovery, persistent permission and timeout messages, a standard-accuracy retry, and nearest-site fallback results."],["0.65.1","Added online latitude/longitude calculation, coordinate validation, geocoding progress, unmatched-address review, optional CSV coordinates, and coordinate-safe repeat importing."],["0.65.0","Added preview-first customer CSV importing, Account Id update matching, validation warnings, imported monitoring details, and sync activity tracking."],["0.64.1","Simplified Academy article headers, removed floating metadata badges, and improved continuous scrolling and readability."],["0.64.0","Added Sync Activity, a conflict review center, export/import audit entries, and an automatic OneDrive connection-readiness checklist."],["0.63.1","Overhauled contextual Help and Academy reader formatting, removed overlapping sticky article headers, and restored full scrolling on phones and tablets."],["0.63.0","Added permanent record IDs, audit metadata, local version tracking, pending-sync states, conflict readiness, device identity, and a Team Sync settings workspace."],["0.60.0","Connected major screens and Settings areas directly to matching Academy chapters with return-to-screen navigation."],["0.59.0","Added interactive tutorials, guided orientation, pinned learning, field tips, and documentation tracking."],["0.58.0","Expanded Help & Manual into FireVault Academy with bookmarks, smart search, Quick Start, and reader navigation."],["0.57.0","Added the first complete searchable in-app FireVault User Manual."],["Ongoing review rule","Any change to navigation, labels, storage, workflows, permissions, or supported layouts requires the related manual chapter to be checked."]]],
   trouble:["❓","Troubleshooting","Common problems and safe first checks.",FIREVAULT_MANUAL_058.find(x=>x.id==="trouble")?.topics||[]]
  };
  const [icon,title,note,items]=pages[type]||["ⓘ","Unavailable","This Help section is not available in the installed version.",[["Current status","Return to Help and choose an available chapter or tutorial."]]];
@@ -8555,21 +7242,21 @@ let academyPins059=(()=>{try{return JSON.parse(localStorage.getItem(ACADEMY_PINS
 let activeTutorial059="";
 let activeTourStep059=0;
 const ACADEMY_TUTORIALS_059=[
- {id:"first-setup",icon:"⚙",title:"First-Time Setup",time:"5 min",level:"Beginner",summary:"Configure identity, permissions, reports, email, Home layout, and backups.",steps:["Open Settings and complete Technician Profile.","Review GPS permissions and choose the nearby-site radius.","Set Report and Email defaults.","Choose a Home Layout preset that fits your workflow.","Export a test backup and confirm the file downloads."]},
- {id:"first-site",icon:"▦",title:"Create Your First Customer",time:"4 min",level:"Beginner",summary:"Create a complete customer account and confirm Site Detail information.",steps:["Open Sites and tap Add Site.","Enter the customer name and complete address.","Add panel, contact, access, and GPS information.","Save and reopen the account.","Review Site Brief and Important Site Info for accuracy."]},
+ {id:"first-setup",icon:"⚙",title:"First-Time Setup",time:"5 min",level:"Beginner",summary:"Configure identity, permissions, reports, email, maps, and backups.",steps:["Open Settings and complete Technician Profile.","Review GPS permissions and choose the nearby-site radius.","Set Report and Email defaults.","Review the Search, Nearby, and Settings navigation.","Export a test backup and confirm the file downloads."]},
+ {id:"first-site",icon:"▦",title:"Create Your First Customer",time:"4 min",level:"Beginner",summary:"Create a complete customer account and confirm Account Detail information.",steps:["Open Sites and tap Add Account.","Enter the customer name and complete address.","Add panel, contact, access, and GPS information.","Save and reopen the account.","Review Site Brief and Important Site Info for accuracy."]},
  {id:"visit",icon:"✓",title:"Document a Site Visit",time:"6 min",level:"Beginner",summary:"Record work performed and leave a useful history for the next technician.",steps:["Open the correct customer account.","Review recent activity and open work.","Create a visit and record arrival details.","Add notes, photos, tasks, deficiencies, and equipment updates.","Review the report before ending the visit."]},
  {id:"notes",icon:"✎",title:"Notes, Tasks & Deficiencies",time:"5 min",level:"Beginner",summary:"Choose the correct record type and create actionable documentation.",steps:["Use a note for observations or permanent context.","Use a task for work that must be completed later.","Use a deficiency for an impaired or noncompliant condition.","Add location, device, cause, and recommended action.","Close tasks and deficiencies only after resolution is documented."]},
  {id:"photos",icon:"▧",title:"Use Photos Effectively",time:"4 min",level:"Intermediate",summary:"Capture useful evidence and apply consistent photo overlays.",steps:["Confirm the correct account before taking the photo.","Frame labels, wiring, device location, and surrounding context.","Add a descriptive caption.","Apply the configured overlay when required.","Verify the saved image appears under the correct site."]},
  {id:"email",icon:"✉",title:"Email a Report",time:"5 min",level:"Intermediate",summary:"Prepare recipients, subject, signature, and report content before sending.",steps:["Open Settings → Email and verify defaults.","Open the site report or Daily Report.","Confirm To and CC recipients.","Review subject, signature, and included sections.","Open the device mail composer and verify attachments before sending."]},
- {id:"route",icon:"⌖",title:"GPS & Route Tracking",time:"5 min",level:"Intermediate",summary:"Record a route day and review saved stops and waypoints.",steps:["Allow location access while FireVault is in use.","Start Daily Route before leaving the first location.","Add manual waypoints when a meaningful stop is not detected.","Pause recording when appropriate.","End the route and review the daily timeline before reporting."]}
+ 
 ];
 const ACADEMY_TOUR_059=[
- ["Today Dashboard","Your daily starting point for Field Focus, Quick Capture, nearby sites, recent accounts, and route activity."],
+ ["Today Dashboard","Your daily starting point for Field Focus, Quick Capture, nearby accounts, and recent work."],
  ["Global Search","Find accounts using customer name, address, panel details, contacts, equipment, or notes."],
  ["Bottom Navigation","Move between Nearby, Accounts, Library, and Settings without losing stored data."],
  ["Sites","Create, search, and open customer accounts. Each account contains its own field history and documentation."],
- ["Site Detail","Review important information, recent activity, photos, visits, tasks, deficiencies, contacts, equipment, and reports."],
- ["Settings","Control technician information, GPS, reports, email, photo overlays, appearance, Home layout, modules, backups, and the Academy."],
+ ["Account Detail","Review important information, recent activity, photos, visits, tasks, deficiencies, contacts, equipment, and reports."],
+ ["Settings","Manage technician information, maps, reports, photo overlays, backups, privacy, Demo Mode, and support."],
  ["Backups","Export a current backup before major updates, browser-data changes, or device replacement."]
 ];
 const ACADEMY_TIPS_059=[
@@ -8729,7 +7416,7 @@ function switchDemoMode0738(enabled,reset=false){
   if(reset) resetDemoData();
   const changed=setDemoMode(enabled);
   if(enabled && !changed){toast("Demo Mode could not be activated because browser storage is unavailable.");return;}
-  try{sessionStorage.removeItem(NEARBY_STATE_KEY_0652);sessionStorage.removeItem(`${NEARBY_STATE_KEY_0652}_demo`);sessionStorage.removeItem(DEMO_ACTIVE_JOB_KEY_0738);sessionStorage.removeItem(DEMO_ACTIVE_ROUTE_KEY_0738);}catch{}
+  try{sessionStorage.removeItem(NEARBY_STATE_KEY_0652);sessionStorage.removeItem(`${NEARBY_STATE_KEY_0652}_demo`);sessionStorage.removeItem("firevault_active_route_day_demo");}catch{}
   location.reload();
 }
 function wireDemoMode0738(){
@@ -9264,7 +7951,7 @@ function settingsPanel(){
   if(settingsTab==="plusCodes") return plusCodesPanel0794();
 
   if(settingsTab==="gps") return `<div class="settingsStack settingsStack540">
-    ${settingsSection540("Navigation","Map Preferences","Set the map service, GPS accuracy, and distance used for nearby-account detection.",`<div class="settingsGrid settingsGrid540">${fieldBlock("Default map",`<select id="gpsMapProvider"><option value="apple" ${gps.mapProvider!=="google"?"selected":""}>Apple Maps</option><option value="google" ${gps.mapProvider==="google"?"selected":""}>Google Maps</option></select>`)}${fieldBlock("GPS accuracy",`<select id="gpsHighAccuracy"><option value="true" ${gps.highAccuracy!==false?"selected":""}>High accuracy</option><option value="false" ${gps.highAccuracy===false?"selected":""}>Standard</option></select>`)}${fieldBlock("Nearby radius",`<input id="gpsNearbyRadius" inputmode="decimal" value="${esc(gps.nearbyRadiusMiles||1)}">`,`Distance in miles used by Nearby Sites`)}</div>`,"green",saveButton())}
+    ${settingsSection540("Navigation","Map Preferences","Set the map service, GPS accuracy, and distance used for nearby-account detection.",`<div class="settingsGrid settingsGrid540">${fieldBlock("Default map",`<select id="gpsMapProvider"><option value="apple" ${gps.mapProvider!=="google"?"selected":""}>Apple Maps</option><option value="google" ${gps.mapProvider==="google"?"selected":""}>Google Maps</option></select>`)}${fieldBlock("GPS accuracy",`<select id="gpsHighAccuracy"><option value="true" ${gps.highAccuracy!==false?"selected":""}>High accuracy</option><option value="false" ${gps.highAccuracy===false?"selected":""}>Standard</option></select>`)}${fieldBlock("Nearby radius",`<input id="gpsNearbyRadius" inputmode="decimal" value="${esc(gps.nearbyRadiusMiles||1)}">`,`Distance in miles used by Nearby Accounts`)}</div>`,"green",saveButton())}
     ${settingsSection540("Availability","GPS Tools","Choose where location controls and saved coordinates are available.",`<div class="settingsList settingsToggleList540">${checkBlock("gpsEnabled","Show GPS capture buttons on site pages",gps.enabled!==false)}${checkBlock("gpsReports","Include GPS coordinates in reports",gps.includeInReports!==false)}</div><div class="settingsInfo540"><strong>Location permission required</strong><span>Browser GPS works only when FireVault is served over HTTPS and location access is allowed on the device.</span></div>`,"teal")}
   </div>`;
 
@@ -9417,176 +8104,6 @@ function saveSettings(){
   if(settingsTab==="sync") s.sync={...(s.sync||{}),provider:val("syncProvider")||"onedrive",organization:val("syncOrganization"),workspace:val("syncWorkspace")||"FireVault Shared Vault",conflictPolicy:val("syncConflict")||"review",enabled:false};
   save(); toast("Settings saved."); view="settings"; mode="settingsDetail"; render();
 }
-
-
-function stabilityReport(){
-  const issues=[];
-  const pass=[];
-  const routeNames=["home","dailySummary","routeLog","actionCenter","pinnedSites","sites","nearbySites","attention","siteDetail","visits","visitDetail","checklist","siteForm","contactsList","contactForm","siteDocs","siteDocForm","equipmentList","equipmentForm","tasks","taskForm","deficiencies","deficiencyForm","report","library","resourceForm","jobMode","serviceVisit","settings","diagnostics","dataTools"];
-  pass.push(`${routeNames.length} app routes registered`);
-  if(Array.isArray(data.sites)) pass.push("Sites database is an array"); else issues.push("Sites database is not an array");
-  if(Array.isArray(data.resources)) pass.push("Library resources database is an array"); else issues.push("Library resources database is not an array");
-  if(Array.isArray(data.resourceFolders)) pass.push("Library folders are available"); else issues.push("Library folders are missing");
-  if(data.settings && data.settings.app && data.settings.theme && data.settings.gps) pass.push("Core settings objects are present"); else issues.push("One or more core settings objects are missing");
-  const storagePlan=fileStoragePlanSummary(data);
-  if(data.settings?.fileStorage?.photo && data.settings?.fileStorage?.document) pass.push(`Independent photo/document storage destinations are configured (${storagePlan.photo.label} / ${storagePlan.document.label})`); else issues.push("Photo or document storage destination settings are missing");
-  const microsoftPlan0795=microsoftStorageSummary(data);
-  if(microsoftPlan0795.noPersonalFallback) pass.push("Microsoft storage no-personal-fallback protection is enabled"); else issues.push("Microsoft storage could fall back to a personal account");
-  const plusCfg=plusCodeSettings0794();
-  if(data.settings?.plusCodes && [10,11].includes(Number(plusCfg.accountLength)) && [10,11].includes(Number(plusCfg.locationLength))) pass.push("Google Plus Code settings are valid"); else issues.push("Google Plus Code settings are invalid");
-  const security=securityFoundationSummary(data);
-  if(Number(security.schemaVersion)===4) pass.push("Security schema 4 is active"); else issues.push(`Security schema is ${security.schemaVersion||"missing"}`);
-  if(security.workspaceId && security.user?.id && security.device?.id) pass.push("Workspace, user, and device identities are present"); else issues.push("Security identity metadata is incomplete");
-  const ids=new Set();
-  (data.sites||[]).forEach((s,idx)=>{
-    if(!s.id) issues.push(`Site ${idx+1} is missing an ID`);
-    if(s.id && ids.has(s.id)) issues.push(`Duplicate site ID detected: ${s.id}`);
-    if(s.id) ids.add(s.id);
-    if(!s.workspaceId || !s.createdByUserId || !s.modifiedByUserId || !s.changeId || !Number(s.recordVersion)) issues.push(`${s.name||"Unnamed site"} is missing security-ready record metadata`);
-    ["visits","tasks","deficiencies","equipment","contacts","docs","checklist","reportDeliveries"].forEach(k=>{
-      if(!Array.isArray(s[k])) issues.push(`${s.name||"Unnamed site"} has invalid ${k} storage`);
-    });
-    if(s.gps && (!Number.isFinite(Number(s.gps.lat)) || !Number.isFinite(Number(s.gps.lng)))) issues.push(`${s.name||"Unnamed site"} has invalid GPS coordinates`);
-    if(plusCfg.enabled && hasGps(s) && s.plusCode && !isValidFullPlusCode(s.plusCode)) issues.push(`${s.name||"Unnamed site"} has an invalid Plus Code`);
-  });
-  const resourceIds=new Set();
-  (data.resources||[]).forEach((r,idx)=>{
-    if(!r.id) issues.push(`Library resource ${idx+1} is missing an ID`);
-    if(r.id && resourceIds.has(r.id)) issues.push(`Duplicate library resource ID detected: ${r.id}`);
-    if(r.id) resourceIds.add(r.id);
-  });
-  if(activeJob && !data.sites.some(s=>s.id===activeJob.siteId)) issues.push("Old active job record points to a site that no longer exists");
-  if(!issues.length){
-    pass.push("No duplicate site IDs found");
-    pass.push("No invalid GPS coordinates found");
-    pass.push("No orphaned active job found");
-  }
-  return {issues, pass, status:issues.length ? "Needs Review" : "Passed"};
-}
-function diagnosticsText(){
-  const taskRows=allTaskRows();
-  const taskCounts=taskFilterCounts(taskRows);
-  const totalDef=data.sites.reduce((n,s)=>n+(s.deficiencies||[]).length,0);
-  const totalVisits=data.sites.reduce((n,s)=>n+(s.visits||[]).length,0);
-  const stability=stabilityReport();
-  const lines=[
-    `FireVault Diagnostics`,
-    `Build: ${BUILD}`,
-    `Stability: ${stability.status}`,
-    `Sites: ${data.sites.length}`,
-    `Resources: ${data.resources.length}`,
-    `Open Tasks: ${taskCounts.open}`,
-    `Due Today: ${taskCounts.today}`,
-    `Overdue Tasks: ${taskCounts.overdue}`,
-    `Deficiencies: ${totalDef}`,
-    `Visits: ${totalVisits}`,
-    `GPS Saved Sites: ${data.sites.filter(hasGps).length}`,
-    `Route Days: ${(data.routeLogs||[]).length}`,
-    `Old Job Record: ${activeJob ? activeJob.siteName : "None"}`,
-    `Storage Key: ${demoStorageLabel0739()}`,
-    `Security Schema: ${securityFoundationSummary(data).schemaVersion}`,
-    `Workspace ID: ${securityFoundationSummary(data).workspaceId}`,
-    `Audit Entries: ${securityFoundationSummary(data).auditCount}`,
-    `Recycle Bin: ${securityFoundationSummary(data).recycleCount}`,
-    `Pending Security Changes: ${securityFoundationSummary(data).pendingChanges}`,
-    ``,
-    `Stability Issues:`,
-    ...(stability.issues.length ? stability.issues.map(i=>`- ${i}`) : ["- None"]),
-    ``,
-    `Checks Passed:`,
-    ...stability.pass.map(p=>`- ${p}`),
-    ``,
-    `Generated: ${new Date().toLocaleString()}`
-  ];
-  return lines.join("\n");
-}
-function copyDiagnostics(){
-  const text=diagnosticsText();
-  if(navigator.clipboard?.writeText){
-    navigator.clipboard.writeText(text).then(()=>toast("Diagnostics copied."),()=>toast("Clipboard unavailable."));
-  }else{
-    toast("Clipboard unavailable.");
-  }
-}
-function startupHealthText520(){
-  const lastBoot=localStorage.getItem("firevault_last_boot_ok") || "Not recorded yet";
-  const lastBuild=localStorage.getItem("firevault_last_boot_build") || "Unknown";
-  const lastRoute=localStorage.getItem("firevault_last_boot_route") || "Unknown";
-  const lastError=localStorage.getItem("firevault_last_boot_error") || window.__FIREVAULT_LAST_ERROR || "None";
-  const minSplash=Number(window.__FIREVAULT_MIN_SPLASH_MS || 5000);
-  const moduleReady=window.__FIREVAULT_MODULE_READY ? "Yes" : "No";
-  const booted=window.__FIREVAULT_BOOTED ? "Yes" : "No";
-  return [
-    "FireVault Startup Health",
-    `Build: ${BUILD}`,
-    `Module Ready: ${moduleReady}`,
-    `Booted: ${booted}`,
-    `Last Good Boot: ${lastBoot}`,
-    `Last Boot Build: ${lastBuild}`,
-    `Last Route: ${lastRoute}`,
-    `Splash Minimum: ${Math.round(minSplash/1000)} seconds`,
-    `Last Boot Error: ${lastError}`,
-    `Generated: ${new Date().toLocaleString()}`
-  ].join("\n");
-}
-function startupHealthCard520(){
-  const lastBoot=localStorage.getItem("firevault_last_boot_ok") || "Not recorded yet";
-  const lastBuild=localStorage.getItem("firevault_last_boot_build") || "Unknown";
-  const lastRoute=localStorage.getItem("firevault_last_boot_route") || "Unknown";
-  const lastError=localStorage.getItem("firevault_last_boot_error") || window.__FIREVAULT_LAST_ERROR || "None";
-  const minSplash=Number(window.__FIREVAULT_MIN_SPLASH_MS || 5000);
-  const ok=window.__FIREVAULT_MODULE_READY && !window.__FIREVAULT_LAST_ERROR;
-  return `<div class="card startupHealth520 ${ok?"passed":"needsReview"}">
-    <div class="startupHealthHead520"><div><h2>Startup Health</h2><p>Boot confidence check for the splash screen, module load, and last successful app start.</p></div><span>${ok?"OK":"Review"}</span></div>
-    <div class="startupHealthGrid520">
-      <div><strong>${window.__FIREVAULT_MODULE_READY?"Yes":"No"}</strong><span>Module Ready</span></div>
-      <div><strong>${window.__FIREVAULT_BOOTED?"Yes":"No"}</strong><span>Booted</span></div>
-      <div><strong>${Math.round(minSplash/1000)} sec</strong><span>Splash Min</span></div>
-      <div><strong>${esc(lastBuild)}</strong><span>Last Build</span></div>
-    </div>
-    <p class="fieldNote">Last good boot: ${esc(lastBoot)} • Last route: ${esc(lastRoute)}</p>
-    <p class="fieldNote">Last startup error: ${esc(lastError)}</p>
-    <button class="ghost smallBtn" id="copyStartupHealth520">Copy Startup Health</button>
-  </div>`;
-}
-function copyStartupHealth520(){
-  if(navigator.clipboard?.writeText){
-    navigator.clipboard.writeText(startupHealthText520()).then(()=>toast("Startup health copied."),()=>toast("Clipboard unavailable."));
-  }else{
-    toast("Clipboard unavailable.");
-  }
-}
-function repairVaultState(){
-  data = loadData();
-  data.sites = Array.isArray(data.sites) ? data.sites : [];
-  data.resources = Array.isArray(data.resources) ? data.resources : [];
-  data.resourceFolders = Array.isArray(data.resourceFolders) ? data.resourceFolders.filter(Boolean) : ["Manuals","Forms","Links","Codes"];
-  if(!data.resourceFolders.length) data.resourceFolders = ["Manuals","Forms","Links","Codes"];
-  const siteIds=new Set();
-  data.sites.forEach(s=>{
-    ensureSite(s);
-    if(!s.id || siteIds.has(s.id)) s.id=uid();
-    siteIds.add(s.id);
-    if(s.gps && (!Number.isFinite(Number(s.gps.lat)) || !Number.isFinite(Number(s.gps.lng)))) s.gps=null;
-  });
-  const resourceIds=new Set();
-  data.resources.forEach(r=>{
-    if(!r.id || resourceIds.has(r.id)) r.id=uid();
-    resourceIds.add(r.id);
-    r.folder = r.folder || "";
-  });
-  if(activeJob && !data.sites.some(s=>s.id===activeJob.siteId)){
-    activeJob=null;
-    saveActiveJob();
-  }
-  fvSafeSet0739("firevault_last_stability_check",new Date().toLocaleString());
-  save();
-  toast("Stability repair completed.");
-  diagnostics();
-}
-
-
-
 
 
 /* Build 0.50.75 Action Center helpers */
@@ -9774,8 +8291,7 @@ function fieldFocusStats561(){
   const attention=attentionRows();
   const photos=sites.reduce((n,s)=>n+(s.docs||[]).filter(docHasPhoto512).length,0);
   const selectedPhotos=sites.reduce((n,s)=>n+reportPhotos526(s).length,0);
-  const routeDays=(data.routeLogs||[]).length;
-  return {sites,openTasks,overdue,dueToday,openDef,attention,photos,selectedPhotos,routeDays};
+  return {sites,openTasks,overdue,dueToday,openDef,attention,photos,selectedPhotos};
 }
 function fieldFocusStatus561(){
   const f=fieldFocusStats561();
@@ -9805,7 +8321,7 @@ function fieldFocusMarkup561(){
         <button id="focusToday561"><strong>${f.dueToday.length}</strong><span>Due Today</span></button>
         <button id="focusOverdue561"><strong>${f.overdue.length}</strong><span>Overdue</span></button>
         <button id="focusReports561"><strong>${f.selectedPhotos}</strong><span>Report Photos</span></button>
-        <button id="focusRoutes561"><strong>${f.routeDays}</strong><span>Route Days</span></button>
+        <button id="focusAccounts561"><strong>${f.sites.length}</strong><span>Accounts</span></button>
       </div>
     </div>
   </div>`;
@@ -9826,8 +8342,7 @@ function fieldFocusText561(){
     `Overdue Tasks: ${f.overdue.length}`,
     `Open Deficiencies: ${f.openDef.length}`,
     `Photos: ${f.photos}`,
-    `Selected Report Photos: ${f.selectedPhotos}`,
-    `Route Days: ${f.routeDays}`
+    `Selected Report Photos: ${f.selectedPhotos}`
   ];
   return lines.join("\n");
 }
@@ -9848,7 +8363,6 @@ function wireFieldFocus561(){
   const today=document.getElementById("focusToday561"); if(today) today.onclick=()=>{actionCenterFilter562="today"; route("actionCenter");};
   const overdue=document.getElementById("focusOverdue561"); if(overdue) overdue.onclick=()=>{actionCenterFilter562="overdue"; route("actionCenter");};
   const reports=document.getElementById("focusReports561"); if(reports) reports.onclick=()=>{actionCenterFilter562="reports"; route("actionCenter");};
-  const routes=document.getElementById("focusRoutes561"); if(routes) routes.onclick=()=>route("routeLog");
 }
 
 
@@ -9916,65 +8430,6 @@ function layoutControlsCard564(){
   </div>`;
 }
 
-function dataToolsStatusGrid560(){
-  const d=dataSafeSummary560();
-  const s=d.stats;
-  return `<div class="dataToolsGrid560">
-    <div><strong>${s.sites}</strong><span>Sites</span></div>
-    <div><strong>${s.visits}</strong><span>Visits</span></div>
-    <div><strong>${s.docs}</strong><span>Docs</span></div>
-    <div><strong>${s.photoDocs}</strong><span>Photos</span></div>
-    <div><strong>${s.tasks}</strong><span>Tasks</span></div>
-    <div><strong>${s.deficiencies}</strong><span>Def.</span></div>
-    <div><strong>${s.routes}</strong><span>Route Days</span></div>
-    <div><strong>${esc(d.kb)}</strong><span>Local Data</span></div>
-  </div>`;
-}
-function dataTools(){
-  const d=dataSafeSummary560();
-  html(`<div class="screen dataToolsScreen560">
-    <div class="row dataToolsTop560"><button class="back ghost" id="backHome560">←</button><div><h1>Data Tools</h1><p>Backup, restore, diagnostics, and build safety.</p></div></div>
-    <div class="card dataToolsHero560">
-      <div><h2>FireVault Data Safety</h2><p>${esc(d.restoreLine)}</p></div>
-      <span>${esc(BUILD)}</span>
-    </div>
-    ${layoutControlsCard564()}
-    ${dataToolsStatusGrid560()}
-    ${backupSafetyMarkup552()}
-    ${backupRestoreCenterMarkup554()}
-    <div class="card dataToolsMaintenance560">
-      <div class="dataToolsMaintenanceHead560"><div><h2>Maintenance</h2><p>Use these when troubleshooting, checking startup health, or preparing a support note.</p></div></div>
-      <div class="dataToolsActions560">
-        <button class="ghost" id="copyFieldFocus561">Copy Field Focus</button>
-        <button class="ghost" id="openPinnedSitesData567">Open Pinned Sites</button>
-        <button class="ghost" id="copyPinnedSitesData566">Copy Pinned Sites</button>
-        <button class="ghost" id="copyActionCenterData562">Copy Action Center</button>
-        <button class="ghost" id="copyDiagnostics560">Copy Diagnostics</button>
-        <button class="ghost" id="copyStartupHealth560">Copy Startup Health</button>
-        <button class="ghost" id="openDiagnostics560">Open Diagnostics</button>
-        <button class="danger" id="repairVault560">Repair Vault</button>
-      </div>
-    </div>
-    <div class="card dataToolsInfo560">
-      <h2>Recommended update order</h2>
-      <p>Download Backup → install / commit the new build → confirm FireVault opens → check one saved account → keep the backup file until the build is confirmed stable.</p>
-    </div>
-  </div>`);
-  document.getElementById("backHome560").onclick=()=>returnFromSettingsSubmenu576("home");
-  wireBackupSafety552();
-  const layoutCopy=document.getElementById("copyLayoutControls564"); if(layoutCopy) layoutCopy.onclick=copyLayoutControls564;
-  const openLayout=document.getElementById("openLayoutSettings565"); if(openLayout) openLayout.onclick=()=>{settingsTab="visibility"; mode="settingsDetail"; route("settings");};
-  const focus=document.getElementById("copyFieldFocus561"); if(focus) focus.onclick=copyFieldFocus561;
-  const actionCopy=document.getElementById("copyActionCenterData562"); if(actionCopy) actionCopy.onclick=copyActionCenter562;
-  const pinnedOpen=document.getElementById("openPinnedSitesData567"); if(pinnedOpen) pinnedOpen.onclick=()=>route("pinnedSites");
-  const pinnedCopy=document.getElementById("copyPinnedSitesData566"); if(pinnedCopy) pinnedCopy.onclick=copyPinnedSites566;
-  const diag=document.getElementById("copyDiagnostics560"); if(diag) diag.onclick=copyDiagnostics;
-  const startup=document.getElementById("copyStartupHealth560"); if(startup) startup.onclick=copyStartupHealth520;
-  const openDiag=document.getElementById("openDiagnostics560"); if(openDiag) openDiag.onclick=()=>route("diagnostics");
-  const repair=document.getElementById("repairVault560"); if(repair) repair.onclick=()=>{ if(confirm("Run Repair Vault? This checks and repairs FireVault's local data structure.")) repairVaultState(); };
-}
-
-
 /* Build 0.50.75 Backup Safety helpers */
 function backupSafetyStats552(){
   const sites = (data.sites || []).length;
@@ -9986,10 +8441,9 @@ function backupSafetyStats552(){
   }).length),0);
   const tasks = (data.sites || []).reduce((n,s)=>n+((s.tasks||[]).length),0);
   const deficiencies = (data.sites || []).reduce((n,s)=>n+((s.deficiencies||[]).length),0);
-  const routes = (data.routeLogs || []).length;
   const resources = (data.resources || []).length;
   const bytes = (()=>{ try{return new Blob([JSON.stringify(data)]).size;}catch{return 0;} })();
-  return {sites,visits,docs,photoDocs,tasks,deficiencies,routes,resources,bytes};
+  return {sites,visits,docs,photoDocs,tasks,deficiencies,resources,bytes};
 }
 function backupFileName552(){
   const stamp = new Date().toISOString().slice(0,19).replace(/[:T]/g,"-");
@@ -10025,7 +8479,6 @@ async function copyBackupSummary552(){
     `Photos: ${s.photoDocs}`,
     `Tasks: ${s.tasks}`,
     `Deficiencies: ${s.deficiencies}`,
-    `Route Days: ${s.routes}`,
     `Resources: ${s.resources}`,
     `Approx. Backup Size: ${s.bytes ? Math.max(1,Math.round(s.bytes/1024))+" KB" : "Unknown"}`,
     "",
@@ -10073,7 +8526,7 @@ async function copyUpdateChecklist553(){
     "1. Tap Download Backup and save the JSON file.",
     "2. Upload / commit the new FireVault build ZIP contents.",
     "3. Open the app and confirm the splash screen clears.",
-    "4. Check Home, Add Site, Backup Safety, and one saved account.",
+    "4. Check Home, Add Account, Backup Safety, and one saved account.",
     "5. Keep the backup file until the new build is confirmed working.",
     "",
     "Data counts:",
@@ -10104,7 +8557,6 @@ function normalizeBackupPayload554(raw){
   if(!Array.isArray(restoredData.sites)) return null;
   if(!restoredData.settings || typeof restoredData.settings !== "object") restoredData.settings = data.settings || {};
   if(!Array.isArray(restoredData.resources)) restoredData.resources = [];
-  if(!Array.isArray(restoredData.routeLogs)) restoredData.routeLogs = [];
   return {
     app: payload.app || "FireVault",
     build: payload.build || restoredData.build || "Unknown",
@@ -10122,8 +8574,7 @@ function backupPreviewStats554(restoredData){
   }).length),0);
   const tasks = (restoredData.sites || []).reduce((n,s)=>n+((s.tasks||[]).length),0);
   const deficiencies = (restoredData.sites || []).reduce((n,s)=>n+((s.deficiencies||[]).length),0);
-  const routes = (restoredData.routeLogs || []).length;
-  return {sites,visits,docs,photos,tasks,deficiencies,routes};
+  return {sites,visits,docs,photos,tasks,deficiencies};
 }
 function restoreStatusMarkup554(){
   if(!pendingRestoreBackup554){
@@ -10243,65 +8694,9 @@ function wireBackupSafety552(){
   wireRestoreCenter554();
 }
 
-function diagnostics(){
-  const taskRows=allTaskRows();
-  const taskCounts=taskFilterCounts(taskRows);
-  const totalTasks=taskRows.length;
-  const serviceTasks=taskRows.filter(r=>r.t.source==="Service Call").length;
-  const totalDef=data.sites.reduce((n,s)=>n+(s.deficiencies||[]).length,0);
-  const openDefTotal=data.sites.reduce((n,s)=>n+(s.deficiencies||[]).filter(d=>(d.status||"Open")!=="Closed").length,0);
-  const closedDefTotal=data.sites.reduce((n,s)=>n+(s.deficiencies||[]).filter(d=>(d.status||"Open")==="Closed").length,0);
-  const totalVisits=data.sites.reduce((n,s)=>n+(s.visits||[]).length,0);
-  const totalContacts=data.sites.reduce((n,s)=>n+(s.contacts||[]).length,0);
-  const totalDocs=data.sites.reduce((n,s)=>n+(s.docs||[]).length,0);
-  const totalReportDeliveries=data.sites.reduce((n,s)=>n+(s.reportDeliveries||[]).length,0);
-  const reportFollowUps=allTaskRows().filter(r=>r.t.source==="Report Delivery" && !taskIsDone(r.t)).length;
-  const totalChecklist=data.sites.reduce((n,s)=>n+(s.checklist||[]).length,0);
-  const checklistIssues=data.sites.reduce((n,s)=>n+(s.checklist||[]).filter(i=>i.status==="Issue").length,0);
-  const completedInspections=data.sites.reduce((n,s)=>n+(s.visits||[]).filter(v=>v.type==="Inspection Checklist").length,0);
-  const healthWarn=data.sites.filter(s=>siteHealth(s).cls==="healthWarn").length;
-  const healthWatch=data.sites.filter(s=>siteHealth(s).cls==="healthWatch").length;
-  const attentionTotal=attentionRows().length;
-  const stability=stabilityReport();
-  const lastCheck=localStorage.getItem("firevault_last_stability_check") || "Not run yet";
-  html(`<div class="screen diagnosticsScreen460">
-    <div class="row"><button class="back ghost" id="backHome">←</button><h1>Diagnostics</h1></div>
-    <div class="card stabilityHero460 ${stability.issues.length?"needsReview":"passed"}">
-      <div><strong>${stability.status}</strong><span>Stability Checkpoint</span></div>
-      <p>${stability.issues.length ? `${stability.issues.length} issue${stability.issues.length===1?"":"s"} found. Run Repair Vault if needed.` : "Core data structure, routes, GPS records, and active job state look clean."}</p>
-    </div>
-    ${startupHealthCard520()}
-    ${backupSafetyMarkup552()}
-    ${backupRestoreCenterMarkup554()}
-    <div class="grid2 diagnosticsActions460">
-      <button class="primary" id="repairVaultBtn">Repair Vault</button>
-      <button class="ghost" id="copyDiagBtn">Copy Diagnostics</button>
-    </div>
-    <div class="card diagnosticsGrid460">
-      <div><strong>${data.sites.length}</strong><span>Sites</span></div>
-      <div><strong>${data.resources.length}</strong><span>Resources</span></div>
-      <div><strong>${totalVisits}</strong><span>Visits</span></div>
-      <div><strong>${taskCounts.open}</strong><span>Open Tasks</span></div>
-      <div><strong>${taskCounts.overdue}</strong><span>Overdue</span></div>
-      <div><strong>${openDefTotal}</strong><span>Open Def.</span></div>
-      <div><strong>${data.sites.filter(hasGps).length}</strong><span>GPS Saved</span></div>
-      <div><strong>${attentionTotal}</strong><span>Attention</span></div>
-    </div>
-    <div class="list grow diagnosticsList460">
-      <div class="card"><h2>Stability Issues</h2>${stability.issues.length?`<ul>${stability.issues.map(i=>`<li>${esc(i)}</li>`).join("")}</ul>`:`<p>No issues found.</p>`}</div>
-      <div class="card"><h2>Checks Passed</h2><ul>${stability.pass.map(p=>`<li>${esc(p)}</li>`).join("")}</ul></div>
-      <div class="card errorBox"><p>Build: ${BUILD}</p><p>Total Tasks: ${totalTasks}</p><p>Due Today: ${taskCounts.today}</p><p>Site Follow-Ups: ${serviceTasks}</p><p>Total Deficiencies: ${totalDef}</p><p>Closed Deficiencies: ${closedDefTotal}</p><p>Total Contacts: ${totalContacts}</p><p>Total Documents: ${totalDocs}</p><p>Report Deliveries: ${totalReportDeliveries}</p><p>Report Follow-Ups: ${reportFollowUps}</p><p>Checklist Items: ${totalChecklist}</p><p>Checklist Issues: ${checklistIssues}</p><p>Completed Inspections: ${completedInspections}</p><p>Attention Sites: ${healthWarn}</p><p>Watch Sites: ${healthWatch}</p><p>Old Job Record: ${activeJob ? esc(activeJob.siteName) : "None"}</p><p>Current Theme: ${esc(data.settings.theme.name)}</p><p>Accent: ${esc(data.settings.theme.accentColor)}</p><p>Route Days: ${(data.routeLogs||[]).length}</p><p>GPS Tools: ${data.settings.gps?.enabled !== false ? "Enabled" : "Hidden"}</p><p>Nearby Radius: ${nearbyRadiusMiles()} mi</p><p>Haptics: ${data.settings.app?.haptics !== false ? "Enabled" : "Off"}</p><p>Last Stability Check: ${esc(lastCheck)}</p><p>Storage key: ${demoStorageLabel0739()}</p><p>Modules loaded successfully.</p></div>
-    </div>
-  </div>`);
-  document.getElementById("backHome").onclick=()=>returnFromSettingsSubmenu576("home");
-  document.getElementById("repairVaultBtn").onclick=repairVaultState;
-  document.getElementById("copyDiagBtn").onclick=copyDiagnostics;
-  const startupBtn=document.getElementById("copyStartupHealth520");
-  if(startupBtn) startupBtn.onclick=copyStartupHealth520;
-  wireBackupSafety552();
-}
 function showChangelog(){
   const notes = [
+    "Build 0.90.0 removes retired scanner capture and service timers, shortens startup, removes the global portrait lock, standardizes Account terminology, and adds release-safe error recovery.",
     "Build 0.89.0 rebuilds Photo Overlay as a compact visual studio with exact preview-to-export rendering, presets, reorganized controls, expanded account fields, and a real fire-alarm deficiency sample photo.",
     "Build 0.88.0 overhauls Settings with sticky search, live status summaries, richer grouped cards, and consistent detail screens while preserving WebDAV, Demo Mode, Plus Codes, backup, import/export, and security.",
     "Build 0.87.11 restores WebDAV Backup to Data & Backup and Settings search while preserving saved connection settings and transfer tools.",
@@ -10351,19 +8746,19 @@ function showChangelog(){
     "Build 0.69.9 enlarges Nearby Open, Route, and Call controls, changes selected accounts to a glowing green treatment, extends the account list to 25 miles, and adapts the overview radius to the selected account distance.",
     "Build 0.69.8 makes Nearby list taps select the tapped account reliably, zooms the map to street level around that account, and forces all account markers to render as true circles.",
     "Build 0.69.6 hides map details until a marker is tapped, stabilizes momentum list settling, and moves the map closer to the top with a simpler header.",
-    "Manual chapters document installation, Today, Sites, Site Detail, field workflow, notes, tasks, deficiencies, photos, GPS, route tracking, reports, email, settings, backups, updates, and troubleshooting.",
+    "Manual chapters document installation, Today, Sites, Account Detail, field workflow, notes, tasks, deficiencies, photos, GPS, route tracking, reports, email, settings, backups, updates, and troubleshooting.",
     "Added living-documentation revision metadata and a release-state review requirement.",
     "Added Quick Capture for timestamped site notes, follow-up tasks, and deficiencies without leaving Today.",
     "Quick Capture defaults to the active or most recently used account and can create a matching task from a deficiency.",
-    "Field Dashboard counters now open the correct Daily Report and Daily Route workspaces.",
-    "Daily Route, Copy Summary, and Today’s Accounts controls are now fully connected.",
+    "Field Dashboard counters open the correct Daily Report and follow-up views.",
+    "Copy Summary and Today’s Accounts controls are fully connected.",
     "Preserved the 0.55.0 Home Layout controls, scoped Settings design, Email composer, responsive layouts, and all existing data."
   ];
   const overlay=document.createElement("div");
   overlay.className="releaseOverlay";
   overlay.innerHTML=`<div class="releaseSheet" role="dialog" aria-modal="true" aria-label="FireVault release notes">
     <div class="releaseHead"><div><strong>${fireVaultBrand575()}</strong><span>Build ${BUILD}</span></div><button class="ghost iconBtn" id="closeRelease" aria-label="Close release notes">×</button></div>
-    <div class="releaseBody"><h2>Release Notes</h2><p class="releaseIntro">Use the simplified scanner with live page detection, automatic framing, hands-free capture, account matching, and multi-page PDF storage.</p><ul>${notes.map(n=>`<li>${esc(n)}</li>`).join("")}</ul></div>
+    <div class="releaseBody"><h2>Release Notes</h2><p class="releaseIntro">FireVault 0.90.0 removes retired workflows, opens faster, improves iPad behavior, and prepares the codebase for release testing.</p><ul>${notes.map(n=>`<li>${esc(n)}</li>`).join("")}</ul></div>
   </div>`;
   document.body.appendChild(overlay);
   const close=()=>overlay.remove();
@@ -10417,7 +8812,7 @@ let keyboardGuardInstalled0802=false;
 let keyboardBaseHeight0802=Math.max(window.innerHeight||0,window.visualViewport?.height||0,document.documentElement.clientHeight||0);
 function editableField0802(el){return !!el&&el.matches?.('input:not([type="button"]):not([type="submit"]):not([type="checkbox"]):not([type="radio"]),textarea,select,[contenteditable="true"]');}
 function keyboardOffset0802(){const vv=window.visualViewport;if(!vv)return 0;const current=Math.max(vv.height||0,window.innerHeight||0);if(!editableField0802(document.activeElement)&&current>keyboardBaseHeight0802*.86)keyboardBaseHeight0802=Math.max(keyboardBaseHeight0802,current);return Math.max(0,Math.round(keyboardBaseHeight0802-vv.height-(vv.offsetTop||0)));}
-function scannerScrollParent0804(el){
+function focusedFieldScrollParent0900(el){
   for(let node=el?.parentElement;node&&node!==document.body;node=node.parentElement){const style=getComputedStyle(node),overflow=style.overflowY;if((overflow==="auto"||overflow==="scroll")&&node.scrollHeight>node.clientHeight+4)return node;}
   return document.scrollingElement||document.documentElement;
 }
@@ -10427,7 +8822,7 @@ function revealFocusedField0802(el=document.activeElement){
     try{
       const viewport=window.visualViewport,top=(viewport?.offsetTop||0)+Math.max(74,Number(document.documentElement.style.getPropertyValue("--fv0785-header-h")?.replace("px","")||0)+12),bottom=(viewport?.offsetTop||0)+(viewport?.height||window.innerHeight)-22,rect=el.getBoundingClientRect();let delta=0;
       if(rect.bottom>bottom)delta=rect.bottom-bottom+18;else if(rect.top<top)delta=rect.top-top-18;
-      if(Math.abs(delta)>2){const parent=scannerScrollParent0804(el);if(parent===document.scrollingElement||parent===document.documentElement||parent===document.body)window.scrollBy({top:delta,behavior:"smooth"});else parent.scrollBy({top:delta,behavior:"smooth"});}
+      if(Math.abs(delta)>2){const parent=focusedFieldScrollParent0900(el);if(parent===document.scrollingElement||parent===document.documentElement||parent===document.body)window.scrollBy({top:delta,behavior:"smooth"});else parent.scrollBy({top:delta,behavior:"smooth"});}
       else el.scrollIntoView({behavior:"smooth",block:"nearest",inline:"nearest"});
     }catch{}
   };
@@ -10482,11 +8877,12 @@ function bootFireVault518(){
     document.getElementById("appHeader")?.removeAttribute("style");
     document.getElementById("appNav")?.removeAttribute("style");
     if(app){
-      app.innerHTML=`<div class="screen"><div class="card errorBox"><h1>FireVault startup error</h1><p>The module loaded, but the app could not render.</p><p>${esc(window.__FIREVAULT_LAST_ERROR)}</p><button class="primary" onclick="location.reload()">Reload App</button></div></div>`;
+      try{window.fireVaultRecordSupportError0900?.(err,"startup");}catch{}
+      app.innerHTML=`<div class="screen"><div class="card errorBox fvReleaseError0900"><h1>Something went wrong</h1><p>FireVault could not finish opening. Your saved account data remains on this device.</p><button class="primary" onclick="location.reload()">Reload</button></div></div>`;
     }
   }
 }
 const splashStarted518 = Number(window.__FIREVAULT_SPLASH_STARTED || Date.now());
-const minSplashMs518 = Number(window.__FIREVAULT_MIN_SPLASH_MS || 5000);
+const minSplashMs518 = Number(window.__FIREVAULT_MIN_SPLASH_MS || 450);
 const elapsedSplashMs518 = Date.now() - splashStarted518;
 setTimeout(bootFireVault518, Math.max(0, minSplashMs518 - elapsedSplashMs518));
