@@ -8,4 +8,4 @@
 **License:** Creative Commons Attribution-ShareAlike 2.0 Generic  
 **License URL:** https://creativecommons.org/licenses/by-sa/2.0/
 
-The original image file is included unchanged as `assets/overlay-sample-fire-alarm-issue.png`. FireVault draws a non-destructive example overlay on a canvas at runtime. Attribution and the license link are also displayed beneath the preview inside the application.
+The original image file is included unchanged as `assets/overlay-sample-fire-alarm-issue.png`. FireVault draws a non-destructive example overlay on a canvas at runtime. Attribution and license details are retained in this notice file; the compact in-app preview does not display a credit line.

@@ -1,4 +1,4 @@
-# FireVault 0.94.1 Design System
+# FireVault 0.94.2 Design System
 
 `src/design-system.css` is the canonical release-facing visual layer.
 
@@ -33,3 +33,10 @@
 
 - Nearby and the global app dock use identical fixed geometry and safe-area padding.
 - The selected route is communicated by the button surface, border, icon, and label—not an underline bar.
+
+## Build 0.94.2 Photo Overlay preview rules
+
+- The Field Photo example remains sticky within the Photo Overlay Settings scroll area.
+- The preview uses the same canvas renderer as exported field photos.
+- Controls scroll in a separate column on iPad and beneath the preview on iPhone.
+- The visible Settings page does not show third-party attribution text; licensing remains in `THIRD_PARTY_NOTICES.md`.

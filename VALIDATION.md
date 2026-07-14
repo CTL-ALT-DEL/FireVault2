@@ -1,9 +1,11 @@
-# Validation — Build 0.94.1
+# Validation — Build 0.94.2
 
-- Confirmed `#appNav` and `.nearbyBottomNav069` share the same fixed bottom position, `var(--navH)` height, safe-area padding, three-column grid, and 52-pixel button height.
-- Confirmed the Nearby navigation can no longer inherit its older absolute-position geometry.
-- Confirmed active-button `::after` indicators are disabled for Nearby, Search, and Settings.
-- Confirmed active button background, border, icon, label, and route behavior remain present.
-- Confirmed the three-button Nearby, Search, Settings navigation remains present.
+- Confirmed the visible “Photo by Ben Schumin · CC BY-SA 2.0” text was removed from the Photo Overlay Settings markup.
+- Confirmed the image attribution and license remain documented in `THIRD_PARTY_NOTICES.md`.
+- Confirmed the Field Photo preview is a sticky direct child of the Photo Overlay studio and remains visible while the controls column scrolls.
+- Confirmed the preview is reduced to a maximum width of 280 pixels on larger layouts, 250 pixels on phones, and 225 pixels on narrow phones.
+- Confirmed the preview and exported photo still use `renderOverlayComposite0890()` and `drawOverlayStamp0890()`.
+- Confirmed all existing Photo Overlay input listeners continue to schedule live preview rendering.
+- Confirmed the Settings detail page remains vertically scrollable and horizontally constrained.
 - Confirmed existing storage key remains `firevault_vault_build_030`.
 - Confirmed JavaScript syntax, JSON parsing, CSS brace balance, service-worker asset references, build references, and ZIP integrity.
