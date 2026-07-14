@@ -1,14 +1,12 @@
-# FireVault Build 0.91.0
+# FireVault Build 0.91.1
 
-Media-storage reliability release built from the 0.90.0 core-cleanup baseline.
+Settings shortcut repair built from the 0.91.0 media-storage reliability baseline.
 
 ## Included
-- Account photos and legacy scanned-page images are moved from the main localStorage vault into IndexedDB.
-- Existing inline Base64 photos migrate automatically without changing account IDs or the FireVault storage key.
-- Runtime media cache keeps photos available after normal account and Settings saves.
-- Manual backup, Shared Vault package export, and WebDAV backup include complete photo and scanned-page payloads.
-- Settings → Data & Backup → File Storage now includes media size, device quota, persistent-storage status, and orphan cleanup.
-- New photos are written to IndexedDB before the account record is finalized.
-- Automatic local snapshots remain lightweight metadata snapshots that reference the on-device media store.
+- Rebuilt the three status shortcuts at the top of Settings: Location, Backup, and Demo Mode.
+- All three controls now occupy equal horizontal space without clipping or side-scrolling.
+- Added consistent SVG icons, readable labels, current-status text, and touch feedback.
+- Added compact iPhone treatment and wider iPad treatment while preserving the same three-button row.
+- Preserved every 0.91.0 IndexedDB media-storage, backup, WebDAV, account, and Demo Mode improvement.
 
 Open `index.html` through HTTPS or deploy the complete folder to GitHub Pages.

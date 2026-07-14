@@ -1,8 +1,8 @@
 {
-  "build": "0.91.0",
-  "released": "2026-07-13",
-  "note": "Media storage reliability: IndexedDB photos and scanned pages, storage health, complete-media backups, and safe legacy migration.",
-  "label": "Media Storage Reliability",
-  "version": "0.91.0",
-  "name": "Media Storage Reliability"
+  "build": "0.91.1",
+  "released": "2026-07-14",
+  "note": "Settings shortcut repair: equal-width Location, Backup, and Demo Mode controls with responsive iPhone and iPad alignment.",
+  "label": "Settings Shortcut Repair",
+  "version": "0.91.1",
+  "name": "Settings Shortcut Repair"
 }

@@ -1,26 +1,17 @@
-# Validation — Build 0.91.0
+# Validation — Build 0.91.1
 
 Validated during packaging:
-- JavaScript syntax for `app.js`, `storage.js`, `media-store.js`, providers, and the service worker
+- JavaScript syntax for app, storage, media-store, providers, and service worker
 - JSON structure for manifest and version metadata
-- Service-worker shell includes the new IndexedDB media module
 - Existing `firevault_vault_build_030` storage key preserved
-- Legacy inline `imageData`, `photoData`, and scanned-page payloads receive stable media references
-- Media payloads are retained in localStorage until the IndexedDB write succeeds, then compacted safely
-- Subsequent synchronous vault reloads hydrate media from the runtime cache
-- Manual and WebDAV exports restore complete media into the backup copy
-- New account photos are staged to IndexedDB before the record save completes
-- Storage Health UI includes media count, payload size, quota estimate, persistence state, and orphan cleanup
-- Automatic snapshots remain metadata-focused to avoid duplicating large photos in localStorage
-- Existing Account, Nearby, Building Navigator, Demo Mode, WebDAV, Photo Overlay, and three-button navigation code retained
+- Three Settings status shortcuts render in equal grid columns
+- No mobile horizontal overflow or status-card side scrolling
+- Location shortcut opens GPS & Maps
+- Backup shortcut opens WebDAV when configured and local Backup otherwise
+- Demo Mode shortcut opens Demo Mode
+- SVG icons include accessible button labels
+- iPhone narrow-width and iPad responsive CSS rules present
+- Build and service-worker references updated to 0.91.1
 - ZIP archive integrity and required-file inventory
 
-Automated Chromium rendering could not complete in the container environment. Physical iPhone and iPad testing remains required for first-run media migration, Safari storage persistence, photo preview, old scan PDF export, WebDAV transfer size, and installed-PWA updates.
-
-Additional automated module tests passed with an in-memory IndexedDB implementation:
-- Two legacy payloads migrated and compacted
-- Photo and scanned-page hydration after metadata reload
-- Complete-media export reconstruction
-- Media count and byte summary
-- Orphan detection and removal
-- `saveData()` localStorage compaction followed by synchronous runtime-cache hydration
+Physical iPhone and iPad testing remains required for final visual spacing, touch feedback, installed-PWA cache replacement, and very long localized status values.
