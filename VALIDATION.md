@@ -1,15 +1,19 @@
-# Validation — Build 0.87.11
+# Validation — Build 0.88.0
 
 - JavaScript syntax checked
 - CSS brace and comment structure checked
+- JSON files parsed successfully
 - Build references updated consistently
 - Service-worker shell references updated
 - Existing FireVault storage key preserved
-- WebDAV removed from the hidden-settings redirect list
-- WebDAV Backup confirmed in the Data & Backup submenu
-- WebDAV Backup confirmed in Settings search metadata
-- Search keywords confirmed for WebDAV, remote backup, server, upload, and restore
-- WebDAV detail screen confirmed to use its dedicated save and transfer controls
-- Existing WebDAV configuration schema and session-only password behavior preserved
-- JSON files parsed successfully
+- Sticky Settings search confirmed in the Settings index
+- Search aliases confirmed for WebDAV, Plus Codes, backup, import/export, Demo Mode, GPS, reports, and privacy
+- Live status summaries confirmed for Location, Backup, Demo Mode, Privacy Lock, WebDAV, reports, and version information
+- WebDAV remains available in Data & Backup and Settings search
+- Demo Mode remains available in Testing and Settings search
+- Google Plus Codes remain available in Maps & GPS and Settings search
+- Backup/restore, imports, storage, and security routes remain available
+- Settings group and detail navigation checked
+- iPhone and iPad responsive CSS breakpoints checked
 - ZIP archive integrity checked
+- Automated Chromium rendering was attempted, but local/file URLs are blocked by the execution environment policy; final visual behavior should be confirmed on iPhone and iPad after deployment.

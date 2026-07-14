@@ -1,8 +1,8 @@
 {
-  "build": "0.87.11",
+  "build": "0.88.0",
   "released": "2026-07-13",
-  "note": "Restored WebDAV Backup to Settings \u2192 Data & Backup and Settings search while preserving saved connection settings and upload/restore controls.",
-  "label": "WebDAV Settings Restoration",
-  "version": "0.87.11",
-  "name": "WebDAV Settings Restoration"
+  "note": "Dedicated Settings polish release with sticky search, live status summaries, richer grouped cards, and consistent detail-screen styling while preserving WebDAV, Demo Mode, Plus Codes, backup, import/export, and security.",
+  "label": "Settings Experience Overhaul",
+  "version": "0.88.0",
+  "name": "Settings Experience Overhaul"
 }

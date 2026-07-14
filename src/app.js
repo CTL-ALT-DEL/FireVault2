@@ -1,6 +1,6 @@
-import { BUILD, KEY, ACTIVE_JOB_KEY, loadData, saveData, ensureSite, fullAddress, esc, uid, downloadBlob, syncSummary, syncQueue, syncConflicts, syncActivity, createSyncPackage, importSyncPackage, resolveSyncConflict, notePackageExport, deviceIdentity, recordSyncActivity, autoBackupInfo, latestAutoBackup, restoreAutoBackup, isDemoMode, setDemoMode, resetDemoData, securityFoundationSummary, securityAudit, recycleBinInfo, restoreRecycleRecord, purgeRecycleBin, recordSecurityEvent, validateVaultIntegrity } from "./storage.js?v=0.87.11";
-import { backendAdapterSummary, runBackendAdapterDiagnostics, backendAdapterManifest, PROVIDER_CONTRACT_VERSION, FILE_STORAGE_CATALOG, fileStoragePlanSummary, cloudFileStorageManifest, MICROSOFT_STORAGE_TYPES, microsoftStorageAccounts, saveMicrosoftStorageAccounts, createMicrosoftStorageAccount, microsoftStorageAccountById, microsoftAppRegistration, saveMicrosoftAppRegistration, microsoftStorageSummary, microsoftStorageManifest } from "./providers.js?v=0.87.11";
-import { encodePlusCode, isValidFullPlusCode, normalizePlusCode, plusCodePrecisionLabel } from "./open-location-code.js?v=0.87.11";
+import { BUILD, KEY, ACTIVE_JOB_KEY, loadData, saveData, ensureSite, fullAddress, esc, uid, downloadBlob, syncSummary, syncQueue, syncConflicts, syncActivity, createSyncPackage, importSyncPackage, resolveSyncConflict, notePackageExport, deviceIdentity, recordSyncActivity, autoBackupInfo, latestAutoBackup, restoreAutoBackup, isDemoMode, setDemoMode, resetDemoData, securityFoundationSummary, securityAudit, recycleBinInfo, restoreRecycleRecord, purgeRecycleBin, recordSecurityEvent, validateVaultIntegrity } from "./storage.js?v=0.88.0";
+import { backendAdapterSummary, runBackendAdapterDiagnostics, backendAdapterManifest, PROVIDER_CONTRACT_VERSION, FILE_STORAGE_CATALOG, fileStoragePlanSummary, cloudFileStorageManifest, MICROSOFT_STORAGE_TYPES, microsoftStorageAccounts, saveMicrosoftStorageAccounts, createMicrosoftStorageAccount, microsoftStorageAccountById, microsoftAppRegistration, saveMicrosoftAppRegistration, microsoftStorageSummary, microsoftStorageManifest } from "./providers.js?v=0.88.0";
+import { encodePlusCode, isValidFullPlusCode, normalizePlusCode, plusCodePrecisionLabel } from "./open-location-code.js?v=0.88.0";
 window.__FIREVAULT_MODULE_READY = true;
 
 function fvPreferenceStore0739(){
@@ -7702,33 +7702,91 @@ const SETTINGS_DASHBOARD_0860 = [
   {key:"about",title:"About FireVault",icon:"info",tabs:["about"]}
 ];
 const SETTINGS_GROUPED_LIST_0873 = [
-  {label:"Account",items:[
-    {key:"profile",subtitle:"Technician and company"}
+  {label:"Profile",items:[
+    {key:"profile",subtitle:"Technician identity and company details"}
   ]},
-  {label:"App Settings",items:[
-    {key:"reports",subtitle:"Reports and email defaults"},
-    {key:"data",subtitle:"Storage, sync, imports, and backup"}
+  {label:"Maps & Location",items:[
+    {key:"maps",subtitle:"Navigation, GPS accuracy, and Plus Codes"}
   ]},
-  {label:"Preferences",items:[
-    {key:"maps",subtitle:"Maps, GPS, and Google Plus Codes"},
-    {key:"photos",subtitle:"Photo labels and overlays"}
+  {label:"Reports & Communication",items:[
+    {key:"reports",subtitle:"Report templates and email defaults"},
+    {key:"photos",subtitle:"Photo labels and field overlays"}
+  ]},
+  {label:"Data & Backup",items:[
+    {key:"data",subtitle:"Storage, WebDAV, imports, and recovery"}
   ]},
   {label:"Security",items:[
-    {key:"privacy",subtitle:"Privacy lock and vault protection"}
+    {key:"privacy",subtitle:"Privacy lock and local vault protection"}
+  ]},
+  {label:"Testing",items:[
+    {key:"demo",subtitle:"Fictional accounts for presentations"}
   ]},
   {label:"About",items:[
-    {key:"demo",subtitle:"Fictional accounts for presentations and testing"},
     {key:"about",subtitle:"Version and application information"}
   ]}
 ];
 function settingsListIcon0873(name){
   return settingsSvg0860(name).replace('settingsTileIcon0860','settingsListIcon0873');
 }
+function settingsShortDate0880(value){
+  if(!value)return "";
+  const d=new Date(value);
+  if(Number.isNaN(d.getTime()))return String(value);
+  const today=new Date();
+  if(d.toDateString()===today.toDateString())return `Today ${d.toLocaleTimeString([], {hour:"numeric",minute:"2-digit"})}`;
+  return d.toLocaleDateString([], {month:"short",day:"numeric"});
+}
+function settingsTabStatus0880(id){
+  const s=data.settings||{}, tech=s.technician||{}, gps=s.gps||{}, reports=s.reports||{}, email=s.email||{}, overlay=s.overlay||{}, plus=s.plusCodes||{}, webdav=s.webdav||{};
+  if(id==="tech") return tech.name||tech.company ? [tech.name||"Profile ready",tech.company||"Company not entered"] : ["Needs setup","Add technician details"];
+  if(id==="gps") return gps.enabled===false ? ["Off","Location tools disabled"] : [gps.mapProvider==="google"?"Google Maps":"Apple Maps",gps.highAccuracy===false?"Standard accuracy":"High accuracy"];
+  if(id==="plusCodes") return plus.enabled===false ? ["Off","Plus Codes disabled"] : [plus.autoGenerate===false?"Manual":"Automatic",`${Number(plus.accountLength)||10}-digit account codes`];
+  if(id==="reports") return [String(reports.format||"detailed").replace(/^./,c=>c.toUpperCase()),reports.title||"Service Report"];
+  if(id==="email") return email.defaultTo||email.cc||email.signature ? ["Configured",email.defaultTo||email.cc||"Signature saved"] : ["Not configured","Add defaults when needed"];
+  if(id==="overlay") return overlay.template ? ["Ready",overlay.showLogo===false?"Text overlay":"Logo and text overlay"] : ["Default","Standard field overlay"];
+  if(id==="privacy") return privacyConfig0791()?.enabled ? ["PIN enabled","Local lock is active"] : ["PIN off","Optional local protection"];
+  if(id==="security") return ["Protected","Audit and recycle bin ready"];
+  if(id==="cloudFiles") return ["Local vault","Photos and documents stay on device"];
+  if(id==="microsoftStorage") return ["Connections","OneDrive and SharePoint setup"];
+  if(id==="sync") {const sum=syncSummary(data);return [sum.pending?`${sum.pending} pending`:"Up to date",sum.conflicts?`${sum.conflicts} conflicts`:"Local package mode"];}
+  if(id==="customerImport") return [`${(data.sites||[]).length} accounts`,"CSV import available"];
+  if(id==="categories") return ["Automatic","Account ID category rules"];
+  if(id==="backup") {const info=autoBackupInfo();return [info.count?`${info.count} snapshots`:"No snapshots",info.last?.createdAt?`Latest ${settingsShortDate0880(info.last.createdAt)}`:"Create a backup"];}
+  if(id==="webdav") return webdav.enabled ? [webdav.lastUpload?"Uploaded":"Enabled",webdav.lastUpload?settingsShortDate0880(webdav.lastUpload):"Connection ready to test"] : ["Off","Optional remote backup"];
+  if(id==="updates") return [`Build ${BUILD}`,"Application files current"];
+  if(id==="demo") return isDemoMode() ? ["Active","Fictional Boise accounts"] : ["Off","Real vault is active"];
+  if(id==="about") return [`Version ${BUILD}`,"FireVault application information"];
+  return ["",""];
+}
+function settingsGroupStatus0880(key){
+  const webdav=data.settings?.webdav||{};
+  if(key==="profile")return settingsTabStatus0880("tech")[0];
+  if(key==="maps")return data.settings?.gps?.enabled===false?"Location off":settingsTabStatus0880("gps")[0];
+  if(key==="reports")return `${settingsTabStatus0880("reports")[0]} reports`;
+  if(key==="photos")return settingsTabStatus0880("overlay")[0];
+  if(key==="data"){const info=autoBackupInfo();return webdav.enabled?"WebDAV enabled":info.count?`${info.count} snapshots`:"Local storage";}
+  if(key==="privacy")return privacyConfig0791()?.enabled?"PIN enabled":"PIN off";
+  if(key==="demo")return isDemoMode()?"Active":"Off";
+  if(key==="about")return `v${BUILD}`;
+  return "";
+}
+function settingsTone0880(key){return ({profile:"blue",maps:"green",reports:"violet",photos:"cyan",data:"amber",privacy:"red",demo:"gold",about:"slate"})[key]||"slate";}
 function settingsGroupedRow0873(item){
   const dashboardItem=SETTINGS_DASHBOARD_0860.find(x=>x.key===item.key);
   if(!dashboardItem) return "";
-  const subtitle=item.key==="demo" && isDemoMode()?"Active · fictional Boise accounts":(item.subtitle||"");
-  return `<button class="settingsListRow0873 ${item.key==="demo"&&isDemoMode()?"isActiveDemo0875":""}" data-settings-group0873="${esc(item.key)}">${settingsListIcon0873(dashboardItem.icon)}<span><strong>${esc(dashboardItem.title)}</strong><small>${esc(subtitle)}</small></span><b>›</b></button>`;
+  const subtitle=item.key==="demo" && isDemoMode()?"Fictional Boise accounts are active":(item.subtitle||"");
+  const status=settingsGroupStatus0880(item.key);
+  return `<button class="settingsListRow0873 tone-${settingsTone0880(item.key)} ${item.key==="demo"&&isDemoMode()?"isActiveDemo0875":""}" data-settings-group0873="${esc(item.key)}">${settingsListIcon0873(dashboardItem.icon)}<span class="settingsListCopy0880"><strong>${esc(dashboardItem.title)}</strong><small>${esc(subtitle)}</small></span><span class="settingsRowTail0880"><em>${esc(status)}</em><b>›</b></span></button>`;
+}
+function settingsOverview0880(){
+  const backupInfo=autoBackupInfo();
+  const webdav=data.settings?.webdav||{};
+  const items=[
+    {tab:"gps",icon:"⌖",label:"Location",value:data.settings?.gps?.enabled===false?"Off":settingsTabStatus0880("gps")[0],tone:"green"},
+    {tab:webdav.enabled?"webdav":"backup",icon:webdav.enabled?"W":"⇅",label:"Backup",value:webdav.lastUpload?settingsShortDate0880(webdav.lastUpload):(backupInfo.count?`${backupInfo.count} local`:webdav.enabled?"WebDAV on":"Not created"),tone:"amber"},
+    {tab:"demo",icon:"D",label:"Demo",value:isDemoMode()?"Active":"Off",tone:isDemoMode()?"gold":"slate"}
+  ];
+  return `<div class="settingsStatusRail0880">${items.map(item=>`<button class="settingsStatusCard0880 tone-${item.tone}" data-settings-quick0880="${esc(item.tab)}"><span>${esc(item.icon)}</span><small>${esc(item.label)}</small><strong>${esc(item.value)}</strong></button>`).join("")}</div>`;
 }
 function settingsSvg0860(name){
   const icons={
@@ -7753,16 +7811,39 @@ function openSettingsDashboardGroup0860(key){
 function settingsSearchRows0874(query=""){
   const q=String(query||"").trim().toLowerCase();
   if(!q) return [];
+  const aliases={
+    tech:"profile technician company identity phone email license",
+    gps:"maps location navigation nearby radius accuracy apple google",
+    plusCodes:"plus codes google offline location code coordinates",
+    overlay:"photo overlay watermark label stamp",
+    reports:"report template document default service",
+    email:"email recipient cc signature subject communication",
+    privacy:"privacy pin lock passcode timeout background",
+    security:"security audit recycle integrity device session",
+    cloudFiles:"files documents photos local storage",
+    microsoftStorage:"microsoft onedrive sharepoint cloud storage",
+    sync:"team sync shared vault package conflict pending",
+    customerImport:"import csv customer account spreadsheet",
+    categories:"category tags alarmnet clss ipdact basic",
+    backup:"backup restore export snapshot recovery",
+    webdav:"webdav dav remote server upload restore backup",
+    updates:"update refresh cache application build",
+    demo:"demo testing fictional boise presentation",
+    about:"about version release revision support information"
+  };
+  const tokens=q.split(/\s+/).filter(Boolean);
   const tabs=settingsTabs();
   return tabs.map(tab=>{
     const group=SETTINGS_DASHBOARD_0860.find(item=>item.tabs.includes(tab[0]));
-    const hay=[tab[0],tab[1],tab[2],group?.title||""].join(" ").toLowerCase();
-    return hay.includes(q)?{tab,group}:null;
+    const status=settingsTabStatus0880(tab[0]);
+    const hay=[tab[0],tab[1],tab[2],group?.title||"",aliases[tab[0]]||"",...status].join(" ").toLowerCase();
+    return tokens.every(token=>hay.includes(token))?{tab,group}:null;
   }).filter(Boolean);
 }
 function settingsSearchResultRow0874(result){
   const [id,title,note]=result.tab;
-  return `<button class="settingsSearchResult0874" data-settings-search-tab0874="${esc(id)}" data-settings-search-group0874="${esc(result.group?.key||"data")}"><span class="settingsGroupIcon0860">${settingsIcon550(id)}</span><span><strong>${esc(title)}</strong><small>${esc(result.group?.title||"")} · ${esc(note)}</small></span><b>›</b></button>`;
+  const status=settingsTabStatus0880(id);
+  return `<button class="settingsSearchResult0874 tone-${settingsTone0880(result.group?.key||"data")}" data-settings-search-tab0874="${esc(id)}" data-settings-search-group0874="${esc(result.group?.key||"data")}"><span class="settingsGroupIcon0860">${settingsIcon550(id)}</span><span class="settingsListCopy0880"><strong>${esc(title)}</strong><small>${esc(result.group?.title||"")} · ${esc(note)}</small></span><span class="settingsRowTail0880"><em>${esc(status[0])}</em><b>›</b></span></button>`;
 }
 function settings(){
   if(["themes","advanced","homeLayout","visibility","backend","manual","diagnostics"].includes(settingsTab)) settingsTab="about";
@@ -7773,16 +7854,19 @@ function settings(){
   if(mode!=="settingsDetail" && mode!=="settingsGroup0860"){
     const searchResults=settingsSearchRows0874(settingsSearch0874);
     const searchActive=Boolean(String(settingsSearch0874||"").trim());
-    html(`<div class="screen settingsConcept10873 settingsStable573">
+    html(`<div class="screen settingsConcept10873 settingsStable573 settingsPolish0880">
       <div class="settingsConcept1Body0873">
-        <h1>Settings</h1>
-        <label class="settingsSearch0874" aria-label="Search settings">
-          ${fvIcon073("search","settingsSearchIcon0874")}
-          <input id="settingsSearchInput0874" type="search" value="${esc(settingsSearch0874)}" placeholder="Search settings" autocomplete="off" autocapitalize="none" spellcheck="false">
-          <button type="button" id="settingsSearchClear0874" aria-label="Clear settings search" ${searchActive?"":"hidden"}>×</button>
-        </label>
-        <div id="settingsHomeContent0874">
-          ${searchActive?`<section class="settingsListGroup0873 settingsSearchGroup0874"><h2>Search Results</h2><div class="settingsSearchResults0874">${searchResults.length?searchResults.map(settingsSearchResultRow0874).join(""):`<div class="settingsSearchEmpty0874"><strong>No settings found</strong><span>Try GPS, Plus Codes, backup, reports, or privacy.</span></div>`}</div></section>`:SETTINGS_GROUPED_LIST_0873.map(group=>`<section class="settingsListGroup0873"><h2>${esc(group.label)}</h2><div class="settingsListCard0873">${group.items.map(settingsGroupedRow0873).join("")}</div></section>`).join("")}
+        <div class="settingsStickyHead0880">
+          <div class="settingsTitleRow0880"><h1>Settings</h1><span>${SETTINGS_DASHBOARD_0860.length} areas</span></div>
+          <label class="settingsSearch0874" aria-label="Search settings">
+            ${fvIcon073("search","settingsSearchIcon0874")}
+            <input id="settingsSearchInput0874" type="search" value="${esc(settingsSearch0874)}" placeholder="Search settings" autocomplete="off" autocapitalize="none" spellcheck="false">
+            <button type="button" id="settingsSearchClear0874" aria-label="Clear settings search" ${searchActive?"":"hidden"}>×</button>
+          </label>
+        </div>
+        ${searchActive?"":settingsOverview0880()}
+        <div id="settingsHomeContent0874" class="settingsGroupsGrid0880">
+          ${searchActive?`<section class="settingsListGroup0873 settingsSearchGroup0874"><h2>Search Results</h2><div class="settingsSearchResults0874">${searchResults.length?searchResults.map(settingsSearchResultRow0874).join(""):`<div class="settingsSearchEmpty0874"><strong>No settings found</strong><span>Try GPS, Plus Codes, WebDAV, backup, reports, or privacy.</span></div>`}</div></section>`:SETTINGS_GROUPED_LIST_0873.map(group=>`<section class="settingsListGroup0873"><h2>${esc(group.label)}</h2><div class="settingsListCard0873">${group.items.map(settingsGroupedRow0873).join("")}</div></section>`).join("")}
         </div>
       </div>
     </div>`);
@@ -7804,21 +7888,30 @@ function settings(){
       mode="settingsDetail";
       render();
     });
+    document.querySelectorAll("[data-settings-quick0880]").forEach(b=>b.onclick=()=>{
+      const tab=b.dataset.settingsQuick0880;
+      const group=SETTINGS_DASHBOARD_0860.find(item=>item.tabs.includes(tab));
+      settingsGroup067=group?.key||"data";
+      settingsTab=tab;
+      mode="settingsDetail";
+      render();
+    });
     restoreSettingsScroll576(false); return;
   }
   if(mode==="settingsGroup0860"){
     const rows=dashboardItem.tabs.map(id=>tabs.find(t=>t[0]===id)).filter(Boolean);
-    html(`<div class="screen settingsGroupScreen0860 settingsStable573">
-      <header class="settingsGroupHeader0860"><button class="ghost" id="settingsGroupBack0860" aria-label="Back to Settings">←</button><h1>${esc(dashboardItem.title)}</h1><span></span></header>
-      <div class="settingsGroupBody0860"><div class="settingsGroupList0860">${rows.map(t=>`<button class="settingsGroupRow0860" data-tab="${t[0]}"><span class="settingsGroupIcon0860">${settingsIcon550(t[0])}</span><span><strong>${esc(t[1])}</strong><small>${esc(t[2])}</small></span><b>›</b></button>`).join("")}</div></div>
+    html(`<div class="screen settingsGroupScreen0860 settingsStable573 settingsPolish0880 tone-${settingsTone0880(dashboardItem.key)}">
+      <header class="settingsGroupHeader0860 settingsGroupHeader0880"><button class="ghost" id="settingsGroupBack0860" aria-label="Back to Settings">←</button><div class="settingsGroupTitle0880"><h1>${esc(dashboardItem.title)}</h1><small>${rows.length} option${rows.length===1?"":"s"} · ${esc(settingsGroupStatus0880(dashboardItem.key))}</small></div><span></span></header>
+      <div class="settingsGroupBody0860"><div class="settingsGroupList0860">${rows.map(t=>{const status=settingsTabStatus0880(t[0]);return `<button class="settingsGroupRow0860" data-tab="${t[0]}"><span class="settingsGroupIcon0860">${settingsIcon550(t[0])}</span><span class="settingsListCopy0880"><strong>${esc(t[1])}</strong><small>${esc(t[2])}</small></span><span class="settingsRowTail0880"><em>${esc(status[0])}</em><b>›</b></span></button>`;}).join("")}</div></div>
     </div>`);
     document.getElementById("settingsGroupBack0860")?.addEventListener("click",()=>{mode=null;render();});
     document.querySelectorAll(".settingsGroupRow0860[data-tab]").forEach(b=>b.onclick=()=>{settingsTab=b.dataset.tab;mode="settingsDetail";render();});
     restoreSettingsScroll576(false); return;
   }
   const saveable=!['privacy','cloudFiles','microsoftStorage','customerImport','categories','backup','webdav','updates','demo','about'].includes(settingsTab);
-  html(`<div class="screen settingsSimpleDetail0850 settingsDetail0860 settingsStable573 settingsTab-${settingsTab}" data-settings-tab="${settingsTab}">
-    <header class="settingsSimpleDetailHeader0850"><button class="ghost" id="settingsBackBtn" aria-label="Back">←</button><div><h1>${esc(active[1])}</h1></div>${saveable?`<button class="primary" id="saveSettingsTop">Save</button>`:`<button class="ghost" id="settingsDoneBtn">Done</button>`}</header>
+  const detailStatus=settingsTabStatus0880(settingsTab);
+  html(`<div class="screen settingsSimpleDetail0850 settingsDetail0860 settingsStable573 settingsPolish0880 settingsTab-${settingsTab} tone-${settingsTone0880(dashboardItem.key)}" data-settings-tab="${settingsTab}">
+    <header class="settingsSimpleDetailHeader0850 settingsDetailHeader0880"><button class="ghost" id="settingsBackBtn" aria-label="Back">←</button><div class="settingsDetailTitle0880"><h1>${esc(active[1])}</h1><small>${esc(active[2])}</small></div><span class="settingsDetailStatus0880">${esc(detailStatus[0])}</span>${saveable?`<button class="primary" id="saveSettingsTop">Save</button>`:`<button class="ghost" id="settingsDoneBtn">Done</button>`}</header>
     <div class="settingsSimpleDetailBody0850 settingsDetailBody488 settingsContent448">${settingsPanel()}</div>
   </div>`);
   document.getElementById("settingsBackBtn")?.addEventListener("click",()=>{mode=dashboardItem.tabs?.length>1?"settingsGroup0860":null;render();});
@@ -8397,7 +8490,7 @@ function manualSimplePage058(type){
   quick:["🚀","Quick Start Guide","Get FireVault ready for a normal field day.",[["1. Verify the build","Confirm the green build badge shows 0.67.0 before entering production information."],["2. Complete Technician Profile","Enter your name, company, phone, email, and license or employee identification."],["3. Review permissions","Allow location and photo access only when FireVault requests them and the feature is needed."],["4. Create or open a site","Add the customer name, full address, panel details, contacts, access notes, and GPS location."],["5. Document the visit","Record notes, photos, tasks, deficiencies, equipment changes, and a service visit."],["6. Finish and protect the data","Review the report, send or copy the required summary, then export a current backup."]]],
   new:["🆕","What’s New in 0.67.0","Account View, Settings navigation, and FireVault Academy redesign.",[["Unified visual system","Standardized typography, spacing, card surfaces, borders, controls, and responsive behavior across FireVault."],["Settings cleanup","Improved Settings home cards and every submenu while preserving the preferred Email setup workflow."],["Help readability","Converted contextual Help and Academy articles into one uninterrupted scrolling reading column with no floating metadata."],["Site Detail stability","Reinforced natural-height cards, readable text, and scroll-safe account sections."],["Operational screens","Simplified Customer Import, Team Sync, Conflict Center, and Nearby Sites presentation without changing their workflows."],["Phone and iPad layouts","Added consistent narrow-phone and tablet behavior, bottom-navigation clearance, and overflow protection."],["Nearby scan diagnostics","Nearby Sites now shows total sites, GPS-ready records, missing coordinates, phone-location progress, and persistent error messages."],["Coordinate recovery","FireVault recovers valid latitude and longitude stored in compatible legacy or imported fields and normalizes them into the site GPS record."],["Location retry","If high-accuracy location times out or is unavailable, FireVault retries once using standard accuracy."],["Nearest-site fallback","When no site is inside the selected radius, the nearest GPS-ready sites remain visible instead of presenting an empty result."],["Latitude and longitude","Customer Import can calculate missing coordinates from each usable U.S. street address before saving records."],["Coordinate requirement","The importer requires calculated, supplied, or existing GPS coordinates by default. Unmatched addresses remain in review."],["Census address matching","Only address fields are sent to the U.S. Census Geocoder. The returned point is an address-range calculation, not a guaranteed building entrance."],["Account Id matching","Repeat imports update the matching FireVault site instead of creating duplicates or deleting field history."],["CSV coordinate columns","Files that already contain Latitude and Longitude columns use those values directly."],["Sync-ready changes","Added and updated customer records enter the pending synchronization queue and create a Sync Activity entry."]]],
   tips:["🧰","Field Tips","Short practices that improve the usefulness of FireVault records.",[["Write for the next technician","Include the exact panel, circuit, device, location, symptom, test result, and next action instead of relying on memory."],["Photograph context first","Take one wide photo showing the equipment location before close-up terminal, label, or damage photos."],["Separate facts from follow-up","Use notes for what occurred, deficiencies for code or system problems, and tasks for work that still needs completion."],["Confirm the account","Before using Quick Capture, verify the selected customer site to prevent records from being stored under the wrong account."],["Back up before updates","Download an external backup before a major update or device change and after completing significant field documentation."]]],
-  revisions:["📋","Revision History","Application and documentation checkpoints.",[[["0.87.11","Restored WebDAV Backup to Data & Backup and Settings search while preserving saved connection settings and transfer tools."],["0.87.10","Aligned the four Account Directory card actions across the full card width in Call, Route, Add Note, Favorite order."],["0.87.9","Cleaned up the Account Directory with layered depth, raised controls, dimensional account cards, and category-accented shading while preserving fluid scrolling."],["0.87.8","Improved Account Directory scrolling performance and added iPad portrait, landscape, and split-view layout refinements."],["0.87.4","Added spacing and search to Settings, removed the Field category, moved Google Plus Codes under Maps & GPS, enlarged Account ID/category tags, moved Favorite beside Call, removed empty panel/contact text, and restored Nearby-style card scroll locking."],["0.87.3","Moved account addresses below site names, placed Account ID and category tags beneath the address, and changed Settings to a dark grouped-list design without a duplicate logo."],["0.87.2","Polished Account Directory cards and removed the default Ready, No Open Work, and GPS status tags so only actionable issues are shown."],["0.87.1","Rebuilt Account Directory, Search, account cards, and Account Detail from the stable 0.86.1 baseline and removed the layout gap above the bottom navigation."],["0.86.1","Repaired the Settings startup error and standardized the three-button Nearby, Search, and Settings dock across the app."],["0.86.0","Redesigned Settings as a simplified dark tile dashboard and renamed the bottom Accounts navigation button to Search."],["0.85.0","Removed Tools navigation and the Account Detail Visit action, and rebuilt Settings as a simple grouped menu with clean detail screens."],["0.84.0","Refined Nearby map selection with a fixed details overlay, no marker popup, delayed street-level zoom, and direct account-card navigation."],["0.81.0","Prepared FireVault for App Store review by removing the document scanner, Daily Route and time-tracking controls, theme selection, advanced settings, diagnostics access, and excess instructional copy while preserving account data."]],["0.80.3","Defaulted new Tools scanner documents to the closest GPS-ready account with visible distance, accuracy, retry, and manual override."],["0.80.2","Simplified Document Scanner, added on-device AI Auto Scan with live corner framing and hands-free capture, and repaired mobile keyboard field visibility."],["0.80.1","Moved Document Scanner to Tools, added post-capture account search and matching, and added scanner access inside the full Site Notes workspace."],["0.80.0","Added an account-specific multi-page camera document scanner with automatic edge detection, manual corner correction, rotation, cleanup modes, page ordering, PDF preview/download/share, and account-note activity."],["0.79.14","Restored numbered Nearby Accounts map pins matched to distance-sorted list rows and removed Smart Account Intelligence."],["0.79.13","Repaired startup parsing inherited from 0.79.11 and corrected Building Navigator location-copy syntax."],["0.79.12","Added Building Navigator with exact site locations, GPS/Plus Codes, verification, linked photos, route targets, and timeline events."],["0.79.7","Shortened every Settings summary and removed the colored bar from each Section Overview."],["0.79.6","Added Nearby-style account-list scroll locking so cards settle cleanly at the top while the Accounts controls remain fixed."],["0.79.5","Added separate Personal OneDrive, Work OneDrive, and SharePoint connection profiles with exact photo/document assignments and no-personal-fallback protection."],["0.79.4","Added independent photo and document storage destinations, cloud-provider integration targets, and offline Google Plus Codes for accounts and exact field locations."],["0.79.3","Added backend-neutral provider interfaces for authentication, database, file storage, synchronization, and audit while keeping FireVault fully local."],["0.79.2","Added a unified Security Center with vault integrity validation, backup health, audit filters, device naming, session clearing, and PIN confirmation for sensitive exports, restores, and deletion."],["0.79.1","Added an optional local six-digit privacy lock with PBKDF2 hashing, inactivity/background locking, app-switcher privacy screen, recovery code, cooldown protection, and local lock events."],["0.79.0","Added security-ready schema 4 metadata, stable workspace/user/device identities, local audit history, pending change queue, recoverable deletion, credential-safe exports, and protected restore/reset actions."],["0.67.0","Redesigned Account View around service actions and grouped information, consolidated Settings into five folders, and simplified FireVault Academy and contextual Help for continuous reading."],["0.65.2","Repaired Nearby Sites with GPS inventory counts, imported-coordinate recovery, persistent permission and timeout messages, a standard-accuracy retry, and nearest-site fallback results."],["0.65.1","Added online latitude/longitude calculation, coordinate validation, geocoding progress, unmatched-address review, optional CSV coordinates, and coordinate-safe repeat importing."],["0.65.0","Added preview-first customer CSV importing, Account Id update matching, validation warnings, imported monitoring details, and sync activity tracking."],["0.64.1","Simplified Academy article headers, removed floating metadata badges, and improved continuous scrolling and readability."],["0.64.0","Added Sync Activity, a conflict review center, export/import audit entries, and an automatic OneDrive connection-readiness checklist."],["0.63.1","Overhauled contextual Help and Academy reader formatting, removed overlapping sticky article headers, and restored full scrolling on phones and tablets."],["0.63.0","Added permanent record IDs, audit metadata, local version tracking, pending-sync states, conflict readiness, device identity, and a Team Sync settings workspace."],["0.60.0","Connected major screens and Settings areas directly to matching Academy chapters with return-to-screen navigation."],["0.59.0","Added interactive tutorials, guided orientation, pinned learning, field tips, and documentation tracking."],["0.58.0","Expanded Help & Manual into FireVault Academy with bookmarks, smart search, Quick Start, and reader navigation."],["0.57.0","Added the first complete searchable in-app FireVault User Manual."],["Ongoing review rule","Any change to navigation, labels, storage, workflows, permissions, or supported layouts requires the related manual chapter to be checked."]]],
+  revisions:["📋","Revision History","Application and documentation checkpoints.",[[["0.88.0","Overhauled Settings with sticky search, live status summaries, richer grouped cards, consistent detail screens, and improved iPad layout while preserving every release-critical setting."],["0.87.11","Restored WebDAV Backup to Data & Backup and Settings search while preserving saved connection settings and transfer tools."],["0.87.10","Aligned the four Account Directory card actions across the full card width in Call, Route, Add Note, Favorite order."],["0.87.9","Cleaned up the Account Directory with layered depth, raised controls, dimensional account cards, and category-accented shading while preserving fluid scrolling."],["0.87.8","Improved Account Directory scrolling performance and added iPad portrait, landscape, and split-view layout refinements."],["0.87.4","Added spacing and search to Settings, removed the Field category, moved Google Plus Codes under Maps & GPS, enlarged Account ID/category tags, moved Favorite beside Call, removed empty panel/contact text, and restored Nearby-style card scroll locking."],["0.87.3","Moved account addresses below site names, placed Account ID and category tags beneath the address, and changed Settings to a dark grouped-list design without a duplicate logo."],["0.87.2","Polished Account Directory cards and removed the default Ready, No Open Work, and GPS status tags so only actionable issues are shown."],["0.87.1","Rebuilt Account Directory, Search, account cards, and Account Detail from the stable 0.86.1 baseline and removed the layout gap above the bottom navigation."],["0.86.1","Repaired the Settings startup error and standardized the three-button Nearby, Search, and Settings dock across the app."],["0.86.0","Redesigned Settings as a simplified dark tile dashboard and renamed the bottom Accounts navigation button to Search."],["0.85.0","Removed Tools navigation and the Account Detail Visit action, and rebuilt Settings as a simple grouped menu with clean detail screens."],["0.84.0","Refined Nearby map selection with a fixed details overlay, no marker popup, delayed street-level zoom, and direct account-card navigation."],["0.81.0","Prepared FireVault for App Store review by removing the document scanner, Daily Route and time-tracking controls, theme selection, advanced settings, diagnostics access, and excess instructional copy while preserving account data."]],["0.80.3","Defaulted new Tools scanner documents to the closest GPS-ready account with visible distance, accuracy, retry, and manual override."],["0.80.2","Simplified Document Scanner, added on-device AI Auto Scan with live corner framing and hands-free capture, and repaired mobile keyboard field visibility."],["0.80.1","Moved Document Scanner to Tools, added post-capture account search and matching, and added scanner access inside the full Site Notes workspace."],["0.80.0","Added an account-specific multi-page camera document scanner with automatic edge detection, manual corner correction, rotation, cleanup modes, page ordering, PDF preview/download/share, and account-note activity."],["0.79.14","Restored numbered Nearby Accounts map pins matched to distance-sorted list rows and removed Smart Account Intelligence."],["0.79.13","Repaired startup parsing inherited from 0.79.11 and corrected Building Navigator location-copy syntax."],["0.79.12","Added Building Navigator with exact site locations, GPS/Plus Codes, verification, linked photos, route targets, and timeline events."],["0.79.7","Shortened every Settings summary and removed the colored bar from each Section Overview."],["0.79.6","Added Nearby-style account-list scroll locking so cards settle cleanly at the top while the Accounts controls remain fixed."],["0.79.5","Added separate Personal OneDrive, Work OneDrive, and SharePoint connection profiles with exact photo/document assignments and no-personal-fallback protection."],["0.79.4","Added independent photo and document storage destinations, cloud-provider integration targets, and offline Google Plus Codes for accounts and exact field locations."],["0.79.3","Added backend-neutral provider interfaces for authentication, database, file storage, synchronization, and audit while keeping FireVault fully local."],["0.79.2","Added a unified Security Center with vault integrity validation, backup health, audit filters, device naming, session clearing, and PIN confirmation for sensitive exports, restores, and deletion."],["0.79.1","Added an optional local six-digit privacy lock with PBKDF2 hashing, inactivity/background locking, app-switcher privacy screen, recovery code, cooldown protection, and local lock events."],["0.79.0","Added security-ready schema 4 metadata, stable workspace/user/device identities, local audit history, pending change queue, recoverable deletion, credential-safe exports, and protected restore/reset actions."],["0.67.0","Redesigned Account View around service actions and grouped information, consolidated Settings into five folders, and simplified FireVault Academy and contextual Help for continuous reading."],["0.65.2","Repaired Nearby Sites with GPS inventory counts, imported-coordinate recovery, persistent permission and timeout messages, a standard-accuracy retry, and nearest-site fallback results."],["0.65.1","Added online latitude/longitude calculation, coordinate validation, geocoding progress, unmatched-address review, optional CSV coordinates, and coordinate-safe repeat importing."],["0.65.0","Added preview-first customer CSV importing, Account Id update matching, validation warnings, imported monitoring details, and sync activity tracking."],["0.64.1","Simplified Academy article headers, removed floating metadata badges, and improved continuous scrolling and readability."],["0.64.0","Added Sync Activity, a conflict review center, export/import audit entries, and an automatic OneDrive connection-readiness checklist."],["0.63.1","Overhauled contextual Help and Academy reader formatting, removed overlapping sticky article headers, and restored full scrolling on phones and tablets."],["0.63.0","Added permanent record IDs, audit metadata, local version tracking, pending-sync states, conflict readiness, device identity, and a Team Sync settings workspace."],["0.60.0","Connected major screens and Settings areas directly to matching Academy chapters with return-to-screen navigation."],["0.59.0","Added interactive tutorials, guided orientation, pinned learning, field tips, and documentation tracking."],["0.58.0","Expanded Help & Manual into FireVault Academy with bookmarks, smart search, Quick Start, and reader navigation."],["0.57.0","Added the first complete searchable in-app FireVault User Manual."],["Ongoing review rule","Any change to navigation, labels, storage, workflows, permissions, or supported layouts requires the related manual chapter to be checked."]]],
   trouble:["❓","Troubleshooting","Common problems and safe first checks.",FIREVAULT_MANUAL_058.find(x=>x.id==="trouble")?.topics||[]]
  };
  const [icon,title,note,items]=pages[type]||["ⓘ","Unavailable","This Help section is not available in the installed version.",[["Current status","Return to Help and choose an available chapter or tutorial."]]];
@@ -10158,7 +10251,8 @@ function diagnostics(){
 }
 function showChangelog(){
   const notes = [
-    "Build 0.87.11 restores WebDAV Backup to Settings → Data & Backup and Settings search while preserving saved connection details and transfer controls.",
+    "Build 0.88.0 overhauls Settings with sticky search, live status summaries, richer grouped cards, and consistent detail screens while preserving WebDAV, Demo Mode, Plus Codes, backup, import/export, and security.",
+    "Build 0.87.11 restores WebDAV Backup to Data & Backup and Settings search while preserving saved connection settings and transfer tools.",
     "Build 0.87.10 aligns the four Account Directory card actions across the full card width in Call, Route, Add Note, Favorite order.",
     "Build 0.87.9 cleans up the Account Directory with subtle 3D shading, layered surfaces, raised controls, clearer card separation, and category-accented depth without changing account workflows.",
     "Build 0.87.8 improves Account Directory scrolling responsiveness and adds iPad portrait, landscape, and Split View layout refinements.",
