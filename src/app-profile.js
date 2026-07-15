@@ -1,4 +1,4 @@
-export const APP_PROFILE_SCHEMA_VERSION = 1;
+export const APP_PROFILE_SCHEMA_VERSION = 2;
 
 export const APP_PROFILE = Object.freeze({
   schemaVersion: APP_PROFILE_SCHEMA_VERSION,
@@ -12,6 +12,7 @@ export const APP_PROFILE = Object.freeze({
   terminology: Object.freeze({
     recordSingular: "Account",
     recordPlural: "Accounts",
+    recordId: "Account ID",
     locationSingular: "Location",
     locationPlural: "Locations",
     personSingular: "Technician",
@@ -26,6 +27,24 @@ export const APP_PROFILE = Object.freeze({
     taskPlural: "Tasks",
     fileSingular: "File",
     filePlural: "Files"
+  }),
+  labels: Object.freeze({
+    recordDirectory: "{{account}} Directory",
+    recordDetail: "{{account}} Detail",
+    addRecord: "Add {{account}}",
+    editRecord: "Edit {{account}}",
+    unnamedRecord: "Unnamed {{account}}",
+    searchRecords: "Search {{accounts}}",
+    nearbyRecords: "Nearby {{accounts}}",
+    chooseRecord: "Choose {{account}}",
+    currentRecord: "Current {{account}}",
+    recordActions: "{{account}} actions",
+    recordSections: "{{account}} sections",
+    noRecords: "No {{accounts}} yet",
+    noMatchingRecords: "No matching {{accounts}}",
+    firstRecord: "Add First {{account}}",
+    recordPhoto: "{{account}} Photo",
+    recordPhotos: "{{account}} Photos"
   }),
   navigation: Object.freeze({
     nearby: "Nearby",
@@ -98,13 +117,23 @@ export function applyProfileTerms(template, values={}){
     industry:APP_PROFILE.industry,
     account:appTerm("account",1),
     accounts:appTerm("account",2),
+    account_lower:appTerm("account",1,{lower:true}),
+    accounts_lower:appTerm("account",2,{lower:true}),
+    account_id:APP_PROFILE.terminology.recordId || `${appTerm("account",1)} ID`,
     location:appTerm("location",1),
     locations:appTerm("location",2),
     technician:appTerm("technician",1),
     technicians:appTerm("technician",2),
+    note:appTerm("note",1),
+    notes:appTerm("note",2),
     ...values
   };
   return source.replace(/\{\{([a-z_]+)\}\}/gi,(match,key)=>Object.prototype.hasOwnProperty.call(replacements,key)?String(replacements[key]):match);
+}
+
+export function appLabel(key, values={}){
+  const template=APP_PROFILE.labels?.[String(key||"")] || String(key||"");
+  return applyProfileTerms(template,values);
 }
 
 export function appProfileExport(){

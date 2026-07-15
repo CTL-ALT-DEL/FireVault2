@@ -1,9 +1,9 @@
-import { BUILD, KEY, loadData, saveData, ensureSite, fullAddress, esc, uid, downloadBlob, syncSummary, syncQueue, syncConflicts, syncActivity, createSyncPackage, importSyncPackage, resolveSyncConflict, notePackageExport, deviceIdentity, recordSyncActivity, autoBackupInfo, latestAutoBackup, restoreAutoBackup, isDemoMode, setDemoMode, resetDemoData, securityFoundationSummary, securityAudit, recycleBinInfo, restoreRecycleRecord, purgeRecycleBin, recordSecurityEvent, validateVaultIntegrity } from "./storage.js?v=0.95.3";
-import { backendAdapterSummary, runBackendAdapterDiagnostics, backendAdapterManifest, PROVIDER_CONTRACT_VERSION, FILE_STORAGE_CATALOG, fileStoragePlanSummary, cloudFileStorageManifest, MICROSOFT_STORAGE_TYPES, microsoftStorageAccounts, saveMicrosoftStorageAccounts, createMicrosoftStorageAccount, microsoftStorageAccountById, microsoftAppRegistration, saveMicrosoftAppRegistration, microsoftStorageSummary, microsoftStorageManifest } from "./providers.js?v=0.95.3";
-import { encodePlusCode, isValidFullPlusCode, normalizePlusCode, plusCodePrecisionLabel } from "./open-location-code.js?v=0.95.3";
-import { hydrateVaultMedia, stageVaultMedia, prepareVaultWithMedia, mediaStorageSummary, requestPersistentMediaStorage, pruneOrphanedMedia, flushMediaWrites } from "./media-store.js?v=0.95.3";
-import { APP_PROFILE, APP_PROFILE_SCHEMA_VERSION, appTerm, appNavigationLabel, appProfileExport } from "./app-profile.js?v=0.95.3";
-import { MODULE_REGISTRY, MODULE_REGISTRY_VERSION, MODULE_CLASSIFICATIONS, FUTURE_APP_COLUMNS, moduleRegistrySummary, moduleMatrixRows, moduleRegistryExport } from "./module-registry.js?v=0.95.3";
+import { BUILD, KEY, loadData, saveData, ensureSite, fullAddress, esc, uid, downloadBlob, syncSummary, syncQueue, syncConflicts, syncActivity, createSyncPackage, importSyncPackage, resolveSyncConflict, notePackageExport, deviceIdentity, recordSyncActivity, autoBackupInfo, latestAutoBackup, restoreAutoBackup, isDemoMode, setDemoMode, resetDemoData, securityFoundationSummary, securityAudit, recycleBinInfo, restoreRecycleRecord, purgeRecycleBin, recordSecurityEvent, validateVaultIntegrity } from "./storage.js?v=0.95.4";
+import { backendAdapterSummary, runBackendAdapterDiagnostics, backendAdapterManifest, PROVIDER_CONTRACT_VERSION, FILE_STORAGE_CATALOG, fileStoragePlanSummary, cloudFileStorageManifest, MICROSOFT_STORAGE_TYPES, microsoftStorageAccounts, saveMicrosoftStorageAccounts, createMicrosoftStorageAccount, microsoftStorageAccountById, microsoftAppRegistration, saveMicrosoftAppRegistration, microsoftStorageSummary, microsoftStorageManifest } from "./providers.js?v=0.95.4";
+import { encodePlusCode, isValidFullPlusCode, normalizePlusCode, plusCodePrecisionLabel } from "./open-location-code.js?v=0.95.4";
+import { hydrateVaultMedia, stageVaultMedia, prepareVaultWithMedia, mediaStorageSummary, requestPersistentMediaStorage, pruneOrphanedMedia, flushMediaWrites } from "./media-store.js?v=0.95.4";
+import { APP_PROFILE, APP_PROFILE_SCHEMA_VERSION, appTerm, appLabel, appNavigationLabel, appProfileExport } from "./app-profile.js?v=0.95.4";
+import { MODULE_REGISTRY, MODULE_REGISTRY_VERSION, MODULE_CLASSIFICATIONS, FUTURE_APP_COLUMNS, moduleRegistrySummary, moduleMatrixRows, moduleRegistryExport } from "./module-registry.js?v=0.95.4";
 window.__FIREVAULT_MODULE_READY = true;
 
 function applyAppProfileFoundation0953(){
@@ -12,10 +12,13 @@ function applyAppProfileFoundation0953(){
   Object.entries(navMap).forEach(([id,key])=>{
     const button=document.getElementById(id);if(!button)return;
     const label=appNavigationLabel(key);const span=button.querySelector("span");if(span)span.textContent=label;
-    if(key!=="photo")button.setAttribute("aria-label",label);
+    const accessible=key==="nearby"?appLabel("nearbyRecords"):key==="search"?appLabel("searchRecords"):key==="photo"?`Take a photo for the selected ${appTerm("account",1,{lower:true})}`:label;
+    button.setAttribute("aria-label",accessible);
   });
   const theme=document.querySelector('meta[name="theme-color"]');if(theme)theme.setAttribute("content",APP_PROFILE.appearance.surface);
 }
+function recordTerm0954(count=1,lower=false){return appTerm("account",count,lower?{lower:true}:{});}
+function recordIdLabel0954(){return APP_PROFILE.terminology.recordId||`${recordTerm0954()} ID`;}
 applyAppProfileFoundation0953();
 
 function fvPreferenceStore0739(){
@@ -410,16 +413,16 @@ let lastRenderedScrollKey0782 = "";
 let routeScrollRestoreFrame0782 = 0;
 function routeTitle0782(routeName=view){
   const titles={
-    home:"Nearby Accounts",dashboard068:"Dashboard",dailySummary:"Daily Summary",
-    actionCenter:"Action Center",pinnedSites:"Pinned Accounts",sites:"Accounts",
-    nearbySites:"Nearby Accounts",attention:"Attention Queue",siteDetail:"Account Detail",visits:"Visits",
-    visitDetail:"Visit Detail",checklist:"Checklist",siteForm:selectedSiteId?"Edit Account":"Add Account",
+    home:appLabel("nearbyRecords"),dashboard068:"Dashboard",dailySummary:"Daily Summary",
+    actionCenter:"Action Center",pinnedSites:`Pinned ${recordTerm0954(2)}`,sites:recordTerm0954(2),
+    nearbySites:appLabel("nearbyRecords"),attention:"Attention Queue",siteDetail:appLabel("recordDetail"),visits:"Visits",
+    visitDetail:"Visit Detail",checklist:"Checklist",siteForm:selectedSiteId?appLabel("editRecord"):appLabel("addRecord"),
     contactsList:"Contacts",contactForm:"Contact",siteDocs:"Documents",siteDocForm:"Document",
-    equipmentList:"Equipment",equipmentForm:"Equipment Item",tasks:"Tasks",taskForm:"Task",
-    deficiencies:"Deficiencies",deficiencyForm:"Deficiency",report:"Report",library:"Library",
+    equipmentList:appTerm("equipment",2),equipmentForm:`${appTerm("equipment",1)} Item`,tasks:appTerm("task",2),taskForm:appTerm("task",1),
+    deficiencies:appTerm("deficiency",2),deficiencyForm:appTerm("deficiency",1),report:"Report",library:"Library",
     resourceForm:"Library Item",jobMode:"Site Notes",settings:"Settings",
   };
-  return titles[routeName]||"FireVault";
+  return titles[routeName]||APP_PROFILE.name;
 }
 function routeScrollKey0782(){
   const parts=[String(view||"home")];
@@ -2671,8 +2674,8 @@ function homeNearbyMapShell069(){
     <div class="nearbyMapControlMask0717" aria-hidden="true"></div>
     <div id="nearbySelectedOverlay0712" class="nearbySelectedOverlay0712" hidden></div>
     <div id="nearbyMapActions0711" class="nearbyMapActions0711" hidden>
-      <button id="nearbyMapRoute0711" aria-label="Route to selected account">${fvIcon073("route","fvMapActionIcon073")}<b>Route</b></button>
-      <button id="nearbyMapCall0711" aria-label="Call selected account">${fvIcon073("call","fvMapActionIcon073")}<b>Call</b></button>
+      <button id="nearbyMapRoute0711" aria-label="Route to selected ${esc(recordTerm0954(1,true))}">${fvIcon073("route","fvMapActionIcon073")}<b>Route</b></button>
+      <button id="nearbyMapCall0711" aria-label="Call selected ${esc(recordTerm0954(1,true))}">${fvIcon073("call","fvMapActionIcon073")}<b>Call</b></button>
     </div>
   </div>`;
 }
@@ -2694,7 +2697,7 @@ function home(){
   html(`<div class="screen nearbyHome069">
     <section class="nearbyTop069"><div class="nearbyLogo069"><img src="assets/favicon.png?v=${BUILD}" alt=""><strong>${fireVaultBrand575()}</strong></div>${todayHeader070()}</section>
     <section class="nearbyCompactHead069">
-      <div class="nearbyCompactTitle069"><h1>Nearby Accounts</h1><span><i></i>${esc(gpsText)}</span></div>
+      <div class="nearbyCompactTitle069"><h1>${esc(appLabel("nearbyRecords"))}</h1><span><i></i>${esc(gpsText)}</span></div>
       <div class="nearbyCompactActions069"><button class="nearbyViewToggle069" id="nearbyViewToggle069" aria-label="Switch between map and list">${fvIcon073(homeNearbyView069==='map'?'map':'list','fvToggleIcon073')}<b>${homeNearbyView069==='map'?'MAP':'LIST'}</b></button><label class="nearbyCategoryFilter070 category-${nearbyCategoryFilter070}" aria-label="Filter nearby accounts by communicator category" title="Filter: ${esc(NEARBY_CATEGORY_META_070[nearbyCategoryFilter070]?.label||'All')}"><span class="nearbyFilterGlyph0714" aria-hidden="true"></span><select id="nearbyCategoryFilter070" aria-label="Nearby account category filter">${categoryOptions070}</select></label></div>
     </section>
     ${status==='error'?`<div class="nearbyNotice069"><strong>Location problem:</strong> ${esc(nearbyScanStatus0652.message)}</div>`:''}
@@ -2703,7 +2706,7 @@ function home(){
       <div class="nearbyListHead069"><strong>${rows.length} ${nearbyCategoryFilter070==='all'?'account':NEARBY_CATEGORY_META_070[nearbyCategoryFilter070].label+' account'}${rows.length===1?'':'s'} within ${NEARBY_LIST_MAX_MILES_069} miles</strong><span>Sorted by distance</span></div>
       <div class="nearbyCards069" id="nearbyCards069">${rows.length?rows.map(nearbyAccountCard069).join(''):`<div class="nearbyEmpty069">${nearbyState?'No nearby accounts found.':'Refreshing GPS…'}</div>`}</div>
     </section>
-    <nav class="nearbyBottomNav069 fvNavThree0733"><button class="active" id="homeNearbyNav069" aria-label="Refresh nearby accounts using current GPS">${fvIcon073("nearby","fvNavIcon073")}<span>Nearby</span></button><button id="homeAccounts069" aria-label="Search accounts">${fvIcon073("search","fvNavIcon073")}<span>Search</span></button><button id="homePhotoNav0950" aria-label="Take a photo for the selected account">${fvIcon073("photo","fvNavIcon073")}<span>Photo</span></button><button id="homeSettingsNav069" aria-label="Open Settings">${fvIcon073("settings","fvNavIcon073")}<span>Settings</span></button></nav>
+    <nav class="nearbyBottomNav069 fvNavThree0733"><button class="active" id="homeNearbyNav069" aria-label="Refresh nearby ${esc(recordTerm0954(2,true))} using current GPS">${fvIcon073("nearby","fvNavIcon073")}<span>Nearby</span></button><button id="homeAccounts069" aria-label="${esc(appLabel("searchRecords"))}">${fvIcon073("search","fvNavIcon073")}<span>Search</span></button><button id="homePhotoNav0950" aria-label="Take a photo for the selected ${esc(recordTerm0954(1,true))}">${fvIcon073("photo","fvNavIcon073")}<span>Photo</span></button><button id="homeSettingsNav069" aria-label="Open Settings">${fvIcon073("settings","fvNavIcon073")}<span>Settings</span></button></nav>
   </div>`);
   document.getElementById('homeAccounts069').onclick=()=>route('sites');
   document.getElementById('homePhotoNav0950').onclick=()=>quickPhotoStart0950();
@@ -3292,6 +3295,7 @@ function accountHealthBadge0762(health){
   return null;
 }
 function accountDirectoryRow0759(s,addressCount=1){
+  const recordLower=recordTerm0954(1,true);
   const id=accountId069(s);
   const category=accountCategory070(s);
   const categoryLabel=NEARBY_CATEGORY_META_070[category]?.label||"Basic";
@@ -3310,11 +3314,11 @@ function accountDirectoryRow0759(s,addressCount=1){
   if(healthBadge) issueTags.push(`<span class="${healthBadge.cls}">${esc(healthBadge.label)}</span>`);
   if(work.score>0&&work.label) issueTags.push(`<span class="${work.cls}">${esc(work.label)}</span>`);
   const issueMarkup=issueTags.length?`<div class="accountRowIssues0951">${issueTags.join("")}</div>`:"";
-  return `<article class="accountCard0871 accountRow0951 category-${category}" data-account-card0759 data-id="${esc(s.id)}" data-search="${esc(siteSearchBlob(s))}" data-letter0763="${esc(initial)}" role="button" tabindex="0" aria-label="Open ${esc(s.name||'account')}, ${esc(address)}">
+  return `<article class="accountCard0871 accountRow0951 category-${category}" data-account-card0759 data-id="${esc(s.id)}" data-search="${esc(siteSearchBlob(s))}" data-letter0763="${esc(initial)}" role="button" tabindex="0" aria-label="Open ${esc(s.name||recordLower)}, ${esc(address)}">
     <div class="accountRowBody0951">
       <div class="accountRowMark0951" aria-hidden="true">${esc(initial)}</div>
       <div class="accountRowCopy0951">
-        <div class="accountRowTitle0951"><h2>${esc(s.name||"Unnamed Account")}</h2>${issueMarkup}</div>
+        <div class="accountRowTitle0951"><h2>${esc(s.name||appLabel("unnamedRecord"))}</h2>${issueMarkup}</div>
         <p class="accountRowAddress0951">${esc(address)}</p>
         <div class="accountRowMeta0951">
           ${id?`<span class="accountRowId0951">${esc(id)}</span>`:""}
@@ -3324,10 +3328,10 @@ function accountDirectoryRow0759(s,addressCount=1){
         </div>
       </div>
     </div>
-    <div class="accountRowActions0951" aria-label="Account quick actions">
-      <button type="button" data-account-call0762="${esc(s.id)}" ${phone?"":"disabled"} aria-label="Call ${esc(s.name||'account')}">${fvIcon073("call","accountCardIcon0871")}<span>Call</span></button>
-      <button type="button" data-account-route0762="${esc(s.id)}" ${gpsReady?"":"disabled"} aria-label="Route to ${esc(s.name||'account')}">${fvIcon073("route","accountCardIcon0871")}<span>Route</span></button>
-      <button type="button" data-account-note0877="${esc(s.id)}" aria-label="Add note to ${esc(s.name||'account')}">${fvIcon073("note","accountCardIcon0871")}<span>Add Note</span></button>
+    <div class="accountRowActions0951" aria-label="${esc(appLabel("recordActions"))}">
+      <button type="button" data-account-call0762="${esc(s.id)}" ${phone?"":"disabled"} aria-label="Call ${esc(s.name||recordLower)}">${fvIcon073("call","accountCardIcon0871")}<span>Call</span></button>
+      <button type="button" data-account-route0762="${esc(s.id)}" ${gpsReady?"":"disabled"} aria-label="Route to ${esc(s.name||recordLower)}">${fvIcon073("route","accountCardIcon0871")}<span>Route</span></button>
+      <button type="button" data-account-note0877="${esc(s.id)}" aria-label="Add note to ${esc(s.name||recordLower)}">${fvIcon073("note","accountCardIcon0871")}<span>Add Note</span></button>
       <button type="button" class="accountFavorite0871 ${pinned?"active":""}" data-account-favorite0761="${esc(s.id)}" aria-pressed="${pinned?"true":"false"}" aria-label="${pinned?"Remove":"Add"} favorite">${pinned?"★":"☆"}<span>Favorite</span></button>
     </div>
   </article>`;
@@ -3445,6 +3449,7 @@ function settleAccountsList0796(list){
 function sites(){
   restoreAppChrome572();
   showGlobalChrome537();
+  const recordSingular=recordTerm0954(),recordPlural=recordTerm0954(2),recordLower=recordTerm0954(1,true),recordsLower=recordTerm0954(2,true),recordIdLabel=recordIdLabel0954();
   const allAccounts=[...(data.sites||[])];
   const addressCounts=accountAddressCounts0762(allAccounts);
   const accounts=accountDirectorySort0760(allAccounts);
@@ -3452,25 +3457,25 @@ function sites(){
   html(`<div class="screen accountDirectory0871 accountDirectory0951">
     <div class="accountDirectoryTop0940 accountDirectoryTop0951">
       <header class="accountDirectoryHeader0871 accountDirectoryHeader0940 accountDirectoryHeader0951">
-        <div class="accountDirectoryHeading0951"><span>SEARCH</span><h1>Account Directory</h1></div>
-        <button type="button" class="accountAdd0871 accountAdd0940 accountAdd0951" id="addBtn0759" aria-label="Add account"><span aria-hidden="true">＋</span><b>Add</b></button>
+        <div class="accountDirectoryHeading0951"><span>${esc(appNavigationLabel("search").toUpperCase())}</span><h1>${esc(appLabel("recordDirectory"))}</h1></div>
+        <button type="button" class="accountAdd0871 accountAdd0940 accountAdd0951" id="addBtn0759" aria-label="${esc(appLabel("addRecord"))}"><span aria-hidden="true">＋</span><b>Add</b></button>
       </header>
-      <section class="accountSearch0871 accountSearch0940 accountSearch0951" aria-label="Search accounts">
+      <section class="accountSearch0871 accountSearch0940 accountSearch0951" aria-label="${esc(appLabel("searchRecords"))}">
         ${fvIcon073("search","accountSearchIcon0871")}
-        <input id="siteSearch0759" type="search" placeholder="Name, address, Account ID, panel, or phone" value="${esc(siteSearch)}" autocomplete="off" autocapitalize="none" spellcheck="false">
+        <input id="siteSearch0759" type="search" placeholder="Name, address, ${esc(recordIdLabel)}, panel, or phone" value="${esc(siteSearch)}" autocomplete="off" autocapitalize="none" spellcheck="false">
         <button type="button" id="clearSiteSearch0759" aria-label="Clear search" ${siteSearch?"":"hidden"}>×</button>
       </section>
       <section class="accountDirectoryTools0871 accountDirectoryTools0876 accountDirectoryTools0951">
-        <p id="siteSearchCount0759" class="accountDirectoryCount0951">${accounts.length} account${accounts.length===1?"":"s"}</p>
+        <p id="siteSearchCount0759" class="accountDirectoryCount0951">${accounts.length} ${accounts.length===1?recordLower:recordsLower}</p>
         <button type="button" class="accountDirectoryNear0951" id="nearBtn0759">${fvIcon073("nearby","accountToolIcon0871")}<span>Nearby</span></button>
-        <label class="accountDirectorySort0951"><span>Sort: <b>${esc(accountsSortLabel0760())}</b></span><b>⌄</b><select id="accountsSort0871" aria-label="Sort accounts"><option value="az" ${accountsSort0760==="az"?"selected":""}>A–Z</option><option value="favorites" ${accountsSort0760==="favorites"?"selected":""}>Favorites</option><option value="recent" ${accountsSort0760==="recent"?"selected":""}>Recent</option><option value="attention" ${accountsSort0760==="attention"?"selected":""}>Priority</option></select></label>
+        <label class="accountDirectorySort0951"><span>Sort: <b>${esc(accountsSortLabel0760())}</b></span><b>⌄</b><select id="accountsSort0871" aria-label="Sort ${esc(recordsLower)}"><option value="az" ${accountsSort0760==="az"?"selected":""}>A–Z</option><option value="favorites" ${accountsSort0760==="favorites"?"selected":""}>Favorites</option><option value="recent" ${accountsSort0760==="recent"?"selected":""}>Recent</option><option value="attention" ${accountsSort0760==="attention"?"selected":""}>Priority</option></select></label>
         <button type="button" class="accountDirectoryReset0876 accountDirectoryReset0951" id="resetAccounts0871" ${(!siteSearch&&accountsSort0760==="az")?"hidden":""}>Reset</button>
       </section>
     </div>
     <section class="accountDirectoryListShell0871">
       <div class="accountDirectoryList0871" id="accountsList0759">
-        ${accounts.length?accounts.map(s=>accountDirectoryRow0759(s,addressCounts.get(accountAddressKey0762(s))||1)).join(""):`<div class="accountEmpty0871"><span>＋</span><strong>No accounts yet</strong><p>Add an account or import your customer list from Settings.</p><button class="primary" id="emptyAdd0759">Add First Account</button></div>`}
-        <div class="accountNoResults0871" id="accountsNoResults0759" hidden><span>⌕</span><strong>No matching accounts</strong><p>Try a name, address, Account ID, panel, or contact.</p><button type="button" id="clearNoResults0871">Clear Search</button></div>
+        ${accounts.length?accounts.map(s=>accountDirectoryRow0759(s,addressCounts.get(accountAddressKey0762(s))||1)).join(""):`<div class="accountEmpty0871"><span>＋</span><strong>${esc(appLabel("noRecords"))}</strong><p>Add a ${esc(recordLower)} or import your customer list from Settings.</p><button class="primary" id="emptyAdd0759">${esc(appLabel("firstRecord"))}</button></div>`}
+        <div class="accountNoResults0871" id="accountsNoResults0759" hidden><span>⌕</span><strong>${esc(appLabel("noMatchingRecords"))}</strong><p>Try a name, address, ${esc(recordIdLabel)}, panel, or contact.</p><button type="button" id="clearNoResults0871">Clear Search</button></div>
       </div>
     </section>
   </div>`);
@@ -3493,7 +3498,7 @@ function sites(){
   const openAccount=id=>{
     if(opening)return;
     const target=(data.sites||[]).find(s=>s.id===id);
-    if(!target){toast("That account is no longer available.");return;}
+    if(!target){toast(`That ${recordLower} is no longer available.`);return;}
     opening=true;
     accountsScroll0759=list?.scrollTop||0;
     persistAccountsViewState0761(true);
@@ -3510,7 +3515,7 @@ function sites(){
       card.hidden=!visible;
       if(visible)shown++;
     });
-    if(countEl)countEl.textContent=query?`${shown} of ${allAccounts.length}`:`${shown} account${shown===1?"":"s"}`;
+    if(countEl)countEl.textContent=query?`${shown} of ${allAccounts.length}`:`${shown} ${shown===1?recordLower:recordsLower}`;
     if(clearBtn)clearBtn.hidden=!query;
     if(noResults)noResults.hidden=shown!==0||allAccounts.length===0;
     if(resetBtn)resetBtn.hidden=!query&&accountsSort0760==="az";
@@ -3540,7 +3545,7 @@ function sites(){
     if(noteButton){
       event.preventDefault();event.stopPropagation();
       const target=(data.sites||[]).find(s=>s.id===noteButton.dataset.accountNote0877);
-      if(!target){toast("That account is no longer available.");return;}
+      if(!target){toast(`That ${recordLower} is no longer available.`);return;}
       accountsScroll0759=list?.scrollTop||0;persistAccountsViewState0761(true);
       selectedSiteId=target.id;
       addSiteNotePrompt();
@@ -4066,7 +4071,7 @@ function rememberAccountTab0751(value){
 }
 function accountPersistentActions0751(s={},ctx={}){
   const phone=formatPhone0758(ctx.primary?.phone||s.sitePhone)||"";
-  return `<section class="accountPersistentActions0751 accountActions0786" aria-label="Account quick actions">
+  return `<section class="accountPersistentActions0751 accountActions0786" aria-label="${esc(appLabel("recordActions"))}">
     <button id="callPrimary477" ${phone?"":"disabled"} aria-label="Call account contact">${fvIcon073("call","accountPersistentIcon0751")}<strong>Call</strong><small>${phone?"Primary contact":"No phone"}</small></button>
     <button id="navigateBtn477" ${hasGps(s)?"":"disabled"} aria-label="Route to account">${fvIcon073("route","accountPersistentIcon0751")}<strong>Route</strong><small>${hasGps(s)?"Open navigation":"No GPS"}</small></button>
     <button id="qaAddNote544" aria-label="Add account note">${fvIcon073("note","accountPersistentIcon0751")}<strong>Note</strong><small>Quick entry</small></button>
@@ -4125,9 +4130,9 @@ function accountOverviewTab0735(s,ctx){
       <button id="callSitePhone0786" ${contactPhone?"":"disabled"}><span>Phone</span><strong>${esc(contactPhone||"Not entered")}</strong></button>
       ${primary?.email?`<a href="mailto:${esc(primary.email)}"><span>Email</span><strong>${esc(primary.email)}</strong></a>`:""}
       <div><span>Category</span><strong>${esc(accountCategoryLabel0735(s))}</strong></div>
-      <div><span>Account Since</span><strong>${esc(accountSince0735(s))}</strong></div>
+      <div><span>${esc(recordTerm0954())} Since</span><strong>${esc(accountSince0735(s))}</strong></div>
     </section>
-    <section class="accountPanel0735 accountTimeline0786"><div class="accountPanelHead0735"><div><span>RECENT ACTIVITY</span><h2>Account Timeline</h2></div><button class="ghost" id="allVisitsBtn">View All</button></div>${accountRecentMarkup0735(s)}</section>
+    <section class="accountPanel0735 accountTimeline0786"><div class="accountPanelHead0735"><div><span>RECENT ACTIVITY</span><h2>${esc(recordTerm0954())} Timeline</h2></div><button class="ghost" id="allVisitsBtn">View All</button></div>${accountRecentMarkup0735(s)}</section>
   </div>`;
 }
 function accountDetailsTab0735(s,ctx){
@@ -4139,7 +4144,7 @@ function accountDetailsTab0735(s,ctx){
         <div><span>Panel</span><strong>${esc(panel)}</strong></div>
         <div><span>Primary Contact</span><strong>${esc(primary?contactTitle(primary):"No contact saved")}</strong>${primaryMeta?`<small>${esc(primaryMeta)}</small>`:""}</div>
         <div><span>Access</span><strong>${esc(access||"No access notes")}</strong></div>
-        <div><span>Account ID</span><strong>${esc(accountId069(s)||"Not assigned")}</strong></div>
+        <div><span>${esc(recordIdLabel0954())}</span><strong>${esc(accountId069(s)||"Not assigned")}</strong></div>
         <div><span>Site Phone</span><strong>${esc(formatPhone0758(s.sitePhone)||s.sitePhone||"Not entered")}</strong></div>
       </div>
       <div class="accountInlineActions067"><button class="ghost" id="copyImportantInfo568">Copy Site Info</button><button class="ghost" id="snapshotBtn">Copy Snapshot</button><button class="ghost" id="contactsQuick477">Contacts</button></div>
@@ -4164,7 +4169,7 @@ function accountDocsTab0735(s){
   const docs=Array.isArray(s.docs)?s.docs:[];
   const photos=docs.filter(docHasPhoto512);
   return `<div class="accountTabPanel0735">
-    <section class="accountPanel0735"><div class="accountPanelHead0735"><div><span>PHOTOS</span><h2>${photos.length} Account Photo${photos.length===1?"":"s"}</h2></div><div><button class="ghost" id="openPhotoVaultBtn523">Open Vault</button><button class="primary" id="addAccountPhotoBtn523">＋ Photo</button></div></div>
+    <section class="accountPanel0735"><div class="accountPanelHead0735"><div><span>PHOTOS</span><h2>${photos.length} ${esc(photos.length===1?appLabel("recordPhoto"):appLabel("recordPhotos"))}</h2></div><div><button class="ghost" id="openPhotoVaultBtn523">Open Vault</button><button class="primary" id="addAccountPhotoBtn523">＋ Photo</button></div></div>
       ${photos.length?`<div class="accountPhotoGrid0735">${photos.slice(0,8).map(d=>`<button class="accountPhotoThumb523" data-doc="${esc(d.id)}">${docPhotoThumb512(d)}<span>${esc(d.title||d.imageName||"Photo")}</span></button>`).join("")}</div>`:`<div class="accountEmptyState0735"><strong>No photos saved</strong><span>Add panel, device, wiring, deficiency, or completed-work photos.</span></div>`}
     </section>
     <section class="accountPanel0735"><div class="accountPanelHead0735"><div><span>FILES</span><h2>${docs.length} Saved Item${docs.length===1?"":"s"}</h2></div><button class="ghost" id="manageDocsBtn">Manage</button></div>
@@ -4184,6 +4189,7 @@ function accountNotesTab0735(s,ctx){
 function siteDetail(){
   restoreAppChrome572();
   showGlobalChrome537();
+  const recordSingular=recordTerm0954(),recordLower=recordTerm0954(1,true),recordIdLabel=recordIdLabel0954();
   const s=site(); if(!s){route("sites");return;}
   if(accountDetailSite0735!==s.id){accountDetailSite0735=s.id;accountDetailTab0735=accountTabPreference0751();s.lastOpenedAt=new Date().toISOString();saveData(data);}
   const open=(s.tasks||[]).filter(t=>(t.status||"Open")!=="Done").length;
@@ -4197,7 +4203,7 @@ function siteDetail(){
   const primary=primaryContact477(s);
   const access=accessSummary477(s);
   const ctx={open,def,siteVisits,equipment,docs,health,lastVisit,panel,primary,access};
-  const accountId=accountId069(s)||"No Account ID";
+  const accountId=accountId069(s)||`No ${recordIdLabel}`;
   const phone=formatPhone0758(primary?.phone||s.sitePhone)||"";
   const address=fullAddress(s)||"No address saved";
   const category=accountCategory070(s);
@@ -4209,25 +4215,25 @@ function siteDetail(){
     <section class="accountDetailHeader0952 category-${category}">
       <header class="accountDetailTop0871 accountDetailTop0952">
         <button id="backBtn" aria-label="Back">‹</button>
-        <span>ACCOUNT DETAIL</span>
-        <div><button class="${isPinnedSite566(s)?"active":""}" id="pinSiteBtn566" aria-label="Favorite account">${isPinnedSite566(s)?"★":"☆"}</button><button id="editBtn" aria-label="Edit account">✎</button></div>
+        <span>${esc(appLabel("recordDetail").toUpperCase())}</span>
+        <div><button class="${isPinnedSite566(s)?"active":""}" id="pinSiteBtn566" aria-label="Favorite ${esc(recordLower)}">${isPinnedSite566(s)?"★":"☆"}</button><button id="editBtn" aria-label="${esc(appLabel("editRecord"))}">✎</button></div>
       </header>
       <div class="accountIdentity0871 accountIdentity0952">
         <div class="accountIdentityMain0952">
           <div class="accountIdentityMeta0871 accountIdentityMeta0952"><span>${esc(accountCategoryLabel0735(s))}</span><b>${esc(accountId)}</b></div>
-          <h1>${esc(s.name||"Unnamed Account")}</h1>
+          <h1>${esc(s.name||appLabel("unnamedRecord"))}</h1>
           <p>${esc(address)}</p>
         </div>
         ${issueMarkup}
         ${tagMarkup?`<div class="accountTags0871 accountTags0952">${tagMarkup}</div>`:""}
       </div>
-      <section class="accountActionGrid0871 accountActionGrid0952" aria-label="Account actions">
+      <section class="accountActionGrid0871 accountActionGrid0952" aria-label="${esc(appLabel("recordActions"))}">
         <button id="detailCall0871" ${phone?"":"disabled"}>${fvIcon073("call","accountActionIcon0871")}<span>Call</span></button>
         <button id="detailRoute0871" ${hasGps(s)?"":"disabled"}>${fvIcon073("route","accountActionIcon0871")}<span>Route</span></button>
         <button id="detailNote0871">${fvIcon073("note","accountActionIcon0871")}<span>Add Note</span></button>
         <button id="detailPhoto0952">${fvIcon073("photo","accountActionIcon0871")}<span>Photo</span></button>
       </section>
-      <nav class="accountTabs0871 accountTabs0952" aria-label="Account sections">${tabs.map(([key,label])=>`<button class="${accountDetailTab0735===key?"active":""}" data-account-tab0735="${key}" aria-current="${accountDetailTab0735===key?"page":"false"}"><span>${label}</span></button>`).join("")}</nav>
+      <nav class="accountTabs0871 accountTabs0952" aria-label="${esc(appLabel("recordSections"))}">${tabs.map(([key,label])=>`<button class="${accountDetailTab0735===key?"active":""}" data-account-tab0735="${key}" aria-current="${accountDetailTab0735===key?"page":"false"}"><span>${label}</span></button>`).join("")}</nav>
     </section>
     <div class="accountDetailContent0871 accountDetailContent0952">${panelMarkup}</div>
   </div>`);
@@ -4974,18 +4980,19 @@ async function quickPhotoFileSelected0950(event){
 }
 function quickPhotoCloseReview0950(){quickPhotoOverlay0950?.remove();quickPhotoOverlay0950=null;}
 function quickPhotoReviewAccountMarkup0950(account){
-  return `<button type="button" class="quickPhotoAccount0950" id="quickPhotoChangeAccount0950"><span>${esc(account?.name||"Choose account")}</span><small>${esc(quickPhotoAccountMeta0950(account))}</small><b>Change</b></button>`;
+  return `<button type="button" class="quickPhotoAccount0950" id="quickPhotoChangeAccount0950"><span>${esc(account?.name||appLabel("chooseRecord"))}</span><small>${esc(quickPhotoAccountMeta0950(account))}</small><b>Change</b></button>`;
 }
 function quickPhotoReviewMarkup0950(){
+  const recordSingular=recordTerm0954(),recordLower=recordTerm0954(1,true),recordIdLabel=recordIdLabel0954();
   const account=quickPhotoAccountById0950(quickPhotoDraft0950.accountId),stamp=new Date();
   const title=`Field Photo - ${stamp.toLocaleDateString([], {month:"short",day:"numeric",year:"numeric"})} ${stamp.toLocaleTimeString([], {hour:"numeric",minute:"2-digit"})}`;
   return `<section class="quickPhotoSheet0950" role="dialog" aria-modal="true" aria-labelledby="quickPhotoTitle0950">
     <header><div><span>QUICK CAPTURE</span><h2 id="quickPhotoTitle0950">Review Field Photo</h2></div><button type="button" class="ghost" id="quickPhotoClose0950" aria-label="Close photo review">×</button></header>
-    <div class="quickPhotoPreview0950"><canvas id="quickPhotoPreviewCanvas0950" width="900" height="600" aria-label="Photo preview using selected account information"></canvas><div id="quickPhotoPreviewStatus0950">Building account overlay…</div></div>
+    <div class="quickPhotoPreview0950"><canvas id="quickPhotoPreviewCanvas0950" width="900" height="600" aria-label="Photo preview using selected ${esc(recordLower)} information"></canvas><div id="quickPhotoPreviewStatus0950">Building ${esc(recordLower)} overlay…</div></div>
     ${quickPhotoReviewAccountMarkup0950(account)}
     <div class="quickPhotoOptions0950">
       <label><span>Category</span><select id="quickPhotoCategory0950">${PHOTO_CATEGORIES_524.map(category=>`<option value="${esc(category)}" ${quickPhotoDraft0950.category===category?"selected":""}>${esc(category)}</option>`).join("")}</select></label>
-      <label class="checkRow"><input type="checkbox" id="quickPhotoOverlayToggle0950" ${quickPhotoDraft0950.useOverlay?"checked":""}> <span>Show account overlay</span></label>
+      <label class="checkRow"><input type="checkbox" id="quickPhotoOverlayToggle0950" ${quickPhotoDraft0950.useOverlay?"checked":""}> <span>Show ${esc(recordLower)} overlay</span></label>
       <label class="checkRow"><input type="checkbox" id="quickPhotoReportToggle0950" ${quickPhotoDraft0950.includeReport?"checked":""}> <span>Include in customer report</span></label>
     </div>
     <details class="quickPhotoDetails0950"><summary>Title and notes</summary><label>Photo title<input id="quickPhotoTitleField0950" value="${esc(title)}"></label><label>Internal notes<textarea id="quickPhotoNotes0950" placeholder="Problem found, device address, circuit, or repair notes…"></textarea></label><label>Customer caption<textarea id="quickPhotoCaption0950" placeholder="Optional customer-facing caption"></textarea></label></details>
@@ -5006,10 +5013,11 @@ function quickPhotoShowReview0950(){
   quickPhotoRenderPreview0950();
 }
 async function quickPhotoRenderPreview0950(){
+  const recordLower=recordTerm0954(1,true);
   const canvas=document.getElementById("quickPhotoPreviewCanvas0950"),status=document.getElementById("quickPhotoPreviewStatus0950"),account=quickPhotoAccountById0950(quickPhotoDraft0950.accountId);
   if(!canvas||!quickPhotoDraft0950.dataUrl)return;
   const token=quickPhotoDraft0950.dataUrl+quickPhotoDraft0950.accountId+String(quickPhotoDraft0950.useOverlay);
-  canvas.dataset.renderToken=token;if(status){status.hidden=false;status.textContent=quickPhotoDraft0950.useOverlay?"Building account overlay…":"Preparing photo…";}
+  canvas.dataset.renderToken=token;if(status){status.hidden=false;status.textContent=quickPhotoDraft0950.useOverlay?`Building ${recordLower} overlay…`:"Preparing photo…";}
   try{
     const composed=quickPhotoDraft0950.useOverlay?await renderOverlayComposite0890(quickPhotoDraft0950.dataUrl,overlayCleanSetting510(data.settings.overlay||{}),account||{},1200):await loadImage512(quickPhotoDraft0950.dataUrl);
     if(!canvas.isConnected||canvas.dataset.renderToken!==token)return;
@@ -5017,10 +5025,11 @@ async function quickPhotoRenderPreview0950(){
   }catch(err){if(status)status.textContent="Preview unavailable";}
 }
 function quickPhotoOpenAccountPicker0950(onSelect=null,openCameraAfter=false){
+  const recordSingular=recordTerm0954(),recordPlural=recordTerm0954(2),recordLower=recordTerm0954(1,true),recordsLower=recordTerm0954(2,true),recordIdLabel=recordIdLabel0954();
   quickPhotoPicker0950?.remove();
   const overlay=document.createElement("div");overlay.className="quickPhotoPickerOverlay0950";
   const accounts=[...(data.sites||[])].sort((a,b)=>String(a.name||"").localeCompare(String(b.name||""),undefined,{sensitivity:"base",numeric:true}));
-  overlay.innerHTML=`<section class="quickPhotoPicker0950" role="dialog" aria-modal="true" aria-labelledby="quickPhotoPickerTitle0950"><header><div><span>PHOTO ACCOUNT</span><h2 id="quickPhotoPickerTitle0950">Choose an account</h2></div><button type="button" class="ghost" id="quickPhotoPickerClose0950">×</button></header><div class="quickPhotoPickerSearch0950">${fvIcon073("search")}<input id="quickPhotoAccountSearch0950" type="search" placeholder="Search name, address, or Account ID" autocomplete="off"></div><div class="quickPhotoAccountList0950" id="quickPhotoAccountList0950">${accounts.map(account=>`<button type="button" data-quick-photo-account="${esc(account.id)}" data-search="${esc([account.name,account.externalAccountId,account.accountId,fullAddress(account)].filter(Boolean).join(" ").toLowerCase())}"><strong>${esc(account.name||"Unnamed account")}</strong><small>${esc(quickPhotoAccountMeta0950(account))}</small></button>`).join("")||`<div class="empty">No accounts are available.</div>`}</div></section>`;
+  overlay.innerHTML=`<section class="quickPhotoPicker0950" role="dialog" aria-modal="true" aria-labelledby="quickPhotoPickerTitle0950"><header><div><span>PHOTO ${esc(recordSingular.toUpperCase())}</span><h2 id="quickPhotoPickerTitle0950">${esc(appLabel("chooseRecord"))}</h2></div><button type="button" class="ghost" id="quickPhotoPickerClose0950">×</button></header><div class="quickPhotoPickerSearch0950">${fvIcon073("search")}<input id="quickPhotoAccountSearch0950" type="search" placeholder="Search name, address, or ${esc(recordIdLabel)}" autocomplete="off"></div><div class="quickPhotoAccountList0950" id="quickPhotoAccountList0950">${accounts.map(account=>`<button type="button" data-quick-photo-account="${esc(account.id)}" data-search="${esc([account.name,account.externalAccountId,account.accountId,fullAddress(account)].filter(Boolean).join(" ").toLowerCase())}"><strong>${esc(account.name||appLabel("unnamedRecord"))}</strong><small>${esc(quickPhotoAccountMeta0950(account))}</small></button>`).join("")||`<div class="empty">No ${esc(recordsLower)} are available.</div>`}</div></section>`;
   document.body.appendChild(overlay);quickPhotoPicker0950=overlay;
   const close=()=>{overlay.remove();if(quickPhotoPicker0950===overlay)quickPhotoPicker0950=null;};
   overlay.addEventListener("click",event=>{if(event.target===overlay)close();});document.getElementById("quickPhotoPickerClose0950").onclick=close;
@@ -5029,7 +5038,7 @@ function quickPhotoOpenAccountPicker0950(onSelect=null,openCameraAfter=false){
   setTimeout(()=>document.getElementById("quickPhotoAccountSearch0950")?.focus(),80);
 }
 async function quickPhotoSave0950(){
-  const account=quickPhotoAccountById0950(quickPhotoDraft0950.accountId);if(!account){toast("Choose an account before saving.","error");return;}
+  const account=quickPhotoAccountById0950(quickPhotoDraft0950.accountId);if(!account){toast(`Choose a ${recordTerm0954(1,true)} before saving.`,"error");return;}
   if(!quickPhotoDraft0950.dataUrl){toast("Take a photo first.","error");return;}
   const button=document.getElementById("quickPhotoSave0950");setButtonBusy0781(button,true,"Saving photo…");
   const now=new Date(),title=val("quickPhotoTitleField0950")||`Field Photo - ${now.toLocaleDateString()}`;
@@ -5037,7 +5046,7 @@ async function quickPhotoSave0950(){
   const target=fileStorageTarget0794("photo");
   const record={id:uid(),type:"Photo Set",title,ref:"",url:"",date:now.toLocaleDateString(),notes:raw("quickPhotoNotes0950"),customerCaption:raw("quickPhotoCaption0950"),imageData:quickPhotoDraft0950.dataUrl,imageName:quickPhotoDraft0950.name||"Field photo",photoCategory:quickPhotoDraft0950.category||"Panel",useOverlayOnSave:quickPhotoDraft0950.useOverlay,includeInCustomerReport:quickPhotoDraft0950.includeReport,imageUpdatedAt:now.toISOString(),createdAt:now.toISOString(),updatedAt:now.toISOString(),captureSource:"bottom-navigation",capturedAccountId:account.id,capturedAccountName:account.name||"",storageTargetId:`${target.provider||"local"}:photo`,storageProvider:target.provider||"local",storageFolder:target.folder||"FireVault/Photos",storageStatus:(target.provider||"local")==="local"?"local":"pending",remoteFileId:"",remoteRevision:"",remoteUrl:"",mediaRef:"",mediaStorage:""};
   account.docs.unshift(record);account.updatedAt=now.toISOString();
-  try{const result=await stageVaultMedia(data);if(result.failed)throw new Error("The photo could not be protected in device media storage.");save();selectedSiteId=account.id;quickPhotoWriteSafe0950(QUICK_PHOTO_LAST_ACCOUNT_KEY0950,account.id);quickPhotoWriteSafe0950(QUICK_PHOTO_LAST_CATEGORY_KEY0950,record.photoCategory);quickPhotoCloseReview0950();toast(`Photo saved to ${account.name||"account"}.`,`success`);}
+  try{const result=await stageVaultMedia(data);if(result.failed)throw new Error("The photo could not be protected in device media storage.");save();selectedSiteId=account.id;quickPhotoWriteSafe0950(QUICK_PHOTO_LAST_ACCOUNT_KEY0950,account.id);quickPhotoWriteSafe0950(QUICK_PHOTO_LAST_CATEGORY_KEY0950,record.photoCategory);quickPhotoCloseReview0950();toast(`Photo saved to ${account.name||recordTerm0954(1,true)}.`,`success`);}
   catch(err){account.docs=account.docs.filter(item=>item.id!==record.id);setButtonBusy0781(button,false);toast(err?.message||"Photo save failed. Try again.","error");}
 }
 
@@ -5307,31 +5316,32 @@ function duplicateAccountId0760(value,currentSiteId=""){
   return (data.sites||[]).find(candidate=>candidate.id!==currentSiteId && canonicalAccountId0731(accountId069(candidate))===key) || null;
 }
 function siteForm(){
+  const recordSingular=recordTerm0954(),recordLower=recordTerm0954(1,true),recordIdLabel=recordIdLabel0954();
   const editing=mode==="edit";
   const s=editing ? site() : {};
   if(editing && !s){route("sites");return;}
   const currentAccountId=accountId069(s);
   html(`<div class="screen accountFormScreen0760">
-    <section class="accountFormHeader0760"><button class="back ghost" id="backBtn" aria-label="Cancel and go back">←</button><div><span>${editing?"ACCOUNT MAINTENANCE":"NEW CUSTOMER"}</span><h1>${editing?"Edit Account":"Add Account"}</h1><p>${editing?"Update this customer record without changing its history.":"Create the core account now. Details can be added after saving."}</p></div></section>
+    <section class="accountFormHeader0760"><button class="back ghost" id="backBtn" aria-label="Cancel and go back">←</button><div><span>${editing?`${esc(recordSingular.toUpperCase())} MAINTENANCE`:"NEW CUSTOMER"}</span><h1>${esc(editing?appLabel("editRecord"):appLabel("addRecord"))}</h1><p>${editing?`Update this ${esc(recordLower)} without changing its history.`:`Create the core ${esc(recordLower)} now. Details can be added after saving.`}</p></div></section>
     <div class="form grow accountForm0760">
       <div class="accountFormError0760" id="accountFormError0760" hidden></div>
-      <section class="card accountFormCard0760"><div class="accountFormSectionTitle0760"><span>1</span><div><strong>Account Identity</strong><small>Name and Account ID are used throughout FireVault.</small></div></div>
-        <label>Account Name <b>Required</b></label><input id="name" value="${esc(s.name||"")}" placeholder="Customer or building name" autocomplete="organization">
-        <div class="compactField"><div><label>Account ID</label><input id="externalAccountId0760" value="${esc(currentAccountId)}" placeholder="Example: G7C1234-01" autocapitalize="characters" spellcheck="false"><small class="accountFieldHint0760" id="accountIdHint0760">Exact Account IDs must be unique. Same-address buildings are allowed.</small></div><div><label>Site Phone</label><input id="sitePhone0760" inputmode="tel" autocomplete="tel" value="${esc(formatPhone0758(s.sitePhone)||s.sitePhone||"")}" placeholder="(307)555-0123"></div></div>
+      <section class="card accountFormCard0760"><div class="accountFormSectionTitle0760"><span>1</span><div><strong>${esc(recordSingular)} Identity</strong><small>Name and ${esc(recordIdLabel)} are used throughout ${esc(APP_PROFILE.name)}.</small></div></div>
+        <label>${esc(recordSingular)} Name <b>Required</b></label><input id="name" value="${esc(s.name||"")}" placeholder="Customer or building name" autocomplete="organization">
+        <div class="compactField"><div><label>${esc(recordIdLabel)}</label><input id="externalAccountId0760" value="${esc(currentAccountId)}" placeholder="Example: G7C1234-01" autocapitalize="characters" spellcheck="false"><small class="accountFieldHint0760" id="accountIdHint0760">Exact ${recordIdLabel}s must be unique. Same-address buildings are allowed.</small></div><div><label>Site Phone</label><input id="sitePhone0760" inputmode="tel" autocomplete="tel" value="${esc(formatPhone0758(s.sitePhone)||s.sitePhone||"")}" placeholder="(307)555-0123"></div></div>
       </section>
-      <section class="card accountFormCard0760"><div class="accountFormSectionTitle0760"><span>2</span><div><strong>Location</strong><small>Accounts may share an address when they represent different buildings or account numbers.</small></div></div>
+      <section class="card accountFormCard0760"><div class="accountFormSectionTitle0760"><span>2</span><div><strong>Location</strong><small>${recordTerm0954(2)} may share an address when they represent different buildings or record numbers.</small></div></div>
         <label>Street Address</label><input id="street" value="${esc(s.street||"")}" autocomplete="street-address">
         <div class="compactField"><div><label>City</label><input id="city" value="${esc(s.city||"")}" autocomplete="address-level2"></div><div><label>State</label><input id="state" value="${esc(s.state||"")}" maxlength="2" autocapitalize="characters" autocomplete="address-level1"></div></div>
         <div class="compactField"><div><label>ZIP</label><input id="zip" value="${esc(s.zip||"")}" inputmode="numeric" autocomplete="postal-code"></div><div class="accountFormLocationAction0760"><label>GPS</label><button type="button" class="ghost" id="formGpsBtn">Capture Current Location</button></div></div>
         <div class="accountGpsFields0760"><div><label>Latitude</label><input id="gpsLat" inputmode="decimal" value="${hasGps(s)?esc(s.gps.lat):""}"></div><div><label>Longitude</label><input id="gpsLng" inputmode="decimal" value="${hasGps(s)?esc(s.gps.lng):""}"></div><input id="gpsAccuracy" type="hidden" value="${hasGps(s)?esc(s.gps.accuracy||""):""}"><input id="gpsCapturedAt" type="hidden" value="${hasGps(s)?esc(s.gps.capturedAt||""):""}"></div>
         <div class="accountPlusPreview0794" id="accountPlusPreview0794"></div>
       </section>
-      <section class="card accountFormCard0760"><div class="accountFormSectionTitle0760"><span>3</span><div><strong>Fire Alarm System</strong><small>Optional panel information helps technicians identify the account quickly.</small></div></div>
+      <section class="card accountFormCard0760"><div class="accountFormSectionTitle0760"><span>3</span><div><strong>Fire Alarm System</strong><small>Optional panel information helps technicians identify the ${recordLower} quickly.</small></div></div>
         <div class="compactField"><div><label>Panel Make</label><input id="pm" value="${esc(s.panelManufacturer||"")}" placeholder="Notifier, EST, Siemens…"></div><div><label>Panel Model</label><input id="model" value="${esc(s.panelModel||"")}"></div></div>
         <label>Site Notes</label><textarea id="notes" placeholder="Access details, panel location, recurring issues…">${esc(s.notes||"")}</textarea>
       </section>
-      <div class="accountFormActions0760"><button class="ghost" id="cancelAccount0760">Cancel</button><button class="primary" id="saveBtn">${editing?"Save Changes":"Create Account"}</button></div>
-      ${editing?`<button class="danger accountDelete0760" id="delBtn">Delete Account</button>`:""}
+      <div class="accountFormActions0760"><button class="ghost" id="cancelAccount0760">Cancel</button><button class="primary" id="saveBtn">${editing?"Save Changes":`Create ${esc(recordSingular)}`}</button></div>
+      ${editing?`<button class="danger accountDelete0760" id="delBtn">Delete ${esc(recordSingular)}</button>`:""}
     </div>
   </div>`);
   const goBack=()=>route(editing?"siteDetail":"sites");
@@ -5350,7 +5360,7 @@ function siteForm(){
     if(idInput && idInput.value!==canonical) idInput.value=canonical;
     const duplicate=duplicateAccountId0760(canonical,s.id||"");
     idInput?.classList.toggle("fieldError0760",!!duplicate);
-    if(idHint){idHint.textContent=duplicate?`Already assigned to ${duplicate.name||"another account"}.`:`Exact Account IDs must be unique. Same-address buildings are allowed.`;idHint.classList.toggle("error",!!duplicate);}
+    if(idHint){idHint.textContent=duplicate?`Already assigned to ${duplicate.name||`another ${recordLower}`}.`:`Exact ${recordIdLabel}s must be unique. Same-address buildings are allowed.`;idHint.classList.toggle("error",!!duplicate);}
     return duplicate;
   };
   idInput?.addEventListener("blur",checkId);
@@ -5358,9 +5368,9 @@ function siteForm(){
   document.getElementById("saveBtn")?.addEventListener("click",()=>{
     showFormError("");
     const accountName=val("name");
-    if(!accountName){showFormError("Enter an account name before saving.");nameInput?.focus();return;}
+    if(!accountName){showFormError(`Enter a ${recordLower} name before saving.`);nameInput?.focus();return;}
     const duplicate=checkId();
-    if(duplicate){showFormError(`Account ID ${canonicalAccountId0731(idInput?.value||"")} already belongs to ${duplicate.name||"another account"}. Use a different Account ID.`);idInput?.focus();return;}
+    if(duplicate){showFormError(`${recordIdLabel} ${canonicalAccountId0731(idInput?.value||"")} already belongs to ${duplicate.name||`another ${recordLower}`}. Use a different ${recordIdLabel}.`);idInput?.focus();return;}
     const obj={
       name:accountName,
       externalAccountId:canonicalAccountId0731(val("externalAccountId0760")),accountId:"",
@@ -5375,10 +5385,10 @@ function siteForm(){
     }else{obj.gps=null;obj.plusCode="";}
     if(editing){Object.assign(s,obj);selectedSiteId=s.id;}
     else{const n=ensureSite({...obj,id:uid(),createdAt:new Date().toISOString()});data.sites.unshift(n);selectedSiteId=n.id;}
-    save();toast(editing?"Account updated.":"Account created.");route("siteDetail");
+    save();toast(editing?`${recordSingular} updated.`:`${recordSingular} created.`);route("siteDetail");
   });
   const del=document.getElementById("delBtn");
-  if(del) del.onclick=()=>{if(!data.settings.app.confirmDeletes || confirm(`Delete ${s.name||"this account"}? This removes its locally stored notes, visits, and files.`)){data.sites=data.sites.filter(x=>x.id!==s.id);save();selectedSiteId=null;toast("Account deleted.");route("sites");}};
+  if(del) del.onclick=()=>{if(!data.settings.app.confirmDeletes || confirm(`Delete ${s.name||`this ${recordLower}`}? This removes its locally stored notes, visits, and files.`)){data.sites=data.sites.filter(x=>x.id!==s.id);save();selectedSiteId=null;toast(`${recordSingular} deleted.`);route("sites");}};
   if(!editing) requestAnimationFrame(()=>nameInput?.focus());
 }
 
@@ -7819,7 +7829,7 @@ function manualSimplePage058(type){
   quick:["🚀","Quick Start Guide","Get FireVault ready for a normal field day.",[["1. Verify the build","Confirm the green build badge shows 0.67.0 before entering production information."],["2. Complete Technician Profile","Enter your name, company, phone, email, and license or employee identification."],["3. Review permissions","Allow location and photo access only when FireVault requests them and the feature is needed."],["4. Create or open a site","Add the customer name, full address, panel details, contacts, access notes, and GPS location."],["5. Document the visit","Record notes, photos, tasks, deficiencies, equipment changes, and a service visit."],["6. Finish and protect the data","Review the report, send or copy the required summary, then export a current backup."]]],
   new:["🆕","What’s New in 0.67.0","Account View, Settings navigation, and FireVault Academy redesign.",[["Unified visual system","Standardized typography, spacing, card surfaces, borders, controls, and responsive behavior across FireVault."],["Settings cleanup","Improved Settings home cards and every submenu while preserving the preferred Email setup workflow."],["Help readability","Converted contextual Help and Academy articles into one uninterrupted scrolling reading column with no floating metadata."],["Account Detail stability","Reinforced natural-height cards, readable text, and scroll-safe account sections."],["Operational screens","Simplified Customer Import, Team Sync, Conflict Center, and Nearby Accounts presentation without changing their workflows."],["Phone and iPad layouts","Added consistent narrow-phone and tablet behavior, bottom-navigation clearance, and overflow protection."],["Nearby scan diagnostics","Nearby Accounts now shows total sites, GPS-ready records, missing coordinates, phone-location progress, and persistent error messages."],["Coordinate recovery","FireVault recovers valid latitude and longitude stored in compatible legacy or imported fields and normalizes them into the site GPS record."],["Location retry","If high-accuracy location times out or is unavailable, FireVault retries once using standard accuracy."],["Nearest-site fallback","When no site is inside the selected radius, the nearest GPS-ready sites remain visible instead of presenting an empty result."],["Latitude and longitude","Customer Import can calculate missing coordinates from each usable U.S. street address before saving records."],["Coordinate requirement","The importer requires calculated, supplied, or existing GPS coordinates by default. Unmatched addresses remain in review."],["Census address matching","Only address fields are sent to the U.S. Census Geocoder. The returned point is an address-range calculation, not a guaranteed building entrance."],["Account Id matching","Repeat imports update the matching FireVault site instead of creating duplicates or deleting field history."],["CSV coordinate columns","Files that already contain Latitude and Longitude columns use those values directly."],["Sync-ready changes","Added and updated customer records enter the pending synchronization queue and create a Sync Activity entry."]]],
   tips:["🧰","Field Tips","Short practices that improve the usefulness of FireVault records.",[["Write for the next technician","Include the exact panel, circuit, device, location, symptom, test result, and next action instead of relying on memory."],["Photograph context first","Take one wide photo showing the equipment location before close-up terminal, label, or damage photos."],["Separate facts from follow-up","Use notes for what occurred, deficiencies for code or system problems, and tasks for work that still needs completion."],["Confirm the account","Before using Quick Capture, verify the selected customer site to prevent records from being stored under the wrong account."],["Back up before updates","Download an external backup before a major update or device change and after completing significant field documentation."]]],
-  revisions:["📋","Revision History","Application and documentation checkpoints.",[[["0.95.3","Adds a central App Profile, terminology layer, module registry, in-app architecture view, and reusable feature matrix while preserving FireVault workflows and storage."],["0.95.2","Redesigns Account Detail with a compact identity header, four fast actions, reordered tabs, responsive iPad content, and origin-aware Back navigation."],["0.95.1","Rebuilds Account Directory as a compact dark two-line list with a smaller search header, slim filters, dense account rows, and preserved quick actions."],["0.95.0","Adds a bottom-navigation Photo button with current-account capture, overlay preview, account confirmation, automatic image resizing, category memory, and IndexedDB-safe saving."],["0.94.10","Fixes the Account Detail crash caused by an undefined account-context value when opening an account from Nearby Accounts or Search."],["0.94.9","Shows Tech Info as a single Photo Overlay field with its own adjustment options and hides individual technician profile fields from the overlay editor."],["0.94.8","Repairs Technician Overlay Template wrapping and adds group-level left, center, or right alignment with exact preview/export matching."],["0.94.7","Adds a resized technician profile photo and completion-aware collapsible Technician sections that remain open until required information is filled."],["0.94.6","Enlarges Photo Overlay editing controls, adds a reusable Technician Overlay Template under Profile, and replaces the old Technician + Phone shortcut with Technician Info."],["0.94.5","Makes Photo Overlay field rows thinner, adds per-field flush-left/flush-right alignment, and adds a one-tap Technician + Phone flush-right layout."],["0.94.4","Replaces raw Photo Overlay text editing with an auto-saving field builder that supports one-tap add, reordering, line control, and removal without a keyboard confirmation step."],["0.94.3","Maximizes the Photo Overlay Field Photo preview, removes the full detail header, and repairs field insertion and long overlay text rendering."],["0.94.2","Keeps the Photo Overlay Field Photo preview visible while controls scroll, reduces the preview size, and removes the visible sample-photo attribution line."],["0.94.1","Aligned the Nearby bottom navigation with Search and Settings and removed the red active-button underline across all three sections."],["0.94.0","Polished Settings section hierarchy, rebuilt the Account Directory header and search controls, improved active navigation, and standardized active-screen spacing and touch targets."],["0.93.1","Removed the three Settings shortcut buttons and repaired horizontal page overflow so Settings remains locked to vertical scrolling on iPhone and iPad."],["0.93.0","Improved field reliability with a visible splash presentation, unsaved-change protection, duplicate-action prevention, corrected navigation states, keyboard-safe forms, and consistent interaction feedback."],["0.92.0","Introduced a canonical release-facing design system for global chrome, Account Directory, Account Detail, Settings, Nearby, forms, cards, buttons, and responsive iPhone/iPad layouts."],["0.91.1","Rebuilt the three Settings status shortcuts as equal-width responsive controls with clear icons, readable status text, and reliable iPhone/iPad alignment."],["0.91.0","Moved photos and scanned-page payloads from the main localStorage vault into IndexedDB, added storage health and protection controls, preserved complete-media exports, and retained safe legacy migration."],["0.90.0","Core cleanup removed retired scanner capture and service timers, shortened startup, removed the global portrait lock, standardized Account terminology, and added release-safe error recovery."],["0.89.0","Rebuilt Photo Overlay as a compact visual studio with an exact canvas preview, quick presets, reorganized content/layout/branding controls, expanded account fields, and a real fire-alarm deficiency sample photo with attribution."],["0.88.0","Overhauled Settings with sticky search, live status summaries, richer grouped cards, consistent detail screens, and improved iPad layout while preserving every release-critical setting."],["0.87.11","Restored WebDAV Backup to Data & Backup and Settings search while preserving saved connection settings and transfer tools."],["0.87.10","Aligned the four Account Directory card actions across the full card width in Call, Route, Add Note, Favorite order."],["0.87.9","Cleaned up the Account Directory with layered depth, raised controls, dimensional account cards, and category-accented shading while preserving fluid scrolling."],["0.87.8","Improved Account Directory scrolling performance and added iPad portrait, landscape, and split-view layout refinements."],["0.87.4","Added spacing and search to Settings, removed the Field category, moved Google Plus Codes under Maps & GPS, enlarged Account ID/category tags, moved Favorite beside Call, removed empty panel/contact text, and restored Nearby-style card scroll locking."],["0.87.3","Moved account addresses below site names, placed Account ID and category tags beneath the address, and changed Settings to a dark grouped-list design without a duplicate logo."],["0.87.2","Polished Account Directory cards and removed the default Ready, No Open Work, and GPS status tags so only actionable issues are shown."],["0.87.1","Rebuilt Account Directory, Search, account cards, and Account Detail from the stable 0.86.1 baseline and removed the layout gap above the bottom navigation."],["0.86.1","Repaired the Settings startup error and standardized the three-button Nearby, Search, and Settings dock across the app."],["0.86.0","Redesigned Settings as a simplified dark tile dashboard and renamed the bottom Accounts navigation button to Search."],["0.85.0","Removed Tools navigation and the Account Detail Visit action, and rebuilt Settings as a simple grouped menu with clean detail screens."],["0.84.0","Refined Nearby map selection with a fixed details overlay, no marker popup, delayed street-level zoom, and direct account-card navigation."],["0.81.0","Prepared FireVault for App Store review by removing the document scanner, Daily Route and time-tracking controls, theme selection, advanced settings, diagnostics access, and excess instructional copy while preserving account data."]],["0.80.3","Defaulted new Tools scanner documents to the closest GPS-ready account with visible distance, accuracy, retry, and manual override."],["0.80.2","Simplified Document Scanner, added on-device AI Auto Scan with live corner framing and hands-free capture, and repaired mobile keyboard field visibility."],["0.80.1","Moved Document Scanner to Tools, added post-capture account search and matching, and added scanner access inside the full Site Notes workspace."],["0.80.0","Added an account-specific multi-page camera document scanner with automatic edge detection, manual corner correction, rotation, cleanup modes, page ordering, PDF preview/download/share, and account-note activity."],["0.79.14","Restored numbered Nearby Accounts map pins matched to distance-sorted list rows and removed Smart Account Intelligence."],["0.79.13","Repaired startup parsing inherited from 0.79.11 and corrected Building Navigator location-copy syntax."],["0.79.12","Added Building Navigator with exact site locations, GPS/Plus Codes, verification, linked photos, route targets, and timeline events."],["0.79.7","Shortened every Settings summary and removed the colored bar from each Section Overview."],["0.79.6","Added Nearby-style account-list scroll locking so cards settle cleanly at the top while the Accounts controls remain fixed."],["0.79.5","Added separate Personal OneDrive, Work OneDrive, and SharePoint connection profiles with exact photo/document assignments and no-personal-fallback protection."],["0.79.4","Added independent photo and document storage destinations, cloud-provider integration targets, and offline Google Plus Codes for accounts and exact field locations."],["0.79.3","Added backend-neutral provider interfaces for authentication, database, file storage, synchronization, and audit while keeping FireVault fully local."],["0.79.2","Added a unified Security Center with vault integrity validation, backup health, audit filters, device naming, session clearing, and PIN confirmation for sensitive exports, restores, and deletion."],["0.79.1","Added an optional local six-digit privacy lock with PBKDF2 hashing, inactivity/background locking, app-switcher privacy screen, recovery code, cooldown protection, and local lock events."],["0.79.0","Added security-ready schema 4 metadata, stable workspace/user/device identities, local audit history, pending change queue, recoverable deletion, credential-safe exports, and protected restore/reset actions."],["0.67.0","Redesigned Account View around service actions and grouped information, consolidated Settings into five folders, and simplified FireVault Academy and contextual Help for continuous reading."],["0.65.2","Repaired Nearby Accounts with GPS inventory counts, imported-coordinate recovery, persistent permission and timeout messages, a standard-accuracy retry, and nearest-site fallback results."],["0.65.1","Added online latitude/longitude calculation, coordinate validation, geocoding progress, unmatched-address review, optional CSV coordinates, and coordinate-safe repeat importing."],["0.65.0","Added preview-first customer CSV importing, Account Id update matching, validation warnings, imported monitoring details, and sync activity tracking."],["0.64.1","Simplified Academy article headers, removed floating metadata badges, and improved continuous scrolling and readability."],["0.64.0","Added Sync Activity, a conflict review center, export/import audit entries, and an automatic OneDrive connection-readiness checklist."],["0.63.1","Overhauled contextual Help and Academy reader formatting, removed overlapping sticky article headers, and restored full scrolling on phones and tablets."],["0.63.0","Added permanent record IDs, audit metadata, local version tracking, pending-sync states, conflict readiness, device identity, and a Team Sync settings workspace."],["0.60.0","Connected major screens and Settings areas directly to matching Academy chapters with return-to-screen navigation."],["0.59.0","Added interactive tutorials, guided orientation, pinned learning, field tips, and documentation tracking."],["0.58.0","Expanded Help & Manual into FireVault Academy with bookmarks, smart search, Quick Start, and reader navigation."],["0.57.0","Added the first complete searchable in-app FireVault User Manual."],["Ongoing review rule","Any change to navigation, labels, storage, workflows, permissions, or supported layouts requires the related manual chapter to be checked."]]],
+  revisions:["📋","Revision History","Application and documentation checkpoints.",[[["0.95.4","Connects the App Profile terminology layer to live Search, Nearby, Account Detail, account forms, Quick Photo, navigation, and photo-category workflows while preserving FireVault labels and storage."],["0.95.3","Adds a central App Profile, terminology layer, module registry, in-app architecture view, and reusable feature matrix while preserving FireVault workflows and storage."],["0.95.2","Redesigns Account Detail with a compact identity header, four fast actions, reordered tabs, responsive iPad content, and origin-aware Back navigation."],["0.95.1","Rebuilds Account Directory as a compact dark two-line list with a smaller search header, slim filters, dense account rows, and preserved quick actions."],["0.95.0","Adds a bottom-navigation Photo button with current-account capture, overlay preview, account confirmation, automatic image resizing, category memory, and IndexedDB-safe saving."],["0.94.10","Fixes the Account Detail crash caused by an undefined account-context value when opening an account from Nearby Accounts or Search."],["0.94.9","Shows Tech Info as a single Photo Overlay field with its own adjustment options and hides individual technician profile fields from the overlay editor."],["0.94.8","Repairs Technician Overlay Template wrapping and adds group-level left, center, or right alignment with exact preview/export matching."],["0.94.7","Adds a resized technician profile photo and completion-aware collapsible Technician sections that remain open until required information is filled."],["0.94.6","Enlarges Photo Overlay editing controls, adds a reusable Technician Overlay Template under Profile, and replaces the old Technician + Phone shortcut with Technician Info."],["0.94.5","Makes Photo Overlay field rows thinner, adds per-field flush-left/flush-right alignment, and adds a one-tap Technician + Phone flush-right layout."],["0.94.4","Replaces raw Photo Overlay text editing with an auto-saving field builder that supports one-tap add, reordering, line control, and removal without a keyboard confirmation step."],["0.94.3","Maximizes the Photo Overlay Field Photo preview, removes the full detail header, and repairs field insertion and long overlay text rendering."],["0.94.2","Keeps the Photo Overlay Field Photo preview visible while controls scroll, reduces the preview size, and removes the visible sample-photo attribution line."],["0.94.1","Aligned the Nearby bottom navigation with Search and Settings and removed the red active-button underline across all three sections."],["0.94.0","Polished Settings section hierarchy, rebuilt the Account Directory header and search controls, improved active navigation, and standardized active-screen spacing and touch targets."],["0.93.1","Removed the three Settings shortcut buttons and repaired horizontal page overflow so Settings remains locked to vertical scrolling on iPhone and iPad."],["0.93.0","Improved field reliability with a visible splash presentation, unsaved-change protection, duplicate-action prevention, corrected navigation states, keyboard-safe forms, and consistent interaction feedback."],["0.92.0","Introduced a canonical release-facing design system for global chrome, Account Directory, Account Detail, Settings, Nearby, forms, cards, buttons, and responsive iPhone/iPad layouts."],["0.91.1","Rebuilt the three Settings status shortcuts as equal-width responsive controls with clear icons, readable status text, and reliable iPhone/iPad alignment."],["0.91.0","Moved photos and scanned-page payloads from the main localStorage vault into IndexedDB, added storage health and protection controls, preserved complete-media exports, and retained safe legacy migration."],["0.90.0","Core cleanup removed retired scanner capture and service timers, shortened startup, removed the global portrait lock, standardized Account terminology, and added release-safe error recovery."],["0.89.0","Rebuilt Photo Overlay as a compact visual studio with an exact canvas preview, quick presets, reorganized content/layout/branding controls, expanded account fields, and a real fire-alarm deficiency sample photo with attribution."],["0.88.0","Overhauled Settings with sticky search, live status summaries, richer grouped cards, consistent detail screens, and improved iPad layout while preserving every release-critical setting."],["0.87.11","Restored WebDAV Backup to Data & Backup and Settings search while preserving saved connection settings and transfer tools."],["0.87.10","Aligned the four Account Directory card actions across the full card width in Call, Route, Add Note, Favorite order."],["0.87.9","Cleaned up the Account Directory with layered depth, raised controls, dimensional account cards, and category-accented shading while preserving fluid scrolling."],["0.87.8","Improved Account Directory scrolling performance and added iPad portrait, landscape, and split-view layout refinements."],["0.87.4","Added spacing and search to Settings, removed the Field category, moved Google Plus Codes under Maps & GPS, enlarged Account ID/category tags, moved Favorite beside Call, removed empty panel/contact text, and restored Nearby-style card scroll locking."],["0.87.3","Moved account addresses below site names, placed Account ID and category tags beneath the address, and changed Settings to a dark grouped-list design without a duplicate logo."],["0.87.2","Polished Account Directory cards and removed the default Ready, No Open Work, and GPS status tags so only actionable issues are shown."],["0.87.1","Rebuilt Account Directory, Search, account cards, and Account Detail from the stable 0.86.1 baseline and removed the layout gap above the bottom navigation."],["0.86.1","Repaired the Settings startup error and standardized the three-button Nearby, Search, and Settings dock across the app."],["0.86.0","Redesigned Settings as a simplified dark tile dashboard and renamed the bottom Accounts navigation button to Search."],["0.85.0","Removed Tools navigation and the Account Detail Visit action, and rebuilt Settings as a simple grouped menu with clean detail screens."],["0.84.0","Refined Nearby map selection with a fixed details overlay, no marker popup, delayed street-level zoom, and direct account-card navigation."],["0.81.0","Prepared FireVault for App Store review by removing the document scanner, Daily Route and time-tracking controls, theme selection, advanced settings, diagnostics access, and excess instructional copy while preserving account data."]],["0.80.3","Defaulted new Tools scanner documents to the closest GPS-ready account with visible distance, accuracy, retry, and manual override."],["0.80.2","Simplified Document Scanner, added on-device AI Auto Scan with live corner framing and hands-free capture, and repaired mobile keyboard field visibility."],["0.80.1","Moved Document Scanner to Tools, added post-capture account search and matching, and added scanner access inside the full Site Notes workspace."],["0.80.0","Added an account-specific multi-page camera document scanner with automatic edge detection, manual corner correction, rotation, cleanup modes, page ordering, PDF preview/download/share, and account-note activity."],["0.79.14","Restored numbered Nearby Accounts map pins matched to distance-sorted list rows and removed Smart Account Intelligence."],["0.79.13","Repaired startup parsing inherited from 0.79.11 and corrected Building Navigator location-copy syntax."],["0.79.12","Added Building Navigator with exact site locations, GPS/Plus Codes, verification, linked photos, route targets, and timeline events."],["0.79.7","Shortened every Settings summary and removed the colored bar from each Section Overview."],["0.79.6","Added Nearby-style account-list scroll locking so cards settle cleanly at the top while the Accounts controls remain fixed."],["0.79.5","Added separate Personal OneDrive, Work OneDrive, and SharePoint connection profiles with exact photo/document assignments and no-personal-fallback protection."],["0.79.4","Added independent photo and document storage destinations, cloud-provider integration targets, and offline Google Plus Codes for accounts and exact field locations."],["0.79.3","Added backend-neutral provider interfaces for authentication, database, file storage, synchronization, and audit while keeping FireVault fully local."],["0.79.2","Added a unified Security Center with vault integrity validation, backup health, audit filters, device naming, session clearing, and PIN confirmation for sensitive exports, restores, and deletion."],["0.79.1","Added an optional local six-digit privacy lock with PBKDF2 hashing, inactivity/background locking, app-switcher privacy screen, recovery code, cooldown protection, and local lock events."],["0.79.0","Added security-ready schema 4 metadata, stable workspace/user/device identities, local audit history, pending change queue, recoverable deletion, credential-safe exports, and protected restore/reset actions."],["0.67.0","Redesigned Account View around service actions and grouped information, consolidated Settings into five folders, and simplified FireVault Academy and contextual Help for continuous reading."],["0.65.2","Repaired Nearby Accounts with GPS inventory counts, imported-coordinate recovery, persistent permission and timeout messages, a standard-accuracy retry, and nearest-site fallback results."],["0.65.1","Added online latitude/longitude calculation, coordinate validation, geocoding progress, unmatched-address review, optional CSV coordinates, and coordinate-safe repeat importing."],["0.65.0","Added preview-first customer CSV importing, Account Id update matching, validation warnings, imported monitoring details, and sync activity tracking."],["0.64.1","Simplified Academy article headers, removed floating metadata badges, and improved continuous scrolling and readability."],["0.64.0","Added Sync Activity, a conflict review center, export/import audit entries, and an automatic OneDrive connection-readiness checklist."],["0.63.1","Overhauled contextual Help and Academy reader formatting, removed overlapping sticky article headers, and restored full scrolling on phones and tablets."],["0.63.0","Added permanent record IDs, audit metadata, local version tracking, pending-sync states, conflict readiness, device identity, and a Team Sync settings workspace."],["0.60.0","Connected major screens and Settings areas directly to matching Academy chapters with return-to-screen navigation."],["0.59.0","Added interactive tutorials, guided orientation, pinned learning, field tips, and documentation tracking."],["0.58.0","Expanded Help & Manual into FireVault Academy with bookmarks, smart search, Quick Start, and reader navigation."],["0.57.0","Added the first complete searchable in-app FireVault User Manual."],["Ongoing review rule","Any change to navigation, labels, storage, workflows, permissions, or supported layouts requires the related manual chapter to be checked."]]],
   trouble:["❓","Troubleshooting","Common problems and safe first checks.",FIREVAULT_MANUAL_058.find(x=>x.id==="trouble")?.topics||[]]
  };
  const [icon,title,note,items]=pages[type]||["ⓘ","Unavailable","This Help section is not available in the installed version.",[["Current status","Return to Help and choose an available chapter or tutorial."]]];
@@ -8704,6 +8714,8 @@ function architectureSummaryText0953(){
     `FireVault-specific: ${summary.firevault}`,
     `AppForge-ready: ${summary.appForgeReady}`,
     `Primary record term: ${appTerm("account",1)} / ${appTerm("account",2)}`,
+    `Record ID label: ${recordIdLabel0954()}`,
+    `Visible terminology integration: Active`,
     `Storage key: ${KEY}`
   ].join("\n");
 }
@@ -8727,11 +8739,13 @@ function architecturePanel0953(){
         <div class="architectureProfileBrand0953"><img src="assets/favicon.png?v=${BUILD}" alt=""><div><strong>${esc(APP_PROFILE.name)}</strong><span>${esc(APP_PROFILE.industry)}</span></div><em>Profile v${APP_PROFILE.schemaVersion}</em></div>
         <div class="architectureProfileGrid0953">
           <div><strong>Record terminology</strong><span>${esc(appTerm("account",1))} / ${esc(appTerm("account",2))}</span></div>
+          <div><strong>Record ID label</strong><span>${esc(recordIdLabel0954())}</span></div>
           <div><strong>Location terminology</strong><span>${esc(appTerm("location",1))} / ${esc(appTerm("location",2))}</span></div>
           <div><strong>Navigation</strong><span>${["nearby","search","photo","settings"].map(appNavigationLabel).map(esc).join(" · ")}</span></div>
+          <div><strong>Visible labels</strong><span>Directory · Detail · Forms · Quick Photo</span></div>
           <div><strong>Storage compatibility</strong><span>${esc(KEY)}</span></div>
         </div>
-        <p>The profile is the future AppForge swap point for identity, terminology, navigation labels, appearance, photo categories, and enabled modules. FireVault data and workflows are unchanged.</p>
+        <p>The profile now actively supplies terminology to the Directory, Nearby, Account Detail, account forms, Quick Photo, navigation labels, appearance, photo categories, and enabled modules. FireVault data and workflows are unchanged.</p>
       </div>
     `,"red")}
     ${settingsSection540("Architecture inventory","Module Registry",`${summary.total} registered modules are explicitly separated into shared core, reusable optional, and FireVault-specific layers.`,`
@@ -9535,6 +9549,7 @@ function wireBackupSafety552(){
 
 function showChangelog(){
   const notes = [
+    "Build 0.95.4 connects the App Profile terminology layer to Search, Nearby, Account Detail, account forms, Quick Photo, navigation labels, and profile-defined photo categories while preserving FireVault terminology and data.",
     "Build 0.95.3 adds the reusable App Profile, terminology layer, module registry, in-app architecture view, and feature matrix without changing FireVault workflows or its storage key.",
     "Build 0.95.2 redesigns Account Detail with a compact identity header, Call / Route / Add Note / Photo actions, reordered tabs, responsive iPad content, and origin-aware Back navigation.",
     "Build 0.95.0 adds a bottom-navigation Photo button with current-account capture, account confirmation, live overlay preview, automatic image resizing, remembered categories, and IndexedDB-safe saving.",
@@ -9614,7 +9629,7 @@ function showChangelog(){
   overlay.className="releaseOverlay";
   overlay.innerHTML=`<div class="releaseSheet" role="dialog" aria-modal="true" aria-label="FireVault release notes">
     <div class="releaseHead"><div><strong>${fireVaultBrand575()}</strong><span>Build ${BUILD}</span></div><button class="ghost iconBtn" id="closeRelease" aria-label="Close release notes">×</button></div>
-    <div class="releaseBody"><h2>Release Notes</h2><p class="releaseIntro">FireVault 0.95.3 establishes the reusable Field Vault architecture while preserving the FireVault technician experience.</p><ul>${notes.map(n=>`<li>${esc(n)}</li>`).join("")}</ul></div>
+    <div class="releaseBody"><h2>Release Notes</h2><p class="releaseIntro">FireVault 0.95.4 activates the reusable terminology layer across core field workflows while preserving the FireVault technician experience.</p><ul>${notes.map(n=>`<li>${esc(n)}</li>`).join("")}</ul></div>
   </div>`;
   document.body.appendChild(overlay);
   const close=()=>overlay.remove();

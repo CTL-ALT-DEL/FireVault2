@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "id": "firevault",
   "family": "field-vault",
   "name": "FireVault",
@@ -10,6 +10,7 @@
   "terminology": {
     "recordSingular": "Account",
     "recordPlural": "Accounts",
+    "recordId": "Account ID",
     "locationSingular": "Location",
     "locationPlural": "Locations",
     "personSingular": "Technician",
@@ -24,6 +25,24 @@
     "taskPlural": "Tasks",
     "fileSingular": "File",
     "filePlural": "Files"
+  },
+  "labels": {
+    "recordDirectory": "{{account}} Directory",
+    "recordDetail": "{{account}} Detail",
+    "addRecord": "Add {{account}}",
+    "editRecord": "Edit {{account}}",
+    "unnamedRecord": "Unnamed {{account}}",
+    "searchRecords": "Search {{accounts}}",
+    "nearbyRecords": "Nearby {{accounts}}",
+    "chooseRecord": "Choose {{account}}",
+    "currentRecord": "Current {{account}}",
+    "recordActions": "{{account}} actions",
+    "recordSections": "{{account}} sections",
+    "noRecords": "No {{accounts}} yet",
+    "noMatchingRecords": "No matching {{accounts}}",
+    "firstRecord": "Add First {{account}}",
+    "recordPhoto": "{{account}} Photo",
+    "recordPhotos": "{{account}} Photos"
   },
   "navigation": {
     "nearby": "Nearby",

@@ -1,27 +1,27 @@
-# FireVault Build 0.95.3 Validation
+# FireVault Build 0.95.4 Validation
 
-## Architecture foundation
+## Terminology integration
 
-- App Profile module loads as an ES module.
-- Module Registry contains unique module IDs and valid classifications.
-- Every FireVault enabled module resolves to a registry entry.
-- Feature matrix exports valid CSV rows for each registered module.
-- Architecture & Modules is reachable from Settings → About FireVault.
-- App Profile and Module Registry JSON downloads are wired.
+- App Profile schema 2 loads as an ES module.
+- Reusable phrase labels resolve through `appLabel()`.
+- Record singular, plural, lowercase, and ID labels resolve through the active profile.
+- Search / Directory, Nearby, Account Detail, Add / Edit Account, and Quick Photo consume profile terminology.
+- Photo categories continue to load from `APP_PROFILE.defaultPhotoCategories`.
+- FireVault still displays Account / Accounts / Account ID under the FireVault profile.
 
-## Compatibility
+## Architecture and compatibility
 
+- Module Registry and feature matrix remain available from Settings → About FireVault → Architecture & Modules.
 - Storage key remains `firevault_vault_build_030`.
-- Existing settings receive only `profileId: firevault` and `architectureVersion: 1` defaults.
-- Existing accounts, notes, visits, photos, documents, overlays, and IndexedDB media are not renamed or migrated.
-- Search, Nearby, Quick Photo, Account Detail, Settings, backup, WebDAV, Demo Mode, and privacy/security routes remain present.
+- Architecture metadata advances to version 2 without renaming or migrating user records.
+- Existing accounts, notes, visits, photos, documents, overlays, and IndexedDB media remain compatible.
 
 ## Release checks
 
-- JavaScript syntax checks pass.
+- JavaScript syntax checks pass for all modules.
 - JSON files parse successfully.
-- Service-worker shell contains both new architecture modules.
-- All cache-busting references use Build 0.95.3.
+- App Profile JSON matches schema version 2.
+- Service-worker shell contains all application and architecture modules using Build 0.95.4 references.
 - CSS braces are balanced.
 - ZIP integrity check passes.
 

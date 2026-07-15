@@ -2279,6 +2279,7 @@ main,
 }
 
 /* Build 0.95.3 — reusable App Profile, module registry, and architecture matrix */
+/* Build 0.95.4 — live terminology integration across reusable core screens */
 .architectureStack0953{padding-bottom:calc(var(--navH,76px) + 22px)!important}
 .architectureProfile0953{display:flex;flex-direction:column;gap:13px}
 .architectureProfileBrand0953{display:grid;grid-template-columns:46px minmax(0,1fr) auto;gap:11px;align-items:center;padding:12px;border:1px solid rgba(239,68,68,.24);border-radius:14px;background:linear-gradient(145deg,rgba(65,18,25,.34),rgba(13,22,33,.92))}

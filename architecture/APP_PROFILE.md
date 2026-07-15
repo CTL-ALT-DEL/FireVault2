@@ -1,16 +1,29 @@
-# App Profile Foundation
+# FireVault App Profile
 
-FireVault Build 0.95.3 introduces a central, read-only application profile in `src/app-profile.js`.
+FireVault Build 0.95.4 uses a central application profile in `src/app-profile.js` as an active source for reusable UI terminology and configuration.
 
-The profile currently controls the canonical definitions for:
+## Profile responsibilities
 
 - App identity and industry
-- Reusable record terminology
+- Singular and plural record terminology
+- Record-ID label
+- Reusable interface phrases
+- Location, technician, note, equipment, task, deficiency, and file terminology
 - Bottom-navigation labels
-- Theme identity
+- Appearance defaults
 - Default photo categories
-- Enabled module identifiers
+- Enabled modules
 
-FireVault remains the active profile. Future AppForge work can generate additional profiles that reuse the same core modules while replacing terminology, branding, categories, and vertical-specific modules.
+## Live integration
 
-User data is not migrated to a new storage key. The existing key remains `firevault_vault_build_030`.
+The profile now drives visible terminology in:
+
+- Search / Account Directory
+- Nearby
+- Account Detail
+- Add / Edit Account
+- Quick Photo
+- Navigation labels
+- Photo categories
+
+The FireVault profile continues to resolve these terms as Account, Accounts, Account ID, and other fire-service wording. Future AppForge profiles can substitute different vocabulary without changing the underlying record storage or workflows.

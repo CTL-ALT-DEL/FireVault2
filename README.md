@@ -1,19 +1,22 @@
 # FireVault
-## Build 0.95.3 — Core Architecture Foundation
+## Build 0.95.4 — Core Terminology Integration
 
-Build 0.95.3 establishes the reusable Field Vault architecture without changing FireVault's technician workflows or storage key.
+Build 0.95.4 turns the App Profile from an architecture reference into an active UI source while keeping FireVault optimized for fire alarm technicians.
 
-### Added
+### Integrated
 
-- `src/app-profile.js`: canonical app identity, terminology, navigation labels, appearance defaults, photo categories, and enabled modules.
-- `src/module-registry.js`: explicit Core, Reusable optional, and FireVault-specific module classifications.
-- Settings → About FireVault → Architecture & Modules: profile summary, registry inventory, feature matrix, and downloadable JSON/CSV exports.
-- `architecture/FEATURE_MODULE_MATRIX.md` and `.csv`: development decision sheet for FireVault and future vertical apps.
-- Storage metadata now records profile `firevault` and architecture version `1` while retaining `firevault_vault_build_030`.
+- Search / Account Directory headings, counts, empty states, search labels, sorting accessibility, and account cards now use the App Profile terminology layer.
+- Nearby titles and selected-record action labels use profile terminology.
+- Account Detail titles, identity labels, actions, sections, photo headings, and record metadata use profile terminology.
+- Add / Edit Account forms, validation, confirmation, deletion, and status messages use profile terminology.
+- Quick Photo account selection, preview, overlay wording, empty states, and save messages use profile terminology.
+- Navigation labels and photo categories continue to come from the App Profile.
+- App Profile schema is now version 2 and includes reusable phrases plus a configurable record-ID label.
+
+### FireVault behavior
+
+The active profile still resolves the shared terms to Account, Accounts, Account ID, Technician, Equipment, Tasks, and Deficiencies. Fire alarm system fields and fire-specific modules remain in the FireVault vertical layer.
 
 ### Compatibility
 
-Accounts, notes, photos, IndexedDB media, WebDAV, backups, Demo Mode, Quick Photo, Search, Nearby, and Account Detail remain compatible with Build 0.95.2 data.
-
-
-Rebuilds Account Detail around a compact account identity header, Call / Route / Add Note / Photo actions, and a faster tab order: Overview, Notes, Locations, Equipment, Files, and Details. The content area stays independently scrollable, iPad layouts use wider two-column space where appropriate, and Back returns to Search or Nearby according to where the account was opened. Existing data and storage remain compatible.
+The storage key remains `firevault_vault_build_030`. Existing accounts, notes, photos, IndexedDB media, WebDAV, backups, Photo Overlay, Demo Mode, Nearby, Search, and Account Detail remain compatible.

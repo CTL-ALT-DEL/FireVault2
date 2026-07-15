@@ -1,4 +1,4 @@
-# FireVault 0.95.3 Design System
+# FireVault 0.95.4 Design System
 
 `src/design-system.css` is the canonical release-facing visual layer.
 
@@ -80,3 +80,8 @@ Photo Overlay field controls use larger iPhone touch targets. Settings → Profi
 - Core, reusable optional, and FireVault-specific modules use distinct restrained accents.
 - The feature matrix remains horizontally scrollable on phones and readable as a wide table on iPad.
 - Architecture controls are informational and export-only; they do not change current FireVault workflows.
+
+
+## Build 0.95.4 terminology integration
+
+Core screen labels now resolve through the App Profile instead of relying on duplicated hard-coded Account wording. The active FireVault profile preserves the existing visible terminology and design.
