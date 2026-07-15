@@ -1,0 +1,8 @@
+{
+  "build": "0.95.6",
+  "released": "2026-07-15",
+  "note": "The App Profile now selects active record fields, Account Detail sections, and Quick Photo categories through a reusable record schema.",
+  "label": "Configurable Record Schema",
+  "version": "0.95.6",
+  "name": "Configurable Record Schema"
+}
