@@ -1,0 +1,8 @@
+{
+  "build": "0.95.5",
+  "released": "2026-07-15",
+  "note": "Navigation, routes, Account Detail tabs and actions, and Settings now respond to the App Profile enabled-module list.",
+  "label": "Module-Aware Interface",
+  "version": "0.95.5",
+  "name": "Module-Aware Interface"
+}
