@@ -1,8 +1,8 @@
 {
-  "build": "0.94.8",
+  "build": "0.94.9",
   "released": "2026-07-14",
-  "note": "Technician Overlay Template text fitting and group-level left, center, or right alignment.",
-  "label": "Technician Overlay Alignment",
-  "version": "0.94.8",
-  "name": "Technician Overlay Alignment"
+  "note": "Shows Tech Info as a single Photo Overlay field and hides individual technician profile fields in the overlay editor.",
+  "label": "Tech Info Overlay Field",
+  "version": "0.94.9",
+  "name": "Tech Info Overlay Field"
 }

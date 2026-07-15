@@ -1,25 +1,24 @@
-# FireVault 0.94.8 validation
+# FireVault 0.94.9 validation
 
 ## Completed static checks
 
 - JavaScript syntax passed for all active JavaScript modules.
 - `manifest.json` and `version.json` parsed successfully.
-- Service-worker build and cached asset query strings reference Build 0.94.8.
+- Service-worker build, module imports, and cached asset query strings reference Build 0.94.9.
 - Existing `firevault_vault_build_030` storage key remains unchanged.
-- Existing Technician Overlay field lists migrate without data loss.
-- Legacy per-field left/right values are used to infer the initial group alignment.
-- Technician Template group alignment accepts Left, Center, or Right and auto-saves.
-- Technician Template preview uses full-width single-line rows and does not split long words.
-- Technician Info applies the saved group alignment to Photo Overlay fields.
-- Photo Overlay normalization, live preview, and export renderer preserve center alignment and no-wrap metadata.
-- No-wrap Technician Info lines shrink or fit to the available canvas width instead of wrapping.
+- Photo Overlay field choices contain one **Tech Info** field and do not expose the individual Technician, Company, Phone, Email, or License fields.
+- Existing field layouts containing any legacy technician-profile field migrate to one Tech Info field without duplicates.
+- Tech Info retains adjustment controls for ordering, Left/Center/Right alignment, and removal.
+- The line arrangement inside Tech Info remains controlled by the Technician Overlay Template in Profile.
+- The live preview and exported photo expand Tech Info using the saved Profile template.
+- Raw legacy overlay templates containing technician tags also migrate to Tech Info.
 - CSS brace counts are balanced in both active stylesheets.
-- Build references, release notes, and deployment documents were updated.
+- Build references, release notes, deployment files, and archive contents were updated.
 
 ## Device checks still required
 
-- Confirm long technician names, companies, email addresses, and license IDs remain on one line on iPhone.
-- Confirm Left, Center, and Right previews match exported photos.
-- Confirm Technician Info applies the selected Profile alignment in Photo Overlay.
-- Confirm field reordering and line-break buttons remain comfortable on smaller iPhones.
+- Confirm an existing 0.94.8 overlay with multiple technician fields displays one Tech Info row after update.
+- Confirm moving and aligning Tech Info updates the live preview immediately on iPhone.
+- Confirm editing the Technician Overlay Template in Profile changes Tech Info contents without creating separate overlay fields.
+- Confirm exported photos match the live preview for Left, Center, and Right Tech Info alignment.
 - Confirm layouts in iPad portrait, landscape, and Split View.
