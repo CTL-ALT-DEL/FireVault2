@@ -1,4 +1,4 @@
-# FireVault 0.95.0 Design System
+# FireVault 0.95.1 Design System
 
 `src/design-system.css` is the canonical release-facing visual layer.
 
@@ -56,7 +56,7 @@ Photo Overlay data fields use a button-first ordered list. The editor auto-saves
 
 Photo Overlay field controls use larger iPhone touch targets. Settings → Profile contains a reusable Technician Overlay Template whose order, line breaks, and left/right alignment are applied by the Technician Info quick choice in Photo Overlay.
 
-## Build 0.95.0 Technician Overlay alignment
+## Build 0.95.1 Technician Overlay alignment
 
 - Technician Overlay Template uses one group alignment control: Left, Center, or Right.
 - Template preview rows use the full available width and never break inside long words.

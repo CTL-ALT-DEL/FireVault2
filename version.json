@@ -1,8 +1,8 @@
 {
-  "build": "0.95.0",
+  "build": "0.95.1",
   "released": "2026-07-14",
-  "note": "Adds account-aware Quick Photo capture to the bottom navigation with overlay preview and safe media storage.",
-  "label": "Quick Account Photo",
-  "version": "0.95.0",
-  "name": "Quick Account Photo"
+  "note": "Compact dark two-line Account Directory redesign based on Concept 6.",
+  "label": "Compact Dark Account Directory",
+  "version": "0.95.1",
+  "name": "Compact Dark Account Directory"
 }

@@ -1725,3 +1725,241 @@ main,
 .quickPhotoAccountList0950{display:grid;gap:8px;margin-top:12px;max-height:60dvh;overflow:auto}.quickPhotoAccountList0950 button{display:grid;gap:3px;text-align:left;min-height:62px;padding:11px 13px;border:1px solid #33445a;border-radius:14px;background:linear-gradient(145deg,#172538,#0d1724);color:#fff}.quickPhotoAccountList0950 button strong{font-size:.94rem}.quickPhotoAccountList0950 button small{color:#a7b4c7;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 @media (min-width:760px){.quickPhotoOverlay0950,.quickPhotoPickerOverlay0950{align-items:center}.quickPhotoSheet0950,.quickPhotoPicker0950{border-radius:24px}.quickPhotoSheet0950{width:min(92vw,720px)}.quickPhotoPreview0950{aspect-ratio:16/10}}
 @media (max-width:390px){#appNav,.nearbyBottomNav069{gap:4px!important;padding-left:6px!important;padding-right:6px!important}#appNav button,.nearbyBottomNav069 button{border-radius:13px!important}#appNav .fvNavIcon073,.nearbyBottomNav069 .fvNavIcon073{width:24px!important;height:24px!important}#appNav button span,.nearbyBottomNav069 button span{font-size:.69rem!important}.quickPhotoOverlay0950,.quickPhotoPickerOverlay0950{padding:0}.quickPhotoSheet0950,.quickPhotoPicker0950{max-height:96dvh;border-radius:22px 22px 0 0}}
+
+
+/* Build 0.95.1 — compact dark Account Directory, Concept 6. */
+.accountDirectory0951{
+  --dir0951-bg:#070a0f;
+  --dir0951-surface:#0d131c;
+  --dir0951-surface-2:#111925;
+  --dir0951-line:#263244;
+  --dir0951-muted:#8f9caf;
+  --dir0951-text:#f4f7fb;
+  --dir0951-red:#ef3f4c;
+  background:var(--dir0951-bg)!important;
+  width:min(880px,100%)!important;
+}
+.accountDirectory0951 .accountDirectoryTop0951{
+  flex:0 0 auto!important;
+  padding:8px 10px 7px!important;
+  margin:0!important;
+  border:0!important;
+  border-radius:0!important;
+  background:linear-gradient(180deg,#0b1018 0%,#080c12 100%)!important;
+  box-shadow:0 1px 0 rgba(255,255,255,.035),0 8px 18px rgba(0,0,0,.22)!important;
+}
+.accountDirectory0951 .accountDirectoryHeader0951{
+  min-height:43px!important;
+  padding:0 2px 6px!important;
+  gap:10px!important;
+  background:transparent!important;
+  border:0!important;
+  box-shadow:none!important;
+}
+.accountDirectory0951 .accountDirectoryHeading0951{min-width:0;display:flex;align-items:baseline;gap:9px}
+.accountDirectory0951 .accountDirectoryHeading0951>span{
+  color:var(--dir0951-red)!important;
+  font-size:.68rem!important;
+  line-height:1!important;
+  font-weight:950!important;
+  letter-spacing:.14em!important;
+}
+.accountDirectory0951 .accountDirectoryHeading0951 h1{
+  margin:0!important;
+  color:var(--dir0951-text)!important;
+  font-size:1.08rem!important;
+  line-height:1.1!important;
+  font-weight:900!important;
+  letter-spacing:.01em!important;
+}
+.accountDirectory0951 .accountAdd0951{
+  min-width:67px!important;
+  width:auto!important;
+  height:36px!important;
+  min-height:36px!important;
+  padding:0 11px!important;
+  border-radius:10px!important;
+  border:1px solid #54303a!important;
+  background:linear-gradient(180deg,#26161c,#171017)!important;
+  color:#ff8b94!important;
+  box-shadow:inset 0 1px rgba(255,255,255,.05)!important;
+}
+.accountDirectory0951 .accountAdd0951 span{font-size:1.05rem!important}
+.accountDirectory0951 .accountAdd0951 b{font-size:.73rem!important}
+.accountDirectory0951 .accountSearch0951{
+  height:44px!important;
+  min-height:44px!important;
+  margin:0!important;
+  padding:0 10px!important;
+  border-radius:11px!important;
+  border:1px solid #2b3748!important;
+  background:#0c121b!important;
+  box-shadow:inset 0 1px 2px rgba(0,0,0,.5),0 1px rgba(255,255,255,.025)!important;
+}
+.accountDirectory0951 .accountSearch0951 .accountSearchIcon0871{width:19px!important;height:19px!important;color:#98a5b5!important}
+.accountDirectory0951 .accountSearch0951 input{
+  height:42px!important;
+  min-height:42px!important;
+  padding:0 5px!important;
+  color:#f4f7fb!important;
+  font-size:16px!important;
+  font-weight:650!important;
+}
+.accountDirectory0951 .accountSearch0951>button{width:34px!important;height:34px!important;min-height:34px!important;border-radius:9px!important}
+.accountDirectory0951 .accountDirectoryTools0951{
+  display:grid!important;
+  grid-template-columns:minmax(80px,1fr) auto minmax(128px,auto) auto!important;
+  align-items:center!important;
+  gap:6px!important;
+  padding:7px 0 0!important;
+  margin:0!important;
+}
+.accountDirectory0951 .accountDirectoryCount0951{
+  min-width:0;margin:0!important;color:#9aa6b5!important;font-size:.67rem!important;font-weight:850!important;letter-spacing:.04em!important;text-transform:uppercase!important;white-space:nowrap;overflow:hidden;text-overflow:ellipsis
+}
+.accountDirectory0951 .accountDirectoryNear0951,
+.accountDirectory0951 .accountDirectorySort0951,
+.accountDirectory0951 .accountDirectoryReset0951{
+  position:relative!important;
+  height:34px!important;
+  min-height:34px!important;
+  border:1px solid #293648!important;
+  border-radius:9px!important;
+  background:#101823!important;
+  color:#dce3ed!important;
+  box-shadow:none!important;
+}
+.accountDirectory0951 .accountDirectoryNear0951{
+  display:flex!important;align-items:center!important;gap:6px!important;padding:0 10px!important;font-size:.69rem!important;font-weight:850!important
+}
+.accountDirectory0951 .accountDirectoryNear0951 svg{width:15px!important;height:15px!important;color:#ef5561!important}
+.accountDirectory0951 .accountDirectorySort0951{
+  display:flex!important;align-items:center!important;justify-content:space-between!important;gap:7px!important;padding:0 10px!important;overflow:hidden!important
+}
+.accountDirectory0951 .accountDirectorySort0951>span{font-size:.66rem!important;color:#9eabba!important;white-space:nowrap!important}
+.accountDirectory0951 .accountDirectorySort0951>span b{color:#eef2f7!important;font-size:.69rem!important}
+.accountDirectory0951 .accountDirectorySort0951>select{position:absolute!important;inset:0!important;width:100%!important;height:100%!important;opacity:0!important;cursor:pointer!important}
+.accountDirectory0951 .accountDirectoryReset0951{padding:0 9px!important;color:#ff858e!important;font-size:.66rem!important;font-weight:850!important}
+.accountDirectory0951 .accountDirectoryListShell0871{
+  padding:0 8px!important;
+  background:linear-gradient(180deg,#070a0f,#06090e)!important;
+}
+.accountDirectory0951 .accountDirectoryList0871{
+  gap:6px!important;
+  padding:8px 0 14px!important;
+  scroll-padding-top:7px!important;
+}
+.accountDirectory0951 .accountRow0951{
+  --row-accent:#8e9cad;
+  display:block!important;
+  position:relative!important;
+  min-height:0!important;
+  padding:0!important;
+  margin:0!important;
+  border:1px solid #242f3f!important;
+  border-radius:12px!important;
+  background:linear-gradient(180deg,#111925 0%,#0c131c 100%)!important;
+  box-shadow:0 3px 8px rgba(0,0,0,.22),inset 0 1px rgba(255,255,255,.03)!important;
+  overflow:hidden!important;
+  contain-intrinsic-size:auto 104px!important;
+}
+.accountDirectory0951 .accountRow0951:nth-child(even){background:linear-gradient(180deg,#0f1721 0%,#0a1119 100%)!important}
+.accountDirectory0951 .accountRow0951.category-clss{--row-accent:#4db7f4}
+.accountDirectory0951 .accountRow0951.category-alarmnet{--row-accent:#f4ad3d}
+.accountDirectory0951 .accountRow0951.category-ipdact{--row-accent:#51d6a2}
+.accountDirectory0951 .accountRow0951.category-basic{--row-accent:#9aa9bb}
+.accountDirectory0951 .accountRow0951::before{
+  content:""!important;display:block!important;position:absolute!important;left:0!important;top:0!important;bottom:0!important;width:3px!important;border-radius:0!important;background:var(--row-accent)!important;box-shadow:none!important
+}
+.accountDirectory0951 .accountRow0951::after{display:none!important}
+.accountDirectory0951 .accountRowBody0951{
+  display:grid!important;
+  grid-template-columns:34px minmax(0,1fr)!important;
+  align-items:center!important;
+  gap:9px!important;
+  padding:9px 10px 7px 11px!important;
+}
+.accountDirectory0951 .accountRowMark0951{
+  width:32px!important;height:32px!important;display:grid!important;place-items:center!important;border-radius:9px!important;border:1px solid color-mix(in srgb,var(--row-accent) 55%,#263241)!important;background:color-mix(in srgb,var(--row-accent) 16%,#101722)!important;color:color-mix(in srgb,var(--row-accent) 80%,white)!important;font-size:.78rem!important;font-weight:950!important
+}
+.accountDirectory0951 .accountRowCopy0951{min-width:0!important}
+.accountDirectory0951 .accountRowTitle0951{display:flex!important;align-items:center!important;justify-content:space-between!important;gap:8px!important;min-width:0!important}
+.accountDirectory0951 .accountRowTitle0951 h2{
+  min-width:0!important;margin:0!important;color:#f5f7fa!important;font-size:.88rem!important;line-height:1.18!important;font-weight:900!important;white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important
+}
+.accountDirectory0951 .accountRowAddress0951{
+  margin:2px 0 0!important;color:#b7c1cf!important;font-size:.7rem!important;line-height:1.2!important;font-weight:620!important;white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important
+}
+.accountDirectory0951 .accountRowMeta0951{
+  display:flex!important;align-items:center!important;gap:6px!important;min-width:0!important;margin-top:4px!important;white-space:nowrap!important;overflow:hidden!important
+}
+.accountDirectory0951 .accountRowMeta0951>span{font-style:normal!important;font-size:.58rem!important;line-height:1!important;font-weight:900!important;letter-spacing:.045em!important;text-transform:uppercase!important}
+.accountDirectory0951 .accountRowId0951{color:#ff747e!important}
+.accountDirectory0951 .accountRowCategory0951{color:#8fbbe5!important}
+.accountDirectory0951 .accountRowShared0951{color:#d4b66d!important}
+.accountDirectory0951 .accountRowSupporting0951{min-width:0!important;overflow:hidden!important;text-overflow:ellipsis!important;color:#7f8c9e!important;text-transform:none!important;letter-spacing:0!important;font-weight:650!important}
+.accountDirectory0951 .accountRowIssues0951{display:flex!important;gap:4px!important;flex:0 0 auto!important}
+.accountDirectory0951 .accountRowIssues0951 span{
+  min-height:18px!important;display:inline-flex!important;align-items:center!important;padding:2px 5px!important;border-radius:6px!important;border:1px solid #3a4555!important;background:#111821!important;color:#aeb8c4!important;font-size:.52rem!important;font-weight:900!important;text-transform:uppercase!important;white-space:nowrap!important
+}
+.accountDirectory0951 .accountRowIssues0951 .danger{border-color:#6c2c35!important;background:#281319!important;color:#ff9099!important}
+.accountDirectory0951 .accountRowIssues0951 .warning{border-color:#665021!important;background:#251e10!important;color:#ffd071!important}
+.accountDirectory0951 .accountRowActions0951{
+  display:grid!important;
+  grid-template-columns:repeat(4,minmax(0,1fr))!important;
+  gap:0!important;
+  border-top:1px solid #202b39!important;
+  background:rgba(4,8,13,.24)!important;
+}
+.accountDirectory0951 .accountRowActions0951 button,
+.accountDirectory0951 .accountRowActions0951 .accountFavorite0871{
+  width:100%!important;
+  height:34px!important;
+  min-height:34px!important;
+  padding:0 3px!important;
+  display:flex!important;
+  flex-direction:row!important;
+  align-items:center!important;
+  justify-content:center!important;
+  gap:5px!important;
+  border:0!important;
+  border-right:1px solid #202b39!important;
+  border-radius:0!important;
+  background:transparent!important;
+  color:#b8c2cf!important;
+  box-shadow:none!important;
+  font-size:.61rem!important;
+  font-weight:850!important;
+}
+.accountDirectory0951 .accountRowActions0951 button:last-child{border-right:0!important}
+.accountDirectory0951 .accountRowActions0951 button:active{background:#182230!important;color:#fff!important}
+.accountDirectory0951 .accountRowActions0951 button:disabled{opacity:.28!important}
+.accountDirectory0951 .accountRowActions0951 .accountCardIcon0871{width:15px!important;height:15px!important;color:#ef5864!important}
+.accountDirectory0951 .accountRowActions0951 .accountFavorite0871{font-size:.95rem!important;color:#8591a1!important}
+.accountDirectory0951 .accountRowActions0951 .accountFavorite0871 span{font-size:.61rem!important;color:inherit!important}
+.accountDirectory0951 .accountRowActions0951 .accountFavorite0871.active{color:#ffd15a!important;background:#221c0e!important}
+.accountDirectory0951 .accountRow0951:focus-visible{outline:2px solid rgba(239,63,76,.65)!important;outline-offset:1px!important;box-shadow:0 0 0 3px rgba(239,63,76,.15)!important}
+.accountDirectory0951 .accountRow0951:active{transform:scale(.995)!important}
+.accountDirectory0951 .accountDirectoryList0871.isScrolling0878 .accountRow0951{box-shadow:none!important}
+@media(max-width:390px){
+  .accountDirectory0951 .accountDirectoryTop0951{padding-left:7px!important;padding-right:7px!important}
+  .accountDirectory0951 .accountDirectoryTools0951{grid-template-columns:minmax(70px,1fr) auto minmax(112px,auto)!important}
+  .accountDirectory0951 .accountDirectoryReset0951{grid-column:1/-1!important;width:100%!important;height:30px!important;min-height:30px!important}
+  .accountDirectory0951 .accountRowBody0951{grid-template-columns:30px minmax(0,1fr)!important;gap:8px!important;padding:8px 8px 6px 10px!important}
+  .accountDirectory0951 .accountRowMark0951{width:29px!important;height:29px!important;border-radius:8px!important;font-size:.72rem!important}
+  .accountDirectory0951 .accountRowTitle0951 h2{font-size:.82rem!important}
+  .accountDirectory0951 .accountRowAddress0951{font-size:.65rem!important}
+  .accountDirectory0951 .accountRowSupporting0951{display:none!important}
+  .accountDirectory0951 .accountRowActions0951 button,.accountDirectory0951 .accountRowActions0951 .accountFavorite0871{height:33px!important;min-height:33px!important;font-size:.56rem!important;gap:4px!important}
+  .accountDirectory0951 .accountRowActions0951 .accountFavorite0871 span{font-size:.56rem!important}
+}
+@media(min-width:700px){
+  .accountDirectory0951{width:min(820px,calc(100% - 34px))!important}
+  .accountDirectory0951 .accountDirectoryTop0951{padding:12px 14px 9px!important}
+  .accountDirectory0951 .accountDirectoryListShell0871{padding:0 14px!important}
+  .accountDirectory0951 .accountRowBody0951{grid-template-columns:38px minmax(0,1fr)!important;padding:11px 14px 9px 15px!important}
+  .accountDirectory0951 .accountRowMark0951{width:36px!important;height:36px!important}
+  .accountDirectory0951 .accountRowTitle0951 h2{font-size:.98rem!important}
+  .accountDirectory0951 .accountRowAddress0951{font-size:.76rem!important}
+  .accountDirectory0951 .accountRowActions0951 button,.accountDirectory0951 .accountRowActions0951 .accountFavorite0871{height:38px!important;min-height:38px!important;font-size:.67rem!important}
+}

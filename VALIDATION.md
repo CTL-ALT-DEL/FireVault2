@@ -1,18 +1,12 @@
-# FireVault Build 0.95.0 Validation
+# FireVault Build 0.95.1 Validation
 
-Validated:
+- JavaScript module syntax checked.
+- JSON files parsed.
+- Account Directory markup and event data attributes preserved.
+- Search, Nearby, Sort, Add Account, Call, Route, Add Note, Favorite, and Account Detail selectors preserved.
+- Four-button bottom navigation preserved.
+- Storage key preserved.
+- Service-worker build references updated.
+- ZIP archive integrity checked.
 
-- JavaScript syntax for app and storage modules
-- Four-button bottom navigation in global and Nearby layouts
-- Photo button routes without changing the active page
-- Current-account, selected-Nearby, last-account, and account-picker selection paths
-- Rear-camera file input and retake flow
-- 2048-pixel JPEG resize/compression logic
-- Live account-overlay preview
-- Category memory and account confirmation
-- IndexedDB media staging before vault save
-- Existing storage key preservation
-- Service-worker and version references
-- ZIP archive integrity
-
-Physical iPhone/iPad testing remains required for camera permission, camera chooser behavior, image orientation, and the final overlay preview.
+Physical iPhone and iPad confirmation is still recommended for scrolling, row density, and touch targets.
