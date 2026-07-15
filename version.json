@@ -1,8 +1,8 @@
 {
-  "build": "0.95.2",
-  "released": "2026-07-14",
-  "note": "Compact Account Detail redesign with fast field actions, reordered tabs, responsive tablet layout, and origin-aware Back navigation.",
-  "label": "Account Detail Redesign",
-  "version": "0.95.2",
-  "name": "Account Detail Redesign"
+  "build": "0.95.3",
+  "released": "2026-07-15",
+  "note": "Introduces the reusable App Profile, terminology layer, module registry, in-app architecture view, and feature matrix while preserving FireVault workflows and storage.",
+  "label": "Core Architecture Foundation",
+  "version": "0.95.3",
+  "name": "Core Architecture Foundation"
 }

@@ -1,6 +1,6 @@
-const BUILD="0.95.2";
+const BUILD="0.95.3";
 const CACHE=`firevault-${BUILD}`;
-const SHELL=["./","./index.html","./manifest.json","./version.json","./src/app.js?v=0.95.2","./src/storage.js?v=0.95.2","./src/providers.js?v=0.95.2","./src/open-location-code.js?v=0.95.2","./src/media-store.js?v=0.95.2","./src/styles.css?v=0.95.2","./src/design-system.css?v=0.95.2","./assets/favicon.png","./assets/apple-touch-icon.png","./assets/icon-192.png","./assets/icon-512.png","./assets/firevault-logo-master.png","./assets/overlay-sample-fire-alarm-issue.png"];
+const SHELL=["./","./index.html","./manifest.json","./version.json","./src/app.js?v=0.95.3","./src/storage.js?v=0.95.3","./src/providers.js?v=0.95.3","./src/open-location-code.js?v=0.95.3","./src/media-store.js?v=0.95.3","./src/app-profile.js?v=0.95.3","./src/module-registry.js?v=0.95.3","./src/styles.css?v=0.95.3","./src/design-system.css?v=0.95.3","./assets/favicon.png","./assets/apple-touch-icon.png","./assets/icon-192.png","./assets/icon-512.png","./assets/firevault-logo-master.png","./assets/overlay-sample-fire-alarm-issue.png"];
 self.addEventListener("install",event=>{event.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(SHELL)).then(()=>self.skipWaiting()));});
 self.addEventListener("activate",event=>{event.waitUntil((async()=>{if(self.registration.navigationPreload)await self.registration.navigationPreload.enable();const keys=await caches.keys();await Promise.all(keys.filter(k=>k.startsWith("firevault-")&&k!==CACHE).map(k=>caches.delete(k)));await self.clients.claim();})());});
 self.addEventListener("message",event=>{if(event.data&&event.data.type==="SKIP_WAITING")self.skipWaiting();});

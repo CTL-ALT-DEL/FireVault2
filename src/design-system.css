@@ -2277,3 +2277,54 @@ main,
   }
   .accountDetail0952 .accountPanel0735{padding:15px!important}
 }
+
+/* Build 0.95.3 — reusable App Profile, module registry, and architecture matrix */
+.architectureStack0953{padding-bottom:calc(var(--navH,76px) + 22px)!important}
+.architectureProfile0953{display:flex;flex-direction:column;gap:13px}
+.architectureProfileBrand0953{display:grid;grid-template-columns:46px minmax(0,1fr) auto;gap:11px;align-items:center;padding:12px;border:1px solid rgba(239,68,68,.24);border-radius:14px;background:linear-gradient(145deg,rgba(65,18,25,.34),rgba(13,22,33,.92))}
+.architectureProfileBrand0953 img{width:46px;height:46px;border-radius:11px;object-fit:contain;background:#090d13}
+.architectureProfileBrand0953 div{display:flex;flex-direction:column;min-width:0}
+.architectureProfileBrand0953 strong{color:#fff;font-size:1.02rem}
+.architectureProfileBrand0953 span{color:#aebdcc;font-size:.7rem;line-height:1.35}
+.architectureProfileBrand0953 em{padding:5px 8px;border-radius:999px;background:rgba(239,68,68,.14);color:#ffadb3;font-size:.61rem;font-style:normal;font-weight:850;white-space:nowrap}
+.architectureProfileGrid0953{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}
+.architectureProfileGrid0953>div{min-width:0;padding:10px;border:1px solid rgba(130,155,185,.18);border-radius:11px;background:rgba(5,13,22,.55);display:flex;flex-direction:column;gap:4px}
+.architectureProfileGrid0953 strong{color:#dce6ef;font-size:.66rem;text-transform:uppercase;letter-spacing:.055em}
+.architectureProfileGrid0953 span{color:#9fb0c1;font-size:.7rem;line-height:1.4;overflow-wrap:anywhere}
+.architectureProfile0953>p{margin:0;color:#a8b7c6;font-size:.73rem;line-height:1.52}
+.architectureMetrics0953{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:7px;margin-bottom:12px}
+.architectureMetrics0953>div{padding:11px 6px;border:1px solid rgba(130,155,185,.18);border-radius:11px;background:rgba(5,13,22,.55);text-align:center}
+.architectureMetrics0953 strong{display:block;color:#fff;font-size:1.08rem}
+.architectureMetrics0953 span{display:block;margin-top:3px;color:#94a7ba;font-size:.59rem;line-height:1.2}
+.architectureLegend0953{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px;margin-bottom:15px}
+.architectureLegend0953>span{display:flex;flex-direction:column;gap:4px;min-width:0;padding:9px;border-radius:10px;border:1px solid rgba(130,155,185,.16);background:rgba(5,13,22,.45);color:#8fa1b5;font-size:.62rem;line-height:1.35}
+.architectureLegend0953 b{font-size:.66rem}
+.architectureLegend0953 .class-core b{color:#67d7ff}.architectureLegend0953 .class-optional b{color:#c6a7ff}.architectureLegend0953 .class-firevault b{color:#ff9098}
+.architectureGroup0953{margin-top:15px}
+.architectureGroup0953>div:first-child{display:flex;align-items:center;justify-content:space-between;margin-bottom:7px}
+.architectureGroup0953 h3{margin:0;color:#fff;font-size:.86rem}
+.architectureGroup0953>div:first-child>span{color:#8294a8;font-size:.64rem}
+.architectureModuleGrid0953{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.architectureModule0953{min-width:0;padding:11px;border:1px solid rgba(130,155,185,.19);border-radius:12px;background:linear-gradient(145deg,rgba(18,31,47,.91),rgba(7,15,25,.96));box-shadow:inset 0 1px 0 rgba(255,255,255,.035)}
+.architectureModule0953.class-core{border-left:3px solid #38bdf8}.architectureModule0953.class-optional{border-left:3px solid #a78bfa}.architectureModule0953.class-firevault{border-left:3px solid #ef4444}
+.architectureModuleHead0953{display:flex;justify-content:space-between;gap:6px;align-items:center}
+.architectureModuleHead0953>span{color:#8fa3b8;font-size:.56rem;font-weight:850;text-transform:uppercase;letter-spacing:.06em}
+.architectureModuleHead0953 em{font-style:normal;font-size:.55rem;font-weight:850;padding:3px 6px;border-radius:999px}.architectureModuleHead0953 em.enabled{background:rgba(34,197,94,.12);color:#8defad}.architectureModuleHead0953 em.disabled{background:rgba(148,163,184,.12);color:#b5c0cc}
+.architectureModule0953 h3{margin:8px 0 4px;color:#fff;font-size:.8rem;line-height:1.25}
+.architectureModule0953 p{margin:0;color:#95a6b8;font-size:.65rem;line-height:1.43}
+.architectureModuleMeta0953{display:flex;align-items:center;justify-content:space-between;gap:7px;margin-top:9px}
+.architectureModuleMeta0953 code{min-width:0;color:#7f94a9;font-size:.54rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.architectureModuleMeta0953 small{color:#b7c3cf;font-size:.54rem;white-space:nowrap}
+.architectureDependencies0953{margin-top:8px;padding-top:7px;border-top:1px solid rgba(130,155,185,.12);display:flex;flex-direction:column;gap:3px}
+.architectureDependencies0953 strong{color:#9eb0c2;font-size:.55rem;text-transform:uppercase}.architectureDependencies0953 span{color:#75899d;font-size:.55rem;line-height:1.35;overflow-wrap:anywhere}
+.architectureMatrixScroll0953{width:100%;overflow:auto;border:1px solid rgba(130,155,185,.19);border-radius:12px;background:#07101a;-webkit-overflow-scrolling:touch}
+.architectureMatrix0953{width:max-content;min-width:100%;border-collapse:separate;border-spacing:0;font-size:.62rem}
+.architectureMatrix0953 th{position:sticky;top:0;z-index:1;padding:9px 8px;background:#101d2a;color:#b8c6d5;text-align:left;white-space:nowrap;border-bottom:1px solid rgba(130,155,185,.24)}
+.architectureMatrix0953 td{padding:8px;border-bottom:1px solid rgba(130,155,185,.12);color:#95a7b9;vertical-align:middle;white-space:nowrap}
+.architectureMatrix0953 td:first-child{position:sticky;left:0;z-index:0;min-width:155px;background:#09131e}
+.architectureMatrix0953 td:first-child strong{display:block;color:#e7edf4;font-size:.64rem}.architectureMatrix0953 td:first-child small{display:block;margin-top:2px;color:#71869a;font-size:.52rem}
+.architectureMatrix0953 .matrixCheck0953{text-align:center;font-weight:900}.architectureMatrix0953 .matrixCheck0953.yes{color:#70e59b}.architectureMatrix0953 .matrixCheck0953.no{color:#65778b}
+.architectureActions0953{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px;margin-top:11px}
+.architectureActions0953 button{min-height:42px;height:auto;padding:8px;font-size:.67rem}
+@media(max-width:430px){.architectureProfileGrid0953,.architectureModuleGrid0953{grid-template-columns:1fr}.architectureMetrics0953{grid-template-columns:repeat(2,minmax(0,1fr))}.architectureLegend0953{grid-template-columns:1fr}.architectureActions0953{grid-template-columns:1fr}.architectureProfileBrand0953{grid-template-columns:40px minmax(0,1fr)}.architectureProfileBrand0953 img{width:40px;height:40px}.architectureProfileBrand0953 em{grid-column:1/-1;justify-self:start}}
+@media(min-width:820px){.architectureModuleGrid0953{grid-template-columns:repeat(3,minmax(0,1fr))}.architectureActions0953{grid-template-columns:repeat(4,minmax(0,1fr))}}

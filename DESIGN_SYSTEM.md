@@ -1,4 +1,4 @@
-# FireVault 0.95.2 Design System
+# FireVault 0.95.3 Design System
 
 `src/design-system.css` is the canonical release-facing visual layer.
 
@@ -72,3 +72,11 @@ Photo Overlay field controls use larger iPhone touch targets. Settings → Profi
 - Only the tab content scrolls; the account identity and actions remain visible.
 - Account Detail Back navigation returns to the originating Search or Nearby context.
 - iPad layouts may use two columns while phone layouts remain one readable vertical column.
+
+
+## Build 0.95.3 architecture view
+
+- The Architecture & Modules page uses the existing dark Settings surfaces and responsive card system.
+- Core, reusable optional, and FireVault-specific modules use distinct restrained accents.
+- The feature matrix remains horizontally scrollable on phones and readable as a wide table on iPad.
+- Architecture controls are informational and export-only; they do not change current FireVault workflows.
