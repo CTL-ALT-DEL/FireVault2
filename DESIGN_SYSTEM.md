@@ -1,4 +1,4 @@
-# FireVault 0.95.1 Design System
+# FireVault 0.95.2 Design System
 
 `src/design-system.css` is the canonical release-facing visual layer.
 
@@ -56,9 +56,19 @@ Photo Overlay data fields use a button-first ordered list. The editor auto-saves
 
 Photo Overlay field controls use larger iPhone touch targets. Settings → Profile contains a reusable Technician Overlay Template whose order, line breaks, and left/right alignment are applied by the Technician Info quick choice in Photo Overlay.
 
-## Build 0.95.1 Technician Overlay alignment
+## Build 0.94.8 Technician Overlay alignment
 
 - Technician Overlay Template uses one group alignment control: Left, Center, or Right.
 - Template preview rows use the full available width and never break inside long words.
 - Technician Info uses no-wrap canvas rows and fits text to the export width.
 - Center alignment is supported by the shared Photo Overlay preview/export renderer.
+
+
+## Build 0.95.2 Account Detail workspace
+
+- Account identity, category, Account ID, address, and issue indicators occupy one compact header.
+- Primary field actions are Call, Route, Add Note, and Photo.
+- Account tabs appear in field-use order: Overview, Notes, Locations, Equipment, Files, Details.
+- Only the tab content scrolls; the account identity and actions remain visible.
+- Account Detail Back navigation returns to the originating Search or Nearby context.
+- iPad layouts may use two columns while phone layouts remain one readable vertical column.

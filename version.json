@@ -1,8 +1,8 @@
 {
-  "build": "0.95.1",
+  "build": "0.95.2",
   "released": "2026-07-14",
-  "note": "Compact dark two-line Account Directory redesign based on Concept 6.",
-  "label": "Compact Dark Account Directory",
-  "version": "0.95.1",
-  "name": "Compact Dark Account Directory"
+  "note": "Compact Account Detail redesign with fast field actions, reordered tabs, responsive tablet layout, and origin-aware Back navigation.",
+  "label": "Account Detail Redesign",
+  "version": "0.95.2",
+  "name": "Account Detail Redesign"
 }
