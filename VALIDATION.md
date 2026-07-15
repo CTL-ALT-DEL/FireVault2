@@ -1,8 +1,18 @@
-# FireVault 0.94.10 validation
+# FireVault Build 0.95.0 Validation
 
-- Confirmed the Account Detail renderer no longer references the undefined `activeHere` variable.
-- Verified Nearby account cards assign the selected account ID before routing to Account Detail.
-- Verified JavaScript syntax for all application modules.
-- Confirmed build and service-worker references use 0.94.10.
-- Confirmed `firevault_vault_build_030` remains unchanged.
-- Confirmed archive structure and ZIP integrity.
+Validated:
+
+- JavaScript syntax for app and storage modules
+- Four-button bottom navigation in global and Nearby layouts
+- Photo button routes without changing the active page
+- Current-account, selected-Nearby, last-account, and account-picker selection paths
+- Rear-camera file input and retake flow
+- 2048-pixel JPEG resize/compression logic
+- Live account-overlay preview
+- Category memory and account confirmation
+- IndexedDB media staging before vault save
+- Existing storage key preservation
+- Service-worker and version references
+- ZIP archive integrity
+
+Physical iPhone/iPad testing remains required for camera permission, camera chooser behavior, image orientation, and the final overlay preview.

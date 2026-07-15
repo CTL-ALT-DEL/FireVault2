@@ -1,8 +1,8 @@
 {
-  "build": "0.94.10",
+  "build": "0.95.0",
   "released": "2026-07-14",
-  "note": "Fixes the Account Detail crash when opening an account from Nearby Accounts or Search.",
-  "label": "Account Detail Stabilization",
-  "version": "0.94.10",
-  "name": "Account Detail Stabilization"
+  "note": "Adds account-aware Quick Photo capture to the bottom navigation with overlay preview and safe media storage.",
+  "label": "Quick Account Photo",
+  "version": "0.95.0",
+  "name": "Quick Account Photo"
 }

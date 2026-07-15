@@ -1605,7 +1605,7 @@ main,
 .technicianPhotoActions0947 strong{display:block;color:#fff;font-size:.94rem}.technicianPhotoActions0947 small{display:block;margin-top:5px;color:#a8b2bf;font-size:.72rem;line-height:1.4}.technicianPhotoActions0947>div{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}.technicianPhotoActions0947 .technicianPhotoChoose0947,.technicianPhotoActions0947 button{display:inline-flex;align-items:center;justify-content:center;min-height:44px;padding:0 14px;text-decoration:none}
 @media(max-width:520px){.technicianSettingsSummary0947{grid-template-columns:40px minmax(0,1fr) 22px;padding:12px}.technicianSectionStatus0947{grid-column:2/3;justify-self:start;margin-top:2px}.technicianSectionChevron0947{grid-column:3;grid-row:1/3}.technicianSectionCopy0947 em{font-size:.69rem}.technicianPhotoEditor0947{grid-template-columns:88px minmax(0,1fr);gap:12px}.technicianPhotoPreview0947{width:88px;border-radius:16px}.technicianPhotoActions0947>div{gap:7px}.technicianPhotoActions0947 .technicianPhotoChoose0947,.technicianPhotoActions0947 button{flex:1 1 110px}}
 
-/* Build 0.94.10 — Technician Overlay Template fitting and group alignment */
+/* Build 0.95.0 — Technician Overlay Template fitting and group alignment */
 .technicianOverlayPreview0946{
   overflow:hidden;
 }
@@ -1692,8 +1692,36 @@ main,
 }
 
 
-/* Build 0.94.10 — grouped Tech Info field in Photo Overlay */
+/* Build 0.95.0 — grouped Tech Info field in Photo Overlay */
 .overlayTechInfoField0949{border-color:rgba(239,68,68,.42)!important;background:linear-gradient(145deg,rgba(73,28,33,.68),rgba(24,31,43,.94))!important}
 .overlayTechInfoField0949 .overlayActiveFieldText0944 strong{color:#fff!important}
 .overlayTechInfoField0949 .overlayActiveFieldText0944 small{color:#fca5a5!important}
 .overlayTechInfoField0949 .overlayBreakButton0944:disabled{opacity:.66!important;color:#fca5a5!important}
+
+
+/* Build 0.95.0 — four-button navigation and account-aware Quick Photo. */
+#appNav,#appNav.fvNavThree0733,.nearbyBottomNav069,.nearbyBottomNav069.fvNavThree0733{
+  grid-template-columns:repeat(4,minmax(0,1fr))!important;
+}
+#appNav,.nearbyBottomNav069{gap:7px!important;padding-left:10px!important;padding-right:10px!important;}
+#appNav button,.nearbyBottomNav069 button{min-width:0!important;padding-left:4px!important;padding-right:4px!important;}
+#appNav button span,.nearbyBottomNav069 button span{white-space:nowrap!important;}
+.quickPhotoOverlay0950,.quickPhotoPickerOverlay0950{position:fixed;inset:0;z-index:16000;display:flex;align-items:flex-end;justify-content:center;padding:14px;background:rgba(1,5,10,.78);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px)}
+.quickPhotoSheet0950,.quickPhotoPicker0950{width:min(100%,620px);max-height:min(92dvh,900px);overflow:auto;border:1px solid #34445a;border-radius:24px 24px 18px 18px;background:linear-gradient(160deg,#172437,#09111d 72%);box-shadow:0 -20px 60px rgba(0,0,0,.55),inset 0 1px 0 rgba(255,255,255,.08);padding:16px;color:#f8fafc}
+.quickPhotoSheet0950>header,.quickPhotoPicker0950>header{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px}
+.quickPhotoSheet0950>header span,.quickPhotoPicker0950>header span{display:block;color:#fb7185;font-size:.69rem;font-weight:900;letter-spacing:.14em}
+.quickPhotoSheet0950 h2,.quickPhotoPicker0950 h2{margin:2px 0 0;font-size:1.28rem}
+.quickPhotoSheet0950>header button,.quickPhotoPicker0950>header button{width:44px;height:44px;padding:0;border-radius:13px;font-size:1.5rem}
+.quickPhotoPreview0950{position:relative;display:flex;align-items:center;justify-content:center;width:100%;aspect-ratio:4/3;overflow:hidden;border:1px solid #3c4b60;border-radius:18px;background:#03070c;box-shadow:inset 0 1px 0 rgba(255,255,255,.05),0 12px 28px rgba(0,0,0,.32)}
+.quickPhotoPreview0950 canvas{display:block;width:100%;height:auto;max-height:100%;object-fit:contain;background:#02060a}
+.quickPhotoPreview0950>div{position:absolute;inset:auto 12px 12px;padding:7px 10px;border-radius:10px;background:rgba(5,10,17,.8);font-size:.75rem;color:#dbeafe}
+.quickPhotoAccount0950{position:relative;width:100%;margin:12px 0;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:2px 12px;text-align:left;align-items:center;padding:12px 14px;border:1px solid #40516a;border-radius:15px;background:linear-gradient(145deg,#1c2b3e,#111b29);color:#fff}
+.quickPhotoAccount0950 span{font-size:1rem;font-weight:900}.quickPhotoAccount0950 small{grid-column:1;color:#aebbd0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.quickPhotoAccount0950 b{grid-column:2;grid-row:1/3;color:#fda4af;font-size:.76rem;letter-spacing:.04em}
+.quickPhotoOptions0950{display:grid;gap:9px}.quickPhotoOptions0950>label:not(.checkRow){display:grid;gap:6px}.quickPhotoOptions0950 select{min-height:48px}.quickPhotoOptions0950 .checkRow{min-height:48px;margin:0;padding:10px 12px;border:1px solid #334155;border-radius:13px;background:#0e1927}
+.quickPhotoDetails0950{margin-top:10px;border:1px solid #334155;border-radius:14px;background:#0b1522;padding:0 12px 12px}.quickPhotoDetails0950 summary{padding:13px 0;font-weight:850;cursor:pointer}.quickPhotoDetails0950 label{display:grid;gap:6px;margin-top:9px}.quickPhotoDetails0950 textarea{min-height:82px}
+.quickPhotoSheet0950>footer{position:sticky;bottom:-16px;display:grid;grid-template-columns:1fr 1.35fr;gap:10px;margin:14px -16px -16px;padding:12px 16px calc(12px + env(safe-area-inset-bottom));border-top:1px solid #304056;background:rgba(7,13,23,.96);backdrop-filter:blur(14px)}
+.quickPhotoSheet0950>footer button{min-height:52px}
+.quickPhotoPickerSearch0950{display:grid;grid-template-columns:auto minmax(0,1fr);align-items:center;gap:9px;padding:0 12px;border:1px solid #40516a;border-radius:14px;background:#0a1421}.quickPhotoPickerSearch0950 svg{width:22px;height:22px}.quickPhotoPickerSearch0950 input{border:0!important;background:transparent!important;box-shadow:none!important;padding-left:0!important}
+.quickPhotoAccountList0950{display:grid;gap:8px;margin-top:12px;max-height:60dvh;overflow:auto}.quickPhotoAccountList0950 button{display:grid;gap:3px;text-align:left;min-height:62px;padding:11px 13px;border:1px solid #33445a;border-radius:14px;background:linear-gradient(145deg,#172538,#0d1724);color:#fff}.quickPhotoAccountList0950 button strong{font-size:.94rem}.quickPhotoAccountList0950 button small{color:#a7b4c7;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+@media (min-width:760px){.quickPhotoOverlay0950,.quickPhotoPickerOverlay0950{align-items:center}.quickPhotoSheet0950,.quickPhotoPicker0950{border-radius:24px}.quickPhotoSheet0950{width:min(92vw,720px)}.quickPhotoPreview0950{aspect-ratio:16/10}}
+@media (max-width:390px){#appNav,.nearbyBottomNav069{gap:4px!important;padding-left:6px!important;padding-right:6px!important}#appNav button,.nearbyBottomNav069 button{border-radius:13px!important}#appNav .fvNavIcon073,.nearbyBottomNav069 .fvNavIcon073{width:24px!important;height:24px!important}#appNav button span,.nearbyBottomNav069 button span{font-size:.69rem!important}.quickPhotoOverlay0950,.quickPhotoPickerOverlay0950{padding:0}.quickPhotoSheet0950,.quickPhotoPicker0950{max-height:96dvh;border-radius:22px 22px 0 0}}
