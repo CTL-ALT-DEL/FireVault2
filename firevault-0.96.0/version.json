@@ -1,0 +1,8 @@
+{
+  "build": "1.03.0",
+  "released": "2026-07-16",
+  "note": "Focused UI cleanup improves Nearby distance placement, Account Detail navigation, Settings organization, independent photo overlays, email preview, storage identities, visual Help, and update recovery.",
+  "label": "Settings & Help Cleanup",
+  "version": "1.03.0",
+  "name": "Settings & Help Cleanup"
+}

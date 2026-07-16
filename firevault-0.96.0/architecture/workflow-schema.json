@@ -1,0 +1,343 @@
+{
+  "version": 1,
+  "profileWorkflow": {
+    "presetId": "fire-alarm-technician",
+    "directoryActionIds": [
+      "call",
+      "route",
+      "note",
+      "favorite"
+    ],
+    "detailPrimaryActionIds": [
+      "call",
+      "route",
+      "note",
+      "photo"
+    ],
+    "notesActionIds": [
+      "task",
+      "deficiency",
+      "photo",
+      "report"
+    ],
+    "quickPhoto": {
+      "defaultUseOverlay": true,
+      "defaultIncludeReport": false,
+      "rememberAccount": true,
+      "rememberCategory": true,
+      "allowAccountChange": true,
+      "allowRetake": true,
+      "showCategory": true,
+      "showOverlayToggle": true,
+      "showReportToggle": true,
+      "showTitle": true,
+      "showInternalNotes": true,
+      "showCustomerCaption": true,
+      "cameraFacing": "environment",
+      "maxImageDimension": 2048,
+      "jpegQuality": 0.86
+    }
+  },
+  "schema": {
+    "id": "field-vault.workflow.v1",
+    "actions": [
+      {
+        "id": "call",
+        "label": "Call",
+        "surfaceSupport": [
+          "directory",
+          "detailPrimary"
+        ],
+        "modules": [
+          "core.records"
+        ],
+        "capability": "phone",
+        "appForgeReady": true
+      },
+      {
+        "id": "route",
+        "label": "Route",
+        "surfaceSupport": [
+          "directory",
+          "detailPrimary"
+        ],
+        "modules": [
+          "core.nearby"
+        ],
+        "capability": "gps",
+        "appForgeReady": true
+      },
+      {
+        "id": "note",
+        "label": "Add Note",
+        "surfaceSupport": [
+          "directory",
+          "detailPrimary"
+        ],
+        "modules": [
+          "core.notes"
+        ],
+        "capability": "notes",
+        "appForgeReady": true
+      },
+      {
+        "id": "photo",
+        "label": "Photo",
+        "surfaceSupport": [
+          "directory",
+          "detailPrimary",
+          "notes"
+        ],
+        "modules": [
+          "core.photos"
+        ],
+        "capability": "camera",
+        "appForgeReady": true
+      },
+      {
+        "id": "favorite",
+        "label": "Favorite",
+        "surfaceSupport": [
+          "directory"
+        ],
+        "modules": [
+          "core.search"
+        ],
+        "capability": "favorite",
+        "appForgeReady": true
+      },
+      {
+        "id": "task",
+        "label": "Task",
+        "surfaceSupport": [
+          "notes"
+        ],
+        "modules": [
+          "optional.tasks"
+        ],
+        "capability": "task",
+        "appForgeReady": true
+      },
+      {
+        "id": "deficiency",
+        "label": "Deficiency",
+        "surfaceSupport": [
+          "notes"
+        ],
+        "modules": [
+          "optional.deficiencies"
+        ],
+        "capability": "deficiency",
+        "appForgeReady": true
+      },
+      {
+        "id": "report",
+        "label": "Report",
+        "surfaceSupport": [
+          "notes"
+        ],
+        "modules": [
+          "optional.reports"
+        ],
+        "capability": "report",
+        "appForgeReady": true
+      }
+    ],
+    "quickPhotoDefaults": {
+      "defaultUseOverlay": true,
+      "defaultIncludeReport": false,
+      "rememberAccount": true,
+      "rememberCategory": true,
+      "allowAccountChange": true,
+      "allowRetake": true,
+      "showCategory": true,
+      "showOverlayToggle": true,
+      "showReportToggle": true,
+      "showTitle": true,
+      "showInternalNotes": true,
+      "showCustomerCaption": true,
+      "cameraFacing": "environment",
+      "maxImageDimension": 2048,
+      "jpegQuality": 0.86
+    }
+  },
+  "active": {
+    "directory": [
+      {
+        "id": "call",
+        "label": "Call",
+        "surfaceSupport": [
+          "directory",
+          "detailPrimary"
+        ],
+        "modules": [
+          "core.records"
+        ],
+        "capability": "phone",
+        "appForgeReady": true
+      },
+      {
+        "id": "route",
+        "label": "Route",
+        "surfaceSupport": [
+          "directory",
+          "detailPrimary"
+        ],
+        "modules": [
+          "core.nearby"
+        ],
+        "capability": "gps",
+        "appForgeReady": true
+      },
+      {
+        "id": "note",
+        "label": "Add Note",
+        "surfaceSupport": [
+          "directory",
+          "detailPrimary"
+        ],
+        "modules": [
+          "core.notes"
+        ],
+        "capability": "notes",
+        "appForgeReady": true
+      },
+      {
+        "id": "favorite",
+        "label": "Favorite",
+        "surfaceSupport": [
+          "directory"
+        ],
+        "modules": [
+          "core.search"
+        ],
+        "capability": "favorite",
+        "appForgeReady": true
+      }
+    ],
+    "detailPrimary": [
+      {
+        "id": "call",
+        "label": "Call",
+        "surfaceSupport": [
+          "directory",
+          "detailPrimary"
+        ],
+        "modules": [
+          "core.records"
+        ],
+        "capability": "phone",
+        "appForgeReady": true
+      },
+      {
+        "id": "route",
+        "label": "Route",
+        "surfaceSupport": [
+          "directory",
+          "detailPrimary"
+        ],
+        "modules": [
+          "core.nearby"
+        ],
+        "capability": "gps",
+        "appForgeReady": true
+      },
+      {
+        "id": "note",
+        "label": "Add Note",
+        "surfaceSupport": [
+          "directory",
+          "detailPrimary"
+        ],
+        "modules": [
+          "core.notes"
+        ],
+        "capability": "notes",
+        "appForgeReady": true
+      },
+      {
+        "id": "photo",
+        "label": "Photo",
+        "surfaceSupport": [
+          "directory",
+          "detailPrimary",
+          "notes"
+        ],
+        "modules": [
+          "core.photos"
+        ],
+        "capability": "camera",
+        "appForgeReady": true
+      }
+    ],
+    "notes": [
+      {
+        "id": "task",
+        "label": "Task",
+        "surfaceSupport": [
+          "notes"
+        ],
+        "modules": [
+          "optional.tasks"
+        ],
+        "capability": "task",
+        "appForgeReady": true
+      },
+      {
+        "id": "deficiency",
+        "label": "Deficiency",
+        "surfaceSupport": [
+          "notes"
+        ],
+        "modules": [
+          "optional.deficiencies"
+        ],
+        "capability": "deficiency",
+        "appForgeReady": true
+      },
+      {
+        "id": "photo",
+        "label": "Photo",
+        "surfaceSupport": [
+          "directory",
+          "detailPrimary",
+          "notes"
+        ],
+        "modules": [
+          "core.photos"
+        ],
+        "capability": "camera",
+        "appForgeReady": true
+      },
+      {
+        "id": "report",
+        "label": "Report",
+        "surfaceSupport": [
+          "notes"
+        ],
+        "modules": [
+          "optional.reports"
+        ],
+        "capability": "report",
+        "appForgeReady": true
+      }
+    ],
+    "quickPhoto": {
+      "defaultUseOverlay": true,
+      "defaultIncludeReport": false,
+      "rememberAccount": true,
+      "rememberCategory": true,
+      "allowAccountChange": true,
+      "allowRetake": true,
+      "showCategory": true,
+      "showOverlayToggle": true,
+      "showReportToggle": true,
+      "showTitle": true,
+      "showInternalNotes": true,
+      "showCustomerCaption": true,
+      "cameraFacing": "environment",
+      "maxImageDimension": 2048,
+      "jpegQuality": 0.86
+    }
+  }
+}

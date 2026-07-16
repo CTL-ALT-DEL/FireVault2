@@ -1,0 +1,13 @@
+# FireVault generated/local folders
+node_modules/
+dist/
+.firevault-tmp/
+
+# Do not commit extracted build packages
+firevault-build-*/
+firevault-build-*.zip
+
+# OS/editor noise
+.DS_Store
+Thumbs.db
+.vscode/

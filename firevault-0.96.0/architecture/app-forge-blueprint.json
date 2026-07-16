@@ -1,0 +1,49 @@
+{
+  "kind": "field-vault.app-forge-blueprint",
+  "schemaVersion": 1,
+  "build": "1.03.0",
+  "product": {
+    "id": "firevault",
+    "family": "field-vault",
+    "name": "FireVault",
+    "industry": "Fire alarm service",
+    "audience": "Fire alarm technicians"
+  },
+  "readiness": {
+    "status": "ready",
+    "checksPassed": 9,
+    "checksTotal": 9
+  },
+  "contracts": {
+    "appProfile": 12,
+    "moduleRegistry": 9,
+    "moduleBindings": 2,
+    "recordSchema": 1,
+    "workflowSchema": 1,
+    "themeProfile": 1,
+    "contentPacks": 1,
+    "syncStorageProfile": 1
+  },
+  "runtime": {
+    "architecture": "shared-field-vault-core",
+    "offlineFirst": true,
+    "pwa": {
+      "manifest": "manifest.json",
+      "serviceWorker": "sw.js"
+    },
+    "nativeTargets": {
+      "ios": "profile-ready",
+      "android": "profile-ready"
+    }
+  },
+  "sourceContracts": {
+    "appProfile": "architecture/app-profile.json",
+    "moduleRegistry": "architecture/module-registry.json",
+    "moduleBindings": "architecture/module-bindings.json",
+    "recordSchema": "architecture/record-schema.json",
+    "workflowSchema": "architecture/workflow-schema.json",
+    "themeProfile": "architecture/theme-profile.json",
+    "contentPacks": "architecture/content-pack-registry.json",
+    "syncStorage": "architecture/sync-storage-profile.json"
+  }
+}

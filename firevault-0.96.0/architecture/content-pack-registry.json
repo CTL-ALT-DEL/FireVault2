@@ -1,0 +1,270 @@
+{
+  "version": 1,
+  "sourceTypes": {
+    "local": {
+      "label": "Local vault",
+      "description": "User-created and imported content stored on the device."
+    },
+    "bundled": {
+      "label": "Bundled reference",
+      "description": "Read-only content packaged with the app release."
+    },
+    "import": {
+      "label": "Import source",
+      "description": "CSV or JSON content brought into the app by the user."
+    },
+    "remote": {
+      "label": "Remote catalog",
+      "description": "Versioned catalog metadata prepared for future signed downloads."
+    }
+  },
+  "sources": [
+    {
+      "id": "local.user-vault",
+      "name": "User Library",
+      "type": "local",
+      "status": "active",
+      "offline": true,
+      "readOnly": false,
+      "description": "Manuals, forms, links, notes, and reference items created or saved by the user."
+    },
+    {
+      "id": "bundled.app-reference",
+      "name": "Bundled App Reference",
+      "type": "bundled",
+      "status": "active",
+      "offline": true,
+      "readOnly": true,
+      "description": "Small reference sets shipped inside the application package."
+    },
+    {
+      "id": "import.csv-json",
+      "name": "CSV / JSON Import",
+      "type": "import",
+      "status": "active",
+      "offline": true,
+      "readOnly": false,
+      "description": "Structured records and reference metadata imported through reusable onboarding tools."
+    },
+    {
+      "id": "remote.versioned-catalog",
+      "name": "Versioned Content Catalog",
+      "type": "remote",
+      "status": "foundation",
+      "offline": false,
+      "readOnly": true,
+      "description": "Future provider-neutral manifest for downloadable state, trade, manufacturer, or themed packs."
+    }
+  ],
+  "packs": [
+    {
+      "id": "core.user-library",
+      "name": "User Reference Library",
+      "classification": "core",
+      "sourceId": "local.user-vault",
+      "status": "active",
+      "appForgeReady": true,
+      "description": "Reusable user-managed folders and reference items available to every field-vault app.",
+      "folderNames": [
+        "Manuals",
+        "Forms",
+        "Links",
+        "Codes"
+      ],
+      "contentTypes": [
+        "document",
+        "link",
+        "note",
+        "image"
+      ],
+      "apps": {
+        "fireVault": true,
+        "travelGuide": true,
+        "fishing": true,
+        "ghostTowns": true,
+        "gardening": true,
+        "inspection": true
+      }
+    },
+    {
+      "id": "core.account-content",
+      "name": "Record-Linked Content",
+      "classification": "core",
+      "sourceId": "local.user-vault",
+      "status": "active",
+      "appForgeReady": true,
+      "description": "Photos, documents, links, and reference items connected to a specific account or location.",
+      "folderNames": [],
+      "contentTypes": [
+        "document",
+        "photo",
+        "link"
+      ],
+      "apps": {
+        "fireVault": true,
+        "travelGuide": true,
+        "fishing": true,
+        "ghostTowns": true,
+        "gardening": true,
+        "inspection": true
+      }
+    },
+    {
+      "id": "firevault.field-reference",
+      "name": "Fire Alarm Field Reference",
+      "classification": "firevault",
+      "sourceId": "bundled.app-reference",
+      "status": "active",
+      "appForgeReady": false,
+      "description": "Fire-alarm-oriented library organization for field manuals, forms, codes, and quick references.",
+      "folderNames": [
+        "Panel Manuals",
+        "Communicators",
+        "Inspection Forms",
+        "Fire Codes"
+      ],
+      "contentTypes": [
+        "document",
+        "link",
+        "note"
+      ],
+      "apps": {
+        "fireVault": true,
+        "travelGuide": false,
+        "fishing": false,
+        "ghostTowns": false,
+        "gardening": false,
+        "inspection": false
+      }
+    },
+    {
+      "id": "firevault.panel-documents",
+      "name": "Panel Document Matching",
+      "classification": "firevault",
+      "sourceId": "local.user-vault",
+      "status": "active",
+      "appForgeReady": false,
+      "description": "Manufacturer and model-linked documents that can be assigned to fire-alarm accounts.",
+      "folderNames": [
+        "Panel Manuals"
+      ],
+      "contentTypes": [
+        "document",
+        "link"
+      ],
+      "apps": {
+        "fireVault": true,
+        "travelGuide": false,
+        "fishing": false,
+        "ghostTowns": false,
+        "gardening": false,
+        "inspection": false
+      }
+    },
+    {
+      "id": "travel.wyoming-points",
+      "name": "Wyoming Points of Interest",
+      "classification": "optional",
+      "sourceId": "remote.versioned-catalog",
+      "status": "planned",
+      "appForgeReady": true,
+      "description": "Example downloadable location pack for attractions, unusual sites, services, and travel notes.",
+      "folderNames": [
+        "Attractions",
+        "Scenic Stops",
+        "Historic Sites",
+        "Services"
+      ],
+      "contentTypes": [
+        "record",
+        "photo",
+        "reference"
+      ],
+      "apps": {
+        "fireVault": false,
+        "travelGuide": true,
+        "fishing": false,
+        "ghostTowns": true,
+        "gardening": false,
+        "inspection": false
+      }
+    },
+    {
+      "id": "outdoors.fishing-spots",
+      "name": "Fishing Locations",
+      "classification": "optional",
+      "sourceId": "remote.versioned-catalog",
+      "status": "planned",
+      "appForgeReady": true,
+      "description": "Example location pack for access points, water details, species, regulations, and live-condition readiness.",
+      "folderNames": [
+        "Access",
+        "Regulations",
+        "Species",
+        "Conditions"
+      ],
+      "contentTypes": [
+        "record",
+        "photo",
+        "reference"
+      ],
+      "apps": {
+        "fireVault": false,
+        "travelGuide": true,
+        "fishing": true,
+        "ghostTowns": false,
+        "gardening": false,
+        "inspection": false
+      }
+    },
+    {
+      "id": "history.ghost-towns",
+      "name": "Ghost Towns and Historic Sites",
+      "classification": "optional",
+      "sourceId": "remote.versioned-catalog",
+      "status": "planned",
+      "appForgeReady": true,
+      "description": "Example themed location pack with history, access, safety, photos, and route information.",
+      "folderNames": [
+        "History",
+        "Access",
+        "Safety",
+        "Nearby Sites"
+      ],
+      "contentTypes": [
+        "record",
+        "photo",
+        "reference"
+      ],
+      "apps": {
+        "fireVault": false,
+        "travelGuide": true,
+        "fishing": false,
+        "ghostTowns": true,
+        "gardening": false,
+        "inspection": false
+      }
+    }
+  ],
+  "activeProfile": {
+    "schemaVersion": 1,
+    "registryId": "firevault-content-v1",
+    "enabledSourceIds": [
+      "local.user-vault",
+      "bundled.app-reference",
+      "import.csv-json"
+    ],
+    "enabledPackIds": [
+      "core.user-library",
+      "core.account-content",
+      "firevault.field-reference",
+      "firevault.panel-documents"
+    ],
+    "updatePolicy": {
+      "mode": "manual",
+      "allowMetered": false,
+      "verifyManifests": true,
+      "keepPreviousVersion": true
+    }
+  }
+}

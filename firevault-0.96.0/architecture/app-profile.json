@@ -1,0 +1,309 @@
+{
+  "schemaVersion": 12,
+  "id": "firevault",
+  "family": "field-vault",
+  "name": "FireVault",
+  "shortName": "FireVault",
+  "industry": "Fire alarm service",
+  "audience": "Fire alarm technicians",
+  "purpose": "Local-first field knowledge, account history, navigation, photos, documents, and technician reference.",
+  "terminology": {
+    "recordSingular": "Account",
+    "recordPlural": "Accounts",
+    "recordId": "Account ID",
+    "locationSingular": "Location",
+    "locationPlural": "Locations",
+    "personSingular": "Technician",
+    "personPlural": "Technicians",
+    "noteSingular": "Note",
+    "notePlural": "Notes",
+    "equipmentSingular": "Equipment",
+    "equipmentPlural": "Equipment",
+    "deficiencySingular": "Deficiency",
+    "deficiencyPlural": "Deficiencies",
+    "taskSingular": "Task",
+    "taskPlural": "Tasks",
+    "fileSingular": "File",
+    "filePlural": "Files"
+  },
+  "labels": {
+    "recordDirectory": "{{account}} Directory",
+    "recordDetail": "{{account}} Detail",
+    "addRecord": "Add {{account}}",
+    "editRecord": "Edit {{account}}",
+    "unnamedRecord": "Unnamed {{account}}",
+    "searchRecords": "Search {{accounts}}",
+    "nearbyRecords": "Nearby {{accounts}}",
+    "chooseRecord": "Choose {{account}}",
+    "currentRecord": "Current {{account}}",
+    "recordActions": "{{account}} actions",
+    "recordSections": "{{account}} sections",
+    "noRecords": "No {{accounts}} yet",
+    "noMatchingRecords": "No matching {{accounts}}",
+    "firstRecord": "Add First {{account}}",
+    "recordPhoto": "{{account}} Photo",
+    "recordPhotos": "{{account}} Photos"
+  },
+  "navigation": {
+    "nearby": "Nearby",
+    "search": "Search",
+    "photo": "Photo",
+    "settings": "Settings"
+  },
+  "branding": {
+    "mark": "assets/favicon.png",
+    "logo": "assets/firevault-logo-master.png",
+    "icon192": "assets/icon-192.png",
+    "icon512": "assets/icon-512.png",
+    "appleTouchIcon": "assets/apple-touch-icon.png",
+    "wordmark": [
+      {
+        "text": "FIRE",
+        "tone": "primary"
+      },
+      {
+        "text": "VAULT",
+        "tone": "accent"
+      }
+    ],
+    "tagline": "Field Vault System"
+  },
+  "appearance": {
+    "profileId": "firevault-dark",
+    "profileName": "FireVault Dark",
+    "theme": "dark",
+    "accent": "#ef4444",
+    "accentStrong": "#991b1b",
+    "background": "#0b0d10",
+    "surface": "#151922",
+    "surfaceRaised": "#1d2330",
+    "line": "#303747",
+    "text": "#f4f7fb",
+    "muted": "#a7b0c0",
+    "success": "#22c55e",
+    "warning": "#f59e0b",
+    "info": "#38bdf8",
+    "cyan": "#22d3ee",
+    "themeColor": "#101216",
+    "statusBarStyle": "black",
+    "radius": 18,
+    "controlRadius": 15,
+    "compact": false,
+    "baseFontSize": 14
+  },
+  "defaultPhotoCategories": [
+    "Panel",
+    "NAC",
+    "Device",
+    "Communicator",
+    "Battery",
+    "Deficiency",
+    "Before",
+    "After",
+    "Other"
+  ],
+  "dataModel": {
+    "schemaId": "firevault.account.v1",
+    "enabledFieldIds": [
+      "name",
+      "externalAccountId",
+      "sitePhone",
+      "street",
+      "city",
+      "state",
+      "zip",
+      "gps",
+      "panelManufacturer",
+      "panelModel",
+      "notes"
+    ],
+    "requiredFieldIds": [
+      "name"
+    ],
+    "detailSectionIds": [
+      "overview",
+      "notes",
+      "locations",
+      "equipment",
+      "docs",
+      "details"
+    ],
+    "photoCategoryIds": [
+      "panel",
+      "nac",
+      "device",
+      "communicator",
+      "battery",
+      "deficiency",
+      "before",
+      "after",
+      "other"
+    ]
+  },
+  "workflows": {
+    "presetId": "fire-alarm-technician",
+    "directoryActionIds": [
+      "call",
+      "route",
+      "note",
+      "favorite"
+    ],
+    "detailPrimaryActionIds": [
+      "call",
+      "route",
+      "note",
+      "photo"
+    ],
+    "notesActionIds": [
+      "task",
+      "deficiency",
+      "photo",
+      "report"
+    ],
+    "quickPhoto": {
+      "defaultUseOverlay": true,
+      "defaultIncludeReport": false,
+      "rememberAccount": true,
+      "rememberCategory": true,
+      "allowAccountChange": true,
+      "allowRetake": true,
+      "showCategory": true,
+      "showOverlayToggle": true,
+      "showReportToggle": true,
+      "showTitle": true,
+      "showInternalNotes": true,
+      "showCustomerCaption": true,
+      "cameraFacing": "environment",
+      "maxImageDimension": 2048,
+      "jpegQuality": 0.86
+    }
+  },
+  "content": {
+    "registryId": "firevault-content-v1",
+    "enabledSourceIds": [
+      "local.user-vault",
+      "bundled.app-reference",
+      "import.csv-json"
+    ],
+    "enabledPackIds": [
+      "core.user-library",
+      "core.account-content",
+      "firevault.field-reference",
+      "firevault.panel-documents"
+    ],
+    "updatePolicy": {
+      "mode": "manual",
+      "allowMetered": false,
+      "verifyManifests": true,
+      "keepPreviousVersion": true
+    }
+  },
+  "syncStorage": {
+    "profileId": "firevault-local-first",
+    "enabledProviderIds": [
+      "local",
+      "webdav",
+      "onedrive",
+      "sharepoint"
+    ],
+    "roles": {
+      "vault": [
+        "local"
+      ],
+      "media": [
+        "local"
+      ],
+      "backup": [
+        "local",
+        "webdav"
+      ],
+      "photo": [
+        "local",
+        "onedrive",
+        "sharepoint"
+      ],
+      "document": [
+        "local",
+        "onedrive",
+        "sharepoint"
+      ],
+      "sync-package": [
+        "onedrive",
+        "sharepoint"
+      ]
+    },
+    "local": {
+      "offlineFirst": true,
+      "vaultBackend": "localStorage",
+      "mediaBackend": "indexedDB",
+      "persistentStorageRecommended": true
+    },
+    "backup": {
+      "manualExport": true,
+      "automaticSnapshots": true,
+      "snapshotLimit": 12,
+      "verifyBeforeRestore": true,
+      "includeMedia": true
+    },
+    "collaboration": {
+      "mode": "package-exchange",
+      "automaticSync": false,
+      "queueOffline": true,
+      "conflictPolicy": "manual-review"
+    },
+    "security": {
+      "storeCredentialsInVault": false,
+      "requireHttps": true,
+      "preserveLocalCopy": true,
+      "preventPersonalFallback": true
+    }
+  },
+  "interfaceIntegration": {
+    "terminology": true,
+    "navigation": true,
+    "routes": true,
+    "accountTabs": true,
+    "accountActions": true,
+    "settings": true,
+    "recordFields": true,
+    "detailSections": true,
+    "photoCategories": true,
+    "workflows": true,
+    "brandingTheme": true,
+    "contentPacks": true,
+    "syncStorage": true,
+    "appForgeBlueprint": true,
+    "appForgeRecipes": true,
+    "appForgeFactory": true,
+    "appForgeGenerator": true
+  },
+  "enabledModules": [
+    "core.records",
+    "core.themeProfile",
+    "core.contentPacks",
+    "core.syncStorageProfile",
+    "core.appForgeBlueprint",
+    "core.appForgeRecipes",
+    "core.appForgeFactory",
+    "core.appForgeGenerator",
+    "core.search",
+    "core.nearby",
+    "core.notes",
+    "core.photos",
+    "core.files",
+    "core.photoOverlay",
+    "core.locationNavigator",
+    "core.offlineStorage",
+    "core.backupRestore",
+    "core.security",
+    "optional.equipment",
+    "optional.tasks",
+    "optional.deficiencies",
+    "optional.reports",
+    "optional.cloudStorage",
+    "optional.importExport",
+    "firevault.fireAlarmProfile",
+    "firevault.panelDocuments",
+    "firevault.fireLocationTypes"
+  ]
+}

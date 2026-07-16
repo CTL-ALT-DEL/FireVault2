@@ -1,0 +1,47 @@
+{
+  "version": 1,
+  "build": "1.03.0",
+  "activeRecipeId": "firevault",
+  "recipes": [
+    {
+      "id": "firevault",
+      "name": "FireVault",
+      "category": "Field service",
+      "status": "active",
+      "blueprintChecks": "9/9",
+      "assetStatus": "production",
+      "databaseStatus": "user-vault",
+      "requirements": []
+    },
+    {
+      "id": "wyoming-explorer",
+      "name": "Wyoming Explorer",
+      "category": "Travel guide",
+      "status": "foundation",
+      "blueprintChecks": "9/9",
+      "assetStatus": "placeholder",
+      "databaseStatus": "planned-content-pack",
+      "requirements": ["Replace placeholder brand icons", "Install a verified Wyoming location database"]
+    },
+    {
+      "id": "wyoming-fishing",
+      "name": "Wyoming Fishing Guide",
+      "category": "Outdoor guide",
+      "status": "foundation",
+      "blueprintChecks": "9/9",
+      "assetStatus": "placeholder",
+      "databaseStatus": "planned-content-pack",
+      "requirements": ["Replace placeholder brand icons", "Install verified fishing locations and current regulations"]
+    },
+    {
+      "id": "ghost-towns",
+      "name": "Ghost Towns Guide",
+      "category": "Themed travel",
+      "status": "foundation",
+      "blueprintChecks": "9/9",
+      "assetStatus": "placeholder",
+      "databaseStatus": "planned-content-pack",
+      "requirements": ["Replace placeholder brand icons", "Install a verified historic-sites database"]
+    }
+  ]
+}

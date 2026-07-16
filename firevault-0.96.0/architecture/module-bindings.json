@@ -1,0 +1,174 @@
+{
+  "version": 2,
+  "navigation": {
+    "nearby": [
+      "core.nearby"
+    ],
+    "search": [
+      "core.search"
+    ],
+    "photo": [
+      "core.photos"
+    ],
+    "settings": []
+  },
+  "routes": {
+    "home": [
+      "core.nearby"
+    ],
+    "nearbySites": [
+      "core.nearby"
+    ],
+    "sites": [
+      "core.search"
+    ],
+    "siteDetail": [
+      "core.records"
+    ],
+    "siteForm": [
+      "core.records"
+    ],
+    "contactsList": [
+      "core.records"
+    ],
+    "contactForm": [
+      "core.records"
+    ],
+    "siteDocs": [
+      "core.files"
+    ],
+    "siteDocForm": [
+      "core.files"
+    ],
+    "equipmentList": [
+      "optional.equipment"
+    ],
+    "equipmentForm": [
+      "optional.equipment"
+    ],
+    "tasks": [
+      "optional.tasks"
+    ],
+    "taskForm": [
+      "optional.tasks"
+    ],
+    "deficiencies": [
+      "optional.deficiencies"
+    ],
+    "deficiencyForm": [
+      "optional.deficiencies"
+    ],
+    "report": [
+      "optional.reports"
+    ],
+    "library": [
+      "core.files",
+      "core.contentPacks"
+    ],
+    "resourceForm": [
+      "core.files",
+      "core.contentPacks"
+    ],
+    "jobMode": [
+      "core.notes"
+    ],
+    "settings": []
+  },
+  "settings": {
+    "tech": [
+      "firevault.fireAlarmProfile"
+    ],
+    "gps": [
+      "core.nearby"
+    ],
+    "plusCodes": [
+      "core.locationNavigator"
+    ],
+    "overlay": [
+      "core.photoOverlay"
+    ],
+    "reports": [
+      "optional.reports"
+    ],
+    "email": [
+      "optional.reports"
+    ],
+    "privacy": [
+      "core.security"
+    ],
+    "security": [
+      "core.security"
+    ],
+    "cloudFiles": [
+      "core.files"
+    ],
+    "microsoftStorage": [
+      "optional.cloudStorage"
+    ],
+    "sync": [
+      "optional.cloudStorage"
+    ],
+    "customerImport": [
+      "optional.importExport"
+    ],
+    "categories": [
+      "core.records"
+    ],
+    "backup": [
+      "core.backupRestore"
+    ],
+    "webdav": [
+      "optional.cloudStorage"
+    ],
+    "updates": [],
+    "demo": [
+      "core.records"
+    ],
+    "about": [],
+    "architecture": []
+  },
+  "accountTabs": [
+    {
+      "key": "overview",
+      "label": "Overview",
+      "modules": [
+        "core.records"
+      ]
+    },
+    {
+      "key": "notes",
+      "label": "Notes",
+      "modules": [
+        "core.notes"
+      ]
+    },
+    {
+      "key": "locations",
+      "label": "Locations",
+      "modules": [
+        "core.locationNavigator"
+      ]
+    },
+    {
+      "key": "equipment",
+      "term": "equipment",
+      "modules": [
+        "optional.equipment"
+      ]
+    },
+    {
+      "key": "docs",
+      "term": "file",
+      "modules": [
+        "core.files"
+      ]
+    },
+    {
+      "key": "details",
+      "label": "Details",
+      "modules": [
+        "core.records"
+      ]
+    }
+  ]
+}

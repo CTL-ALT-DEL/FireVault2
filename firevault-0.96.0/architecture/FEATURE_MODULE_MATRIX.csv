@@ -1,0 +1,28 @@
+Module ID,Module,Classification,Status,FireVault,Travel Guide,Fishing,Ghost Towns,Gardening,Inspection,AppForge Ready,Dependencies
+core.records,Record Database,Core,active,Yes,Yes,Yes,Yes,Yes,Yes,Yes,
+core.themeProfile,Branding & Theme Profile,Core,active,Yes,Yes,Yes,Yes,Yes,Yes,Yes,
+core.contentPacks,Data Sources & Content Packs,Core,active,Yes,Yes,Yes,Yes,Yes,Yes,Yes,core.offlineStorage
+core.syncStorageProfile,Sync & Storage Profile,Core,active,Yes,Yes,Yes,Yes,Yes,Yes,Yes,core.offlineStorage | core.backupRestore
+core.appForgeBlueprint,AppForge Product Blueprint,Core,active,Yes,Yes,Yes,Yes,Yes,Yes,Yes,core.records | core.themeProfile | core.contentPacks | core.syncStorageProfile
+core.appForgeRecipes,AppForge Product Recipes,Core,active,Yes,Yes,Yes,Yes,Yes,Yes,Yes,core.appForgeBlueprint
+core.appForgeFactory,AppForge Factory Manifest,Core,active,Yes,Yes,Yes,Yes,Yes,Yes,Yes,core.appForgeRecipes
+core.appForgeGenerator,AppForge Generator Engine,Core,active,Yes,Yes,Yes,Yes,Yes,Yes,Yes,core.appForgeFactory
+core.search,Search Directory,Core,active,Yes,Yes,Yes,Yes,Yes,Yes,Yes,core.records
+core.nearby,Nearby GPS,Core,active,Yes,Yes,Yes,Yes,No,Yes,Yes,core.records
+core.notes,Notes & History,Core,active,Yes,Yes,Yes,Yes,Yes,Yes,Yes,core.records
+core.photos,Quick Photo,Core,active,Yes,Yes,Yes,Yes,Yes,Yes,Yes,core.records | core.offlineStorage
+core.files,Files & Documents,Core,active,Yes,Yes,Yes,Yes,Yes,Yes,Yes,core.records | core.offlineStorage
+core.photoOverlay,Photo Overlay,Core,active,Yes,Yes,Yes,Yes,Yes,Yes,Yes,core.photos
+core.locationNavigator,Exact Location Navigator,Core,active,Yes,Yes,Yes,Yes,Yes,Yes,Yes,core.records | core.nearby
+core.offlineStorage,Offline Storage,Core,active,Yes,Yes,Yes,Yes,Yes,Yes,Yes,
+core.backupRestore,Backup & Restore,Core,active,Yes,Yes,Yes,Yes,Yes,Yes,Yes,core.offlineStorage
+core.security,Security Foundation,Core,active,Yes,Yes,Yes,Yes,Yes,Yes,Yes,core.offlineStorage
+optional.equipment,Equipment Records,Reusable optional,active,Yes,No,Yes,No,Yes,Yes,Yes,core.records
+optional.tasks,Tasks,Reusable optional,active,Yes,No,No,No,Yes,Yes,Yes,core.records | core.notes
+optional.deficiencies,Deficiencies / Issues,Reusable optional,active,Yes,No,No,No,Yes,Yes,Yes,core.records | core.photos
+optional.reports,Reports,Reusable optional,active,Yes,No,No,No,No,Yes,Yes,core.records | core.files
+optional.cloudStorage,Cloud Storage Adapters,Reusable optional,foundation,Yes,Yes,Yes,Yes,Yes,Yes,Yes,core.files | core.backupRestore | core.syncStorageProfile
+optional.importExport,Import & Export,Reusable optional,active,Yes,Yes,Yes,Yes,Yes,Yes,Yes,core.records | core.backupRestore
+firevault.fireAlarmProfile,Fire Alarm Account Profile,FireVault-specific,active,Yes,No,No,No,No,No,No,core.records | optional.equipment
+firevault.panelDocuments,Panel Documents,FireVault-specific,active,Yes,No,No,No,No,No,No,core.files | optional.equipment | firevault.fireAlarmProfile
+firevault.fireLocationTypes,Fire Location Types,FireVault-specific,active,Yes,No,No,No,No,No,No,core.locationNavigator | firevault.fireAlarmProfile

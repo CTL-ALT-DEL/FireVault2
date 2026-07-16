@@ -1,0 +1,52 @@
+{
+  "schemaVersion": 1,
+  "id": "firevault-dark",
+  "name": "FireVault Dark",
+  "mode": "dark",
+  "branding": {
+    "mark": "assets/favicon.png",
+    "logo": "assets/firevault-logo-master.png",
+    "icon192": "assets/icon-192.png",
+    "icon512": "assets/icon-512.png",
+    "appleTouchIcon": "assets/apple-touch-icon.png",
+    "wordmark": [
+      {
+        "text": "FIRE",
+        "tone": "primary"
+      },
+      {
+        "text": "VAULT",
+        "tone": "accent"
+      }
+    ],
+    "tagline": "Field Vault System"
+  },
+  "colors": {
+    "background": "#0b0d10",
+    "surface": "#151922",
+    "surfaceRaised": "#1d2330",
+    "line": "#303747",
+    "text": "#f4f7fb",
+    "muted": "#a7b0c0",
+    "accent": "#ef4444",
+    "accentStrong": "#991b1b",
+    "success": "#22c55e",
+    "warning": "#f59e0b",
+    "info": "#38bdf8",
+    "cyan": "#22d3ee"
+  },
+  "chrome": {
+    "themeColor": "#101216",
+    "backgroundColor": "#0b0d10",
+    "statusBarStyle": "black"
+  },
+  "shape": {
+    "radius": 18,
+    "controlRadius": 15,
+    "compact": false
+  },
+  "typography": {
+    "family": "-apple-system,BlinkMacSystemFont,\"Segoe UI\",Roboto,Arial,sans-serif",
+    "baseSize": 14
+  }
+}

@@ -1,0 +1,302 @@
+{
+  "version": 1,
+  "id": "firevault.account.v1",
+  "label": "FireVault Account Record",
+  "description": "Configurable field and section definition layered over the shared Field Vault record engine.",
+  "groups": [
+    {
+      "id": "identity",
+      "label": "Account Identity",
+      "description": "Stable identity and primary contact fields shared by the directory and detail screens."
+    },
+    {
+      "id": "location",
+      "label": "Location",
+      "description": "Address, coordinates, and route-ready location data."
+    },
+    {
+      "id": "fireSystem",
+      "label": "Fire Alarm System",
+      "description": "FireVault-specific panel and technician reference fields."
+    }
+  ],
+  "fields": [
+    {
+      "id": "name",
+      "path": "name",
+      "group": "identity",
+      "label": "Account Name",
+      "type": "text",
+      "required": true,
+      "modules": [
+        "core.records"
+      ],
+      "searchable": true,
+      "appForgeReady": true
+    },
+    {
+      "id": "externalAccountId",
+      "path": "externalAccountId",
+      "group": "identity",
+      "label": "Account ID",
+      "type": "text",
+      "required": false,
+      "modules": [
+        "core.records"
+      ],
+      "searchable": true,
+      "unique": true,
+      "appForgeReady": true
+    },
+    {
+      "id": "sitePhone",
+      "path": "sitePhone",
+      "group": "identity",
+      "label": "Site Phone",
+      "type": "phone",
+      "required": false,
+      "modules": [
+        "core.records"
+      ],
+      "searchable": true,
+      "appForgeReady": true
+    },
+    {
+      "id": "street",
+      "path": "street",
+      "group": "location",
+      "label": "Street Address",
+      "type": "text",
+      "required": false,
+      "modules": [
+        "core.records"
+      ],
+      "searchable": true,
+      "appForgeReady": true
+    },
+    {
+      "id": "city",
+      "path": "city",
+      "group": "location",
+      "label": "City",
+      "type": "text",
+      "required": false,
+      "modules": [
+        "core.records"
+      ],
+      "searchable": true,
+      "appForgeReady": true
+    },
+    {
+      "id": "state",
+      "path": "state",
+      "group": "location",
+      "label": "State",
+      "type": "text",
+      "required": false,
+      "modules": [
+        "core.records"
+      ],
+      "searchable": true,
+      "appForgeReady": true
+    },
+    {
+      "id": "zip",
+      "path": "zip",
+      "group": "location",
+      "label": "ZIP",
+      "type": "postal",
+      "required": false,
+      "modules": [
+        "core.records"
+      ],
+      "searchable": true,
+      "appForgeReady": true
+    },
+    {
+      "id": "gps",
+      "path": "gps",
+      "group": "location",
+      "label": "GPS",
+      "type": "coordinates",
+      "required": false,
+      "modules": [
+        "core.nearby"
+      ],
+      "searchable": false,
+      "appForgeReady": true
+    },
+    {
+      "id": "panelManufacturer",
+      "path": "panelManufacturer",
+      "group": "fireSystem",
+      "label": "Panel Make",
+      "type": "text",
+      "required": false,
+      "modules": [
+        "firevault.fireAlarmProfile"
+      ],
+      "searchable": true,
+      "appForgeReady": false
+    },
+    {
+      "id": "panelModel",
+      "path": "panelModel",
+      "group": "fireSystem",
+      "label": "Panel Model",
+      "type": "text",
+      "required": false,
+      "modules": [
+        "firevault.fireAlarmProfile"
+      ],
+      "searchable": true,
+      "appForgeReady": false
+    },
+    {
+      "id": "notes",
+      "path": "notes",
+      "group": "fireSystem",
+      "label": "Site Notes",
+      "type": "multiline",
+      "required": false,
+      "modules": [
+        "core.notes"
+      ],
+      "searchable": true,
+      "appForgeReady": true
+    }
+  ],
+  "detailSections": [
+    {
+      "id": "overview",
+      "label": "Overview",
+      "modules": [
+        "core.records"
+      ],
+      "appForgeReady": true
+    },
+    {
+      "id": "notes",
+      "label": "Notes",
+      "modules": [
+        "core.notes"
+      ],
+      "appForgeReady": true
+    },
+    {
+      "id": "locations",
+      "label": "Locations",
+      "modules": [
+        "core.locationNavigator"
+      ],
+      "appForgeReady": true
+    },
+    {
+      "id": "equipment",
+      "label": "Equipment",
+      "modules": [
+        "optional.equipment"
+      ],
+      "appForgeReady": true
+    },
+    {
+      "id": "docs",
+      "label": "Files",
+      "modules": [
+        "core.files"
+      ],
+      "appForgeReady": true
+    },
+    {
+      "id": "details",
+      "label": "Details",
+      "modules": [
+        "core.records"
+      ],
+      "appForgeReady": true
+    }
+  ],
+  "photoCategories": [
+    {
+      "id": "panel",
+      "label": "Panel",
+      "hint": "Panel cabinet, display, trouble state, or wiring overview.",
+      "modules": [
+        "firevault.fireAlarmProfile"
+      ],
+      "appForgeReady": false
+    },
+    {
+      "id": "nac",
+      "label": "NAC",
+      "hint": "Horn/strobe circuit, EOL, module, or notification appliance wiring.",
+      "modules": [
+        "firevault.fireAlarmProfile"
+      ],
+      "appForgeReady": false
+    },
+    {
+      "id": "device",
+      "label": "Device",
+      "hint": "Smoke, pull station, duct detector, module, tamper, flow, or other field device.",
+      "modules": [
+        "firevault.fireAlarmProfile"
+      ],
+      "appForgeReady": false
+    },
+    {
+      "id": "communicator",
+      "label": "Communicator",
+      "hint": "Cellular/IP communicator, antenna, signal screen, or wiring.",
+      "modules": [
+        "firevault.fireAlarmProfile"
+      ],
+      "appForgeReady": false
+    },
+    {
+      "id": "battery",
+      "label": "Battery",
+      "hint": "Batteries, date codes, charger readings, or cabinet condition.",
+      "modules": [
+        "firevault.fireAlarmProfile"
+      ],
+      "appForgeReady": false
+    },
+    {
+      "id": "deficiency",
+      "label": "Deficiency",
+      "hint": "Problem condition, damage, missing device, access issue, or failed test evidence.",
+      "modules": [
+        "optional.deficiencies"
+      ],
+      "appForgeReady": true
+    },
+    {
+      "id": "before",
+      "label": "Before",
+      "hint": "Before repair or before cleanup documentation.",
+      "modules": [
+        "core.photos"
+      ],
+      "appForgeReady": true
+    },
+    {
+      "id": "after",
+      "label": "After",
+      "hint": "After repair, restore, cleanup, or completion documentation.",
+      "modules": [
+        "core.photos"
+      ],
+      "appForgeReady": true
+    },
+    {
+      "id": "other",
+      "label": "Other",
+      "hint": "General site photo.",
+      "modules": [
+        "core.photos"
+      ],
+      "appForgeReady": true
+    }
+  ]
+}
