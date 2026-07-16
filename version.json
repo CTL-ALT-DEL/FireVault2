@@ -1,8 +1,8 @@
 {
-  "build": "1.01.1",
+  "build": "1.01.2",
   "released": "2026-07-15",
-  "note": "Account Detail now uses larger field-ready controls, clearer account identity, simplified tabs, and responsive phone and iPad layouts without changing workflows or stored data.",
-  "label": "Account Detail Polish",
-  "version": "1.01.1",
-  "name": "Account Detail Polish"
+  "note": "Photo Overlay now uses a clearer step-by-step editor, larger field controls, compact branding, and responsive phone and iPad layouts without changing rendering or stored settings.",
+  "label": "Photo Overlay Polish",
+  "version": "1.01.2",
+  "name": "Photo Overlay Polish"
 }

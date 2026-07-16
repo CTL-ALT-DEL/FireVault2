@@ -2484,7 +2484,7 @@ button,.btn,input,textarea,select{border-radius:var(--fv-control-radius,15px)}
 .appForgeGeneratorStatus1000{display:flex;align-items:center;gap:10px;margin-top:12px;padding:11px;border:1px solid color-mix(in srgb,var(--success) 28%,var(--line));border-radius:14px;background:color-mix(in srgb,var(--success) 7%,var(--panel2))}.appForgeGeneratorStatus1000>i{display:grid;place-items:center;flex:0 0 28px;height:28px;border-radius:50%;background:rgba(34,197,94,.15);color:var(--success);font-style:normal;font-weight:900}.appForgeGeneratorStatus1000>span{display:flex;flex-direction:column;gap:2px;min-width:0}.appForgeGeneratorStatus1000 strong{font-size:11px;color:var(--text)}.appForgeGeneratorStatus1000 small{font-size:10px;line-height:1.35;color:var(--muted)}
 @media(max-width:680px){.appForgeGeneratorMetrics1000{grid-template-columns:repeat(2,minmax(0,1fr))}.appForgeGeneratorGrid1000{grid-template-columns:1fr}.appForgeGeneratorFlow1000{justify-content:flex-start}.appForgeGeneratorPending1000{min-height:0}}
 
-/* Build 1.01.1 — Account Detail readability and visual hierarchy. */
+/* Build 1.01.2 — Account Detail readability and visual hierarchy. */
 .accountDetail1011{
   --account-control:#17263a;
   --account-control-raised:#1d3048;
@@ -2847,4 +2847,347 @@ button,.btn,input,textarea,select{border-radius:var(--fv-control-radius,15px)}
   .accountDetail1011 .accountOverview0735>.accountInfoCard0735{grid-column:auto!important}
   .accountDetail1011 .accountOverview0735>.accountTimeline0786{grid-column:1/-1!important}
   .accountDetail1011 .accountPanel0735{padding:18px!important}
+}
+
+/* Build 1.01.2 — Photo Overlay workflow hierarchy and field-ready controls. */
+.settingsOverlayDetail1012{
+  background:
+    radial-gradient(circle at 88% -8%,rgba(239,68,68,.10),transparent 30%),
+    linear-gradient(180deg,#071421,#06101a)!important;
+}
+.settingsOverlayDetail1012 .settingsSimpleDetailBody0850{
+  padding:8px max(8px,env(safe-area-inset-left,0px)) calc(104px + env(safe-area-inset-bottom)) max(8px,env(safe-area-inset-right,0px))!important;
+}
+.overlayStudio1012{width:min(100%,1100px)!important;gap:14px!important}
+.overlayPreview1012{
+  padding:8px!important;
+  border-color:rgba(128,158,193,.30)!important;
+  border-radius:20px!important;
+  background:linear-gradient(160deg,#16263a,#0b1725)!important;
+  box-shadow:0 16px 34px rgba(0,0,0,.32),inset 0 1px 0 rgba(255,255,255,.06)!important;
+}
+.overlayWorkspaceHead1012{
+  min-height:58px;
+  display:grid;
+  grid-template-columns:auto minmax(0,1fr) auto;
+  align-items:center;
+  gap:11px;
+  padding:0 4px 8px;
+}
+.overlayPreview1012 .overlayFloatingBack0943{
+  position:static!important;
+  width:auto!important;
+  min-width:76px!important;
+  height:44px!important;
+  min-height:44px!important;
+  padding:0 12px 0 9px!important;
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  gap:5px!important;
+  border-color:rgba(136,164,198,.30)!important;
+  border-radius:13px!important;
+  background:linear-gradient(180deg,#20344d,#15263a)!important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.06)!important;
+  font-size:12px!important;
+}
+.overlayBackIcon1012{width:19px!important;height:19px!important;flex:0 0 19px!important}
+.overlayPreview1012 .overlayFloatingBack0943 strong{font-size:12px!important;line-height:1!important}
+.overlayWorkspaceHead1012>div{min-width:0;display:grid;gap:2px}
+.overlayWorkspaceHead1012>div>span{
+  color:#f87171;
+  font-size:9.5px;
+  line-height:1;
+  font-weight:950;
+  letter-spacing:.12em;
+}
+.overlayWorkspaceHead1012>div>strong{color:#fff;font-size:17px;line-height:1.08}
+.overlayWorkspaceHead1012>div>small{color:#9dafc2;font-size:10.5px;line-height:1.2}
+.overlayPreview1012 .overlayAutoSave0944{
+  min-width:58px;
+  padding:7px 9px!important;
+  border:1px solid rgba(54,211,153,.28)!important;
+  border-radius:999px!important;
+  color:#9beac0!important;
+  background:rgba(23,108,74,.19)!important;
+  font-size:10px!important;
+  text-align:center;
+}
+.overlayPreview1012 .overlayAutoSave0944[data-state="saving"]{color:#fcd78d!important;border-color:rgba(245,158,11,.30)!important;background:rgba(133,79,14,.18)!important}
+.overlayPreview1012 .overlayPreviewFrame0890{
+  width:min(100%,820px,calc(36vh * 1.5))!important;
+  border-radius:15px!important;
+  border-color:rgba(255,255,255,.16)!important;
+  box-shadow:0 12px 26px rgba(0,0,0,.28),inset 0 1px rgba(255,255,255,.06)!important;
+}
+.overlayControlsColumn1012{
+  width:min(100%,960px)!important;
+  gap:14px!important;
+}
+.overlayControlsColumn1012>.overlayQuickCard0890,
+.overlayControlsColumn1012>.overlaySection0890{
+  min-width:0!important;
+  padding:17px!important;
+  border-color:rgba(128,158,193,.24)!important;
+  border-radius:19px!important;
+  background:linear-gradient(150deg,rgba(22,37,55,.99),rgba(10,20,32,.99))!important;
+  box-shadow:0 10px 24px rgba(0,0,0,.22),inset 0 1px 0 rgba(255,255,255,.045)!important;
+}
+.overlayControlsColumn1012>.overlayQuickCard0890{
+  order:0!important;
+  background:
+    radial-gradient(circle at 92% 0%,rgba(239,68,68,.12),transparent 34%),
+    linear-gradient(150deg,#192a3d,#0b1725)!important;
+}
+.overlayControlsColumn1012 .overlayCardHead0890{margin-bottom:14px!important;gap:14px!important}
+.overlayControlsColumn1012 .overlayCardHead0890 span{font-size:10px!important;letter-spacing:.12em!important}
+.overlayControlsColumn1012 .overlayCardHead0890 h2{font-size:18px!important;line-height:1.15!important}
+.overlayControlsColumn1012 .overlayCardHead0890 p{
+  margin:5px 0 0!important;
+  color:#9dadbf!important;
+  font-size:12px!important;
+  line-height:1.4!important;
+}
+.overlayReset1012{min-height:42px!important;padding:8px 13px!important;border-radius:12px!important;font-size:12px!important}
+.overlayQuickCard1012 .overlayPresetGrid0890{
+  grid-template-columns:repeat(3,minmax(0,1fr))!important;
+  gap:9px!important;
+}
+.overlayQuickCard1012 .overlayPresetGrid0890 button{
+  min-width:0!important;
+  min-height:82px!important;
+  grid-template-columns:32px minmax(0,1fr)!important;
+  column-gap:8px!important;
+  padding:10px!important;
+  border-radius:15px!important;
+}
+.overlayPresetIcon1012{
+  grid-row:1/3;
+  width:32px!important;
+  height:32px!important;
+  padding:7px;
+  border-radius:10px;
+  color:#f87171!important;
+  background:rgba(239,68,68,.10);
+}
+.overlayQuickCard1012 .overlayPresetGrid0890 button strong{font-size:12.5px!important}
+.overlayQuickCard1012 .overlayPresetGrid0890 button small{font-size:10px!important;line-height:1.25!important}
+.overlayQuickCard1012 .overlayQuickToggles0890{gap:9px!important;margin-top:10px!important}
+.overlayQuickCard1012 .overlayQuickToggles0890 .checkRow{min-height:48px!important;padding:9px 11px!important;font-size:12px!important}
+.overlayFieldBuilder1012 .overlayBuilderGroup0944{
+  padding:13px!important;
+  border-color:rgba(128,158,193,.22)!important;
+  border-radius:16px!important;
+  background:rgba(5,14,24,.38)!important;
+}
+.overlayFieldBuilder1012 .overlayBuilderGroup0944+.overlayBuilderGroup0944{margin-top:11px!important}
+.overlayFieldBuilder1012 .overlayBuilderTitle0944{margin-bottom:10px!important;gap:10px!important}
+.overlayFieldBuilder1012 .overlayBuilderTitle0944 strong{font-size:13.5px!important;line-height:1.2!important}
+.overlayFieldBuilder1012 .overlayBuilderTitle0944 small{color:#9dadbf!important;font-size:11px!important;line-height:1.35!important;text-align:left!important}
+.overlayFieldBuilder1012 .overlayQuickAlign0945{
+  min-width:150px!important;
+  min-height:50px!important;
+  padding:7px 10px!important;
+  border-radius:13px!important;
+}
+.overlayFieldBuilder1012 .overlayQuickAlign0945 strong{font-size:12px!important}
+.overlayFieldBuilder1012 .overlayQuickAlign0945 small{font-size:10px!important}
+.overlayQuickInfoIcon1012{grid-row:1/3;width:28px!important;height:28px!important;color:#9ed0ff!important}
+.overlayFieldBuilder1012 .overlayActiveFields0944{gap:9px!important}
+.overlayFieldBuilder1012 .overlayMainField1012{
+  min-height:0!important;
+  display:grid!important;
+  grid-template-columns:minmax(0,1fr)!important;
+  grid-template-areas:none!important;
+  gap:9px!important;
+  padding:10px!important;
+  border:1px solid rgba(128,158,193,.25)!important;
+  border-radius:15px!important;
+  background:linear-gradient(145deg,#17273a,#0e1a28)!important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.035)!important;
+}
+.overlayMainField1012 .overlayFieldTop1012{
+  display:grid;
+  grid-template-columns:28px minmax(0,1fr) auto;
+  align-items:center;
+  gap:9px;
+}
+.overlayMainField1012 .overlayDragHandle0944{
+  grid-area:auto!important;
+  width:28px!important;
+  height:40px!important;
+  border-radius:9px!important;
+  color:#93a8bf!important;
+  background:rgba(255,255,255,.035)!important;
+  font-size:15px!important;
+}
+.overlayDragIcon1012{width:18px!important;height:18px!important}
+.overlayMainField1012 .overlayActiveFieldText0944{grid-area:auto!important;display:grid!important;gap:3px!important}
+.overlayMainField1012 .overlayActiveFieldText0944 strong{color:#f7fbff!important;font-size:14px!important;line-height:1.15!important}
+.overlayMainField1012 .overlayActiveFieldText0944 small{
+  display:block!important;
+  overflow:hidden!important;
+  color:#9aabbd!important;
+  font-size:10.5px!important;
+  line-height:1.25!important;
+  text-overflow:ellipsis!important;
+  white-space:nowrap!important;
+}
+.overlayMainField1012 .overlayBreakButton0944{
+  grid-area:auto!important;
+  width:auto!important;
+  min-width:82px!important;
+  min-height:44px!important;
+  padding:7px 10px!important;
+  border-radius:11px!important;
+  font-size:10.5px!important;
+  line-height:1.1!important;
+}
+.overlayMainField1012 .overlayBreakButton0944:disabled{opacity:.56!important}
+.overlayMainField1012 .overlayFieldBottom1012{
+  display:grid;
+  grid-template-columns:minmax(210px,1fr) auto;
+  align-items:stretch;
+  gap:9px;
+  padding-left:37px;
+}
+.overlayMainField1012 .overlayFieldAlign0945{
+  grid-area:auto!important;
+  min-width:210px!important;
+  min-height:44px!important;
+  border-radius:11px!important;
+}
+.overlayMainField1012 .overlayFieldAlign0945 button{
+  min-height:44px!important;
+  padding:0 8px!important;
+  font-size:11.5px!important;
+}
+.overlayMainField1012 .overlayFieldActions0944{
+  grid-area:auto!important;
+  display:grid!important;
+  grid-template-columns:52px 52px 68px!important;
+  gap:5px!important;
+}
+.overlayMainField1012 .overlayFieldActions0944 button{
+  width:100%!important;
+  min-width:0!important;
+  min-height:44px!important;
+  display:flex!important;
+  flex-direction:column!important;
+  align-items:center!important;
+  justify-content:center!important;
+  gap:2px!important;
+  padding:3px!important;
+  border-radius:11px!important;
+}
+.overlayFieldControlIcon1012{width:15px!important;height:15px!important;flex:0 0 15px!important}
+.overlayMainField1012 .overlayFieldActions0944 button>span{font-size:9.5px!important;line-height:1!important;font-weight:850!important}
+.overlayFieldBuilder1012 .overlayFieldGrid510{
+  grid-template-columns:repeat(2,minmax(0,1fr))!important;
+  gap:8px!important;
+}
+.overlayFieldBuilder1012 .overlayFieldChip510{
+  min-height:50px!important;
+  padding:9px 10px!important;
+  border-radius:13px!important;
+}
+.overlayFieldBuilder1012 .overlayFieldChip510 strong{font-size:12px!important;line-height:1.2!important}
+.overlayFieldChipIcon1012{width:15px!important;height:15px!important}
+.overlayLayout1012{gap:15px!important}
+.overlayLayout1012 .overlayControlBlock0890>label{font-size:12px!important}
+.overlayLayout1012 .overlayChoice0890{min-height:60px!important;border-radius:13px!important}
+.overlayLayout1012 .overlayChoice0890 strong{font-size:11.5px!important}
+.overlayChoiceIcon1012{width:21px!important;height:21px!important}
+.overlayLayout1012 .overlayRange0890{padding:12px!important}
+.overlayLayout1012 .overlayRange0890>span{font-size:12px!important}
+.overlayBrand1012 .overlayColorGrid0890 label{font-size:11px!important}
+.overlayBrand1012 .overlayColorGrid0890 input[type="color"],
+.overlayBrand1012 .overlayColorGrid0890 select{min-height:50px!important;font-size:12px!important}
+.overlayBrand1012 .overlayLogoCard511{padding:12px!important;border-radius:15px!important}
+.overlayBrand1012 .overlayLogoCard511{
+  grid-template-columns:96px minmax(0,1fr)!important;
+  align-items:start!important;
+  gap:12px!important;
+}
+.overlayBrand1012 .overlayLogoPreview511{width:96px!important;height:96px!important;min-height:96px!important;border-radius:14px!important}
+.overlayBrand1012 .overlayLogoMeta511 strong{font-size:14px!important}
+.overlayBrand1012 .overlayLogoMeta511 p,
+.overlayBrand1012 .overlayUploadLabel511{font-size:11.5px!important}
+.overlayBrand1012 .overlayLogoActions511 .ghost{min-height:42px!important;font-size:11.5px!important}
+.settingsOverlayDetail1012 button:focus-visible,
+.settingsOverlayDetail1012 input:focus-visible,
+.settingsOverlayDetail1012 select:focus-visible{
+  outline:3px solid rgba(96,165,250,.76)!important;
+  outline-offset:2px!important;
+}
+
+@media(max-width:620px){
+  .overlayWorkspaceHead1012{gap:8px}
+  .overlayControlsColumn1012>.overlayQuickCard0890,
+  .overlayControlsColumn1012>.overlaySection0890{padding:14px!important}
+  .overlayFieldBuilder1012 .overlayBuilderTitle0944{align-items:stretch!important}
+  .overlayFieldBuilder1012 .overlayQuickAlign0945{width:100%!important;min-width:0!important}
+  .overlayMainField1012 .overlayFieldBottom1012{
+    grid-template-columns:minmax(0,1fr)!important;
+    padding-left:37px!important;
+  }
+  .overlayMainField1012 .overlayFieldAlign0945{width:100%!important;min-width:0!important}
+  .overlayMainField1012 .overlayFieldActions0944{grid-template-columns:repeat(3,minmax(0,1fr))!important;width:100%!important}
+  .overlayMainField1012 .overlayFieldActions0944 button{min-height:46px!important}
+}
+
+@media(max-width:430px){
+  .settingsOverlayDetail1012 .settingsSimpleDetailBody0850{padding-left:6px!important;padding-right:6px!important}
+  .overlayPreview1012{padding:6px!important;border-radius:16px!important}
+  .overlayWorkspaceHead1012{min-height:54px;padding:0 2px 6px}
+  .overlayPreview1012 .overlayFloatingBack0943{min-width:66px!important;height:42px!important;min-height:42px!important;padding-inline:8px!important}
+  .overlayWorkspaceHead1012>div>strong{font-size:15px}
+  .overlayWorkspaceHead1012>div>small{display:none}
+  .overlayPreview1012 .overlayAutoSave0944{min-width:52px;padding:6px 7px!important;font-size:9.5px!important}
+  .overlayQuickCard1012 .overlayPresetGrid0890{gap:6px!important}
+  .overlayQuickCard1012 .overlayPresetGrid0890 button{
+    min-height:68px!important;
+    display:flex!important;
+    flex-direction:column!important;
+    align-items:center!important;
+    justify-content:center!important;
+    gap:5px!important;
+    padding:7px 4px!important;
+    text-align:center!important;
+  }
+  .overlayPresetIcon1012{grid-row:auto;width:28px!important;height:28px!important;padding:6px!important}
+  .overlayQuickCard1012 .overlayPresetGrid0890 button small,
+  .overlayQuickCard1012 .overlayPresetGrid0890 button em{display:none!important}
+  .overlayQuickCard1012 .overlayPresetGrid0890 button strong{font-size:11.5px!important}
+  .overlayFieldBuilder1012 .overlayBuilderGroup0944{padding:10px!important}
+  .overlayMainField1012 .overlayFieldTop1012{grid-template-columns:26px minmax(0,1fr) auto;gap:7px}
+  .overlayMainField1012 .overlayDragHandle0944{width:26px!important}
+  .overlayMainField1012 .overlayBreakButton0944{min-width:76px!important;padding-inline:7px!important;font-size:10px!important}
+  .overlayMainField1012 .overlayFieldBottom1012{padding-left:33px!important}
+  .overlayMainField1012 .overlayActiveFieldText0944 strong{font-size:13px!important}
+  .overlayFieldBuilder1012 .overlayFieldChip510 strong{font-size:11.5px!important}
+  .overlayBrand1012 .overlayLogoCard511{grid-template-columns:84px minmax(0,1fr)!important;gap:10px!important}
+  .overlayBrand1012 .overlayLogoPreview511{width:84px!important;height:84px!important;min-height:84px!important}
+}
+
+@media(max-width:350px){
+  .overlayPreview1012 .overlayFloatingBack0943{min-width:44px!important;width:44px!important;padding:0!important}
+  .overlayPreview1012 .overlayFloatingBack0943 strong{display:none}
+  .overlayWorkspaceHead1012>div>span{font-size:8.5px}
+  .overlayWorkspaceHead1012>div>strong{font-size:14px}
+  .overlayMainField1012 .overlayFieldTop1012{grid-template-columns:24px minmax(0,1fr)}
+  .overlayMainField1012 .overlayBreakButton0944{grid-column:2;width:100%!important}
+  .overlayMainField1012 .overlayFieldBottom1012{padding-left:31px!important}
+}
+
+@media(min-width:700px){
+  .overlayFieldBuilder1012 .overlayFieldGrid510{grid-template-columns:repeat(4,minmax(0,1fr))!important}
+}
+
+@media(min-width:800px){
+  .overlayControlsColumn1012{grid-template-columns:repeat(2,minmax(0,1fr))!important;align-items:start!important}
+  .overlayControlsColumn1012>.overlayQuickCard1012,
+  .overlayControlsColumn1012>.overlayFieldBuilder1012{grid-column:1/-1!important}
+  .overlayControlsColumn1012>.overlayLayout1012{grid-column:1!important}
+  .overlayControlsColumn1012>.overlayBrand1012{grid-column:2!important}
 }
