@@ -1,4 +1,4 @@
-# FireVault 0.95.9 Design System
+# FireVault 0.96.0 Design System
 
 `src/design-system.css` is the canonical release-facing visual layer.
 

@@ -1,0 +1,196 @@
+{
+  "version": 1,
+  "providerTypes": {
+    "local": {
+      "label": "Local device",
+      "description": "On-device vault, IndexedDB media, and manual downloads."
+    },
+    "webdav": {
+      "label": "WebDAV",
+      "description": "Remote backup endpoint using user-supplied server credentials."
+    },
+    "microsoft": {
+      "label": "Microsoft cloud",
+      "description": "OneDrive and SharePoint profiles prepared for Microsoft Graph."
+    },
+    "oauth": {
+      "label": "OAuth cloud",
+      "description": "Provider adapter requiring an external OAuth application."
+    }
+  },
+  "providers": [
+    {
+      "id": "local",
+      "name": "This Device",
+      "type": "local",
+      "status": "active",
+      "offline": true,
+      "roles": [
+        "vault",
+        "media",
+        "backup",
+        "photo",
+        "document"
+      ],
+      "credentials": "none",
+      "appForgeReady": true
+    },
+    {
+      "id": "webdav",
+      "name": "WebDAV",
+      "type": "webdav",
+      "status": "backup-ready",
+      "offline": false,
+      "roles": [
+        "backup"
+      ],
+      "credentials": "session-password",
+      "appForgeReady": true
+    },
+    {
+      "id": "onedrive",
+      "name": "Microsoft OneDrive",
+      "type": "microsoft",
+      "status": "profile-ready",
+      "offline": false,
+      "roles": [
+        "photo",
+        "document",
+        "sync-package"
+      ],
+      "credentials": "oauth-pkce",
+      "appForgeReady": true
+    },
+    {
+      "id": "sharepoint",
+      "name": "SharePoint Library",
+      "type": "microsoft",
+      "status": "profile-ready",
+      "offline": false,
+      "roles": [
+        "photo",
+        "document",
+        "sync-package"
+      ],
+      "credentials": "oauth-pkce",
+      "appForgeReady": true
+    },
+    {
+      "id": "googledrive",
+      "name": "Google Drive",
+      "type": "oauth",
+      "status": "planned",
+      "offline": false,
+      "roles": [
+        "photo",
+        "document",
+        "backup",
+        "sync-package"
+      ],
+      "credentials": "oauth",
+      "appForgeReady": true
+    },
+    {
+      "id": "dropbox",
+      "name": "Dropbox",
+      "type": "oauth",
+      "status": "planned",
+      "offline": false,
+      "roles": [
+        "photo",
+        "document",
+        "backup",
+        "sync-package"
+      ],
+      "credentials": "oauth-pkce",
+      "appForgeReady": true
+    }
+  ],
+  "roles": {
+    "vault": {
+      "label": "Primary vault",
+      "description": "Structured records and settings."
+    },
+    "media": {
+      "label": "Media storage",
+      "description": "Photos and scanned-page payloads."
+    },
+    "backup": {
+      "label": "Backup destination",
+      "description": "Complete vault and media recovery packages."
+    },
+    "photo": {
+      "label": "Photo destination",
+      "description": "Optional account-photo export or upload target."
+    },
+    "document": {
+      "label": "Document destination",
+      "description": "Optional manuals, drawings, and report target."
+    },
+    "sync-package": {
+      "label": "Team package exchange",
+      "description": "Manual shared-vault package exchange."
+    }
+  },
+  "activeProfile": {
+    "schemaVersion": 1,
+    "profileId": "firevault-local-first",
+    "enabledProviderIds": [
+      "local",
+      "webdav",
+      "onedrive",
+      "sharepoint"
+    ],
+    "roles": {
+      "vault": [
+        "local"
+      ],
+      "media": [
+        "local"
+      ],
+      "backup": [
+        "local",
+        "webdav"
+      ],
+      "photo": [
+        "local",
+        "onedrive",
+        "sharepoint"
+      ],
+      "document": [
+        "local",
+        "onedrive",
+        "sharepoint"
+      ],
+      "sync-package": [
+        "onedrive",
+        "sharepoint"
+      ]
+    },
+    "local": {
+      "offlineFirst": true,
+      "vaultBackend": "localStorage",
+      "mediaBackend": "indexedDB",
+      "persistentStorageRecommended": true
+    },
+    "backup": {
+      "manualExport": true,
+      "automaticSnapshots": true,
+      "snapshotLimit": 12,
+      "verifyBeforeRestore": true,
+      "includeMedia": true
+    },
+    "collaboration": {
+      "mode": "package-exchange",
+      "automaticSync": false,
+      "queueOffline": true,
+      "conflictPolicy": "manual-review"
+    },
+    "security": {
+      "storeCredentialsInVault": false,
+      "requireHttps": true,
+      "preserveLocalCopy": true,
+      "preventPersonalFallback": true
+    }
+  }
+}

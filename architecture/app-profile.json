@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 7,
+  "schemaVersion": 8,
   "id": "firevault",
   "family": "field-vault",
   "name": "FireVault",
@@ -198,6 +198,66 @@
       "keepPreviousVersion": true
     }
   },
+  "syncStorage": {
+    "profileId": "firevault-local-first",
+    "enabledProviderIds": [
+      "local",
+      "webdav",
+      "onedrive",
+      "sharepoint"
+    ],
+    "roles": {
+      "vault": [
+        "local"
+      ],
+      "media": [
+        "local"
+      ],
+      "backup": [
+        "local",
+        "webdav"
+      ],
+      "photo": [
+        "local",
+        "onedrive",
+        "sharepoint"
+      ],
+      "document": [
+        "local",
+        "onedrive",
+        "sharepoint"
+      ],
+      "sync-package": [
+        "onedrive",
+        "sharepoint"
+      ]
+    },
+    "local": {
+      "offlineFirst": true,
+      "vaultBackend": "localStorage",
+      "mediaBackend": "indexedDB",
+      "persistentStorageRecommended": true
+    },
+    "backup": {
+      "manualExport": true,
+      "automaticSnapshots": true,
+      "snapshotLimit": 12,
+      "verifyBeforeRestore": true,
+      "includeMedia": true
+    },
+    "collaboration": {
+      "mode": "package-exchange",
+      "automaticSync": false,
+      "queueOffline": true,
+      "conflictPolicy": "manual-review"
+    },
+    "security": {
+      "storeCredentialsInVault": false,
+      "requireHttps": true,
+      "preserveLocalCopy": true,
+      "preventPersonalFallback": true
+    }
+  },
   "interfaceIntegration": {
     "terminology": true,
     "navigation": true,
@@ -210,12 +270,14 @@
     "photoCategories": true,
     "workflows": true,
     "brandingTheme": true,
-    "contentPacks": true
+    "contentPacks": true,
+    "syncStorage": true
   },
   "enabledModules": [
     "core.records",
     "core.themeProfile",
     "core.contentPacks",
+    "core.syncStorageProfile",
     "core.search",
     "core.nearby",
     "core.notes",

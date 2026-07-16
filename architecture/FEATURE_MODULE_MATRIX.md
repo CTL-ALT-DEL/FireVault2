@@ -1,7 +1,7 @@
 # FireVault / Field Vault Feature and Module Matrix
 
-Build baseline: 0.95.9  
-Architecture version: 3
+Build baseline: 0.96.0  
+Architecture version: 4
 
 ## Decision rule
 
@@ -14,6 +14,7 @@ Architecture version: 3
 | Record Database | Core | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
 | Branding & Theme Profile | Core | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
 | Data Sources & Content Packs | Core | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
+| Sync & Storage Profile | Core | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
 | Search Directory | Core | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
 | Nearby GPS | Core | ✓ | ✓ | ✓ | ✓ |  | ✓ | ✓ |
 | Notes & History | Core | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
@@ -34,8 +35,8 @@ Architecture version: 3
 | Panel Documents | FireVault-specific | ✓ |  |  |  |  |  |  |
 | Fire Location Types | FireVault-specific | ✓ |  |  |  |  |  |  |
 
-The canonical machine-readable definitions are in `src/app-profile.js`, `src/module-registry.js`, and `src/content-pack-registry.js`.
+The canonical machine-readable definitions are in `src/app-profile.js`, `src/module-registry.js`, `src/content-pack-registry.js`, and `src/sync-storage-profile.js`.
 
-## Build 0.95.9 configurable data sources and content packs
+## Build 0.96.0 configurable sync and storage
 
-`core.contentPacks` is now a registered core module. App Profile schema 7 selects approved local, bundled, imported, and future remote data sources through `src/content-pack-registry.js`. Active packs can define reusable Library folders and update policies while FireVault keeps its fire-alarm field-reference and panel-document packs enabled.
+`core.syncStorageProfile` is now a registered core module. App Profile schema 8 selects approved storage providers, assigns provider roles, defines offline and backup behavior, and controls collaboration and credential safeguards through `src/sync-storage-profile.js`. FireVault keeps its current local-first storage, WebDAV backup, Microsoft profile readiness, and manual package exchange.

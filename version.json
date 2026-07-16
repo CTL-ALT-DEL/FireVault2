@@ -1,8 +1,8 @@
 {
-  "build": "0.95.9",
+  "build": "0.96.0",
   "released": "2026-07-15",
-  "note": "The App Profile now controls approved data sources, active content packs, reusable Library folders, and future versioned catalog policies.",
-  "label": "Configurable Data Sources and Content Packs",
-  "version": "0.95.9",
-  "name": "Configurable Data Sources and Content Packs"
+  "note": "The App Profile now controls local storage backends, approved providers, backup rules, package exchange, conflict policy, and credential safeguards.",
+  "label": "Configurable Sync and Storage Profiles",
+  "version": "0.96.0",
+  "name": "Configurable Sync and Storage Profiles"
 }

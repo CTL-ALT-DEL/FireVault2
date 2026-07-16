@@ -2429,3 +2429,23 @@ button,.btn,input,textarea,select{border-radius:var(--fv-control-radius,15px)}
 .contentPolicy0959 strong{color:var(--text)}
 .contentPolicy0959 span{color:var(--muted);font-size:12px;text-align:right}
 @media(max-width:640px){.contentPackMetrics0959{grid-template-columns:repeat(2,minmax(0,1fr))}.contentSourceGrid0959,.contentPackGrid0959{grid-template-columns:1fr}.contentPolicy0959{flex-direction:column}.contentPolicy0959 span{text-align:left}}
+
+/* Build 0.96.0 — profile-driven sync, backup, and storage providers. */
+.syncStorageMetrics0960{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin:0 0 14px}
+.syncStorageMetrics0960>div{display:flex;min-height:72px;flex-direction:column;justify-content:center;padding:12px;border:1px solid var(--line);border-radius:var(--fv-control-radius,15px);background:color-mix(in srgb,var(--panel2) 76%,transparent)}
+.syncStorageMetrics0960 strong{font-size:22px;line-height:1;color:var(--text)}
+.syncStorageMetrics0960 span{margin-top:6px;color:var(--muted);font-size:11px;font-weight:750;text-transform:uppercase;letter-spacing:.06em}
+.syncStorageProviderGrid0960{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.syncStorageProviderGrid0960 article{min-width:0;padding:13px;border:1px solid var(--line);border-radius:var(--fv-control-radius,15px);background:var(--panel2)}
+.syncStorageProviderGrid0960 article>div{display:flex;align-items:flex-start;justify-content:space-between;gap:8px}
+.syncStorageProviderGrid0960 strong{display:block;color:var(--text);font-size:14px}
+.syncStorageProviderGrid0960 em{flex:0 0 auto;padding:3px 7px;border-radius:999px;background:color-mix(in srgb,var(--cyan) 10%,transparent);color:var(--cyan);font-size:9px;font-style:normal;font-weight:800;text-transform:uppercase}
+.syncStorageProviderGrid0960 p{margin:7px 0;color:var(--muted);font-size:12px;line-height:1.45}
+.syncStorageProviderGrid0960 article>span{display:flex;flex-wrap:wrap;gap:5px;margin:9px 0}
+.syncStorageProviderGrid0960 article>span b{padding:4px 7px;border:1px solid var(--line);border-radius:999px;color:var(--text);font-size:10px;font-weight:700}
+.syncStorageProviderGrid0960 small{display:block;color:var(--muted);font-size:10px}
+.syncStoragePolicy0960{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:12px}
+.syncStoragePolicy0960 section{display:flex;flex-direction:column;gap:5px;padding:12px;border:1px solid var(--line);border-radius:var(--fv-control-radius,15px);background:color-mix(in srgb,var(--panel2) 70%,transparent)}
+.syncStoragePolicy0960 strong{color:var(--text);font-size:12px}
+.syncStoragePolicy0960 span{color:var(--muted);font-size:11px;line-height:1.45}
+@media(max-width:640px){.syncStorageMetrics0960{grid-template-columns:repeat(2,minmax(0,1fr))}.syncStorageProviderGrid0960,.syncStoragePolicy0960{grid-template-columns:1fr}}

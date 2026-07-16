@@ -1,4 +1,4 @@
-export const APP_PROFILE_SCHEMA_VERSION = 7;
+export const APP_PROFILE_SCHEMA_VERSION = 8;
 
 export const APP_PROFILE = Object.freeze({
   schemaVersion: APP_PROFILE_SCHEMA_VERSION,
@@ -128,6 +128,22 @@ export const APP_PROFILE = Object.freeze({
     enabledPackIds:Object.freeze(["core.user-library","core.account-content","firevault.field-reference","firevault.panel-documents"]),
     updatePolicy:Object.freeze({mode:"manual",allowMetered:false,verifyManifests:true,keepPreviousVersion:true})
   }),
+  syncStorage:Object.freeze({
+    profileId:"firevault-local-first",
+    enabledProviderIds:Object.freeze(["local","webdav","onedrive","sharepoint"]),
+    roles:Object.freeze({
+      vault:Object.freeze(["local"]),
+      media:Object.freeze(["local"]),
+      backup:Object.freeze(["local","webdav"]),
+      photo:Object.freeze(["local","onedrive","sharepoint"]),
+      document:Object.freeze(["local","onedrive","sharepoint"]),
+      "sync-package":Object.freeze(["onedrive","sharepoint"])
+    }),
+    local:Object.freeze({offlineFirst:true,vaultBackend:"localStorage",mediaBackend:"indexedDB",persistentStorageRecommended:true}),
+    backup:Object.freeze({manualExport:true,automaticSnapshots:true,snapshotLimit:12,verifyBeforeRestore:true,includeMedia:true}),
+    collaboration:Object.freeze({mode:"package-exchange",automaticSync:false,queueOffline:true,conflictPolicy:"manual-review"}),
+    security:Object.freeze({storeCredentialsInVault:false,requireHttps:true,preserveLocalCopy:true,preventPersonalFallback:true})
+  }),
   interfaceIntegration:Object.freeze({
     terminology:true,
     navigation:true,
@@ -140,12 +156,14 @@ export const APP_PROFILE = Object.freeze({
     photoCategories:true,
     workflows:true,
     brandingTheme:true,
-    contentPacks:true
+    contentPacks:true,
+    syncStorage:true
   }),
   enabledModules: Object.freeze([
     "core.records",
     "core.themeProfile",
     "core.contentPacks",
+    "core.syncStorageProfile",
     "core.search",
     "core.nearby",
     "core.notes",

@@ -1,5 +1,5 @@
 {
-  "version": 4,
+  "version": 5,
   "classifications": {
     "core": {
       "label": "Core",
@@ -83,6 +83,26 @@
       "description": "Profile-selected local, bundled, imported, and future remote content sources with reusable pack manifests and library organization.",
       "dependencies": [
         "core.offlineStorage"
+      ],
+      "appForgeReady": true,
+      "apps": {
+        "fireVault": true,
+        "travelGuide": true,
+        "fishing": true,
+        "ghostTowns": true,
+        "gardening": true,
+        "inspection": true
+      }
+    },
+    {
+      "id": "core.syncStorageProfile",
+      "name": "Sync & Storage Profile",
+      "classification": "core",
+      "status": "active",
+      "description": "Profile-selected local backends, approved cloud providers, backup rules, package exchange, conflict policy, and credential safeguards.",
+      "dependencies": [
+        "core.offlineStorage",
+        "core.backupRestore"
       ],
       "appForgeReady": true,
       "apps": {
@@ -372,7 +392,8 @@
       "description": "Provider-neutral file destinations, OneDrive/SharePoint profiles, and WebDAV backup.",
       "dependencies": [
         "core.files",
-        "core.backupRestore"
+        "core.backupRestore",
+        "core.syncStorageProfile"
       ],
       "appForgeReady": true,
       "apps": {

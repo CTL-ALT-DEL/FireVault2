@@ -1,37 +1,37 @@
 # FireVault
-## Build 0.95.9 — Configurable Data Sources and Content Packs
+## Build 0.96.0 — Configurable Sync and Storage Profiles
 
-Build 0.95.9 adds a reusable content-delivery layer while preserving FireVault’s current accounts, manuals, photos, documents, and local-first behavior.
+Build 0.96.0 adds a reusable storage-policy layer while preserving FireVault’s existing offline-first vault, IndexedDB media, backups, WebDAV configuration, Microsoft profile readiness, and manual Team Sync package workflow.
 
 ### Integrated
 
-- Added `src/content-pack-registry.js` as the canonical registry for approved data sources and content packs.
-- App Profile schema version 7 now selects enabled sources, active packs, and update policy.
-- Registered `core.contentPacks` in the shared Module Registry.
-- Library routes now require both Files and Content Packs modules.
-- The Library derives its default folders from the active content packs instead of a FireVault-only hard-coded list.
-- Architecture & Modules displays active sources, packs, generated folders, and update safeguards.
-- Added downloadable Content Pack Registry JSON.
+- Added `src/sync-storage-profile.js` as the canonical registry for storage providers, provider roles, backup policy, and collaboration behavior.
+- App Profile schema version 8 now selects approved providers and assigns vault, media, backup, photo, document, and sync-package roles.
+- Registered `core.syncStorageProfile` in the shared Module Registry.
+- File Storage provider choices now come from the active Sync & Storage Profile.
+- Microsoft Storage, WebDAV, Team Sync, File Storage, and Backup settings can be hidden safely when a future profile does not enable them.
+- Architecture & Modules now displays approved providers, local backends, backup retention, collaboration mode, conflict policy, and credential safeguards.
+- Added downloadable Sync & Storage Profile JSON.
 
-### FireVault active content
+### FireVault active profile
 
-FireVault keeps these active packs:
+FireVault uses `firevault-local-first`:
 
-- User Reference Library
-- Record-Linked Content
-- Fire Alarm Field Reference
-- Panel Document Matching
+- Structured vault: localStorage
+- Photo and scan media: IndexedDB
+- Automatic local snapshots: enabled
+- Complete manual exports with media: enabled
+- Backup providers: This Device and WebDAV
+- Photo and document providers: This Device, OneDrive, and SharePoint
+- Collaboration: manual package exchange with an offline queue
+- Conflict handling: manual review
+- Credentials: excluded from the vault and backups
+- Remote transfer policy: preserve the local copy
 
-The resulting Library folders include the existing general folders plus fire-alarm-oriented folders such as Panel Manuals, Communicators, Inspection Forms, and Fire Codes.
+### Provider honesty
 
-### AppForge direction
-
-A future app profile can select different packs without branching Search, Nearby, Library, Files, offline storage, or import code. Planned registry examples include Wyoming Points of Interest, Fishing Locations, and Ghost Towns. They are planning definitions only and are not installed into FireVault.
-
-### Update safety
-
-The current FireVault policy is manual. Remote catalogs are only a foundation in this build; FireVault does not silently download data. The profile requires manifest verification and keeps the prior pack version for rollback readiness.
+This build configures and filters approved providers; it does not claim new live OAuth transfer or automatic cloud synchronization. Each existing provider continues to report its actual readiness state.
 
 ### Compatibility
 
-The storage key remains `firevault_vault_build_030`. Existing accounts, notes, photos, documents, overlays, IndexedDB media, backups, WebDAV settings, Demo Mode, record schema, workflow schema, and Theme Profile remain compatible.
+The storage key remains `firevault_vault_build_030`. Existing accounts, notes, photos, documents, overlays, IndexedDB media, backups, WebDAV settings, Microsoft profiles, Demo Mode, schemas, Theme Profile, and Content Pack Registry remain compatible.
