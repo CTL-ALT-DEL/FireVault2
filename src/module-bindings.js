@@ -46,6 +46,7 @@ export const SETTINGS_MODULE_REQUIREMENTS = Object.freeze({
   categories:Object.freeze(["core.records"]),
   backup:Object.freeze(["core.backupRestore"]),
   webdav:Object.freeze(["optional.cloudStorage"]),
+  manual:Object.freeze([]),
   updates:Object.freeze([]),
   demo:Object.freeze(["core.records"]),
   about:Object.freeze([]),

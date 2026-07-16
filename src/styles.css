@@ -48,7 +48,7 @@ button,.btn{border:1px solid rgba(255,255,255,.09);border-radius:15px;background
 
 
 /* Build 0.40.5 Settings small-space redesign + logo cache-bust */
-.settingsScreen{gap:6px;min-height:0}.settingsMicrobar{display:flex;align-items:center;justify-content:space-between;gap:8px;min-height:34px;padding:5px 7px;border:1px solid rgba(255,255,255,.07);border-radius:12px;background:rgba(255,255,255,.035)}.settingsCrumb{display:flex;align-items:center;gap:7px;min-width:0;font-size:12px;color:var(--muted);font-weight:850;text-transform:uppercase;letter-spacing:.055em}.settingsCrumb b{color:var(--text);font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-transform:none;letter-spacing:0}.settingsMicroLogo{width:24px;height:24px;border-radius:7px;flex:0 0 auto}.iconBtn{width:32px;height:32px;min-height:32px;padding:0;border-radius:10px;font-size:14px;display:grid;place-items:center}.settingsLayout{grid-template-columns:124px minmax(0,1fr);gap:7px}.settingsRail{gap:5px;padding:0 1px 8px}.settingsRail .tabBtn,.settingsRail .tabBtn.tabBtn{min-height:38px;padding:5px 7px;border-radius:11px;align-items:flex-start;text-align:left}.settingsRail .tabBtn strong{font-size:12px;line-height:1.05}.settingsRail .tabBtn span{font-size:9.5px;line-height:1.05;margin-top:1px;letter-spacing:0}.settingsContent{padding-bottom:12px}.settingsStack{gap:7px}.compactPane{padding:8px 9px;border-left-width:3px}.paneHead{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:2px}.paneHead h2{font-size:15px;line-height:1.1;margin:0}.paneNote{font-size:11px;line-height:1.25;margin:0 0 7px;color:var(--muted)}.saveMini{min-height:32px;padding:6px 10px;border-radius:10px;font-size:12px;flex:0 0 auto}.settingsGrid{grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}.settingField{gap:3px}.settingField label,label{font-size:9.5px;line-height:1.1;letter-spacing:.065em;text-align:left}.settingField input,.settingField textarea,.settingField select,input,textarea,select{min-height:38px;padding:8px 9px;border-radius:10px;font-size:13px;text-align:left}.settingField textarea,textarea{min-height:64px}.fieldNote{font-size:10.5px;line-height:1.2;margin:1px 0 0}.settingsList{gap:6px;margin-top:7px}.settingsList.twoCol{grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}.checkRow{min-height:36px;padding:7px 8px;border-radius:10px;font-size:12px;line-height:1.15;text-align:left;justify-content:flex-start}.checkRow input{width:17px;height:17px;min-height:17px}.presetGrid{grid-template-columns:repeat(2,minmax(0,1fr));gap:6px;margin-bottom:7px}.presetBtn{min-height:38px;padding:6px 8px;border-radius:10px;font-size:12px}.previewPanel.compactPreview{min-height:92px;margin:6px 0}.previewOverlay{font-size:11px;padding:7px 8px}.aboutGrid{gap:6px}.aboutGrid div{padding:8px;border-radius:10px}.aboutGrid strong{font-size:9.5px}.aboutGrid span{font-size:12px}.brandMark{content:url("../assets/icon-192.png?v=1.02.0")}
+.settingsScreen{gap:6px;min-height:0}.settingsMicrobar{display:flex;align-items:center;justify-content:space-between;gap:8px;min-height:34px;padding:5px 7px;border:1px solid rgba(255,255,255,.07);border-radius:12px;background:rgba(255,255,255,.035)}.settingsCrumb{display:flex;align-items:center;gap:7px;min-width:0;font-size:12px;color:var(--muted);font-weight:850;text-transform:uppercase;letter-spacing:.055em}.settingsCrumb b{color:var(--text);font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-transform:none;letter-spacing:0}.settingsMicroLogo{width:24px;height:24px;border-radius:7px;flex:0 0 auto}.iconBtn{width:32px;height:32px;min-height:32px;padding:0;border-radius:10px;font-size:14px;display:grid;place-items:center}.settingsLayout{grid-template-columns:124px minmax(0,1fr);gap:7px}.settingsRail{gap:5px;padding:0 1px 8px}.settingsRail .tabBtn,.settingsRail .tabBtn.tabBtn{min-height:38px;padding:5px 7px;border-radius:11px;align-items:flex-start;text-align:left}.settingsRail .tabBtn strong{font-size:12px;line-height:1.05}.settingsRail .tabBtn span{font-size:9.5px;line-height:1.05;margin-top:1px;letter-spacing:0}.settingsContent{padding-bottom:12px}.settingsStack{gap:7px}.compactPane{padding:8px 9px;border-left-width:3px}.paneHead{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:2px}.paneHead h2{font-size:15px;line-height:1.1;margin:0}.paneNote{font-size:11px;line-height:1.25;margin:0 0 7px;color:var(--muted)}.saveMini{min-height:32px;padding:6px 10px;border-radius:10px;font-size:12px;flex:0 0 auto}.settingsGrid{grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}.settingField{gap:3px}.settingField label,label{font-size:9.5px;line-height:1.1;letter-spacing:.065em;text-align:left}.settingField input,.settingField textarea,.settingField select,input,textarea,select{min-height:38px;padding:8px 9px;border-radius:10px;font-size:13px;text-align:left}.settingField textarea,textarea{min-height:64px}.fieldNote{font-size:10.5px;line-height:1.2;margin:1px 0 0}.settingsList{gap:6px;margin-top:7px}.settingsList.twoCol{grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}.checkRow{min-height:36px;padding:7px 8px;border-radius:10px;font-size:12px;line-height:1.15;text-align:left;justify-content:flex-start}.checkRow input{width:17px;height:17px;min-height:17px}.presetGrid{grid-template-columns:repeat(2,minmax(0,1fr));gap:6px;margin-bottom:7px}.presetBtn{min-height:38px;padding:6px 8px;border-radius:10px;font-size:12px}.previewPanel.compactPreview{min-height:92px;margin:6px 0}.previewOverlay{font-size:11px;padding:7px 8px}.aboutGrid{gap:6px}.aboutGrid div{padding:8px;border-radius:10px}.aboutGrid strong{font-size:9.5px}.aboutGrid span{font-size:12px}.brandMark{content:url("../assets/icon-192.png?v=1.03.0")}
 @media(max-width:720px){main{padding:7px 7px 14px}.settingsLayout{grid-template-columns:1fr;gap:6px}.settingsRail{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));grid-auto-flow:row;grid-auto-columns:auto;overflow:visible;gap:5px;padding:0}.settingsRail .tabBtn,.settingsRail .tabBtn.tabBtn{min-height:36px;padding:5px 4px;align-items:center;text-align:center}.settingsRail .tabBtn strong{font-size:11px}.settingsRail .tabBtn span{font-size:8.5px}.settingsGrid,.settingsList.twoCol,.presetGrid{grid-template-columns:1fr}.compactPane{padding:8px}.paneHead h2{font-size:14px}.settingsCrumb span{display:none}.settingsMicrobar{min-height:32px}.settingsContent{overflow:auto;padding-bottom:16px}.settingField input,.settingField textarea,.settingField select,input,textarea,select{font-size:13px;min-height:37px}.checkRow{font-size:11.5px}.presetGrid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:390px){.settingsRail{grid-template-columns:repeat(4,minmax(0,1fr));gap:4px}.settingsRail .tabBtn strong{font-size:10.5px}.settingsRail .tabBtn span{display:none}.presetGrid{grid-template-columns:1fr}.paneNote{display:none}.settingsGrid{gap:6px}.compactPane{padding:7px}}
 
@@ -1269,7 +1269,7 @@ button:active,.btn:active,.smallBtn:active,.miniBtn:active,.iconBtn:active,.tabB
   outline:1px solid color-mix(in srgb,var(--accent) 28%, transparent)!important;
 }
 .settingsContent448{
-  font-size:14px!important;
+  font-size:15px!important;
   line-height:1.36!important;
   padding-bottom:16px!important;
 }
@@ -19612,3 +19612,86 @@ button,input,select,textarea{font:inherit}button{min-height:var(--fv-touch)}
 .mediaStorageActions0910 button{min-height:44px}
 @media(max-width:700px){.mediaStorageMetrics0910{grid-template-columns:1fr}.mediaStorageActions0910{grid-template-columns:1fr 1fr}.mediaStorageActions0910 button:last-child{grid-column:1/-1}}
 @media(min-width:900px){.mediaStorageMetrics0910 article{padding:17px}.mediaStorageMetrics0910 strong{font-size:1.4rem}}
+
+/* Build 1.03.0 — focused UI cleanup, Help, storage identity, and independent overlays. */
+.nearbyAccount069{align-items:stretch!important}
+.nearbyAccount069 .nearbyNumber069{align-self:center!important}
+.nearbyAccount069 .nearbyInfo069{align-self:center!important}
+.nearbyAccount069 .nearbyDistance069{
+  align-self:end!important;
+  justify-self:end!important;
+  margin-bottom:1px!important;
+  font-size:14px!important;
+  line-height:1.15!important;
+  font-weight:900!important;
+}
+
+.accountDetailTop0952{grid-template-columns:72px minmax(0,1fr) auto!important}
+.accountDetailTop0952 .accountTopBack1011{
+  display:inline-flex!important;
+  align-items:center!important;
+  justify-content:flex-start!important;
+  gap:5px!important;
+  width:72px!important;
+  min-width:72px!important;
+  padding:0 8px!important;
+  font-size:inherit!important;
+}
+.accountTopBack1011>span{display:block!important;flex:0 0 auto;font-size:27px!important;line-height:1!important;transform:translateY(-1px)}
+.accountTopBack1011>strong{display:block!important;font-size:12.5px!important;line-height:1!important;white-space:nowrap}
+
+.storageProviderLogo1030{display:block;width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:1.65;stroke-linecap:round;stroke-linejoin:round}
+.storageProviderLogo1030.provider-onedrive,.storageProviderLogo1030.provider-sharepoint,.storageProviderLogo1030.provider-googledrive,.storageProviderLogo1030.provider-dropbox{stroke:none}
+.provider-onedrive .logoFill1030{fill:#0364b8}.provider-onedrive .logoFillAlt1030{fill:#28a8ea;opacity:.96}
+.provider-sharepoint .logoFill1030{fill:#37c6d0}.provider-sharepoint .logoFillAlt1030{fill:#1a9ba1}.provider-sharepoint .logoFillDark1030{fill:#087b83}.provider-sharepoint .logoLetter1030{fill:none;stroke:#fff;stroke-width:1.25}
+.driveGreen1030{fill:#16a05d}.driveYellow1030{fill:#f9bc15}.driveBlue1030{fill:#287be0}.dropboxFill1030{fill:#1877f2}
+.settingsGroupIcon0860 .settingsProviderLogo1030{width:23px;height:23px}
+.cloudProviderCatalog0794 article>span.providerMark1030{display:grid;place-items:center;width:38px;height:38px;border-radius:11px;background:rgba(255,255,255,.055);color:#bfdbfe}
+.cloudProviderCatalog0794 article>span.providerMark1030 .storageProviderLogo1030{width:27px;height:27px}
+.microsoftProfileIcon0795 .storageProviderLogo1030{width:27px;height:27px}
+
+.photoOverlaySettings1030{display:grid;gap:15px;min-width:0}
+.technicianOverlayIndependent1030{overflow:hidden;padding:0!important;border:1px solid rgba(167,139,250,.34)!important;border-radius:18px!important;background:linear-gradient(155deg,rgba(45,35,72,.76),rgba(13,20,31,.98))!important;box-shadow:0 16px 34px rgba(0,0,0,.24)!important}
+.technicianOverlayIndependentHead1030{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;padding:16px;border-bottom:1px solid rgba(167,139,250,.23);background:linear-gradient(100deg,rgba(124,58,237,.13),transparent)}
+.technicianOverlayIndependentHead1030>div{min-width:0}.technicianOverlayIndependentHead1030 span{display:block;color:#c4b5fd;font-size:9.5px;font-weight:950;letter-spacing:.14em}.technicianOverlayIndependentHead1030 h2{margin:4px 0;color:#fff;font-size:21px;line-height:1.15}.technicianOverlayIndependentHead1030 p{max-width:690px;margin:0;color:#bdc6d3;font-size:12px;line-height:1.45}
+.technicianOverlayIndependentHead1030>em{flex:0 0 auto}
+.technicianOverlayIndependent1030 .technicianOverlayTemplate0946{padding:16px}
+.overlayIsolationBadge1030{display:inline-flex!important;align-items:center;min-height:28px;padding:5px 9px;border:1px solid rgba(167,139,250,.34);border-radius:999px;background:rgba(124,58,237,.14);color:#ddd6fe!important;font-size:9.5px!important;font-weight:900!important;white-space:nowrap}
+
+.settingsTab-email .emailPreviewPanel530{overflow:hidden!important;border-color:rgba(56,189,248,.26)!important;background:#101a27!important}
+.settingsTab-email .emailPreviewHead530{align-items:center!important;background:linear-gradient(110deg,rgba(14,165,233,.13),transparent)!important}
+.emailPreviewOnly1030{flex:0 0 auto;padding:6px 8px;border:1px solid rgba(56,189,248,.25);border-radius:999px;background:rgba(14,165,233,.10);color:#7dd3fc!important;font-size:8.5px!important;font-weight:950!important;letter-spacing:.09em!important}
+.settingsTab-email .emailMock530{display:grid!important;gap:0!important;padding:14px!important;background:#eef2f7!important}
+.emailMockSender1030{display:flex;align-items:center;gap:10px;padding:2px 2px 12px;color:#17202c}
+.emailMockSender1030>span{display:grid;place-items:center;flex:0 0 38px;width:38px;height:38px;border-radius:12px;background:linear-gradient(145deg,#c52b37,#7f1720);color:#fff;font-size:12px;font-weight:950}
+.emailMockSender1030>div{display:grid;gap:2px}.emailMockSender1030 strong{font-size:13px}.emailMockSender1030 small{color:#6b7788;font-size:10.5px}
+.emailMockRecipients1030{padding:4px 12px;border:1px solid #d7dee8;border-radius:11px 11px 0 0;background:#fff}
+.settingsTab-email .emailMockRecipients1030 .emailMockRow530{grid-template-columns:38px minmax(0,1fr)!important;padding:8px 0!important}
+.settingsTab-email .emailMockRecipients1030 .emailMockRow530:last-child{border-bottom:0!important}
+.settingsTab-email .emailMockRecipients1030 .emailMockRow530 strong{color:#58677a!important;opacity:1!important}
+.settingsTab-email .emailMockRecipients1030 .emailMockRow530 span{color:#1c2939!important;font-weight:650!important;opacity:1!important}
+.emailMockMessage1030{overflow:hidden;border:1px solid #d7dee8;border-top:0;border-radius:0 0 11px 11px;background:#fff;color:#17202c}
+.emailPreviewSubject1030{display:grid;gap:4px;padding:13px 12px;border-bottom:1px solid #e2e7ed}
+.emailPreviewSubject1030>span{color:#687587;font-size:9.5px;font-weight:900;letter-spacing:.08em;text-transform:uppercase}.emailPreviewSubject1030>strong{color:#17202c;font-size:13.5px;line-height:1.4;overflow-wrap:anywhere}
+.emailPreviewBody1030{padding:15px 12px;color:#273446;font-size:12.5px;line-height:1.5}.emailPreviewBody1030 p{margin:0 0 10px}.emailPreviewBody1030 p strong{color:#17202c}
+.emailPreviewAttachment1030{display:flex;align-items:center;gap:9px;margin:13px 0;padding:10px;border:1px solid #dfe5ec;border-radius:9px;background:#f7f9fb}.emailPreviewAttachment1030>span{display:grid;place-items:center;width:30px;height:30px;border-radius:8px;background:#e2ecf8;color:#2563eb;font-weight:900}.emailPreviewAttachment1030>div{display:grid;gap:1px}.emailPreviewAttachment1030 strong{color:#223044;font-size:11px}.emailPreviewAttachment1030 small{color:#778397;font-size:9.5px}
+.settingsTab-email .emailPreviewBody1030 .emailPreviewSignature{margin-top:14px!important;padding:12px 0 0!important;border-top:1px solid #e3e8ef;color:#243246!important;font-size:12px!important;line-height:1.55!important}
+
+.manualScreenshotGuide1030{margin-top:14px;padding:15px;border:1px solid rgba(96,165,250,.24);border-radius:16px;background:linear-gradient(145deg,rgba(30,64,175,.13),rgba(15,23,42,.72))}
+.manualScreenshotGuide1030>header>span{display:block;color:#60a5fa;font-size:9px;font-weight:950;letter-spacing:.13em}.manualScreenshotGuide1030>header h3{margin:4px 0;color:#fff;font-size:18px}.manualScreenshotGuide1030>header p{margin:0;color:#aebaca;font-size:11.5px;line-height:1.45}
+.manualScreenshotGuide1030>div{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:13px}
+.manualScreenshotGuide1030 article{overflow:hidden;border:1px solid rgba(148,163,184,.18);border-radius:13px;background:#101923}
+.manualScreenshotGuide1030 article>img{display:block;width:100%;aspect-ratio:9/14;object-fit:cover;object-position:top;background:#080d14;border-bottom:1px solid rgba(148,163,184,.16)}
+.manualScreenshotGuide1030 article>div{display:grid;grid-template-columns:24px minmax(0,1fr);gap:3px 8px;padding:10px}.manualScreenshotGuide1030 article>div>span{grid-row:1/3;display:grid;place-items:center;align-self:start;width:24px;height:24px;border-radius:8px;background:#193a63;color:#93c5fd;font-size:11px;font-weight:950}.manualScreenshotGuide1030 article strong{font-size:12px;color:#f8fafc}.manualScreenshotGuide1030 article p{grid-column:2;margin:0;color:#aebaca;font-size:10.5px;line-height:1.4}
+
+@media(max-width:700px){
+  .technicianOverlayIndependentHead1030{display:grid}.technicianOverlayIndependentHead1030>em{justify-self:start}
+  .manualScreenshotGuide1030>div{grid-template-columns:1fr}.manualScreenshotGuide1030 article{display:grid;grid-template-columns:minmax(110px,36%) minmax(0,1fr)}.manualScreenshotGuide1030 article>img{height:180px;aspect-ratio:auto;border:0;border-right:1px solid rgba(148,163,184,.16)}.manualScreenshotGuide1030 article>div{align-content:center}
+}
+@media(max-width:390px){
+  .nearbyAccount069 .nearbyDistance069{font-size:14px!important}
+  .accountDetailTop0952{grid-template-columns:68px minmax(0,1fr) auto!important;padding-left:8px!important;padding-right:8px!important}
+  .accountDetailTop0952 .accountTopBack1011{width:68px!important;min-width:68px!important;padding-left:6px!important}
+  .manualScreenshotGuide1030{padding:12px}.manualScreenshotGuide1030 article{grid-template-columns:112px minmax(0,1fr)}.manualScreenshotGuide1030 article>img{height:176px}
+  .settingsTab-email .emailPreviewHead530{display:flex!important}.emailPreviewOnly1030{display:none!important}
+}

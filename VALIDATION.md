@@ -1,62 +1,57 @@
-# FireVault Build 1.02.0 Validation
+# FireVault Build 1.03.0 Validation
 
 ## Static checks
 
 - JavaScript syntax passes for every source module and the service worker.
 - Every imported symbol resolves from its source module.
 - All JSON architecture contracts parse and runtime mirrors match.
-- Every static application reference resolves to Build 1.02.0.
-- Service-worker shell includes the generated-profile bridge, Generator Engine, and every required runtime asset.
+- Every active application reference resolves to Build 1.03.0; 1.02.0 remains only in historical release documentation.
+- Service-worker shell includes all runtime modules and the three Help screenshots.
 - Local HTTP asset smoke test and release ZIP integrity pass.
 
-## On-Site Guide checks
+## Responsive UI checks
 
-- A successful foreground Nearby scan offers arrival guidance only at 125 m accuracy or better and within the adaptive 120–180 m arrival boundary.
-- Automatic arrival requires at least one precise saved Parking Area, Main Entrance, or Secondary Entrance point.
-- The arrival card identifies the account, summarizes access points, remains nonblocking, and stays above navigation at 320×700, 390×844, and 1024×1366.
-- The arrival card appears only once per eligible account group during the current session.
-- Accounts sharing the same site location present a name and Account ID chooser before the guide opens.
-- The selected account is preserved when a shared-address choice opens the guide.
-- The guide orders Parking Area, Main Entrance, Secondary Entrance, access points, and fire-alarm equipment for field use.
-- Every precise saved location has a matching numbered map pin, Copy action, Route action, Plus Code when available, and access context.
-- Map-pin selection highlights and reveals the matching location row.
-- Account Detail → Locations exposes a 44px On-Site Guide action whenever precise saved locations exist.
-- Guide layout, actions, scrolling, dialog semantics, and horizontal overflow pass at all three supported test viewports.
-- Demo Mode includes a safe Parking → Entrance → Panel sequence for hands-on validation.
+- Nearby distance is within the row’s lower-right inset and renders at 14px or larger at 320×700, 390×844, and 1024×1366.
+- Account Detail Back arrow and label centerlines remain within one pixel at all three viewports.
+- Nearby, Account Detail, Photo Overlay, and User Manual have zero horizontal overflow at all three viewports.
+- Profile, Photo Overlay, About FireVault, email preview, and File Storage labels remain readable at phone and iPad sizes.
 
-## GPS safety checks
+## Settings organization checks
 
-- Arrival detection runs only after FireVault itself requests GPS while visible; no background monitoring is added.
-- GPS results worse than ±125 m do not produce an automatic arrival prompt.
-- Accounts without precise access points do not produce an automatic arrival prompt.
-- Manual On-Site Guide access remains available for any account with a precise saved location.
-- Dismissing or opening a prompt records only session state and never edits the account.
+- Settings home shows Profile, not Profile & Photos.
+- Technician contains only profile photo, identity, and contact sections.
+- Photo Overlay contains the normal overlay studio and the separately labeled Technician Overlay.
+- Editing Technician Overlay and waiting for auto-save leaves the complete original `settings.overlay` object byte-for-byte unchanged.
+- Data & Backup does not contain App Updates.
+- About FireVault contains Help & User Manual, App Updates, Demo Mode, and About FireVault.
+- Microsoft Storage uses a OneDrive mark, and every enabled File Storage target has a provider-specific mark.
 
-## Preserved UI cleanup
+## Help and email checks
 
-- Build 1.01.5 Update Ready sheet behavior, progress locking, retry state, and layout remain intact.
-- Build 1.01.4 selected-tab visibility remains intact on phone and iPad layouts.
-- Build 1.01.3 star-only Favorite control, 44px target, and accessible state remain intact.
-- Build 1.01.2 Photo Overlay workflow, controls, preview, and responsive layouts remain intact.
-- Build 1.01.1 Account Detail actions, tabs, and responsive layouts remain intact.
-- Normal Settings continues to present six technician-focused areas.
+- Help loads all three bundled screenshots with nonzero natural dimensions.
+- The visual guide explains Nearby, Account Detail, and the two independent overlay settings.
+- The searchable User Manual remains available below the visual guide.
+- Email Preview uses Sample Message rather than the previous redundant Live Preview / Example Email hierarchy.
+- Recipient rows, subject, body, example attachment, and signature render without horizontal overflow.
+
+## Update procedure checks
+
+- An installed waiting worker receives exactly one `SKIP_WAITING` message from Install Update.
+- Worker activation completes the reload handoff and clears the activation flag.
+- A failed `postMessage` restores enabled Try Again and Reload App controls immediately.
+- A stalled update has an eight-second timeout that restores the same usable controls.
+- Duplicate detections update the existing sheet instead of stacking dialogs.
+- The service worker no longer calls `skipWaiting()` during install; updates wait for the explicit popup action.
+
+## Scope and compatibility
+
+- No new field workflow, record type, schema, or storage service was activated.
+- App Profile remains schema version 12 and Module Registry remains version 9.
 - AppForge remains hidden from normal Settings and available only with `?appforge=1`.
-- Demo Mode remains available under About FireVault.
-
-## Scope checks
-
-- The existing reusable `core.locationNavigator` capability is extended; no duplicate map or settings module was added.
-- App Profile remains schema version 12.
-- Module Registry remains version 9.
-- Existing Build 1.00 AppForge generator contracts remain intact behind developer access.
-
-## Compatibility checks
-
 - Active runtime profile remains `firevault`.
 - Storage key remains `firevault_vault_build_030`.
-- FireVault retains all fire-alarm modules, fields, categories, and technician actions.
 - No record, media, backup, WebDAV, Microsoft profile, privacy, or schema migration is required.
 
-## Device confirmation
+## Automated result
 
-In Demo Mode, refresh Nearby and confirm the arrival card opens Capitol Plaza Offices; verify the guide presents Technician Parking, Main Entrance, and Main Fire Alarm Panel in that order; close it and confirm it does not reappear during the same session; open any Account Detail → Locations and launch On-Site Guide manually. Also confirm shared-address account selection, existing Update Ready behavior, Account Detail, Favorite, Add Note, Photo Overlay, Settings cleanup, hidden AppForge access, and offline startup.
+The focused Chromium behavior suite passes 47 of 47 checks across 320×700, 390×844, and 1024×1366. Static syntax, JSON parsing, service-worker assets, package integrity, storage-key continuity, and AppForge contract checks also pass.

@@ -1,19 +1,19 @@
-import { BUILD, KEY, loadData, saveData, ensureSite, fullAddress, esc, uid, downloadBlob, syncSummary, syncQueue, syncConflicts, syncActivity, createSyncPackage, importSyncPackage, resolveSyncConflict, notePackageExport, deviceIdentity, recordSyncActivity, autoBackupInfo, latestAutoBackup, restoreAutoBackup, isDemoMode, setDemoMode, resetDemoData, securityFoundationSummary, securityAudit, recycleBinInfo, restoreRecycleRecord, purgeRecycleBin, recordSecurityEvent, validateVaultIntegrity } from "./storage.js?v=1.02.0";
-import { backendAdapterSummary, runBackendAdapterDiagnostics, backendAdapterManifest, PROVIDER_CONTRACT_VERSION, FILE_STORAGE_CATALOG, fileStoragePlanSummary, cloudFileStorageManifest, MICROSOFT_STORAGE_TYPES, microsoftStorageAccounts, saveMicrosoftStorageAccounts, createMicrosoftStorageAccount, microsoftStorageAccountById, microsoftAppRegistration, saveMicrosoftAppRegistration, microsoftStorageSummary, microsoftStorageManifest } from "./providers.js?v=1.02.0";
-import { encodePlusCode, isValidFullPlusCode, normalizePlusCode, plusCodePrecisionLabel } from "./open-location-code.js?v=1.02.0";
-import { hydrateVaultMedia, stageVaultMedia, prepareVaultWithMedia, mediaStorageSummary, requestPersistentMediaStorage, pruneOrphanedMedia, flushMediaWrites } from "./media-store.js?v=1.02.0";
-import { APP_PROFILE, APP_PROFILE_SCHEMA_VERSION, appTerm, appLabel, appNavigationLabel, appProfileExport } from "./app-profile.js?v=1.02.0";
-import { MODULE_REGISTRY, MODULE_REGISTRY_VERSION, MODULE_CLASSIFICATIONS, FUTURE_APP_COLUMNS, moduleRegistrySummary, moduleMatrixRows, moduleRegistryExport } from "./module-registry.js?v=1.02.0";
-import { MODULE_BINDINGS_VERSION, NAV_MODULE_REQUIREMENTS as NAV_MODULE_REQUIREMENTS_0955, ROUTE_MODULE_REQUIREMENTS as ROUTE_MODULE_REQUIREMENTS_0955, SETTINGS_MODULE_REQUIREMENTS as SETTINGS_MODULE_REQUIREMENTS_0955, ACCOUNT_TAB_BINDINGS, requirementsMet as moduleRequirementsMetFromBindings0955, moduleBindingsExport } from "./module-bindings.js?v=1.02.0";
-import { RECORD_SCHEMA, RECORD_SCHEMA_VERSION, recordFieldById, activeRecordFields, recordFieldEnabled, recordFieldRequired, activeDetailSections, recordDetailSectionEnabled, recordPhotoCategories, recordSchemaSummary, recordSchemaExport } from "./record-schema.js?v=1.02.0";
-import { WORKFLOW_SCHEMA, WORKFLOW_SCHEMA_VERSION, activeWorkflowActions, workflowActionEnabled, quickPhotoWorkflow, workflowSchemaSummary, workflowSchemaExport } from "./workflow-schema.js?v=1.02.0";
-import { THEME_PROFILE_SCHEMA_VERSION, resolveThemeProfile, applyThemeProfile, themeBrandAsset, themeWordmarkMarkup, themeProfileSummary, themeProfileExport } from "./theme-profile.js?v=1.02.0";
-import { CONTENT_PACK_SCHEMA_VERSION, CONTENT_SOURCE_TYPES, CONTENT_SOURCES, CONTENT_PACKS, resolveContentPackProfile, activeContentSources, activeContentPacks, contentPackLibraryFolders, contentPackSummary, contentPackRegistryExport } from "./content-pack-registry.js?v=1.02.0";
-import { SYNC_STORAGE_PROFILE_SCHEMA_VERSION, STORAGE_PROVIDER_TYPES, STORAGE_PROVIDERS, STORAGE_ROLES, resolveSyncStorageProfile, activeStorageProviders, storageProviderEnabled, storageRoleProviders, syncStorageSettingsTabEnabled, syncStorageSummary, syncStorageProfileExport } from "./sync-storage-profile.js?v=1.02.0";
-import { APP_FORGE_BLUEPRINT_SCHEMA_VERSION, appForgeReadinessSummary, validateAppForgeProfile, appForgeBlueprintExport } from "./app-forge-blueprint.js?v=1.02.0";
-import { APP_FORGE_RECIPE_SCHEMA_VERSION, appForgeRecipes, appForgeRecipeSummary, appForgeRecipeBlueprintExport, appForgeRecipeCatalogExport } from "./app-forge-recipes.js?v=1.02.0";
-import { APP_FORGE_FACTORY_SCHEMA_VERSION, createAppForgeGenerationRequest, appForgeFactoryManifest, appForgeFactorySummary, appForgeFactorySchemaExport } from "./app-forge-factory.js?v=1.02.0";
-import { APP_FORGE_GENERATOR_SCHEMA_VERSION, appForgeGeneratorPlan, appForgeGeneratorSummary, generateAppForgePwaPackage, appForgeGeneratorSchemaExport } from "./app-forge-generator.js?v=1.02.0";
+import { BUILD, KEY, loadData, saveData, ensureSite, fullAddress, esc, uid, downloadBlob, syncSummary, syncQueue, syncConflicts, syncActivity, createSyncPackage, importSyncPackage, resolveSyncConflict, notePackageExport, deviceIdentity, recordSyncActivity, autoBackupInfo, latestAutoBackup, restoreAutoBackup, isDemoMode, setDemoMode, resetDemoData, securityFoundationSummary, securityAudit, recycleBinInfo, restoreRecycleRecord, purgeRecycleBin, recordSecurityEvent, validateVaultIntegrity } from "./storage.js?v=1.03.0";
+import { backendAdapterSummary, runBackendAdapterDiagnostics, backendAdapterManifest, PROVIDER_CONTRACT_VERSION, FILE_STORAGE_CATALOG, fileStoragePlanSummary, cloudFileStorageManifest, MICROSOFT_STORAGE_TYPES, microsoftStorageAccounts, saveMicrosoftStorageAccounts, createMicrosoftStorageAccount, microsoftStorageAccountById, microsoftAppRegistration, saveMicrosoftAppRegistration, microsoftStorageSummary, microsoftStorageManifest } from "./providers.js?v=1.03.0";
+import { encodePlusCode, isValidFullPlusCode, normalizePlusCode, plusCodePrecisionLabel } from "./open-location-code.js?v=1.03.0";
+import { hydrateVaultMedia, stageVaultMedia, prepareVaultWithMedia, mediaStorageSummary, requestPersistentMediaStorage, pruneOrphanedMedia, flushMediaWrites } from "./media-store.js?v=1.03.0";
+import { APP_PROFILE, APP_PROFILE_SCHEMA_VERSION, appTerm, appLabel, appNavigationLabel, appProfileExport } from "./app-profile.js?v=1.03.0";
+import { MODULE_REGISTRY, MODULE_REGISTRY_VERSION, MODULE_CLASSIFICATIONS, FUTURE_APP_COLUMNS, moduleRegistrySummary, moduleMatrixRows, moduleRegistryExport } from "./module-registry.js?v=1.03.0";
+import { MODULE_BINDINGS_VERSION, NAV_MODULE_REQUIREMENTS as NAV_MODULE_REQUIREMENTS_0955, ROUTE_MODULE_REQUIREMENTS as ROUTE_MODULE_REQUIREMENTS_0955, SETTINGS_MODULE_REQUIREMENTS as SETTINGS_MODULE_REQUIREMENTS_0955, ACCOUNT_TAB_BINDINGS, requirementsMet as moduleRequirementsMetFromBindings0955, moduleBindingsExport } from "./module-bindings.js?v=1.03.0";
+import { RECORD_SCHEMA, RECORD_SCHEMA_VERSION, recordFieldById, activeRecordFields, recordFieldEnabled, recordFieldRequired, activeDetailSections, recordDetailSectionEnabled, recordPhotoCategories, recordSchemaSummary, recordSchemaExport } from "./record-schema.js?v=1.03.0";
+import { WORKFLOW_SCHEMA, WORKFLOW_SCHEMA_VERSION, activeWorkflowActions, workflowActionEnabled, quickPhotoWorkflow, workflowSchemaSummary, workflowSchemaExport } from "./workflow-schema.js?v=1.03.0";
+import { THEME_PROFILE_SCHEMA_VERSION, resolveThemeProfile, applyThemeProfile, themeBrandAsset, themeWordmarkMarkup, themeProfileSummary, themeProfileExport } from "./theme-profile.js?v=1.03.0";
+import { CONTENT_PACK_SCHEMA_VERSION, CONTENT_SOURCE_TYPES, CONTENT_SOURCES, CONTENT_PACKS, resolveContentPackProfile, activeContentSources, activeContentPacks, contentPackLibraryFolders, contentPackSummary, contentPackRegistryExport } from "./content-pack-registry.js?v=1.03.0";
+import { SYNC_STORAGE_PROFILE_SCHEMA_VERSION, STORAGE_PROVIDER_TYPES, STORAGE_PROVIDERS, STORAGE_ROLES, resolveSyncStorageProfile, activeStorageProviders, storageProviderEnabled, storageRoleProviders, syncStorageSettingsTabEnabled, syncStorageSummary, syncStorageProfileExport } from "./sync-storage-profile.js?v=1.03.0";
+import { APP_FORGE_BLUEPRINT_SCHEMA_VERSION, appForgeReadinessSummary, validateAppForgeProfile, appForgeBlueprintExport } from "./app-forge-blueprint.js?v=1.03.0";
+import { APP_FORGE_RECIPE_SCHEMA_VERSION, appForgeRecipes, appForgeRecipeSummary, appForgeRecipeBlueprintExport, appForgeRecipeCatalogExport } from "./app-forge-recipes.js?v=1.03.0";
+import { APP_FORGE_FACTORY_SCHEMA_VERSION, createAppForgeGenerationRequest, appForgeFactoryManifest, appForgeFactorySummary, appForgeFactorySchemaExport } from "./app-forge-factory.js?v=1.03.0";
+import { APP_FORGE_GENERATOR_SCHEMA_VERSION, appForgeGeneratorPlan, appForgeGeneratorSummary, generateAppForgePwaPackage, appForgeGeneratorSchemaExport } from "./app-forge-generator.js?v=1.03.0";
 window.__FIREVAULT_MODULE_READY = true;
 window.__FIREVAULT_BUILD = BUILD;
 const ACTIVE_THEME_0958=resolveThemeProfile(APP_PROFILE);
@@ -420,7 +420,7 @@ const OVERLAY_TAGS_510 = [
   ["{panel}","Panel","Panel manufacturer and model"],
   ["{date}","Date","Current date"],
   ["{time}","Time","Current time"],
-  [OVERLAY_TECH_INFO_TAG_0949,"Tech Info","Uses the Technician Overlay Template from Profile"],
+  [OVERLAY_TECH_INFO_TAG_0949,"Tech Info","Uses the independent Technician Overlay below"],
   ["{city}","City","Site city"],
   ["{state}","State","Site state"],
   ["{zip}","ZIP","Site ZIP code"],
@@ -6729,9 +6729,9 @@ const SETTINGS_GROUPS_067 = [
   {key:"profile",icon:"👤",title:"Profile",tabs:["tech","overlay"]},
   {key:"maps",icon:"⌖",title:"Maps & GPS",tabs:["gps","plusCodes"]},
   {key:"reports",icon:"▤",title:"Reports",tabs:["reports","email"]},
-  {key:"data",icon:"⇅",title:"Data & Backup",tabs:["cloudFiles","microsoftStorage","sync","customerImport","categories","backup","webdav","updates"]},
+  {key:"data",icon:"⇅",title:"Data & Backup",tabs:["cloudFiles","microsoftStorage","sync","customerImport","categories","backup","webdav"]},
   {key:"privacy",icon:"▣",title:"Privacy & Security",tabs:["privacy","security"]},
-  {key:"about",icon:"ⓘ",title:"About",tabs:["demo","about"]}
+  {key:"about",icon:"ⓘ",title:`About ${APP_PROFILE.name}`,tabs:["manual","updates","demo","about"]}
 ];
 function settingsGroupForTab067(tab){ return SETTINGS_GROUPS_067.find(g=>g.tabs.includes(tab))?.key || "data"; }
 function settingsGroup067ByKey(key){ return SETTINGS_GROUPS_067.find(g=>g.key===key) || SETTINGS_GROUPS_067[0]; }
@@ -6739,10 +6739,10 @@ function openSettingsGroup067(key){ settingsGroup067=key||"profile"; mode=null; 
 const APP_FORGE_TOOL_MODE_1010=(()=>{try{return new URLSearchParams(location.search).get("appforge")==="1";}catch{return false;}})();
 function settingsTabs(){
   return [
-    ["tech",appTerm("technician",1),"Identity and overlay template"],
+    ["tech",appTerm("technician",1),"Identity and profile photo"],
     ["gps","GPS & Maps","Location and navigation"],
     ["plusCodes","Google Plus Codes","Offline location codes"],
-    ["overlay","Photo Overlay","Photo labels"],
+    ["overlay","Photo Overlay","Photo and technician overlays"],
     ["reports","Reports","Report defaults"],
     ["email","Email","Recipients and signature"],
     ["privacy","Privacy Lock","PIN protection"],
@@ -6754,14 +6754,28 @@ function settingsTabs(){
     ["categories","Categories",`Automatic ${recordTerm0954(1,true)} tags`],
     ["backup","Backup & Restore","Protect your data"],
     ["webdav","WebDAV Backup","Remote server upload and restore"],
+    ["manual","Help & User Manual","Instructions and screenshots"],
     ["updates","App Updates","Refresh application files"],
     ["demo","Demo Mode",`Fictional ${recordTerm0954(2,true)} for presentations and testing`],
     ["about",`About ${APP_PROFILE.name}`,"Version and information"],
     ...(APP_FORGE_TOOL_MODE_1010?[["architecture","AppForge Factory","Blueprints, recipes, and PWA generation"]]:[])
   ].filter(([id])=>settingsTabEnabled0955(id));
 }
+function storageProviderLogo1030(provider="local",extraClass=""){
+  const paths={
+    local:'<rect x="4" y="3" width="16" height="18" rx="3"/><path d="M8 7h8M8 11h8M8 15h5"/>',
+    webdav:'<path d="M7.5 18H18a4 4 0 0 0 .7-7.9A6.5 6.5 0 0 0 6.3 8.7 4.7 4.7 0 0 0 7.5 18z"/><path d="M9 12h6M9 15h4"/>',
+    onedrive:'<path class="logoFill1030" d="M9.1 17.8h9.4a3.5 3.5 0 0 0 .7-6.9 5.3 5.3 0 0 0-9.7-2.5 4.2 4.2 0 0 0-.4 9.4z"/><path class="logoFillAlt1030" d="M4.9 18h9.6a3.5 3.5 0 0 0 .2-7 5 5 0 0 0-9.2 2A2.7 2.7 0 0 0 4.9 18z"/>',
+    sharepoint:'<circle class="logoFill1030" cx="15" cy="8" r="5"/><circle class="logoFillAlt1030" cx="16" cy="16" r="4"/><rect class="logoFillDark1030" x="3" y="6" width="10" height="12" rx="2"/><path class="logoLetter1030" d="M7 10.2c1.7-1 3.8-.2 3.8 1.2 0 2.1-3.6 1.2-3.6 2.6 0 .7 1.3 1 2.8.2"/>',
+    googledrive:'<path class="driveGreen1030" d="M8.5 3h5l7.2 12.5h-5z"/><path class="driveYellow1030" d="M8.5 3 2.8 13l2.5 4.3L13.5 3z"/><path class="driveBlue1030" d="M5.3 17.3h12.1l3.3-1.8-2.5 4.3H3.8z"/>',
+    dropbox:'<path class="dropboxFill1030" d="m7 4 5 3-5 3-5-3zm10 0 5 3-5 3-5-3zM7 11l5 3-5 3-5-3zm10 0 5 3-5 3-5-3zm-8 7 3-2 3 2-3 2z"/>'
+  };
+  const key=paths[provider]?provider:"local";
+  return `<svg class="storageProviderLogo1030 provider-${key} ${extraClass}" viewBox="0 0 24 24" aria-hidden="true">${paths[key]}</svg>`;
+}
 function settingsIcon550(tab){
-  return ({tech:"👤",gps:"⌖",plusCodes:"＋",reports:"▤",email:"✉",overlay:"▧",privacy:"▣",security:"⌾",cloudFiles:"☁",microsoftStorage:"M",sync:"↔",customerImport:"⇩",categories:"◇",backup:"⇅",webdav:"W",updates:"↻",demo:"D",about:"ⓘ",architecture:"⌘"})[tab]||"•";
+  if(tab==="microsoftStorage")return storageProviderLogo1030("onedrive","settingsProviderLogo1030");
+  return ({tech:"👤",gps:"⌖",plusCodes:"＋",reports:"▤",email:"✉",overlay:"▧",privacy:"▣",security:"⌾",cloudFiles:"☁",sync:"↔",customerImport:"⇩",categories:"◇",backup:"⇅",webdav:"W",manual:"?",updates:"↻",demo:"D",about:"ⓘ",architecture:"⌘"})[tab]||"•";
 }
 function restoreAppChrome572(){
   document.body.classList.remove("homeFullscreen480","homeLayoutFixed570");
@@ -6784,16 +6798,16 @@ function openSettingsHome572(){
 }
 function leaveSettingsHome572(){settingsGroup067="";mode=null;settingsTab="tech";route("home");}
 const SETTINGS_DASHBOARD_0860 = [
-  {key:"profile",title:"Profile & Photos",icon:"user",tabs:["tech","overlay"]},
+  {key:"profile",title:"Profile",icon:"user",tabs:["tech","overlay"]},
   {key:"reports",title:"Reports",icon:"document",tabs:["reports","email"]},
-  {key:"data",title:"Data & Backup",icon:"database",tabs:["cloudFiles","microsoftStorage","sync","customerImport","categories","backup","webdav","updates"]},
+  {key:"data",title:"Data & Backup",icon:"database",tabs:["cloudFiles","microsoftStorage","sync","customerImport","categories","backup","webdav"]},
   {key:"maps",title:"Maps & GPS",icon:"pin",tabs:["gps","plusCodes"]},
   {key:"privacy",title:"Privacy & Security",icon:"shield",tabs:["privacy","security"]},
-  {key:"about",title:`About ${APP_PROFILE.name}`,icon:"info",tabs:["demo","about",...(APP_FORGE_TOOL_MODE_1010?["architecture"]:[])]}
+  {key:"about",title:`About ${APP_PROFILE.name}`,icon:"info",tabs:["manual","updates","demo","about",...(APP_FORGE_TOOL_MODE_1010?["architecture"]:[])]}
 ];
 const SETTINGS_GROUPED_LIST_0873 = [
   {label:"Profile",items:[
-    {key:"profile",subtitle:"Technician identity and photo overlay"}
+    {key:"profile",subtitle:"Technician identity, profile photo, and overlays"}
   ]},
   {label:"Maps & Location",items:[
     {key:"maps",subtitle:"Navigation, GPS accuracy, and Plus Codes"}
@@ -6808,7 +6822,7 @@ const SETTINGS_GROUPED_LIST_0873 = [
     {key:"privacy",subtitle:"Privacy lock and local vault protection"}
   ]},
   {label:"About",items:[
-    {key:"about",subtitle:"Version information and Demo Mode"}
+    {key:"about",subtitle:"Help, app updates, version information, and Demo Mode"}
   ]}
 ];
 
@@ -6839,12 +6853,12 @@ function settingsShortDate0880(value){
 }
 function settingsTabStatus0880(id){
   const s=data.settings||{}, tech=s.technician||{}, gps=s.gps||{}, reports=s.reports||{}, email=s.email||{}, overlay=s.overlay||{}, plus=s.plusCodes||{}, webdav=s.webdav||{};
-  if(id==="tech") {const complete=["photo","identity","contact","template"].filter(technicianSectionComplete0947).length;return complete===4?[tech.name||"Profile ready",tech.company||"Technician profile complete"]:[`${complete}/4 complete`,tech.name||"Finish technician profile"];}
+  if(id==="tech") {const complete=["photo","identity","contact"].filter(technicianSectionComplete0947).length;return complete===3?[tech.name||"Profile ready",tech.company||"Technician profile complete"]:[`${complete}/3 complete`,tech.name||"Finish technician profile"];}
   if(id==="gps") return gps.enabled===false ? ["Off","Location tools disabled"] : [gps.mapProvider==="google"?"Google Maps":"Apple Maps",gps.highAccuracy===false?"Standard accuracy":"High accuracy"];
   if(id==="plusCodes") return plus.enabled===false ? ["Off","Plus Codes disabled"] : [plus.autoGenerate===false?"Manual":"Automatic",`${Number(plus.accountLength)||10}-digit account codes`];
   if(id==="reports") return [String(reports.format||"detailed").replace(/^./,c=>c.toUpperCase()),reports.title||"Service Report"];
   if(id==="email") return email.defaultTo||email.cc||email.signature ? ["Configured",email.defaultTo||email.cc||"Signature saved"] : ["Not configured","Add defaults when needed"];
-  if(id==="overlay") return overlay.template ? ["Ready",overlay.showLogo===false?"Text overlay":"Logo and text overlay"] : ["Default","Standard field overlay"];
+  if(id==="overlay") return overlay.template ? ["2 overlays",technicianSectionComplete0947("template")?"Photo and technician overlays ready":"Photo overlay ready"] : ["Default","Photo and technician overlays"];
   if(id==="privacy") return privacyConfig0791()?.enabled ? ["PIN enabled","Local lock is active"] : ["PIN off","Optional local protection"];
   if(id==="security") return ["Protected","Audit and recycle bin ready"];
   if(id==="cloudFiles") return ["IndexedDB","Photos and documents stored outside the main vault"];
@@ -6854,6 +6868,7 @@ function settingsTabStatus0880(id){
   if(id==="categories") return ["Automatic","Account ID category rules"];
   if(id==="backup") {const info=autoBackupInfo();return [info.count?`${info.count} snapshots`:"No snapshots",info.last?.createdAt?`Latest ${settingsShortDate0880(info.last.createdAt)}`:"Create a backup"];}
   if(id==="webdav") return webdav.enabled ? [webdav.lastUpload?"Uploaded":"Enabled",webdav.lastUpload?settingsShortDate0880(webdav.lastUpload):"Connection ready to test"] : ["Off","Optional remote backup"];
+  if(id==="manual") return ["User Manual","Instructions with screenshots"];
   if(id==="updates") return [`Build ${BUILD}`,"Application files current"];
   if(id==="demo") return isDemoMode() ? ["Active","Fictional Boise accounts"] : ["Off","Real vault is active"];
   if(id==="about") return [`Version ${BUILD}`,"FireVault application information"];
@@ -6919,6 +6934,7 @@ function settingsSearchRows0874(query=""){
     categories:"category tags alarmnet clss ipdact basic",
     backup:"backup restore export snapshot recovery",
     webdav:"webdav dav remote server upload restore backup",
+    manual:"help user manual instructions screenshots guide support academy",
     updates:"update refresh cache application build",
     demo:"demo testing fictional boise presentation",
     about:"about version release revision support information",
@@ -6939,7 +6955,7 @@ function settingsSearchResultRow0874(result){
   return `<button class="settingsSearchResult0874 tone-${settingsTone0880(result.group?.key||"data")}" data-settings-search-tab0874="${esc(id)}" data-settings-search-group0874="${esc(result.group?.key||"data")}"><span class="settingsGroupIcon0860">${settingsIcon550(id)}</span><span class="settingsListCopy0880"><strong>${esc(title)}</strong><small>${esc(result.group?.title||"")} · ${esc(note)}</small></span><span class="settingsRowTail0880"><em>${esc(status[0])}</em><b>›</b></span></button>`;
 }
 function settings(){
-  if(["themes","advanced","homeLayout","visibility","backend","manual","diagnostics"].includes(settingsTab)) settingsTab="about";
+  if(["themes","advanced","homeLayout","visibility","backend","diagnostics"].includes(settingsTab)) settingsTab="about";
   normalizeSettingsTab0955();
   captureSettingsScroll576(); restoreAppChrome572();
   const tabs=settingsTabs();
@@ -7099,7 +7115,13 @@ function emailPreviewHtml(subject, signature){
   const renderedSubject=renderTemplate(subject || "", sample).trim() || "FireVault Report - Acme Fire Panel - Today";
   const signatureValue=renderTemplate(signature || "", sample);
   const renderedSig=signatureValue.trim() ? signatureValue : "FireVault Technician\nExample Fire Protection\n(307) 555-0100\ntech@example.com";
-  return `<div class="emailPreviewLine"><strong>Subject</strong><span id="emailPreviewSubject">${esc(renderedSubject)}</span></div><div class="emailPreviewSignature" id="emailPreviewSignature">${esc(renderedSig).replaceAll("\n","<br>")}</div>`;
+  return `<div class="emailPreviewSubject1030"><span>Subject</span><strong id="emailPreviewSubject">${esc(renderedSubject)}</strong></div>
+    <div class="emailPreviewBody1030">
+      <p>Hello,</p>
+      <p>Your FireVault service report for <strong>Acme Fire Panel</strong> is ready for review.</p>
+      <div class="emailPreviewAttachment1030"><span aria-hidden="true">▤</span><div><strong>FireVault Service Report.pdf</strong><small>Example attachment</small></div></div>
+      <div class="emailPreviewSignature" id="emailPreviewSignature">${esc(renderedSig).replaceAll("\n","<br>")}</div>
+    </div>`;
 }
 function emailSettingsPanel(email){
   return `<div class="settingsStack emailSettingsRedesign530 emailSettings540">
@@ -7134,11 +7156,14 @@ function emailSettingsPanel(email){
     </section>
 
     <aside class="card compactPane settingsSection530 emailPreviewPanel530 settingsSection540 tone-preview">
-      <div class="settingsSectionHead530 emailPreviewHead530"><div><span class="settingsEyebrow530">Live preview</span><h2>Example Email</h2><p>Sample account information shows how your saved templates will read.</p></div></div>
+      <div class="settingsSectionHead530 emailPreviewHead530"><div><span class="settingsEyebrow530">Preview</span><h2>Sample Message</h2><p>See exactly how the saved defaults read before using them on a real account.</p></div><span class="emailPreviewOnly1030">PREVIEW ONLY</span></div>
       <div class="emailMock530">
-        <div class="emailMockRow530"><strong>To</strong><span id="emailPreviewTo530">${esc(email.defaultTo || 'Customer email added when sending')}</span></div>
-        <div class="emailMockRow530"><strong>CC</strong><span id="emailPreviewCc530">${esc(email.cc || 'None')}</span></div>
-        ${emailPreviewHtml(email.defaultSubject, email.signature)}
+        <div class="emailMockSender1030"><span>FV</span><div><strong>FireVault Reports</strong><small>Prepared from a sample account</small></div></div>
+        <div class="emailMockRecipients1030">
+          <div class="emailMockRow530"><strong>To</strong><span id="emailPreviewTo530">${esc(email.defaultTo || 'Added when sending')}</span></div>
+          <div class="emailMockRow530"><strong>CC</strong><span id="emailPreviewCc530">${esc(email.cc || 'None')}</span></div>
+        </div>
+        <div class="emailMockMessage1030">${emailPreviewHtml(email.defaultSubject, email.signature)}</div>
       </div>
     </aside>
   </div>`;
@@ -7397,7 +7422,7 @@ function overlayActiveFieldsMarkup0944(){
       <div class="overlayFieldTop1012">
         <span class="overlayDragHandle0944" aria-hidden="true">${fvIcon073("drag","overlayDragIcon1012")}</span>
         <div class="overlayActiveFieldText0944"><strong>${esc(meta.label)}</strong><small>${esc(meta.note)}</small></div>
-        <button type="button" class="overlayBreakButton0944 ${item.breakBefore?"active":""}" data-overlay-break-field="${index}" ${(index===0||isTechInfo)?"disabled":""} aria-label="${isTechInfo?"Tech Info uses its Profile template line arrangement":`${item.breakBefore?"Place on same line":"Start a new line before"} ${esc(meta.label)}`}">${isTechInfo?"Profile lines":index===0?"First line":item.breakBefore?"New line":"Same line"}</button>
+        <button type="button" class="overlayBreakButton0944 ${item.breakBefore?"active":""}" data-overlay-break-field="${index}" ${(index===0||isTechInfo)?"disabled":""} aria-label="${isTechInfo?"Tech Info uses its independent Technician Overlay line arrangement":`${item.breakBefore?"Place on same line":"Start a new line before"} ${esc(meta.label)}`}">${isTechInfo?"Overlay lines":index===0?"First line":item.breakBefore?"New line":"Same line"}</button>
       </div>
       <div class="overlayFieldBottom1012">
         <div class="overlayFieldAlign0945" role="group" aria-label="Align ${esc(meta.label)}">
@@ -7718,7 +7743,7 @@ function overlaySettingsPanel510(o){
       <section class="overlaySection0890 overlayContent0890 overlayFieldBuilder0944 overlayFieldBuilder1012">
         <div class="overlayCardHead0890"><div><span>2 · FIELDS</span><h2>Photo information</h2><p>Choose what appears and arrange it for quick field reading.</p></div></div>
         <input type="hidden" id="ovTemplate" value="${esc(set.template)}">
-        <div class="overlayBuilderGroup0944"><div class="overlayBuilderTitle0944"><div><strong>Fields on photo</strong><small>Drag to reorder, or use the larger controls below each field.</small></div><button type="button" class="overlayQuickAlign0945" id="overlayTechnicianInfo0946">${fvIcon073("visit","overlayQuickInfoIcon1012")}<strong>Tech Info</strong><small>Use Profile template</small></button></div><div class="overlayActiveFields0944" id="overlayActiveFields0944">${overlayActiveFieldsMarkup0944()}</div></div>
+        <div class="overlayBuilderGroup0944"><div class="overlayBuilderTitle0944"><div><strong>Fields on photo</strong><small>Drag to reorder, or use the larger controls below each field.</small></div><button type="button" class="overlayQuickAlign0945" id="overlayTechnicianInfo0946">${fvIcon073("visit","overlayQuickInfoIcon1012")}<strong>Tech Info</strong><small>Use overlay below</small></button></div><div class="overlayActiveFields0944" id="overlayActiveFields0944">${overlayActiveFieldsMarkup0944()}</div></div>
         <div class="overlayBuilderGroup0944"><div class="overlayBuilderTitle0944"><div><strong>Add another field</strong><small>Checked fields are already on the photo.</small></div></div><div class="overlayFieldGrid510" id="overlayAvailableFields0944">${overlayTagButtons510()}</div></div>
       </section>
       <section class="overlaySection0890 overlayLayout0890 overlayLayout1012">
@@ -7959,7 +7984,7 @@ const FIREVAULT_MANUAL_058 = [
     ["Add a photo","Open the account photo or document area and choose the camera or photo library. Confirm the correct account before saving."],
     
     ["Useful photo notes","Describe the device, room, floor, circuit, condition, and reason the photo matters. Avoid relying on an image alone."],
-    ["Overlay settings","Settings → Photo Overlay controls the template fields, alignment, font size, colors, background, opacity, logo, and tagline."],
+    ["Overlay settings","Settings → Profile → Photo Overlay controls the main photo stamp. The independent Technician Overlay on the same page controls the reusable technician block without altering the main overlay settings."],
     ["Storage caution","Photos and scanned pages can increase local browser storage quickly. Standard quality is recommended; use Compact for long documents. Export backups and remove unnecessary duplicates."],
     ["Photo review","Confirm the saved photo, caption, and overlay are readable before leaving the account."]
   ]},
@@ -7981,10 +8006,10 @@ const FIREVAULT_MANUAL_058 = [
   ]},
   {id:"settings",title:"Settings Reference",icon:"⚙",status:"Current",summary:"Understand each Settings area and the effect it has on FireVault.",topics:[
     ["Technician","Stores the technician name, company, phone, email, and license or employee identifier reused in reports and templates."],
-    ["Demo Mode","Settings → App → Demo Mode switches FireVault to a separate fictional Boise dataset with 20 accounts, simulated Nearby GPS, and sample field history. Exit Demo Mode to return to the untouched real vault."],
+    ["Demo Mode","Settings → About FireVault → Demo Mode switches FireVault to a separate fictional Boise dataset with 20 accounts, simulated Nearby GPS, and sample field history. Exit Demo Mode to return to the untouched real vault."],
     ["GPS / Maps","Controls the map provider, accuracy preference, nearby radius, GPS capture buttons, and report coordinates."],
     ["Reports and Email","Sets report defaults, recipients, subject templates, signature templates, and email preview behavior."],
-    ["Photo Overlay","Controls the information and branding stamped onto exported or saved field photos."],
+    ["Photo Overlay","Controls the normal field-photo stamp and a separately saved Technician Overlay. Changing one overlay does not change the other."],
     ["Home Layout","Shows or hides optional Home cards and chooses whether each remembers, opens, or collapses by default."],
     ["Modules","Simple, Advanced, and Power modes determine which optional FireVault tools are visible. Disabling a module does not delete its data."],
     ["Advanced","Controls optional integrations that may require permissions, APIs, subscriptions, or external services."],
@@ -7997,7 +8022,7 @@ const FIREVAULT_MANUAL_058 = [
     ["Export regularly","Go to Settings → Backup and export a JSON backup. Store copies outside the browser, preferably in more than one safe location."],
     ["Before an update","FireVault creates local safety snapshots automatically. Download an external backup before major updates or device changes, then verify the installed build and account count afterward."],
     ["Restore safely","Import a recognized FireVault JSON backup, review the preview counts and build information, then confirm restore. Restore overwrites the current local vault."],
-    ["Update safely","Use Settings → App Updates → Check for Updates or Reload FireVault. Do not delete the Home Screen app unless a current external backup has been downloaded and verified."],
+    ["Update safely","Use Settings → About FireVault → App Updates → Check for Updates or Reload FireVault. If Update Ready stalls, the popup restores Try Again and Reload App controls instead of remaining locked. Do not delete the Home Screen app unless a current external backup has been downloaded and verified."],
     ["Do not assume cloud sync","Until cloud synchronization is explicitly released, each browser/device has its own local copy of the vault."]
   ]},
   {id:"trouble",title:"Troubleshooting",icon:"!",status:"Current",summary:"Resolve common loading, saving, GPS, layout, and deployment problems.",topics:[
@@ -8009,7 +8034,7 @@ const FIREVAULT_MANUAL_058 = [
     ["Restore fails","Use an unmodified FireVault JSON backup, verify the file is readable, and compare its preview details before confirming restore."]
   ]},
   {id:"release",title:"App Information",icon:"ⓘ",status:"Current",summary:"Find version details, documentation notes, and information needed when reporting a problem.",topics:[
-    ["Installed version","Open Settings → App Updates or About to confirm the build currently installed on the device."],
+    ["Installed version","Open Settings → About FireVault → App Updates or About FireVault to confirm the build currently installed on the device."],
     ["Documentation","Help chapters describe the controls and workflows available in the installed app."],
     ["Release notes","Tap the build number where available to review recent changes."],
     ["Problem reports","Include the build number, page name, device, screenshot, exact action, and what happened instead."]
@@ -8047,6 +8072,14 @@ function manualExpandedQuery058(q){ const parts=q.toLowerCase().trim().split(/\s
 function manualStatus058(ch){ if(["start","home","sites","detail","workflow","notes","photos","gps","reports","settings","backup","trouble"].includes(ch.id)) return "Complete"; return "Needs Review"; }
 function manualMinutes058(ch){ return Math.max(2,Math.ceil(ch.topics.length*0.8)); }
 function manualTile058(icon,title,note,view,tone="blue",badge=""){ return `<button class="academyTile058 tone-${tone}" data-manual-view="${view}"><span>${icon}</span><div><strong>${esc(title)}</strong><small>${esc(note)}</small></div>${badge?`<em>${esc(badge)}</em>`:""}</button>`; }
+function manualScreenshotGuide1030(){
+  const cards=[
+    ["assets/help-nearby.png","Find the closest account","Open Nearby, allow location while using FireVault, then tap a numbered account row to open it."],
+    ["assets/help-account-detail.png","Work from Account Detail","Use the large actions for calls, routes, notes, and photos. The aligned Back control returns to your previous account list."],
+    ["assets/help-photo-overlay.png","Set up both photo overlays","Go to Settings → Profile → Photo Overlay. The normal photo stamp and Technician Overlay save independently."]
+  ];
+  return `<section class="manualScreenshotGuide1030"><header><span>QUICK VISUAL GUIDE</span><h3>Three everyday workflows</h3><p>Each screenshot matches this installed build. Tap User Manual below for complete instructions.</p></header><div>${cards.map(([src,title,note],index)=>`<article><img src="${src}?v=${BUILD}" alt="FireVault ${esc(title)} screen" loading="lazy"><div><span>${index+1}</span><strong>${esc(title)}</strong><p>${esc(note)}</p></div></article>`).join("")}</div></section>`;
+}
 function manualHome058(){
   const bookmarked=FIREVAULT_MANUAL_058.filter(ch=>manualBookmarks058.includes(ch.id));
   return `<div class="academyHome067">
@@ -8058,10 +8091,11 @@ function manualHome058(){
       <button data-manual-view="trouble"><span>?</span><div><strong>Troubleshooting</strong><small>GPS, storage, photos, and updates</small></div><b>›</b></button>
       <button data-manual-view="new"><span>🆕</span><div><strong>What’s New</strong><small>Changes in Build ${BUILD}</small></div><b>›</b></button>
     </div>
+    ${manualScreenshotGuide1030()}
     ${bookmarked.length?`<section class="academySaved067"><div><span>Saved pages</span><strong>Bookmarks</strong></div>${bookmarked.map(ch=>`<button data-manual-chapter="${ch.id}"><span>${ch.icon}</span><strong>${esc(ch.title)}</strong><b>›</b></button>`).join('')}</section>`:''}
     <details class="academyMore067"><summary><span>More learning tools</span><b>⌄</b></summary><div><button data-manual-view="tutorials">Interactive Tutorials</button><button data-manual-view="tips">Field Tips</button><button data-manual-view="tour">Show Me Around</button><button data-manual-view="revisions">Revision History</button><button data-manual-view="tracker">Documentation Tracker</button></div></details>
     ${pinnedLearning059()}
-    <p class="academyReviewNote067">Manual revision 1.02.0 · Reviewed July 2026. Documentation must be checked with every release.</p>
+    <p class="academyReviewNote067">Manual revision 1.03.0 · Reviewed July 2026. Documentation must be checked with every release.</p>
   </div>`;
 }
 function manualList058(){
@@ -8083,8 +8117,8 @@ function manualChapterView058(){
 }
 function manualSimplePage058(type){
  const pages={
-  quick:["🚀","Quick Start Guide","Get FireVault ready for a normal field day.",[["1. Verify the build","Confirm the green build badge shows 1.02.0 before entering production information."],["2. Complete Technician Profile","Enter your name, company, phone, email, and license or employee identification."],["3. Review permissions","Allow location and photo access only when FireVault requests them and the feature is needed."],["4. Create or open a site","Add the customer name, full address, panel details, contacts, access notes, and GPS location."],["5. Document the visit","Record notes, photos, tasks, deficiencies, equipment changes, and a service visit."],["6. Finish and protect the data","Review the report, send or copy the required summary, then export a current backup."]]],
-  new:["🆕","What’s New in 1.02.0","Arrival-aware guidance from the property edge to the exact fire-alarm location.",[["Arrival prompt","A foreground Nearby scan can now offer an On-Site Guide when usable GPS confirms arrival and the account has saved parking or entrance points."],["Focused property map","The guide presents numbered exact-location pins with Plus Codes, access notes, distance, Copy, and Route actions."],["Field sequence","Saved locations are ordered Parking → Entrance → equipment so technicians can move through the site naturally."],["Safe account choice","Accounts sharing one site location show their account names and IDs before the guide opens."],["Manual access","On-Site Guide is always available from Account Detail → Locations when exact GPS points exist."]]],
+  quick:["🚀","Quick Start Guide","Get FireVault ready for a normal field day.",[["1. Verify the build","Confirm the green build badge shows 1.03.0 before entering production information."],["2. Complete Technician Profile","Enter your name, company, phone, email, and license or employee identification."],["3. Review permissions","Allow location and photo access only when FireVault requests them and the feature is needed."],["4. Create or open a site","Add the customer name, full address, panel details, contacts, access notes, and GPS location."],["5. Document the visit","Record notes, photos, tasks, deficiencies, equipment changes, and a service visit."],["6. Finish and protect the data","Review the report, send or copy the required summary, then export a current backup."]]],
+  new:["🆕","What’s New in 1.03.0","A cleaner field interface, simpler Settings, visual Help, and reliable update recovery.",[["Nearby and Account Detail","Distance is larger and anchored at the lower right of Nearby rows, and the Account Detail Back arrow now aligns with its label."],["Simpler Settings","Profile is shorter, App Updates moved to About FireVault, and Help now opens a screenshot-based User Manual."],["Independent overlays","The Technician Overlay moved to Photo Overlay and remains stored separately from the normal photo stamp."],["Cleaner communication and storage","Email Preview is easier to scan and storage targets use recognizable provider marks."],["Update recovery","Update Ready now waits for deliberate installation and restores usable Try Again and Reload App actions if activation stalls."]]],
   tips:["🧰","Field Tips","Short practices that improve the usefulness of FireVault records.",[["Write for the next technician","Include the exact panel, circuit, device, location, symptom, test result, and next action instead of relying on memory."],["Photograph context first","Take one wide photo showing the equipment location before close-up terminal, label, or damage photos."],["Separate facts from follow-up","Use notes for what occurred, deficiencies for code or system problems, and tasks for work that still needs completion."],["Confirm the account","Before using Quick Capture, verify the selected customer site to prevent records from being stored under the wrong account."],["Back up before updates","Download an external backup before a major update or device change and after completing significant field documentation."]]],
   revisions:["📋","Revision History","Application and documentation checkpoints.",[[["1.02.0","Adds the foreground arrival prompt and On-Site Guide with shared-account confirmation, property mapping, ordered exact locations, and manual Account Detail access."],["1.01.5","Redesigns Update Ready as a clear field-safe sheet with full-size actions, installation progress, duplicate handling, and retry guidance."],["1.01.4","Keeps the selected Account Detail tab fully visible after every tab change on narrow phones without changing tab content or workflows."],["1.01.3","Replaces the wrapping Account Detail Favorite label with a compact star-only 44px control while preserving its action and accessible state."],["1.01.2","Polishes Photo Overlay with a clearer step-by-step editor, larger field controls, compact branding, and responsive phone/iPad layouts."],["1.01.1","Polishes Account Detail with larger field-ready actions, clearer account hierarchy, simplified icon tabs, and responsive phone/iPad layouts."],["1.01.0","Simplifies FireVault Settings into six technician-focused areas and hides AppForge factory tools from normal app use."],["1.00.0","Adds the AppForge Generator Engine with deterministic, isolated, installable PWA ZIP packages for all four Product Recipes."],["0.99.0","Adds deterministic AppForge Factory Manifests with generation requests, composed profiles, validation gates, output inventories, requirements, and safety guardrails."],["0.98.0","Adds validated AppForge Product Recipes for FireVault, Wyoming Explorer, Wyoming Fishing Guide, and Ghost Towns Guide with explicit publication requirements."],["0.97.0","Adds a validated AppForge Product Blueprint that packages identity, modules, data, workflows, branding, content, and storage as one portable build definition."],["0.96.0","Adds a profile-driven Sync & Storage Profile for local backends, approved providers, backups, collaboration policy, conflict handling, and credential safeguards."],["0.95.9","Adds profile-driven data sources and content packs, derives Library folders from active packs, and prepares verified versioned catalogs without downloading remote data."],["0.95.8","Adds a profile-driven Theme Profile for brand assets, semantic colors, typography, shape, and mobile browser chrome while preserving FireVault’s dark technician interface."],["0.95.7","Adds profile-defined action surfaces and Quick Photo workflow presets while preserving FireVault's complete technician workflow."],["0.95.6","Adds a profile-defined record schema for account fields, detail sections, and photo categories while keeping FireVault's complete fire-alarm data model active."],["0.95.5","Makes navigation, Account Detail tabs and actions, routes, and Settings respond to the App Profile enabled-module list while preserving all FireVault modules."],["0.95.4","Connects the App Profile terminology layer to live Search, Nearby, Account Detail, account forms, Quick Photo, navigation, and photo-category workflows while preserving FireVault labels and storage."],["0.95.3","Adds a central App Profile, terminology layer, module registry, in-app architecture view, and reusable feature matrix while preserving FireVault workflows and storage."],["0.95.2","Redesigns Account Detail with a compact identity header, four fast actions, reordered tabs, responsive iPad content, and origin-aware Back navigation."],["0.95.1","Rebuilds Account Directory as a compact dark two-line list with a smaller search header, slim filters, dense account rows, and preserved quick actions."],["0.95.0","Adds a bottom-navigation Photo button with current-account capture, overlay preview, account confirmation, automatic image resizing, category memory, and IndexedDB-safe saving."],["0.94.10","Fixes the Account Detail crash caused by an undefined account-context value when opening an account from Nearby Accounts or Search."],["0.94.9","Shows Tech Info as a single Photo Overlay field with its own adjustment options and hides individual technician profile fields from the overlay editor."],["0.94.8","Repairs Technician Overlay Template wrapping and adds group-level left, center, or right alignment with exact preview/export matching."],["0.94.7","Adds a resized technician profile photo and completion-aware collapsible Technician sections that remain open until required information is filled."],["0.94.6","Enlarges Photo Overlay editing controls, adds a reusable Technician Overlay Template under Profile, and replaces the old Technician + Phone shortcut with Technician Info."],["0.94.5","Makes Photo Overlay field rows thinner, adds per-field flush-left/flush-right alignment, and adds a one-tap Technician + Phone flush-right layout."],["0.94.4","Replaces raw Photo Overlay text editing with an auto-saving field builder that supports one-tap add, reordering, line control, and removal without a keyboard confirmation step."],["0.94.3","Maximizes the Photo Overlay Field Photo preview, removes the full detail header, and repairs field insertion and long overlay text rendering."],["0.94.2","Keeps the Photo Overlay Field Photo preview visible while controls scroll, reduces the preview size, and removes the visible sample-photo attribution line."],["0.94.1","Aligned the Nearby bottom navigation with Search and Settings and removed the red active-button underline across all three sections."],["0.94.0","Polished Settings section hierarchy, rebuilt the Account Directory header and search controls, improved active navigation, and standardized active-screen spacing and touch targets."],["0.93.1","Removed the three Settings shortcut buttons and repaired horizontal page overflow so Settings remains locked to vertical scrolling on iPhone and iPad."],["0.93.0","Improved field reliability with a visible splash presentation, unsaved-change protection, duplicate-action prevention, corrected navigation states, keyboard-safe forms, and consistent interaction feedback."],["0.92.0","Introduced a canonical release-facing design system for global chrome, Account Directory, Account Detail, Settings, Nearby, forms, cards, buttons, and responsive iPhone/iPad layouts."],["0.91.1","Rebuilt the three Settings status shortcuts as equal-width responsive controls with clear icons, readable status text, and reliable iPhone/iPad alignment."],["0.91.0","Moved photos and scanned-page payloads from the main localStorage vault into IndexedDB, added storage health and protection controls, preserved complete-media exports, and retained safe legacy migration."],["0.90.0","Core cleanup removed retired scanner capture and service timers, shortened startup, removed the global portrait lock, standardized Account terminology, and added release-safe error recovery."],["0.89.0","Rebuilt Photo Overlay as a compact visual studio with an exact canvas preview, quick presets, reorganized content/layout/branding controls, expanded account fields, and a real fire-alarm deficiency sample photo with attribution."],["0.88.0","Overhauled Settings with sticky search, live status summaries, richer grouped cards, consistent detail screens, and improved iPad layout while preserving every release-critical setting."],["0.87.11","Restored WebDAV Backup to Data & Backup and Settings search while preserving saved connection settings and transfer tools."],["0.87.10","Aligned the four Account Directory card actions across the full card width in Call, Route, Add Note, Favorite order."],["0.87.9","Cleaned up the Account Directory with layered depth, raised controls, dimensional account cards, and category-accented shading while preserving fluid scrolling."],["0.87.8","Improved Account Directory scrolling performance and added iPad portrait, landscape, and split-view layout refinements."],["0.87.4","Added spacing and search to Settings, removed the Field category, moved Google Plus Codes under Maps & GPS, enlarged Account ID/category tags, moved Favorite beside Call, removed empty panel/contact text, and restored Nearby-style card scroll locking."],["0.87.3","Moved account addresses below site names, placed Account ID and category tags beneath the address, and changed Settings to a dark grouped-list design without a duplicate logo."],["0.87.2","Polished Account Directory cards and removed the default Ready, No Open Work, and GPS status tags so only actionable issues are shown."],["0.87.1","Rebuilt Account Directory, Search, account cards, and Account Detail from the stable 0.86.1 baseline and removed the layout gap above the bottom navigation."],["0.86.1","Repaired the Settings startup error and standardized the three-button Nearby, Search, and Settings dock across the app."],["0.86.0","Redesigned Settings as a simplified dark tile dashboard and renamed the bottom Accounts navigation button to Search."],["0.85.0","Removed Tools navigation and the Account Detail Visit action, and rebuilt Settings as a simple grouped menu with clean detail screens."],["0.84.0","Refined Nearby map selection with a fixed details overlay, no marker popup, delayed street-level zoom, and direct account-card navigation."],["0.81.0","Prepared FireVault for App Store review by removing the document scanner, Daily Route and time-tracking controls, theme selection, advanced settings, diagnostics access, and excess instructional copy while preserving account data."]],["0.80.3","Defaulted new Tools scanner documents to the closest GPS-ready account with visible distance, accuracy, retry, and manual override."],["0.80.2","Simplified Document Scanner, added on-device AI Auto Scan with live corner framing and hands-free capture, and repaired mobile keyboard field visibility."],["0.80.1","Moved Document Scanner to Tools, added post-capture account search and matching, and added scanner access inside the full Site Notes workspace."],["0.80.0","Added an account-specific multi-page camera document scanner with automatic edge detection, manual corner correction, rotation, cleanup modes, page ordering, PDF preview/download/share, and account-note activity."],["0.79.14","Restored numbered Nearby Accounts map pins matched to distance-sorted list rows and removed Smart Account Intelligence."],["0.79.13","Repaired startup parsing inherited from 0.79.11 and corrected Building Navigator location-copy syntax."],["0.79.12","Added Building Navigator with exact site locations, GPS/Plus Codes, verification, linked photos, route targets, and timeline events."],["0.79.7","Shortened every Settings summary and removed the colored bar from each Section Overview."],["0.79.6","Added Nearby-style account-list scroll locking so cards settle cleanly at the top while the Accounts controls remain fixed."],["0.79.5","Added separate Personal OneDrive, Work OneDrive, and SharePoint connection profiles with exact photo/document assignments and no-personal-fallback protection."],["0.79.4","Added independent photo and document storage destinations, cloud-provider integration targets, and offline Google Plus Codes for accounts and exact field locations."],["0.79.3","Added backend-neutral provider interfaces for authentication, database, file storage, synchronization, and audit while keeping FireVault fully local."],["0.79.2","Added a unified Security Center with vault integrity validation, backup health, audit filters, device naming, session clearing, and PIN confirmation for sensitive exports, restores, and deletion."],["0.79.1","Added an optional local six-digit privacy lock with PBKDF2 hashing, inactivity/background locking, app-switcher privacy screen, recovery code, cooldown protection, and local lock events."],["0.79.0","Added security-ready schema 4 metadata, stable workspace/user/device identities, local audit history, pending change queue, recoverable deletion, credential-safe exports, and protected restore/reset actions."],["0.67.0","Redesigned Account View around service actions and grouped information, consolidated Settings into five folders, and simplified FireVault Academy and contextual Help for continuous reading."],["0.65.2","Repaired Nearby Accounts with GPS inventory counts, imported-coordinate recovery, persistent permission and timeout messages, a standard-accuracy retry, and nearest-site fallback results."],["0.65.1","Added online latitude/longitude calculation, coordinate validation, geocoding progress, unmatched-address review, optional CSV coordinates, and coordinate-safe repeat importing."],["0.65.0","Added preview-first customer CSV importing, Account Id update matching, validation warnings, imported monitoring details, and sync activity tracking."],["0.64.1","Simplified Academy article headers, removed floating metadata badges, and improved continuous scrolling and readability."],["0.64.0","Added Sync Activity, a conflict review center, export/import audit entries, and an automatic OneDrive connection-readiness checklist."],["0.63.1","Overhauled contextual Help and Academy reader formatting, removed overlapping sticky article headers, and restored full scrolling on phones and tablets."],["0.63.0","Added permanent record IDs, audit metadata, local version tracking, pending-sync states, conflict readiness, device identity, and a Team Sync settings workspace."],["0.60.0","Connected major screens and Settings areas directly to matching Academy chapters with return-to-screen navigation."],["0.59.0","Added interactive tutorials, guided orientation, pinned learning, field tips, and documentation tracking."],["0.58.0","Expanded Help & Manual into FireVault Academy with bookmarks, smart search, Quick Start, and reader navigation."],["0.57.0","Added the first complete searchable in-app FireVault User Manual."],["Ongoing review rule","Any change to navigation, labels, storage, workflows, permissions, or supported layouts requires the related manual chapter to be checked."]]],
   trouble:["❓","Troubleshooting","Common problems and safe first checks.",FIREVAULT_MANUAL_058.find(x=>x.id==="trouble")?.topics||[]]
@@ -8662,7 +8696,7 @@ function cloudFileStoragePanel0794(){
     ${settingsSection540("Local-first behavior","Transfer Policy","Remote destinations must never destroy the only copy of a field photo or document.",`
       <div class="settingsList settingsToggleList540">${checkBlock("keepLocalCopy0794","Keep a local FireVault copy after upload",cfg.keepLocalCopy!==false)}${checkBlock("uploadOnSave0794","Queue remote upload when a photo or document is saved",!!cfg.uploadOnSave)}${checkBlock("noPersonalFallback0795","Never fall back from Work/SharePoint to Personal OneDrive",cfg.neverFallbackToPersonal!==false)}</div>
       <div class="cloudStorageActions0794"><button class="primary" id="saveCloudStorage0794">Save Destinations</button><button class="ghost" id="downloadCloudManifest0794">Download Integration Manifest</button>${syncStorageSettingsTabEnabled(APP_PROFILE,"microsoftStorage")?`<button class="ghost" id="openMicrosoftCloud0795">Microsoft Accounts</button>`:""}${syncStorageSettingsTabEnabled(APP_PROFILE,"webdav")?`<button class="ghost" id="openWebdavCloud0794">WebDAV Settings</button>`:""}</div>` ,"green")}
-    <section class="card compactPane cloudProviderCatalog0794"><div class="paneHead"><div><h2>Available Storage Targets</h2><p class="paneNote">Local storage works now. The existing WebDAV module remains available for vault backup; photo/document transfer and OAuth providers are prepared as later connectors.</p></div></div><div>${providers.map(item=>`<article><span>${item.id==="onedrive"||item.id==="sharepoint"?"M":item.id==="googledrive"?"G":item.id==="dropbox"?"D":item.id==="webdav"?"W":"L"}</span><div><strong>${esc(item.label)}</strong><small>${esc(item.note)}</small></div><b class="${item.id==="local"?"available":"planned"}">${item.id==="local"?"READY":item.id==="webdav"?"BACKUP READY":item.id==="onedrive"||item.id==="sharepoint"?"PROFILES READY":"OAUTH SETUP"}</b></article>`).join("")}</div></section>
+    <section class="card compactPane cloudProviderCatalog0794"><div class="paneHead"><div><h2>Available Storage Targets</h2><p class="paneNote">Local storage works now. The existing WebDAV module remains available for vault backup; photo/document transfer and OAuth providers are prepared as later connectors.</p></div></div><div>${providers.map(item=>`<article><span class="providerMark1030">${storageProviderLogo1030(item.id)}</span><div><strong>${esc(item.label)}</strong><small>${esc(item.note)}</small></div><b class="${item.id==="local"?"available":"planned"}">${item.id==="local"?"READY":item.id==="webdav"?"BACKUP READY":item.id==="onedrive"||item.id==="sharepoint"?"PROFILES READY":"OAUTH SETUP"}</b></article>`).join("")}</div></section>
   </div>`;
 }
 function wireCloudFileStorage0794(){
@@ -8714,7 +8748,7 @@ function microsoftStoragePanel0795(){
       <div class="microsoftSummaryGrid0795"><article><span>PERSONAL / WORK PROFILES</span><strong>${accounts.filter(x=>x.type!=="sharepoint").length}</strong><small>Configured on this device</small></article><article><span>SHAREPOINT PROFILES</span><strong>${accounts.filter(x=>x.type==="sharepoint").length}</strong><small>Named libraries</small></article><article><span>PHOTO DESTINATION</span><strong>${esc(assignmentLabel("photo"))}</strong><small>Exact account assignment</small></article><article><span>DOCUMENT DESTINATION</span><strong>${esc(assignmentLabel("document"))}</strong><small>Exact account assignment</small></article></div>
       <div class="settingsInfo540 warning"><strong>No personal fallback</strong><span>If a Work or SharePoint destination is unavailable, FireVault keeps the file local and queued. It never substitutes a Personal OneDrive profile.</span></div>`,"blue")}
     ${settingsSection540("Connection profiles","Personal, Work & SharePoint",accounts.length?"Edit a profile or assign it directly to Photos or Documents.":"Create your first named Microsoft storage profile.",`
-      <div class="microsoftProfileList0795">${accounts.length?accounts.map(item=>`<article class="microsoftProfileCard0795"><span class="microsoftProfileIcon0795">M</span><div><strong>${esc(item.label)}</strong><small>${esc(microsoftProfileTypeLabel0795(item.type))}${item.email?` · ${esc(item.email)}`:""}</small>${item.type==="sharepoint"&&item.libraryName?`<em>${esc(item.libraryName)}</em>`:""}</div><b>NOT CONNECTED</b><div class="microsoftProfileActions0795"><button class="ghost" data-ms-edit0795="${esc(item.id)}">Edit</button><button class="ghost" data-ms-assign0795="photo" data-ms-id0795="${esc(item.id)}">Use for Photos</button><button class="ghost" data-ms-assign0795="document" data-ms-id0795="${esc(item.id)}">Use for Documents</button><button class="danger" data-ms-delete0795="${esc(item.id)}">Remove</button></div></article>`).join(""):`<div class="emptyState"><strong>No Microsoft storage profiles</strong><span>Add Personal OneDrive, Work OneDrive, or a SharePoint library below.</span></div>`}</div>`,"cyan")}
+      <div class="microsoftProfileList0795">${accounts.length?accounts.map(item=>`<article class="microsoftProfileCard0795"><span class="microsoftProfileIcon0795">${storageProviderLogo1030(item.type==="sharepoint"?"sharepoint":"onedrive")}</span><div><strong>${esc(item.label)}</strong><small>${esc(microsoftProfileTypeLabel0795(item.type))}${item.email?` · ${esc(item.email)}`:""}</small>${item.type==="sharepoint"&&item.libraryName?`<em>${esc(item.libraryName)}</em>`:""}</div><b>NOT CONNECTED</b><div class="microsoftProfileActions0795"><button class="ghost" data-ms-edit0795="${esc(item.id)}">Edit</button><button class="ghost" data-ms-assign0795="photo" data-ms-id0795="${esc(item.id)}">Use for Photos</button><button class="ghost" data-ms-assign0795="document" data-ms-id0795="${esc(item.id)}">Use for Documents</button><button class="danger" data-ms-delete0795="${esc(item.id)}">Remove</button></div></article>`).join(""):`<div class="emptyState"><strong>No Microsoft storage profiles</strong><span>Add Personal OneDrive, Work OneDrive, or a SharePoint library below.</span></div>`}</div>`,"cyan")}
     ${settingsSection540(editingMicrosoftProfile0795?"Edit profile":"New profile",editingMicrosoftProfile0795?"Update Microsoft Storage Profile":"Add Microsoft Storage Profile","Profiles are local connector settings and are excluded from FireVault vault backups. OAuth tokens are never stored here.",`
       <div class="settingsGrid settingsGrid540">
         ${fieldBlock("Profile type",`<select id="msProfileType0795"><option value="personal" ${editing.type==="personal"?"selected":""}>Personal OneDrive</option><option value="work" ${editing.type==="work"?"selected":""}>Work OneDrive</option><option value="sharepoint" ${editing.type==="sharepoint"?"selected":""}>SharePoint Library</option></select>`)}
@@ -8927,7 +8961,6 @@ function saveTechnicianSection0947(section){
   data.settings.technician=tech;save();setTechnicianSectionState0947(section,false);toast("Technician profile saved.","success");settings();
 }
 function wireTechnicianProfile0947(){
-  wireTechnicianOverlayTemplate0946();
   document.querySelectorAll("[data-technician-section]").forEach(section=>section.addEventListener("toggle",()=>{
     const id=section.dataset.technicianSection;if(!id)return;
     if(technicianSectionComplete0947(id))setTechnicianSectionState0947(id,section.open);
@@ -8951,6 +8984,22 @@ function wireTechnicianProfile0947(){
     data.settings.technician={...current,photoData:"",photoUpdatedAt:""};
     save();setTechnicianSectionState0947("photo",true);toast("Technician photo removed.");settings();
   };
+}
+
+function technicianOverlaySettingsPanel1030(){
+  return `<section class="card technicianOverlayIndependent1030">
+    <header class="technicianOverlayIndependentHead1030">
+      <div><span>INDEPENDENT OVERLAY</span><h2>Technician Overlay</h2><p>Build the Technician Info block used on field photos. These controls are saved separately and never change the Photo Overlay layout above.</p></div>
+      <em class="overlayAutoSave0944" id="technicianOverlayAutoSave0946" data-state="saved">Saved automatically</em>
+    </header>
+    <div class="technicianOverlayTemplate0946 overlayFieldBuilder0944">
+      <div class="technicianOverlayTemplateHead0946"><div><strong>Technician block preview</strong><small>Uses the saved name, company, phone, email, and license from Profile.</small></div><span class="overlayIsolationBadge1030">Separate settings</span></div>
+      <div id="technicianOverlayPreview0946">${technicianOverlayPreviewMarkup0946()}</div>
+      <div class="technicianOverlayAlignmentCard0948"><div><strong>Group alignment</strong><small>Place the complete Technician Info block flush left, centered, or flush right.</small></div><div id="technicianOverlayGroupAlign0948">${technicianOverlayGroupAlignmentMarkup0948()}</div></div>
+      <div class="overlayBuilderGroup0944"><div class="overlayBuilderTitle0944"><div><strong>Technician fields</strong><small>Reorder fields and choose where each new line begins.</small></div><button type="button" class="ghost technicianOverlayReset0946" id="technicianOverlayReset0946">Reset</button></div><div class="overlayActiveFields0944" id="technicianOverlayActive0946">${technicianOverlayActiveMarkup0946()}</div></div>
+      <div class="overlayBuilderGroup0944"><div class="overlayBuilderTitle0944"><div><strong>Add profile field</strong><small>Added fields are checked.</small></div></div><div class="overlayFieldGrid510" id="technicianOverlayAvailable0946">${technicianOverlayAvailableMarkup0946()}</div></div>
+    </div>
+  </section>`;
 }
 
 function architectureCsvCell0953(value){
@@ -9158,20 +9207,10 @@ function settingsPanel(){
   const saveButton=(label="Save")=>`<button class="primary saveMini" id="saveSettings">${esc(label)}</button>`;
 
   if(settingsTab==="tech"){
-    technicianOverlayFieldState0946=technicianOverlayNormalize0946(s.technicianOverlay?.fields);
-    technicianOverlayGroupAlign0948=technicianOverlaySavedAlignment0948();
     return `<div class="settingsStack settingsStack540 technicianSettingsStack0947">
       ${technicianSection0947("photo","Profile photo","Technician Photo","Add a clear head-and-shoulders image for your technician profile.",technicianPhotoMarkup0947(),"red")}
       ${technicianSection0947("identity","Identity","Technician Profile","Name and company are reused throughout reports, templates, and field records.",`<div class="settingsGrid settingsGrid540">${fieldBlock("Technician name",`<input id="techName" autocomplete="name" value="${esc(tech.name)}">`)}${fieldBlock("Company",`<input id="techCompany" autocomplete="organization" value="${esc(tech.company)}">`)}</div><div class="technicianSectionActions0947"><button type="button" class="primary" data-save-technician-section="identity">Save Identity</button></div>`,"blue")}
       ${technicianSection0947("contact","Contact","Contact & Credentials","Phone and email complete the section. License or employee ID remains optional.",`<div class="settingsGrid settingsGrid540">${fieldBlock("Phone",`<input id="techPhone" autocomplete="tel" inputmode="tel" value="${esc(formatPhone0758(tech.phone)||tech.phone)}">`)}${fieldBlock("Email",`<input id="techEmail" autocomplete="email" inputmode="email" value="${esc(tech.email)}">`)}${fieldBlock("License / ID",`<input id="techLicense" value="${esc(tech.license)}">`,`Optional identifier shown on reports`)}</div><div class="technicianSectionActions0947"><button type="button" class="primary" data-save-technician-section="contact">Save Contact</button></div>`,"cyan")}
-      ${technicianSection0947("template","Photo overlay","Technician Overlay Template","Build the Technician Info block once, then add it from Photo Overlay with one tap.",`
-        <div class="technicianOverlayTemplate0946 overlayFieldBuilder0944">
-          <div class="technicianOverlayTemplateHead0946"><div><strong>Template preview</strong><small>Uses your Profile information when available.</small></div><em class="overlayAutoSave0944" id="technicianOverlayAutoSave0946" data-state="saved">Saved automatically</em></div>
-          <div id="technicianOverlayPreview0946">${technicianOverlayPreviewMarkup0946()}</div>
-          <div class="technicianOverlayAlignmentCard0948"><div><strong>Group alignment</strong><small>Place the complete Technician Info block flush left, centered, or flush right.</small></div><div id="technicianOverlayGroupAlign0948">${technicianOverlayGroupAlignmentMarkup0948()}</div></div>
-          <div class="overlayBuilderGroup0944"><div class="overlayBuilderTitle0944"><div><strong>Technician fields</strong><small>Reorder fields and choose where each new line begins.</small></div><button type="button" class="ghost technicianOverlayReset0946" id="technicianOverlayReset0946">Reset</button></div><div class="overlayActiveFields0944" id="technicianOverlayActive0946">${technicianOverlayActiveMarkup0946()}</div></div>
-          <div class="overlayBuilderGroup0944"><div class="overlayBuilderTitle0944"><strong>Add profile field</strong><small>Added fields are checked.</small></div><div class="overlayFieldGrid510" id="technicianOverlayAvailable0946">${technicianOverlayAvailableMarkup0946()}</div></div>
-        </div>`,"violet")}
     </div>`;
   }
 
@@ -9181,7 +9220,11 @@ function settingsPanel(){
   </div>`;
 
   if(settingsTab==="email") return emailSettingsPanel(email);
-  if(settingsTab==="overlay") return overlaySettingsPanel510(o);
+  if(settingsTab==="overlay"){
+    technicianOverlayFieldState0946=technicianOverlayNormalize0946(s.technicianOverlay?.fields);
+    technicianOverlayGroupAlign0948=technicianOverlaySavedAlignment0948();
+    return `<div class="photoOverlaySettings1030">${overlaySettingsPanel510(o)}${technicianOverlaySettingsPanel1030()}</div>`;
+  }
 
   if(settingsTab==="plusCodes") return plusCodesPanel0794();
 
@@ -9283,7 +9326,7 @@ function wireSettingsPanel(){
   if(settingsTab==="webdav"){wireWebdav0757();return;}
   const saveBtn=document.getElementById("saveSettings"); if(saveBtn) saveBtn.onclick=saveSettings;
   if(settingsTab==="tech") wireTechnicianProfile0947();
-  if(settingsTab==="overlay") wireOverlaySettings510();
+  if(settingsTab==="overlay"){wireOverlaySettings510();wireTechnicianOverlayTemplate0946();}
   if(settingsTab==="demo") wireDemoMode0738();
   if(settingsTab==="manual") wireManual058();
   if(settingsTab==="customerImport") wireCustomerImport065();
@@ -9935,6 +9978,10 @@ function wireBackupSafety552(){
 
 function showChangelog(){
   const notes = [
+    "Build 1.03.0 moves Nearby distance to the lower right with larger type and aligns the Account Detail Back arrow and label.",
+    "Profile is simplified, the independent Technician Overlay now lives on Photo Overlay, and App Updates moved to About FireVault.",
+    "Email Preview is cleaner, storage providers use recognizable brand marks, and Help includes a screenshot-based User Manual.",
+    "Update Ready now waits for deliberate activation and always restores Try Again and Reload App recovery controls if installation stalls.",
     "Build 1.02.0 adds an On-Site Guide that turns precise saved Plus Code locations into an arrival-aware property map.",
     "A foreground Nearby scan can offer a nonblocking arrival card when GPS accuracy is usable and the account has saved parking or entrance points.",
     "The guide orders Parking, Entrances, and fire-alarm equipment with numbered pins, distance, notes, Plus Codes, Copy, and Route actions.",
@@ -10058,7 +10105,7 @@ function showChangelog(){
   overlay.className="releaseOverlay";
   overlay.innerHTML=`<div class="releaseSheet" role="dialog" aria-modal="true" aria-label="FireVault release notes">
     <div class="releaseHead"><div><strong>${fireVaultBrand575()}</strong><span>Build ${BUILD}</span></div><button class="ghost iconBtn" id="closeRelease" aria-label="Close release notes">×</button></div>
-    <div class="releaseBody"><h2>Release Notes</h2><p class="releaseIntro">FireVault 1.02.0 guides technicians from arrival to exact parking, entrances, and fire-alarm equipment while keeping location checks foreground-only.</p><ul>${notes.map(n=>`<li>${esc(n)}</li>`).join("")}</ul></div>
+    <div class="releaseBody"><h2>Release Notes</h2><p class="releaseIntro">FireVault 1.03.0 cleans up daily field screens and Settings, adds visual Help, and makes app-update recovery dependable.</p><ul>${notes.map(n=>`<li>${esc(n)}</li>`).join("")}</ul></div>
   </div>`;
   document.body.appendChild(overlay);
   const close=()=>overlay.remove();

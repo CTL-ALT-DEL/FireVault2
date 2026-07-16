@@ -1,8 +1,8 @@
 {
-  "build": "1.02.0",
+  "build": "1.03.0",
   "released": "2026-07-16",
-  "note": "On-Site Guide turns precise saved Plus Code locations into an arrival-aware property map with parking, entrance, equipment, copy, and route guidance.",
-  "label": "On-Site Guide",
-  "version": "1.02.0",
-  "name": "On-Site Guide"
+  "note": "Focused UI cleanup improves Nearby distance placement, Account Detail navigation, Settings organization, independent photo overlays, email preview, storage identities, visual Help, and update recovery.",
+  "label": "Settings & Help Cleanup",
+  "version": "1.03.0",
+  "name": "Settings & Help Cleanup"
 }
