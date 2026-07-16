@@ -1,6 +1,6 @@
 # AppForge Product Recipes
 
-Build baseline: 1.01.5  
+Build baseline: 1.02.0  
 Recipe schema: 1
 
 Product Recipes are validated starting definitions for creating distinct apps from the shared Field Vault core. They prove configuration portability without switching the active FireVault app or touching its customer vault.

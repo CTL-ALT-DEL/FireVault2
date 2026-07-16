@@ -1,6 +1,6 @@
 # AppForge Factory Manifest
 
-Build baseline: 1.01.5  
+Build baseline: 1.02.0  
 Factory schema: 1
 
 The Factory Manifest is the deterministic handoff between a Product Recipe and the AppForge Generator Engine. It says exactly what was requested, what configuration was composed, what validation passed, what outputs are expected, and what still must be supplied.

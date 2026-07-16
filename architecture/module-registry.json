@@ -314,7 +314,7 @@
       "name": "Exact Location Navigator",
       "classification": "core",
       "status": "active",
-      "description": "Saved entrances, parking, equipment points, access notes, and route targets.",
+      "description": "Saved entrances, parking, equipment points, foreground arrival guidance, access notes, property mapping, and route targets.",
       "dependencies": [
         "core.records",
         "core.nearby"

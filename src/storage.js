@@ -1,5 +1,5 @@
-import { stageVaultMedia, stripPersistedMediaForStorage, hydrateVaultMediaFromCache } from "./media-store.js?v=1.01.5";
-export const BUILD = "1.01.5";
+import { stageVaultMedia, stripPersistedMediaForStorage, hydrateVaultMediaFromCache } from "./media-store.js?v=1.02.0";
+export const BUILD = "1.02.0";
 export const SECURITY_SCHEMA_VERSION = 4;
 export const KEY = "firevault_vault_build_030";
 export const DEVICE_KEY = "firevault_device_identity_062";
@@ -100,9 +100,10 @@ function demoSite(spec,index){
       {id:demoId("note",index+1),note:"Demo technician note: account reviewed and access information confirmed.",createdAt:demoIso(3+index),type:"Site Note",technician:"Demo Technician"}
     ],
     knownIssues:[],reportDeliveries:[],locationPoints:[
-      {id:demoId("location",index*2+1),type:"Main Entrance",label:"Main Entrance",floor:"1",placement:"Outdoor",description:"Primary technician entrance",notes:"Check in with the site contact on arrival.",lat:Number((spec.lat+0.00008).toFixed(7)),lng:Number((spec.lng-0.00006).toFixed(7)),accuracy:7,verification:"verified",lastVerifiedAt:demoIso(12+index),createdAt:demoIso(120+index),updatedAt:demoIso(12+index)},
-      {id:demoId("location",index*2+2),type:"Fire Alarm Control Panel",label:"Main Fire Alarm Panel",floor:index%3===0?"B1":"1",placement:"Indoor",description:["Main electrical room","Lobby riser room","Fire command center","Receiving electrical room"][index%4],notes:"Demo location for Building Navigator.",lat:Number((spec.lat-0.00005).toFixed(7)),lng:Number((spec.lng+0.00007).toFixed(7)),accuracy:6,verification:index%5===0?"needs":"verified",lastVerifiedAt:index%5===0?demoIso(240):demoIso(20+index),photoDocId:demoId("photo",index+1),createdAt:demoIso(115+index),updatedAt:demoIso(20+index)}
-    ],preferredLocationPointId:demoId("location",index*2+1),createdAt:demoIso(300+index),modifiedAt:demoIso(index),modifiedBy:"Demo Technician",createdBy:"Demo Technician"
+      {id:demoId("location",index*3+1),type:"Parking Area",label:"Technician Parking",floor:"",placement:"Outdoor",description:"Recommended service-vehicle parking",notes:"Keep the fire lane and FDC clear.",lat:Number((spec.lat+0.00015).toFixed(7)),lng:Number((spec.lng+0.00014).toFixed(7)),accuracy:8,verification:"verified",lastVerifiedAt:demoIso(14+index),createdAt:demoIso(125+index),updatedAt:demoIso(14+index)},
+      {id:demoId("location",index*3+2),type:"Main Entrance",label:"Main Entrance",floor:"1",placement:"Outdoor",description:"Primary technician entrance",notes:"Check in with the site contact on arrival.",lat:Number((spec.lat+0.00008).toFixed(7)),lng:Number((spec.lng-0.00006).toFixed(7)),accuracy:7,verification:"verified",lastVerifiedAt:demoIso(12+index),createdAt:demoIso(120+index),updatedAt:demoIso(12+index)},
+      {id:demoId("location",index*3+3),type:"Fire Alarm Control Panel",label:"Main Fire Alarm Panel",floor:index%3===0?"B1":"1",placement:"Indoor",description:["Main electrical room","Lobby riser room","Fire command center","Receiving electrical room"][index%4],notes:"Demo location for Building Navigator.",lat:Number((spec.lat-0.00005).toFixed(7)),lng:Number((spec.lng+0.00007).toFixed(7)),accuracy:6,verification:index%5===0?"needs":"verified",lastVerifiedAt:index%5===0?demoIso(240):demoIso(20+index),photoDocId:demoId("photo",index+1),createdAt:demoIso(115+index),updatedAt:demoIso(20+index)}
+    ],preferredLocationPointId:demoId("location",index*3+2),createdAt:demoIso(300+index),modifiedAt:demoIso(index),modifiedBy:"Demo Technician",createdBy:"Demo Technician"
   };
 }
 export function createDemoVault(){

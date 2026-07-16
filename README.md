@@ -1,26 +1,27 @@
 # FireVault
 
-## Build 1.01.5 — Update Sheet Redesign
+## Build 1.02.0 — On-Site Guide
 
-Build 1.01.5 redesigns the working Update Ready popup into a clear, field-safe update sheet. It explains what will happen, protects against repeat taps, and provides useful progress and retry states without changing the service-worker update mechanism.
+Build 1.02.0 turns exact saved Plus Code locations into a focused On-Site Guide. When a foreground Nearby scan confirms that a technician has reached an account with saved parking or entrance points, FireVault offers a compact arrival prompt and a property map ordered for field use.
 
-### Polished
+### Added
 
-- Replaced the cramped toast and unlabeled × with clear Later and Install Update actions.
-- Enlarged both actions to 48px and kept the sheet above bottom navigation on phones and iPad.
-- Added an Installing state that disables repeat taps and explains that FireVault will reopen automatically.
-- Added retry guidance when activation takes longer than expected.
-- Refreshes an already-open update sheet when a newer waiting build is detected instead of creating a duplicate.
-- Clearly states that saved accounts, notes, photos, and settings remain on the device.
+- Offers a nonblocking arrival card only while FireVault is open, GPS accuracy is usable, and the account has a saved parking or entrance location.
+- Opens an On-Site Guide with a focused property map, numbered pins, Plus Codes, access notes, distance, Copy, and Route actions.
+- Orders locations Parking → Entrance → fire-alarm equipment so the guide matches a technician’s approach to the property.
+- Provides a permanent On-Site Guide action in Account Detail → Locations for manual use at any time.
+- Identifies shared-location accounts by account name and Account ID before opening the guide.
+- Shows the arrival prompt only once per account group during the current app session.
+- Expands the fictional Demo Mode dataset with technician parking points for safe hands-on testing.
 
 ### Preserved UI cleanup
 
-Build 1.01.4 Account tab visibility, Build 1.01.3 Favorite cleanup, Build 1.01.2 Photo Overlay polish, Build 1.01.1 Account Detail polish, and Build 1.01.0 Settings cleanup remain intact. Everyday Settings stays consolidated into six technician-focused areas, and AppForge remains hidden from normal app use.
+Build 1.01.5 Update Sheet redesign, Build 1.01.4 Account tab visibility, Build 1.01.3 Favorite cleanup, Build 1.01.2 Photo Overlay polish, Build 1.01.1 Account Detail polish, and Build 1.01.0 Settings cleanup remain intact. Everyday Settings stays consolidated into six technician-focused areas, and AppForge remains hidden from normal app use.
 
 ### Developer access
 
 Existing Build 1.00 AppForge tools are preserved. To open them, serve the app locally and visit `http://localhost:8000/?appforge=1`, then open Settings → About FireVault → AppForge Factory.
 
-### No feature or data changes
+### Compatibility
 
-This build adds no features and changes no storage contracts. The active storage key remains `firevault_vault_build_030`; update detection and activation, tabs, Favorite behavior, account actions, overlay rendering, photos, accounts, documents, imports, backups, security controls, and field workflows are unchanged.
+The active storage key remains `firevault_vault_build_030`; no schema migration is required. Arrival detection uses the existing foreground Nearby GPS request and the existing reusable Exact Location Navigator. It does not monitor location in the background. Update activation, tabs, Favorite behavior, Photo Overlay, photos, accounts, documents, imports, backups, security controls, and other field workflows are unchanged.
