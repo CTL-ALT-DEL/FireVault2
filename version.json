@@ -1,8 +1,8 @@
 {
-  "build": "1.01.3",
+  "build": "1.01.4",
   "released": "2026-07-16",
-  "note": "Account Detail now uses a compact star-only Favorite control that cannot wrap on narrow phones, while preserving the same action and accessible selected state.",
-  "label": "Favorite Button Cleanup",
-  "version": "1.01.3",
-  "name": "Favorite Button Cleanup"
+  "note": "Account Detail now keeps the selected tab visible after every tab change on narrow phones, while preserving the same six tabs, content, and workflows.",
+  "label": "Account Tab Visibility",
+  "version": "1.01.4",
+  "name": "Account Tab Visibility"
 }
