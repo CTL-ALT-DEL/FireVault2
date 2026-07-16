@@ -1,5 +1,5 @@
-import { appForgeFactoryManifest } from "./app-forge-factory.js?v=1.01.2";
-import { appForgeRecipeById, appForgeRecipes } from "./app-forge-recipes.js?v=1.01.2";
+import { appForgeFactoryManifest } from "./app-forge-factory.js?v=1.01.3";
+import { appForgeRecipeById, appForgeRecipes } from "./app-forge-recipes.js?v=1.01.3";
 
 export const APP_FORGE_GENERATOR_SCHEMA_VERSION = 1;
 export const APP_FORGE_GENERATOR_KIND = "field-vault.app-forge-generated-pwa";
@@ -62,7 +62,7 @@ function generatedManifest(profile,build){
 }
 
 function generatedVersion(profile,build,plan){return {
-  build:String(build),released:"2026-07-15",version:String(build),name:profile.name,label:"AppForge Generated PWA",
+  build:String(build),released:"2026-07-16",version:String(build),name:profile.name,label:"AppForge Generated PWA",
   note:`Generated from the ${plan.recipe.name} Product Recipe using AppForge Generator schema ${APP_FORGE_GENERATOR_SCHEMA_VERSION}.`,
   productId:profile.id,sourceRecipeId:plan.recipe.id,publicationReady:plan.publicationReady
 };}
@@ -78,7 +78,7 @@ function generatedValidation(plan){return `# Generated Package Validation\n\n- [
 function iosProfile(plan,build){return {
   schemaVersion:1,kind:"field-vault.ios-project-profile",build:String(build),productId:plan.product.id,displayName:plan.product.name,
   bundleIdSuggestion:`com.bannermanguides.${plan.product.id.replace(/-/g,"")}`,webAppPath:"app/",status:"handoff-profile",
-  note:"This is an Xcode handoff profile. Build 1.01.2 does not generate, sign, archive, or publish a native Xcode project."
+  note:"This is an Xcode handoff profile. Build 1.01.3 does not generate, sign, archive, or publish a native Xcode project."
 };}
 
 function transformIndex(source,profile,build){
@@ -115,7 +115,7 @@ function transformSource(path,source,plan,build){
   return namespaceText(text,profile);
 }
 
-export function appForgeGeneratorPlan(recipeId="firevault",build="1.01.2",overrides={}){
+export function appForgeGeneratorPlan(recipeId="firevault",build="1.01.3",overrides={}){
   const manifest=appForgeFactoryManifest(recipeId,build,overrides);if(!manifest)return null;
   const profile=clone(manifest.blueprint?.appProfile||{});
   const requirements=[...manifest.requirements.publication];
@@ -130,7 +130,7 @@ export function appForgeGeneratorPlan(recipeId="firevault",build="1.01.2",overri
   });
 }
 
-export function appForgeGeneratorSummary(build="1.01.2"){
+export function appForgeGeneratorSummary(build="1.01.3"){
   const plans=appForgeRecipes().map(recipe=>appForgeGeneratorPlan(recipe.id,build)).filter(Boolean);
   return clone({schemaVersion:APP_FORGE_GENERATOR_SCHEMA_VERSION,total:plans.length,packageReady:plans.filter(plan=>plan.packageReady).length,releaseCandidates:plans.filter(plan=>plan.publicationReady).length,prototypes:plans.filter(plan=>plan.packageState==="prototype-ready").length,sourceFiles:APP_FORGE_CORE_SOURCE_FILES.length});
 }
@@ -163,7 +163,7 @@ export function createDeterministicZip(entries=[]){
   return concat([...locals,...centrals,end],localSize+centralSize+end.length);
 }
 
-export async function generateAppForgePwaPackage(recipeId="firevault",build="1.01.2",overrides={},options={}){
+export async function generateAppForgePwaPackage(recipeId="firevault",build="1.01.3",overrides={},options={}){
   const plan=appForgeGeneratorPlan(recipeId,build,overrides);if(!plan)throw new Error("The selected Product Recipe is unavailable.");
   if(!plan.packageReady)throw new Error("The generation request or App Profile did not pass validation.");
   const loader=options.sourceLoader||defaultSourceLoader;const onProgress=typeof options.onProgress==="function"?options.onProgress:()=>{};const entries=[];

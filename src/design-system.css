@@ -2484,7 +2484,7 @@ button,.btn,input,textarea,select{border-radius:var(--fv-control-radius,15px)}
 .appForgeGeneratorStatus1000{display:flex;align-items:center;gap:10px;margin-top:12px;padding:11px;border:1px solid color-mix(in srgb,var(--success) 28%,var(--line));border-radius:14px;background:color-mix(in srgb,var(--success) 7%,var(--panel2))}.appForgeGeneratorStatus1000>i{display:grid;place-items:center;flex:0 0 28px;height:28px;border-radius:50%;background:rgba(34,197,94,.15);color:var(--success);font-style:normal;font-weight:900}.appForgeGeneratorStatus1000>span{display:flex;flex-direction:column;gap:2px;min-width:0}.appForgeGeneratorStatus1000 strong{font-size:11px;color:var(--text)}.appForgeGeneratorStatus1000 small{font-size:10px;line-height:1.35;color:var(--muted)}
 @media(max-width:680px){.appForgeGeneratorMetrics1000{grid-template-columns:repeat(2,minmax(0,1fr))}.appForgeGeneratorGrid1000{grid-template-columns:1fr}.appForgeGeneratorFlow1000{justify-content:flex-start}.appForgeGeneratorPending1000{min-height:0}}
 
-/* Build 1.01.2 — Account Detail readability and visual hierarchy. */
+/* Build 1.01.1 — Account Detail readability and visual hierarchy. */
 .accountDetail1011{
   --account-control:#17263a;
   --account-control-raised:#1d3048;
@@ -3190,4 +3190,28 @@ button,.btn,input,textarea,select{border-radius:var(--fv-control-radius,15px)}
   .overlayControlsColumn1012>.overlayFieldBuilder1012{grid-column:1/-1!important}
   .overlayControlsColumn1012>.overlayLayout1012{grid-column:1!important}
   .overlayControlsColumn1012>.overlayBrand1012{grid-column:2!important}
+}
+
+/* Build 1.01.3 — compact Account Detail favorite control. */
+.accountDetail1011 .accountFavoriteUtility1013{
+  width:44px!important;
+  min-width:44px!important;
+  padding:0!important;
+  display:grid!important;
+  place-items:center!important;
+}
+.accountDetail1011 .accountFavoriteUtility1013 .accountUtilityIcon1011{
+  width:21px!important;
+  height:21px!important;
+}
+
+@media(max-width:430px){
+  .accountDetail1011 .accountFavoriteUtility1013{
+    width:44px!important;
+    min-width:44px!important;
+  }
+  .accountDetail1011 .accountFavoriteUtility1013 .accountUtilityIcon1011{
+    width:20px!important;
+    height:20px!important;
+  }
 }

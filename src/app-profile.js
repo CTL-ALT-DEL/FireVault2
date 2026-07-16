@@ -1,4 +1,4 @@
-import { GENERATED_APP_PROFILE } from "./generated-app-profile.js?v=1.01.2";
+import { GENERATED_APP_PROFILE } from "./generated-app-profile.js?v=1.01.3";
 
 export const APP_PROFILE_SCHEMA_VERSION = 12;
 

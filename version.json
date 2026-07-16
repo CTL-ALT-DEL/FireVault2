@@ -1,8 +1,8 @@
 {
-  "build": "1.01.2",
-  "released": "2026-07-15",
-  "note": "Photo Overlay now uses a clearer step-by-step editor, larger field controls, compact branding, and responsive phone and iPad layouts without changing rendering or stored settings.",
-  "label": "Photo Overlay Polish",
-  "version": "1.01.2",
-  "name": "Photo Overlay Polish"
+  "build": "1.01.3",
+  "released": "2026-07-16",
+  "note": "Account Detail now uses a compact star-only Favorite control that cannot wrap on narrow phones, while preserving the same action and accessible selected state.",
+  "label": "Favorite Button Cleanup",
+  "version": "1.01.3",
+  "name": "Favorite Button Cleanup"
 }
