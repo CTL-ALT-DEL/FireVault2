@@ -6,7 +6,7 @@ Build 1.03.4 makes the Photo Overlay tagline follow the selected photo category 
 
 ### Updated
 
-- Uses `FIREVAULT FIELD NOTES - {CATEGORY}` whenever the Photo Overlay tagline is enabled.
+- Uses `FIREVAULT FIELD NOTES - {CATEGORY}` whenever the Photo Overlay tagline is enabled. 
 - Uses `FIREVAULT FIELD NOTES` without a suffix when Other is selected.
 - Rebuilds live previews immediately when the selected photo category changes.
 - Adds an independent Technician Overlay toggle to Quick Photo capture and Take Photo / Upload Photo.
