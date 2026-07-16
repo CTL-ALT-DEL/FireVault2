@@ -12,7 +12,7 @@ const [index,worker,app,storage,styles,version]=await Promise.all([
 const {encodePlusCode,isValidFullPlusCode}=await import("../src/open-location-code.js");
 
 const build=JSON.parse(version).build;
-assert.equal(build,"1.03.3");
+assert.equal(build,"1.03.4");
 assert.match(index,/setTimeout\(function\(\)\{[\s\S]*?showRecovery\([\s\S]*?\},8000\);/);
 assert.match(index,/updateButton\.disabled=false;laterButton\.disabled=false;/);
 assert.match(index,/updateButton\.textContent="Try Again";laterButton\.textContent="Reload App";/);
@@ -46,6 +46,14 @@ assert.match(app,/function wireOverlaySettings510\(/);
 assert.match(app,/querySelectorAll\("\[data-overlay-preset\]"\)/);
 assert.match(app,/getElementById\("ovCustomLogo"\)/);
 assert.match(app,/wireTechnicianOverlayTemplate0946\(\)/);
+assert.match(app,/return !label\|\|label\.toLowerCase\(\)===\"other\" \? \"FIREVAULT FIELD NOTES\" : `FIREVAULT FIELD NOTES - \$\{label\.toUpperCase\(\)\}`/);
+assert.match(app,/renderOverlayComposite0890\(source,set,siteData,maxW=1800,options=\{\}\)/);
+assert.match(app,/id="quickPhotoTechnicianOverlay1034"/);
+assert.match(app,/id="docUseTechnicianOverlay1034"/);
+assert.match(app,/useTechnicianOverlayOnSave:quickPhotoDraft0950\.useTechnicianOverlay/);
+assert.match(app,/useTechnicianOverlayOnSave:imageData\?checked\("docUseTechnicianOverlay1034"\):false/);
+assert.match(app,/if\(id===\"overlay\"\)return moduleEnabled0955\(\"core\.photoOverlay\"\)\|\|moduleEnabled0955\(\"core\.photos\"\)/);
+assert.match(styles,/\.technicianPhotoToggle1034/);
 
 for(const source of [index,worker,app,storage]) assert.doesNotMatch(source,/\?v=1\.03\.0/,"Active runtime references must use the current build.");
-console.log(JSON.stringify({status:"passed",build,checks:32,csvPlusCode}));
+console.log(JSON.stringify({status:"passed",build,checks:40,csvPlusCode}));

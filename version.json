@@ -1,8 +1,8 @@
 {
-  "build": "1.03.3",
+  "build": "1.03.4",
   "released": "2026-07-16",
   "note": "Customer CSV coordinates now generate and persist offline Google Plus Codes, while Photo Overlay returns as a complete standalone Settings section.",
   "label": "CSV Plus Codes & Photo Overlay",
-  "version": "1.03.3",
+  "version": "1.03.4",
   "name": "CSV Plus Codes & Photo Overlay"
 }

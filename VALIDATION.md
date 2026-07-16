@@ -1,4 +1,4 @@
-# FireVault Build 1.03.3 Validation
+# FireVault Build 1.03.4 Validation
 
 ## Customer CSV regression
 
@@ -25,12 +25,17 @@
 ## Photo Overlay checks
 
 - Settings home exposes Photo Overlay as its own row instead of hiding it inside Profile.
+- Photo Overlay remains visible whenever either Photos or Photo Overlay is enabled in the active profile.
 - The Photo Overlay detail page includes visible Back and Done controls.
 - Compact, Standard, and Detailed presets remain wired.
 - Field add, remove, reorder, line-break, and left/center/right alignment controls remain wired.
 - Position, background style, text size, opacity, accent, text color, logo, and tagline controls remain wired.
 - Custom-logo upload, FireVault-logo restore, and custom-logo clear remain wired.
 - Technician Overlay fields, ordering, line breaks, group alignment, reset, and independent auto-save remain wired.
+- A non-Other category produces `FIREVAULT FIELD NOTES - {CATEGORY}` in preview and export.
+- Other produces `FIREVAULT FIELD NOTES` without a category suffix.
+- Quick Photo and Take Photo / Upload Photo both expose an independent Add Technician Overlay option.
+- The per-photo Technician Overlay choice persists without changing the normal Photo Overlay settings.
 
 ## Update Ready regression
 
@@ -49,12 +54,12 @@
 - JavaScript syntax passes for `app.js`, `storage.js`, `sw.js`, and both release regression tests.
 - The storage transition test passes with 20 isolated demo sites and one real site surviving a simulated reload.
 - The release-safety test covers build references, CSV persistence guards, Plus Code generation, Photo Overlay access and wiring, and the centered Update Ready recovery flow.
-- Active runtime and service-worker references resolve to Build 1.03.3.
-- `version.json`, the manifest, cache name, module imports, and release UI agree on Build 1.03.3.
+- Active runtime and service-worker references resolve to Build 1.03.4.
+- `version.json`, the manifest, cache name, module imports, and release UI agree on Build 1.03.4.
 
 ## Scope and compatibility
 
 - No new record type, schema, or storage service was added.
 - The storage key remains `firevault_vault_build_030`; no migration is required.
 - Existing Account ID matching and history-preservation rules are unchanged.
-- Build 1.03.2 CSV Plus Codes, Photo Overlay access, and real-vault CSV persistence remain intact.
+- Build 1.03.3 update recovery plus the earlier CSV Plus Codes and real-vault persistence remain intact.

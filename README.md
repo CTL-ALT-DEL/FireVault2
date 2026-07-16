@@ -1,17 +1,18 @@
 # FireVault
 
-## Build 1.03.3 — Recovery Ready Update Dialog
+## Build 1.03.4 — Category-Aware Photo Overlays
 
-Build 1.03.3 redesigns Update Ready as a large, centered, recovery-safe dialog while preserving the existing service-worker update procedure and local data.
+Build 1.03.4 makes the Photo Overlay tagline follow the selected photo category and adds an independent Technician Overlay option to camera and imported-photo workflows.
 
-### Polished
+### Updated
 
-- Centers the update dialog in a larger card and blurs the inactive app behind it.
-- Clearly identifies the update as safe to install and confirms that local data remains protected.
-- Provides large Install Update, Release Notes, and Later controls with readable labels.
-- Keeps Try Again and Reload App available if activation fails or takes too long.
-- Prevents duplicate dialogs and repeat install taps during activation.
-- Retains Build 1.03.2 CSV Plus Codes, Photo Overlay access, and real-vault CSV persistence.
+- Uses `FIREVAULT FIELD NOTES - {CATEGORY}` whenever the Photo Overlay tagline is enabled.
+- Uses `FIREVAULT FIELD NOTES` without a suffix when Other is selected.
+- Rebuilds live previews immediately when the selected photo category changes.
+- Adds an independent Technician Overlay toggle to Quick Photo capture and Take Photo / Upload Photo.
+- Saves the Technician Overlay choice with each photo without changing the normal Photo Overlay template.
+- Keeps Photo Overlay directly available from the main Settings page whenever Photos are enabled.
+- Retains Build 1.03.3 update-dialog recovery and all earlier CSV and Plus Code fixes.
 
 ### Run locally
 
