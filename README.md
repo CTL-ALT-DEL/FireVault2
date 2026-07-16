@@ -1,31 +1,20 @@
 # FireVault
 
-## Build 1.00.0 — AppForge Generator Engine
+## Build 1.01.0 — UI & Settings Cleanup
 
-Build 1.00.0 turns the validated AppForge factory contracts into working, downloadable PWA packages while preserving FireVault as the production fire-alarm technician app.
+Build 1.01.0 keeps the scope to interface cleanup. It simplifies everyday Settings for fire alarm technicians and hides developer-only AppForge tools from normal app use.
 
-### Integrated
+### Cleaned up
 
-- Added `src/app-forge-generator.js` with a deterministic client-side ZIP writer and package pipeline.
-- Added `src/generated-app-profile.js` as the safe profile-injection point for generated products.
-- Added `core.appForgeGenerator` to Module Registry version 9.
-- Advanced the App Profile to schema version 12.
-- Added one-click PWA ZIP generation for FireVault, Wyoming Explorer, Wyoming Fishing Guide, and Ghost Towns Guide.
-- Generated packages contain the shared runtime, offline shell, product-specific App Profile, PWA manifest, architecture contracts, factory records, requirements report, and iOS handoff profile.
-- Each generated product receives its own storage, media-database, global, and service-worker cache namespace.
-- Added live generation progress and package-state reporting under Architecture & Modules.
+- Consolidated Settings into six areas: Profile & Photos, Reports, Data & Backup, Maps & GPS, Privacy & Security, and About FireVault.
+- Folded Demo Mode into About FireVault.
+- Removed AppForge and Architecture from the normal Settings interface.
+- Simplified About FireVault copy around the technician workflow.
 
-### Generator results
+### Developer access
 
-- **FireVault:** release-candidate PWA package for parity testing.
-- **Wyoming Explorer:** working prototype PWA; original brand assets and verified location database remain required.
-- **Wyoming Fishing Guide:** working prototype PWA; original assets, verified fishing locations, and current regulations remain required.
-- **Ghost Towns Guide:** working prototype PWA; original assets and verified historic-sites database remain required.
+Existing Build 1.00 AppForge tools are preserved. To open them, serve the app locally and visit `http://localhost:8000/?appforge=1`, then open Settings → About FireVault → AppForge Factory.
 
-### Capability honesty
+### No feature or data changes
 
-Build 1.00.0 generates installable PWA source ZIPs and an iOS handoff profile. It does not generate or sign an Xcode project, install an authoritative database, create original production artwork, configure OAuth, or publish an app automatically.
-
-### Safety and compatibility
-
-Generation happens entirely in the browser from versioned static source. It never reads customer records, photos, documents, backups, credentials, device identity, or OAuth tokens. The active FireVault storage key remains `firevault_vault_build_030`, and all fire-alarm technician workflows remain enabled.
+This build adds no features and changes no storage contracts. The active storage key remains `firevault_vault_build_030`; existing accounts, photos, documents, imports, backups, security controls, and field workflows are unchanged.

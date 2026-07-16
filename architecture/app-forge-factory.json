@@ -1,7 +1,7 @@
 {
   "kind": "field-vault.app-forge-factory-manifest",
   "schemaVersion": 1,
-  "build": "1.00.0",
+  "build": "1.01.0",
   "requestSchema": "field-vault.generation-request.v1",
   "registeredRecipes": 4,
   "factoryReady": 4,
