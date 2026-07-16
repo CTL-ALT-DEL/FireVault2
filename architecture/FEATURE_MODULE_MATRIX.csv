@@ -1,6 +1,7 @@
 Module ID,Module,Classification,Status,FireVault,Travel Guide,Fishing,Ghost Towns,Gardening,Inspection,AppForge Ready,Dependencies
 core.records,Record Database,Core,active,Yes,Yes,Yes,Yes,Yes,Yes,Yes,
 core.themeProfile,Branding & Theme Profile,Core,active,Yes,Yes,Yes,Yes,Yes,Yes,Yes,
+core.contentPacks,Data Sources & Content Packs,Core,active,Yes,Yes,Yes,Yes,Yes,Yes,Yes,core.offlineStorage
 core.search,Search Directory,Core,active,Yes,Yes,Yes,Yes,Yes,Yes,Yes,core.records
 core.nearby,Nearby GPS,Core,active,Yes,Yes,Yes,Yes,No,Yes,Yes,core.records
 core.notes,Notes & History,Core,active,Yes,Yes,Yes,Yes,Yes,Yes,Yes,core.records

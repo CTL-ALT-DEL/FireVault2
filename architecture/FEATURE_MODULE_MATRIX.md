@@ -1,7 +1,7 @@
 # FireVault / Field Vault Feature and Module Matrix
 
-Build baseline: 0.95.8  
-Architecture version: 2
+Build baseline: 0.95.9  
+Architecture version: 3
 
 ## Decision rule
 
@@ -13,6 +13,7 @@ Architecture version: 2
 |---|---|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
 | Record Database | Core | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
 | Branding & Theme Profile | Core | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
+| Data Sources & Content Packs | Core | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
 | Search Directory | Core | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
 | Nearby GPS | Core | ✓ | ✓ | ✓ | ✓ |  | ✓ | ✓ |
 | Notes & History | Core | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
@@ -33,8 +34,8 @@ Architecture version: 2
 | Panel Documents | FireVault-specific | ✓ |  |  |  |  |  |  |
 | Fire Location Types | FireVault-specific | ✓ |  |  |  |  |  |  |
 
-The canonical machine-readable definitions are in `src/app-profile.js` and `src/module-registry.js`.
+The canonical machine-readable definitions are in `src/app-profile.js`, `src/module-registry.js`, and `src/content-pack-registry.js`.
 
-## Build 0.95.8 configurable branding and themes
+## Build 0.95.9 configurable data sources and content packs
 
-`core.themeProfile` is now a registered core module. App Profile schema 6 selects brand assets, wordmark, semantic colors, typography, shape, density, and mobile browser chrome through `src/theme-profile.js`. FireVault keeps the `firevault-dark` profile while future AppForge products can substitute another visual identity without screen forks.
+`core.contentPacks` is now a registered core module. App Profile schema 7 selects approved local, bundled, imported, and future remote data sources through `src/content-pack-registry.js`. Active packs can define reusable Library folders and update policies while FireVault keeps its fire-alarm field-reference and panel-document packs enabled.

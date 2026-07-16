@@ -1,5 +1,5 @@
 {
-  "version": 3,
+  "version": 4,
   "classifications": {
     "core": {
       "label": "Core",
@@ -65,6 +65,25 @@
       "status": "active",
       "description": "Profile-resolved app assets, wordmark, semantic colors, typography, shape, density, and mobile browser chrome.",
       "dependencies": [],
+      "appForgeReady": true,
+      "apps": {
+        "fireVault": true,
+        "travelGuide": true,
+        "fishing": true,
+        "ghostTowns": true,
+        "gardening": true,
+        "inspection": true
+      }
+    },
+    {
+      "id": "core.contentPacks",
+      "name": "Data Sources & Content Packs",
+      "classification": "core",
+      "status": "active",
+      "description": "Profile-selected local, bundled, imported, and future remote content sources with reusable pack manifests and library organization.",
+      "dependencies": [
+        "core.offlineStorage"
+      ],
       "appForgeReady": true,
       "apps": {
         "fireVault": true,

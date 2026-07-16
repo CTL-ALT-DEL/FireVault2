@@ -1,4 +1,4 @@
-export const MODULE_REGISTRY_VERSION = 3;
+export const MODULE_REGISTRY_VERSION = 4;
 
 export const MODULE_CLASSIFICATIONS = Object.freeze({
   core:{label:"Core",description:"Required foundation shared by future apps."},
@@ -18,6 +18,7 @@ export const FUTURE_APP_COLUMNS = Object.freeze([
 export const MODULE_REGISTRY = Object.freeze([
   {id:"core.records",name:"Record Database",classification:"core",status:"active",description:"Stable records with profile-selected fields, identity, address, metadata, history, and relationships.",dependencies:[],appForgeReady:true,apps:{fireVault:true,travelGuide:true,fishing:true,ghostTowns:true,gardening:true,inspection:true}},
   {id:"core.themeProfile",name:"Branding & Theme Profile",classification:"core",status:"active",description:"Profile-resolved app assets, wordmark, semantic colors, typography, shape, density, and mobile browser chrome.",dependencies:[],appForgeReady:true,apps:{fireVault:true,travelGuide:true,fishing:true,ghostTowns:true,gardening:true,inspection:true}},
+  {id:"core.contentPacks",name:"Data Sources & Content Packs",classification:"core",status:"active",description:"Profile-selected local, bundled, imported, and future remote content sources with reusable pack manifests and library organization.",dependencies:["core.offlineStorage"],appForgeReady:true,apps:{fireVault:true,travelGuide:true,fishing:true,ghostTowns:true,gardening:true,inspection:true}},
   {id:"core.search",name:"Search Directory",classification:"core",status:"active",description:"Fast search, filtering, sorting, favorites, and record opening.",dependencies:["core.records"],appForgeReady:true,apps:{fireVault:true,travelGuide:true,fishing:true,ghostTowns:true,gardening:true,inspection:true}},
   {id:"core.nearby",name:"Nearby GPS",classification:"core",status:"active",description:"Distance-ranked nearby records using saved coordinates.",dependencies:["core.records"],appForgeReady:true,apps:{fireVault:true,travelGuide:true,fishing:true,ghostTowns:true,gardening:false,inspection:true}},
   {id:"core.notes",name:"Notes & History",classification:"core",status:"active",description:"Record-specific notes, timestamps, authorship, and activity history.",dependencies:["core.records"],appForgeReady:true,apps:{fireVault:true,travelGuide:true,fishing:true,ghostTowns:true,gardening:true,inspection:true}},

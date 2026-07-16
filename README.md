@@ -1,32 +1,37 @@
 # FireVault
-## Build 0.95.8 — Configurable Branding and Theme Profiles
+## Build 0.95.9 — Configurable Data Sources and Content Packs
 
-Build 0.95.8 makes the shared Field Vault shell visually configurable while preserving FireVault’s current dark fire-technician presentation.
+Build 0.95.9 adds a reusable content-delivery layer while preserving FireVault’s current accounts, manuals, photos, documents, and local-first behavior.
 
 ### Integrated
 
-- Added `src/theme-profile.js` as the canonical resolver for branding and visual design tokens.
-- App Profile schema version 6 now defines the app mark, full logo, install icons, wordmark segments, tagline, semantic colors, browser chrome, typography, density, and corner shape.
-- The live application shell applies the resolved Theme Profile at startup.
-- Header, splash, Home, Nearby, privacy lock, overlay branding, About, release notes, and Architecture previews use profile-resolved brand assets or wordmarks.
-- Shared CSS uses semantic variables instead of requiring a new stylesheet for every future vertical app.
-- Architecture & Modules displays and exports the active Theme Profile.
+- Added `src/content-pack-registry.js` as the canonical registry for approved data sources and content packs.
+- App Profile schema version 7 now selects enabled sources, active packs, and update policy.
+- Registered `core.contentPacks` in the shared Module Registry.
+- Library routes now require both Files and Content Packs modules.
+- The Library derives its default folders from the active content packs instead of a FireVault-only hard-coded list.
+- Architecture & Modules displays active sources, packs, generated folders, and update safeguards.
+- Added downloadable Content Pack Registry JSON.
 
-### FireVault behavior
+### FireVault active content
 
-The active `firevault-dark` profile retains:
+FireVault keeps these active packs:
 
-- FireVault name, wordmark, icons, and Field Vault System tagline
-- Dark charcoal surfaces
-- Red primary accent
-- Existing status colors and readable light text
-- Existing iPhone and iPad spacing
-- All current technician workflows and modules
+- User Reference Library
+- Record-Linked Content
+- Fire Alarm Field Reference
+- Panel Document Matching
+
+The resulting Library folders include the existing general folders plus fire-alarm-oriented folders such as Panel Manuals, Communicators, Inspection Forms, and Fire Codes.
 
 ### AppForge direction
 
-A future app profile can replace branding, colors, typography, shape, and mobile browser chrome without branching Search, Nearby, Account Detail, Quick Photo, Settings, or storage code.
+A future app profile can select different packs without branching Search, Nearby, Library, Files, offline storage, or import code. Planned registry examples include Wyoming Points of Interest, Fishing Locations, and Ghost Towns. They are planning definitions only and are not installed into FireVault.
+
+### Update safety
+
+The current FireVault policy is manual. Remote catalogs are only a foundation in this build; FireVault does not silently download data. The profile requires manifest verification and keeps the prior pack version for rollback readiness.
 
 ### Compatibility
 
-The storage key remains `firevault_vault_build_030`. Existing accounts, notes, photos, documents, overlays, IndexedDB media, backups, WebDAV settings, Demo Mode, Nearby, Search, Account Detail, record schema, and workflow schema remain compatible.
+The storage key remains `firevault_vault_build_030`. Existing accounts, notes, photos, documents, overlays, IndexedDB media, backups, WebDAV settings, Demo Mode, record schema, workflow schema, and Theme Profile remain compatible.

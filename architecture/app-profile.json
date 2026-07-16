@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 6,
+  "schemaVersion": 7,
   "id": "firevault",
   "family": "field-vault",
   "name": "FireVault",
@@ -178,6 +178,26 @@
       "jpegQuality": 0.86
     }
   },
+  "content": {
+    "registryId": "firevault-content-v1",
+    "enabledSourceIds": [
+      "local.user-vault",
+      "bundled.app-reference",
+      "import.csv-json"
+    ],
+    "enabledPackIds": [
+      "core.user-library",
+      "core.account-content",
+      "firevault.field-reference",
+      "firevault.panel-documents"
+    ],
+    "updatePolicy": {
+      "mode": "manual",
+      "allowMetered": false,
+      "verifyManifests": true,
+      "keepPreviousVersion": true
+    }
+  },
   "interfaceIntegration": {
     "terminology": true,
     "navigation": true,
@@ -189,11 +209,13 @@
     "detailSections": true,
     "photoCategories": true,
     "workflows": true,
-    "brandingTheme": true
+    "brandingTheme": true,
+    "contentPacks": true
   },
   "enabledModules": [
     "core.records",
     "core.themeProfile",
+    "core.contentPacks",
     "core.search",
     "core.nearby",
     "core.notes",

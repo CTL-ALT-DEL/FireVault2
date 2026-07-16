@@ -1,4 +1,4 @@
-export const APP_PROFILE_SCHEMA_VERSION = 6;
+export const APP_PROFILE_SCHEMA_VERSION = 7;
 
 export const APP_PROFILE = Object.freeze({
   schemaVersion: APP_PROFILE_SCHEMA_VERSION,
@@ -122,6 +122,12 @@ export const APP_PROFILE = Object.freeze({
       jpegQuality:0.86
     })
   }),
+  content:Object.freeze({
+    registryId:"firevault-content-v1",
+    enabledSourceIds:Object.freeze(["local.user-vault","bundled.app-reference","import.csv-json"]),
+    enabledPackIds:Object.freeze(["core.user-library","core.account-content","firevault.field-reference","firevault.panel-documents"]),
+    updatePolicy:Object.freeze({mode:"manual",allowMetered:false,verifyManifests:true,keepPreviousVersion:true})
+  }),
   interfaceIntegration:Object.freeze({
     terminology:true,
     navigation:true,
@@ -133,11 +139,13 @@ export const APP_PROFILE = Object.freeze({
     detailSections:true,
     photoCategories:true,
     workflows:true,
-    brandingTheme:true
+    brandingTheme:true,
+    contentPacks:true
   }),
   enabledModules: Object.freeze([
     "core.records",
     "core.themeProfile",
+    "core.contentPacks",
     "core.search",
     "core.nearby",
     "core.notes",

@@ -1,4 +1,4 @@
-export const MODULE_BINDINGS_VERSION = 1;
+export const MODULE_BINDINGS_VERSION = 2;
 
 export const NAV_MODULE_REQUIREMENTS = Object.freeze({
   nearby:Object.freeze(["core.nearby"]),
@@ -24,8 +24,8 @@ export const ROUTE_MODULE_REQUIREMENTS = Object.freeze({
   deficiencies:Object.freeze(["optional.deficiencies"]),
   deficiencyForm:Object.freeze(["optional.deficiencies"]),
   report:Object.freeze(["optional.reports"]),
-  library:Object.freeze(["core.files"]),
-  resourceForm:Object.freeze(["core.files"]),
+  library:Object.freeze(["core.files","core.contentPacks"]),
+  resourceForm:Object.freeze(["core.files","core.contentPacks"]),
   jobMode:Object.freeze(["core.notes"]),
   settings:Object.freeze([])
 });
