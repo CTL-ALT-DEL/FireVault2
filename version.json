@@ -1,8 +1,8 @@
 {
-  "build": "0.96.1",
+  "build": "0.97.0",
   "released": "2026-07-15",
-  "note": "Adds automated architecture validation, FireVault regression checks, safe route and Account Detail coverage checks, and a hidden alternate-app proof profile.",
-  "label": "Architecture Validation and Regression Audit",
-  "version": "0.96.1",
-  "name": "Architecture Validation and Regression Audit"
+  "note": "The validated AppForge Product Blueprint packages identity, modules, data, workflows, branding, content, and storage as one portable build definition.",
+  "label": "AppForge Product Blueprint",
+  "version": "0.97.0",
+  "name": "AppForge Product Blueprint"
 }

@@ -115,11 +115,11 @@
       }
     },
     {
-      "id": "core.architectureValidation",
-      "name": "Architecture Validation",
+      "id": "core.appForgeBlueprint",
+      "name": "AppForge Product Blueprint",
       "classification": "core",
       "status": "active",
-      "description": "Automated profile, dependency, route, schema, workflow, theme, content, storage, and alternate-profile regression checks.",
+      "description": "One validated, portable product definition combining identity, modules, data, workflows, theme, content, and storage policy.",
       "dependencies": [
         "core.records",
         "core.themeProfile",

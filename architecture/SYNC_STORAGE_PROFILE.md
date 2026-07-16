@@ -1,6 +1,6 @@
 # Sync & Storage Profile
 
-FireVault Build 0.96.0 adds `src/sync-storage-profile.js` as the reusable policy layer for local storage, remote providers, backups, and collaboration.
+FireVault Build 0.97.0 adds `src/sync-storage-profile.js` as the reusable policy layer for local storage, remote providers, backups, and collaboration.
 
 ## Purpose
 

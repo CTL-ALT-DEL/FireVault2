@@ -158,14 +158,14 @@ export const APP_PROFILE = Object.freeze({
     brandingTheme:true,
     contentPacks:true,
     syncStorage:true,
-    architectureValidation:true
+    appForgeBlueprint:true
   }),
   enabledModules: Object.freeze([
     "core.records",
     "core.themeProfile",
     "core.contentPacks",
     "core.syncStorageProfile",
-    "core.architectureValidation",
+    "core.appForgeBlueprint",
     "core.search",
     "core.nearby",
     "core.notes",

@@ -1,6 +1,6 @@
 # FireVault / Field Vault Feature and Module Matrix
 
-Build baseline: 0.96.1  
+Build baseline: 0.97.0  
 Architecture version: 5
 
 ## Decision rule
@@ -15,7 +15,7 @@ Architecture version: 5
 | Branding & Theme Profile | Core | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
 | Data Sources & Content Packs | Core | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
 | Sync & Storage Profile | Core | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
-| Architecture Validation | Core | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
+| AppForge Product Blueprint | Core | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
 | Search Directory | Core | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
 | Nearby GPS | Core | ✓ | ✓ | ✓ | ✓ |  | ✓ | ✓ |
 | Notes & History | Core | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
@@ -36,8 +36,8 @@ Architecture version: 5
 | Panel Documents | FireVault-specific | ✓ |  |  |  |  |  |  |
 | Fire Location Types | FireVault-specific | ✓ |  |  |  |  |  |  |
 
-The canonical machine-readable definitions are in `src/app-profile.js`, `src/module-registry.js`, and the profile schema modules under `src/`.
+The canonical machine-readable definitions are in `src/app-profile.js`, `src/module-registry.js`, `src/content-pack-registry.js`, `src/sync-storage-profile.js`, and `src/app-forge-blueprint.js`.
 
-## Build 0.96.1 architecture validation
+## Build 0.97.0 AppForge Product Blueprint
 
-`core.architectureValidation` runs profile reference checks, dependency closure, route and Settings coverage, Account Detail section coverage, workflow validation, theme validation, content-source coverage, storage-role validation, FireVault regression checks, and a hidden Location Guide transformation proof. The packaged audit completed **PASS** with 60 of 60 checks passing.
+`core.appForgeBlueprint` is now a registered core module. App Profile schema 9 marks the complete product definition as blueprint-enabled, while `src/app-forge-blueprint.js` validates module dependencies and every configured record, workflow, content, branding, and storage reference. FireVault can export those contracts together as one portable AppForge build input without changing its local-first vault or technician workflow.

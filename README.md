@@ -1,44 +1,36 @@
 # FireVault
-## Build 0.96.1 — Architecture Validation and Regression Audit
+## Build 0.97.0 — AppForge Product Blueprint
 
-Build 0.96.1 proves and protects the reusable Field Vault architecture while preserving FireVault’s current technician interface, data, media, backups, and storage key.
+Build 0.97.0 turns FireVault’s reusable architecture into one validated, portable product definition while preserving the complete fire-alarm technician app.
 
 ### Integrated
 
-- Added `src/architecture-validator.js` as the automated configuration and regression audit engine.
-- Registered `core.architectureValidation` in the shared Module Registry.
-- Advanced the App Profile to schema version 9 and UI bindings to version 3.
-- Added live checks for profile references, enabled-module dependencies, navigation and route bindings, Settings pages, Account Detail sections, record fields, photo categories, workflow actions, Quick Photo limits, theme assets and colors, content-pack sources, storage providers, provider roles, and offline coverage.
-- Added FireVault-specific regression checks for critical modules, all six Account Detail sections, all nine photo categories, and all expected technician actions.
-- Added a hidden `Location Guide Proof` profile that validates the same shared core without any `firevault.*` modules or FireVault-only fields.
-- Added an in-app Architecture Validation section under **Settings → About FireVault → Architecture & Modules**.
-- Added Run Audit Again, Download Audit JSON, and Download Audit Text controls.
+- Added `src/app-forge-blueprint.js` with a nine-check configuration validator.
+- Added `core.appForgeBlueprint` to Module Registry version 6.
+- Advanced the App Profile to schema version 9 and explicitly enabled blueprint integration.
+- Combined the App Profile, Module Registry, UI bindings, Record Schema, Workflow Schema, Theme Profile, Content Pack Registry, and Sync & Storage Profile into one downloadable blueprint.
+- Added AppForge readiness, reusable/vertical module counts, and individual validation results under Settings → About FireVault → Architecture & Modules.
+- Added a one-tap **Download AppForge Blueprint** action.
+- Added the canonical blueprint contract and documentation under `architecture/`.
 
-### Validation result
+### FireVault readiness
 
-The packaged audit completed:
+The active FireVault profile passes all nine blueprint checks:
 
-- Overall: PASS
-- Total checks: 60
-- Passed: 60
-- Warnings: 0
-- Failures: 0
-- FireVault active profile: PASS
-- Hidden Location Guide proof: PASS
+- Product identity
+- Module selection
+- Module dependencies
+- UI bindings
+- Record schema
+- Workflow schema
+- Content packs
+- Sync and storage
+- Theme assets
 
-### Hidden alternate-profile proof
+### Safety
 
-The validation-only profile confirms that the platform can:
-
-- Change Account terminology to Location.
-- Remove FireVault-specific modules and panel fields.
-- Retain Search, Nearby, Notes, Photos, Files, location points, backups, security, and import/export.
-- Load a travel-oriented content-pack definition.
-- Reduce storage to a local-only provider configuration.
-- Preserve safe Account Detail tab and route coverage.
-
-The proof profile is never activated in the production FireVault interface.
+The blueprint exports configuration only. It contains no customer accounts, notes, photos, documents, credentials, backups, or device identity.
 
 ### Compatibility
 
-The storage key remains `firevault_vault_build_030`. Existing accounts, notes, photos, documents, overlays, IndexedDB media, backups, WebDAV settings, Microsoft profiles, Demo Mode, record schemas, workflow presets, Theme Profile, Content Pack Registry, and Sync & Storage Profile remain compatible.
+The storage key remains `firevault_vault_build_030`. Existing accounts, notes, photos, documents, overlays, IndexedDB media, backups, WebDAV settings, Microsoft profiles, Demo Mode, and every current technician workflow remain compatible.

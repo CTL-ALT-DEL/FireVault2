@@ -272,14 +272,14 @@
     "brandingTheme": true,
     "contentPacks": true,
     "syncStorage": true,
-    "architectureValidation": true
+    "appForgeBlueprint": true
   },
   "enabledModules": [
     "core.records",
     "core.themeProfile",
     "core.contentPacks",
     "core.syncStorageProfile",
-    "core.architectureValidation",
+    "core.appForgeBlueprint",
     "core.search",
     "core.nearby",
     "core.notes",
