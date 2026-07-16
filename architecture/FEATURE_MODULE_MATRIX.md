@@ -1,7 +1,7 @@
 # FireVault / Field Vault Feature and Module Matrix
 
-Build baseline: 0.97.0  
-Architecture version: 5
+Build baseline: 0.98.0  
+Architecture version: 6
 
 ## Decision rule
 
@@ -16,6 +16,7 @@ Architecture version: 5
 | Data Sources & Content Packs | Core | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
 | Sync & Storage Profile | Core | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
 | AppForge Product Blueprint | Core | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
+| AppForge Product Recipes | Core | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
 | Search Directory | Core | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
 | Nearby GPS | Core | ✓ | ✓ | ✓ | ✓ |  | ✓ | ✓ |
 | Notes & History | Core | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
@@ -37,6 +38,10 @@ Architecture version: 5
 | Fire Location Types | FireVault-specific | ✓ |  |  |  |  |  |  |
 
 The canonical machine-readable definitions are in `src/app-profile.js`, `src/module-registry.js`, `src/content-pack-registry.js`, `src/sync-storage-profile.js`, and `src/app-forge-blueprint.js`.
+
+## Build 0.98.0 AppForge Product Recipes
+
+`core.appForgeRecipes` adds four validated starting definitions: the active FireVault product plus foundation recipes for Wyoming Explorer, Wyoming Fishing Guide, and Ghost Towns Guide. Every recipe passes the blueprint contract gate. Only FireVault is marked publish-ready; alternate recipes explicitly require their own brand assets and verified databases before publication.
 
 ## Build 0.97.0 AppForge Product Blueprint
 

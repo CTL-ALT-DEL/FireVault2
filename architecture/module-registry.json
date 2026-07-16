@@ -1,5 +1,5 @@
 {
-  "version": 6,
+  "version": 7,
   "classifications": {
     "core": {
       "label": "Core",
@@ -125,6 +125,25 @@
         "core.themeProfile",
         "core.contentPacks",
         "core.syncStorageProfile"
+      ],
+      "appForgeReady": true,
+      "apps": {
+        "fireVault": true,
+        "travelGuide": true,
+        "fishing": true,
+        "ghostTowns": true,
+        "gardening": true,
+        "inspection": true
+      }
+    },
+    {
+      "id": "core.appForgeRecipes",
+      "name": "AppForge Product Recipes",
+      "classification": "core",
+      "status": "active",
+      "description": "Validated starting profiles for distinct vertical products with explicit branding, database, and publication requirements.",
+      "dependencies": [
+        "core.appForgeBlueprint"
       ],
       "appForgeReady": true,
       "apps": {

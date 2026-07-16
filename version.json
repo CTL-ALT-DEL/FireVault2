@@ -1,8 +1,8 @@
 {
-  "build": "0.97.0",
+  "build": "0.98.0",
   "released": "2026-07-15",
-  "note": "The validated AppForge Product Blueprint packages identity, modules, data, workflows, branding, content, and storage as one portable build definition.",
-  "label": "AppForge Product Blueprint",
-  "version": "0.97.0",
-  "name": "AppForge Product Blueprint"
+  "note": "Validated AppForge Product Recipes prove the FireVault core can define Wyoming Explorer, Fishing Guide, and Ghost Towns apps without changing the active vault.",
+  "label": "AppForge Product Recipes",
+  "version": "0.98.0",
+  "name": "AppForge Product Recipes"
 }

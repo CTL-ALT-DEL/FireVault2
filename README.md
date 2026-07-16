@@ -1,36 +1,30 @@
 # FireVault
-## Build 0.97.0 — AppForge Product Blueprint
+## Build 0.98.0 — AppForge Product Recipes
 
-Build 0.97.0 turns FireVault’s reusable architecture into one validated, portable product definition while preserving the complete fire-alarm technician app.
+Build 0.98.0 proves that FireVault’s shared core can define several genuinely different products without changing the active technician app or customer vault.
 
 ### Integrated
 
-- Added `src/app-forge-blueprint.js` with a nine-check configuration validator.
-- Added `core.appForgeBlueprint` to Module Registry version 6.
-- Advanced the App Profile to schema version 9 and explicitly enabled blueprint integration.
-- Combined the App Profile, Module Registry, UI bindings, Record Schema, Workflow Schema, Theme Profile, Content Pack Registry, and Sync & Storage Profile into one downloadable blueprint.
-- Added AppForge readiness, reusable/vertical module counts, and individual validation results under Settings → About FireVault → Architecture & Modules.
-- Added a one-tap **Download AppForge Blueprint** action.
-- Added the canonical blueprint contract and documentation under `architecture/`.
+- Added `src/app-forge-recipes.js` as the canonical Product Recipe registry.
+- Added `core.appForgeRecipes` to Module Registry version 7.
+- Advanced the App Profile to schema version 10 with recipe support.
+- Added four validated recipes: FireVault, Wyoming Explorer, Wyoming Fishing Guide, and Ghost Towns Guide.
+- Every recipe passes all nine AppForge Blueprint configuration checks.
+- Added recipe comparison cards under Settings → About FireVault → Architecture & Modules.
+- Added one-tap downloads for every individual recipe blueprint and the complete recipe catalog.
+- Added explicit publication requirements so blueprint validity is never confused with App Store readiness.
 
-### FireVault readiness
+### Readiness distinction
 
-The active FireVault profile passes all nine blueprint checks:
-
-- Product identity
-- Module selection
-- Module dependencies
-- UI bindings
-- Record schema
-- Workflow schema
-- Content packs
-- Sync and storage
-- Theme assets
+- **FireVault:** active and publish-ready at the recipe level.
+- **Wyoming Explorer:** foundation; needs original brand assets and a verified Wyoming database.
+- **Wyoming Fishing Guide:** foundation; needs original brand assets, verified fishing locations, and current regulations.
+- **Ghost Towns Guide:** foundation; needs original brand assets and a verified historic-sites database.
 
 ### Safety
 
-The blueprint exports configuration only. It contains no customer accounts, notes, photos, documents, credentials, backups, or device identity.
+Alternate recipes are configuration downloads only. They do not activate inside FireVault, alter terminology, switch branding, install databases, migrate storage, or include customer records, media, credentials, backups, or device identity.
 
 ### Compatibility
 
-The storage key remains `firevault_vault_build_030`. Existing accounts, notes, photos, documents, overlays, IndexedDB media, backups, WebDAV settings, Microsoft profiles, Demo Mode, and every current technician workflow remain compatible.
+The storage key remains `firevault_vault_build_030`. All current accounts, notes, photos, documents, overlays, IndexedDB media, backups, cloud profiles, Demo Mode behavior, and technician workflows remain compatible.

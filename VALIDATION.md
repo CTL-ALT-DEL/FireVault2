@@ -1,37 +1,37 @@
-# FireVault Build 0.97.0 Validation
+# FireVault Build 0.98.0 Validation
 
 ## Static checks
 
-- JavaScript syntax passed for all source modules and the service worker.
-- JSON parsing passed for manifest, version, every architecture contract, and the AppForge Blueprint example.
-- Every `?v=` application reference resolves to Build 0.97.0.
-- Service-worker shell includes `app-forge-blueprint.js` and every required application asset.
+- JavaScript syntax passed for every source module and the service worker.
+- Every imported symbol resolves from its source module.
+- JSON parsing passed for manifest, version, and every architecture contract.
+- Every static `?v=` application reference resolves to Build 0.98.0.
+- Service-worker shell includes `app-forge-recipes.js` and every required application asset.
+- Runtime App Profile and Module Registry match their architecture JSON mirrors.
+- Local HTTP asset smoke test passed.
 - ZIP integrity test passed.
 
-## AppForge Blueprint checks
+## Product Recipe checks
 
-- App Profile schema is version 9 and enables `core.appForgeBlueprint`.
-- Module Registry is version 6 and registers the blueprint as shared core.
-- Blueprint schema is version 1.
-- FireVault passes all nine runtime validation checks.
-- Every enabled module ID resolves to the Module Registry.
-- Every enabled module dependency is enabled.
-- Every module used by navigation, routes, Settings, and Account Detail bindings resolves.
-- Every configured record field, detail section, and photo category resolves.
-- Every configured workflow action resolves.
-- Every enabled content pack and source relationship resolves.
-- Every storage provider and assigned provider role resolves.
-- All required Theme Profile brand assets are assigned.
-- The exported blueprint includes every component contract and version.
-- The blueprint contains configuration only and no customer vault data or credentials.
+- App Profile schema is version 10 and enables `core.appForgeRecipes`.
+- Module Registry is version 7 and registers Product Recipes as shared core.
+- Recipe schema is version 1.
+- FireVault passes 9/9 blueprint checks with 25 enabled modules.
+- Wyoming Explorer passes 9/9 blueprint checks with 17 enabled modules and three content packs.
+- Wyoming Fishing Guide passes 9/9 blueprint checks with 17 enabled modules and three content packs.
+- Ghost Towns Guide passes 9/9 blueprint checks with 17 enabled modules and four content packs.
+- Every recipe export includes identity, terminology, modules, data model, workflows, theme, content, storage, validation, and publication requirements.
+- Foundation recipes use local-first storage and disabled collaboration by default.
+- Foundation recipes are clearly separated from publication readiness.
 
 ## Compatibility checks
 
 - Storage key remains `firevault_vault_build_030`.
+- The active runtime profile remains FireVault.
+- No alternate recipe is activated or written into customer storage.
 - No record, media, backup, WebDAV, Microsoft profile, privacy, Demo Mode, or schema migration is required.
 - FireVault keeps every current fire-alarm module, field, photo category, and technician action enabled.
-- Sync and storage behavior remains local-first and capability-honest.
 
 ## Device confirmation
 
-Confirm Architecture & Modules shows a ready 9/9 blueprint, the blueprint downloads as JSON, existing Settings areas remain accessible, and offline startup works on a physical iPhone and iPad.
+Confirm the four Product Recipe cards render under Architecture & Modules, each recipe and the complete catalog download as JSON, existing Settings areas remain accessible, and offline startup works on a physical iPhone and iPad.
