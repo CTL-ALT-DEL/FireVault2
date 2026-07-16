@@ -1,16 +1,17 @@
 # FireVault
 
-## Build 1.03.1 — Real-Vault CSV Import Fix
+## Build 1.03.3 — Recovery Ready Update Dialog
 
-Build 1.03.1 prevents Customer CSV imports from being discarded when a fresh installation starts in Demo Mode.
+Build 1.03.3 redesigns Update Ready as a large, centered, recovery-safe dialog while preserving the existing service-worker update procedure and local data.
 
-### Fixed
+### Polished
 
-- Choosing a Customer CSV while Demo Mode is active now asks to exit Demo Mode before analyzing the file.
-- CSV rows merge against the real vault rather than the temporary fictional workspace.
-- A successful import is shown only after every selected Account ID is verified in persistent storage.
-- Save failures keep the source CSV untouched and show a clear retry message instead of reporting a false success.
-- Existing real-vault accounts and their notes, photos, visits, tasks, deficiencies, contacts, and documents remain protected during repeat imports.
+- Centers the update dialog in a larger card and blurs the inactive app behind it.
+- Clearly identifies the update as safe to install and confirms that local data remains protected.
+- Provides large Install Update, Release Notes, and Later controls with readable labels.
+- Keeps Try Again and Reload App available if activation fails or takes too long.
+- Prevents duplicate dialogs and repeat install taps during activation.
+- Retains Build 1.03.2 CSV Plus Codes, Photo Overlay access, and real-vault CSV persistence.
 
 ### Run locally
 
@@ -22,4 +23,4 @@ Existing AppForge tools remain hidden from normal technician use. Open `http://l
 
 ### Compatibility
 
-The active storage key remains `firevault_vault_build_030`; no schema migration is required. Build 1.03.0 UI cleanup and every prior field workflow remain compatible.
+The active storage key remains `firevault_vault_build_030`; no schema migration is required. Existing CSV matching, account history, and all prior field workflows remain compatible.

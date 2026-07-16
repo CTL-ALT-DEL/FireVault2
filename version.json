@@ -1,8 +1,8 @@
 {
-  "build": "1.03.1",
+  "build": "1.03.3",
   "released": "2026-07-16",
-  "note": "Customer CSV import now exits Demo Mode before analysis, writes to the real vault, and verifies persisted Account IDs before reporting success.",
-  "label": "Real-Vault CSV Import Fix",
-  "version": "1.03.1",
-  "name": "Real-Vault CSV Import Fix"
+  "note": "Customer CSV coordinates now generate and persist offline Google Plus Codes, while Photo Overlay returns as a complete standalone Settings section.",
+  "label": "CSV Plus Codes & Photo Overlay",
+  "version": "1.03.3",
+  "name": "CSV Plus Codes & Photo Overlay"
 }
