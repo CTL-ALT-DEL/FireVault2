@@ -1,4 +1,4 @@
-export const APP_PROFILE_SCHEMA_VERSION = 8;
+export const APP_PROFILE_SCHEMA_VERSION = 9;
 
 export const APP_PROFILE = Object.freeze({
   schemaVersion: APP_PROFILE_SCHEMA_VERSION,
@@ -157,13 +157,15 @@ export const APP_PROFILE = Object.freeze({
     workflows:true,
     brandingTheme:true,
     contentPacks:true,
-    syncStorage:true
+    syncStorage:true,
+    architectureValidation:true
   }),
   enabledModules: Object.freeze([
     "core.records",
     "core.themeProfile",
     "core.contentPacks",
     "core.syncStorageProfile",
+    "core.architectureValidation",
     "core.search",
     "core.nearby",
     "core.notes",

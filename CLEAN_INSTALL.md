@@ -1,3 +1,3 @@
-# FireVault Build 0.96.0 deployment
+# FireVault Build 0.96.1 deployment
 
-Replace the published FireVault files with the contents of this package. Existing local account data uses the same `firevault_vault_build_030` storage key and remains compatible. Reload the installed PWA once after deployment so the Build 0.96.0 service-worker shell can activate.
+Replace the published FireVault files with the contents of this package. Existing local account data uses the same `firevault_vault_build_030` storage key and remains compatible. Reload the installed PWA once after deployment so the Build 0.96.1 service-worker shell can activate.

@@ -1,5 +1,5 @@
 {
-  "version": 2,
+  "version": 3,
   "navigation": {
     "nearby": [
       "core.nearby"
@@ -125,7 +125,9 @@
       "core.records"
     ],
     "about": [],
-    "architecture": []
+    "architecture": [
+      "core.architectureValidation"
+    ]
   },
   "accountTabs": [
     {

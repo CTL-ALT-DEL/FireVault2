@@ -1,4 +1,4 @@
-export const MODULE_BINDINGS_VERSION = 2;
+export const MODULE_BINDINGS_VERSION = 3;
 
 export const NAV_MODULE_REQUIREMENTS = Object.freeze({
   nearby:Object.freeze(["core.nearby"]),
@@ -49,7 +49,7 @@ export const SETTINGS_MODULE_REQUIREMENTS = Object.freeze({
   updates:Object.freeze([]),
   demo:Object.freeze(["core.records"]),
   about:Object.freeze([]),
-  architecture:Object.freeze([])
+  architecture:Object.freeze(["core.architectureValidation"])
 });
 
 export const ACCOUNT_TAB_BINDINGS = Object.freeze([

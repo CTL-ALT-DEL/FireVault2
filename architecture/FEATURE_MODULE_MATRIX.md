@@ -1,7 +1,7 @@
 # FireVault / Field Vault Feature and Module Matrix
 
-Build baseline: 0.96.0  
-Architecture version: 4
+Build baseline: 0.96.1  
+Architecture version: 5
 
 ## Decision rule
 
@@ -15,6 +15,7 @@ Architecture version: 4
 | Branding & Theme Profile | Core | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
 | Data Sources & Content Packs | Core | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
 | Sync & Storage Profile | Core | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
+| Architecture Validation | Core | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
 | Search Directory | Core | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
 | Nearby GPS | Core | ✓ | ✓ | ✓ | ✓ |  | ✓ | ✓ |
 | Notes & History | Core | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
@@ -35,8 +36,8 @@ Architecture version: 4
 | Panel Documents | FireVault-specific | ✓ |  |  |  |  |  |  |
 | Fire Location Types | FireVault-specific | ✓ |  |  |  |  |  |  |
 
-The canonical machine-readable definitions are in `src/app-profile.js`, `src/module-registry.js`, `src/content-pack-registry.js`, and `src/sync-storage-profile.js`.
+The canonical machine-readable definitions are in `src/app-profile.js`, `src/module-registry.js`, and the profile schema modules under `src/`.
 
-## Build 0.96.0 configurable sync and storage
+## Build 0.96.1 architecture validation
 
-`core.syncStorageProfile` is now a registered core module. App Profile schema 8 selects approved storage providers, assigns provider roles, defines offline and backup behavior, and controls collaboration and credential safeguards through `src/sync-storage-profile.js`. FireVault keeps its current local-first storage, WebDAV backup, Microsoft profile readiness, and manual package exchange.
+`core.architectureValidation` runs profile reference checks, dependency closure, route and Settings coverage, Account Detail section coverage, workflow validation, theme validation, content-source coverage, storage-role validation, FireVault regression checks, and a hidden Location Guide transformation proof. The packaged audit completed **PASS** with 60 of 60 checks passing.

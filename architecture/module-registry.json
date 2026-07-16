@@ -1,5 +1,5 @@
 {
-  "version": 5,
+  "version": 6,
   "classifications": {
     "core": {
       "label": "Core",
@@ -103,6 +103,28 @@
       "dependencies": [
         "core.offlineStorage",
         "core.backupRestore"
+      ],
+      "appForgeReady": true,
+      "apps": {
+        "fireVault": true,
+        "travelGuide": true,
+        "fishing": true,
+        "ghostTowns": true,
+        "gardening": true,
+        "inspection": true
+      }
+    },
+    {
+      "id": "core.architectureValidation",
+      "name": "Architecture Validation",
+      "classification": "core",
+      "status": "active",
+      "description": "Automated profile, dependency, route, schema, workflow, theme, content, storage, and alternate-profile regression checks.",
+      "dependencies": [
+        "core.records",
+        "core.themeProfile",
+        "core.contentPacks",
+        "core.syncStorageProfile"
       ],
       "appForgeReady": true,
       "apps": {

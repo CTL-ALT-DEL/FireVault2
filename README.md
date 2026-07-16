@@ -1,37 +1,44 @@
 # FireVault
-## Build 0.96.0 — Configurable Sync and Storage Profiles
+## Build 0.96.1 — Architecture Validation and Regression Audit
 
-Build 0.96.0 adds a reusable storage-policy layer while preserving FireVault’s existing offline-first vault, IndexedDB media, backups, WebDAV configuration, Microsoft profile readiness, and manual Team Sync package workflow.
+Build 0.96.1 proves and protects the reusable Field Vault architecture while preserving FireVault’s current technician interface, data, media, backups, and storage key.
 
 ### Integrated
 
-- Added `src/sync-storage-profile.js` as the canonical registry for storage providers, provider roles, backup policy, and collaboration behavior.
-- App Profile schema version 8 now selects approved providers and assigns vault, media, backup, photo, document, and sync-package roles.
-- Registered `core.syncStorageProfile` in the shared Module Registry.
-- File Storage provider choices now come from the active Sync & Storage Profile.
-- Microsoft Storage, WebDAV, Team Sync, File Storage, and Backup settings can be hidden safely when a future profile does not enable them.
-- Architecture & Modules now displays approved providers, local backends, backup retention, collaboration mode, conflict policy, and credential safeguards.
-- Added downloadable Sync & Storage Profile JSON.
+- Added `src/architecture-validator.js` as the automated configuration and regression audit engine.
+- Registered `core.architectureValidation` in the shared Module Registry.
+- Advanced the App Profile to schema version 9 and UI bindings to version 3.
+- Added live checks for profile references, enabled-module dependencies, navigation and route bindings, Settings pages, Account Detail sections, record fields, photo categories, workflow actions, Quick Photo limits, theme assets and colors, content-pack sources, storage providers, provider roles, and offline coverage.
+- Added FireVault-specific regression checks for critical modules, all six Account Detail sections, all nine photo categories, and all expected technician actions.
+- Added a hidden `Location Guide Proof` profile that validates the same shared core without any `firevault.*` modules or FireVault-only fields.
+- Added an in-app Architecture Validation section under **Settings → About FireVault → Architecture & Modules**.
+- Added Run Audit Again, Download Audit JSON, and Download Audit Text controls.
 
-### FireVault active profile
+### Validation result
 
-FireVault uses `firevault-local-first`:
+The packaged audit completed:
 
-- Structured vault: localStorage
-- Photo and scan media: IndexedDB
-- Automatic local snapshots: enabled
-- Complete manual exports with media: enabled
-- Backup providers: This Device and WebDAV
-- Photo and document providers: This Device, OneDrive, and SharePoint
-- Collaboration: manual package exchange with an offline queue
-- Conflict handling: manual review
-- Credentials: excluded from the vault and backups
-- Remote transfer policy: preserve the local copy
+- Overall: PASS
+- Total checks: 60
+- Passed: 60
+- Warnings: 0
+- Failures: 0
+- FireVault active profile: PASS
+- Hidden Location Guide proof: PASS
 
-### Provider honesty
+### Hidden alternate-profile proof
 
-This build configures and filters approved providers; it does not claim new live OAuth transfer or automatic cloud synchronization. Each existing provider continues to report its actual readiness state.
+The validation-only profile confirms that the platform can:
+
+- Change Account terminology to Location.
+- Remove FireVault-specific modules and panel fields.
+- Retain Search, Nearby, Notes, Photos, Files, location points, backups, security, and import/export.
+- Load a travel-oriented content-pack definition.
+- Reduce storage to a local-only provider configuration.
+- Preserve safe Account Detail tab and route coverage.
+
+The proof profile is never activated in the production FireVault interface.
 
 ### Compatibility
 
-The storage key remains `firevault_vault_build_030`. Existing accounts, notes, photos, documents, overlays, IndexedDB media, backups, WebDAV settings, Microsoft profiles, Demo Mode, schemas, Theme Profile, and Content Pack Registry remain compatible.
+The storage key remains `firevault_vault_build_030`. Existing accounts, notes, photos, documents, overlays, IndexedDB media, backups, WebDAV settings, Microsoft profiles, Demo Mode, record schemas, workflow presets, Theme Profile, Content Pack Registry, and Sync & Storage Profile remain compatible.

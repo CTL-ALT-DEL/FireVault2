@@ -1,8 +1,8 @@
 {
-  "build": "0.96.0",
+  "build": "0.96.1",
   "released": "2026-07-15",
-  "note": "The App Profile now controls local storage backends, approved providers, backup rules, package exchange, conflict policy, and credential safeguards.",
-  "label": "Configurable Sync and Storage Profiles",
-  "version": "0.96.0",
-  "name": "Configurable Sync and Storage Profiles"
+  "note": "Adds automated architecture validation, FireVault regression checks, safe route and Account Detail coverage checks, and a hidden alternate-app proof profile.",
+  "label": "Architecture Validation and Regression Audit",
+  "version": "0.96.1",
+  "name": "Architecture Validation and Regression Audit"
 }

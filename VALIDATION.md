@@ -1,36 +1,55 @@
-# FireVault Build 0.96.0 Validation
+# FireVault Build 0.96.1 Validation
 
-## Static checks
+## Automated architecture audit
 
-- JavaScript syntax passed for all source modules and the service worker.
-- JSON parsing passed for manifest, version, App Profile, Module Registry, module bindings, Record Schema, Workflow Schema, Theme Profile, Content Pack Registry, and Sync & Storage Profile.
-- Every `?v=` application reference resolves to Build 0.96.0.
-- Service-worker shell includes `sync-storage-profile.js` and every required application asset.
-- ZIP integrity test passed.
+- Overall result: PASS.
+- 60 of 60 checks passed.
+- 0 warnings.
+- 0 failures.
+- FireVault active profile passed all regression checks.
+- Hidden Location Guide proof profile passed all transformation checks.
 
-## Sync & Storage Profile checks
+## Architecture checks
 
-- App Profile schema is version 8.
-- Sync & Storage Profile schema is version 1.
-- Module Registry is version 5 and includes `core.syncStorageProfile`.
-- Every enabled provider ID resolves to a registered provider.
-- Every role assignment references an enabled provider that supports that role.
-- Local storage remains the primary vault and media backend.
-- FireVault resolves four approved providers: local, WebDAV, OneDrive, and SharePoint.
-- File Storage choices are filtered by the active profile.
-- WebDAV, Microsoft Storage, Team Sync, File Storage, and Backup settings are profile-aware.
-- Credentials remain excluded from the vault.
-- The profile retains local copies and requires restore verification.
-- Collaboration remains manual package exchange; automatic live synchronization is disabled.
-- Sync & Storage Profile export is JSON-safe.
+- Every enabled module ID resolves to the Module Registry.
+- Enabled module IDs are unique.
+- Every enabled module dependency is satisfied.
+- Navigation, route, Settings, and Account Detail bindings reference registered modules.
+- Every profile-controlled route maps to a runtime screen.
+- Every active Account Detail section maps to a safe tab renderer.
+- Configured record fields, required fields, detail sections, and photo categories resolve to the Record Schema.
+- Configured workflow actions resolve and are valid for their assigned surfaces.
+- Quick Photo dimensions and JPEG quality normalize inside supported limits.
+- Theme assets are present and semantic colors are valid.
+- Every active content pack has an approved source.
+- Storage provider IDs and provider-role assignments are valid.
+- Offline-first vault and media coverage remains local.
 
-## Compatibility checks
+## FireVault regression checks
 
+- Critical core, optional, and FireVault-specific modules remain enabled.
+- Overview, Notes, Locations, Equipment, Files, and Details remain available.
+- Panel, NAC, Device, Communicator, Battery, Deficiency, Before, After, and Other photo categories remain available.
+- Call, Route, Add Note, Photo, Favorite, Task, Deficiency, and Report actions remain available.
 - Storage key remains `firevault_vault_build_030`.
-- No record, media, backup, WebDAV, Microsoft profile, privacy, Demo Mode, Record Schema, Workflow Schema, Theme Profile, or Content Pack migration is required.
-- Existing saved provider assignments are preserved when allowed by the profile and safely fall back to local when a future profile disables a provider.
-- FireVault keeps every current fire-alarm module and technician action enabled.
+
+## Alternate-profile proof
+
+- No `firevault.*` module is enabled.
+- No FireVault-only record field remains visible.
+- Account terminology changes to Location / Locations.
+- Wyoming Points of Interest content-pack metadata resolves.
+- Local-only storage resolves without remote-provider dependencies.
+- Reduced Account Detail sections and actions retain valid runtime coverage.
+
+## Static package checks
+
+- JavaScript syntax passed for every source module and the service worker.
+- JSON parsing passed for manifest, version, architecture exports, schemas, registries, profiles, and audit reports.
+- Every current application `?v=` reference resolves to Build 0.96.1.
+- Service-worker shell includes `architecture-validator.js` and all required application assets.
+- ZIP integrity passed.
 
 ## Device confirmation
 
-Confirm File Storage provider choices, WebDAV and Microsoft Settings access, Team Sync, Backup & Restore, Architecture & Modules storage section, and offline startup on a physical iPhone and iPad.
+Confirm Architecture & Modules rendering, audit downloads, Account Detail tabs, Nearby-to-Account opening, Quick Photo capture, offline startup, installed icon, and service-worker update behavior on a physical iPhone and iPad.

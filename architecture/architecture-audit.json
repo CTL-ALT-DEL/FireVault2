@@ -1,0 +1,835 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-07-16T00:53:11.866Z",
+  "build": "0.96.1",
+  "storageKey": "firevault_vault_build_030",
+  "passed": true,
+  "status": "PASS",
+  "totals": {
+    "total": 60,
+    "pass": 60,
+    "warning": 0,
+    "fail": 0
+  },
+  "primary": {
+    "schemaVersion": 1,
+    "profile": {
+      "id": "firevault",
+      "name": "FireVault",
+      "schemaVersion": 9
+    },
+    "build": "0.96.1",
+    "storageKey": "firevault_vault_build_030",
+    "generatedAt": "2026-07-16T00:53:11.865Z",
+    "passed": true,
+    "status": "PASS",
+    "totals": {
+      "pass": 28,
+      "warning": 0,
+      "fail": 0,
+      "total": 28
+    },
+    "sections": [
+      {
+        "category": "Profile",
+        "total": 1,
+        "pass": 1,
+        "warning": 0,
+        "fail": 0
+      },
+      {
+        "category": "Modules",
+        "total": 3,
+        "pass": 3,
+        "warning": 0,
+        "fail": 0
+      },
+      {
+        "category": "Bindings",
+        "total": 1,
+        "pass": 1,
+        "warning": 0,
+        "fail": 0
+      },
+      {
+        "category": "Routes",
+        "total": 2,
+        "pass": 2,
+        "warning": 0,
+        "fail": 0
+      },
+      {
+        "category": "Settings",
+        "total": 1,
+        "pass": 1,
+        "warning": 0,
+        "fail": 0
+      },
+      {
+        "category": "Record schema",
+        "total": 4,
+        "pass": 4,
+        "warning": 0,
+        "fail": 0
+      },
+      {
+        "category": "Workflow",
+        "total": 3,
+        "pass": 3,
+        "warning": 0,
+        "fail": 0
+      },
+      {
+        "category": "Theme",
+        "total": 2,
+        "pass": 2,
+        "warning": 0,
+        "fail": 0
+      },
+      {
+        "category": "Content packs",
+        "total": 2,
+        "pass": 2,
+        "warning": 0,
+        "fail": 0
+      },
+      {
+        "category": "Sync & storage",
+        "total": 3,
+        "pass": 3,
+        "warning": 0,
+        "fail": 0
+      },
+      {
+        "category": "Integration",
+        "total": 1,
+        "pass": 1,
+        "warning": 0,
+        "fail": 0
+      },
+      {
+        "category": "FireVault regression",
+        "total": 5,
+        "pass": 5,
+        "warning": 0,
+        "fail": 0
+      }
+    ],
+    "checks": [
+      {
+        "id": "profile.identity",
+        "category": "Profile",
+        "status": "pass",
+        "title": "Profile identity is complete",
+        "detail": "FireVault has a stable id and display name.",
+        "evidence": {
+          "id": "firevault",
+          "name": "FireVault"
+        }
+      },
+      {
+        "id": "modules.references",
+        "category": "Modules",
+        "status": "pass",
+        "title": "All enabled modules are registered",
+        "detail": "24 enabled module IDs resolve in the Module Registry.",
+        "evidence": {}
+      },
+      {
+        "id": "modules.duplicates",
+        "category": "Modules",
+        "status": "pass",
+        "title": "Enabled module IDs are unique",
+        "detail": "No duplicate module IDs were found.",
+        "evidence": {}
+      },
+      {
+        "id": "modules.dependencies",
+        "category": "Modules",
+        "status": "pass",
+        "title": "All enabled-module dependencies are satisfied",
+        "detail": "24 enabled modules have a complete dependency chain.",
+        "evidence": {}
+      },
+      {
+        "id": "bindings.moduleReferences",
+        "category": "Bindings",
+        "status": "pass",
+        "title": "All UI binding module references are valid",
+        "detail": "Navigation, route, Settings, and Account Detail bindings resolve to registered modules.",
+        "evidence": {}
+      },
+      {
+        "id": "routes.runtimeCoverage",
+        "category": "Routes",
+        "status": "pass",
+        "title": "All profile-controlled routes have runtime handlers",
+        "detail": "20 route bindings map to supported runtime screens.",
+        "evidence": {}
+      },
+      {
+        "id": "routes.active",
+        "category": "Routes",
+        "status": "pass",
+        "title": "The profile exposes active routes",
+        "detail": "20 profile-controlled routes are active.",
+        "evidence": {
+          "activeRoutes": [
+            "home",
+            "nearbySites",
+            "sites",
+            "siteDetail",
+            "siteForm",
+            "contactsList",
+            "contactForm",
+            "siteDocs",
+            "siteDocForm",
+            "equipmentList",
+            "equipmentForm",
+            "tasks",
+            "taskForm",
+            "deficiencies",
+            "deficiencyForm",
+            "report",
+            "library",
+            "resourceForm",
+            "jobMode",
+            "settings"
+          ]
+        }
+      },
+      {
+        "id": "settings.runtimeCoverage",
+        "category": "Settings",
+        "status": "pass",
+        "title": "All bound Settings pages have runtime handlers",
+        "detail": "19 Settings bindings map to supported pages.",
+        "evidence": {}
+      },
+      {
+        "id": "records.references",
+        "category": "Record schema",
+        "status": "pass",
+        "title": "All configured record-schema references are valid",
+        "detail": "11 fields, 6 sections, and 9 photo categories resolve.",
+        "evidence": {}
+      },
+      {
+        "id": "records.activeFields",
+        "category": "Record schema",
+        "status": "pass",
+        "title": "The profile has active record fields",
+        "detail": "11 fields remain after module filtering.",
+        "evidence": {
+          "fields": [
+            "name",
+            "externalAccountId",
+            "sitePhone",
+            "street",
+            "city",
+            "state",
+            "zip",
+            "gps",
+            "panelManufacturer",
+            "panelModel",
+            "notes"
+          ]
+        }
+      },
+      {
+        "id": "records.detailSections",
+        "category": "Record schema",
+        "status": "pass",
+        "title": "Every active Account Detail section has a safe renderer",
+        "detail": "6 active sections map to known Account Detail tabs.",
+        "evidence": {
+          "sections": [
+            "overview",
+            "notes",
+            "locations",
+            "equipment",
+            "docs",
+            "details"
+          ]
+        }
+      },
+      {
+        "id": "records.photoCategories",
+        "category": "Record schema",
+        "status": "pass",
+        "title": "Photo categories are available",
+        "detail": "9 categories remain after module filtering.",
+        "evidence": {}
+      },
+      {
+        "id": "workflow.references",
+        "category": "Workflow",
+        "status": "pass",
+        "title": "All configured workflow actions are registered",
+        "detail": "8 configured actions resolve.",
+        "evidence": {}
+      },
+      {
+        "id": "workflow.surfaceSupport",
+        "category": "Workflow",
+        "status": "pass",
+        "title": "Active actions match their supported surfaces",
+        "detail": "12 active action placements are valid.",
+        "evidence": {}
+      },
+      {
+        "id": "workflow.quickPhoto",
+        "category": "Workflow",
+        "status": "pass",
+        "title": "Quick Photo settings normalize safely",
+        "detail": "2048px at JPEG quality 0.86.",
+        "evidence": {}
+      },
+      {
+        "id": "theme.assets",
+        "category": "Theme",
+        "status": "pass",
+        "title": "Theme branding assets resolve",
+        "detail": "Mark, logo, install icons, and Apple touch icon are defined.",
+        "evidence": {}
+      },
+      {
+        "id": "theme.colors",
+        "category": "Theme",
+        "status": "pass",
+        "title": "Theme colors are valid six-digit hex values",
+        "detail": "12 semantic colors validated.",
+        "evidence": {}
+      },
+      {
+        "id": "content.references",
+        "category": "Content packs",
+        "status": "pass",
+        "title": "All configured sources and packs are registered",
+        "detail": "3 sources and 4 packs resolve.",
+        "evidence": {}
+      },
+      {
+        "id": "content.sourceCoverage",
+        "category": "Content packs",
+        "status": "pass",
+        "title": "Every active content pack has an approved source",
+        "detail": "4 active packs have source coverage.",
+        "evidence": {}
+      },
+      {
+        "id": "storage.providers",
+        "category": "Sync & storage",
+        "status": "pass",
+        "title": "All configured storage providers are registered",
+        "detail": "4 providers resolve.",
+        "evidence": {}
+      },
+      {
+        "id": "storage.roles",
+        "category": "Sync & storage",
+        "status": "pass",
+        "title": "Provider roles match declared capabilities",
+        "detail": "Vault, media, backup, photo, document, and package roles validated.",
+        "evidence": {}
+      },
+      {
+        "id": "storage.offlineFoundation",
+        "category": "Sync & storage",
+        "status": "pass",
+        "title": "Offline-first storage has local vault and media coverage",
+        "detail": "localStorage vault with indexedDB media.",
+        "evidence": {}
+      },
+      {
+        "id": "integration.coverage",
+        "category": "Integration",
+        "status": "pass",
+        "title": "Architecture layers are connected to the interface",
+        "detail": "14 integration flags are active.",
+        "evidence": {
+          "enabledIntegration": [
+            "terminology",
+            "navigation",
+            "routes",
+            "accountTabs",
+            "accountActions",
+            "settings",
+            "recordFields",
+            "detailSections",
+            "photoCategories",
+            "workflows",
+            "brandingTheme",
+            "contentPacks",
+            "syncStorage",
+            "architectureValidation"
+          ]
+        }
+      },
+      {
+        "id": "firevault.modules",
+        "category": "FireVault regression",
+        "status": "pass",
+        "title": "Expected technician modules remain enabled",
+        "detail": "18 critical FireVault modules are active.",
+        "evidence": {}
+      },
+      {
+        "id": "firevault.sections",
+        "category": "FireVault regression",
+        "status": "pass",
+        "title": "All FireVault Account Detail sections remain available",
+        "detail": "overview · notes · locations · equipment · docs · details",
+        "evidence": {}
+      },
+      {
+        "id": "firevault.photoCategories",
+        "category": "FireVault regression",
+        "status": "pass",
+        "title": "All FireVault photo categories remain available",
+        "detail": "9 categories validated.",
+        "evidence": {}
+      },
+      {
+        "id": "firevault.actions",
+        "category": "FireVault regression",
+        "status": "pass",
+        "title": "All expected FireVault technician actions remain available",
+        "detail": "call · route · note · photo · favorite · task · deficiency · report",
+        "evidence": {}
+      },
+      {
+        "id": "firevault.routes",
+        "category": "FireVault regression",
+        "status": "pass",
+        "title": "Major FireVault routes retain active runtime coverage",
+        "detail": "13 technician routes validated.",
+        "evidence": {}
+      }
+    ]
+  },
+  "proof": {
+    "schemaVersion": 1,
+    "profile": {
+      "id": "location-guide-proof",
+      "name": "Location Guide Proof",
+      "schemaVersion": 9
+    },
+    "build": "0.96.1",
+    "storageKey": "firevault_vault_build_030",
+    "generatedAt": "2026-07-16T00:53:11.866Z",
+    "passed": true,
+    "status": "PASS",
+    "totals": {
+      "pass": 32,
+      "warning": 0,
+      "fail": 0,
+      "total": 32
+    },
+    "sections": [
+      {
+        "category": "Profile",
+        "total": 1,
+        "pass": 1,
+        "warning": 0,
+        "fail": 0
+      },
+      {
+        "category": "Modules",
+        "total": 3,
+        "pass": 3,
+        "warning": 0,
+        "fail": 0
+      },
+      {
+        "category": "Bindings",
+        "total": 1,
+        "pass": 1,
+        "warning": 0,
+        "fail": 0
+      },
+      {
+        "category": "Routes",
+        "total": 2,
+        "pass": 2,
+        "warning": 0,
+        "fail": 0
+      },
+      {
+        "category": "Settings",
+        "total": 1,
+        "pass": 1,
+        "warning": 0,
+        "fail": 0
+      },
+      {
+        "category": "Record schema",
+        "total": 4,
+        "pass": 4,
+        "warning": 0,
+        "fail": 0
+      },
+      {
+        "category": "Workflow",
+        "total": 3,
+        "pass": 3,
+        "warning": 0,
+        "fail": 0
+      },
+      {
+        "category": "Theme",
+        "total": 2,
+        "pass": 2,
+        "warning": 0,
+        "fail": 0
+      },
+      {
+        "category": "Content packs",
+        "total": 2,
+        "pass": 2,
+        "warning": 0,
+        "fail": 0
+      },
+      {
+        "category": "Sync & storage",
+        "total": 3,
+        "pass": 3,
+        "warning": 0,
+        "fail": 0
+      },
+      {
+        "category": "Integration",
+        "total": 1,
+        "pass": 1,
+        "warning": 0,
+        "fail": 0
+      },
+      {
+        "category": "Alternate-profile proof",
+        "total": 9,
+        "pass": 9,
+        "warning": 0,
+        "fail": 0
+      }
+    ],
+    "checks": [
+      {
+        "id": "profile.identity",
+        "category": "Profile",
+        "status": "pass",
+        "title": "Profile identity is complete",
+        "detail": "Location Guide Proof has a stable id and display name.",
+        "evidence": {
+          "id": "location-guide-proof",
+          "name": "Location Guide Proof"
+        }
+      },
+      {
+        "id": "modules.references",
+        "category": "Modules",
+        "status": "pass",
+        "title": "All enabled modules are registered",
+        "detail": "16 enabled module IDs resolve in the Module Registry.",
+        "evidence": {}
+      },
+      {
+        "id": "modules.duplicates",
+        "category": "Modules",
+        "status": "pass",
+        "title": "Enabled module IDs are unique",
+        "detail": "No duplicate module IDs were found.",
+        "evidence": {}
+      },
+      {
+        "id": "modules.dependencies",
+        "category": "Modules",
+        "status": "pass",
+        "title": "All enabled-module dependencies are satisfied",
+        "detail": "16 enabled modules have a complete dependency chain.",
+        "evidence": {}
+      },
+      {
+        "id": "bindings.moduleReferences",
+        "category": "Bindings",
+        "status": "pass",
+        "title": "All UI binding module references are valid",
+        "detail": "Navigation, route, Settings, and Account Detail bindings resolve to registered modules.",
+        "evidence": {}
+      },
+      {
+        "id": "routes.runtimeCoverage",
+        "category": "Routes",
+        "status": "pass",
+        "title": "All profile-controlled routes have runtime handlers",
+        "detail": "20 route bindings map to supported runtime screens.",
+        "evidence": {}
+      },
+      {
+        "id": "routes.active",
+        "category": "Routes",
+        "status": "pass",
+        "title": "The profile exposes active routes",
+        "detail": "13 profile-controlled routes are active.",
+        "evidence": {
+          "activeRoutes": [
+            "home",
+            "nearbySites",
+            "sites",
+            "siteDetail",
+            "siteForm",
+            "contactsList",
+            "contactForm",
+            "siteDocs",
+            "siteDocForm",
+            "library",
+            "resourceForm",
+            "jobMode",
+            "settings"
+          ]
+        }
+      },
+      {
+        "id": "settings.runtimeCoverage",
+        "category": "Settings",
+        "status": "pass",
+        "title": "All bound Settings pages have runtime handlers",
+        "detail": "19 Settings bindings map to supported pages.",
+        "evidence": {}
+      },
+      {
+        "id": "records.references",
+        "category": "Record schema",
+        "status": "pass",
+        "title": "All configured record-schema references are valid",
+        "detail": "8 fields, 5 sections, and 3 photo categories resolve.",
+        "evidence": {}
+      },
+      {
+        "id": "records.activeFields",
+        "category": "Record schema",
+        "status": "pass",
+        "title": "The profile has active record fields",
+        "detail": "8 fields remain after module filtering.",
+        "evidence": {
+          "fields": [
+            "name",
+            "externalAccountId",
+            "street",
+            "city",
+            "state",
+            "zip",
+            "gps",
+            "notes"
+          ]
+        }
+      },
+      {
+        "id": "records.detailSections",
+        "category": "Record schema",
+        "status": "pass",
+        "title": "Every active Account Detail section has a safe renderer",
+        "detail": "5 active sections map to known Account Detail tabs.",
+        "evidence": {
+          "sections": [
+            "overview",
+            "notes",
+            "locations",
+            "docs",
+            "details"
+          ]
+        }
+      },
+      {
+        "id": "records.photoCategories",
+        "category": "Record schema",
+        "status": "pass",
+        "title": "Photo categories are available",
+        "detail": "3 categories remain after module filtering.",
+        "evidence": {}
+      },
+      {
+        "id": "workflow.references",
+        "category": "Workflow",
+        "status": "pass",
+        "title": "All configured workflow actions are registered",
+        "detail": "4 configured actions resolve.",
+        "evidence": {}
+      },
+      {
+        "id": "workflow.surfaceSupport",
+        "category": "Workflow",
+        "status": "pass",
+        "title": "Active actions match their supported surfaces",
+        "detail": "8 active action placements are valid.",
+        "evidence": {}
+      },
+      {
+        "id": "workflow.quickPhoto",
+        "category": "Workflow",
+        "status": "pass",
+        "title": "Quick Photo settings normalize safely",
+        "detail": "2048px at JPEG quality 0.86.",
+        "evidence": {}
+      },
+      {
+        "id": "theme.assets",
+        "category": "Theme",
+        "status": "pass",
+        "title": "Theme branding assets resolve",
+        "detail": "Mark, logo, install icons, and Apple touch icon are defined.",
+        "evidence": {}
+      },
+      {
+        "id": "theme.colors",
+        "category": "Theme",
+        "status": "pass",
+        "title": "Theme colors are valid six-digit hex values",
+        "detail": "12 semantic colors validated.",
+        "evidence": {}
+      },
+      {
+        "id": "content.references",
+        "category": "Content packs",
+        "status": "pass",
+        "title": "All configured sources and packs are registered",
+        "detail": "4 sources and 3 packs resolve.",
+        "evidence": {}
+      },
+      {
+        "id": "content.sourceCoverage",
+        "category": "Content packs",
+        "status": "pass",
+        "title": "Every active content pack has an approved source",
+        "detail": "3 active packs have source coverage.",
+        "evidence": {}
+      },
+      {
+        "id": "storage.providers",
+        "category": "Sync & storage",
+        "status": "pass",
+        "title": "All configured storage providers are registered",
+        "detail": "1 providers resolve.",
+        "evidence": {}
+      },
+      {
+        "id": "storage.roles",
+        "category": "Sync & storage",
+        "status": "pass",
+        "title": "Provider roles match declared capabilities",
+        "detail": "Vault, media, backup, photo, document, and package roles validated.",
+        "evidence": {}
+      },
+      {
+        "id": "storage.offlineFoundation",
+        "category": "Sync & storage",
+        "status": "pass",
+        "title": "Offline-first storage has local vault and media coverage",
+        "detail": "localStorage vault with indexedDB media.",
+        "evidence": {}
+      },
+      {
+        "id": "integration.coverage",
+        "category": "Integration",
+        "status": "pass",
+        "title": "Architecture layers are connected to the interface",
+        "detail": "14 integration flags are active.",
+        "evidence": {
+          "enabledIntegration": [
+            "terminology",
+            "navigation",
+            "routes",
+            "accountTabs",
+            "accountActions",
+            "settings",
+            "recordFields",
+            "detailSections",
+            "photoCategories",
+            "workflows",
+            "brandingTheme",
+            "contentPacks",
+            "syncStorage",
+            "architectureValidation"
+          ]
+        }
+      },
+      {
+        "id": "proof.verticalIsolation",
+        "category": "Alternate-profile proof",
+        "status": "pass",
+        "title": "The proof profile runs without FireVault vertical modules",
+        "detail": "No firevault.* modules are enabled.",
+        "evidence": {}
+      },
+      {
+        "id": "proof.fieldIsolation",
+        "category": "Alternate-profile proof",
+        "status": "pass",
+        "title": "The proof profile exposes only reusable record fields",
+        "detail": "8 active fields are AppForge-ready.",
+        "evidence": {}
+      },
+      {
+        "id": "proof.terminology",
+        "category": "Alternate-profile proof",
+        "status": "pass",
+        "title": "Record terminology transforms correctly",
+        "detail": "Account becomes Location / Locations.",
+        "evidence": {}
+      },
+      {
+        "id": "proof.contentPack",
+        "category": "Alternate-profile proof",
+        "status": "pass",
+        "title": "A non-FireVault content pack resolves",
+        "detail": "Wyoming Points of Interest is active in the hidden proof profile.",
+        "evidence": {}
+      },
+      {
+        "id": "proof.storage",
+        "category": "Alternate-profile proof",
+        "status": "pass",
+        "title": "The proof profile can use a reduced local-only storage configuration",
+        "detail": "Remote-provider Settings can be removed without breaking the local vault.",
+        "evidence": {}
+      },
+      {
+        "id": "proof.navigation",
+        "category": "Alternate-profile proof",
+        "status": "pass",
+        "title": "The reduced profile retains complete core navigation",
+        "detail": "nearby · search · photo · settings",
+        "evidence": {}
+      },
+      {
+        "id": "proof.routeReduction",
+        "category": "Alternate-profile proof",
+        "status": "pass",
+        "title": "Optional technician routes are removed safely",
+        "detail": "Equipment, task, deficiency, and report routes are inactive.",
+        "evidence": {}
+      },
+      {
+        "id": "proof.settingsReduction",
+        "category": "Alternate-profile proof",
+        "status": "pass",
+        "title": "Remote storage Settings reduce safely",
+        "detail": "Microsoft Storage, WebDAV, and Team Sync are hidden while local Backup remains available.",
+        "evidence": {}
+      },
+      {
+        "id": "proof.workflowReduction",
+        "category": "Alternate-profile proof",
+        "status": "pass",
+        "title": "Workflow actions reduce without FireVault task/report behavior",
+        "detail": "Route, Note, Photo, and Favorite remain; Call, Task, Deficiency, and Report are excluded.",
+        "evidence": {}
+      }
+    ]
+  },
+  "proofProfile": {
+    "id": "location-guide-proof",
+    "name": "Location Guide Proof",
+    "visibleToUser": false,
+    "purpose": "Hidden validation profile proving that the shared Field Vault core can operate without FireVault-specific modules."
+  }
+}

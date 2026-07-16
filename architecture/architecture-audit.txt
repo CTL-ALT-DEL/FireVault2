@@ -1,0 +1,70 @@
+FIREVAULT ARCHITECTURE VALIDATION
+Build: 0.96.1
+Generated: 2026-07-16T00:53:11.866Z
+Overall: PASS
+Checks: 60 passed, 0 warnings, 0 failed
+Storage key: firevault_vault_build_030
+
+PRIMARY PROFILE — FireVault: PASS
+[PASS] Profile / Profile identity is complete: FireVault has a stable id and display name.
+[PASS] Modules / All enabled modules are registered: 24 enabled module IDs resolve in the Module Registry.
+[PASS] Modules / Enabled module IDs are unique: No duplicate module IDs were found.
+[PASS] Modules / All enabled-module dependencies are satisfied: 24 enabled modules have a complete dependency chain.
+[PASS] Bindings / All UI binding module references are valid: Navigation, route, Settings, and Account Detail bindings resolve to registered modules.
+[PASS] Routes / All profile-controlled routes have runtime handlers: 20 route bindings map to supported runtime screens.
+[PASS] Routes / The profile exposes active routes: 20 profile-controlled routes are active.
+[PASS] Settings / All bound Settings pages have runtime handlers: 19 Settings bindings map to supported pages.
+[PASS] Record schema / All configured record-schema references are valid: 11 fields, 6 sections, and 9 photo categories resolve.
+[PASS] Record schema / The profile has active record fields: 11 fields remain after module filtering.
+[PASS] Record schema / Every active Account Detail section has a safe renderer: 6 active sections map to known Account Detail tabs.
+[PASS] Record schema / Photo categories are available: 9 categories remain after module filtering.
+[PASS] Workflow / All configured workflow actions are registered: 8 configured actions resolve.
+[PASS] Workflow / Active actions match their supported surfaces: 12 active action placements are valid.
+[PASS] Workflow / Quick Photo settings normalize safely: 2048px at JPEG quality 0.86.
+[PASS] Theme / Theme branding assets resolve: Mark, logo, install icons, and Apple touch icon are defined.
+[PASS] Theme / Theme colors are valid six-digit hex values: 12 semantic colors validated.
+[PASS] Content packs / All configured sources and packs are registered: 3 sources and 4 packs resolve.
+[PASS] Content packs / Every active content pack has an approved source: 4 active packs have source coverage.
+[PASS] Sync & storage / All configured storage providers are registered: 4 providers resolve.
+[PASS] Sync & storage / Provider roles match declared capabilities: Vault, media, backup, photo, document, and package roles validated.
+[PASS] Sync & storage / Offline-first storage has local vault and media coverage: localStorage vault with indexedDB media.
+[PASS] Integration / Architecture layers are connected to the interface: 14 integration flags are active.
+[PASS] FireVault regression / Expected technician modules remain enabled: 18 critical FireVault modules are active.
+[PASS] FireVault regression / All FireVault Account Detail sections remain available: overview · notes · locations · equipment · docs · details
+[PASS] FireVault regression / All FireVault photo categories remain available: 9 categories validated.
+[PASS] FireVault regression / All expected FireVault technician actions remain available: call · route · note · photo · favorite · task · deficiency · report
+[PASS] FireVault regression / Major FireVault routes retain active runtime coverage: 13 technician routes validated.
+
+HIDDEN PROOF PROFILE — Location Guide Proof: PASS
+[PASS] Profile / Profile identity is complete: Location Guide Proof has a stable id and display name.
+[PASS] Modules / All enabled modules are registered: 16 enabled module IDs resolve in the Module Registry.
+[PASS] Modules / Enabled module IDs are unique: No duplicate module IDs were found.
+[PASS] Modules / All enabled-module dependencies are satisfied: 16 enabled modules have a complete dependency chain.
+[PASS] Bindings / All UI binding module references are valid: Navigation, route, Settings, and Account Detail bindings resolve to registered modules.
+[PASS] Routes / All profile-controlled routes have runtime handlers: 20 route bindings map to supported runtime screens.
+[PASS] Routes / The profile exposes active routes: 13 profile-controlled routes are active.
+[PASS] Settings / All bound Settings pages have runtime handlers: 19 Settings bindings map to supported pages.
+[PASS] Record schema / All configured record-schema references are valid: 8 fields, 5 sections, and 3 photo categories resolve.
+[PASS] Record schema / The profile has active record fields: 8 fields remain after module filtering.
+[PASS] Record schema / Every active Account Detail section has a safe renderer: 5 active sections map to known Account Detail tabs.
+[PASS] Record schema / Photo categories are available: 3 categories remain after module filtering.
+[PASS] Workflow / All configured workflow actions are registered: 4 configured actions resolve.
+[PASS] Workflow / Active actions match their supported surfaces: 8 active action placements are valid.
+[PASS] Workflow / Quick Photo settings normalize safely: 2048px at JPEG quality 0.86.
+[PASS] Theme / Theme branding assets resolve: Mark, logo, install icons, and Apple touch icon are defined.
+[PASS] Theme / Theme colors are valid six-digit hex values: 12 semantic colors validated.
+[PASS] Content packs / All configured sources and packs are registered: 4 sources and 3 packs resolve.
+[PASS] Content packs / Every active content pack has an approved source: 3 active packs have source coverage.
+[PASS] Sync & storage / All configured storage providers are registered: 1 providers resolve.
+[PASS] Sync & storage / Provider roles match declared capabilities: Vault, media, backup, photo, document, and package roles validated.
+[PASS] Sync & storage / Offline-first storage has local vault and media coverage: localStorage vault with indexedDB media.
+[PASS] Integration / Architecture layers are connected to the interface: 14 integration flags are active.
+[PASS] Alternate-profile proof / The proof profile runs without FireVault vertical modules: No firevault.* modules are enabled.
+[PASS] Alternate-profile proof / The proof profile exposes only reusable record fields: 8 active fields are AppForge-ready.
+[PASS] Alternate-profile proof / Record terminology transforms correctly: Account becomes Location / Locations.
+[PASS] Alternate-profile proof / A non-FireVault content pack resolves: Wyoming Points of Interest is active in the hidden proof profile.
+[PASS] Alternate-profile proof / The proof profile can use a reduced local-only storage configuration: Remote-provider Settings can be removed without breaking the local vault.
+[PASS] Alternate-profile proof / The reduced profile retains complete core navigation: nearby · search · photo · settings
+[PASS] Alternate-profile proof / Optional technician routes are removed safely: Equipment, task, deficiency, and report routes are inactive.
+[PASS] Alternate-profile proof / Remote storage Settings reduce safely: Microsoft Storage, WebDAV, and Team Sync are hidden while local Backup remains available.
+[PASS] Alternate-profile proof / Workflow actions reduce without FireVault task/report behavior: Route, Note, Photo, and Favorite remain; Call, Task, Deficiency, and Report are excluded.

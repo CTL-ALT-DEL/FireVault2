@@ -1,52 +1,52 @@
 {
   "schemaVersion": 9,
-  "id": "firevault",
+  "id": "location-guide-proof",
   "family": "field-vault",
-  "name": "FireVault",
-  "shortName": "FireVault",
-  "industry": "Fire alarm service",
-  "audience": "Fire alarm technicians",
-  "purpose": "Local-first field knowledge, account history, navigation, photos, documents, and technician reference.",
+  "name": "Location Guide Proof",
+  "shortName": "Guide Proof",
+  "industry": "Location guide",
+  "audience": "Travelers and field researchers",
+  "purpose": "Hidden validation profile proving that the shared Field Vault core can operate without FireVault-specific modules.",
   "terminology": {
-    "recordSingular": "Account",
-    "recordPlural": "Accounts",
-    "recordId": "Account ID",
-    "locationSingular": "Location",
-    "locationPlural": "Locations",
-    "personSingular": "Technician",
-    "personPlural": "Technicians",
+    "recordSingular": "Location",
+    "recordPlural": "Locations",
+    "recordId": "Location ID",
+    "locationSingular": "Point",
+    "locationPlural": "Points",
+    "personSingular": "Contributor",
+    "personPlural": "Contributors",
     "noteSingular": "Note",
     "notePlural": "Notes",
-    "equipmentSingular": "Equipment",
-    "equipmentPlural": "Equipment",
-    "deficiencySingular": "Deficiency",
-    "deficiencyPlural": "Deficiencies",
-    "taskSingular": "Task",
-    "taskPlural": "Tasks",
-    "fileSingular": "File",
-    "filePlural": "Files"
+    "equipmentSingular": "Amenity",
+    "equipmentPlural": "Amenities",
+    "deficiencySingular": "Condition",
+    "deficiencyPlural": "Conditions",
+    "taskSingular": "Checklist Item",
+    "taskPlural": "Checklist Items",
+    "fileSingular": "Reference",
+    "filePlural": "References"
   },
   "labels": {
-    "recordDirectory": "{{account}} Directory",
-    "recordDetail": "{{account}} Detail",
-    "addRecord": "Add {{account}}",
-    "editRecord": "Edit {{account}}",
-    "unnamedRecord": "Unnamed {{account}}",
-    "searchRecords": "Search {{accounts}}",
-    "nearbyRecords": "Nearby {{accounts}}",
-    "chooseRecord": "Choose {{account}}",
-    "currentRecord": "Current {{account}}",
-    "recordActions": "{{account}} actions",
-    "recordSections": "{{account}} sections",
-    "noRecords": "No {{accounts}} yet",
-    "noMatchingRecords": "No matching {{accounts}}",
-    "firstRecord": "Add First {{account}}",
-    "recordPhoto": "{{account}} Photo",
-    "recordPhotos": "{{account}} Photos"
+    "recordDirectory": "Location Directory",
+    "recordDetail": "Location Detail",
+    "addRecord": "Add Location",
+    "editRecord": "Edit Location",
+    "unnamedRecord": "Unnamed Location",
+    "searchRecords": "Search Locations",
+    "nearbyRecords": "Nearby Locations",
+    "chooseRecord": "Choose Location",
+    "currentRecord": "Current Location",
+    "recordActions": "Location actions",
+    "recordSections": "Location sections",
+    "noRecords": "No Locations yet",
+    "noMatchingRecords": "No matching Locations",
+    "firstRecord": "Add First Location",
+    "recordPhoto": "Location Photo",
+    "recordPhotos": "Location Photos"
   },
   "navigation": {
     "nearby": "Nearby",
-    "search": "Search",
+    "search": "Explore",
     "photo": "Photo",
     "settings": "Settings"
   },
@@ -58,33 +58,33 @@
     "appleTouchIcon": "assets/apple-touch-icon.png",
     "wordmark": [
       {
-        "text": "FIRE",
+        "text": "LOCATION",
         "tone": "primary"
       },
       {
-        "text": "VAULT",
+        "text": "GUIDE",
         "tone": "accent"
       }
     ],
-    "tagline": "Field Vault System"
+    "tagline": "Places worth finding"
   },
   "appearance": {
-    "profileId": "firevault-dark",
-    "profileName": "FireVault Dark",
+    "profileId": "location-guide-proof-dark",
+    "profileName": "Location Guide Proof Dark",
     "theme": "dark",
-    "accent": "#ef4444",
-    "accentStrong": "#991b1b",
-    "background": "#0b0d10",
-    "surface": "#151922",
-    "surfaceRaised": "#1d2330",
-    "line": "#303747",
-    "text": "#f4f7fb",
-    "muted": "#a7b0c0",
+    "accent": "#22c55e",
+    "accentStrong": "#166534",
+    "background": "#07110d",
+    "surface": "#102018",
+    "surfaceRaised": "#173326",
+    "line": "#315343",
+    "text": "#f0fdf4",
+    "muted": "#a7c4b2",
     "success": "#22c55e",
     "warning": "#f59e0b",
     "info": "#38bdf8",
     "cyan": "#22d3ee",
-    "themeColor": "#101216",
+    "themeColor": "#07110d",
     "statusBarStyle": "black",
     "radius": 18,
     "controlRadius": 15,
@@ -92,12 +92,6 @@
     "baseFontSize": 14
   },
   "defaultPhotoCategories": [
-    "Panel",
-    "NAC",
-    "Device",
-    "Communicator",
-    "Battery",
-    "Deficiency",
     "Before",
     "After",
     "Other"
@@ -107,14 +101,11 @@
     "enabledFieldIds": [
       "name",
       "externalAccountId",
-      "sitePhone",
       "street",
       "city",
       "state",
       "zip",
       "gps",
-      "panelManufacturer",
-      "panelModel",
       "notes"
     ],
     "requiredFieldIds": [
@@ -124,41 +115,30 @@
       "overview",
       "notes",
       "locations",
-      "equipment",
       "docs",
       "details"
     ],
     "photoCategoryIds": [
-      "panel",
-      "nac",
-      "device",
-      "communicator",
-      "battery",
-      "deficiency",
       "before",
       "after",
       "other"
     ]
   },
   "workflows": {
-    "presetId": "fire-alarm-technician",
+    "presetId": "location-guide-proof",
     "directoryActionIds": [
-      "call",
       "route",
       "note",
+      "photo",
       "favorite"
     ],
     "detailPrimaryActionIds": [
-      "call",
       "route",
       "note",
       "photo"
     ],
     "notesActionIds": [
-      "task",
-      "deficiency",
-      "photo",
-      "report"
+      "photo"
     ],
     "quickPhoto": {
       "defaultUseOverlay": true,
@@ -169,7 +149,7 @@
       "allowRetake": true,
       "showCategory": true,
       "showOverlayToggle": true,
-      "showReportToggle": true,
+      "showReportToggle": false,
       "showTitle": true,
       "showInternalNotes": true,
       "showCustomerCaption": true,
@@ -179,17 +159,17 @@
     }
   },
   "content": {
-    "registryId": "firevault-content-v1",
+    "registryId": "location-guide-proof-content",
     "enabledSourceIds": [
       "local.user-vault",
       "bundled.app-reference",
+      "remote.versioned-catalog",
       "import.csv-json"
     ],
     "enabledPackIds": [
       "core.user-library",
       "core.account-content",
-      "firevault.field-reference",
-      "firevault.panel-documents"
+      "travel.wyoming-points"
     ],
     "updatePolicy": {
       "mode": "manual",
@@ -199,12 +179,9 @@
     }
   },
   "syncStorage": {
-    "profileId": "firevault-local-first",
+    "profileId": "location-guide-proof-local",
     "enabledProviderIds": [
-      "local",
-      "webdav",
-      "onedrive",
-      "sharepoint"
+      "local"
     ],
     "roles": {
       "vault": [
@@ -214,23 +191,15 @@
         "local"
       ],
       "backup": [
-        "local",
-        "webdav"
+        "local"
       ],
       "photo": [
-        "local",
-        "onedrive",
-        "sharepoint"
+        "local"
       ],
       "document": [
-        "local",
-        "onedrive",
-        "sharepoint"
+        "local"
       ],
-      "sync-package": [
-        "onedrive",
-        "sharepoint"
-      ]
+      "sync-package": []
     },
     "local": {
       "offlineFirst": true,
@@ -241,12 +210,12 @@
     "backup": {
       "manualExport": true,
       "automaticSnapshots": true,
-      "snapshotLimit": 12,
+      "snapshotLimit": 8,
       "verifyBeforeRestore": true,
       "includeMedia": true
     },
     "collaboration": {
-      "mode": "package-exchange",
+      "mode": "disabled",
       "automaticSync": false,
       "queueOffline": true,
       "conflictPolicy": "manual-review"
@@ -290,14 +259,6 @@
     "core.offlineStorage",
     "core.backupRestore",
     "core.security",
-    "optional.equipment",
-    "optional.tasks",
-    "optional.deficiencies",
-    "optional.reports",
-    "optional.cloudStorage",
-    "optional.importExport",
-    "firevault.fireAlarmProfile",
-    "firevault.panelDocuments",
-    "firevault.fireLocationTypes"
+    "optional.importExport"
   ]
 }
