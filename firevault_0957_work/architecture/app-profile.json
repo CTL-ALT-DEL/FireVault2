@@ -1,0 +1,180 @@
+{
+  "schemaVersion": 5,
+  "id": "firevault",
+  "family": "field-vault",
+  "name": "FireVault",
+  "shortName": "FireVault",
+  "industry": "Fire alarm service",
+  "audience": "Fire alarm technicians",
+  "purpose": "Local-first field knowledge, account history, navigation, photos, documents, and technician reference.",
+  "terminology": {
+    "recordSingular": "Account",
+    "recordPlural": "Accounts",
+    "recordId": "Account ID",
+    "locationSingular": "Location",
+    "locationPlural": "Locations",
+    "personSingular": "Technician",
+    "personPlural": "Technicians",
+    "noteSingular": "Note",
+    "notePlural": "Notes",
+    "equipmentSingular": "Equipment",
+    "equipmentPlural": "Equipment",
+    "deficiencySingular": "Deficiency",
+    "deficiencyPlural": "Deficiencies",
+    "taskSingular": "Task",
+    "taskPlural": "Tasks",
+    "fileSingular": "File",
+    "filePlural": "Files"
+  },
+  "labels": {
+    "recordDirectory": "{{account}} Directory",
+    "recordDetail": "{{account}} Detail",
+    "addRecord": "Add {{account}}",
+    "editRecord": "Edit {{account}}",
+    "unnamedRecord": "Unnamed {{account}}",
+    "searchRecords": "Search {{accounts}}",
+    "nearbyRecords": "Nearby {{accounts}}",
+    "chooseRecord": "Choose {{account}}",
+    "currentRecord": "Current {{account}}",
+    "recordActions": "{{account}} actions",
+    "recordSections": "{{account}} sections",
+    "noRecords": "No {{accounts}} yet",
+    "noMatchingRecords": "No matching {{accounts}}",
+    "firstRecord": "Add First {{account}}",
+    "recordPhoto": "{{account}} Photo",
+    "recordPhotos": "{{account}} Photos"
+  },
+  "navigation": {
+    "nearby": "Nearby",
+    "search": "Search",
+    "photo": "Photo",
+    "settings": "Settings"
+  },
+  "appearance": {
+    "theme": "dark",
+    "accent": "#ef4444",
+    "background": "#0b0d10",
+    "surface": "#101216"
+  },
+  "defaultPhotoCategories": [
+    "Panel",
+    "NAC",
+    "Device",
+    "Communicator",
+    "Battery",
+    "Deficiency",
+    "Before",
+    "After",
+    "Other"
+  ],
+  "enabledModules": [
+    "core.records",
+    "core.search",
+    "core.nearby",
+    "core.notes",
+    "core.photos",
+    "core.files",
+    "core.photoOverlay",
+    "core.locationNavigator",
+    "core.offlineStorage",
+    "core.backupRestore",
+    "core.security",
+    "optional.equipment",
+    "optional.tasks",
+    "optional.deficiencies",
+    "optional.reports",
+    "optional.cloudStorage",
+    "optional.importExport",
+    "firevault.fireAlarmProfile",
+    "firevault.panelDocuments",
+    "firevault.fireLocationTypes"
+  ],
+  "interfaceIntegration": {
+    "terminology": true,
+    "navigation": true,
+    "routes": true,
+    "accountTabs": true,
+    "accountActions": true,
+    "settings": true,
+    "recordFields": true,
+    "detailSections": true,
+    "photoCategories": true,
+    "workflows": true
+  },
+  "dataModel": {
+    "schemaId": "firevault.account.v1",
+    "enabledFieldIds": [
+      "name",
+      "externalAccountId",
+      "sitePhone",
+      "street",
+      "city",
+      "state",
+      "zip",
+      "gps",
+      "panelManufacturer",
+      "panelModel",
+      "notes"
+    ],
+    "requiredFieldIds": [
+      "name"
+    ],
+    "detailSectionIds": [
+      "overview",
+      "notes",
+      "locations",
+      "equipment",
+      "docs",
+      "details"
+    ],
+    "photoCategoryIds": [
+      "panel",
+      "nac",
+      "device",
+      "communicator",
+      "battery",
+      "deficiency",
+      "before",
+      "after",
+      "other"
+    ]
+  },
+  "workflows": {
+    "presetId": "fire-alarm-technician",
+    "directoryActionIds": [
+      "call",
+      "route",
+      "note",
+      "favorite"
+    ],
+    "detailPrimaryActionIds": [
+      "call",
+      "route",
+      "note",
+      "photo"
+    ],
+    "notesActionIds": [
+      "task",
+      "deficiency",
+      "photo",
+      "report"
+    ],
+    "quickPhoto": {
+      "defaultUseOverlay": true,
+      "defaultIncludeReport": false,
+      "rememberAccount": true,
+      "rememberCategory": true,
+      "allowAccountChange": true,
+      "allowRetake": true,
+      "showCategory": true,
+      "showOverlayToggle": true,
+      "showReportToggle": true,
+      "showTitle": true,
+      "showInternalNotes": true,
+      "showCustomerCaption": true,
+      "cameraFacing": "environment",
+      "maxImageDimension": 2048,
+      "jpegQuality": 0.86
+    }
+  }
+}

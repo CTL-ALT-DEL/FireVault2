@@ -1,0 +1,8 @@
+{
+  "build": "0.95.7",
+  "released": "2026-07-15",
+  "note": "The App Profile now selects Account Directory actions, Account Detail actions, Notes shortcuts, and Quick Photo behavior through a reusable workflow schema.",
+  "label": "Configurable Workflow Presets",
+  "version": "0.95.7",
+  "name": "Configurable Workflow Presets"
+}

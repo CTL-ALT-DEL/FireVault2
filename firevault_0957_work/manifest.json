@@ -1,0 +1,53 @@
+{
+  "name": "FireVault",
+  "short_name": "FireVault",
+  "id": "firevault-field-vault",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#0b0d10",
+  "theme_color": "#101216",
+  "description": "Professional account documentation and field reference system for fire alarm technicians.",
+  "icons": [
+    {
+      "src": "assets/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "assets/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Add Account",
+      "short_name": "Add Account",
+      "url": "./?route=siteForm",
+      "description": "Create a FireVault account"
+    },
+    {
+      "name": "Nearby Accounts",
+      "short_name": "Nearby",
+      "url": "./?route=nearbySites",
+      "description": "Find saved accounts near your current location"
+    },
+    {
+      "name": "Search Accounts",
+      "short_name": "Search",
+      "url": "./?route=sites",
+      "description": "Search the Account Directory"
+    },
+    {
+      "name": "Settings",
+      "short_name": "Settings",
+      "url": "./?route=settings",
+      "description": "Open FireVault settings"
+    }
+  ],
+  "version": "0.95.7"
+}
