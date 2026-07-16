@@ -1,8 +1,8 @@
 {
-  "build": "1.01.0",
+  "build": "1.01.1",
   "released": "2026-07-15",
-  "note": "FireVault Settings is consolidated into six technician-focused areas, while AppForge remains available only through explicit developer access.",
-  "label": "UI & Settings Cleanup",
-  "version": "1.01.0",
-  "name": "UI & Settings Cleanup"
+  "note": "Account Detail now uses larger field-ready controls, clearer account identity, simplified tabs, and responsive phone and iPad layouts without changing workflows or stored data.",
+  "label": "Account Detail Polish",
+  "version": "1.01.1",
+  "name": "Account Detail Polish"
 }
