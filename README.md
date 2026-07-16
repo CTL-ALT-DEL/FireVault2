@@ -1,22 +1,32 @@
 # FireVault
-## Build 0.95.4 — Core Terminology Integration
+## Build 0.95.8 — Configurable Branding and Theme Profiles
 
-Build 0.95.4 turns the App Profile from an architecture reference into an active UI source while keeping FireVault optimized for fire alarm technicians.
+Build 0.95.8 makes the shared Field Vault shell visually configurable while preserving FireVault’s current dark fire-technician presentation.
 
 ### Integrated
 
-- Search / Account Directory headings, counts, empty states, search labels, sorting accessibility, and account cards now use the App Profile terminology layer.
-- Nearby titles and selected-record action labels use profile terminology.
-- Account Detail titles, identity labels, actions, sections, photo headings, and record metadata use profile terminology.
-- Add / Edit Account forms, validation, confirmation, deletion, and status messages use profile terminology.
-- Quick Photo account selection, preview, overlay wording, empty states, and save messages use profile terminology.
-- Navigation labels and photo categories continue to come from the App Profile.
-- App Profile schema is now version 2 and includes reusable phrases plus a configurable record-ID label.
+- Added `src/theme-profile.js` as the canonical resolver for branding and visual design tokens.
+- App Profile schema version 6 now defines the app mark, full logo, install icons, wordmark segments, tagline, semantic colors, browser chrome, typography, density, and corner shape.
+- The live application shell applies the resolved Theme Profile at startup.
+- Header, splash, Home, Nearby, privacy lock, overlay branding, About, release notes, and Architecture previews use profile-resolved brand assets or wordmarks.
+- Shared CSS uses semantic variables instead of requiring a new stylesheet for every future vertical app.
+- Architecture & Modules displays and exports the active Theme Profile.
 
 ### FireVault behavior
 
-The active profile still resolves the shared terms to Account, Accounts, Account ID, Technician, Equipment, Tasks, and Deficiencies. Fire alarm system fields and fire-specific modules remain in the FireVault vertical layer.
+The active `firevault-dark` profile retains:
+
+- FireVault name, wordmark, icons, and Field Vault System tagline
+- Dark charcoal surfaces
+- Red primary accent
+- Existing status colors and readable light text
+- Existing iPhone and iPad spacing
+- All current technician workflows and modules
+
+### AppForge direction
+
+A future app profile can replace branding, colors, typography, shape, and mobile browser chrome without branching Search, Nearby, Account Detail, Quick Photo, Settings, or storage code.
 
 ### Compatibility
 
-The storage key remains `firevault_vault_build_030`. Existing accounts, notes, photos, IndexedDB media, WebDAV, backups, Photo Overlay, Demo Mode, Nearby, Search, and Account Detail remain compatible.
+The storage key remains `firevault_vault_build_030`. Existing accounts, notes, photos, documents, overlays, IndexedDB media, backups, WebDAV settings, Demo Mode, Nearby, Search, Account Detail, record schema, and workflow schema remain compatible.

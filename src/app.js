@@ -1,12 +1,19 @@
-import { BUILD, KEY, loadData, saveData, ensureSite, fullAddress, esc, uid, downloadBlob, syncSummary, syncQueue, syncConflicts, syncActivity, createSyncPackage, importSyncPackage, resolveSyncConflict, notePackageExport, deviceIdentity, recordSyncActivity, autoBackupInfo, latestAutoBackup, restoreAutoBackup, isDemoMode, setDemoMode, resetDemoData, securityFoundationSummary, securityAudit, recycleBinInfo, restoreRecycleRecord, purgeRecycleBin, recordSecurityEvent, validateVaultIntegrity } from "./storage.js?v=0.95.4";
-import { backendAdapterSummary, runBackendAdapterDiagnostics, backendAdapterManifest, PROVIDER_CONTRACT_VERSION, FILE_STORAGE_CATALOG, fileStoragePlanSummary, cloudFileStorageManifest, MICROSOFT_STORAGE_TYPES, microsoftStorageAccounts, saveMicrosoftStorageAccounts, createMicrosoftStorageAccount, microsoftStorageAccountById, microsoftAppRegistration, saveMicrosoftAppRegistration, microsoftStorageSummary, microsoftStorageManifest } from "./providers.js?v=0.95.4";
-import { encodePlusCode, isValidFullPlusCode, normalizePlusCode, plusCodePrecisionLabel } from "./open-location-code.js?v=0.95.4";
-import { hydrateVaultMedia, stageVaultMedia, prepareVaultWithMedia, mediaStorageSummary, requestPersistentMediaStorage, pruneOrphanedMedia, flushMediaWrites } from "./media-store.js?v=0.95.4";
-import { APP_PROFILE, APP_PROFILE_SCHEMA_VERSION, appTerm, appLabel, appNavigationLabel, appProfileExport } from "./app-profile.js?v=0.95.4";
-import { MODULE_REGISTRY, MODULE_REGISTRY_VERSION, MODULE_CLASSIFICATIONS, FUTURE_APP_COLUMNS, moduleRegistrySummary, moduleMatrixRows, moduleRegistryExport } from "./module-registry.js?v=0.95.4";
+import { BUILD, KEY, loadData, saveData, ensureSite, fullAddress, esc, uid, downloadBlob, syncSummary, syncQueue, syncConflicts, syncActivity, createSyncPackage, importSyncPackage, resolveSyncConflict, notePackageExport, deviceIdentity, recordSyncActivity, autoBackupInfo, latestAutoBackup, restoreAutoBackup, isDemoMode, setDemoMode, resetDemoData, securityFoundationSummary, securityAudit, recycleBinInfo, restoreRecycleRecord, purgeRecycleBin, recordSecurityEvent, validateVaultIntegrity } from "./storage.js?v=0.95.8";
+import { backendAdapterSummary, runBackendAdapterDiagnostics, backendAdapterManifest, PROVIDER_CONTRACT_VERSION, FILE_STORAGE_CATALOG, fileStoragePlanSummary, cloudFileStorageManifest, MICROSOFT_STORAGE_TYPES, microsoftStorageAccounts, saveMicrosoftStorageAccounts, createMicrosoftStorageAccount, microsoftStorageAccountById, microsoftAppRegistration, saveMicrosoftAppRegistration, microsoftStorageSummary, microsoftStorageManifest } from "./providers.js?v=0.95.8";
+import { encodePlusCode, isValidFullPlusCode, normalizePlusCode, plusCodePrecisionLabel } from "./open-location-code.js?v=0.95.8";
+import { hydrateVaultMedia, stageVaultMedia, prepareVaultWithMedia, mediaStorageSummary, requestPersistentMediaStorage, pruneOrphanedMedia, flushMediaWrites } from "./media-store.js?v=0.95.8";
+import { APP_PROFILE, APP_PROFILE_SCHEMA_VERSION, appTerm, appLabel, appNavigationLabel, appProfileExport } from "./app-profile.js?v=0.95.8";
+import { MODULE_REGISTRY, MODULE_REGISTRY_VERSION, MODULE_CLASSIFICATIONS, FUTURE_APP_COLUMNS, moduleRegistrySummary, moduleMatrixRows, moduleRegistryExport } from "./module-registry.js?v=0.95.8";
+import { MODULE_BINDINGS_VERSION, NAV_MODULE_REQUIREMENTS as NAV_MODULE_REQUIREMENTS_0955, ROUTE_MODULE_REQUIREMENTS as ROUTE_MODULE_REQUIREMENTS_0955, SETTINGS_MODULE_REQUIREMENTS as SETTINGS_MODULE_REQUIREMENTS_0955, ACCOUNT_TAB_BINDINGS, requirementsMet as moduleRequirementsMetFromBindings0955, moduleBindingsExport } from "./module-bindings.js?v=0.95.8";
+import { RECORD_SCHEMA, RECORD_SCHEMA_VERSION, recordFieldById, activeRecordFields, recordFieldEnabled, recordFieldRequired, activeDetailSections, recordDetailSectionEnabled, recordPhotoCategories, recordSchemaSummary, recordSchemaExport } from "./record-schema.js?v=0.95.8";
+import { WORKFLOW_SCHEMA, WORKFLOW_SCHEMA_VERSION, activeWorkflowActions, workflowActionEnabled, quickPhotoWorkflow, workflowSchemaSummary, workflowSchemaExport } from "./workflow-schema.js?v=0.95.8";
+import { THEME_PROFILE_SCHEMA_VERSION, resolveThemeProfile, applyThemeProfile, themeBrandAsset, themeWordmarkMarkup, themeProfileSummary, themeProfileExport } from "./theme-profile.js?v=0.95.8";
 window.__FIREVAULT_MODULE_READY = true;
+window.__FIREVAULT_BUILD = BUILD;
+const ACTIVE_THEME_0958=resolveThemeProfile(APP_PROFILE);
 
 function applyAppProfileFoundation0953(){
+  applyThemeProfile(APP_PROFILE);
   document.title=APP_PROFILE.name;
   const navMap={"nav-home":"nearby","nav-sites":"search","nav-photo":"photo","nav-settings":"settings"};
   Object.entries(navMap).forEach(([id,key])=>{
@@ -15,10 +22,59 @@ function applyAppProfileFoundation0953(){
     const accessible=key==="nearby"?appLabel("nearbyRecords"):key==="search"?appLabel("searchRecords"):key==="photo"?`Take a photo for the selected ${appTerm("account",1,{lower:true})}`:label;
     button.setAttribute("aria-label",accessible);
   });
-  const theme=document.querySelector('meta[name="theme-color"]');if(theme)theme.setAttribute("content",APP_PROFILE.appearance.surface);
+  const theme=document.querySelector('meta[name="theme-color"]');if(theme)theme.setAttribute("content",ACTIVE_THEME_0958.chrome.themeColor);
+  applyModuleNavigation0955();
 }
 function recordTerm0954(count=1,lower=false){return appTerm("account",count,lower?{lower:true}:{});}
 function recordIdLabel0954(){return APP_PROFILE.terminology.recordId||`${recordTerm0954()} ID`;}
+
+/* Build 0.95.5 — module-aware navigation, routes, account tools, and Settings. */
+const ENABLED_MODULES_0955=new Set(APP_PROFILE.enabledModules||[]);
+function moduleEnabled0955(id){return ENABLED_MODULES_0955.has(String(id||""));}
+function moduleRequirementsMet0955(ids=[]){return moduleRequirementsMetFromBindings0955(ENABLED_MODULES_0955,ids);}
+function moduleAnyEnabled0955(ids=[]){return (ids||[]).some(moduleEnabled0955);}
+function settingsTabEnabled0955(id){return moduleRequirementsMet0955(SETTINGS_MODULE_REQUIREMENTS_0955[id]||[]);}
+function routeEnabled0955(name){return moduleRequirementsMet0955(ROUTE_MODULE_REQUIREMENTS_0955[name]||[]);}
+function moduleRouteFallback0955(){
+  if(moduleEnabled0955("core.search"))return "sites";
+  if(moduleEnabled0955("core.nearby"))return "home";
+  return "settings";
+}
+function resolveModuleRoute0955(name){
+  if(routeEnabled0955(name))return name;
+  if(["equipmentList","equipmentForm","tasks","taskForm","deficiencies","deficiencyForm","report","siteDocs","siteDocForm","jobMode"].includes(name) && moduleEnabled0955("core.records"))return "siteDetail";
+  return moduleRouteFallback0955();
+}
+function applyModuleNavigation0955(){
+  const controls=[
+    ["nav-home","nearby"],["nav-sites","search"],["nav-photo","photo"],["nav-settings","settings"],
+    ["homeNearbyNav069","nearby"],["homeAccounts069","search"],["homePhotoNav0950","photo"],["homeSettingsNav069","settings"]
+  ];
+  controls.forEach(([id,key])=>{const el=document.getElementById(id);if(!el)return;const enabled=moduleRequirementsMet0955(NAV_MODULE_REQUIREMENTS_0955[key]||[]);el.hidden=!enabled;el.toggleAttribute("aria-hidden",!enabled);});
+  [document.getElementById("appNav"),document.querySelector(".nearbyBottomNav069")].filter(Boolean).forEach(nav=>{
+    const count=Array.from(nav.children).filter(el=>!el.hidden).length||1;
+    nav.classList.add("fvModuleNav0955");nav.style.setProperty("--fv-module-nav-count",String(count));nav.dataset.moduleNavCount=String(count);
+  });
+}
+function recordFieldOn0956(id){return recordFieldEnabled(APP_PROFILE,id);}
+function moduleAccountTabs0955(){
+  return ACCOUNT_TAB_BINDINGS.filter(item=>recordDetailSectionEnabled(APP_PROFILE,item.key)&&moduleRequirementsMet0955(item.modules)).map(item=>[item.key,item.term?appTerm(item.term,2):item.label,item.modules]);
+}
+function normalizeAccountTabForModules0955(value){const tabs=moduleAccountTabs0955();return tabs.some(([key])=>key===value)?value:(tabs[0]?.[0]||"overview");}
+
+/* Build 0.95.7 — profile-defined actions and capture workflow presets. */
+const QUICK_PHOTO_WORKFLOW_0957=quickPhotoWorkflow(APP_PROFILE);
+function workflowActions0957(surface){return activeWorkflowActions(APP_PROFILE,surface);}
+function workflowActionOn0957(surface,id){return workflowActionEnabled(APP_PROFILE,surface,id);}
+function workflowActionCount0957(surface){return Math.max(1,workflowActions0957(surface).length);}
+function workflowActionStyle0957(surface){return `--fv-workflow-action-count:${workflowActionCount0957(surface)}`;}
+function workflowPhotoCategories0957(){return RECORD_PHOTO_CATEGORIES_0956.map(category=>category.label);}
+function workflowPhotoDefaultCategory0957(){
+  const configured=String(APP_PROFILE.workflows?.quickPhoto?.defaultCategoryId||"");
+  const match=RECORD_PHOTO_CATEGORIES_0956.find(category=>category.id===configured);
+  return match?.label||DEFAULT_PHOTO_CATEGORY_0956;
+}
+
 applyAppProfileFoundation0953();
 
 function fvPreferenceStore0739(){
@@ -134,7 +190,7 @@ function privacyHideContent0791(on){
 function privacyRemoveCurtain0791(){document.getElementById("fvPrivacyCurtain0791")?.remove();document.body?.classList.remove("fv-privacy-curtain0791");}
 function privacyShowCurtain0791(){
   if(document.getElementById("fvPrivacyCurtain0791")||document.getElementById("fvPrivacyLock0791"))return;
-  const curtain=document.createElement("div");curtain.id="fvPrivacyCurtain0791";curtain.className="fvPrivacyCurtain0791";curtain.innerHTML=`<img src="assets/favicon.png?v=${BUILD}" alt=""><strong>FIREVAULT</strong><span>Private workspace</span>`;document.body.appendChild(curtain);document.body.classList.add("fv-privacy-curtain0791");
+  const curtain=document.createElement("div");curtain.id="fvPrivacyCurtain0791";curtain.className="fvPrivacyCurtain0791";curtain.innerHTML=`<img src="${esc(themeBrandAsset(APP_PROFILE,"mark"))}?v=${BUILD}" alt=""><strong>${esc(APP_PROFILE.name.toUpperCase())}</strong><span>Private workspace</span>`;document.body.appendChild(curtain);document.body.classList.add("fv-privacy-curtain0791");
 }
 function privacyLockMessage0791(reason){return reason==="inactivity"?"FireVault locked after inactivity.":reason==="background"?"FireVault locked when the app left the foreground.":"Enter your local PIN to continue.";}
 function privacyShowLock0791(reason="manual"){
@@ -144,10 +200,10 @@ function privacyShowLock0791(reason="manual"){
   if(!overlay){overlay=document.createElement("div");overlay.id="fvPrivacyLock0791";overlay.className="fvPrivacyOverlay0791";document.body.appendChild(overlay);}
   privacyRecoveryMode0791=false;
   overlay.innerHTML=`<section class="fvPrivacyCard0791" role="dialog" aria-modal="true" aria-labelledby="fvPrivacyTitle0791">
-    <div class="fvPrivacyBrand0791"><img src="assets/favicon.png?v=${BUILD}" alt=""><div><span>FIREVAULT</span><small>LOCAL PRIVACY LOCK</small></div></div>
-    <div class="fvPrivacyShield0791" aria-hidden="true">⌾</div><h1 id="fvPrivacyTitle0791">FireVault Locked</h1><p id="fvPrivacyMessage0791">${esc(privacyLockMessage0791(reason))}</p>
+    <div class="fvPrivacyBrand0791"><img src="${esc(themeBrandAsset(APP_PROFILE,"mark"))}?v=${BUILD}" alt=""><div><span>${esc(APP_PROFILE.name.toUpperCase())}</span><small>LOCAL PRIVACY LOCK</small></div></div>
+    <div class="fvPrivacyShield0791" aria-hidden="true">⌾</div><h1 id="fvPrivacyTitle0791">${esc(APP_PROFILE.name)} Locked</h1><p id="fvPrivacyMessage0791">${esc(privacyLockMessage0791(reason))}</p>
     <label class="fvPrivacyInputLabel0791" for="fvPrivacyInput0791">6-digit PIN</label><input id="fvPrivacyInput0791" class="fvPrivacyInput0791" type="password" inputmode="numeric" autocomplete="off" maxlength="6" pattern="[0-9]*" aria-describedby="fvPrivacyError0791">
-    <p id="fvPrivacyError0791" class="fvPrivacyError0791" role="alert"></p><button class="primary fvPrivacyUnlock0791" id="fvPrivacyUnlock0791">Unlock FireVault</button>
+    <p id="fvPrivacyError0791" class="fvPrivacyError0791" role="alert"></p><button class="primary fvPrivacyUnlock0791" id="fvPrivacyUnlock0791">Unlock ${esc(APP_PROFILE.name)}</button>
     <button class="ghost fvPrivacyRecoveryToggle0791" id="fvPrivacyRecoveryToggle0791">Use recovery code</button><small class="fvPrivacyFoot0791">This local lock reduces casual access on this device. It is not cloud login, encryption, or server-enforced authorization.</small>
   </section>`;
   const input=document.getElementById("fvPrivacyInput0791"),button=document.getElementById("fvPrivacyUnlock0791"),toggle=document.getElementById("fvPrivacyRecoveryToggle0791");
@@ -267,11 +323,15 @@ let docPhotoDraftDataUrl512 = "";
 let docPhotoDraftName512 = "";
 let docPhotoClearRequested512 = false;
 
+/* Build 0.95.6 — profile-defined record fields, sections, and photo categories. */
+const RECORD_PHOTO_CATEGORIES_0956=recordPhotoCategories(APP_PROFILE);
+const DEFAULT_PHOTO_CATEGORY_0956=RECORD_PHOTO_CATEGORIES_0956[0]?.label||"Other";
+
 /* Build 0.95.0 — account-aware quick photo capture from bottom navigation. */
 let quickPhotoInput0950=null;
 let quickPhotoOverlay0950=null;
 let quickPhotoPicker0950=null;
-let quickPhotoDraft0950={dataUrl:"",name:"",accountId:"",category:"Panel",useOverlay:true,includeReport:false};
+let quickPhotoDraft0950={dataUrl:"",name:"",accountId:"",category:DEFAULT_PHOTO_CATEGORY_0956,useOverlay:QUICK_PHOTO_WORKFLOW_0957.defaultUseOverlay,includeReport:QUICK_PHOTO_WORKFLOW_0957.defaultIncludeReport};
 const QUICK_PHOTO_LAST_ACCOUNT_KEY0950="firevault_quick_photo_account_0950";
 const QUICK_PHOTO_LAST_CATEGORY_KEY0950="firevault_quick_photo_category_0950";
 let taskFilter = "open";
@@ -351,18 +411,8 @@ const OVERLAY_TAGS_510 = [
   ["{gps}","GPS","Saved GPS coordinates"],
   ["{build}","Build","Current FireVault build number"]
 ];
-const PHOTO_CATEGORIES_524 = [...APP_PROFILE.defaultPhotoCategories];
-const PHOTO_CATEGORY_HINTS_524 = {
-  Panel:"Panel cabinet, display, trouble state, or wiring overview.",
-  NAC:"Horn/strobe circuit, EOL, module, or notification appliance wiring.",
-  Device:"Smoke, pull station, duct detector, module, tamper, flow, or other field device.",
-  Communicator:"Cellular/IP communicator, antenna, signal screen, or wiring.",
-  Battery:"Batteries, date codes, charger readings, or cabinet condition.",
-  Deficiency:"Problem condition, damage, missing device, access issue, or failed test evidence.",
-  Before:"Before repair or before cleanup documentation.",
-  After:"After repair, restore, cleanup, or completion documentation.",
-  Other:"General site photo."
-};
+const PHOTO_CATEGORIES_524 = RECORD_PHOTO_CATEGORIES_0956.map(category=>category.label);
+const PHOTO_CATEGORY_HINTS_524 = Object.fromEntries(RECORD_PHOTO_CATEGORIES_0956.map(category=>[category.label,category.hint]));
 const REPORT_SECTION_KEY = "firevault_report_section_prefs";
 let reportSectionPrefs = loadReportSectionPrefs();
 const appEl = document.getElementById("app");
@@ -499,12 +549,12 @@ function scrollCurrentRouteToTop0782(){
 }
 function updateRouteContext0782(){
   const title=routeTitle0782();
-  document.title=title==="FireVault"?"FireVault":`${title} — FireVault`;
+  document.title=title===APP_PROFILE.name?APP_PROFILE.name:`${title} — ${APP_PROFILE.name}`;
   appEl.setAttribute("aria-label",title);
   appEl.dataset.fvRouteTitle=title;
 }
 function fireVaultBrand575(extraClass=""){
-  return `<span class="fireVaultWordmark575 ${esc(extraClass)}"><span>FIRE</span><b>VAULT</b></span>`;
+  return themeWordmarkMarkup(APP_PROFILE,extraClass);
 }
 function fvIcon073(name, extraClass=""){
   const icons={
@@ -867,6 +917,7 @@ document.querySelectorAll("#appNav button, .nearbyBottomNav069 button").forEach(
   const target=btn.dataset.route;
   if(!target) return;
   if(target==="photo"){
+    if(!moduleEnabled0955("core.photos")){toast("Photo capture is not enabled for this app profile.");return;}
     quickPhotoStart0950();
     return;
   }
@@ -934,6 +985,9 @@ function val(id){ return document.getElementById(id)?.value?.trim() || ""; }
 function raw(id){ return document.getElementById(id)?.value || ""; }
 function checked(id){ return !!document.getElementById(id)?.checked; }
 function route(v){
+  const requestedRoute0955=v;
+  v=resolveModuleRoute0955(v);
+  if(v!==requestedRoute0955) toast("That module is not enabled for this app profile.");
   const retiredRoutes0900=new Set(["tools","documentScanner","routeLog","serviceVisit","diagnostics","dataTools"]);
   if(retiredRoutes0900.has(v)){
     toast("That retired workspace is not included in FireVault 1.0.");
@@ -1922,6 +1976,7 @@ function applyRoutePolishClass0780(){
 
 function render(){
   try{
+    view=resolveModuleRoute0955(view);
     const nextScrollKey0782=routeScrollKey0782();
     if(lastRenderedScrollKey0782 && lastRenderedScrollKey0782===nextScrollKey0782) captureRouteScroll0782(lastRenderedScrollKey0782);
     applyRoutePolishClass0780();
@@ -1939,6 +1994,7 @@ function render(){
     document.body.classList.toggle("settingsChrome572", view === "settings");
     if(view !== "settings") document.body.classList.remove("settingsChrome572");
     applyFeatureVisibility();
+    applyModuleNavigation0955();
     setActiveNav();
     injectContextualHelp060();
     applyRoutePolishClass0780();
@@ -2447,7 +2503,7 @@ function dashboard068(){
   const dateLine = now.toLocaleDateString([], {weekday:"long", month:"long", day:"numeric"});
   html(`<div class="screen homeScreen476 homeScreen478 homeMilestone5100 ${siteSearch?"homeSearchMode484":""}">
     <div class="homeChrome478 homeChrome493">
-      <div class="brand478 brand493"><img src="assets/favicon.png?v=${BUILD}" alt="FireVault"><strong>${fireVaultBrand575("homeWordmark575")}</strong></div>
+      <div class="brand478 brand493"><img src="${esc(themeBrandAsset(APP_PROFILE,"mark"))}?v=${BUILD}" alt="FireVault"><strong>${fireVaultBrand575("homeWordmark575")}</strong></div>
       <button class="homeBuildPill481 homeBuildPill493" id="homeBell478" aria-label="Release notes"><span></span>${BUILD}</button>
       <button class="homeIcon478 settingsIcon493 stackedMenu553" id="modulesTopBtn476" aria-label="Settings">☰</button>
     </div>
@@ -2695,7 +2751,7 @@ function home(){
   const categoryCounts070=nearbyCategoryCounts070(allRows);
   const categoryOptions070=Object.entries(NEARBY_CATEGORY_META_070).map(([key,item])=>`<option value="${key}" ${nearbyCategoryFilter070===key?'selected':''}>${esc(item.label)} (${categoryCounts070[key]||0})</option>`).join('');
   html(`<div class="screen nearbyHome069">
-    <section class="nearbyTop069"><div class="nearbyLogo069"><img src="assets/favicon.png?v=${BUILD}" alt=""><strong>${fireVaultBrand575()}</strong></div>${todayHeader070()}</section>
+    <section class="nearbyTop069"><div class="nearbyLogo069"><img src="${esc(themeBrandAsset(APP_PROFILE,"mark"))}?v=${BUILD}" alt=""><strong>${fireVaultBrand575()}</strong></div>${todayHeader070()}</section>
     <section class="nearbyCompactHead069">
       <div class="nearbyCompactTitle069"><h1>${esc(appLabel("nearbyRecords"))}</h1><span><i></i>${esc(gpsText)}</span></div>
       <div class="nearbyCompactActions069"><button class="nearbyViewToggle069" id="nearbyViewToggle069" aria-label="Switch between map and list">${fvIcon073(homeNearbyView069==='map'?'map':'list','fvToggleIcon073')}<b>${homeNearbyView069==='map'?'MAP':'LIST'}</b></button><label class="nearbyCategoryFilter070 category-${nearbyCategoryFilter070}" aria-label="Filter nearby accounts by communicator category" title="Filter: ${esc(NEARBY_CATEGORY_META_070[nearbyCategoryFilter070]?.label||'All')}"><span class="nearbyFilterGlyph0714" aria-hidden="true"></span><select id="nearbyCategoryFilter070" aria-label="Nearby account category filter">${categoryOptions070}</select></label></div>
@@ -2709,7 +2765,7 @@ function home(){
     <nav class="nearbyBottomNav069 fvNavThree0733"><button class="active" id="homeNearbyNav069" aria-label="Refresh nearby ${esc(recordTerm0954(2,true))} using current GPS">${fvIcon073("nearby","fvNavIcon073")}<span>Nearby</span></button><button id="homeAccounts069" aria-label="${esc(appLabel("searchRecords"))}">${fvIcon073("search","fvNavIcon073")}<span>Search</span></button><button id="homePhotoNav0950" aria-label="Take a photo for the selected ${esc(recordTerm0954(1,true))}">${fvIcon073("photo","fvNavIcon073")}<span>Photo</span></button><button id="homeSettingsNav069" aria-label="Open Settings">${fvIcon073("settings","fvNavIcon073")}<span>Settings</span></button></nav>
   </div>`);
   document.getElementById('homeAccounts069').onclick=()=>route('sites');
-  document.getElementById('homePhotoNav0950').onclick=()=>quickPhotoStart0950();
+  document.getElementById('homePhotoNav0950').onclick=()=>{if(moduleEnabled0955("core.photos"))quickPhotoStart0950();};
   document.getElementById('homeSettingsNav069').onclick=()=>route('settings');
   const refreshNearbyHome0714=()=>{resetNearbyMapOverview069(false);runNearbyScan0652('home');};
   document.getElementById('homeNearbyNav069').onclick=refreshNearbyHome0714;
@@ -3314,6 +3370,7 @@ function accountDirectoryRow0759(s,addressCount=1){
   if(healthBadge) issueTags.push(`<span class="${healthBadge.cls}">${esc(healthBadge.label)}</span>`);
   if(work.score>0&&work.label) issueTags.push(`<span class="${work.cls}">${esc(work.label)}</span>`);
   const issueMarkup=issueTags.length?`<div class="accountRowIssues0951">${issueTags.join("")}</div>`:"";
+  const directoryActionIds=new Set(workflowActions0957("directory").map(action=>action.id));
   return `<article class="accountCard0871 accountRow0951 category-${category}" data-account-card0759 data-id="${esc(s.id)}" data-search="${esc(siteSearchBlob(s))}" data-letter0763="${esc(initial)}" role="button" tabindex="0" aria-label="Open ${esc(s.name||recordLower)}, ${esc(address)}">
     <div class="accountRowBody0951">
       <div class="accountRowMark0951" aria-hidden="true">${esc(initial)}</div>
@@ -3328,11 +3385,12 @@ function accountDirectoryRow0759(s,addressCount=1){
         </div>
       </div>
     </div>
-    <div class="accountRowActions0951" aria-label="${esc(appLabel("recordActions"))}">
-      <button type="button" data-account-call0762="${esc(s.id)}" ${phone?"":"disabled"} aria-label="Call ${esc(s.name||recordLower)}">${fvIcon073("call","accountCardIcon0871")}<span>Call</span></button>
-      <button type="button" data-account-route0762="${esc(s.id)}" ${gpsReady?"":"disabled"} aria-label="Route to ${esc(s.name||recordLower)}">${fvIcon073("route","accountCardIcon0871")}<span>Route</span></button>
-      <button type="button" data-account-note0877="${esc(s.id)}" aria-label="Add note to ${esc(s.name||recordLower)}">${fvIcon073("note","accountCardIcon0871")}<span>Add Note</span></button>
-      <button type="button" class="accountFavorite0871 ${pinned?"active":""}" data-account-favorite0761="${esc(s.id)}" aria-pressed="${pinned?"true":"false"}" aria-label="${pinned?"Remove":"Add"} favorite">${pinned?"★":"☆"}<span>Favorite</span></button>
+    <div class="accountRowActions0951 workflowActions0957" style="${workflowActionStyle0957("directory")}" aria-label="${esc(appLabel("recordActions"))}">
+      ${directoryActionIds.has("call")?`<button type="button" data-account-call0762="${esc(s.id)}" ${phone?"":"disabled"} aria-label="Call ${esc(s.name||recordLower)}">${fvIcon073("call","accountCardIcon0871")}<span>Call</span></button>`:""}
+      ${directoryActionIds.has("route")?`<button type="button" data-account-route0762="${esc(s.id)}" ${gpsReady?"":"disabled"} aria-label="Route to ${esc(s.name||recordLower)}">${fvIcon073("route","accountCardIcon0871")}<span>Route</span></button>`:""}
+      ${directoryActionIds.has("note")?`<button type="button" data-account-note0877="${esc(s.id)}" aria-label="Add note to ${esc(s.name||recordLower)}">${fvIcon073("note","accountCardIcon0871")}<span>Add Note</span></button>`:""}
+      ${directoryActionIds.has("photo")?`<button type="button" data-account-photo0957="${esc(s.id)}" aria-label="Take photo for ${esc(s.name||recordLower)}">${fvIcon073("photo","accountCardIcon0871")}<span>Photo</span></button>`:""}
+      ${directoryActionIds.has("favorite")?`<button type="button" class="accountFavorite0871 ${pinned?"active":""}" data-account-favorite0761="${esc(s.id)}" aria-pressed="${pinned?"true":"false"}" aria-label="${pinned?"Remove":"Add"} favorite">${pinned?"★":"☆"}<span>Favorite</span></button>`:""}
     </div>
   </article>`;
 }
@@ -3550,6 +3608,13 @@ function sites(){
       selectedSiteId=target.id;
       addSiteNotePrompt();
       return;
+    }
+    const photoButton=event.target.closest("[data-account-photo0957]");
+    if(photoButton){
+      event.preventDefault();event.stopPropagation();
+      const target=(data.sites||[]).find(s=>s.id===photoButton.dataset.accountPhoto0957);
+      if(!target){toast(`That ${recordLower} is no longer available.`);return;}
+      selectedSiteId=target.id;quickPhotoStart0950(target.id);return;
     }
     const favorite=event.target.closest("[data-account-favorite0761]");
     if(favorite){
@@ -4063,8 +4128,8 @@ function accountCategoryLabel0735(s={}){
 function accountTabPreference0751(){
   try{
     const value=sessionStorage.getItem("firevault_account_tab_0751");
-    return ["overview","details","locations","equipment","docs","notes"].includes(value)?value:"overview";
-  }catch{return "overview";}
+    return normalizeAccountTabForModules0955(value);
+  }catch{return normalizeAccountTabForModules0955("overview");}
 }
 function rememberAccountTab0751(value){
   try{sessionStorage.setItem("firevault_account_tab_0751",value);}catch{}
@@ -4099,15 +4164,15 @@ function accountRecentActivity0735(s={},limit=5){
   const rows=[];
   const add=(at,kind,title,detail,routeName)=>{const t=new Date(at||0).getTime();if(Number.isFinite(t)&&t>0)rows.push({t,kind,title,detail,routeName});};
   (s.visits||[]).forEach(v=>add(v.endedAt||v.startedAt||v.date,"visit","Service visit",visitNotesPreview(v,1),"visits"));
-  (s.deficiencies||[]).forEach(d=>add(d.createdAt||d.updatedAt,"deficiency",d.title||"Deficiency",`${d.priority||"Normal"} • ${d.status||"Open"}`,"deficiencies"));
-  (s.tasks||[]).forEach(t=>add(t.createdAt||t.updatedAt,"task",t.title||"Task",t.status||"Open","tasks"));
-  (s.docs||[]).forEach(d=>add(d.createdAt||d.updatedAt,"document",d.title||d.imageName||"Document",docIsScan0800(d)?`${d.scanPageCount||d.scanPages.length}-page scan added`:docHasPhoto512(d)?"Photo added":"Document added","siteDocs"));
-  (s.noteEntries||[]).filter(n=>n.type==="Building Location").forEach(n=>add(n.createdAt,"location","Building location",n.note||"Location updated","locations"));
+  if(moduleEnabled0955("optional.deficiencies"))(s.deficiencies||[]).forEach(d=>add(d.createdAt||d.updatedAt,"deficiency",d.title||appTerm("deficiency",1),`${d.priority||"Normal"} • ${d.status||"Open"}`,"deficiencies"));
+  if(moduleEnabled0955("optional.tasks"))(s.tasks||[]).forEach(t=>add(t.createdAt||t.updatedAt,"task",t.title||appTerm("task",1),t.status||"Open","tasks"));
+  if(moduleEnabled0955("core.files"))(s.docs||[]).forEach(d=>add(d.createdAt||d.updatedAt,"document",d.title||d.imageName||appTerm("file",1),docIsScan0800(d)?`${d.scanPageCount||d.scanPages.length}-page scan added`:docHasPhoto512(d)?"Photo added":"Document added","siteDocs"));
+  if(moduleEnabled0955("core.locationNavigator"))(s.noteEntries||[]).filter(n=>n.type==="Building Location").forEach(n=>add(n.createdAt,"location",`${appTerm("location",1)} saved`,n.note||`${appTerm("location",1)} updated`,"locations"));
   return rows.sort((a,b)=>b.t-a.t).slice(0,limit);
 }
 function accountRecentMarkup0735(s={}){
   const rows=accountRecentActivity0735(s,6);
-  if(!rows.length) return `<div class="accountEmptyState0735"><strong>No recent activity</strong><span>Visits, tasks, deficiencies, photos, and documents will appear here.</span></div>`;
+  if(!rows.length) return `<div class="accountEmptyState0735"><strong>No recent activity</strong><span>Activity from enabled modules will appear here.</span></div>`;
   const icons={visit:"✓",deficiency:"!",task:"□",document:"▣",location:"⌖"};
   return `<div class="accountRecentList0735">${rows.map(r=>`<button data-account-activity0735="${esc(r.routeName)}"><span class="kind-${esc(r.kind)}">${icons[r.kind]||"•"}</span><div><strong>${esc(r.title)}</strong><small>${esc(new Date(r.t).toLocaleDateString([], {month:"short",day:"numeric",year:"numeric"}))}${r.detail?` • ${esc(r.detail)}`:""}</small></div><b>›</b></button>`).join("")}</div>`;
 }
@@ -4173,15 +4238,16 @@ function accountDocsTab0735(s){
       ${photos.length?`<div class="accountPhotoGrid0735">${photos.slice(0,8).map(d=>`<button class="accountPhotoThumb523" data-doc="${esc(d.id)}">${docPhotoThumb512(d)}<span>${esc(d.title||d.imageName||"Photo")}</span></button>`).join("")}</div>`:`<div class="accountEmptyState0735"><strong>No photos saved</strong><span>Add panel, device, wiring, deficiency, or completed-work photos.</span></div>`}
     </section>
     <section class="accountPanel0735"><div class="accountPanelHead0735"><div><span>FILES</span><h2>${docs.length} Saved Item${docs.length===1?"":"s"}</h2></div><button class="ghost" id="manageDocsBtn">Manage</button></div>
-      <div class="accountDocActions0735"><button id="reportBtn"><span>▤</span><strong>Report</strong><small>Customer closeout</small></button><button id="checklistBtn"><span>✓</span><strong>Checklist</strong><small>Inspection workflow</small></button><button id="qaCloseout544"><span>↗</span><strong>Copy Closeout</strong><small>Customer packet</small></button></div>
+      ${moduleEnabled0955("optional.reports")?`<div class="accountDocActions0735"><button id="reportBtn"><span>▤</span><strong>Report</strong><small>Customer closeout</small></button><button id="checklistBtn"><span>✓</span><strong>Checklist</strong><small>Inspection workflow</small></button><button id="qaCloseout544"><span>↗</span><strong>Copy Closeout</strong><small>Customer packet</small></button></div>`:""}
     </section>
   </div>`;
 }
 function accountNotesTab0735(s,ctx){
   const {health,lastVisit,def,open}=ctx;
+  const notesActionIds=new Set(workflowActions0957("notes").map(action=>action.id));
   return `<div class="accountTabPanel0735">
     <section class="accountPanel0735"><div class="accountPanelHead0735"><div><span>SITE NOTES</span><h2>Technician Notes</h2></div><button class="primary" id="addSiteNoteBtn491">＋ Add Note</button></div><div class="accountNotesBody0735">${esc(s.notes||"No notes entered.")}</div><div class="accountNoteDocActions0800"><button class="ghost accountWideButton0735" id="openSiteNotesBtn494">Open Full Notes Workspace</button></div></section>
-    <section class="accountQuickBar0735 accountWorkActions0735"><button id="qaAddTask544"><span>□</span><strong>Task</strong></button><button id="qaAddDef544"><span>!</span><strong>Deficiency</strong></button><button id="qaAddPhoto544"><span>▣</span><strong>Photo</strong></button><button id="qaReport544"><span>▤</span><strong>Report</strong></button></section>
+    <section class="accountQuickBar0735 accountWorkActions0735 moduleActions0955 workflowActions0957" style="${workflowActionStyle0957("notes")}">${notesActionIds.has("task")?`<button id="qaAddTask544"><span>□</span><strong>${esc(appTerm("task",1))}</strong></button>`:""}${notesActionIds.has("deficiency")?`<button id="qaAddDef544"><span>!</span><strong>${esc(appTerm("deficiency",1))}</strong></button>`:""}${notesActionIds.has("photo")?`<button id="qaAddPhoto544"><span>▣</span><strong>Photo</strong></button>`:""}${notesActionIds.has("report")?`<button id="qaReport544"><span>▤</span><strong>Report</strong></button>`:""}</section>
     <section class="accountPanel0735"><div class="accountPanelHead0735"><div><span>RECENT VISIT</span><h2>${esc(lastVisit?visitDateLabel(lastVisit):"No completed visits")}</h2></div>${lastVisit?`<button class="ghost" id="allVisitsBtn">History</button>`:""}</div>${lastVisit?`<p class="accountVisitPreview0735">${esc(visitNotesPreview(lastVisit,3))}</p>`:`<div class="accountEmptyState0735"><span>Start a service visit to create an account history.</span></div>`}</section>
     ${featureOn("siteTimeline")?siteActivityTimelineMarkup557(s):""}
   </div>`;
@@ -4192,11 +4258,11 @@ function siteDetail(){
   const recordSingular=recordTerm0954(),recordLower=recordTerm0954(1,true),recordIdLabel=recordIdLabel0954();
   const s=site(); if(!s){route("sites");return;}
   if(accountDetailSite0735!==s.id){accountDetailSite0735=s.id;accountDetailTab0735=accountTabPreference0751();s.lastOpenedAt=new Date().toISOString();saveData(data);}
-  const open=(s.tasks||[]).filter(t=>(t.status||"Open")!=="Done").length;
-  const def=(s.deficiencies||[]).filter(d=>(d.status||"Open")!=="Closed").length;
+  const open=moduleEnabled0955("optional.tasks")?(s.tasks||[]).filter(t=>(t.status||"Open")!=="Done").length:0;
+  const def=moduleEnabled0955("optional.deficiencies")?(s.deficiencies||[]).filter(d=>(d.status||"Open")!=="Closed").length:0;
   const siteVisits=Array.isArray(s.visits)?s.visits:[];
-  const equipment=Array.isArray(s.equipment)?s.equipment:[];
-  const docs=Array.isArray(s.docs)?s.docs:[];
+  const equipment=moduleEnabled0955("optional.equipment")&&Array.isArray(s.equipment)?s.equipment:[];
+  const docs=moduleEnabled0955("core.files")&&Array.isArray(s.docs)?s.docs:[];
   const health=siteHealth(s);
   const lastVisit=siteVisits[0];
   const panel=[s.panelManufacturer,s.panelModel].filter(Boolean).join(" ")||"Panel not entered";
@@ -4207,10 +4273,12 @@ function siteDetail(){
   const phone=formatPhone0758(primary?.phone||s.sitePhone)||"";
   const address=fullAddress(s)||"No address saved";
   const category=accountCategory070(s);
-  const tabs=[["overview","Overview"],["notes","Notes"],["locations","Locations"],["equipment","Equipment"],["docs","Files"],["details","Details"]];
+  const tabs=moduleAccountTabs0955();
+  accountDetailTab0735=normalizeAccountTabForModules0955(accountDetailTab0735);
   const panelMarkup=accountDetailTab0735==="details"?accountDetailsTab0735(s,ctx):accountDetailTab0735==="locations"?accountLocationsTab07912(s):accountDetailTab0735==="equipment"?accountEquipmentTab0735(s):accountDetailTab0735==="docs"?accountDocsTab0735(s):accountDetailTab0735==="notes"?accountNotesTab0735(s,ctx):accountOverviewTab0735(s,ctx);
   const issueMarkup=(open||def)?`<div class="accountIssueStrip0952">${open?`<button type="button" id="taskBtn"><strong>${open}</strong><span>Open task${open===1?"":"s"}</span></button>`:""}${def?`<button type="button" class="danger" id="defBtn"><strong>${def}</strong><span>Deficienc${def===1?"y":"ies"}</span></button>`:""}</div>`:"";
   const tagMarkup=accountTagChips0737(s,6);
+  const detailActionIds=new Set(workflowActions0957("detailPrimary").map(action=>action.id));
   html(`<div class="screen accountDetail0871 accountDetail0952">
     <section class="accountDetailHeader0952 category-${category}">
       <header class="accountDetailTop0871 accountDetailTop0952">
@@ -4227,11 +4295,11 @@ function siteDetail(){
         ${issueMarkup}
         ${tagMarkup?`<div class="accountTags0871 accountTags0952">${tagMarkup}</div>`:""}
       </div>
-      <section class="accountActionGrid0871 accountActionGrid0952" aria-label="${esc(appLabel("recordActions"))}">
-        <button id="detailCall0871" ${phone?"":"disabled"}>${fvIcon073("call","accountActionIcon0871")}<span>Call</span></button>
-        <button id="detailRoute0871" ${hasGps(s)?"":"disabled"}>${fvIcon073("route","accountActionIcon0871")}<span>Route</span></button>
-        <button id="detailNote0871">${fvIcon073("note","accountActionIcon0871")}<span>Add Note</span></button>
-        <button id="detailPhoto0952">${fvIcon073("photo","accountActionIcon0871")}<span>Photo</span></button>
+      <section class="accountActionGrid0871 accountActionGrid0952 moduleActions0955 workflowActions0957" style="${workflowActionStyle0957("detailPrimary")}" aria-label="${esc(appLabel("recordActions"))}">
+        ${detailActionIds.has("call")?`<button id="detailCall0871" ${phone?"":"disabled"}>${fvIcon073("call","accountActionIcon0871")}<span>Call</span></button>`:""}
+        ${detailActionIds.has("route")?`<button id="detailRoute0871" ${hasGps(s)?"":"disabled"}>${fvIcon073("route","accountActionIcon0871")}<span>Route</span></button>`:""}
+        ${detailActionIds.has("note")?`<button id="detailNote0871">${fvIcon073("note","accountActionIcon0871")}<span>Add ${esc(appTerm("note",1))}</span></button>`:""}
+        ${detailActionIds.has("photo")?`<button id="detailPhoto0952">${fvIcon073("photo","accountActionIcon0871")}<span>Photo</span></button>`:""}
       </section>
       <nav class="accountTabs0871 accountTabs0952" aria-label="${esc(appLabel("recordSections"))}">${tabs.map(([key,label])=>`<button class="${accountDetailTab0735===key?"active":""}" data-account-tab0735="${key}" aria-current="${accountDetailTab0735===key?"page":"false"}"><span>${label}</span></button>`).join("")}</nav>
     </section>
@@ -4296,7 +4364,7 @@ function siteDetail(){
   wireImportantSiteInfo568();wireSiteBrief556();wireSiteActivity557();
   requestAnimationFrame(setActiveNav);
 }
-function photoCategory524(d={}){ return d.photoCategory || (docHasPhoto512(d) ? "Panel" : ""); }
+function photoCategory524(d={}){ return d.photoCategory || (docHasPhoto512(d) ? DEFAULT_PHOTO_CATEGORY_0956 : ""); }
 function photoReportSelected526(d={}){ return !!(d && d.imageData && d.includeInCustomerReport === true); }
 function reportPhotos526(s={}){ return (s.docs||[]).filter(photoReportSelected526); }
 function reportPhotoLabel526(d={}){ return [photoCategory524(d)||"Photo", d.title||d.imageName||"Account Photo"].filter(Boolean).join(" • "); }
@@ -4593,10 +4661,10 @@ function selectedReportPhotosText526(s={}){
 }
 
 function photoCategoryHint524(cat){ return PHOTO_CATEGORY_HINTS_524[cat] || PHOTO_CATEGORY_HINTS_524.Other; }
-function photoCategoryChips524(active="Panel"){
+function photoCategoryChips524(active=DEFAULT_PHOTO_CATEGORY_0956){
   return `<div class="photoCategoryGrid524">${PHOTO_CATEGORIES_524.map(cat=>`<button type="button" class="photoCategoryChip524 ${active===cat?"active":""}" data-photo-category="${esc(cat)}"><strong>${esc(cat)}</strong><span>${esc(photoCategoryHint524(cat))}</span></button>`).join("")}</div>`;
 }
-function selectedPhotoCategory524(){ return document.querySelector(".photoCategoryChip524.active")?.dataset.photoCategory || val("docPhotoCategory524") || "Panel"; }
+function selectedPhotoCategory524(){ return document.querySelector(".photoCategoryChip524.active")?.dataset.photoCategory || val("docPhotoCategory524") || DEFAULT_PHOTO_CATEGORY_0956; }
 function setPhotoCategory524(cat){
   const hidden=document.getElementById("docPhotoCategory524");
   if(hidden) hidden.value=cat;
@@ -4655,7 +4723,7 @@ function safePhotoFileBase512(s,d){
 }
 function docPhotoPreviewMarkup512(d={}){
   const src=docPhotoDraftDataUrl512 || d.imageData || "";
-  const currentCategory=photoCategory524(d)||"Panel";
+  const currentCategory=photoCategory524(d)||DEFAULT_PHOTO_CATEGORY_0956;
   const useOverlay = d.useOverlayOnSave !== false;
   return `<div class="docPhotoManager512 docPhotoManager513 docPhotoManager524">
     <div class="docPhotoHead512 docPhotoHead524"><div><strong>Account Photo</strong><span>Take Photo / Upload Photo, choose a category, add notes, then save it to this account.</span></div><button type="button" class="ghost smallBtn" id="openOverlaySettings512">Overlay Settings</button></div>
@@ -4817,7 +4885,7 @@ function wireDocPhotoControls512(d={}){
   if(down) down.onclick=()=>downloadPhotoWithOverlay512({...(d||{}),title:val("docTitle")||d.title||"Site Photo",imageData:docPhotoDraftDataUrl512||d.imageData});
   const original=document.getElementById("downloadOriginalPhoto513");
   if(original) original.onclick=()=>downloadOriginalPhoto513({...(d||{}),title:val("docTitle")||d.title||"Site Photo",imageData:docPhotoDraftDataUrl512||d.imageData});
-  document.querySelectorAll(".photoCategoryChip524").forEach(b=>b.onclick=()=>setPhotoCategory524(b.dataset.photoCategory||"Panel"));
+  document.querySelectorAll(".photoCategoryChip524").forEach(b=>b.onclick=()=>setPhotoCategory524(b.dataset.photoCategory||DEFAULT_PHOTO_CATEGORY_0956));
   const settingsBtn=document.getElementById("openOverlaySettings512");
   if(settingsBtn) settingsBtn.onclick=()=>{ settingsTab="overlay"; mode="settingsDetail"; route("settings"); };
 }
@@ -4926,7 +4994,7 @@ function quickPhotoReadSafe0950(key,fallback=""){
 function quickPhotoWriteSafe0950(key,value){try{localStorage.setItem(key,String(value||""));}catch{}}
 function quickPhotoAccountById0950(id){return (data.sites||[]).find(account=>account.id===id)||null;}
 function quickPhotoCurrentAccount0950(){
-  const ids=[selectedSiteId,view==="home"?homeNearbySelected069:"",quickPhotoReadSafe0950(QUICK_PHOTO_LAST_ACCOUNT_KEY0950,"")];
+  const ids=[selectedSiteId,view==="home"?homeNearbySelected069:"",QUICK_PHOTO_WORKFLOW_0957.rememberAccount?quickPhotoReadSafe0950(QUICK_PHOTO_LAST_ACCOUNT_KEY0950,""):""];
   for(const id of ids){const account=quickPhotoAccountById0950(id);if(account)return account;}
   return null;
 }
@@ -4937,15 +5005,18 @@ function quickPhotoAccountMeta0950(account){
 function quickPhotoEnsureInput0950(){
   if(quickPhotoInput0950?.isConnected)return quickPhotoInput0950;
   const input=document.createElement("input");
-  input.type="file";input.accept="image/*";input.setAttribute("capture","environment");input.hidden=true;input.id="quickPhotoInput0950";
+  input.type="file";input.accept="image/*";if(QUICK_PHOTO_WORKFLOW_0957.cameraFacing!=="none")input.setAttribute("capture",QUICK_PHOTO_WORKFLOW_0957.cameraFacing);input.hidden=true;input.id="quickPhotoInput0950";
   input.addEventListener("change",quickPhotoFileSelected0950);
   document.body.appendChild(input);quickPhotoInput0950=input;return input;
 }
 function quickPhotoStart0950(accountId=""){
   const account=quickPhotoAccountById0950(accountId)||quickPhotoCurrentAccount0950();
   if(!account){quickPhotoOpenAccountPicker0950(null,true);return;}
-  quickPhotoDraft0950={dataUrl:"",name:"",accountId:account.id,category:quickPhotoReadSafe0950(QUICK_PHOTO_LAST_CATEGORY_KEY0950,"Panel")||"Panel",useOverlay:true,includeReport:false};
-  quickPhotoWriteSafe0950(QUICK_PHOTO_LAST_ACCOUNT_KEY0950,account.id);
+  const categories=workflowPhotoCategories0957();
+  const fallbackCategory=workflowPhotoDefaultCategory0957();
+  const rememberedCategory=QUICK_PHOTO_WORKFLOW_0957.rememberCategory?quickPhotoReadSafe0950(QUICK_PHOTO_LAST_CATEGORY_KEY0950,fallbackCategory):fallbackCategory;
+  quickPhotoDraft0950={dataUrl:"",name:"",accountId:account.id,category:categories.includes(rememberedCategory)?rememberedCategory:fallbackCategory,useOverlay:Boolean(QUICK_PHOTO_WORKFLOW_0957.defaultUseOverlay),includeReport:Boolean(QUICK_PHOTO_WORKFLOW_0957.defaultIncludeReport)};
+  if(QUICK_PHOTO_WORKFLOW_0957.rememberAccount)quickPhotoWriteSafe0950(QUICK_PHOTO_LAST_ACCOUNT_KEY0950,account.id);
   const input=quickPhotoEnsureInput0950();input.value="";input.click();
 }
 function quickPhotoLoadBitmap0950(file){
@@ -4959,11 +5030,11 @@ async function quickPhotoResize0950(file){
     source=await loadImage512(url);
   }
   try{
-    const width=source.width||source.naturalWidth||1,height=source.height||source.naturalHeight||1,maxSide=2048,scale=Math.min(1,maxSide/Math.max(width,height));
+    const width=source.width||source.naturalWidth||1,height=source.height||source.naturalHeight||1,maxSide=QUICK_PHOTO_WORKFLOW_0957.maxImageDimension,scale=Math.min(1,maxSide/Math.max(width,height));
     const outW=Math.max(1,Math.round(width*scale)),outH=Math.max(1,Math.round(height*scale));
     const canvas=document.createElement("canvas");canvas.width=outW;canvas.height=outH;
     const ctx=canvas.getContext("2d",{alpha:false});ctx.fillStyle="#000";ctx.fillRect(0,0,outW,outH);ctx.drawImage(source,0,0,outW,outH);
-    let quality=.86,result=canvas.toDataURL("image/jpeg",quality);
+    let quality=QUICK_PHOTO_WORKFLOW_0957.jpegQuality,result=canvas.toDataURL("image/jpeg",quality);
     while(result.length>4300000&&quality>.62){quality-=.06;result=canvas.toDataURL("image/jpeg",quality);}
     return {dataUrl:result,width:outW,height:outH};
   }finally{try{source.close?.();}catch{}cleanup();}
@@ -4980,36 +5051,45 @@ async function quickPhotoFileSelected0950(event){
 }
 function quickPhotoCloseReview0950(){quickPhotoOverlay0950?.remove();quickPhotoOverlay0950=null;}
 function quickPhotoReviewAccountMarkup0950(account){
-  return `<button type="button" class="quickPhotoAccount0950" id="quickPhotoChangeAccount0950"><span>${esc(account?.name||appLabel("chooseRecord"))}</span><small>${esc(quickPhotoAccountMeta0950(account))}</small><b>Change</b></button>`;
+  const content=`<span>${esc(account?.name||appLabel("chooseRecord"))}</span><small>${esc(quickPhotoAccountMeta0950(account))}</small>`;
+  return QUICK_PHOTO_WORKFLOW_0957.allowAccountChange
+    ? `<button type="button" class="quickPhotoAccount0950" id="quickPhotoChangeAccount0950">${content}<b>Change</b></button>`
+    : `<div class="quickPhotoAccount0950 quickPhotoAccountLocked0957">${content}<b>Selected</b></div>`;
 }
 function quickPhotoReviewMarkup0950(){
-  const recordSingular=recordTerm0954(),recordLower=recordTerm0954(1,true),recordIdLabel=recordIdLabel0954();
-  const account=quickPhotoAccountById0950(quickPhotoDraft0950.accountId),stamp=new Date();
+  const recordLower=recordTerm0954(1,true),account=quickPhotoAccountById0950(quickPhotoDraft0950.accountId),stamp=new Date();
   const title=`Field Photo - ${stamp.toLocaleDateString([], {month:"short",day:"numeric",year:"numeric"})} ${stamp.toLocaleTimeString([], {hour:"numeric",minute:"2-digit"})}`;
+  const categories=workflowPhotoCategories0957();
+  const optionRows=[
+    QUICK_PHOTO_WORKFLOW_0957.showCategory?`<label><span>Category</span><select id="quickPhotoCategory0950">${categories.map(category=>`<option value="${esc(category)}" ${quickPhotoDraft0950.category===category?"selected":""}>${esc(category)}</option>`).join("")}</select></label>`:"",
+    QUICK_PHOTO_WORKFLOW_0957.showOverlayToggle?`<label class="checkRow"><input type="checkbox" id="quickPhotoOverlayToggle0950" ${quickPhotoDraft0950.useOverlay?"checked":""}> <span>Show ${esc(recordLower)} overlay</span></label>`:"",
+    QUICK_PHOTO_WORKFLOW_0957.showReportToggle&&moduleEnabled0955("optional.reports")?`<label class="checkRow"><input type="checkbox" id="quickPhotoReportToggle0950" ${quickPhotoDraft0950.includeReport?"checked":""}> <span>Include in customer report</span></label>`:""
+  ].filter(Boolean).join("");
+  const detailRows=[
+    QUICK_PHOTO_WORKFLOW_0957.showTitle?`<label>Photo title<input id="quickPhotoTitleField0950" value="${esc(title)}"></label>`:"",
+    QUICK_PHOTO_WORKFLOW_0957.showInternalNotes?`<label>Internal notes<textarea id="quickPhotoNotes0950" placeholder="Problem found, device address, circuit, or repair notes…"></textarea></label>`:"",
+    QUICK_PHOTO_WORKFLOW_0957.showCustomerCaption?`<label>Customer caption<textarea id="quickPhotoCaption0950" placeholder="Optional customer-facing caption"></textarea></label>`:""
+  ].filter(Boolean).join("");
   return `<section class="quickPhotoSheet0950" role="dialog" aria-modal="true" aria-labelledby="quickPhotoTitle0950">
     <header><div><span>QUICK CAPTURE</span><h2 id="quickPhotoTitle0950">Review Field Photo</h2></div><button type="button" class="ghost" id="quickPhotoClose0950" aria-label="Close photo review">×</button></header>
     <div class="quickPhotoPreview0950"><canvas id="quickPhotoPreviewCanvas0950" width="900" height="600" aria-label="Photo preview using selected ${esc(recordLower)} information"></canvas><div id="quickPhotoPreviewStatus0950">Building ${esc(recordLower)} overlay…</div></div>
     ${quickPhotoReviewAccountMarkup0950(account)}
-    <div class="quickPhotoOptions0950">
-      <label><span>Category</span><select id="quickPhotoCategory0950">${PHOTO_CATEGORIES_524.map(category=>`<option value="${esc(category)}" ${quickPhotoDraft0950.category===category?"selected":""}>${esc(category)}</option>`).join("")}</select></label>
-      <label class="checkRow"><input type="checkbox" id="quickPhotoOverlayToggle0950" ${quickPhotoDraft0950.useOverlay?"checked":""}> <span>Show ${esc(recordLower)} overlay</span></label>
-      <label class="checkRow"><input type="checkbox" id="quickPhotoReportToggle0950" ${quickPhotoDraft0950.includeReport?"checked":""}> <span>Include in customer report</span></label>
-    </div>
-    <details class="quickPhotoDetails0950"><summary>Title and notes</summary><label>Photo title<input id="quickPhotoTitleField0950" value="${esc(title)}"></label><label>Internal notes<textarea id="quickPhotoNotes0950" placeholder="Problem found, device address, circuit, or repair notes…"></textarea></label><label>Customer caption<textarea id="quickPhotoCaption0950" placeholder="Optional customer-facing caption"></textarea></label></details>
-    <footer><button type="button" class="ghost" id="quickPhotoRetake0950">Retake</button><button type="button" class="primary" id="quickPhotoSave0950">Save Photo</button></footer>
+    ${optionRows?`<div class="quickPhotoOptions0950">${optionRows}</div>`:""}
+    ${detailRows?`<details class="quickPhotoDetails0950"><summary>Title and notes</summary>${detailRows}</details>`:""}
+    <footer>${QUICK_PHOTO_WORKFLOW_0957.allowRetake?`<button type="button" class="ghost" id="quickPhotoRetake0950">Retake</button>`:""}<button type="button" class="primary" id="quickPhotoSave0950">Save Photo</button></footer>
   </section>`;
 }
 function quickPhotoShowReview0950(){
   quickPhotoCloseReview0950();
   const overlay=document.createElement("div");overlay.className="quickPhotoOverlay0950";overlay.innerHTML=quickPhotoReviewMarkup0950();document.body.appendChild(overlay);quickPhotoOverlay0950=overlay;
   overlay.addEventListener("click",event=>{if(event.target===overlay)quickPhotoCloseReview0950();});
-  document.getElementById("quickPhotoClose0950").onclick=quickPhotoCloseReview0950;
-  document.getElementById("quickPhotoRetake0950").onclick=()=>{quickPhotoCloseReview0950();const input=quickPhotoEnsureInput0950();input.value="";input.click();};
-  document.getElementById("quickPhotoChangeAccount0950").onclick=()=>quickPhotoOpenAccountPicker0950(account=>{quickPhotoDraft0950.accountId=account.id;quickPhotoWriteSafe0950(QUICK_PHOTO_LAST_ACCOUNT_KEY0950,account.id);quickPhotoShowReview0950();});
-  document.getElementById("quickPhotoCategory0950").onchange=event=>{quickPhotoDraft0950.category=event.target.value||"Panel";quickPhotoWriteSafe0950(QUICK_PHOTO_LAST_CATEGORY_KEY0950,quickPhotoDraft0950.category);};
-  document.getElementById("quickPhotoOverlayToggle0950").onchange=event=>{quickPhotoDraft0950.useOverlay=event.target.checked;quickPhotoRenderPreview0950();};
-  document.getElementById("quickPhotoReportToggle0950").onchange=event=>{quickPhotoDraft0950.includeReport=event.target.checked;};
-  document.getElementById("quickPhotoSave0950").onclick=quickPhotoSave0950;
+  document.getElementById("quickPhotoClose0950")?.addEventListener("click",quickPhotoCloseReview0950);
+  document.getElementById("quickPhotoRetake0950")?.addEventListener("click",()=>{quickPhotoCloseReview0950();const input=quickPhotoEnsureInput0950();input.value="";input.click();});
+  document.getElementById("quickPhotoChangeAccount0950")?.addEventListener("click",()=>quickPhotoOpenAccountPicker0950(account=>{quickPhotoDraft0950.accountId=account.id;if(QUICK_PHOTO_WORKFLOW_0957.rememberAccount)quickPhotoWriteSafe0950(QUICK_PHOTO_LAST_ACCOUNT_KEY0950,account.id);quickPhotoShowReview0950();}));
+  document.getElementById("quickPhotoCategory0950")?.addEventListener("change",event=>{quickPhotoDraft0950.category=event.target.value||workflowPhotoDefaultCategory0957();if(QUICK_PHOTO_WORKFLOW_0957.rememberCategory)quickPhotoWriteSafe0950(QUICK_PHOTO_LAST_CATEGORY_KEY0950,quickPhotoDraft0950.category);});
+  document.getElementById("quickPhotoOverlayToggle0950")?.addEventListener("change",event=>{quickPhotoDraft0950.useOverlay=event.target.checked;quickPhotoRenderPreview0950();});
+  document.getElementById("quickPhotoReportToggle0950")?.addEventListener("change",event=>{quickPhotoDraft0950.includeReport=event.target.checked;});
+  document.getElementById("quickPhotoSave0950")?.addEventListener("click",quickPhotoSave0950);
   quickPhotoRenderPreview0950();
 }
 async function quickPhotoRenderPreview0950(){
@@ -5034,7 +5114,7 @@ function quickPhotoOpenAccountPicker0950(onSelect=null,openCameraAfter=false){
   const close=()=>{overlay.remove();if(quickPhotoPicker0950===overlay)quickPhotoPicker0950=null;};
   overlay.addEventListener("click",event=>{if(event.target===overlay)close();});document.getElementById("quickPhotoPickerClose0950").onclick=close;
   document.getElementById("quickPhotoAccountSearch0950").oninput=event=>{const q=event.target.value.trim().toLowerCase();document.querySelectorAll("[data-quick-photo-account]").forEach(button=>button.hidden=Boolean(q)&&!button.dataset.search.includes(q));};
-  document.querySelectorAll("[data-quick-photo-account]").forEach(button=>button.onclick=()=>{const account=quickPhotoAccountById0950(button.dataset.quickPhotoAccount);if(!account)return;close();quickPhotoDraft0950.accountId=account.id;quickPhotoWriteSafe0950(QUICK_PHOTO_LAST_ACCOUNT_KEY0950,account.id);if(onSelect)onSelect(account);else if(openCameraAfter)quickPhotoStart0950(account.id);});
+  document.querySelectorAll("[data-quick-photo-account]").forEach(button=>button.onclick=()=>{const account=quickPhotoAccountById0950(button.dataset.quickPhotoAccount);if(!account)return;close();quickPhotoDraft0950.accountId=account.id;if(QUICK_PHOTO_WORKFLOW_0957.rememberAccount)quickPhotoWriteSafe0950(QUICK_PHOTO_LAST_ACCOUNT_KEY0950,account.id);if(onSelect)onSelect(account);else if(openCameraAfter)quickPhotoStart0950(account.id);});
   setTimeout(()=>document.getElementById("quickPhotoAccountSearch0950")?.focus(),80);
 }
 async function quickPhotoSave0950(){
@@ -5044,9 +5124,9 @@ async function quickPhotoSave0950(){
   const now=new Date(),title=val("quickPhotoTitleField0950")||`Field Photo - ${now.toLocaleDateString()}`;
   account.docs=Array.isArray(account.docs)?account.docs:[];
   const target=fileStorageTarget0794("photo");
-  const record={id:uid(),type:"Photo Set",title,ref:"",url:"",date:now.toLocaleDateString(),notes:raw("quickPhotoNotes0950"),customerCaption:raw("quickPhotoCaption0950"),imageData:quickPhotoDraft0950.dataUrl,imageName:quickPhotoDraft0950.name||"Field photo",photoCategory:quickPhotoDraft0950.category||"Panel",useOverlayOnSave:quickPhotoDraft0950.useOverlay,includeInCustomerReport:quickPhotoDraft0950.includeReport,imageUpdatedAt:now.toISOString(),createdAt:now.toISOString(),updatedAt:now.toISOString(),captureSource:"bottom-navigation",capturedAccountId:account.id,capturedAccountName:account.name||"",storageTargetId:`${target.provider||"local"}:photo`,storageProvider:target.provider||"local",storageFolder:target.folder||"FireVault/Photos",storageStatus:(target.provider||"local")==="local"?"local":"pending",remoteFileId:"",remoteRevision:"",remoteUrl:"",mediaRef:"",mediaStorage:""};
+  const record={id:uid(),type:"Photo Set",title,ref:"",url:"",date:now.toLocaleDateString(),notes:raw("quickPhotoNotes0950"),customerCaption:raw("quickPhotoCaption0950"),imageData:quickPhotoDraft0950.dataUrl,imageName:quickPhotoDraft0950.name||"Field photo",photoCategory:quickPhotoDraft0950.category||workflowPhotoDefaultCategory0957(),useOverlayOnSave:quickPhotoDraft0950.useOverlay,includeInCustomerReport:quickPhotoDraft0950.includeReport,imageUpdatedAt:now.toISOString(),createdAt:now.toISOString(),updatedAt:now.toISOString(),captureSource:"bottom-navigation",capturedAccountId:account.id,capturedAccountName:account.name||"",storageTargetId:`${target.provider||"local"}:photo`,storageProvider:target.provider||"local",storageFolder:target.folder||"FireVault/Photos",storageStatus:(target.provider||"local")==="local"?"local":"pending",remoteFileId:"",remoteRevision:"",remoteUrl:"",mediaRef:"",mediaStorage:""};
   account.docs.unshift(record);account.updatedAt=now.toISOString();
-  try{const result=await stageVaultMedia(data);if(result.failed)throw new Error("The photo could not be protected in device media storage.");save();selectedSiteId=account.id;quickPhotoWriteSafe0950(QUICK_PHOTO_LAST_ACCOUNT_KEY0950,account.id);quickPhotoWriteSafe0950(QUICK_PHOTO_LAST_CATEGORY_KEY0950,record.photoCategory);quickPhotoCloseReview0950();toast(`Photo saved to ${account.name||recordTerm0954(1,true)}.`,`success`);}
+  try{const result=await stageVaultMedia(data);if(result.failed)throw new Error("The photo could not be protected in device media storage.");save();selectedSiteId=account.id;if(QUICK_PHOTO_WORKFLOW_0957.rememberAccount)quickPhotoWriteSafe0950(QUICK_PHOTO_LAST_ACCOUNT_KEY0950,account.id);if(QUICK_PHOTO_WORKFLOW_0957.rememberCategory)quickPhotoWriteSafe0950(QUICK_PHOTO_LAST_CATEGORY_KEY0950,record.photoCategory);quickPhotoCloseReview0950();toast(`Photo saved to ${account.name||recordTerm0954(1,true)}.`,`success`);}
   catch(err){account.docs=account.docs.filter(item=>item.id!==record.id);setButtonBusy0781(button,false);toast(err?.message||"Photo save failed. Try again.","error");}
 }
 
@@ -5320,26 +5400,35 @@ function siteForm(){
   const editing=mode==="edit";
   const s=editing ? site() : {};
   if(editing && !s){route("sites");return;}
+  const fieldOn=recordFieldOn0956;
+  const fieldRequired=id=>recordFieldRequired(APP_PROFILE,id);
+  const requiredBadge=id=>fieldRequired(id)?" <b>Required</b>":"";
   const currentAccountId=accountId069(s);
+  const identityPhone=fieldOn("sitePhone")?`<div><label>${esc(recordFieldById("sitePhone")?.label||"Site Phone")}${requiredBadge("sitePhone")}</label><input id="sitePhone0760" inputmode="tel" autocomplete="tel" value="${esc(formatPhone0758(s.sitePhone)||s.sitePhone||"")}" placeholder="(307)555-0123"></div>`:"";
+  const identityId=fieldOn("externalAccountId")?`<div><label>${esc(recordIdLabel)}${requiredBadge("externalAccountId")}</label><input id="externalAccountId0760" value="${esc(currentAccountId)}" placeholder="Example: G7C1234-01" autocapitalize="characters" spellcheck="false"><small class="accountFieldHint0760" id="accountIdHint0760">Exact ${esc(recordIdLabel)}s must be unique. Same-address buildings are allowed.</small></div>`:"";
+  const locationFields=["street","city","state","zip","gps"].filter(fieldOn);
+  const systemFields=["panelManufacturer","panelModel","notes"].filter(fieldOn);
+  const fireProfileVisible=fieldOn("panelManufacturer")||fieldOn("panelModel");
+  const locationMarkup=locationFields.length?`<section class="card accountFormCard0760" data-record-group="location"><div class="accountFormSectionTitle0760"><span>2</span><div><strong>${esc(RECORD_SCHEMA.groups.find(group=>group.id==="location")?.label||"Location")}</strong><small>${recordTerm0954(2)} may share an address when they represent different buildings or record numbers.</small></div></div>
+        ${fieldOn("street")?`<label>${esc(recordFieldById("street")?.label||"Street Address")}${requiredBadge("street")}</label><input id="street" value="${esc(s.street||"")}" autocomplete="street-address">`:""}
+        ${(fieldOn("city")||fieldOn("state"))?`<div class="compactField">${fieldOn("city")?`<div><label>${esc(recordFieldById("city")?.label||"City")}${requiredBadge("city")}</label><input id="city" value="${esc(s.city||"")}" autocomplete="address-level2"></div>`:""}${fieldOn("state")?`<div><label>${esc(recordFieldById("state")?.label||"State")}${requiredBadge("state")}</label><input id="state" value="${esc(s.state||"")}" maxlength="2" autocapitalize="characters" autocomplete="address-level1"></div>`:""}</div>`:""}
+        ${(fieldOn("zip")||fieldOn("gps"))?`<div class="compactField">${fieldOn("zip")?`<div><label>${esc(recordFieldById("zip")?.label||"ZIP")}${requiredBadge("zip")}</label><input id="zip" value="${esc(s.zip||"")}" inputmode="numeric" autocomplete="postal-code"></div>`:""}${fieldOn("gps")?`<div class="accountFormLocationAction0760"><label>${esc(recordFieldById("gps")?.label||"GPS")}${requiredBadge("gps")}</label><button type="button" class="ghost" id="formGpsBtn">Capture Current Location</button></div>`:""}</div>`:""}
+        ${fieldOn("gps")?`<div class="accountGpsFields0760"><div><label>Latitude</label><input id="gpsLat" inputmode="decimal" value="${hasGps(s)?esc(s.gps.lat):""}"></div><div><label>Longitude</label><input id="gpsLng" inputmode="decimal" value="${hasGps(s)?esc(s.gps.lng):""}"></div><input id="gpsAccuracy" type="hidden" value="${hasGps(s)?esc(s.gps.accuracy||""):""}"><input id="gpsCapturedAt" type="hidden" value="${hasGps(s)?esc(s.gps.capturedAt||""):""}"></div><div class="accountPlusPreview0794" id="accountPlusPreview0794"></div>`:""}
+      </section>`:"";
+  const systemMarkup=systemFields.length?`<section class="card accountFormCard0760" data-record-group="fireSystem"><div class="accountFormSectionTitle0760"><span>${locationFields.length?3:2}</span><div><strong>${esc(fireProfileVisible?(RECORD_SCHEMA.groups.find(group=>group.id==="fireSystem")?.label||"Fire Alarm System"):"Record Notes")}</strong><small>${fireProfileVisible?`Optional panel information helps technicians identify the ${recordLower} quickly.`:`Keep reusable notes connected to this ${recordLower}.`}</small></div></div>
+        ${(fieldOn("panelManufacturer")||fieldOn("panelModel"))?`<div class="compactField">${fieldOn("panelManufacturer")?`<div><label>${esc(recordFieldById("panelManufacturer")?.label||"Panel Make")}${requiredBadge("panelManufacturer")}</label><input id="pm" value="${esc(s.panelManufacturer||"")}" placeholder="Notifier, EST, Siemens…"></div>`:""}${fieldOn("panelModel")?`<div><label>${esc(recordFieldById("panelModel")?.label||"Panel Model")}${requiredBadge("panelModel")}</label><input id="model" value="${esc(s.panelModel||"")}"></div>`:""}</div>`:""}
+        ${fieldOn("notes")?`<label>${esc(recordFieldById("notes")?.label||"Site Notes")}${requiredBadge("notes")}</label><textarea id="notes" placeholder="Access details, panel location, recurring issues…">${esc(s.notes||"")}</textarea>`:""}
+      </section>`:"";
   html(`<div class="screen accountFormScreen0760">
-    <section class="accountFormHeader0760"><button class="back ghost" id="backBtn" aria-label="Cancel and go back">←</button><div><span>${editing?`${esc(recordSingular.toUpperCase())} MAINTENANCE`:"NEW CUSTOMER"}</span><h1>${esc(editing?appLabel("editRecord"):appLabel("addRecord"))}</h1><p>${editing?`Update this ${esc(recordLower)} without changing its history.`:`Create the core ${esc(recordLower)} now. Details can be added after saving.`}</p></div></section>
+    <section class="accountFormHeader0760"><button class="back ghost" id="backBtn" aria-label="Cancel and go back">←</button><div><span>${editing?`${esc(recordSingular.toUpperCase())} MAINTENANCE`:`NEW ${esc(recordSingular.toUpperCase())}`}</span><h1>${esc(editing?appLabel("editRecord"):appLabel("addRecord"))}</h1><p>${editing?`Update this ${esc(recordLower)} without changing its history.`:`Create the core ${esc(recordLower)} now. Details can be added after saving.`}</p></div></section>
     <div class="form grow accountForm0760">
       <div class="accountFormError0760" id="accountFormError0760" hidden></div>
-      <section class="card accountFormCard0760"><div class="accountFormSectionTitle0760"><span>1</span><div><strong>${esc(recordSingular)} Identity</strong><small>Name and ${esc(recordIdLabel)} are used throughout ${esc(APP_PROFILE.name)}.</small></div></div>
-        <label>${esc(recordSingular)} Name <b>Required</b></label><input id="name" value="${esc(s.name||"")}" placeholder="Customer or building name" autocomplete="organization">
-        <div class="compactField"><div><label>${esc(recordIdLabel)}</label><input id="externalAccountId0760" value="${esc(currentAccountId)}" placeholder="Example: G7C1234-01" autocapitalize="characters" spellcheck="false"><small class="accountFieldHint0760" id="accountIdHint0760">Exact ${recordIdLabel}s must be unique. Same-address buildings are allowed.</small></div><div><label>Site Phone</label><input id="sitePhone0760" inputmode="tel" autocomplete="tel" value="${esc(formatPhone0758(s.sitePhone)||s.sitePhone||"")}" placeholder="(307)555-0123"></div></div>
+      <section class="card accountFormCard0760" data-record-group="identity"><div class="accountFormSectionTitle0760"><span>1</span><div><strong>${esc(RECORD_SCHEMA.groups.find(group=>group.id==="identity")?.label||`${recordSingular} Identity`)}</strong><small>Name${fieldOn("externalAccountId")?` and ${esc(recordIdLabel)}`:""} are used throughout ${esc(APP_PROFILE.name)}.</small></div></div>
+        <label>${esc(recordFieldById("name")?.label||`${recordSingular} Name`)}${requiredBadge("name")}</label><input id="name" value="${esc(s.name||"")}" placeholder="Customer or building name" autocomplete="organization">
+        ${(identityId||identityPhone)?`<div class="compactField">${identityId}${identityPhone}</div>`:""}
       </section>
-      <section class="card accountFormCard0760"><div class="accountFormSectionTitle0760"><span>2</span><div><strong>Location</strong><small>${recordTerm0954(2)} may share an address when they represent different buildings or record numbers.</small></div></div>
-        <label>Street Address</label><input id="street" value="${esc(s.street||"")}" autocomplete="street-address">
-        <div class="compactField"><div><label>City</label><input id="city" value="${esc(s.city||"")}" autocomplete="address-level2"></div><div><label>State</label><input id="state" value="${esc(s.state||"")}" maxlength="2" autocapitalize="characters" autocomplete="address-level1"></div></div>
-        <div class="compactField"><div><label>ZIP</label><input id="zip" value="${esc(s.zip||"")}" inputmode="numeric" autocomplete="postal-code"></div><div class="accountFormLocationAction0760"><label>GPS</label><button type="button" class="ghost" id="formGpsBtn">Capture Current Location</button></div></div>
-        <div class="accountGpsFields0760"><div><label>Latitude</label><input id="gpsLat" inputmode="decimal" value="${hasGps(s)?esc(s.gps.lat):""}"></div><div><label>Longitude</label><input id="gpsLng" inputmode="decimal" value="${hasGps(s)?esc(s.gps.lng):""}"></div><input id="gpsAccuracy" type="hidden" value="${hasGps(s)?esc(s.gps.accuracy||""):""}"><input id="gpsCapturedAt" type="hidden" value="${hasGps(s)?esc(s.gps.capturedAt||""):""}"></div>
-        <div class="accountPlusPreview0794" id="accountPlusPreview0794"></div>
-      </section>
-      <section class="card accountFormCard0760"><div class="accountFormSectionTitle0760"><span>3</span><div><strong>Fire Alarm System</strong><small>Optional panel information helps technicians identify the ${recordLower} quickly.</small></div></div>
-        <div class="compactField"><div><label>Panel Make</label><input id="pm" value="${esc(s.panelManufacturer||"")}" placeholder="Notifier, EST, Siemens…"></div><div><label>Panel Model</label><input id="model" value="${esc(s.panelModel||"")}"></div></div>
-        <label>Site Notes</label><textarea id="notes" placeholder="Access details, panel location, recurring issues…">${esc(s.notes||"")}</textarea>
-      </section>
+      ${locationMarkup}
+      ${systemMarkup}
       <div class="accountFormActions0760"><button class="ghost" id="cancelAccount0760">Cancel</button><button class="primary" id="saveBtn">${editing?"Save Changes":`Create ${esc(recordSingular)}`}</button></div>
       ${editing?`<button class="danger accountDelete0760" id="delBtn">Delete ${esc(recordSingular)}</button>`:""}
     </div>
@@ -5349,17 +5438,18 @@ function siteForm(){
   document.getElementById("cancelAccount0760")?.addEventListener("click",goBack);
   document.getElementById("formGpsBtn")?.addEventListener("click",captureGpsIntoForm);
   ["gpsLat","gpsLng"].forEach(id=>document.getElementById(id)?.addEventListener("input",updateAccountPlusPreview0794));
-  updateAccountPlusPreview0794();
+  if(fieldOn("gps"))updateAccountPlusPreview0794();
   const nameInput=document.getElementById("name");
   const idInput=document.getElementById("externalAccountId0760");
   const errorBox=document.getElementById("accountFormError0760");
   const idHint=document.getElementById("accountIdHint0760");
   const showFormError=message=>{if(errorBox){errorBox.textContent=message;errorBox.hidden=!message;}if(message)errorBox?.scrollIntoView({behavior:"smooth",block:"nearest"});};
   const checkId=()=>{
-    const canonical=canonicalAccountId0731(idInput?.value||"");
-    if(idInput && idInput.value!==canonical) idInput.value=canonical;
+    if(!fieldOn("externalAccountId")||!idInput)return null;
+    const canonical=canonicalAccountId0731(idInput.value||"");
+    if(idInput.value!==canonical)idInput.value=canonical;
     const duplicate=duplicateAccountId0760(canonical,s.id||"");
-    idInput?.classList.toggle("fieldError0760",!!duplicate);
+    idInput.classList.toggle("fieldError0760",!!duplicate);
     if(idHint){idHint.textContent=duplicate?`Already assigned to ${duplicate.name||`another ${recordLower}`}.`:`Exact ${recordIdLabel}s must be unique. Same-address buildings are allowed.`;idHint.classList.toggle("error",!!duplicate);}
     return duplicate;
   };
@@ -5368,28 +5458,37 @@ function siteForm(){
   document.getElementById("saveBtn")?.addEventListener("click",()=>{
     showFormError("");
     const accountName=val("name");
-    if(!accountName){showFormError(`Enter a ${recordLower} name before saving.`);nameInput?.focus();return;}
+    const requiredInputIds={name:"name",externalAccountId:"externalAccountId0760",sitePhone:"sitePhone0760",street:"street",city:"city",state:"state",zip:"zip",panelManufacturer:"pm",panelModel:"model",notes:"notes"};
+    for(const field of activeRecordFields(APP_PROFILE).filter(item=>item.required)){
+      const present=field.id==="gps"?(Number.isFinite(Number(val("gpsLat")))&&Number.isFinite(Number(val("gpsLng")))):Boolean(val(requiredInputIds[field.id]||field.id));
+      if(!present){showFormError(`Enter ${field.label.toLowerCase()} before saving.`);document.getElementById(requiredInputIds[field.id]||field.id)?.focus();return;}
+    }
     const duplicate=checkId();
     if(duplicate){showFormError(`${recordIdLabel} ${canonicalAccountId0731(idInput?.value||"")} already belongs to ${duplicate.name||`another ${recordLower}`}. Use a different ${recordIdLabel}.`);idInput?.focus();return;}
-    const obj={
-      name:accountName,
-      externalAccountId:canonicalAccountId0731(val("externalAccountId0760")),accountId:"",
-      sitePhone:normalizePhoneValue0758(val("sitePhone0760")),
-      street:val("street"),city:val("city"),state:val("state").toUpperCase(),zip:val("zip"),
-      panelManufacturer:val("pm"),panelModel:val("model"),notes:raw("notes")
-    };
-    const gpsLat=Number(val("gpsLat")), gpsLng=Number(val("gpsLng"));
-    if(Number.isFinite(gpsLat) && Number.isFinite(gpsLng)){
-      obj.gps={lat:gpsLat,lng:gpsLng,accuracy:Number(val("gpsAccuracy"))||0,capturedAt:val("gpsCapturedAt")||new Date().toISOString()};
-      obj.plusCode=encodePlusCode071(gpsLat,gpsLng,plusCodeSettings0794().accountLength);
-    }else{obj.gps=null;obj.plusCode="";}
+    const obj={name:accountName};
+    if(fieldOn("externalAccountId")){obj.externalAccountId=canonicalAccountId0731(val("externalAccountId0760"));obj.accountId="";}
+    if(fieldOn("sitePhone"))obj.sitePhone=normalizePhoneValue0758(val("sitePhone0760"));
+    if(fieldOn("street"))obj.street=val("street");
+    if(fieldOn("city"))obj.city=val("city");
+    if(fieldOn("state"))obj.state=val("state").toUpperCase();
+    if(fieldOn("zip"))obj.zip=val("zip");
+    if(fieldOn("panelManufacturer"))obj.panelManufacturer=val("pm");
+    if(fieldOn("panelModel"))obj.panelModel=val("model");
+    if(fieldOn("notes"))obj.notes=raw("notes");
+    if(fieldOn("gps")){
+      const gpsLat=Number(val("gpsLat")),gpsLng=Number(val("gpsLng"));
+      if(Number.isFinite(gpsLat)&&Number.isFinite(gpsLng)){
+        obj.gps={lat:gpsLat,lng:gpsLng,accuracy:Number(val("gpsAccuracy"))||0,capturedAt:val("gpsCapturedAt")||new Date().toISOString()};
+        obj.plusCode=encodePlusCode071(gpsLat,gpsLng,plusCodeSettings0794().accountLength);
+      }else{obj.gps=null;obj.plusCode="";}
+    }
     if(editing){Object.assign(s,obj);selectedSiteId=s.id;}
     else{const n=ensureSite({...obj,id:uid(),createdAt:new Date().toISOString()});data.sites.unshift(n);selectedSiteId=n.id;}
     save();toast(editing?`${recordSingular} updated.`:`${recordSingular} created.`);route("siteDetail");
   });
   const del=document.getElementById("delBtn");
-  if(del) del.onclick=()=>{if(!data.settings.app.confirmDeletes || confirm(`Delete ${s.name||`this ${recordLower}`}? This removes its locally stored notes, visits, and files.`)){data.sites=data.sites.filter(x=>x.id!==s.id);save();selectedSiteId=null;toast(`${recordSingular} deleted.`);route("sites");}};
-  if(!editing) requestAnimationFrame(()=>nameInput?.focus());
+  if(del)del.onclick=()=>{if(!data.settings.app.confirmDeletes||confirm(`Delete ${s.name||`this ${recordLower}`}? This removes its locally stored notes, visits, and files.`)){data.sites=data.sites.filter(x=>x.id!==s.id);save();selectedSiteId=null;toast(`${recordSingular} deleted.`);route("sites");}};
+  if(!editing)requestAnimationFrame(()=>nameInput?.focus());
 }
 
 function tasks(){
@@ -6504,7 +6603,7 @@ function settingsGroup067ByKey(key){ return SETTINGS_GROUPS_067.find(g=>g.key===
 function openSettingsGroup067(key){ settingsGroup067=key||"profile"; mode=null; view="settings"; render(); }
 function settingsTabs(){
   return [
-    ["tech","Technician","Identity and overlay template"],
+    ["tech",appTerm("technician",1),"Identity and overlay template"],
     ["gps","GPS & Maps","Location and navigation"],
     ["plusCodes","Google Plus Codes","Offline location codes"],
     ["overlay","Photo Overlay","Photo labels"],
@@ -6512,18 +6611,18 @@ function settingsTabs(){
     ["email","Email","Recipients and signature"],
     ["privacy","Privacy Lock","PIN protection"],
     ["security","Security","Vault protection"],
-    ["cloudFiles","File Storage","Photos and documents"],
+    ["cloudFiles","File Storage",`${appTerm("file",2)} and photos`],
     ["microsoftStorage","Microsoft Storage","OneDrive and SharePoint"],
     ["sync","Team Sync","Shared-vault status"],
-    ["customerImport","Import Accounts","Customer CSV"],
-    ["categories","Categories","Automatic account tags"],
+    ["customerImport",`Import ${recordTerm0954(2)}`,"CSV import"],
+    ["categories","Categories",`Automatic ${recordTerm0954(1,true)} tags`],
     ["backup","Backup & Restore","Protect your data"],
     ["webdav","WebDAV Backup","Remote server upload and restore"],
     ["updates","App Updates","Refresh application files"],
-    ["demo","Demo Mode","Fictional accounts for presentations and testing"],
-    ["about","About FireVault","Version and information"],
-    ["architecture","Architecture & Modules","Core, reusable, and FireVault layers"]
-  ];
+    ["demo","Demo Mode",`Fictional ${recordTerm0954(2,true)} for presentations and testing`],
+    ["about",`About ${APP_PROFILE.name}`,"Version and information"],
+    ["architecture","Architecture & Modules","Core, reusable, and vertical layers"]
+  ].filter(([id])=>settingsTabEnabled0955(id));
 }
 function settingsIcon550(tab){
   return ({tech:"👤",gps:"⌖",plusCodes:"＋",reports:"▤",email:"✉",overlay:"▧",privacy:"▣",security:"⌾",cloudFiles:"☁",microsoftStorage:"M",sync:"↔",customerImport:"⇩",categories:"◇",backup:"⇅",webdav:"W",updates:"↻",demo:"D",about:"ⓘ",architecture:"⌘"})[tab]||"•";
@@ -6556,7 +6655,7 @@ const SETTINGS_DASHBOARD_0860 = [
   {key:"photos",title:"Photo Overlays",icon:"camera",tabs:["overlay"]},
   {key:"privacy",title:"Privacy",icon:"shield",tabs:["privacy","security"]},
   {key:"demo",title:"Demo Mode",icon:"demo",tabs:["demo"]},
-  {key:"about",title:"About FireVault",icon:"info",tabs:["about","architecture"]}
+  {key:"about",title:`About ${APP_PROFILE.name}`,icon:"info",tabs:["about","architecture"]}
 ];
 const SETTINGS_GROUPED_LIST_0873 = [
   {label:"Profile",items:[
@@ -6582,6 +6681,21 @@ const SETTINGS_GROUPED_LIST_0873 = [
     {key:"about",subtitle:"Version, modules, and reusable app architecture"}
   ]}
 ];
+
+function settingsDashboardItems0955(){
+  const tabs=new Set(settingsTabs().map(row=>row[0]));
+  return SETTINGS_DASHBOARD_0860.map(item=>({...item,tabs:item.tabs.filter(id=>tabs.has(id))})).filter(item=>item.tabs.length);
+}
+function settingsGroupedItems0955(){
+  const dashboard=new Set(settingsDashboardItems0955().map(item=>item.key));
+  return SETTINGS_GROUPED_LIST_0873.map(group=>({...group,items:group.items.filter(item=>dashboard.has(item.key))})).filter(group=>group.items.length);
+}
+function normalizeSettingsTab0955(){
+  const tabs=settingsTabs();
+  if(!tabs.some(row=>row[0]===settingsTab))settingsTab=tabs.find(row=>row[0]==="about")?.[0]||tabs[0]?.[0]||"about";
+  const dashboards=settingsDashboardItems0955();
+  if(!dashboards.some(item=>item.key===settingsGroup067))settingsGroup067=dashboards[0]?.key||"about";
+}
 function settingsListIcon0873(name){
   return settingsSvg0860(name).replace('settingsTileIcon0860','settingsListIcon0873');
 }
@@ -6683,7 +6797,7 @@ function settingsSearchRows0874(query=""){
   const tokens=q.split(/\s+/).filter(Boolean);
   const tabs=settingsTabs();
   return tabs.map(tab=>{
-    const group=SETTINGS_DASHBOARD_0860.find(item=>item.tabs.includes(tab[0]));
+    const group=settingsDashboardItems0955().find(item=>item.tabs.includes(tab[0]));
     const status=settingsTabStatus0880(tab[0]);
     const hay=[tab[0],tab[1],tab[2],group?.title||"",aliases[tab[0]]||"",...status].join(" ").toLowerCase();
     return tokens.every(token=>hay.includes(token))?{tab,group}:null;
@@ -6696,17 +6810,20 @@ function settingsSearchResultRow0874(result){
 }
 function settings(){
   if(["themes","advanced","homeLayout","visibility","backend","manual","diagnostics"].includes(settingsTab)) settingsTab="about";
+  normalizeSettingsTab0955();
   captureSettingsScroll576(); restoreAppChrome572();
   const tabs=settingsTabs();
+  const dashboards=settingsDashboardItems0955();
+  const groupedSettings=settingsGroupedItems0955();
   const active=tabs.find(t=>t[0]===settingsTab)||tabs[0];
-  const dashboardItem=SETTINGS_DASHBOARD_0860.find(x=>x.key===settingsGroup067)||SETTINGS_DASHBOARD_0860[0];
+  const dashboardItem=dashboards.find(x=>x.key===settingsGroup067)||dashboards[0];
   if(mode!=="settingsDetail" && mode!=="settingsGroup0860"){
     const searchResults=settingsSearchRows0874(settingsSearch0874);
     const searchActive=Boolean(String(settingsSearch0874||"").trim());
     html(`<div class="screen settingsConcept10873 settingsStable573 settingsPolish0880">
       <div class="settingsConcept1Body0873">
         <div class="settingsStickyHead0880">
-          <div class="settingsTitleRow0880"><h1>Settings</h1><span>${SETTINGS_DASHBOARD_0860.length} areas</span></div>
+          <div class="settingsTitleRow0880"><h1>Settings</h1><span>${dashboards.length} areas</span></div>
           <label class="settingsSearch0874" aria-label="Search settings">
             ${fvIcon073("search","settingsSearchIcon0874")}
             <input id="settingsSearchInput0874" type="search" value="${esc(settingsSearch0874)}" placeholder="Search settings" autocomplete="off" autocapitalize="none" spellcheck="false">
@@ -6714,7 +6831,7 @@ function settings(){
           </label>
         </div>
         <div id="settingsHomeContent0874" class="settingsGroupsGrid0880">
-          ${searchActive?`<section class="settingsListGroup0873 settingsSearchGroup0874 tone-red"><div class="settingsSectionHeading0940"><span aria-hidden="true"></span><h2>Search Results</h2></div><div class="settingsSearchResults0874">${searchResults.length?searchResults.map(settingsSearchResultRow0874).join(""):`<div class="settingsSearchEmpty0874"><strong>No settings found</strong><span>Try GPS, Plus Codes, WebDAV, backup, reports, or privacy.</span></div>`}</div></section>`:SETTINGS_GROUPED_LIST_0873.map(group=>{const tone=settingsTone0880(group.items?.[0]?.key||"data");return `<section class="settingsListGroup0873 tone-${tone}"><div class="settingsSectionHeading0940"><span aria-hidden="true"></span><h2>${esc(group.label)}</h2></div><div class="settingsListCard0873">${group.items.map(settingsGroupedRow0873).join("")}</div></section>`;}).join("")}
+          ${searchActive?`<section class="settingsListGroup0873 settingsSearchGroup0874 tone-red"><div class="settingsSectionHeading0940"><span aria-hidden="true"></span><h2>Search Results</h2></div><div class="settingsSearchResults0874">${searchResults.length?searchResults.map(settingsSearchResultRow0874).join(""):`<div class="settingsSearchEmpty0874"><strong>No settings found</strong><span>Try GPS, Plus Codes, WebDAV, backup, reports, or privacy.</span></div>`}</div></section>`:groupedSettings.map(group=>{const tone=settingsTone0880(group.items?.[0]?.key||"data");return `<section class="settingsListGroup0873 tone-${tone}"><div class="settingsSectionHeading0940"><span aria-hidden="true"></span><h2>${esc(group.label)}</h2></div><div class="settingsListCard0873">${group.items.map(settingsGroupedRow0873).join("")}</div></section>`;}).join("")}
         </div>
       </div>
     </div>`);
@@ -6724,7 +6841,7 @@ function settings(){
     searchInput?.addEventListener("search",refreshSearch);
     document.getElementById("settingsSearchClear0874")?.addEventListener("click",()=>{settingsSearch0874="";settings();requestAnimationFrame(()=>document.getElementById("settingsSearchInput0874")?.focus());});
     document.querySelectorAll("[data-settings-group0873]").forEach(b=>b.onclick=()=>{
-      const item=SETTINGS_DASHBOARD_0860.find(x=>x.key===b.dataset.settingsGroup0873);
+      const item=dashboards.find(x=>x.key===b.dataset.settingsGroup0873);
       if(!item) return;
       settingsGroup067=item.key;
       if(item.tabs.length===1){settingsTab=item.tabs[0];mode="settingsDetail";render();}
@@ -7258,7 +7375,7 @@ function wireOverlayFieldEditor0944(){
 }
 function overlayLogoSrc510(set){
   if(set.logoMode === "custom") return set.customLogoData || "";
-  return `assets/firevault-logo-master.png?v=${BUILD}`;
+  return `${themeBrandAsset(APP_PROFILE,"logo")}?v=${BUILD}`;
 }
 function overlayLogoStatus510(set){
   if(set.logoMode === "custom" && set.customLogoData) return "Custom logo ready";
@@ -7829,7 +7946,7 @@ function manualSimplePage058(type){
   quick:["🚀","Quick Start Guide","Get FireVault ready for a normal field day.",[["1. Verify the build","Confirm the green build badge shows 0.67.0 before entering production information."],["2. Complete Technician Profile","Enter your name, company, phone, email, and license or employee identification."],["3. Review permissions","Allow location and photo access only when FireVault requests them and the feature is needed."],["4. Create or open a site","Add the customer name, full address, panel details, contacts, access notes, and GPS location."],["5. Document the visit","Record notes, photos, tasks, deficiencies, equipment changes, and a service visit."],["6. Finish and protect the data","Review the report, send or copy the required summary, then export a current backup."]]],
   new:["🆕","What’s New in 0.67.0","Account View, Settings navigation, and FireVault Academy redesign.",[["Unified visual system","Standardized typography, spacing, card surfaces, borders, controls, and responsive behavior across FireVault."],["Settings cleanup","Improved Settings home cards and every submenu while preserving the preferred Email setup workflow."],["Help readability","Converted contextual Help and Academy articles into one uninterrupted scrolling reading column with no floating metadata."],["Account Detail stability","Reinforced natural-height cards, readable text, and scroll-safe account sections."],["Operational screens","Simplified Customer Import, Team Sync, Conflict Center, and Nearby Accounts presentation without changing their workflows."],["Phone and iPad layouts","Added consistent narrow-phone and tablet behavior, bottom-navigation clearance, and overflow protection."],["Nearby scan diagnostics","Nearby Accounts now shows total sites, GPS-ready records, missing coordinates, phone-location progress, and persistent error messages."],["Coordinate recovery","FireVault recovers valid latitude and longitude stored in compatible legacy or imported fields and normalizes them into the site GPS record."],["Location retry","If high-accuracy location times out or is unavailable, FireVault retries once using standard accuracy."],["Nearest-site fallback","When no site is inside the selected radius, the nearest GPS-ready sites remain visible instead of presenting an empty result."],["Latitude and longitude","Customer Import can calculate missing coordinates from each usable U.S. street address before saving records."],["Coordinate requirement","The importer requires calculated, supplied, or existing GPS coordinates by default. Unmatched addresses remain in review."],["Census address matching","Only address fields are sent to the U.S. Census Geocoder. The returned point is an address-range calculation, not a guaranteed building entrance."],["Account Id matching","Repeat imports update the matching FireVault site instead of creating duplicates or deleting field history."],["CSV coordinate columns","Files that already contain Latitude and Longitude columns use those values directly."],["Sync-ready changes","Added and updated customer records enter the pending synchronization queue and create a Sync Activity entry."]]],
   tips:["🧰","Field Tips","Short practices that improve the usefulness of FireVault records.",[["Write for the next technician","Include the exact panel, circuit, device, location, symptom, test result, and next action instead of relying on memory."],["Photograph context first","Take one wide photo showing the equipment location before close-up terminal, label, or damage photos."],["Separate facts from follow-up","Use notes for what occurred, deficiencies for code or system problems, and tasks for work that still needs completion."],["Confirm the account","Before using Quick Capture, verify the selected customer site to prevent records from being stored under the wrong account."],["Back up before updates","Download an external backup before a major update or device change and after completing significant field documentation."]]],
-  revisions:["📋","Revision History","Application and documentation checkpoints.",[[["0.95.4","Connects the App Profile terminology layer to live Search, Nearby, Account Detail, account forms, Quick Photo, navigation, and photo-category workflows while preserving FireVault labels and storage."],["0.95.3","Adds a central App Profile, terminology layer, module registry, in-app architecture view, and reusable feature matrix while preserving FireVault workflows and storage."],["0.95.2","Redesigns Account Detail with a compact identity header, four fast actions, reordered tabs, responsive iPad content, and origin-aware Back navigation."],["0.95.1","Rebuilds Account Directory as a compact dark two-line list with a smaller search header, slim filters, dense account rows, and preserved quick actions."],["0.95.0","Adds a bottom-navigation Photo button with current-account capture, overlay preview, account confirmation, automatic image resizing, category memory, and IndexedDB-safe saving."],["0.94.10","Fixes the Account Detail crash caused by an undefined account-context value when opening an account from Nearby Accounts or Search."],["0.94.9","Shows Tech Info as a single Photo Overlay field with its own adjustment options and hides individual technician profile fields from the overlay editor."],["0.94.8","Repairs Technician Overlay Template wrapping and adds group-level left, center, or right alignment with exact preview/export matching."],["0.94.7","Adds a resized technician profile photo and completion-aware collapsible Technician sections that remain open until required information is filled."],["0.94.6","Enlarges Photo Overlay editing controls, adds a reusable Technician Overlay Template under Profile, and replaces the old Technician + Phone shortcut with Technician Info."],["0.94.5","Makes Photo Overlay field rows thinner, adds per-field flush-left/flush-right alignment, and adds a one-tap Technician + Phone flush-right layout."],["0.94.4","Replaces raw Photo Overlay text editing with an auto-saving field builder that supports one-tap add, reordering, line control, and removal without a keyboard confirmation step."],["0.94.3","Maximizes the Photo Overlay Field Photo preview, removes the full detail header, and repairs field insertion and long overlay text rendering."],["0.94.2","Keeps the Photo Overlay Field Photo preview visible while controls scroll, reduces the preview size, and removes the visible sample-photo attribution line."],["0.94.1","Aligned the Nearby bottom navigation with Search and Settings and removed the red active-button underline across all three sections."],["0.94.0","Polished Settings section hierarchy, rebuilt the Account Directory header and search controls, improved active navigation, and standardized active-screen spacing and touch targets."],["0.93.1","Removed the three Settings shortcut buttons and repaired horizontal page overflow so Settings remains locked to vertical scrolling on iPhone and iPad."],["0.93.0","Improved field reliability with a visible splash presentation, unsaved-change protection, duplicate-action prevention, corrected navigation states, keyboard-safe forms, and consistent interaction feedback."],["0.92.0","Introduced a canonical release-facing design system for global chrome, Account Directory, Account Detail, Settings, Nearby, forms, cards, buttons, and responsive iPhone/iPad layouts."],["0.91.1","Rebuilt the three Settings status shortcuts as equal-width responsive controls with clear icons, readable status text, and reliable iPhone/iPad alignment."],["0.91.0","Moved photos and scanned-page payloads from the main localStorage vault into IndexedDB, added storage health and protection controls, preserved complete-media exports, and retained safe legacy migration."],["0.90.0","Core cleanup removed retired scanner capture and service timers, shortened startup, removed the global portrait lock, standardized Account terminology, and added release-safe error recovery."],["0.89.0","Rebuilt Photo Overlay as a compact visual studio with an exact canvas preview, quick presets, reorganized content/layout/branding controls, expanded account fields, and a real fire-alarm deficiency sample photo with attribution."],["0.88.0","Overhauled Settings with sticky search, live status summaries, richer grouped cards, consistent detail screens, and improved iPad layout while preserving every release-critical setting."],["0.87.11","Restored WebDAV Backup to Data & Backup and Settings search while preserving saved connection settings and transfer tools."],["0.87.10","Aligned the four Account Directory card actions across the full card width in Call, Route, Add Note, Favorite order."],["0.87.9","Cleaned up the Account Directory with layered depth, raised controls, dimensional account cards, and category-accented shading while preserving fluid scrolling."],["0.87.8","Improved Account Directory scrolling performance and added iPad portrait, landscape, and split-view layout refinements."],["0.87.4","Added spacing and search to Settings, removed the Field category, moved Google Plus Codes under Maps & GPS, enlarged Account ID/category tags, moved Favorite beside Call, removed empty panel/contact text, and restored Nearby-style card scroll locking."],["0.87.3","Moved account addresses below site names, placed Account ID and category tags beneath the address, and changed Settings to a dark grouped-list design without a duplicate logo."],["0.87.2","Polished Account Directory cards and removed the default Ready, No Open Work, and GPS status tags so only actionable issues are shown."],["0.87.1","Rebuilt Account Directory, Search, account cards, and Account Detail from the stable 0.86.1 baseline and removed the layout gap above the bottom navigation."],["0.86.1","Repaired the Settings startup error and standardized the three-button Nearby, Search, and Settings dock across the app."],["0.86.0","Redesigned Settings as a simplified dark tile dashboard and renamed the bottom Accounts navigation button to Search."],["0.85.0","Removed Tools navigation and the Account Detail Visit action, and rebuilt Settings as a simple grouped menu with clean detail screens."],["0.84.0","Refined Nearby map selection with a fixed details overlay, no marker popup, delayed street-level zoom, and direct account-card navigation."],["0.81.0","Prepared FireVault for App Store review by removing the document scanner, Daily Route and time-tracking controls, theme selection, advanced settings, diagnostics access, and excess instructional copy while preserving account data."]],["0.80.3","Defaulted new Tools scanner documents to the closest GPS-ready account with visible distance, accuracy, retry, and manual override."],["0.80.2","Simplified Document Scanner, added on-device AI Auto Scan with live corner framing and hands-free capture, and repaired mobile keyboard field visibility."],["0.80.1","Moved Document Scanner to Tools, added post-capture account search and matching, and added scanner access inside the full Site Notes workspace."],["0.80.0","Added an account-specific multi-page camera document scanner with automatic edge detection, manual corner correction, rotation, cleanup modes, page ordering, PDF preview/download/share, and account-note activity."],["0.79.14","Restored numbered Nearby Accounts map pins matched to distance-sorted list rows and removed Smart Account Intelligence."],["0.79.13","Repaired startup parsing inherited from 0.79.11 and corrected Building Navigator location-copy syntax."],["0.79.12","Added Building Navigator with exact site locations, GPS/Plus Codes, verification, linked photos, route targets, and timeline events."],["0.79.7","Shortened every Settings summary and removed the colored bar from each Section Overview."],["0.79.6","Added Nearby-style account-list scroll locking so cards settle cleanly at the top while the Accounts controls remain fixed."],["0.79.5","Added separate Personal OneDrive, Work OneDrive, and SharePoint connection profiles with exact photo/document assignments and no-personal-fallback protection."],["0.79.4","Added independent photo and document storage destinations, cloud-provider integration targets, and offline Google Plus Codes for accounts and exact field locations."],["0.79.3","Added backend-neutral provider interfaces for authentication, database, file storage, synchronization, and audit while keeping FireVault fully local."],["0.79.2","Added a unified Security Center with vault integrity validation, backup health, audit filters, device naming, session clearing, and PIN confirmation for sensitive exports, restores, and deletion."],["0.79.1","Added an optional local six-digit privacy lock with PBKDF2 hashing, inactivity/background locking, app-switcher privacy screen, recovery code, cooldown protection, and local lock events."],["0.79.0","Added security-ready schema 4 metadata, stable workspace/user/device identities, local audit history, pending change queue, recoverable deletion, credential-safe exports, and protected restore/reset actions."],["0.67.0","Redesigned Account View around service actions and grouped information, consolidated Settings into five folders, and simplified FireVault Academy and contextual Help for continuous reading."],["0.65.2","Repaired Nearby Accounts with GPS inventory counts, imported-coordinate recovery, persistent permission and timeout messages, a standard-accuracy retry, and nearest-site fallback results."],["0.65.1","Added online latitude/longitude calculation, coordinate validation, geocoding progress, unmatched-address review, optional CSV coordinates, and coordinate-safe repeat importing."],["0.65.0","Added preview-first customer CSV importing, Account Id update matching, validation warnings, imported monitoring details, and sync activity tracking."],["0.64.1","Simplified Academy article headers, removed floating metadata badges, and improved continuous scrolling and readability."],["0.64.0","Added Sync Activity, a conflict review center, export/import audit entries, and an automatic OneDrive connection-readiness checklist."],["0.63.1","Overhauled contextual Help and Academy reader formatting, removed overlapping sticky article headers, and restored full scrolling on phones and tablets."],["0.63.0","Added permanent record IDs, audit metadata, local version tracking, pending-sync states, conflict readiness, device identity, and a Team Sync settings workspace."],["0.60.0","Connected major screens and Settings areas directly to matching Academy chapters with return-to-screen navigation."],["0.59.0","Added interactive tutorials, guided orientation, pinned learning, field tips, and documentation tracking."],["0.58.0","Expanded Help & Manual into FireVault Academy with bookmarks, smart search, Quick Start, and reader navigation."],["0.57.0","Added the first complete searchable in-app FireVault User Manual."],["Ongoing review rule","Any change to navigation, labels, storage, workflows, permissions, or supported layouts requires the related manual chapter to be checked."]]],
+  revisions:["📋","Revision History","Application and documentation checkpoints.",[[["0.95.8","Adds a profile-driven Theme Profile for brand assets, semantic colors, typography, shape, and mobile browser chrome while preserving FireVault’s dark technician interface."],["0.95.7","Adds profile-defined action surfaces and Quick Photo workflow presets while preserving FireVault's complete technician workflow."],["0.95.6","Adds a profile-defined record schema for account fields, detail sections, and photo categories while keeping FireVault's complete fire-alarm data model active."],["0.95.5","Makes navigation, Account Detail tabs and actions, routes, and Settings respond to the App Profile enabled-module list while preserving all FireVault modules."],["0.95.4","Connects the App Profile terminology layer to live Search, Nearby, Account Detail, account forms, Quick Photo, navigation, and photo-category workflows while preserving FireVault labels and storage."],["0.95.3","Adds a central App Profile, terminology layer, module registry, in-app architecture view, and reusable feature matrix while preserving FireVault workflows and storage."],["0.95.2","Redesigns Account Detail with a compact identity header, four fast actions, reordered tabs, responsive iPad content, and origin-aware Back navigation."],["0.95.1","Rebuilds Account Directory as a compact dark two-line list with a smaller search header, slim filters, dense account rows, and preserved quick actions."],["0.95.0","Adds a bottom-navigation Photo button with current-account capture, overlay preview, account confirmation, automatic image resizing, category memory, and IndexedDB-safe saving."],["0.94.10","Fixes the Account Detail crash caused by an undefined account-context value when opening an account from Nearby Accounts or Search."],["0.94.9","Shows Tech Info as a single Photo Overlay field with its own adjustment options and hides individual technician profile fields from the overlay editor."],["0.94.8","Repairs Technician Overlay Template wrapping and adds group-level left, center, or right alignment with exact preview/export matching."],["0.94.7","Adds a resized technician profile photo and completion-aware collapsible Technician sections that remain open until required information is filled."],["0.94.6","Enlarges Photo Overlay editing controls, adds a reusable Technician Overlay Template under Profile, and replaces the old Technician + Phone shortcut with Technician Info."],["0.94.5","Makes Photo Overlay field rows thinner, adds per-field flush-left/flush-right alignment, and adds a one-tap Technician + Phone flush-right layout."],["0.94.4","Replaces raw Photo Overlay text editing with an auto-saving field builder that supports one-tap add, reordering, line control, and removal without a keyboard confirmation step."],["0.94.3","Maximizes the Photo Overlay Field Photo preview, removes the full detail header, and repairs field insertion and long overlay text rendering."],["0.94.2","Keeps the Photo Overlay Field Photo preview visible while controls scroll, reduces the preview size, and removes the visible sample-photo attribution line."],["0.94.1","Aligned the Nearby bottom navigation with Search and Settings and removed the red active-button underline across all three sections."],["0.94.0","Polished Settings section hierarchy, rebuilt the Account Directory header and search controls, improved active navigation, and standardized active-screen spacing and touch targets."],["0.93.1","Removed the three Settings shortcut buttons and repaired horizontal page overflow so Settings remains locked to vertical scrolling on iPhone and iPad."],["0.93.0","Improved field reliability with a visible splash presentation, unsaved-change protection, duplicate-action prevention, corrected navigation states, keyboard-safe forms, and consistent interaction feedback."],["0.92.0","Introduced a canonical release-facing design system for global chrome, Account Directory, Account Detail, Settings, Nearby, forms, cards, buttons, and responsive iPhone/iPad layouts."],["0.91.1","Rebuilt the three Settings status shortcuts as equal-width responsive controls with clear icons, readable status text, and reliable iPhone/iPad alignment."],["0.91.0","Moved photos and scanned-page payloads from the main localStorage vault into IndexedDB, added storage health and protection controls, preserved complete-media exports, and retained safe legacy migration."],["0.90.0","Core cleanup removed retired scanner capture and service timers, shortened startup, removed the global portrait lock, standardized Account terminology, and added release-safe error recovery."],["0.89.0","Rebuilt Photo Overlay as a compact visual studio with an exact canvas preview, quick presets, reorganized content/layout/branding controls, expanded account fields, and a real fire-alarm deficiency sample photo with attribution."],["0.88.0","Overhauled Settings with sticky search, live status summaries, richer grouped cards, consistent detail screens, and improved iPad layout while preserving every release-critical setting."],["0.87.11","Restored WebDAV Backup to Data & Backup and Settings search while preserving saved connection settings and transfer tools."],["0.87.10","Aligned the four Account Directory card actions across the full card width in Call, Route, Add Note, Favorite order."],["0.87.9","Cleaned up the Account Directory with layered depth, raised controls, dimensional account cards, and category-accented shading while preserving fluid scrolling."],["0.87.8","Improved Account Directory scrolling performance and added iPad portrait, landscape, and split-view layout refinements."],["0.87.4","Added spacing and search to Settings, removed the Field category, moved Google Plus Codes under Maps & GPS, enlarged Account ID/category tags, moved Favorite beside Call, removed empty panel/contact text, and restored Nearby-style card scroll locking."],["0.87.3","Moved account addresses below site names, placed Account ID and category tags beneath the address, and changed Settings to a dark grouped-list design without a duplicate logo."],["0.87.2","Polished Account Directory cards and removed the default Ready, No Open Work, and GPS status tags so only actionable issues are shown."],["0.87.1","Rebuilt Account Directory, Search, account cards, and Account Detail from the stable 0.86.1 baseline and removed the layout gap above the bottom navigation."],["0.86.1","Repaired the Settings startup error and standardized the three-button Nearby, Search, and Settings dock across the app."],["0.86.0","Redesigned Settings as a simplified dark tile dashboard and renamed the bottom Accounts navigation button to Search."],["0.85.0","Removed Tools navigation and the Account Detail Visit action, and rebuilt Settings as a simple grouped menu with clean detail screens."],["0.84.0","Refined Nearby map selection with a fixed details overlay, no marker popup, delayed street-level zoom, and direct account-card navigation."],["0.81.0","Prepared FireVault for App Store review by removing the document scanner, Daily Route and time-tracking controls, theme selection, advanced settings, diagnostics access, and excess instructional copy while preserving account data."]],["0.80.3","Defaulted new Tools scanner documents to the closest GPS-ready account with visible distance, accuracy, retry, and manual override."],["0.80.2","Simplified Document Scanner, added on-device AI Auto Scan with live corner framing and hands-free capture, and repaired mobile keyboard field visibility."],["0.80.1","Moved Document Scanner to Tools, added post-capture account search and matching, and added scanner access inside the full Site Notes workspace."],["0.80.0","Added an account-specific multi-page camera document scanner with automatic edge detection, manual corner correction, rotation, cleanup modes, page ordering, PDF preview/download/share, and account-note activity."],["0.79.14","Restored numbered Nearby Accounts map pins matched to distance-sorted list rows and removed Smart Account Intelligence."],["0.79.13","Repaired startup parsing inherited from 0.79.11 and corrected Building Navigator location-copy syntax."],["0.79.12","Added Building Navigator with exact site locations, GPS/Plus Codes, verification, linked photos, route targets, and timeline events."],["0.79.7","Shortened every Settings summary and removed the colored bar from each Section Overview."],["0.79.6","Added Nearby-style account-list scroll locking so cards settle cleanly at the top while the Accounts controls remain fixed."],["0.79.5","Added separate Personal OneDrive, Work OneDrive, and SharePoint connection profiles with exact photo/document assignments and no-personal-fallback protection."],["0.79.4","Added independent photo and document storage destinations, cloud-provider integration targets, and offline Google Plus Codes for accounts and exact field locations."],["0.79.3","Added backend-neutral provider interfaces for authentication, database, file storage, synchronization, and audit while keeping FireVault fully local."],["0.79.2","Added a unified Security Center with vault integrity validation, backup health, audit filters, device naming, session clearing, and PIN confirmation for sensitive exports, restores, and deletion."],["0.79.1","Added an optional local six-digit privacy lock with PBKDF2 hashing, inactivity/background locking, app-switcher privacy screen, recovery code, cooldown protection, and local lock events."],["0.79.0","Added security-ready schema 4 metadata, stable workspace/user/device identities, local audit history, pending change queue, recoverable deletion, credential-safe exports, and protected restore/reset actions."],["0.67.0","Redesigned Account View around service actions and grouped information, consolidated Settings into five folders, and simplified FireVault Academy and contextual Help for continuous reading."],["0.65.2","Repaired Nearby Accounts with GPS inventory counts, imported-coordinate recovery, persistent permission and timeout messages, a standard-accuracy retry, and nearest-site fallback results."],["0.65.1","Added online latitude/longitude calculation, coordinate validation, geocoding progress, unmatched-address review, optional CSV coordinates, and coordinate-safe repeat importing."],["0.65.0","Added preview-first customer CSV importing, Account Id update matching, validation warnings, imported monitoring details, and sync activity tracking."],["0.64.1","Simplified Academy article headers, removed floating metadata badges, and improved continuous scrolling and readability."],["0.64.0","Added Sync Activity, a conflict review center, export/import audit entries, and an automatic OneDrive connection-readiness checklist."],["0.63.1","Overhauled contextual Help and Academy reader formatting, removed overlapping sticky article headers, and restored full scrolling on phones and tablets."],["0.63.0","Added permanent record IDs, audit metadata, local version tracking, pending-sync states, conflict readiness, device identity, and a Team Sync settings workspace."],["0.60.0","Connected major screens and Settings areas directly to matching Academy chapters with return-to-screen navigation."],["0.59.0","Added interactive tutorials, guided orientation, pinned learning, field tips, and documentation tracking."],["0.58.0","Expanded Help & Manual into FireVault Academy with bookmarks, smart search, Quick Start, and reader navigation."],["0.57.0","Added the first complete searchable in-app FireVault User Manual."],["Ongoing review rule","Any change to navigation, labels, storage, workflows, permissions, or supported layouts requires the related manual chapter to be checked."]]],
   trouble:["❓","Troubleshooting","Common problems and safe first checks.",FIREVAULT_MANUAL_058.find(x=>x.id==="trouble")?.topics||[]]
  };
  const [icon,title,note,items]=pages[type]||["ⓘ","Unavailable","This Help section is not available in the installed version.",[["Current status","Return to Help and choose an available chapter or tutorial."]]];
@@ -8708,6 +8825,10 @@ function architectureSummaryText0953(){
     `Build: ${BUILD}`,
     `App profile schema: ${APP_PROFILE_SCHEMA_VERSION}`,
     `Module registry: ${MODULE_REGISTRY_VERSION}`,
+    `Module bindings: ${MODULE_BINDINGS_VERSION}`,
+    `Record schema: ${RECORD_SCHEMA_VERSION} (${APP_PROFILE.dataModel?.schemaId||RECORD_SCHEMA.id})`,
+    `Workflow schema: ${WORKFLOW_SCHEMA_VERSION} (${APP_PROFILE.workflows?.presetId||"default"})`,
+    `Theme profile: ${THEME_PROFILE_SCHEMA_VERSION} (${ACTIVE_THEME_0958.id})`,
     `Modules: ${summary.total}`,
     `Core: ${summary.core}`,
     `Reusable optional: ${summary.optional}`,
@@ -8716,6 +8837,11 @@ function architectureSummaryText0953(){
     `Primary record term: ${appTerm("account",1)} / ${appTerm("account",2)}`,
     `Record ID label: ${recordIdLabel0954()}`,
     `Visible terminology integration: Active`,
+    `Module-aware navigation and Settings: Active`,
+    `Profile-defined fields and photo categories: Active`,
+    `Profile-defined actions and Quick Photo workflow: Active`,
+    `Profile-defined branding and visual tokens: Active`,
+    `Enabled modules: ${summary.enabled} of ${summary.total}`,
     `Storage key: ${KEY}`
   ].join("\n");
 }
@@ -8736,18 +8862,47 @@ function architecturePanel0953(){
   return `<div class="settingsStack settingsStack540 architectureStack0953">
     ${settingsSection540("Reusable foundation","App Profile",`${APP_PROFILE.name} remains optimized for ${APP_PROFILE.audience.toLowerCase()}, while shared behavior is defined outside the fire-specific layer.`,`
       <div class="architectureProfile0953">
-        <div class="architectureProfileBrand0953"><img src="assets/favicon.png?v=${BUILD}" alt=""><div><strong>${esc(APP_PROFILE.name)}</strong><span>${esc(APP_PROFILE.industry)}</span></div><em>Profile v${APP_PROFILE.schemaVersion}</em></div>
+        <div class="architectureProfileBrand0953"><img src="${esc(themeBrandAsset(APP_PROFILE,"mark"))}?v=${BUILD}" alt=""><div><strong>${esc(APP_PROFILE.name)}</strong><span>${esc(APP_PROFILE.industry)}</span></div><em>Profile v${APP_PROFILE.schemaVersion}</em></div>
         <div class="architectureProfileGrid0953">
           <div><strong>Record terminology</strong><span>${esc(appTerm("account",1))} / ${esc(appTerm("account",2))}</span></div>
           <div><strong>Record ID label</strong><span>${esc(recordIdLabel0954())}</span></div>
           <div><strong>Location terminology</strong><span>${esc(appTerm("location",1))} / ${esc(appTerm("location",2))}</span></div>
           <div><strong>Navigation</strong><span>${["nearby","search","photo","settings"].map(appNavigationLabel).map(esc).join(" · ")}</span></div>
           <div><strong>Visible labels</strong><span>Directory · Detail · Forms · Quick Photo</span></div>
+          <div><strong>Module-aware UI</strong><span>Navigation · Account tabs · Actions · Settings</span></div>
+          <div><strong>Binding schema</strong><span>Version ${MODULE_BINDINGS_VERSION}</span></div>
+          <div><strong>Workflow preset</strong><span>${esc(APP_PROFILE.workflows?.presetId||"default")}</span></div>
+          <div><strong>Workflow schema</strong><span>Version ${WORKFLOW_SCHEMA_VERSION}</span></div>
+          <div><strong>Theme profile</strong><span>${esc(ACTIVE_THEME_0958.name)} · v${THEME_PROFILE_SCHEMA_VERSION}</span></div>
+          <div><strong>Brand identity</strong><span>${esc(ACTIVE_THEME_0958.branding.tagline)}</span></div>
           <div><strong>Storage compatibility</strong><span>${esc(KEY)}</span></div>
         </div>
-        <p>The profile now actively supplies terminology to the Directory, Nearby, Account Detail, account forms, Quick Photo, navigation labels, appearance, photo categories, and enabled modules. FireVault data and workflows are unchanged.</p>
+        <p>The profile supplies terminology, enabled modules, record fields, detail sections, photo categories, actions, capture behavior, branding, and visual tokens to the shared workflows. FireVault keeps every current fire-alarm module, field, and technician action enabled.</p>
       </div>
     `,"red")}
+    ${settingsSection540("Configurable data model","Record Schema",`${recordSchemaSummary(APP_PROFILE).activeFields} active fields, ${recordSchemaSummary(APP_PROFILE).detailSections} detail sections, and ${recordSchemaSummary(APP_PROFILE).photoCategories} photo categories are selected by the App Profile.`, `
+      <div class="recordSchemaMetrics0956"><div><strong>${recordSchemaSummary(APP_PROFILE).activeFields}</strong><span>Active fields</span></div><div><strong>${recordSchemaSummary(APP_PROFILE).requiredFields}</strong><span>Required</span></div><div><strong>${recordSchemaSummary(APP_PROFILE).detailSections}</strong><span>Detail sections</span></div><div><strong>${recordSchemaSummary(APP_PROFILE).photoCategories}</strong><span>Photo categories</span></div></div>
+      <div class="recordSchemaTableWrap0956"><table class="recordSchemaTable0956"><thead><tr><th>Field</th><th>Group</th><th>Type</th><th>Layer</th></tr></thead><tbody>${activeRecordFields(APP_PROFILE).map(field=>`<tr><td><strong>${esc(field.label)}</strong><small>${esc(field.id)}${field.required?" · Required":""}</small></td><td>${esc(RECORD_SCHEMA.groups.find(group=>group.id===field.group)?.label||field.group)}</td><td>${esc(field.type)}</td><td>${field.appForgeReady?"Core-ready":"FireVault"}</td></tr>`).join("")}</tbody></table></div>
+      <div class="recordSchemaCategories0956"><strong>Photo categories</strong><div>${recordPhotoCategories(APP_PROFILE).map(category=>`<span>${esc(category.label)}</span>`).join("")}</div></div>
+      <div class="architectureActions0953"><button class="ghost" id="downloadRecordSchema0956">Download Record Schema</button></div>
+    `,"green")}
+    ${settingsSection540("Configurable field workflow","Workflow Schema",`${workflowSchemaSummary(APP_PROFILE).directoryActions} directory actions, ${workflowSchemaSummary(APP_PROFILE).detailPrimaryActions} primary actions, and ${workflowSchemaSummary(APP_PROFILE).notesActions} Notes actions are selected by the ${APP_PROFILE.workflows?.presetId||"default"} preset.`, `
+      <div class="workflowSchemaMetrics0957"><div><strong>${workflowSchemaSummary(APP_PROFILE).directoryActions}</strong><span>Directory</span></div><div><strong>${workflowSchemaSummary(APP_PROFILE).detailPrimaryActions}</strong><span>Detail</span></div><div><strong>${workflowSchemaSummary(APP_PROFILE).notesActions}</strong><span>Notes</span></div><div><strong>${QUICK_PHOTO_WORKFLOW_0957.maxImageDimension}</strong><span>Photo pixels</span></div></div>
+      <div class="workflowSchemaSurfaces0957">
+        ${[["Directory","directory"],["Account Detail","detailPrimary"],["Notes Workspace","notes"]].map(([label,surface])=>`<section><strong>${esc(label)}</strong><div>${workflowActions0957(surface).map(action=>`<span>${esc(action.label)}</span>`).join("")||"<em>No actions selected</em>"}</div></section>`).join("")}
+      </div>
+      <div class="workflowPhotoSummary0957"><strong>Quick Photo preset</strong><span>${QUICK_PHOTO_WORKFLOW_0957.cameraFacing==="environment"?"Rear camera":"Selectable camera"} · ${QUICK_PHOTO_WORKFLOW_0957.defaultUseOverlay?"Overlay on":"Overlay off"} · ${QUICK_PHOTO_WORKFLOW_0957.allowAccountChange?"Account change allowed":"Account locked"} · ${QUICK_PHOTO_WORKFLOW_0957.showCategory?"Categories shown":"Category hidden"}</span></div>
+      <div class="architectureActions0953"><button class="ghost" id="downloadWorkflowSchema0957">Download Workflow Schema</button></div>
+    `,"orange")}
+    ${settingsSection540("Configurable brand system","Theme Profile",`${themeProfileSummary(APP_PROFILE).name} supplies the shared app shell with brand assets, semantic colors, typography, shape, and mobile browser chrome.`, `
+      <div class="themeProfileMetrics0958"><div><strong>${esc(themeProfileSummary(APP_PROFILE).mode)}</strong><span>Mode</span></div><div><strong>${esc(themeProfileSummary(APP_PROFILE).accent)}</strong><span>Accent</span></div><div><strong>${themeProfileSummary(APP_PROFILE).brandAssets}</strong><span>Brand assets</span></div><div><strong>${themeProfileSummary(APP_PROFILE).radius}px</strong><span>Radius</span></div></div>
+      <div class="themeProfilePreview0958" style="--theme-preview-accent:${esc(ACTIVE_THEME_0958.colors.accent)};--theme-preview-bg:${esc(ACTIVE_THEME_0958.colors.background)};--theme-preview-surface:${esc(ACTIVE_THEME_0958.colors.surface)};--theme-preview-text:${esc(ACTIVE_THEME_0958.colors.text)}">
+        <div><img src="${esc(themeBrandAsset(APP_PROFILE,"mark"))}?v=${BUILD}" alt=""><span>${fireVaultBrand575()}</span><small>${esc(ACTIVE_THEME_0958.branding.tagline)}</small></div>
+        <button type="button">Primary action</button>
+      </div>
+      <div class="themeTokenGrid0958">${Object.entries(ACTIVE_THEME_0958.colors).map(([key,value])=>`<span><i style="background:${esc(value)}"></i><b>${esc(key)}</b><code>${esc(value)}</code></span>`).join("")}</div>
+      <div class="architectureActions0953"><button class="ghost" id="downloadThemeProfile0958">Download Theme Profile</button></div>
+    `,"violet")}
     ${settingsSection540("Architecture inventory","Module Registry",`${summary.total} registered modules are explicitly separated into shared core, reusable optional, and FireVault-specific layers.`,`
       <div class="architectureMetrics0953"><div><strong>${summary.core}</strong><span>Core</span></div><div><strong>${summary.optional}</strong><span>Reusable</span></div><div><strong>${summary.firevault}</strong><span>FireVault</span></div><div><strong>${summary.appForgeReady}</strong><span>AppForge ready</span></div></div>
       <div class="architectureLegend0953">${grouped.map(group=>`<span class="class-${group.kind}"><b>${esc(group.meta.label)}</b>${esc(group.meta.description)}</span>`).join("")}</div>
@@ -8755,7 +8910,7 @@ function architecturePanel0953(){
     `,"blue")}
     ${settingsSection540("Future app planning","Feature & App Matrix","This matrix is the rulebook for deciding whether each change belongs in the shared core, a reusable module, or the FireVault vertical layer.",`
       <div class="architectureMatrixScroll0953"><table class="architectureMatrix0953"><thead><tr><th>Module</th><th>Class</th>${FUTURE_APP_COLUMNS.map(app=>`<th>${esc(app.label)}</th>`).join("")}<th>AppForge</th></tr></thead><tbody>${matrix.map(row=>`<tr><td><strong>${esc(row.module)}</strong><small>${esc(row.id)}</small></td><td>${esc(row.classification)}</td>${FUTURE_APP_COLUMNS.map(app=>`<td class="matrixCheck0953 ${row[app.key]?"yes":"no"}">${row[app.key]?"✓":"—"}</td>`).join("")}<td class="matrixCheck0953 ${row.appForgeReady?"yes":"no"}">${row.appForgeReady?"✓":"Vertical"}</td></tr>`).join("")}</tbody></table></div>
-      <div class="architectureActions0953"><button class="primary" id="downloadArchitectureMatrix0953">Download Matrix CSV</button><button class="ghost" id="downloadAppProfile0953">Download App Profile</button><button class="ghost" id="downloadModuleRegistry0953">Download Module Registry</button><button class="ghost" id="copyArchitectureSummary0953">Copy Summary</button></div>
+      <div class="architectureActions0953"><button class="primary" id="downloadArchitectureMatrix0953">Download Matrix CSV</button><button class="ghost" id="downloadAppProfile0953">Download App Profile</button><button class="ghost" id="downloadModuleRegistry0953">Download Module Registry</button><button class="ghost" id="downloadModuleBindings0955">Download UI Bindings</button><button class="ghost" id="copyArchitectureSummary0953">Copy Summary</button></div>
     `,"violet")}
     <div class="settingsInfo540"><strong>Development rule</strong><span>Every future feature should identify its layer before implementation: Core, Reusable optional, or FireVault-specific. FireVault usefulness for fire alarm technicians remains the first requirement.</span></div>
   </div>`;
@@ -8764,6 +8919,10 @@ function wireArchitecture0953(){
   document.getElementById("downloadArchitectureMatrix0953")?.addEventListener("click",()=>{downloadBlob(`firevault-feature-module-matrix-build-${BUILD}.csv`,architectureMatrixCsv0953(),"text/csv");toast("Feature matrix downloaded.","success");});
   document.getElementById("downloadAppProfile0953")?.addEventListener("click",()=>{downloadBlob(`firevault-app-profile-build-${BUILD}.json`,JSON.stringify(appProfileExport(),null,2),"application/json");toast("App Profile downloaded.","success");});
   document.getElementById("downloadModuleRegistry0953")?.addEventListener("click",()=>{downloadBlob(`firevault-module-registry-build-${BUILD}.json`,JSON.stringify(moduleRegistryExport(),null,2),"application/json");toast("Module Registry downloaded.","success");});
+  document.getElementById("downloadModuleBindings0955")?.addEventListener("click",()=>{downloadBlob(`firevault-module-bindings-build-${BUILD}.json`,JSON.stringify(moduleBindingsExport(),null,2),"application/json");toast("UI module bindings downloaded.","success");});
+  document.getElementById("downloadRecordSchema0956")?.addEventListener("click",()=>{downloadBlob(`firevault-record-schema-build-${BUILD}.json`,JSON.stringify(recordSchemaExport(APP_PROFILE),null,2),"application/json");toast("Record schema downloaded.","success");});
+  document.getElementById("downloadWorkflowSchema0957")?.addEventListener("click",()=>{downloadBlob(`firevault-workflow-schema-build-${BUILD}.json`,JSON.stringify(workflowSchemaExport(APP_PROFILE),null,2),"application/json");toast("Workflow schema downloaded.","success");});
+  document.getElementById("downloadThemeProfile0958")?.addEventListener("click",()=>{downloadBlob(`firevault-theme-profile-build-${BUILD}.json`,JSON.stringify(themeProfileExport(APP_PROFILE),null,2),"application/json");toast("Theme profile downloaded.","success");});
   document.getElementById("copyArchitectureSummary0953")?.addEventListener("click",async()=>{try{await navigator.clipboard.writeText(architectureSummaryText0953());toast("Architecture summary copied.","success");}catch{toast("Clipboard unavailable.","error");}});
 }
 
@@ -9549,6 +9708,13 @@ function wireBackupSafety552(){
 
 function showChangelog(){
   const notes = [
+    "Build 0.95.8 adds a configurable Theme Profile for brand assets, semantic colors, typography, shape, and mobile browser chrome.",
+    "FireVault keeps its current dark red technician interface while future AppForge profiles can apply a different visual identity without branching shared screen code.",
+    "Build 0.95.7 adds a configurable workflow schema for Account Directory actions, Account Detail actions, Notes shortcuts, and Quick Photo behavior.",
+    "FireVault keeps Call, Route, Add Note, Favorite, Photo, Task, Deficiency, and Report actions active while future apps can select a smaller workflow preset.",
+    "Build 0.95.6 adds a configurable record schema that controls account fields, detail sections, required fields, and photo categories from the App Profile.",
+    "FireVault keeps its complete panel, address, GPS, notes, and technician data model enabled while future apps can select only the fields they need.",
+    "Build 0.95.5 activates module-aware navigation, route guards, Account Detail tabs and actions, and Settings filtering from the reusable App Profile.",
     "Build 0.95.4 connects the App Profile terminology layer to Search, Nearby, Account Detail, account forms, Quick Photo, navigation labels, and profile-defined photo categories while preserving FireVault terminology and data.",
     "Build 0.95.3 adds the reusable App Profile, terminology layer, module registry, in-app architecture view, and feature matrix without changing FireVault workflows or its storage key.",
     "Build 0.95.2 redesigns Account Detail with a compact identity header, Call / Route / Add Note / Photo actions, reordered tabs, responsive iPad content, and origin-aware Back navigation.",
@@ -9629,7 +9795,7 @@ function showChangelog(){
   overlay.className="releaseOverlay";
   overlay.innerHTML=`<div class="releaseSheet" role="dialog" aria-modal="true" aria-label="FireVault release notes">
     <div class="releaseHead"><div><strong>${fireVaultBrand575()}</strong><span>Build ${BUILD}</span></div><button class="ghost iconBtn" id="closeRelease" aria-label="Close release notes">×</button></div>
-    <div class="releaseBody"><h2>Release Notes</h2><p class="releaseIntro">FireVault 0.95.4 activates the reusable terminology layer across core field workflows while preserving the FireVault technician experience.</p><ul>${notes.map(n=>`<li>${esc(n)}</li>`).join("")}</ul></div>
+    <div class="releaseBody"><h2>Release Notes</h2><p class="releaseIntro">FireVault 0.95.8 makes branding and visual design tokens profile-driven while preserving the current fire-alarm technician interface.</p><ul>${notes.map(n=>`<li>${esc(n)}</li>`).join("")}</ul></div>
   </div>`;
   document.body.appendChild(overlay);
   const close=()=>overlay.remove();

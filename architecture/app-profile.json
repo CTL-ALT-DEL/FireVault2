@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 2,
+  "schemaVersion": 6,
   "id": "firevault",
   "family": "field-vault",
   "name": "FireVault",
@@ -50,11 +50,46 @@
     "photo": "Photo",
     "settings": "Settings"
   },
+  "branding": {
+    "mark": "assets/favicon.png",
+    "logo": "assets/firevault-logo-master.png",
+    "icon192": "assets/icon-192.png",
+    "icon512": "assets/icon-512.png",
+    "appleTouchIcon": "assets/apple-touch-icon.png",
+    "wordmark": [
+      {
+        "text": "FIRE",
+        "tone": "primary"
+      },
+      {
+        "text": "VAULT",
+        "tone": "accent"
+      }
+    ],
+    "tagline": "Field Vault System"
+  },
   "appearance": {
+    "profileId": "firevault-dark",
+    "profileName": "FireVault Dark",
     "theme": "dark",
     "accent": "#ef4444",
+    "accentStrong": "#991b1b",
     "background": "#0b0d10",
-    "surface": "#101216"
+    "surface": "#151922",
+    "surfaceRaised": "#1d2330",
+    "line": "#303747",
+    "text": "#f4f7fb",
+    "muted": "#a7b0c0",
+    "success": "#22c55e",
+    "warning": "#f59e0b",
+    "info": "#38bdf8",
+    "cyan": "#22d3ee",
+    "themeColor": "#101216",
+    "statusBarStyle": "black",
+    "radius": 18,
+    "controlRadius": 15,
+    "compact": false,
+    "baseFontSize": 14
   },
   "defaultPhotoCategories": [
     "Panel",
@@ -67,8 +102,98 @@
     "After",
     "Other"
   ],
+  "dataModel": {
+    "schemaId": "firevault.account.v1",
+    "enabledFieldIds": [
+      "name",
+      "externalAccountId",
+      "sitePhone",
+      "street",
+      "city",
+      "state",
+      "zip",
+      "gps",
+      "panelManufacturer",
+      "panelModel",
+      "notes"
+    ],
+    "requiredFieldIds": [
+      "name"
+    ],
+    "detailSectionIds": [
+      "overview",
+      "notes",
+      "locations",
+      "equipment",
+      "docs",
+      "details"
+    ],
+    "photoCategoryIds": [
+      "panel",
+      "nac",
+      "device",
+      "communicator",
+      "battery",
+      "deficiency",
+      "before",
+      "after",
+      "other"
+    ]
+  },
+  "workflows": {
+    "presetId": "fire-alarm-technician",
+    "directoryActionIds": [
+      "call",
+      "route",
+      "note",
+      "favorite"
+    ],
+    "detailPrimaryActionIds": [
+      "call",
+      "route",
+      "note",
+      "photo"
+    ],
+    "notesActionIds": [
+      "task",
+      "deficiency",
+      "photo",
+      "report"
+    ],
+    "quickPhoto": {
+      "defaultUseOverlay": true,
+      "defaultIncludeReport": false,
+      "rememberAccount": true,
+      "rememberCategory": true,
+      "allowAccountChange": true,
+      "allowRetake": true,
+      "showCategory": true,
+      "showOverlayToggle": true,
+      "showReportToggle": true,
+      "showTitle": true,
+      "showInternalNotes": true,
+      "showCustomerCaption": true,
+      "cameraFacing": "environment",
+      "maxImageDimension": 2048,
+      "jpegQuality": 0.86
+    }
+  },
+  "interfaceIntegration": {
+    "terminology": true,
+    "navigation": true,
+    "routes": true,
+    "accountTabs": true,
+    "accountActions": true,
+    "settings": true,
+    "recordFields": true,
+    "detailSections": true,
+    "photoCategories": true,
+    "workflows": true,
+    "brandingTheme": true
+  },
   "enabledModules": [
     "core.records",
+    "core.themeProfile",
     "core.search",
     "core.nearby",
     "core.notes",

@@ -1,5 +1,5 @@
 {
-  "version": 1,
+  "version": 3,
   "classifications": {
     "core": {
       "label": "Core",
@@ -46,7 +46,24 @@
       "name": "Record Database",
       "classification": "core",
       "status": "active",
-      "description": "Stable records with identity, address, metadata, history, and relationships.",
+      "description": "Stable records with profile-selected fields, identity, address, metadata, history, and relationships.",
+      "dependencies": [],
+      "appForgeReady": true,
+      "apps": {
+        "fireVault": true,
+        "travelGuide": true,
+        "fishing": true,
+        "ghostTowns": true,
+        "gardening": true,
+        "inspection": true
+      }
+    },
+    {
+      "id": "core.themeProfile",
+      "name": "Branding & Theme Profile",
+      "classification": "core",
+      "status": "active",
+      "description": "Profile-resolved app assets, wordmark, semantic colors, typography, shape, density, and mobile browser chrome.",
       "dependencies": [],
       "appForgeReady": true,
       "apps": {

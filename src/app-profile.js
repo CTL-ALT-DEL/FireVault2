@@ -1,4 +1,4 @@
-export const APP_PROFILE_SCHEMA_VERSION = 2;
+export const APP_PROFILE_SCHEMA_VERSION = 6;
 
 export const APP_PROFILE = Object.freeze({
   schemaVersion: APP_PROFILE_SCHEMA_VERSION,
@@ -52,17 +52,92 @@ export const APP_PROFILE = Object.freeze({
     photo: "Photo",
     settings: "Settings"
   }),
+  branding: Object.freeze({
+    mark:"assets/favicon.png",
+    logo:"assets/firevault-logo-master.png",
+    icon192:"assets/icon-192.png",
+    icon512:"assets/icon-512.png",
+    appleTouchIcon:"assets/apple-touch-icon.png",
+    wordmark:Object.freeze([
+      Object.freeze({text:"FIRE",tone:"primary"}),
+      Object.freeze({text:"VAULT",tone:"accent"})
+    ]),
+    tagline:"Field Vault System"
+  }),
   appearance: Object.freeze({
-    theme: "dark",
-    accent: "#ef4444",
-    background: "#0b0d10",
-    surface: "#101216"
+    profileId:"firevault-dark",
+    profileName:"FireVault Dark",
+    theme:"dark",
+    accent:"#ef4444",
+    accentStrong:"#991b1b",
+    background:"#0b0d10",
+    surface:"#151922",
+    surfaceRaised:"#1d2330",
+    line:"#303747",
+    text:"#f4f7fb",
+    muted:"#a7b0c0",
+    success:"#22c55e",
+    warning:"#f59e0b",
+    info:"#38bdf8",
+    cyan:"#22d3ee",
+    themeColor:"#101216",
+    statusBarStyle:"black",
+    radius:18,
+    controlRadius:15,
+    compact:false,
+    baseFontSize:14
   }),
   defaultPhotoCategories: Object.freeze([
     "Panel","NAC","Device","Communicator","Battery","Deficiency","Before","After","Other"
   ]),
+  dataModel: Object.freeze({
+    schemaId:"firevault.account.v1",
+    enabledFieldIds:Object.freeze([
+      "name","externalAccountId","sitePhone","street","city","state","zip","gps","panelManufacturer","panelModel","notes"
+    ]),
+    requiredFieldIds:Object.freeze(["name"]),
+    detailSectionIds:Object.freeze(["overview","notes","locations","equipment","docs","details"]),
+    photoCategoryIds:Object.freeze(["panel","nac","device","communicator","battery","deficiency","before","after","other"])
+  }),
+  workflows:Object.freeze({
+    presetId:"fire-alarm-technician",
+    directoryActionIds:Object.freeze(["call","route","note","favorite"]),
+    detailPrimaryActionIds:Object.freeze(["call","route","note","photo"]),
+    notesActionIds:Object.freeze(["task","deficiency","photo","report"]),
+    quickPhoto:Object.freeze({
+      defaultUseOverlay:true,
+      defaultIncludeReport:false,
+      rememberAccount:true,
+      rememberCategory:true,
+      allowAccountChange:true,
+      allowRetake:true,
+      showCategory:true,
+      showOverlayToggle:true,
+      showReportToggle:true,
+      showTitle:true,
+      showInternalNotes:true,
+      showCustomerCaption:true,
+      cameraFacing:"environment",
+      maxImageDimension:2048,
+      jpegQuality:0.86
+    })
+  }),
+  interfaceIntegration:Object.freeze({
+    terminology:true,
+    navigation:true,
+    routes:true,
+    accountTabs:true,
+    accountActions:true,
+    settings:true,
+    recordFields:true,
+    detailSections:true,
+    photoCategories:true,
+    workflows:true,
+    brandingTheme:true
+  }),
   enabledModules: Object.freeze([
     "core.records",
+    "core.themeProfile",
     "core.search",
     "core.nearby",
     "core.notes",

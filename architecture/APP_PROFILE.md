@@ -1,29 +1,7 @@
 # FireVault App Profile
 
-FireVault Build 0.95.4 uses a central application profile in `src/app-profile.js` as an active source for reusable UI terminology and configuration.
+FireVault Build 0.95.8 uses `src/app-profile.js` as the active configuration for identity, terminology, modules, record data model, field workflow presets, branding, and visual design tokens.
 
-## Profile responsibilities
+The FireVault profile remains optimized for fire alarm technicians. Shared screens consume the profile so future AppForge products can change terminology, enabled modules, fields, detail sections, photo categories, action surfaces, Quick Photo behavior, brand assets, colors, typography, and shape without rewriting the shared application core.
 
-- App identity and industry
-- Singular and plural record terminology
-- Record-ID label
-- Reusable interface phrases
-- Location, technician, note, equipment, task, deficiency, and file terminology
-- Bottom-navigation labels
-- Appearance defaults
-- Default photo categories
-- Enabled modules
-
-## Live integration
-
-The profile now drives visible terminology in:
-
-- Search / Account Directory
-- Nearby
-- Account Detail
-- Add / Edit Account
-- Quick Photo
-- Navigation labels
-- Photo categories
-
-The FireVault profile continues to resolve these terms as Account, Accounts, Account ID, and other fire-service wording. Future AppForge profiles can substitute different vocabulary without changing the underlying record storage or workflows.
+The active profile uses schema version 6, the `fire-alarm-technician` workflow preset, and the `firevault-dark` Theme Profile.

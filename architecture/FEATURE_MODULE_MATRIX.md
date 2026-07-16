@@ -1,7 +1,7 @@
 # FireVault / Field Vault Feature and Module Matrix
 
-Build baseline: 0.95.4  
-Architecture version: 1
+Build baseline: 0.95.8  
+Architecture version: 2
 
 ## Decision rule
 
@@ -12,6 +12,7 @@ Architecture version: 1
 | Module | Class | FireVault | Travel Guide | Fishing | Ghost Towns | Gardening | Inspection | AppForge Ready |
 |---|---|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
 | Record Database | Core | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
+| Branding & Theme Profile | Core | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
 | Search Directory | Core | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
 | Nearby GPS | Core | ✓ | ✓ | ✓ | ✓ |  | ✓ | ✓ |
 | Notes & History | Core | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
@@ -33,3 +34,7 @@ Architecture version: 1
 | Fire Location Types | FireVault-specific | ✓ |  |  |  |  |  |  |
 
 The canonical machine-readable definitions are in `src/app-profile.js` and `src/module-registry.js`.
+
+## Build 0.95.8 configurable branding and themes
+
+`core.themeProfile` is now a registered core module. App Profile schema 6 selects brand assets, wordmark, semantic colors, typography, shape, density, and mobile browser chrome through `src/theme-profile.js`. FireVault keeps the `firevault-dark` profile while future AppForge products can substitute another visual identity without screen forks.

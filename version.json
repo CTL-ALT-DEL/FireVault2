@@ -1,8 +1,8 @@
 {
-  "build": "0.95.4",
+  "build": "0.95.8",
   "released": "2026-07-15",
-  "note": "Integrates App Profile terminology into the live Directory, Nearby, Account Detail, account forms, Quick Photo, navigation, and photo categories while preserving FireVault labels and data.",
-  "label": "Core Terminology Integration",
-  "version": "0.95.4",
-  "name": "Core Terminology Integration"
+  "note": "The App Profile now controls brand assets, semantic colors, typography, shape, and mobile browser chrome through a reusable Theme Profile.",
+  "label": "Configurable Branding and Theme Profiles",
+  "version": "0.95.8",
+  "name": "Configurable Branding and Theme Profiles"
 }

@@ -2329,3 +2329,82 @@ main,
 .architectureActions0953 button{min-height:42px;height:auto;padding:8px;font-size:.67rem}
 @media(max-width:430px){.architectureProfileGrid0953,.architectureModuleGrid0953{grid-template-columns:1fr}.architectureMetrics0953{grid-template-columns:repeat(2,minmax(0,1fr))}.architectureLegend0953{grid-template-columns:1fr}.architectureActions0953{grid-template-columns:1fr}.architectureProfileBrand0953{grid-template-columns:40px minmax(0,1fr)}.architectureProfileBrand0953 img{width:40px;height:40px}.architectureProfileBrand0953 em{grid-column:1/-1;justify-self:start}}
 @media(min-width:820px){.architectureModuleGrid0953{grid-template-columns:repeat(3,minmax(0,1fr))}.architectureActions0953{grid-template-columns:repeat(4,minmax(0,1fr))}}
+
+
+/* Build 0.95.5 — module-aware navigation and adaptive action groups. */
+#appNav.fvModuleNav0955,
+.nearbyBottomNav069.fvModuleNav0955{
+  grid-template-columns:repeat(var(--fv-module-nav-count,4),minmax(0,1fr)) !important;
+}
+#appNav.fvModuleNav0955 > button[hidden],
+.nearbyBottomNav069.fvModuleNav0955 > button[hidden]{display:none !important;}
+.moduleActions0955{
+  grid-template-columns:repeat(auto-fit,minmax(74px,1fr)) !important;
+}
+.accountTabs0952 > button[hidden]{display:none !important;}
+
+/* Build 0.95.6 — configurable record schema inventory. */
+.recordSchemaMetrics0956{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-bottom:14px}
+.recordSchemaMetrics0956>div{display:flex;flex-direction:column;gap:3px;padding:13px;border:1px solid rgba(255,255,255,.08);border-radius:14px;background:rgba(255,255,255,.025)}
+.recordSchemaMetrics0956 strong{font-size:1.35rem;color:#fff}
+.recordSchemaMetrics0956 span{font-size:.72rem;color:#9ca3af;text-transform:uppercase;letter-spacing:.06em}
+.recordSchemaTableWrap0956{overflow:auto;border:1px solid rgba(255,255,255,.08);border-radius:14px;background:#0b0d10}
+.recordSchemaTable0956{width:100%;min-width:620px;border-collapse:collapse}
+.recordSchemaTable0956 th,.recordSchemaTable0956 td{padding:11px 12px;text-align:left;border-bottom:1px solid rgba(255,255,255,.07);vertical-align:top}
+.recordSchemaTable0956 th{font-size:.7rem;color:#9ca3af;text-transform:uppercase;letter-spacing:.08em;background:#11141a;position:sticky;top:0}
+.recordSchemaTable0956 td{font-size:.83rem;color:#d1d5db}
+.recordSchemaTable0956 td strong{display:block;color:#f9fafb;font-size:.9rem}
+.recordSchemaTable0956 td small{display:block;color:#6b7280;margin-top:3px}
+.recordSchemaCategories0956{display:flex;align-items:flex-start;gap:12px;margin-top:14px;padding:12px;border:1px solid rgba(255,255,255,.08);border-radius:14px;background:rgba(255,255,255,.025)}
+.recordSchemaCategories0956>strong{white-space:nowrap;font-size:.8rem;color:#e5e7eb;padding-top:4px}
+.recordSchemaCategories0956>div{display:flex;flex-wrap:wrap;gap:7px}
+.recordSchemaCategories0956 span{padding:5px 9px;border-radius:999px;background:#171b22;border:1px solid rgba(255,255,255,.08);font-size:.75rem;color:#cbd5e1}
+@media(max-width:720px){.recordSchemaMetrics0956{grid-template-columns:repeat(2,minmax(0,1fr))}.recordSchemaCategories0956{display:block}.recordSchemaCategories0956>strong{display:block;margin-bottom:9px}}
+
+/* Build 0.95.8 — configurable action surfaces and Quick Photo workflow. */
+.workflowActions0957{
+  grid-template-columns:repeat(var(--fv-workflow-action-count,4),minmax(0,1fr)) !important;
+}
+.quickPhotoAccountLocked0957{cursor:default!important}
+.quickPhotoAccountLocked0957 b{color:#9ca3af!important}
+.workflowSchemaMetrics0957{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-bottom:14px}
+.workflowSchemaMetrics0957>div{display:flex;flex-direction:column;gap:3px;padding:13px;border:1px solid rgba(255,255,255,.08);border-radius:14px;background:rgba(255,255,255,.025)}
+.workflowSchemaMetrics0957 strong{font-size:1.35rem;color:#fff}
+.workflowSchemaMetrics0957 span{font-size:.72rem;color:#9ca3af;text-transform:uppercase;letter-spacing:.06em}
+.workflowSchemaSurfaces0957{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.workflowSchemaSurfaces0957 section{padding:12px;border:1px solid rgba(255,255,255,.08);border-radius:14px;background:#0b0d10}
+.workflowSchemaSurfaces0957 section>strong{display:block;margin-bottom:8px;color:#fff;font-size:.82rem}
+.workflowSchemaSurfaces0957 section>div{display:flex;flex-wrap:wrap;gap:6px}
+.workflowSchemaSurfaces0957 span{padding:5px 8px;border:1px solid #334155;border-radius:999px;background:#111827;color:#dbeafe;font-size:.7rem}
+.workflowSchemaSurfaces0957 em{color:#94a3b8;font-size:.75rem}
+.workflowPhotoSummary0957{display:flex;flex-direction:column;gap:5px;margin-top:10px;padding:12px;border:1px solid rgba(255,255,255,.08);border-radius:14px;background:#0b0d10}
+.workflowPhotoSummary0957 strong{color:#fff;font-size:.82rem}.workflowPhotoSummary0957 span{color:#aab4c2;font-size:.76rem;line-height:1.45}
+@media(max-width:720px){
+  .workflowSchemaMetrics0957{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .workflowSchemaSurfaces0957{grid-template-columns:1fr}
+}
+.workflowActions0957:empty{display:none!important}
+
+
+/* Build 0.95.8 — profile-driven branding and semantic visual tokens */
+html[data-theme-profile]{background:var(--fv-brand-background,var(--bg))}
+body{font-family:var(--fv-font-family,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif)}
+button,.btn,input,textarea,select{border-radius:var(--fv-control-radius,15px)}
+.appWordmark0958 [data-brand-tone="primary"]{color:var(--text,#fff)}
+.appWordmark0958 [data-brand-tone="accent"]{color:var(--accent,#ef4444)}
+.appWordmark0958 [data-brand-tone="muted"]{color:var(--muted,#a7b0c0)}
+.profile-compact0958{--pad:8px;--radius:14px;--fv-control-radius:11px}
+.themeProfileMetrics0958{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin-bottom:12px}
+.themeProfileMetrics0958>div{display:grid;gap:3px;padding:12px;border:1px solid var(--line);border-radius:14px;background:color-mix(in srgb,var(--panel2) 78%,transparent);min-width:0}
+.themeProfileMetrics0958 strong{font-size:1rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-transform:capitalize}
+.themeProfileMetrics0958 span{color:var(--muted);font-size:.72rem;font-weight:800;text-transform:uppercase;letter-spacing:.05em}
+.themeProfilePreview0958{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:16px;border:1px solid color-mix(in srgb,var(--theme-preview-accent) 40%,var(--line));border-radius:18px;background:radial-gradient(circle at 0 0,color-mix(in srgb,var(--theme-preview-accent) 19%,transparent),transparent 46%),var(--theme-preview-bg);color:var(--theme-preview-text)}
+.themeProfilePreview0958>div{display:grid;grid-template-columns:42px 1fr;grid-template-rows:auto auto;column-gap:10px;align-items:center;min-width:0}
+.themeProfilePreview0958 img{grid-row:1/3;width:42px;height:42px;object-fit:contain;border-radius:10px}
+.themeProfilePreview0958>div>span{align-self:end}.themeProfilePreview0958 small{align-self:start;color:var(--muted)}
+.themeProfilePreview0958 button{background:linear-gradient(135deg,var(--theme-preview-accent),color-mix(in srgb,var(--theme-preview-accent) 62%,#000));color:#fff;border:0;white-space:nowrap}
+.themeTokenGrid0958{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px;margin-top:12px}
+.themeTokenGrid0958>span{display:grid;grid-template-columns:18px 1fr;grid-template-rows:auto auto;column-gap:8px;padding:9px;border:1px solid var(--line);border-radius:12px;background:var(--panel);min-width:0}
+.themeTokenGrid0958 i{grid-row:1/3;width:18px;height:100%;min-height:30px;border-radius:7px;border:1px solid rgba(255,255,255,.15)}
+.themeTokenGrid0958 b{font-size:.75rem;text-transform:capitalize;overflow:hidden;text-overflow:ellipsis}.themeTokenGrid0958 code{font-size:.68rem;color:var(--muted)}
+@media(max-width:640px){.themeProfileMetrics0958{grid-template-columns:repeat(2,minmax(0,1fr))}.themeProfilePreview0958{align-items:stretch;flex-direction:column}.themeProfilePreview0958 button{width:100%}.themeTokenGrid0958{grid-template-columns:repeat(2,minmax(0,1fr))}}
