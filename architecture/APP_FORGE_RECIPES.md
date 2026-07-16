@@ -1,6 +1,6 @@
 # AppForge Product Recipes
 
-Build baseline: 0.99.0  
+Build baseline: 1.00.0  
 Recipe schema: 1
 
 Product Recipes are validated starting definitions for creating distinct apps from the shared Field Vault core. They prove configuration portability without switching the active FireVault app or touching its customer vault.
@@ -24,4 +24,4 @@ Product Recipes are validated starting definitions for creating distinct apps fr
 
 ## Safety boundary
 
-Recipes are downloadable JSON build inputs. Downloading one does not activate it, change FireVault labels, modify the installed PWA, migrate storage, or expose customer data. Publication readiness is separate from blueprint validity.
+Recipes are downloadable JSON build inputs and executable Generator Engine inputs. Downloading or packaging one does not activate it, change FireVault labels, modify the installed PWA, migrate storage, or expose customer data. Publication readiness is separate from blueprint and package validity.

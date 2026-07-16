@@ -1,5 +1,5 @@
 {
-  "version": 8,
+  "version": 9,
   "classifications": {
     "core": {
       "label": "Core",
@@ -163,6 +163,25 @@
       "description": "Deterministic generation requests, composed profiles, validation gates, required inputs, guardrails, and expected build outputs.",
       "dependencies": [
         "core.appForgeRecipes"
+      ],
+      "appForgeReady": true,
+      "apps": {
+        "fireVault": true,
+        "travelGuide": true,
+        "fishing": true,
+        "ghostTowns": true,
+        "gardening": true,
+        "inspection": true
+      }
+    },
+    {
+      "id": "core.appForgeGenerator",
+      "name": "AppForge Generator Engine",
+      "classification": "core",
+      "status": "active",
+      "description": "Client-side generation of isolated, installable PWA source packages from validated Product Recipes and Factory Manifests.",
+      "dependencies": [
+        "core.appForgeFactory"
       ],
       "appForgeReady": true,
       "apps": {

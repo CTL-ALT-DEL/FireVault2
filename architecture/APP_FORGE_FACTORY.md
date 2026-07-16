@@ -1,9 +1,9 @@
 # AppForge Factory Manifest
 
-Build baseline: 0.99.0  
+Build baseline: 1.00.0  
 Factory schema: 1
 
-The Factory Manifest is the deterministic handoff between a Product Recipe and a future app-generation process. It says exactly what was requested, what configuration was composed, what validation passed, what outputs are expected, and what still must be supplied.
+The Factory Manifest is the deterministic handoff between a Product Recipe and the AppForge Generator Engine. It says exactly what was requested, what configuration was composed, what validation passed, what outputs are expected, and what still must be supplied.
 
 ## Factory pipeline
 
@@ -29,7 +29,7 @@ The Factory Manifest is the deterministic handoff between a Product Recipe and a
 - Brand asset set
 - Verified content database
 
-The manifest describes planned targets honestly. Build 0.99.0 does not claim to generate an Xcode project, install a database, publish an app, or complete OAuth integrations.
+Build 1.00.0 generates the PWA source-package target and an iOS handoff profile. It does not claim to generate or sign an Xcode project, install an authoritative database, publish an app, or complete OAuth integrations.
 
 ## Guardrails
 

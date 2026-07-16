@@ -1,8 +1,8 @@
 {
-  "build": "0.99.0",
+  "build": "1.00.0",
   "released": "2026-07-15",
-  "note": "AppForge Factory Manifests turn Product Recipes into validated generation requests, composed profiles, required inputs, guardrails, and expected build outputs.",
-  "label": "AppForge Factory Manifest",
-  "version": "0.99.0",
-  "name": "AppForge Factory Manifest"
+  "note": "The AppForge Generator Engine assembles validated Product Recipes into separate, installable, offline-ready PWA source packages entirely in the browser.",
+  "label": "AppForge Generator Engine",
+  "version": "1.00.0",
+  "name": "AppForge Generator Engine"
 }

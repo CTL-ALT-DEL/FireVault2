@@ -1,6 +1,6 @@
 # AppForge Product Blueprint
 
-Build baseline: 0.99.0  
+Build baseline: 1.00.0  
 Blueprint schema: 1
 
 The AppForge Product Blueprint is the portable definition of a Field Vault product. It combines the separate architecture contracts added in Builds 0.95.3 through 0.96.0 and checks them before export.
@@ -21,7 +21,7 @@ The AppForge Product Blueprint is the portable definition of a Field Vault produ
 
 `validateAppForgeProfile()` checks product identity, selected module IDs, module dependencies, UI binding references, record-schema references, workflow actions, content pack/source relationships, storage provider/role relationships, and required Theme Profile assets.
 
-A blueprint with errors reports `blocked`. FireVault Build 0.99.0, all four registered Product Recipes, and all four factory-composed profiles pass all nine checks and report `ready` at the configuration level.
+A blueprint with errors reports `blocked`. FireVault Build 1.00.0, all four registered Product Recipes, and all four generator-composed profiles pass all nine checks and report `ready` at the configuration level.
 
 ## Safety and compatibility
 

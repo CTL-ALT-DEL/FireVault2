@@ -1,0 +1,28 @@
+{
+  "kind": "field-vault.app-forge-generated-pwa",
+  "schemaVersion": 1,
+  "build": "1.00.0",
+  "registeredRecipes": 4,
+  "packageReady": 4,
+  "releaseCandidates": 1,
+  "prototypeReady": 3,
+  "coreSourceFiles": 56,
+  "generatedOutputs": [
+    "installable-pwa",
+    "generation-request",
+    "factory-manifest",
+    "generator-plan",
+    "package-report",
+    "ios-handoff-profile",
+    "requirements-report"
+  ],
+  "guardrails": {
+    "sourceAppUnchanged": true,
+    "isolatedStorageNamespace": true,
+    "customerDataExcluded": true,
+    "mediaExcluded": true,
+    "credentialsExcluded": true,
+    "deviceIdentityExcluded": true,
+    "automaticPublishing": false
+  }
+}

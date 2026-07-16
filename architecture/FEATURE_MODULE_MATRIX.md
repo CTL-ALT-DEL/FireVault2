@@ -1,7 +1,7 @@
 # FireVault / Field Vault Feature and Module Matrix
 
-Build baseline: 0.99.0  
-Architecture version: 7
+Build baseline: 1.00.0  
+Architecture version: 8
 
 ## Decision rule
 
@@ -18,6 +18,7 @@ Architecture version: 7
 | AppForge Product Blueprint | Core | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
 | AppForge Product Recipes | Core | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
 | AppForge Factory Manifest | Core | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
+| AppForge Generator Engine | Core | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
 | Search Directory | Core | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
 | Nearby GPS | Core | ✓ | ✓ | ✓ | ✓ |  | ✓ | ✓ |
 | Notes & History | Core | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
@@ -38,7 +39,11 @@ Architecture version: 7
 | Panel Documents | FireVault-specific | ✓ |  |  |  |  |  |  |
 | Fire Location Types | FireVault-specific | ✓ |  |  |  |  |  |  |
 
-The canonical machine-readable definitions are in `src/app-profile.js`, `src/module-registry.js`, `src/content-pack-registry.js`, `src/sync-storage-profile.js`, `src/app-forge-blueprint.js`, `src/app-forge-recipes.js`, and `src/app-forge-factory.js`.
+The canonical machine-readable definitions are in `src/app-profile.js`, `src/module-registry.js`, `src/content-pack-registry.js`, `src/sync-storage-profile.js`, `src/app-forge-blueprint.js`, `src/app-forge-recipes.js`, `src/app-forge-factory.js`, and `src/app-forge-generator.js`.
+
+## Build 1.00.0 AppForge Generator Engine
+
+`core.appForgeGenerator` consumes a validated Factory Manifest, loads the shared Field Vault source, injects a generated App Profile, assigns a product-specific storage namespace, and creates a deterministic installable PWA ZIP locally in the browser. The package includes architecture contracts, request and manifest records, a package report, requirements, and an iOS handoff profile. It never reads the active vault or publishes an app.
 
 ## Build 0.99.0 AppForge Factory Manifest
 

@@ -1,6 +1,8 @@
-export const APP_PROFILE_SCHEMA_VERSION = 11;
+import { GENERATED_APP_PROFILE } from "./generated-app-profile.js?v=1.00.0";
 
-export const APP_PROFILE = Object.freeze({
+export const APP_PROFILE_SCHEMA_VERSION = 12;
+
+const FIREVAULT_APP_PROFILE = Object.freeze({
   schemaVersion: APP_PROFILE_SCHEMA_VERSION,
   id: "firevault",
   family: "field-vault",
@@ -160,7 +162,8 @@ export const APP_PROFILE = Object.freeze({
     syncStorage:true,
     appForgeBlueprint:true,
     appForgeRecipes:true,
-    appForgeFactory:true
+    appForgeFactory:true,
+    appForgeGenerator:true
   }),
   enabledModules: Object.freeze([
     "core.records",
@@ -170,6 +173,7 @@ export const APP_PROFILE = Object.freeze({
     "core.appForgeBlueprint",
     "core.appForgeRecipes",
     "core.appForgeFactory",
+    "core.appForgeGenerator",
     "core.search",
     "core.nearby",
     "core.notes",
@@ -191,6 +195,8 @@ export const APP_PROFILE = Object.freeze({
     "firevault.fireLocationTypes"
   ])
 });
+
+export const APP_PROFILE = Object.freeze(GENERATED_APP_PROFILE ? {...GENERATED_APP_PROFILE,schemaVersion:APP_PROFILE_SCHEMA_VERSION} : FIREVAULT_APP_PROFILE);
 
 const TERM_KEYS = Object.freeze({
   account: ["recordSingular","recordPlural"],

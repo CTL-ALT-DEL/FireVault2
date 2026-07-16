@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "build": "0.99.0",
+  "build": "1.00.0",
   "activeRecipeId": "firevault",
   "recipes": [
     {

@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 11,
+  "schemaVersion": 12,
   "id": "firevault",
   "family": "field-vault",
   "name": "FireVault",
@@ -274,7 +274,8 @@
     "syncStorage": true,
     "appForgeBlueprint": true,
     "appForgeRecipes": true,
-    "appForgeFactory": true
+    "appForgeFactory": true,
+    "appForgeGenerator": true
   },
   "enabledModules": [
     "core.records",
@@ -284,6 +285,7 @@
     "core.appForgeBlueprint",
     "core.appForgeRecipes",
     "core.appForgeFactory",
+    "core.appForgeGenerator",
     "core.search",
     "core.nearby",
     "core.notes",

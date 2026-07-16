@@ -1,7 +1,7 @@
 {
   "kind": "field-vault.app-forge-blueprint",
   "schemaVersion": 1,
-  "build": "0.99.0",
+  "build": "1.00.0",
   "product": {
     "id": "firevault",
     "family": "field-vault",
@@ -15,8 +15,8 @@
     "checksTotal": 9
   },
   "contracts": {
-    "appProfile": 11,
-    "moduleRegistry": 8,
+    "appProfile": 12,
+    "moduleRegistry": 9,
     "moduleBindings": 2,
     "recordSchema": 1,
     "workflowSchema": 1,
