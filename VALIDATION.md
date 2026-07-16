@@ -1,26 +1,29 @@
-# FireVault Build 1.01.4 Validation
+# FireVault Build 1.01.5 Validation
 
 ## Static checks
 
 - JavaScript syntax passes for every source module and the service worker.
 - Every imported symbol resolves from its source module.
 - All JSON architecture contracts parse and runtime mirrors match.
-- Every static application reference resolves to Build 1.01.4.
+- Every static application reference resolves to Build 1.01.5.
 - Service-worker shell includes the generated-profile bridge, Generator Engine, and every required runtime asset.
 - Local HTTP asset smoke test and release ZIP integrity pass.
 
-## Account Detail tab checks
+## Update Ready sheet checks
 
-- Overview, Notes, Locations, Equipment, Files, and Details remain available in the same order.
-- Activating every tab keeps the selected tab fully visible inside the phone tab rail.
-- A clipped selected tab is revealed automatically after Account Detail re-renders.
-- The tab rail remains horizontally swipeable on phones and remains a six-column grid on iPad.
-- Account Detail creates no horizontal page overflow at 320×700, 390×844, or 1024×1366.
-- Add Note remains readable and contained within its action button.
-- Every Account Detail tab continues to open without runtime errors.
+- The sheet identifies the waiting build and explains that FireVault will reopen after installation.
+- Later and Install Update are visible, labeled, and 48px tall.
+- The sheet stays inside the viewport and above bottom navigation at 320×700, 390×844, and 1024×1366.
+- Install Update sends the existing `SKIP_WAITING` command exactly once per activation attempt.
+- Installation disables both actions, reports Installing, and prevents duplicate taps.
+- A delayed activation restores the actions with clear retry guidance.
+- Later dismisses the sheet without starting the update.
+- Repeated update-ready events refresh one existing sheet instead of creating duplicates.
+- The sheet exposes dialog semantics, live status updates, and no horizontal page overflow.
 
 ## Preserved UI cleanup
 
+- Build 1.01.4 selected-tab visibility remains intact on phone and iPad layouts.
 - Build 1.01.3 star-only Favorite control, 44px target, and accessible state remain intact.
 - Build 1.01.2 Photo Overlay workflow, controls, preview, and responsive layouts remain intact.
 - Build 1.01.1 Account Detail actions, tabs, and responsive layouts remain intact.
@@ -44,4 +47,4 @@
 
 ## Device confirmation
 
-Confirm every Account Detail tab remains fully visible after activation at 320×700 and 390×844; iPad retains all six tabs in one row at 1024×1366; the Favorite and Add Note fixes remain intact; Photo Overlay remains intact; Settings remains consolidated; AppForge stays hidden without the query flag; and offline startup works after updating.
+Confirm Update Ready stays above navigation at 320×700, 390×844, and 1024×1366; Later dismisses it; Install Update enters a locked progress state and reopens FireVault through the existing service-worker flow; prior Account Detail, Favorite, Add Note, Photo Overlay, and Settings cleanup remains intact; AppForge stays hidden without the query flag; and offline startup works after updating.

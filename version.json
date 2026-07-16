@@ -1,8 +1,8 @@
 {
-  "build": "1.01.4",
+  "build": "1.01.5",
   "released": "2026-07-16",
-  "note": "Account Detail now keeps the selected tab visible after every tab change on narrow phones, while preserving the same six tabs, content, and workflows.",
-  "label": "Account Tab Visibility",
-  "version": "1.01.4",
-  "name": "Account Tab Visibility"
+  "note": "Update Ready now uses a clear field-safe sheet with full-size actions, installation progress, duplicate-prompt handling, and retry guidance while preserving the same service-worker update mechanism.",
+  "label": "Update Sheet Redesign",
+  "version": "1.01.5",
+  "name": "Update Sheet Redesign"
 }
