@@ -1,8 +1,8 @@
 {
-  "build": "1.03.0",
+  "build": "1.03.1",
   "released": "2026-07-16",
-  "note": "Focused UI cleanup improves Nearby distance placement, Account Detail navigation, Settings organization, independent photo overlays, email preview, storage identities, visual Help, and update recovery.",
-  "label": "Settings & Help Cleanup",
-  "version": "1.03.0",
-  "name": "Settings & Help Cleanup"
+  "note": "Customer CSV import now exits Demo Mode before analysis, writes to the real vault, and verifies persisted Account IDs before reporting success.",
+  "label": "Real-Vault CSV Import Fix",
+  "version": "1.03.1",
+  "name": "Real-Vault CSV Import Fix"
 }

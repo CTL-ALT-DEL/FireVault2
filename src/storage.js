@@ -1,5 +1,5 @@
-import { stageVaultMedia, stripPersistedMediaForStorage, hydrateVaultMediaFromCache } from "./media-store.js?v=1.03.0";
-export const BUILD = "1.03.0";
+import { stageVaultMedia, stripPersistedMediaForStorage, hydrateVaultMediaFromCache } from "./media-store.js?v=1.03.1";
+export const BUILD = "1.03.1";
 export const SECURITY_SCHEMA_VERSION = 4;
 export const KEY = "firevault_vault_build_030";
 export const DEVICE_KEY = "firevault_device_identity_062";
@@ -741,7 +741,8 @@ function recoverBestLocalVault(){
   candidates.sort((a,b)=>b.count-a.count || String(b.updated).localeCompare(String(a.updated)));
   return candidates[0]||primary||null;
 }
-export function loadData(){
+export function loadData(options={}){
+  const allowEmptyReal=options?.allowEmptyReal===true;
   let demoActive=isDemoMode();
   let best=null;
   if(!demoActive) best=recoverBestLocalVault();
@@ -749,7 +750,7 @@ export function loadData(){
   // Build 0.74.1: when no real customer vault exists, FireVault opens the
   // protected fictional Boise workspace instead of presenting an empty app.
   // The demo master is generated in code and is never stored as a deletable vault.
-  if(!demoActive && !best){
+  if(!demoActive && !best && !allowEmptyReal){
     setDemoMode(true);
     demoActive=true;
   }
