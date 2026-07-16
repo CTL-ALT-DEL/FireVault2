@@ -5,6 +5,7 @@ core.contentPacks,Data Sources & Content Packs,Core,active,Yes,Yes,Yes,Yes,Yes,Y
 core.syncStorageProfile,Sync & Storage Profile,Core,active,Yes,Yes,Yes,Yes,Yes,Yes,Yes,core.offlineStorage | core.backupRestore
 core.appForgeBlueprint,AppForge Product Blueprint,Core,active,Yes,Yes,Yes,Yes,Yes,Yes,Yes,core.records | core.themeProfile | core.contentPacks | core.syncStorageProfile
 core.appForgeRecipes,AppForge Product Recipes,Core,active,Yes,Yes,Yes,Yes,Yes,Yes,Yes,core.appForgeBlueprint
+core.appForgeFactory,AppForge Factory Manifest,Core,active,Yes,Yes,Yes,Yes,Yes,Yes,Yes,core.appForgeRecipes
 core.search,Search Directory,Core,active,Yes,Yes,Yes,Yes,Yes,Yes,Yes,core.records
 core.nearby,Nearby GPS,Core,active,Yes,Yes,Yes,Yes,No,Yes,Yes,core.records
 core.notes,Notes & History,Core,active,Yes,Yes,Yes,Yes,Yes,Yes,Yes,core.records

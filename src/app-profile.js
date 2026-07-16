@@ -1,4 +1,4 @@
-export const APP_PROFILE_SCHEMA_VERSION = 10;
+export const APP_PROFILE_SCHEMA_VERSION = 11;
 
 export const APP_PROFILE = Object.freeze({
   schemaVersion: APP_PROFILE_SCHEMA_VERSION,
@@ -159,7 +159,8 @@ export const APP_PROFILE = Object.freeze({
     contentPacks:true,
     syncStorage:true,
     appForgeBlueprint:true,
-    appForgeRecipes:true
+    appForgeRecipes:true,
+    appForgeFactory:true
   }),
   enabledModules: Object.freeze([
     "core.records",
@@ -168,6 +169,7 @@ export const APP_PROFILE = Object.freeze({
     "core.syncStorageProfile",
     "core.appForgeBlueprint",
     "core.appForgeRecipes",
+    "core.appForgeFactory",
     "core.search",
     "core.nearby",
     "core.notes",

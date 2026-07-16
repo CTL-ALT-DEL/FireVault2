@@ -1,7 +1,7 @@
 # FireVault / Field Vault Feature and Module Matrix
 
-Build baseline: 0.98.0  
-Architecture version: 6
+Build baseline: 0.99.0  
+Architecture version: 7
 
 ## Decision rule
 
@@ -17,6 +17,7 @@ Architecture version: 6
 | Sync & Storage Profile | Core | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
 | AppForge Product Blueprint | Core | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
 | AppForge Product Recipes | Core | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
+| AppForge Factory Manifest | Core | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
 | Search Directory | Core | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
 | Nearby GPS | Core | ✓ | ✓ | ✓ | ✓ |  | ✓ | ✓ |
 | Notes & History | Core | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
@@ -37,7 +38,11 @@ Architecture version: 6
 | Panel Documents | FireVault-specific | ✓ |  |  |  |  |  |  |
 | Fire Location Types | FireVault-specific | ✓ |  |  |  |  |  |  |
 
-The canonical machine-readable definitions are in `src/app-profile.js`, `src/module-registry.js`, `src/content-pack-registry.js`, `src/sync-storage-profile.js`, and `src/app-forge-blueprint.js`.
+The canonical machine-readable definitions are in `src/app-profile.js`, `src/module-registry.js`, `src/content-pack-registry.js`, `src/sync-storage-profile.js`, `src/app-forge-blueprint.js`, `src/app-forge-recipes.js`, and `src/app-forge-factory.js`.
+
+## Build 0.99.0 AppForge Factory Manifest
+
+`core.appForgeFactory` turns each registered Product Recipe into a normalized Generation Request, composed App Profile, two validation gates, explicit publication requirements, expected output inventory, and safety guardrails. The factory contract does not activate recipes, publish apps, or include customer data.
 
 ## Build 0.98.0 AppForge Product Recipes
 

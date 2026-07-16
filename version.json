@@ -1,8 +1,8 @@
 {
-  "build": "0.98.0",
+  "build": "0.99.0",
   "released": "2026-07-15",
-  "note": "Validated AppForge Product Recipes prove the FireVault core can define Wyoming Explorer, Fishing Guide, and Ghost Towns apps without changing the active vault.",
-  "label": "AppForge Product Recipes",
-  "version": "0.98.0",
-  "name": "AppForge Product Recipes"
+  "note": "AppForge Factory Manifests turn Product Recipes into validated generation requests, composed profiles, required inputs, guardrails, and expected build outputs.",
+  "label": "AppForge Factory Manifest",
+  "version": "0.99.0",
+  "name": "AppForge Factory Manifest"
 }

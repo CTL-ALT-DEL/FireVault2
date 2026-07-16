@@ -1,0 +1,20 @@
+{
+  "kind": "field-vault.app-forge-factory-manifest",
+  "schemaVersion": 1,
+  "build": "0.99.0",
+  "requestSchema": "field-vault.generation-request.v1",
+  "registeredRecipes": 4,
+  "factoryReady": 4,
+  "publicationReady": 1,
+  "requirementsPending": 3,
+  "validationGates": ["generation-request", "appforge-blueprint"],
+  "outputInventory": ["request", "profile", "blueprint", "pwa", "ios", "assets", "database"],
+  "guardrails": {
+    "activeAppId": "firevault",
+    "activeAppUnchanged": true,
+    "customerDataExcluded": true,
+    "credentialsExcluded": true,
+    "recipeActivation": false,
+    "automaticPublishing": false
+  }
+}
