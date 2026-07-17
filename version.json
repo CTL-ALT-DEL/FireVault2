@@ -1,8 +1,8 @@
 {
-  "build": "1.03.16",
+  "build": "1.03.17",
   "released": "2026-07-16",
-  "note": "Polishes Contact, Equipment, Task, and Deficiency lists without changing records or workflows.",
-  "label": "Secondary List Cleanup",
-  "version": "1.03.16",
-  "name": "Secondary List Cleanup"
+  "note": "Guides new users from Demo Mode into a confirmed GPS-assisted first account.",
+  "label": "Guided First Account",
+  "version": "1.03.17",
+  "name": "Guided First Account"
 }

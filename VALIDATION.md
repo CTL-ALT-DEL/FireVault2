@@ -1,4 +1,19 @@
-# FireVault Build 1.03.16 Validation
+# FireVault Build 1.03.17 Validation
+
+## New-user onboarding and first-account contract
+
+- A fresh installation with no real vault opens the protected Demo Mode and shows only three short onboarding cards.
+- Existing real-vault users do not receive the first-run popup after updating.
+- The guide explains Demo Mode, Search, Nearby Accounts, Account Detail, and the first real-account transition.
+- Every Add Account entry point asks whether to leave Demo Mode before real information is entered.
+- Choosing Yes exits Demo Mode and loads an empty or existing real vault; choosing No opens a temporary practice form in Demo Mode.
+- The first-account form offers GPS address assistance and manual entry without requesting location automatically.
+- Address assistance performs one user-requested reverse lookup and caches that result only for the current session.
+- FireVault displays the suggested address and any detected commercial location name before changing form fields.
+- Yes applies the name, address, GPS, and Plus Code inputs; No retries; manual entry keeps GPS but does not insert the suggested address.
+- Permission denial, unavailable GPS, lookup timeout, and no-match results return to manual entry without blocking account creation.
+- The OpenStreetMap source is attributed in the confirmation popup and the lookup endpoint remains configurable in GPS settings data.
+- The dedicated onboarding suite verifies Demo Mode isolation, first-run persistence, GPS privacy, address confirmation, business-name handling, fallbacks, and responsive geometry.
 
 ## Secondary list UI contract
 
@@ -62,7 +77,7 @@
 ## Runtime and offline asset integrity
 
 - The HTML bootstrap contains 25 reviewed local stylesheet, module, manifest, icon, image, and application references.
-- Every local HTML reference carries the current Build 1.03.16 cache token.
+- Every local HTML reference carries the current Build 1.03.17 cache token.
 - All JavaScript imports are resolved from their source modules, exist inside the release, and carry the current build token.
 - CSS `url(...)`, branding profile assets, Photo Overlay sample media, and all three visual Help images resolve to packaged files.
 - All 30 runtime files are present in the 32-entry offline shell; the shell contains no duplicate or missing entry.
@@ -78,7 +93,7 @@
 - No nested FireVault build directory, `_config.yml`, or Ruby `Gemfile` can enter the deploy root.
 - The deployment guide identifies the current build, explains root-level extraction, and warns against uploading the containing ZIP folder.
 - The guide explains that only the newest workflow run matters and requires published `version.json` verification before updating the Home Screen app.
-- Runtime HTML and service-worker references agree on Build 1.03.16 and reject asset references from Builds 1.03.0 through 1.03.9.
+- Runtime HTML and service-worker references agree on Build 1.03.17 and reject asset references from Builds 1.03.0 through 1.03.9.
 
 ## Vault upgrade preservation
 
@@ -160,7 +175,7 @@
 
 ## Static checks
 
-- JavaScript syntax passes for `app.js`, `storage.js`, `sw.js`, and all twelve release regression tests.
+- JavaScript syntax passes for `app.js`, `storage.js`, `sw.js`, and all thirteen release regression tests.
 - The runtime-asset integrity suite passes 262 HTML, import, CSS, manifest, icon, branding, help, and offline-shell checks.
 - The deploy-root contract passes 29 direct-publish, file-placement, instruction, build-alignment, and stale-reference checks.
 - The storage transition test passes with 20 isolated demo sites and one real site surviving a simulated reload.
@@ -173,12 +188,13 @@
 - The account-form UI contract verifies Add/Edit Account fields, browser input hints, dirty-state protection, validation controls, and responsive action sizing.
 - The secondary-form UI contract verifies Contact, Equipment, Task, and Deficiency fields, dirty states, support cards, field actions, and responsive save/delete geometry.
 - The secondary-list UI contract verifies Contact, Equipment, Task, and Deficiency headers, cards, filters, quick actions, touch targets, and responsive list geometry.
-- Active runtime and service-worker references resolve to Build 1.03.16.
-- `version.json`, the manifest, cache name, module imports, and release UI agree on Build 1.03.16.
+- The new-user onboarding contract verifies the first-open guide, Demo Mode decision, GPS lookup, address confirmation, commercial-name suggestion, manual fallback, and form integration.
+- Active runtime and service-worker references resolve to Build 1.03.17.
+- `version.json`, the manifest, cache name, module imports, and release UI agree on Build 1.03.17.
 
 ## Scope and compatibility
 
 - No new record type, schema, or storage service was added.
 - The storage key remains `firevault_vault_build_030`; no migration is required.
 - Existing Account ID matching and history-preservation rules are unchanged.
-- Build 1.03.15 secondary-form cleanup, Build 1.03.14 account-form cleanup, Build 1.03.13 photo workflow cleanup, Build 1.03.12 active-screen readability, Build 1.03.11 offline asset integrity, Build 1.03.10 GitHub Pages direct deployment, Build 1.03.9 vault preservation, Build 1.03.8 fresh-first navigation, Build 1.03.7 update geometry hardening, Build 1.03.6 lockup repair, Build 1.03.5 Photo Overlay cleanup, and all earlier data work remain intact.
+- Build 1.03.16 secondary-list cleanup, Build 1.03.15 secondary-form cleanup, Build 1.03.14 account-form cleanup, Build 1.03.13 photo workflow cleanup, Build 1.03.12 active-screen readability, Build 1.03.11 offline asset integrity, Build 1.03.10 GitHub Pages direct deployment, Build 1.03.9 vault preservation, Build 1.03.8 fresh-first navigation, Build 1.03.7 update geometry hardening, Build 1.03.6 lockup repair, Build 1.03.5 Photo Overlay cleanup, and all earlier data work remain intact.

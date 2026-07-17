@@ -3836,6 +3836,169 @@ body.fv-unsaved0930 .fieldFormTop10315 h1::after{
   .defQuickActions .smallBtn{font-size:11px!important;padding-left:4px!important;padding-right:4px!important}
 }
 
+/* Build 1.03.17 — guided first-run and first-account setup. */
+body.fvFirstRunOpen10317{overflow:hidden!important}
+.firstRunOverlay10317{
+  position:fixed;
+  inset:0;
+  z-index:90000;
+  display:grid;
+  place-items:center;
+  box-sizing:border-box;
+  width:100%;
+  min-height:100dvh;
+  padding:max(14px,env(safe-area-inset-top)) max(14px,env(safe-area-inset-right)) max(14px,env(safe-area-inset-bottom)) max(14px,env(safe-area-inset-left));
+  overflow:auto;
+  overscroll-behavior:contain;
+  background:rgba(3,8,17,.76);
+  backdrop-filter:blur(14px) saturate(.8);
+  -webkit-backdrop-filter:blur(14px) saturate(.8);
+}
+.firstRunDialog10317{
+  box-sizing:border-box;
+  width:min(100%,520px);
+  max-height:min(760px,calc(100dvh - 28px));
+  overflow:auto;
+  padding:20px;
+  border:1px solid rgba(118,155,198,.34);
+  border-radius:24px;
+  background:linear-gradient(150deg,#14263d,#091522 72%);
+  box-shadow:0 28px 70px rgba(0,0,0,.58),inset 0 1px rgba(255,255,255,.06);
+}
+.firstRunHead10317,
+.demoChoiceHead10317,
+.detectedAddressDialog10317>header{
+  display:grid;
+  grid-template-columns:48px minmax(0,1fr) auto;
+  align-items:center;
+  gap:12px;
+}
+.firstRunHead10317>span,
+.demoChoiceHead10317>span,
+.detectedAddressDialog10317>header>span{
+  width:48px;
+  height:48px;
+  display:grid;
+  place-items:center;
+  border:1px solid rgba(80,174,255,.3);
+  border-radius:15px;
+  background:linear-gradient(150deg,rgba(50,137,218,.28),rgba(34,197,94,.12));
+  color:#bfe1ff;
+  font-size:21px;
+  font-weight:1000;
+}
+.firstRunHead10317>div,
+.demoChoiceHead10317>div,
+.detectedAddressDialog10317>header>div{min-width:0}
+.firstRunHead10317 em,
+.demoChoiceHead10317 em,
+.detectedAddressDialog10317 header em{
+  display:block;
+  margin-bottom:4px;
+  color:#77bfff;
+  font-size:9.5px;
+  line-height:1;
+  font-style:normal;
+  font-weight:950;
+  letter-spacing:.14em;
+}
+.firstRunHead10317 h2,
+.demoChoiceHead10317 h2,
+.detectedAddressDialog10317 h2{margin:0!important;font-size:22px!important;line-height:1.08!important}
+.firstRunHead10317>button,
+.demoChoiceHead10317>button{min-width:58px!important;min-height:44px!important;padding:7px 10px!important;font-size:11.5px!important}
+.demoChoiceHead10317>button{width:44px!important;min-width:44px!important;padding:0!important;font-size:20px!important}
+.firstRunCopy10317,
+.demoChoiceDialog10317>p,
+.detectedAddressDialog10317>p{margin:18px 0 14px!important;color:#c1ccda!important;font-size:14px!important;line-height:1.5!important}
+.firstRunPoints10317{display:grid;gap:8px}
+.firstRunPoints10317 p{
+  display:grid;
+  grid-template-columns:25px minmax(0,1fr);
+  align-items:center;
+  gap:8px;
+  margin:0!important;
+  padding:10px 11px;
+  border:1px solid rgba(255,255,255,.08);
+  border-radius:13px;
+  background:rgba(255,255,255,.035);
+  color:#dbe5ef!important;
+  font-size:12.5px!important;
+  line-height:1.3!important;
+}
+.firstRunPoints10317 i,
+.demoChoiceSafety10317 i{display:grid;place-items:center;width:25px;height:25px;border-radius:999px;background:rgba(34,197,94,.17);color:#86efac;font-style:normal;font-weight:1000}
+.firstRunProgress10317{display:flex;justify-content:center;gap:7px;margin:18px 0 14px}
+.firstRunProgress10317 i{width:7px;height:7px;border-radius:999px;background:rgba(255,255,255,.16);transition:width .18s ease,background .18s ease}
+.firstRunProgress10317 i.active{width:26px;background:#4eaff4}
+.firstRunActions10317,
+.demoChoiceActions10317{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.firstRunActions10317 button,
+.demoChoiceActions10317 button{min-height:50px!important;font-size:12.5px!important}
+.demoChoiceSafety10317{display:grid;grid-template-columns:25px minmax(0,1fr);align-items:center;gap:9px;margin:14px 0;padding:10px 11px;border:1px solid rgba(34,197,94,.18);border-radius:13px;background:rgba(34,197,94,.07);color:#c9f5da;font-size:12px;line-height:1.35}
+.firstAccountAssistant10317{
+  display:grid!important;
+  grid-template-columns:1fr 1fr;
+  gap:9px!important;
+  padding:14px!important;
+  border-color:rgba(78,175,244,.34)!important;
+  background:linear-gradient(145deg,rgba(25,75,122,.34),rgba(9,22,35,.98))!important;
+}
+.firstAccountAssistHead10317{grid-column:1/-1;display:grid;grid-template-columns:38px minmax(0,1fr);align-items:start;gap:10px}
+.firstAccountAssistHead10317>span{width:38px;height:38px;display:grid;place-items:center;border-radius:12px;background:#16629b;color:#fff;font-size:16px;font-weight:1000;box-shadow:inset 0 1px rgba(255,255,255,.16)}
+.firstAccountAssistHead10317 em{display:block;margin:1px 0 4px;color:#75c3ff;font-size:9px;line-height:1;font-style:normal;font-weight:950;letter-spacing:.13em}
+.firstAccountAssistHead10317 h2{margin:0 0 4px!important;font-size:17px!important;line-height:1.15!important}
+.firstAccountAssistHead10317 p{margin:0!important;color:#aebdd0!important;font-size:11.5px!important;line-height:1.4!important}
+.firstAccountAssistant10317>button{min-height:48px!important;font-size:12px!important}
+.firstAccountAssistant10317>#firstAccountAssistStatus10317{grid-column:1/-1;margin:0!important;padding:9px 10px;border-radius:11px;background:rgba(0,0,0,.18);color:#aebdd0!important;font-size:11px!important;line-height:1.35!important}
+#firstAccountAssistStatus10317[data-state="working"]{color:#bae6fd!important;background:rgba(14,116,144,.12)}
+#firstAccountAssistStatus10317[data-state="ready"]{color:#fde68a!important;background:rgba(180,83,9,.10)}
+#firstAccountAssistStatus10317[data-state="success"]{color:#bbf7d0!important;background:rgba(22,101,52,.13)}
+#firstAccountAssistStatus10317[data-state="error"]{color:#fecaca!important;background:rgba(153,27,27,.13)}
+.detectedAddressDialog10317>header{grid-template-columns:48px minmax(0,1fr)}
+.detectedBusiness10317{display:grid;gap:3px;margin-top:16px;padding:11px 12px;border:1px solid rgba(34,197,94,.2);border-radius:13px;background:rgba(34,197,94,.08)}
+.detectedBusiness10317 small{color:#86efac;font-size:9px;font-weight:950;letter-spacing:.11em}
+.detectedBusiness10317 strong{color:#f0fdf4;font-size:16px;line-height:1.2}
+.detectedAddressDialog10317 address{margin:12px 0 0;padding:13px;border:1px solid rgba(78,175,244,.22);border-radius:14px;background:rgba(4,14,25,.56);color:#fff;font-size:17px;line-height:1.4;font-style:normal;font-weight:850}
+.detectedAccuracy10317{margin:-5px 0 14px;color:#91a4b9;font-size:10.5px;line-height:1.3}
+.detectedAddressDialog10317>footer{display:grid;grid-template-columns:.9fr .9fr 1.2fr;gap:8px}
+.detectedAddressDialog10317>footer button{min-height:50px!important;padding:8px!important;font-size:11.5px!important;line-height:1.2!important;white-space:normal!important}
+.osmCredit10317{display:block;margin-top:11px;color:#71849a;font-size:9.5px;text-align:center}
+
+@media(max-width:430px){
+  .firstRunOverlay10317{padding:max(10px,env(safe-area-inset-top)) max(10px,env(safe-area-inset-right)) max(10px,env(safe-area-inset-bottom)) max(10px,env(safe-area-inset-left))}
+  .firstRunDialog10317{max-height:calc(100dvh - 20px);padding:15px;border-radius:20px}
+  .firstRunHead10317,
+  .demoChoiceHead10317,
+  .detectedAddressDialog10317>header{grid-template-columns:44px minmax(0,1fr) auto;gap:9px}
+  .detectedAddressDialog10317>header{grid-template-columns:44px minmax(0,1fr)}
+  .firstRunHead10317>span,
+  .demoChoiceHead10317>span,
+  .detectedAddressDialog10317>header>span{width:44px;height:44px;border-radius:13px}
+  .firstRunHead10317 h2,
+  .demoChoiceHead10317 h2,
+  .detectedAddressDialog10317 h2{font-size:19px!important}
+  .firstRunCopy10317,
+  .demoChoiceDialog10317>p,
+  .detectedAddressDialog10317>p{margin:14px 0 12px!important;font-size:13px!important}
+  .firstRunActions10317,
+  .demoChoiceActions10317{grid-template-columns:1fr}
+  .firstRunActions10317>span{display:none}
+  .firstRunActions10317 #firstRunBack10317{order:2}
+  .firstAccountAssistant10317{grid-template-columns:1fr;padding:12px!important}
+  .firstAccountAssistHead10317,
+  .firstAccountAssistant10317>#firstAccountAssistStatus10317{grid-column:1}
+  .detectedAddressDialog10317 address{font-size:15px}
+  .detectedAddressDialog10317>footer{grid-template-columns:1fr 1fr}
+  .detectedAddressDialog10317>footer .primary{grid-column:1/-1;grid-row:1}
+}
+
+@media(max-width:350px){
+  .firstRunHead10317>button{min-width:48px!important;padding-inline:7px!important}
+  .detectedAddressDialog10317>footer{grid-template-columns:1fr}
+  .detectedAddressDialog10317>footer .primary{grid-column:auto;grid-row:auto}
+}
+
 /* Build 1.03.7 — canonical Update Ready geometry. Keep this contract last. */
 body.fvUpdateModalOpen1033{overflow:hidden!important}
 #fvUpdateBanner072{

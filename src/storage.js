@@ -1,5 +1,5 @@
-import { stageVaultMedia, stripPersistedMediaForStorage, hydrateVaultMediaFromCache } from "./media-store.js?v=1.03.16";
-export const BUILD = "1.03.16";
+import { stageVaultMedia, stripPersistedMediaForStorage, hydrateVaultMediaFromCache } from "./media-store.js?v=1.03.17";
+export const BUILD = "1.03.17";
 export const SECURITY_SCHEMA_VERSION = 4;
 export const KEY = "firevault_vault_build_030";
 export const DEVICE_KEY = "firevault_device_identity_062";
@@ -927,7 +927,7 @@ export function normalize(data){
   if(data.settings.advanced && !data.legacyArchive.advanced) data.legacyArchive.advanced=data.settings.advanced;
   delete data.settings.theme;
   delete data.settings.advanced;
-  data.settings.gps = {enabled:true, mapProvider:"apple", highAccuracy:true, includeInReports:true, nearbyRadiusMiles:1, ...(data.settings.gps || {})};
+  data.settings.gps = {enabled:true, mapProvider:"apple", highAccuracy:true, includeInReports:true, nearbyRadiusMiles:1, addressAssist:true, reverseGeocodeEndpoint:"https://nominatim.openstreetmap.org/reverse", ...(data.settings.gps || {})};
   data.settings.sync = {provider:"onedrive",enabled:false,organization:"",workspace:"FireVault Shared Vault",autoSync:true,wifiOnly:false,conflictPolicy:"review",...(data.settings.sync||{})};
   const fileStorage=data.settings.fileStorage||{};
   data.settings.fileStorage={
