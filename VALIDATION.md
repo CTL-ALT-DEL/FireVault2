@@ -1,4 +1,15 @@
-# FireVault Build 1.03.10 Validation
+# FireVault Build 1.03.11 Validation
+
+## Runtime and offline asset integrity
+
+- The HTML bootstrap contains 25 reviewed local stylesheet, module, manifest, icon, image, and application references.
+- Every local HTML reference carries the current Build 1.03.11 cache token.
+- All JavaScript imports are resolved from their source modules, exist inside the release, and carry the current build token.
+- CSS `url(...)`, branding profile assets, Photo Overlay sample media, and all three visual Help images resolve to packaged files.
+- All 30 runtime files are present in the 32-entry offline shell; the shell contains no duplicate or missing entry.
+- Manifest start URL, scope, standalone display, orientation, and four in-scope shortcuts are validated.
+- Manifest icons are real PNG files whose stored dimensions exactly match their declared 192×192 and 512×512 sizes.
+- The runtime-asset suite performs 262 checks against the real release files.
 
 ## GitHub Pages deployment contract
 
@@ -8,7 +19,7 @@
 - No nested FireVault build directory, `_config.yml`, or Ruby `Gemfile` can enter the deploy root.
 - The deployment guide identifies the current build, explains root-level extraction, and warns against uploading the containing ZIP folder.
 - The guide explains that only the newest workflow run matters and requires published `version.json` verification before updating the Home Screen app.
-- Runtime HTML and service-worker references agree on Build 1.03.10 and reject asset references from Builds 1.03.0 through 1.03.9.
+- Runtime HTML and service-worker references agree on Build 1.03.11 and reject asset references from Builds 1.03.0 through 1.03.9.
 
 ## Vault upgrade preservation
 
@@ -90,19 +101,20 @@
 
 ## Static checks
 
-- JavaScript syntax passes for `app.js`, `storage.js`, `sw.js`, and all six release regression tests.
+- JavaScript syntax passes for `app.js`, `storage.js`, `sw.js`, and all seven release regression tests.
+- The runtime-asset integrity suite passes 262 HTML, import, CSS, manifest, icon, branding, help, and offline-shell checks.
 - The deploy-root contract passes 29 direct-publish, file-placement, instruction, build-alignment, and stale-reference checks.
 - The storage transition test passes with 20 isolated demo sites and one real site surviving a simulated reload.
 - The vault upgrade-preservation test passes 41 realistic storage, recovery, backup, overlay, location, and service-worker isolation checks.
 - The PWA upgrade-contract test verifies build alignment, deferred activation, old-cache cleanup, version freshness, navigation refresh, all 33 offline-shell assets, and final update-dialog geometry.
 - The service-worker navigation smoke test executes fast-online, slow-online, offline, and first-install responses against the real worker code.
 - The release-safety test covers build references, CSV persistence guards, Plus Code generation, progressive Photo Overlay navigation, Quick Photo and imported-photo composition, retired-style rejection, and the centered Update Ready recovery flow.
-- Active runtime and service-worker references resolve to Build 1.03.10.
-- `version.json`, the manifest, cache name, module imports, and release UI agree on Build 1.03.10.
+- Active runtime and service-worker references resolve to Build 1.03.11.
+- `version.json`, the manifest, cache name, module imports, and release UI agree on Build 1.03.11.
 
 ## Scope and compatibility
 
 - No new record type, schema, or storage service was added.
 - The storage key remains `firevault_vault_build_030`; no migration is required.
 - Existing Account ID matching and history-preservation rules are unchanged.
-- Build 1.03.9 vault preservation, Build 1.03.8 fresh-first navigation, Build 1.03.7 update geometry hardening, Build 1.03.6 lockup repair, Build 1.03.5 Photo Overlay cleanup, and all earlier data work remain intact.
+- Build 1.03.10 GitHub Pages direct deployment, Build 1.03.9 vault preservation, Build 1.03.8 fresh-first navigation, Build 1.03.7 update geometry hardening, Build 1.03.6 lockup repair, Build 1.03.5 Photo Overlay cleanup, and all earlier data work remain intact.

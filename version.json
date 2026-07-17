@@ -1,8 +1,8 @@
 {
-  "build": "1.03.10",
+  "build": "1.03.11",
   "released": "2026-07-16",
-  "note": "Publishes directly through GitHub Pages and verifies the complete release is extracted at repository root without stale files.",
-  "label": "GitHub Pages Direct Deploy",
-  "version": "1.03.10",
-  "name": "GitHub Pages Direct Deploy"
+  "note": "Traces and verifies every runtime, manifest, branding, help, icon, import, and offline-shell asset before packaging.",
+  "label": "Offline Asset Integrity",
+  "version": "1.03.11",
+  "name": "Offline Asset Integrity"
 }

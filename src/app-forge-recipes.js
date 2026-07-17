@@ -1,5 +1,5 @@
-import { APP_PROFILE } from "./app-profile.js?v=1.03.10";
-import { validateAppForgeProfile, appForgeBlueprintExport } from "./app-forge-blueprint.js?v=1.03.10";
+import { APP_PROFILE } from "./app-profile.js?v=1.03.11";
+import { validateAppForgeProfile, appForgeBlueprintExport } from "./app-forge-blueprint.js?v=1.03.11";
 
 export const APP_FORGE_RECIPE_SCHEMA_VERSION = 1;
 
@@ -77,7 +77,7 @@ export function appForgeRecipeSummary(){
   const recipes=appForgeRecipes();
   return {schemaVersion:APP_FORGE_RECIPE_SCHEMA_VERSION,total:recipes.length,active:recipes.filter(recipe=>recipe.status==="active").length,foundation:recipes.filter(recipe=>recipe.status==="foundation").length,blueprintReady:recipes.filter(recipe=>recipe.validation.ready).length,publishReady:recipes.filter(recipe=>recipe.status==="active"&&!recipe.requirements.length).length};
 }
-export function appForgeRecipeBlueprintExport(id,build="1.03.10"){
+export function appForgeRecipeBlueprintExport(id,build="1.03.11"){
   const recipe=appForgeRecipeById(id);if(!recipe)return null;
   const blueprint=appForgeBlueprintExport(recipe.profile,build);
   blueprint.recipe={schemaVersion:APP_FORGE_RECIPE_SCHEMA_VERSION,id:recipe.id,category:recipe.category,status:recipe.status,assetStatus:recipe.assetStatus,databaseStatus:recipe.databaseStatus,requirements:[...recipe.requirements]};

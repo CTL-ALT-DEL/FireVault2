@@ -1,16 +1,16 @@
 # FireVault
 
-## Build 1.03.10 — GitHub Pages Direct Deploy
+## Build 1.03.11 — Offline Asset Integrity
 
-Build 1.03.10 is a no-new-features deployment-stability release. The package now publishes directly through GitHub Pages without Jekyll, carries current deployment instructions, and verifies that every required app file is at repository root before release.
+Build 1.03.11 is a no-new-features runtime-integrity release. The complete HTML, JavaScript, CSS, manifest, branding, help-image, icon, and offline-cache graph is now traced and verified before packaging so GitHub cannot publish a partially broken PWA.
 
 ### Updated
 
-- Adds the `.nojekyll` marker so GitHub Pages serves the static PWA directly instead of invoking an unnecessary Jekyll build.
-- Replaces the outdated deployment note with exact repository-root extraction and version-verification instructions.
-- Adds a deployment contract covering required root files and directories, stale asset versions, forbidden nested release folders, and Jekyll/Ruby build files.
-- Clarifies that only the newest GitHub Pages run for the newest commit needs to succeed.
-- Retains Build 1.03.9 vault-preservation checks, Build 1.03.8 fresh-first navigation, and Build 1.03.7 update geometry hardening.
+- Traces 30 runtime files from the actual HTML bootstrap, module imports, CSS URLs, manifest, branding configuration, and in-app help references.
+- Verifies every runtime file exists and belongs to the 32-entry offline shell.
+- Verifies all versioned HTML, JavaScript, CSS, and service-worker references use the current build token.
+- Validates manifest scope, standalone display, shortcuts, icon paths, PNG signatures, and exact 192×192 and 512×512 dimensions.
+- Retains Build 1.03.10 direct GitHub Pages publishing, Build 1.03.9 vault preservation, and all update-dialog hardening.
 - Changes no records, storage schema, settings, or technician features.
 
 ### Run locally

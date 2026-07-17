@@ -19,7 +19,7 @@ const requiredRootFiles=[
 ];
 const requiredRootDirectories=["assets","src","tests","architecture"];
 
-assert.equal(build,"1.03.10");
+assert.equal(build,"1.03.11");
 for(const path of [...requiredRootFiles,...requiredRootDirectories]) await access(new URL(path,root));
 assert.match(noJekyll,/Publish FireVault directly/);
 assert.doesNotMatch(noJekyll,/theme:|plugins:/i);
@@ -38,7 +38,7 @@ assert.equal(topLevelNames.some(name=>/^firevault-(?:build|0\.)/i.test(name)),fa
 assert.match(index,new RegExp(`window\\.FIREVAULT_BUILD = "${escapedBuild}"`));
 assert.match(index,new RegExp(`serviceWorker\\.register\\("sw\\.js\\?v=${escapedBuild}"`));
 assert.match(worker,new RegExp(`const BUILD="${escapedBuild}"`));
-assert.doesNotMatch(index,new RegExp(`\\?v=1\\.03\\.(?:[0-9])(?:"|')`));
+assert.doesNotMatch(index,new RegExp(`\\?v=1\\.03\\.(?:[0-9]|10)(?:"|')`));
 
 console.log(JSON.stringify({
   status:"passed",build,checks:29,
