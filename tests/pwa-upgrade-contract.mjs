@@ -18,7 +18,7 @@ const manifest=JSON.parse(manifestText);
 const build=version.build;
 const escapedBuild=build.replaceAll(".","\\.");
 
-assert.equal(build,"1.03.7");
+assert.equal(build,"1.03.8");
 assert.equal(manifest.version,build);
 assert.match(storage,new RegExp(`export const BUILD = "${escapedBuild}"`));
 assert.match(worker,new RegExp(`const BUILD="${escapedBuild}"`));
@@ -48,7 +48,11 @@ assert.match(worker,/addEventListener\("message"[\s\S]{0,180}SKIP_WAITING[\s\S]{
 assert.match(worker,/keys\.filter\(k=>k\.startsWith\("firevault-"\)&&k!==CACHE\)/);
 assert.match(worker,/clients\.claim\(\)/);
 assert.match(worker,/version\.json"\)\)\{event\.respondWith\(fetch\(req,\{cache:"no-store"\}\)/);
-assert.match(worker,/req\.mode==="navigate"[\s\S]*?const cached=[\s\S]*?const refresh=/);
+assert.match(worker,/const NAVIGATION_FRESH_WAIT_MS=1800/);
+assert.match(worker,/req\.mode==="navigate"[\s\S]*?const refresh=[\s\S]*?event\.waitUntil\(refresh\.then/);
+assert.match(worker,/if\(!cached\)return await refresh\|\|Response\.error\(\)/);
+assert.match(worker,/Promise\.race\(\[refresh,new Promise\(resolve=>setTimeout/);
+assert.doesNotMatch(worker,/return cached\|\|await refresh/);
 assert.match(worker,/preloadResponse[\s\S]*?fetch\(req,\{cache:"no-store"\}\)/);
 assert.match(index,/controllerchange"[\s\S]{0,120}fireVaultReloadForUpdate\(\)/);
 assert.equal((index.match(/postMessage\(\{type:"SKIP_WAITING"\}\)/g)||[]).length,1);
@@ -63,6 +67,6 @@ assert.match(geometry,/env\(safe-area-inset-top\)[\s\S]*?env\(safe-area-inset-bo
 assert.doesNotMatch(allStyles,/#fvUpdateBanner072\{[^}]*left:50%!important/);
 assert.doesNotMatch(allStyles,/#fvUpdateBanner072\{[^}]*bottom:calc\(88px/);
 assert.doesNotMatch(allStyles,/#fvUpdateBanner072 div\{display:grid/);
-assert.doesNotMatch(index,new RegExp(`\\?v=1\\.03\\.[0-6](?:"|')`));
+assert.doesNotMatch(index,new RegExp(`\\?v=1\\.03\\.[0-7](?:"|')`));
 
-console.log(JSON.stringify({status:"passed",build,checks:30,shellAssets:shell.length,root:fileURLToPath(root)}));
+console.log(JSON.stringify({status:"passed",build,checks:34,shellAssets:shell.length,root:fileURLToPath(root)}));

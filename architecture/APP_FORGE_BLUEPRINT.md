@@ -1,6 +1,6 @@
 # AppForge Product Blueprint
 
-Build baseline: 1.03.7  
+Build baseline: 1.03.8  
 Blueprint schema: 1
 
 The AppForge Product Blueprint is the portable definition of a Field Vault product. It combines the separate architecture contracts added in Builds 0.95.3 through 0.96.0 and checks them before export.

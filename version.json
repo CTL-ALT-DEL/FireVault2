@@ -1,8 +1,8 @@
 {
-  "build": "1.03.7",
+  "build": "1.03.8",
   "released": "2026-07-16",
-  "note": "Hardens the repaired Update Ready geometry, validates the PWA upgrade contract, and expands Photo Overlay workflow regression coverage.",
-  "label": "PWA Update & Overlay Stability",
-  "version": "1.03.7",
-  "name": "PWA Update & Overlay Stability"
+  "note": "Briefly prefers fresh online HTML during navigation while retaining fast cached fallback and background refresh for slow or offline conditions.",
+  "label": "Fresh-First PWA Bootstrap",
+  "version": "1.03.8",
+  "name": "Fresh-First PWA Bootstrap"
 }

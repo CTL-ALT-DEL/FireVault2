@@ -1,17 +1,17 @@
 # FireVault
 
-## Build 1.03.7 — PWA Update & Overlay Stability
+## Build 1.03.8 — Fresh-First PWA Bootstrap
 
-Build 1.03.7 is a no-new-features stability release. It makes the repaired Update Ready geometry the final stylesheet contract, validates the complete PWA upgrade path, and expands coverage for Photo Overlay capture and import workflows.
+Build 1.03.8 is a no-new-features update bootstrap release. When online, navigation briefly prefers the newest page instead of automatically serving stale HTML first; slow or unavailable connections still fall back to the complete offline app.
 
 ### Updated
 
-- Places a tightly scoped Update Ready geometry contract at the end of the stylesheet so older rules cannot override it.
-- Accounts for iPhone and iPad safe areas while keeping the dialog centered, scrollable, and fully inside the viewport.
-- Adds a dedicated PWA upgrade-contract test for build alignment, service-worker activation, cache cleanup, and all offline-shell files.
-- Expands Photo Overlay regression coverage across Quick Photo, imported photos, category rendering, normal overlay, and Technician Overlay composition.
-- Keeps deferred service-worker activation, the eight-second recovery watchdog, and backdrop dismissal intact.
-- Changes no records, storage schema, settings, or field features.
+- Gives a fresh navigation response up to 1.8 seconds to arrive before using cached HTML.
+- Returns the cached app promptly when the network is slow or offline, preserving field reliability.
+- Continues the network refresh in the background after a cached fallback so the next opening is current.
+- Adds an executable service-worker simulation for fast-online, slow-online, offline, and first-install navigation.
+- Retains Build 1.03.7 update geometry hardening and the complete Photo Overlay regression coverage.
+- Changes no records, storage schema, settings, or technician features.
 
 ### Run locally
 

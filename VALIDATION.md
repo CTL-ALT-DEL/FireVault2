@@ -1,4 +1,4 @@
-# FireVault Build 1.03.7 Validation
+# FireVault Build 1.03.8 Validation
 
 ## Customer CSV regression
 
@@ -58,18 +58,27 @@
 - An eight-second activation timeout restores the same usable controls instead of leaving the popup locked.
 - Duplicate update detections reuse the existing dialog rather than stacking another popup.
 
+## Navigation bootstrap regression
+
+- A fast navigation-preload response is returned immediately and written to the active cache.
+- A slow response yields to cached HTML after the 1.8-second freshness window instead of blocking FireVault.
+- The slow response remains alive through `waitUntil` and refreshes the cache after fallback.
+- An offline network failure returns cached HTML without changing the saved vault.
+- A first online load with no cached page waits for and returns the network response.
+
 ## Static checks
 
-- JavaScript syntax passes for `app.js`, `storage.js`, `sw.js`, and all three release regression tests.
+- JavaScript syntax passes for `app.js`, `storage.js`, `sw.js`, and all four release regression tests.
 - The storage transition test passes with 20 isolated demo sites and one real site surviving a simulated reload.
 - The PWA upgrade-contract test verifies build alignment, deferred activation, old-cache cleanup, version freshness, navigation refresh, all 33 offline-shell assets, and final update-dialog geometry.
+- The service-worker navigation smoke test executes fast-online, slow-online, offline, and first-install responses against the real worker code.
 - The release-safety test covers build references, CSV persistence guards, Plus Code generation, progressive Photo Overlay navigation, Quick Photo and imported-photo composition, retired-style rejection, and the centered Update Ready recovery flow.
-- Active runtime and service-worker references resolve to Build 1.03.7.
-- `version.json`, the manifest, cache name, module imports, and release UI agree on Build 1.03.7.
+- Active runtime and service-worker references resolve to Build 1.03.8.
+- `version.json`, the manifest, cache name, module imports, and release UI agree on Build 1.03.8.
 
 ## Scope and compatibility
 
 - No new record type, schema, or storage service was added.
 - The storage key remains `firevault_vault_build_030`; no migration is required.
 - Existing Account ID matching and history-preservation rules are unchanged.
-- Build 1.03.6 Update Ready repair, Build 1.03.5 Photo Overlay cleanup, and all earlier CSV Plus Code and real-vault persistence work remain intact.
+- Build 1.03.7 update geometry hardening, Build 1.03.6 lockup repair, Build 1.03.5 Photo Overlay cleanup, and all earlier data work remain intact.
