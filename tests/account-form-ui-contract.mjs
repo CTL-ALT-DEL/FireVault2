@@ -13,9 +13,9 @@ function match(source,pattern,message){checks+=1;assert.match(source,pattern,mes
 function ok(value,message){checks+=1;assert.ok(value,message)}
 
 const build=JSON.parse(version).build;
-equal(build,"1.03.17");
+equal(build,"1.03.18");
 
-match(app,/class="screen accountFormScreen0760"/);
+match(app,/class="screen accountFormScreen0760/);
 match(app,/class="accountFormHeader0760 accountFormTop0760"/);
 match(app,/id="backBtn" aria-label="Cancel and go back"/);
 match(app,/data-record-group="identity"/);

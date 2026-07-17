@@ -14,7 +14,7 @@ function match(source,pattern,message){checks+=1;assert.match(source,pattern,mes
 function ok(value,message){checks+=1;assert.ok(value,message)}
 
 const build=JSON.parse(version).build;
-equal(build,"1.03.17");
+equal(build,"1.03.18");
 
 match(app,/const FIRST_RUN_KEY_10317="firevault_first_run_complete_10317"/);
 match(app,/function firstRunComplete10317\(\).*localStorage\.getItem\(FIRST_RUN_KEY_10317\)/);
@@ -40,19 +40,19 @@ match(app,/data=loadData\(\{allowEmptyReal:true\}\);applyTheme\(\)/);
 match(app,/firstAccountGuide10317=true;demoAccountChoiceResolved10317=true;startAccountCreation10317\(\)/);
 
 match(app,/const guidedNewAccount10317=!editing&&/);
-match(app,/guidedNewAccount10317\?firstAccountAssistantMarkup10317\(\):""/);
-match(app,/id="firstAccountGps10317">⌖ Find Current Address<\/button>/);
-match(app,/id="firstAccountManual10317">Enter Address Manually<\/button>/);
-match(app,/You will confirm it before any fields are filled/);
-match(app,/GPS sends your coordinates for one address lookup only after you tap the button/);
+match(app,/editing\?editLocationMarkup10318:createLocationMarkup10318/);
+match(app,/id="firstAccountGps10317">⌖ Use Current Location<\/button>/);
+match(app,/id="firstAccountManual10317">✎ Enter Manually<\/button>/);
+match(app,/Find and confirm the location/);
+match(app,/Address lookup starts only after you tap Search or Use Current Location/);
 match(app,/firstAccountGps10317"\)\?\.addEventListener\("click",captureFirstAccountAddress10317\)/);
 match(app,/navigator\.geolocation\.getCurrentPosition\(async position=>/);
 ok(!/scheduleFirstRunOnboarding10317[\s\S]{0,500}navigator\.geolocation\.getCurrentPosition/.test(app),"First-run slides must not request location automatically.");
 
 match(storage,/addressAssist:true/);
 match(storage,/reverseGeocodeEndpoint:"https:\/\/nominatim\.openstreetmap\.org\/reverse"/);
-match(app,/gpsAddressAssist","Suggest an address during first-account setup"/);
-match(app,/address assistance makes one user-requested OpenStreetMap lookup and always asks for confirmation/i);
+match(app,/gpsAddressAssist","Enable address lookup when adding accounts"/);
+match(app,/Search and current-location assistance run only after a tap and always require address confirmation/);
 match(app,/s\.gps=\{\.\.\.\(s\.gps\|\|\{\}\)[\s\S]*?addressAssist:checked\("gpsAddressAssist"\)\}/);
 
 match(app,/function reverseCurrentAddress10317\(coords\)/);
@@ -97,9 +97,9 @@ ok(design.indexOf(marker)<design.indexOf(updateMarker),"Onboarding styles must r
 match(design,/\.firstRunOverlay10317\{[\s\S]*?position:fixed;[\s\S]*?place-items:center;[\s\S]*?backdrop-filter:blur\(14px\)/);
 match(design,/\.firstRunDialog10317\{[\s\S]*?width:min\(100%,520px\);[\s\S]*?max-height:min\(760px,calc\(100dvh - 28px\)\)/);
 match(design,/\.firstRunActions10317,[\s\S]*?grid-template-columns:1fr 1fr/);
-match(design,/\.firstAccountAssistant10317\{[\s\S]*?grid-template-columns:1fr 1fr/);
+match(design,/\.accountAddressWorkspace10318\{gap:11px!important\}/);
 match(design,/\.detectedAddressDialog10317>footer\{[\s\S]*?grid-template-columns:\.9fr \.9fr 1\.2fr/);
-match(design,/@media\(max-width:430px\)\{[\s\S]*?\.firstAccountAssistant10317\{grid-template-columns:1fr/);
+match(design,/@media\(max-width:430px\)\{[\s\S]*?\.accountAddressFinderActions10318\{grid-template-columns:1fr\}/);
 match(design,/@media\(max-width:430px\)\{[\s\S]*?\.detectedAddressDialog10317>footer \.primary\{grid-column:1\/-1;grid-row:1\}/);
 
 console.log(JSON.stringify({status:"passed",build,checks}));

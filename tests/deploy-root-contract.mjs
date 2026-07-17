@@ -19,7 +19,7 @@ const requiredRootFiles=[
 ];
 const requiredRootDirectories=["assets","src","tests","architecture"];
 
-assert.equal(build,"1.03.17");
+assert.equal(build,"1.03.18");
 for(const path of [...requiredRootFiles,...requiredRootDirectories]) await access(new URL(path,root));
 assert.match(noJekyll,/Publish FireVault directly/);
 assert.doesNotMatch(noJekyll,/theme:|plugins:/i);

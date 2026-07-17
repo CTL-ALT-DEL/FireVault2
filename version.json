@@ -1,8 +1,8 @@
 {
-  "build": "1.03.17",
+  "build": "1.03.18",
   "released": "2026-07-16",
-  "note": "Guides new users from Demo Mode into a confirmed GPS-assisted first account.",
-  "label": "Guided First Account",
-  "version": "1.03.17",
-  "name": "Guided First Account"
+  "note": "Rebuilds Add Account around address search, GPS assistance, and mandatory address confirmation.",
+  "label": "Confirmed Account Setup",
+  "version": "1.03.18",
+  "name": "Confirmed Account Setup"
 }

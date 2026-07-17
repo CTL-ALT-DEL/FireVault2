@@ -20,7 +20,7 @@ const {
   isDemoMode,latestAutoBackup,loadData,saveData,setDemoMode
 }=await import("../src/storage.js");
 
-assert.equal(BUILD,"1.03.17");
+assert.equal(BUILD,"1.03.18");
 assert.equal(KEY,"firevault_vault_build_030","Build updates must never rename the customer vault.");
 assert.equal(DEVICE_KEY,"firevault_device_identity_062","Build updates must preserve the device identity key.");
 assert.doesNotMatch(worker,/localStorage|sessionStorage|indexedDB/i,"The app-file cache must not read or write customer storage.");

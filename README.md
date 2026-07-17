@@ -1,19 +1,20 @@
 # FireVault
 
-## Build 1.03.17 — Guided First Account
+## Build 1.03.18 — Confirmed Account Setup
 
-Build 1.03.17 adds a minimal new-user path from the protected Demo Mode into a confirmed, GPS-assisted first real account. It keeps real and fictional data separate and never inserts a detected address without approval.
+Build 1.03.18 completely rebuilds Add Account as a guided, field-ready workspace. Every new account can search a business or street address, use current GPS, or enter the location manually, and the address must be explicitly confirmed before creation.
 
 ### Updated
 
-- Shows three short first-open cards explaining Demo Mode, account search, Nearby Accounts, Account Detail, and the move to real data.
-- Asks whether to leave Demo Mode when Add Account is selected: use the real vault or continue with a temporary practice account.
-- Adds a first-account guide with explicit GPS and manual-entry choices.
-- Uses one user-requested reverse-address lookup, then asks “Is that correct?” before populating any address fields.
-- Shows a commercial location name when OpenStreetMap returns one and uses it as the suggested account name only when the field is empty.
-- Keeps manual entry available when GPS permission is declined, lookup fails, or the suggested address is wrong.
-- Generates the existing offline Google Plus Code after confirmed GPS is applied.
-- Adds an automated onboarding contract and retains Build 1.03.16 list cleanup plus all update, vault, CSV, deployment, and offline safeguards.
+- Adds a compact setup header, three-step navigation, live readiness checklist, simplified required fields, and collapsible optional fire-alarm details.
+- Adds an explicit business or street-address search with up to five reviewable matches.
+- Retains current-location GPS assistance and commercial-location name suggestions for every new account, not only the first one.
+- Shows a structured confirmation sheet before a lookup result fills the account.
+- Invalidates confirmation whenever street, city, state, or ZIP is changed.
+- Requires a final “Confirm & Create” review for manually entered or corrected addresses.
+- Stores confirmation method and time with the account while preserving existing fields, Plus Codes, and account history behavior.
+- Prevents blank latitude and longitude fields from being interpreted as 0,0.
+- Keeps Demo Mode protection, manual fallbacks, and all prior update, vault, CSV, deployment, offline, form, list, and photo safeguards.
 
 ### Run locally
 
