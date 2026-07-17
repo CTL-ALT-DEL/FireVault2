@@ -13,7 +13,7 @@ const [index,worker,app,storage,styles,design,version]=await Promise.all([
 const {encodePlusCode,isValidFullPlusCode}=await import("../src/open-location-code.js");
 
 const build=JSON.parse(version).build;
-assert.equal(build,"1.03.15");
+assert.equal(build,"1.03.16");
 assert.match(index,/setTimeout\(function\(\)\{[\s\S]*?showRecovery\([\s\S]*?\},8000\);/);
 assert.match(index,/updateButton\.disabled=false;laterButton\.disabled=false;/);
 assert.match(index,/updateButton\.textContent="Try Again";laterButton\.textContent="Reload App";/);

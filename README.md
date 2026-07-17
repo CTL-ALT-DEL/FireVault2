@@ -1,18 +1,18 @@
 # FireVault
 
-## Build 1.03.15 — Secondary Form Cleanup
+## Build 1.03.16 — Secondary List Cleanup
 
-Build 1.03.15 is a no-new-features UI cleanup release. It gives Contact, Equipment, Task, and Deficiency editors one consistent, phone-ready layout without changing any field, status action, photo link, save route, or stored data.
+Build 1.03.16 is a no-new-features UI cleanup release. It gives the Contact, Equipment, Task, and Deficiency list screens one compact field-ready layout without changing any record, filter, quick action, route, or stored data.
 
 ### Updated
 
-- Aligns Contact, Equipment, Task, and Deficiency titles beside a consistent 44px Back control.
-- Reconnects the existing Unsaved state to each live secondary-form header.
-- Standardizes labels, 16px inputs, 50px controls, notes areas, checkboxes, support cards, and sticky actions.
-- Keeps Equipment field actions compact in three columns and keeps Deficiency photo actions and Save + Add Photo intact.
-- Collapses paired fields and Save/Delete actions only on the narrowest phones where two columns would be cramped.
-- Adds an automated secondary-form UI contract and retains Build 1.03.14 account-form cleanup plus all update, vault, deployment, and offline safeguards.
-- Changes no contact, equipment, task, or deficiency field, validation, status behavior, storage schema, or technician feature.
+- Gives all four list screens the same compact header with 44px Back and Add controls.
+- Keeps account context readable while safely shortening unusually long account names.
+- Replaces tall phone action stacks with compact two- or three-column 44px action grids.
+- Keeps filter rails horizontal, raises their touch targets to 44px, and strengthens count readability.
+- Aligns card titles, status pills, metadata, notes, and summary counts across phone and tablet layouts.
+- Adds an automated secondary-list UI contract and retains Build 1.03.15 form cleanup plus all update, vault, deployment, and offline safeguards.
+- Changes no contact, equipment, task, or deficiency data, filters, status behavior, storage schema, or technician feature.
 
 ### Run locally
 
