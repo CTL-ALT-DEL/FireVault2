@@ -1,17 +1,16 @@
 # FireVault
 
-## Build 1.03.9 — Vault Upgrade Preservation
+## Build 1.03.10 — GitHub Pages Direct Deploy
 
-Build 1.03.9 is a no-new-features data-preservation release. A realistic production-style account now runs through save, reload, second save, recovery, and rolling-backup checks so future PWA or UI work cannot silently drop important field data.
+Build 1.03.10 is a no-new-features deployment-stability release. The package now publishes directly through GitHub Pages without Jekyll, carries current deployment instructions, and verifies that every required app file is at repository root before release.
 
 ### Updated
 
-- Locks the customer vault key and device identity key across build upgrades.
-- Verifies account notes, contacts, tasks, deficiencies, GPS, account and entrance Plus Codes, and preferred location data after reload.
-- Verifies photo metadata, customer captions, media references, the normal Photo Overlay, and the independent Technician Overlay after reload.
-- Verifies Demo Mode stays off once a real vault exists and the prior revision remains available in the recovery copy.
-- Verifies the service worker cannot access customer local storage or IndexedDB.
-- Retains Build 1.03.8 fresh-first navigation, Build 1.03.7 update geometry hardening, and all earlier field workflows.
+- Adds the `.nojekyll` marker so GitHub Pages serves the static PWA directly instead of invoking an unnecessary Jekyll build.
+- Replaces the outdated deployment note with exact repository-root extraction and version-verification instructions.
+- Adds a deployment contract covering required root files and directories, stale asset versions, forbidden nested release folders, and Jekyll/Ruby build files.
+- Clarifies that only the newest GitHub Pages run for the newest commit needs to succeed.
+- Retains Build 1.03.9 vault-preservation checks, Build 1.03.8 fresh-first navigation, and Build 1.03.7 update geometry hardening.
 - Changes no records, storage schema, settings, or technician features.
 
 ### Run locally

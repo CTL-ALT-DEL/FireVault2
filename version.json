@@ -1,8 +1,8 @@
 {
-  "build": "1.03.9",
+  "build": "1.03.10",
   "released": "2026-07-16",
-  "note": "Locks realistic account, Plus Code, photo metadata, overlay, technician, recovery, and backup preservation into the release suite.",
-  "label": "Vault Upgrade Preservation",
-  "version": "1.03.9",
-  "name": "Vault Upgrade Preservation"
+  "note": "Publishes directly through GitHub Pages and verifies the complete release is extracted at repository root without stale files.",
+  "label": "GitHub Pages Direct Deploy",
+  "version": "1.03.10",
+  "name": "GitHub Pages Direct Deploy"
 }

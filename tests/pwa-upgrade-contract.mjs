@@ -18,7 +18,7 @@ const manifest=JSON.parse(manifestText);
 const build=version.build;
 const escapedBuild=build.replaceAll(".","\\.");
 
-assert.equal(build,"1.03.9");
+assert.equal(build,"1.03.10");
 assert.equal(manifest.version,build);
 assert.match(storage,new RegExp(`export const BUILD = "${escapedBuild}"`));
 assert.match(worker,new RegExp(`const BUILD="${escapedBuild}"`));
@@ -67,6 +67,6 @@ assert.match(geometry,/env\(safe-area-inset-top\)[\s\S]*?env\(safe-area-inset-bo
 assert.doesNotMatch(allStyles,/#fvUpdateBanner072\{[^}]*left:50%!important/);
 assert.doesNotMatch(allStyles,/#fvUpdateBanner072\{[^}]*bottom:calc\(88px/);
 assert.doesNotMatch(allStyles,/#fvUpdateBanner072 div\{display:grid/);
-assert.doesNotMatch(index,new RegExp(`\\?v=1\\.03\\.[0-8](?:"|')`));
+assert.doesNotMatch(index,new RegExp(`\\?v=1\\.03\\.(?:[0-9])(?:"|')`));
 
 console.log(JSON.stringify({status:"passed",build,checks:34,shellAssets:shell.length,root:fileURLToPath(root)}));
