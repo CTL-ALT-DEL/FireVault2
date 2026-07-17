@@ -1,7 +1,7 @@
 # FireVault
 
 ## Build 1.03.4 — Category-Aware Photo Overlays
-
+ 
 Build 1.03.4 makes the Photo Overlay tagline follow the selected photo category and adds an independent Technician Overlay option to camera and imported-photo workflows.
 
 ### Updated
