@@ -3434,6 +3434,100 @@ button,.btn,input,textarea,select{border-radius:var(--fv-control-radius,15px)}
   .docPhotoActions513 button{font-size:11px!important}
 }
 
+/* Build 1.03.14 — field-ready Add/Edit Account form cleanup. */
+.accountFormScreen0760{gap:10px!important}
+.accountFormHeader0760{
+  min-height:84px!important;
+  grid-template-columns:44px minmax(0,1fr)!important;
+  gap:11px!important;
+  padding:12px 13px!important;
+  align-items:start!important;
+}
+.accountFormHeader0760 .back{
+  width:44px!important;
+  height:44px!important;
+  min-height:44px!important;
+  font-size:22px!important;
+}
+.accountFormHeader0760 span{font-size:11px!important;line-height:1.15!important}
+.accountFormHeader0760 h1{font-size:23px!important;line-height:1.08!important}
+.accountFormHeader0760 p{font-size:12.5px!important;line-height:1.4!important}
+body.fv-unsaved0930 .accountFormHeader0760{
+  border-bottom-color:rgba(245,158,11,.72)!important;
+  box-shadow:inset 0 -2px 0 rgba(245,158,11,.72),0 12px 28px rgba(0,0,0,.22)!important;
+}
+body.fv-unsaved0930 .accountFormHeader0760 h1::after{
+  content:" • Unsaved"!important;
+  color:#f6b84a!important;
+  font-size:12px!important;
+  font-weight:850!important;
+  white-space:nowrap!important;
+}
+.accountForm0760{
+  gap:12px!important;
+  padding:12px 12px calc(28px + env(safe-area-inset-bottom))!important;
+  scroll-padding-bottom:110px!important;
+  overscroll-behavior:contain!important;
+}
+.accountFormCard0760{gap:12px!important;padding:14px!important}
+.accountFormSectionTitle0760{margin-bottom:0!important;gap:10px!important}
+.accountFormSectionTitle0760>span{font-size:13px!important}
+.accountFormSectionTitle0760 strong{font-size:15px!important;line-height:1.2!important}
+.accountFormSectionTitle0760 small{font-size:11.5px!important;line-height:1.4!important}
+.accountForm0760 label{min-height:18px!important;font-size:12.5px!important;line-height:1.3!important}
+.accountForm0760 label b{
+  min-height:20px!important;
+  display:inline-flex!important;
+  align-items:center!important;
+  padding:2px 6px!important;
+  border:1px solid rgba(96,165,250,.28)!important;
+  border-radius:999px!important;
+  background:rgba(59,130,246,.10)!important;
+  font-size:9.5px!important;
+  line-height:1!important;
+}
+.accountForm0760 input,
+.accountForm0760 textarea,
+.accountForm0760 select{
+  min-height:50px!important;
+  border-radius:12px!important;
+  font-size:16px!important;
+}
+.accountForm0760 textarea{min-height:104px!important;line-height:1.45!important}
+.accountForm0760 .compactField{gap:10px!important}
+.accountFieldHint0760{font-size:11.5px!important;line-height:1.4!important}
+.accountFormLocationAction0760 button{min-height:50px!important;font-size:12px!important;font-weight:850!important}
+.accountGpsFields0760{gap:10px!important;padding:11px!important}
+.accountPlusPreview0794{margin-top:0!important;padding:10px 11px!important}
+.accountPlusPreview0794 span{font-size:10.5px!important}
+.accountPlusPreview0794 small{font-size:11px!important;line-height:1.4!important}
+.accountFormError0760{font-size:12.5px!important;line-height:1.45!important}
+.accountFormActions0760{
+  grid-template-columns:.82fr 1.18fr!important;
+  gap:9px!important;
+  padding:12px 0 4px!important;
+}
+.accountFormActions0760 button{min-height:56px!important;font-size:13px!important;line-height:1.2!important}
+.accountDelete0760{min-height:50px!important;font-size:12px!important}
+
+@media(max-width:390px){
+  .accountFormScreen0760{gap:7px!important}
+  .accountFormHeader0760{
+    min-height:66px!important;
+    padding:10px!important;
+    align-items:center!important;
+  }
+  .accountFormHeader0760 p{display:none!important}
+  .accountFormHeader0760 h1{font-size:21px!important}
+  .accountForm0760{padding:9px 9px calc(24px + env(safe-area-inset-bottom))!important}
+  .accountFormCard0760{gap:10px!important;padding:12px!important}
+  .accountFormSectionTitle0760{grid-template-columns:32px minmax(0,1fr)!important;gap:8px!important}
+  .accountFormSectionTitle0760>span{width:32px!important;height:32px!important}
+  .accountFormSectionTitle0760 strong{font-size:14px!important}
+  .accountFormActions0760{padding-top:10px!important}
+  .accountFormActions0760 button{min-height:54px!important;font-size:12.5px!important}
+}
+
 /* Build 1.03.7 — canonical Update Ready geometry. Keep this contract last. */
 body.fvUpdateModalOpen1033{overflow:hidden!important}
 #fvUpdateBanner072{

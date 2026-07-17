@@ -15,8 +15,8 @@ function match(source,pattern,message){checks+=1;assert.match(source,pattern,mes
 function ok(value,message){checks+=1;assert.ok(value,message)}
 
 const build=JSON.parse(version).build;
-equal(build,"1.03.13");
-ok(index.indexOf("src/styles.css?v=1.03.13")<index.indexOf("src/design-system.css?v=1.03.13"),"The final design system must load after legacy application styles.");
+equal(build,"1.03.14");
+ok(index.indexOf("src/styles.css?v=1.03.14")<index.indexOf("src/design-system.css?v=1.03.14"),"The final design system must load after legacy application styles.");
 
 match(app,/class="quickPhotoSheet0950" role="dialog" aria-modal="true"/);
 match(app,/id="quickPhotoCategory0950"/);

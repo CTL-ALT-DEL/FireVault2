@@ -1,4 +1,16 @@
-# FireVault Build 1.03.13 Validation
+# FireVault Build 1.03.14 Validation
+
+## Account form UI contract
+
+- Add Account and Edit Account retain the configured Identity, Location, Fire Alarm System, GPS, Plus Code, and notes fields.
+- The live form header now carries the existing `accountFormTop0760` contract so edited inputs display the intended Unsaved state.
+- Account name, Account ID, phone, street, city, state, ZIP, latitude, and longitude retain their browser autocomplete and phone keyboard hints.
+- Form labels, Required badges, section headings, error messages, and field hints use explicit readable sizes.
+- Inputs remain 16px and at least 50px high to prevent iPhone focus zoom and support field use.
+- Capture Current Location remains a 50px action without changing GPS or Plus Code behavior.
+- The sticky Cancel / Create Account or Save Changes actions use 54–56px targets.
+- The narrow-phone header removes only its explanatory sentence; the form title, state, Back control, sections, and every field remain available.
+- The dedicated account-form suite verifies live markup, validation hooks, dirty-state protection, responsive overrides, and final stylesheet order.
 
 ## Photo workflow UI contract
 
@@ -25,7 +37,7 @@
 ## Runtime and offline asset integrity
 
 - The HTML bootstrap contains 25 reviewed local stylesheet, module, manifest, icon, image, and application references.
-- Every local HTML reference carries the current Build 1.03.13 cache token.
+- Every local HTML reference carries the current Build 1.03.14 cache token.
 - All JavaScript imports are resolved from their source modules, exist inside the release, and carry the current build token.
 - CSS `url(...)`, branding profile assets, Photo Overlay sample media, and all three visual Help images resolve to packaged files.
 - All 30 runtime files are present in the 32-entry offline shell; the shell contains no duplicate or missing entry.
@@ -41,7 +53,7 @@
 - No nested FireVault build directory, `_config.yml`, or Ruby `Gemfile` can enter the deploy root.
 - The deployment guide identifies the current build, explains root-level extraction, and warns against uploading the containing ZIP folder.
 - The guide explains that only the newest workflow run matters and requires published `version.json` verification before updating the Home Screen app.
-- Runtime HTML and service-worker references agree on Build 1.03.13 and reject asset references from Builds 1.03.0 through 1.03.9.
+- Runtime HTML and service-worker references agree on Build 1.03.14 and reject asset references from Builds 1.03.0 through 1.03.9.
 
 ## Vault upgrade preservation
 
@@ -123,7 +135,7 @@
 
 ## Static checks
 
-- JavaScript syntax passes for `app.js`, `storage.js`, `sw.js`, and all nine release regression tests.
+- JavaScript syntax passes for `app.js`, `storage.js`, `sw.js`, and all ten release regression tests.
 - The runtime-asset integrity suite passes 262 HTML, import, CSS, manifest, icon, branding, help, and offline-shell checks.
 - The deploy-root contract passes 29 direct-publish, file-placement, instruction, build-alignment, and stale-reference checks.
 - The storage transition test passes with 20 isolated demo sites and one real site surviving a simulated reload.
@@ -133,12 +145,13 @@
 - The release-safety test covers build references, CSV persistence guards, Plus Code generation, progressive Photo Overlay navigation, Quick Photo and imported-photo composition, retired-style rejection, and the centered Update Ready recovery flow.
 - The UI-readability contract verifies active Account Directory, Account Detail, Settings, Photo Overlay, and Nearby markup against the final responsive CSS overrides.
 - The photo-workflow UI contract verifies Quick Photo review, account selection, imported-photo categories, overlay choices, and final action geometry.
-- Active runtime and service-worker references resolve to Build 1.03.13.
-- `version.json`, the manifest, cache name, module imports, and release UI agree on Build 1.03.13.
+- The account-form UI contract verifies Add/Edit Account fields, browser input hints, dirty-state protection, validation controls, and responsive action sizing.
+- Active runtime and service-worker references resolve to Build 1.03.14.
+- `version.json`, the manifest, cache name, module imports, and release UI agree on Build 1.03.14.
 
 ## Scope and compatibility
 
 - No new record type, schema, or storage service was added.
 - The storage key remains `firevault_vault_build_030`; no migration is required.
 - Existing Account ID matching and history-preservation rules are unchanged.
-- Build 1.03.12 active-screen readability, Build 1.03.11 offline asset integrity, Build 1.03.10 GitHub Pages direct deployment, Build 1.03.9 vault preservation, Build 1.03.8 fresh-first navigation, Build 1.03.7 update geometry hardening, Build 1.03.6 lockup repair, Build 1.03.5 Photo Overlay cleanup, and all earlier data work remain intact.
+- Build 1.03.13 photo workflow cleanup, Build 1.03.12 active-screen readability, Build 1.03.11 offline asset integrity, Build 1.03.10 GitHub Pages direct deployment, Build 1.03.9 vault preservation, Build 1.03.8 fresh-first navigation, Build 1.03.7 update geometry hardening, Build 1.03.6 lockup repair, Build 1.03.5 Photo Overlay cleanup, and all earlier data work remain intact.
