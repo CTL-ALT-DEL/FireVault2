@@ -1,8 +1,8 @@
 {
-  "build": "1.03.12",
+  "build": "1.03.13",
   "released": "2026-07-16",
-  "note": "Improves active-screen label readability and touch targets without changing technician workflows or stored data.",
-  "label": "Active-Screen Readability",
-  "version": "1.03.12",
-  "name": "Active-Screen Readability"
+  "note": "Cleans up Quick Photo review and imported-photo controls without changing photo workflows or stored data.",
+  "label": "Photo Workflow Cleanup",
+  "version": "1.03.13",
+  "name": "Photo Workflow Cleanup"
 }

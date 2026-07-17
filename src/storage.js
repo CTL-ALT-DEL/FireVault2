@@ -1,5 +1,5 @@
-import { stageVaultMedia, stripPersistedMediaForStorage, hydrateVaultMediaFromCache } from "./media-store.js?v=1.03.12";
-export const BUILD = "1.03.12";
+import { stageVaultMedia, stripPersistedMediaForStorage, hydrateVaultMediaFromCache } from "./media-store.js?v=1.03.13";
+export const BUILD = "1.03.13";
 export const SECURITY_SCHEMA_VERSION = 4;
 export const KEY = "firevault_vault_build_030";
 export const DEVICE_KEY = "firevault_device_identity_062";

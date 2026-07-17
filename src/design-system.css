@@ -3350,6 +3350,90 @@ button,.btn,input,textarea,select{border-radius:var(--fv-control-radius,15px)}
   .accountDirectory0951 .accountRowActions0951 .accountFavorite0871>span{font-size:10px!important}
 }
 
+/* Build 1.03.13 — compact, readable photo capture and import workflow. */
+.quickPhotoSheet0950,
+.quickPhotoPicker0950{overscroll-behavior:contain!important}
+.quickPhotoSheet0950>header,
+.quickPhotoPicker0950>header{margin-bottom:10px!important}
+.quickPhotoSheet0950>header span,
+.quickPhotoPicker0950>header span{font-size:11px!important}
+.quickPhotoSheet0950 h2,
+.quickPhotoPicker0950 h2{font-size:20px!important;line-height:1.15!important}
+.quickPhotoPreview0950>div{font-size:12px!important;line-height:1.3!important}
+.quickPhotoAccount0950{min-height:64px!important;margin:10px 0!important;padding:10px 12px!important}
+.quickPhotoAccount0950 span{font-size:15px!important;line-height:1.2!important}
+.quickPhotoAccount0950 small{font-size:11px!important;line-height:1.25!important}
+.quickPhotoAccount0950 b{font-size:11px!important}
+.quickPhotoOptions0950{gap:7px!important}
+.quickPhotoOptions0950>label:not(.checkRow)>span{font-size:11.5px!important;font-weight:850!important}
+.quickPhotoOptions0950 select{min-height:50px!important;font-size:16px!important}
+.quickPhotoOptions0950 .checkRow{
+  min-height:50px!important;
+  padding:9px 11px!important;
+  font-size:13px!important;
+  line-height:1.25!important;
+}
+.quickPhotoOptions0950 .checkRow input{width:20px!important;height:20px!important;min-height:20px!important}
+.quickPhotoDetails0950 summary{min-height:46px!important;display:flex!important;align-items:center!important;font-size:12.5px!important}
+.quickPhotoSheet0950>footer button{min-height:54px!important;font-size:13px!important;font-weight:900!important}
+.quickPhotoAccountList0950 button{min-height:66px!important;padding:11px 13px!important}
+.quickPhotoAccountList0950 button strong{font-size:14px!important}
+.quickPhotoAccountList0950 button small{font-size:11px!important;line-height:1.3!important}
+
+.docPhotoManager524{gap:10px!important;padding:12px!important}
+.docPhotoHead524 strong{font-size:15px!important}
+.docPhotoHead524 span{font-size:11.5px!important;line-height:1.35!important}
+.docPhotoHead524>button{min-height:44px!important;font-size:11.5px!important;white-space:nowrap!important}
+.photoPickerPanel524>label,
+.photoNotesPanel524>label:not(.checkRow){font-size:11.5px!important;font-weight:850!important}
+#docPhotoFile512{min-height:50px!important;font-size:13px!important}
+.photoCategoryChip524{min-height:58px!important;padding:8px!important}
+.photoCategoryChip524 strong{font-size:12.5px!important}
+.photoCategoryChip524 span{font-size:10px!important;line-height:1.2!important}
+.photoNotesPanel524 .checkRow{min-height:48px!important;padding:9px 10px!important;font-size:12.5px!important;line-height:1.25!important}
+.photoNotesPanel524 .checkRow input{width:20px!important;height:20px!important;min-height:20px!important}
+.photoNotesPanel524>.fieldNote{font-size:10.5px!important;line-height:1.4!important}
+.docPhotoActions513 button{min-height:48px!important;font-size:11.5px!important;line-height:1.2!important}
+
+@media(max-width:520px){
+  .quickPhotoSheet0950{padding:12px!important}
+  .quickPhotoPreview0950{aspect-ratio:16/10!important;max-height:36dvh!important}
+  .quickPhotoSheet0950>footer{
+    bottom:-12px!important;
+    margin:12px -12px -12px!important;
+    padding:10px 12px calc(10px + env(safe-area-inset-bottom))!important;
+  }
+  .docPhotoHead512{display:flex!important;align-items:center!important}
+  .docPhotoHead512 span{display:none!important}
+  .docPhotoHead524>button{flex:0 0 auto!important;padding-inline:10px!important}
+  .docPhotoPreview524{min-height:170px!important}
+  .photoCategoryGrid524{grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:6px!important}
+  .photoCategoryChip524{
+    min-height:48px!important;
+    align-content:center!important;
+    justify-items:center!important;
+    padding:7px 4px!important;
+    text-align:center!important;
+  }
+  .photoCategoryChip524 strong{font-size:12px!important}
+  .photoCategoryChip524 span{display:none!important}
+  .docPhotoActions512,
+  .docPhotoActions513{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:7px!important}
+}
+
+@media(max-width:390px){
+  .quickPhotoOverlay0950,
+  .quickPhotoPickerOverlay0950{align-items:flex-end!important}
+  .quickPhotoSheet0950,
+  .quickPhotoPicker0950{max-height:96dvh!important;border-radius:20px 20px 0 0!important}
+  .quickPhotoSheet0950 h2,
+  .quickPhotoPicker0950 h2{font-size:18px!important}
+  .quickPhotoAccount0950{min-height:60px!important}
+  .quickPhotoOptions0950 .checkRow{font-size:12.5px!important}
+  .docPhotoManager524{padding:9px!important}
+  .docPhotoActions513 button{font-size:11px!important}
+}
+
 /* Build 1.03.7 — canonical Update Ready geometry. Keep this contract last. */
 body.fvUpdateModalOpen1033{overflow:hidden!important}
 #fvUpdateBanner072{

@@ -14,7 +14,7 @@ function match(source,pattern,message){checks+=1;assert.match(source,pattern,mes
 function ok(value,message){checks+=1;assert.ok(value,message)}
 
 const build=JSON.parse(version).build;
-equal(build,"1.03.12");
+equal(build,"1.03.13");
 
 match(app,/class="accountRowActions0951 workflowActions0957"/);
 match(app,/<span>Call<\/span>/);
