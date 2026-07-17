@@ -1,4 +1,16 @@
-# FireVault Build 1.03.8 Validation
+# FireVault Build 1.03.9 Validation
+
+## Vault upgrade preservation
+
+- The production vault key remains `firevault_vault_build_030`; normal build updates do not create a replacement vault namespace.
+- The device identity remains stable through save and reload.
+- A realistic account retains its Account ID, address, panel data, access notes, contacts, tasks, deficiencies, and site-note history.
+- Account GPS, account Plus Code, preferred entrance, entrance GPS, and entrance Plus Code survive save and reload.
+- Photo category, customer caption, media reference, linked deficiency, storage destination, and both per-photo overlay choices survive save and reload.
+- Photo Overlay layout, colors, template, custom field layout, Technician Overlay fields/alignment, technician profile, and Plus Code settings survive save and reload.
+- A first real save creates a rolling safety snapshot and a second save preserves the prior revision in the recovery copy.
+- A populated real vault keeps Demo Mode off after reload.
+- The service worker contains no customer-storage key and no `localStorage`, `sessionStorage`, or `indexedDB` access.
 
 ## Customer CSV regression
 
@@ -68,17 +80,18 @@
 
 ## Static checks
 
-- JavaScript syntax passes for `app.js`, `storage.js`, `sw.js`, and all four release regression tests.
+- JavaScript syntax passes for `app.js`, `storage.js`, `sw.js`, and all five release regression tests.
 - The storage transition test passes with 20 isolated demo sites and one real site surviving a simulated reload.
+- The vault upgrade-preservation test passes 41 realistic storage, recovery, backup, overlay, location, and service-worker isolation checks.
 - The PWA upgrade-contract test verifies build alignment, deferred activation, old-cache cleanup, version freshness, navigation refresh, all 33 offline-shell assets, and final update-dialog geometry.
 - The service-worker navigation smoke test executes fast-online, slow-online, offline, and first-install responses against the real worker code.
 - The release-safety test covers build references, CSV persistence guards, Plus Code generation, progressive Photo Overlay navigation, Quick Photo and imported-photo composition, retired-style rejection, and the centered Update Ready recovery flow.
-- Active runtime and service-worker references resolve to Build 1.03.8.
-- `version.json`, the manifest, cache name, module imports, and release UI agree on Build 1.03.8.
+- Active runtime and service-worker references resolve to Build 1.03.9.
+- `version.json`, the manifest, cache name, module imports, and release UI agree on Build 1.03.9.
 
 ## Scope and compatibility
 
 - No new record type, schema, or storage service was added.
 - The storage key remains `firevault_vault_build_030`; no migration is required.
 - Existing Account ID matching and history-preservation rules are unchanged.
-- Build 1.03.7 update geometry hardening, Build 1.03.6 lockup repair, Build 1.03.5 Photo Overlay cleanup, and all earlier data work remain intact.
+- Build 1.03.8 fresh-first navigation, Build 1.03.7 update geometry hardening, Build 1.03.6 lockup repair, Build 1.03.5 Photo Overlay cleanup, and all earlier data work remain intact.

@@ -1,16 +1,17 @@
 # FireVault
 
-## Build 1.03.8 — Fresh-First PWA Bootstrap
+## Build 1.03.9 — Vault Upgrade Preservation
 
-Build 1.03.8 is a no-new-features update bootstrap release. When online, navigation briefly prefers the newest page instead of automatically serving stale HTML first; slow or unavailable connections still fall back to the complete offline app.
+Build 1.03.9 is a no-new-features data-preservation release. A realistic production-style account now runs through save, reload, second save, recovery, and rolling-backup checks so future PWA or UI work cannot silently drop important field data.
 
 ### Updated
 
-- Gives a fresh navigation response up to 1.8 seconds to arrive before using cached HTML.
-- Returns the cached app promptly when the network is slow or offline, preserving field reliability.
-- Continues the network refresh in the background after a cached fallback so the next opening is current.
-- Adds an executable service-worker simulation for fast-online, slow-online, offline, and first-install navigation.
-- Retains Build 1.03.7 update geometry hardening and the complete Photo Overlay regression coverage.
+- Locks the customer vault key and device identity key across build upgrades.
+- Verifies account notes, contacts, tasks, deficiencies, GPS, account and entrance Plus Codes, and preferred location data after reload.
+- Verifies photo metadata, customer captions, media references, the normal Photo Overlay, and the independent Technician Overlay after reload.
+- Verifies Demo Mode stays off once a real vault exists and the prior revision remains available in the recovery copy.
+- Verifies the service worker cannot access customer local storage or IndexedDB.
+- Retains Build 1.03.8 fresh-first navigation, Build 1.03.7 update geometry hardening, and all earlier field workflows.
 - Changes no records, storage schema, settings, or technician features.
 
 ### Run locally

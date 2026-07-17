@@ -1,6 +1,6 @@
 # FireVault App Profile
 
-FireVault Build 1.03.8 uses `src/app-profile.js` as the active configuration for identity, terminology, modules, record data, workflow presets, branding, content packs, storage policy, AppForge blueprint participation, product recipes, factory manifests, and generated PWA packages.
+FireVault Build 1.03.9 uses `src/app-profile.js` as the active configuration for identity, terminology, modules, record data, workflow presets, branding, content packs, storage policy, AppForge blueprint participation, product recipes, factory manifests, and generated PWA packages.
 
 The FireVault profile remains optimized for fire alarm technicians. Shared screens consume the profile so future AppForge products can change terminology, enabled modules, fields, detail sections, photo categories, action surfaces, Quick Photo behavior, brand assets, content packs, approved storage providers, backup rules, and collaboration policy without rewriting the shared application core.
 
@@ -15,7 +15,7 @@ The active profile uses schema version 12 with:
 - AppForge Factory Request and Manifest generation
 - AppForge Generator Engine package generation
 
-Build 1.03.8 keeps AppForge out of the normal technician-facing Settings interface. Existing factory and generator tools are available only when FireVault is opened with the explicit `?appforge=1` developer query.
+Build 1.03.9 keeps AppForge out of the normal technician-facing Settings interface. Existing factory and generator tools are available only when FireVault is opened with the explicit `?appforge=1` developer query.
 
 ## Build 1.00.0 generator configuration
 
