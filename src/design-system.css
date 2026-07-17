@@ -3276,6 +3276,80 @@ button,.btn,input,textarea,select{border-radius:var(--fv-control-radius,15px)}
   .overlayPreview1012{padding:6px!important}.overlayWorkspaceHead1012{min-height:42px!important}.overlayPreviewFoot1035{padding-top:6px}.overlayQuickCard1035{padding:10px!important}.overlayQuickCard1035 .overlayPresetGrid0890 button{min-height:57px!important}.overlayQuickCard1035 .overlayQuickToggles0890 .checkRow{min-height:40px!important;font-size:11px!important}.overlayQuickCard1035 .overlayTaglineNote1034{display:none}.overlayDisclosureBody1035{padding:9px!important}.overlayDisclosure1035 .overlayBuilderTitle0944{display:grid!important}.overlayDisclosure1035 .overlayQuickAlign0945{width:100%!important;min-width:0!important;min-height:42px!important}.overlayFieldDisclosure1035 .overlayActiveFieldText0944 small{display:none!important}.overlayBrand1012 .overlayColorGrid0890{grid-template-columns:1fr 1fr!important}.overlayBrand1012 .overlayColorGrid0890>div:last-child{grid-column:1/-1}.technicianCompactHead1035{display:grid}.technicianCompactHead1035 .overlayAutoSave0944{justify-self:start}
 }
 
+/* Build 1.03.12 — active-screen readability and touch-target polish. */
+.accountDirectory0951 .accountRowTitle0951 h2{font-size:15px!important}
+.accountDirectory0951 .accountRowAddress0951{font-size:12px!important}
+.accountDirectory0951 .accountRowMeta0951>span{font-size:10px!important}
+.accountDirectory0951 .accountRowIssues0951 span{
+  min-height:22px!important;
+  padding:3px 6px!important;
+  font-size:9.5px!important;
+}
+.accountDirectory0951 .accountRowActions0951 button,
+.accountDirectory0951 .accountRowActions0951 .accountFavorite0871{
+  height:46px!important;
+  min-height:46px!important;
+  gap:6px!important;
+  padding-inline:5px!important;
+  font-size:11.5px!important;
+  line-height:1.1!important;
+}
+.accountDirectory0951 .accountRowActions0951 button>span{
+  min-width:0!important;
+  overflow:hidden!important;
+  font-size:11.5px!important;
+  line-height:1.1!important;
+  text-overflow:ellipsis!important;
+  white-space:nowrap!important;
+}
+.accountDirectory0951 .accountRowActions0951 .accountCardIcon0871{width:18px!important;height:18px!important}
+.accountDirectory0951 .accountRowActions0951 .accountFavorite0871{font-size:19px!important}
+.accountDirectory0951 .accountRowActions0951 .accountFavorite0871>span{font-size:10.5px!important;white-space:nowrap!important}
+.accountDirectory0951 .accountDirectoryNear0951,
+.accountDirectory0951 .accountDirectorySort0951,
+.accountDirectory0951 .accountDirectoryReset0951{
+  height:42px!important;
+  min-height:42px!important;
+  font-size:11.5px!important;
+}
+.accountDirectory0951 .accountDirectorySort0951>span,
+.accountDirectory0951 .accountDirectorySort0951>span b{font-size:11.5px!important}
+.settingsPolish0880 .settingsDetailHeader0880>#settingsBackBtn,
+.settingsPolish0880 .settingsDetailHeader0880>#settingsDoneBtn,
+.settingsPolish0880 .settingsDetailHeader0880>#saveSettingsTop{
+  height:44px!important;
+  min-height:44px!important;
+  font-size:12.5px!important;
+}
+.settingsOverlayDetail1012 .overlayFieldDisclosure1035 .overlayFieldActions0944 button>span{font-size:10px!important}
+.settingsOverlayDetail1012 .overlayFieldState1035{font-size:10px!important}
+.settingsOverlayDetail1012 .overlayPreviewFoot1035{font-size:10.5px!important}
+
+@media(max-width:430px){
+  .accountDetail1011 .accountTopBack1011{min-width:64px!important}
+  .accountDetail1011 .accountTopBack1011 strong{font-size:12.5px!important}
+  .accountDetail1011 .accountActionGrid0952 strong{font-size:13px!important}
+  .accountDetail1011 .accountTabs0952 button{min-width:96px!important;font-size:12.5px!important}
+  .accountDetail1011 .accountPanelHead0735 button,
+  .accountDetail1011 .accountInlineActions067 button{font-size:12.5px!important}
+}
+
+@media(max-width:390px){
+  .accountDirectory0951 .accountDirectoryReset0951{height:40px!important;min-height:40px!important}
+  .accountDirectory0951 .accountRowTitle0951 h2{font-size:14px!important}
+  .accountDirectory0951 .accountRowAddress0951{font-size:11.5px!important}
+  .accountDirectory0951 .accountRowActions0951 button,
+  .accountDirectory0951 .accountRowActions0951 .accountFavorite0871{
+    height:48px!important;
+    min-height:48px!important;
+    gap:4px!important;
+    padding-inline:2px!important;
+    font-size:11px!important;
+  }
+  .accountDirectory0951 .accountRowActions0951 button>span{font-size:10.5px!important}
+  .accountDirectory0951 .accountRowActions0951 .accountFavorite0871>span{font-size:10px!important}
+}
+
 /* Build 1.03.7 — canonical Update Ready geometry. Keep this contract last. */
 body.fvUpdateModalOpen1033{overflow:hidden!important}
 #fvUpdateBanner072{

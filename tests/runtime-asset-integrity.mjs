@@ -39,7 +39,7 @@ async function requireFile(relative,label){
 }
 function matches(text,expression){return [...text.matchAll(expression)].map(match=>match[1]);}
 
-equal(build,"1.03.11");
+equal(build,"1.03.12");
 equal(manifest.version,build);
 equal(manifest.start_url,"./");
 equal(manifest.scope,"./");

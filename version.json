@@ -1,8 +1,8 @@
 {
-  "build": "1.03.11",
+  "build": "1.03.12",
   "released": "2026-07-16",
-  "note": "Traces and verifies every runtime, manifest, branding, help, icon, import, and offline-shell asset before packaging.",
-  "label": "Offline Asset Integrity",
-  "version": "1.03.11",
-  "name": "Offline Asset Integrity"
+  "note": "Improves active-screen label readability and touch targets without changing technician workflows or stored data.",
+  "label": "Active-Screen Readability",
+  "version": "1.03.12",
+  "name": "Active-Screen Readability"
 }

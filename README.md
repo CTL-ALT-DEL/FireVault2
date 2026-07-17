@@ -1,17 +1,18 @@
 # FireVault
 
-## Build 1.03.11 — Offline Asset Integrity
+## Build 1.03.12 — Active-Screen Readability
 
-Build 1.03.11 is a no-new-features runtime-integrity release. The complete HTML, JavaScript, CSS, manifest, branding, help-image, icon, and offline-cache graph is now traced and verified before packaging so GitHub cannot publish a partially broken PWA.
+Build 1.03.12 is a no-new-features UI cleanup release. It improves the smallest labels and touch targets on the screens technicians use most while preserving the compact Photo Overlay workspace and every existing workflow.
 
 ### Updated
 
-- Traces 30 runtime files from the actual HTML bootstrap, module imports, CSS URLs, manifest, branding configuration, and in-app help references.
-- Verifies every runtime file exists and belongs to the 32-entry offline shell.
-- Verifies all versioned HTML, JavaScript, CSS, and service-worker references use the current build token.
-- Validates manifest scope, standalone display, shortcuts, icon paths, PNG signatures, and exact 192×192 and 512×512 dimensions.
-- Retains Build 1.03.10 direct GitHub Pages publishing, Build 1.03.9 vault preservation, and all update-dialog hardening.
-- Changes no records, storage schema, settings, or technician features.
+- Enlarges Account Directory names, addresses, metadata, issue badges, quick actions, and filter controls.
+- Keeps Add Note and Favorite on one line with readable labels and 46–48px action targets.
+- Improves phone-size Account Detail Back, primary-action, tab, and inline-action labels.
+- Improves Settings header controls and the smallest Photo Overlay field-action and status labels without expanding the workspace.
+- Preserves the larger bottom-right Nearby distance, the star-only Account Detail favorite, and the hardened Update Ready dialog.
+- Adds an automated UI-readability contract and retains the complete runtime/offline integrity suite from Build 1.03.11.
+- Changes no records, storage schema, settings behavior, or technician features.
 
 ### Run locally
 
