@@ -1,8 +1,8 @@
 {
-  "build": "1.03.14",
+  "build": "1.03.15",
   "released": "2026-07-16",
-  "note": "Polishes Add/Edit Account labels, spacing, unsaved state, and actions without changing fields or saved data.",
-  "label": "Account Form Cleanup",
-  "version": "1.03.14",
-  "name": "Account Form Cleanup"
+  "note": "Standardizes Contact, Equipment, Task, and Deficiency forms without changing fields or saved data.",
+  "label": "Secondary Form Cleanup",
+  "version": "1.03.15",
+  "name": "Secondary Form Cleanup"
 }

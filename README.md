@@ -1,18 +1,18 @@
 # FireVault
 
-## Build 1.03.14 — Account Form Cleanup
+## Build 1.03.15 — Secondary Form Cleanup
 
-Build 1.03.14 is a no-new-features UI cleanup release. It makes Add Account and Edit Account clearer, more compact, and safer to use with a phone keyboard without changing any account field, validation rule, or saved data.
+Build 1.03.15 is a no-new-features UI cleanup release. It gives Contact, Equipment, Task, and Deficiency editors one consistent, phone-ready layout without changing any field, status action, photo link, save route, or stored data.
 
 ### Updated
 
-- Reconnects the existing Unsaved indicator to the live account-form header.
-- Enlarges the Back control, form heading, labels, required badges, GPS action, error message, and Save / Cancel actions.
-- Reduces excess space between section headings and fields while retaining Identity, Location, Fire Alarm System, GPS, Plus Code, and notes content.
-- Keeps 16px inputs and explicit phone keyboard modes to prevent iPhone focus zoom and preserve efficient entry.
-- Keeps the sticky Save / Cancel bar reachable and hides only the nonessential header description on narrow phones.
-- Adds an automated account-form UI contract and retains Build 1.03.13 photo cleanup plus all existing update, vault, deployment, and offline safeguards.
-- Changes no account field, validation rule, storage schema, or technician feature.
+- Aligns Contact, Equipment, Task, and Deficiency titles beside a consistent 44px Back control.
+- Reconnects the existing Unsaved state to each live secondary-form header.
+- Standardizes labels, 16px inputs, 50px controls, notes areas, checkboxes, support cards, and sticky actions.
+- Keeps Equipment field actions compact in three columns and keeps Deficiency photo actions and Save + Add Photo intact.
+- Collapses paired fields and Save/Delete actions only on the narrowest phones where two columns would be cramped.
+- Adds an automated secondary-form UI contract and retains Build 1.03.14 account-form cleanup plus all update, vault, deployment, and offline safeguards.
+- Changes no contact, equipment, task, or deficiency field, validation, status behavior, storage schema, or technician feature.
 
 ### Run locally
 

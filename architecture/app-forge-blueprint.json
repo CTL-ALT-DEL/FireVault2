@@ -1,7 +1,7 @@
 {
   "kind": "field-vault.app-forge-blueprint",
   "schemaVersion": 1,
-  "build": "1.03.14",
+  "build": "1.03.15",
   "product": {
     "id": "firevault",
     "family": "field-vault",
