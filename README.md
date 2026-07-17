@@ -1,20 +1,20 @@
 # FireVault
 
-## Build 1.03.18 — Confirmed Account Setup
+## Build 1.03.19 — Focused Account Directory
 
-Build 1.03.18 completely rebuilds Add Account as a guided, field-ready workspace. Every new account can search a business or street address, use current GPS, or enter the location manually, and the address must be explicitly confirmed before creation.
+Build 1.03.19 makes the Account Directory calmer and more reliable on a phone. Only the account aligned at the top shows quick actions, search filters immediately, and bottom-navigation labels remain fully visible.
 
 ### Updated
 
-- Adds a compact setup header, three-step navigation, live readiness checklist, simplified required fields, and collapsible optional fire-alarm details.
-- Adds an explicit business or street-address search with up to five reviewable matches.
-- Retains current-location GPS assistance and commercial-location name suggestions for every new account, not only the first one.
-- Shows a structured confirmation sheet before a lookup result fills the account.
-- Invalidates confirmation whenever street, city, state, or ZIP is changed.
-- Requires a final “Confirm & Create” review for manually entered or corrected addresses.
-- Stores confirmation method and time with the account while preserving existing fields, Plus Codes, and account history behavior.
-- Prevents blank latitude and longitude fields from being interpreted as 0,0.
-- Keeps Demo Mode protection, manual fallbacks, and all prior update, vault, CSV, deployment, offline, form, list, and photo safeguards.
+- Keeps non-top account cards compact and hides their Call, Route, Add Note, Photo, and Favorite controls.
+- Reveals the action strip only after an account settles at the top, avoiding layout changes during touch or wheel scrolling.
+- Preserves card taps, keyboard opening, action behavior, sort choices, and saved scroll position.
+- Repairs Account Directory search with immediate input, paste, dictation, composition, and change handling.
+- Matches multi-word searches across account name, address, Account ID, panel, phone, contacts, equipment, documents, tasks, deficiencies, checklists, tags, and Plus Codes when enabled.
+- Resets filtered results to the top and exposes actions only on the first visible match.
+- Replaces the long Alphabetical sort label with the compact A-Z label.
+- Enlarges bottom-navigation buttons and reserves safe-area-aware vertical space so labels no longer clip.
+- Keeps the Build 1.03.18 Add Account redesign, Demo Mode protection, GPS assistance, and all prior update, vault, CSV, deployment, offline, form, list, and photo safeguards.
 
 ### Run locally
 

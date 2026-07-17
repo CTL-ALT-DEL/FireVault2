@@ -4109,6 +4109,66 @@ body.fvFirstRunOpen10317{overflow:hidden!important}
   .accountAddressConfirmDialog10318>header,.accountManualConfirmDialog10318>header{grid-template-columns:42px minmax(0,1fr) auto;gap:8px}.accountManualConfirmDialog10318>header{grid-template-columns:42px minmax(0,1fr)}.accountAddressConfirmDialog10318>header>span,.accountManualConfirmDialog10318>header>span{width:42px;height:42px}.accountAddressConfirmDialog10318 h2,.accountManualConfirmDialog10318 h2{font-size:18px!important}.accountAddressConfirmFacts10318{grid-template-columns:1fr}.accountAddressConfirmFacts10318>span:last-child{grid-column:1}.accountAddressConfirmDialog10318>footer{grid-template-columns:1fr 1fr}.accountAddressConfirmDialog10318>footer .primary{grid-column:1/-1;grid-row:1}.accountManualConfirmDialog10318>footer{grid-template-columns:1fr}.accountManualConfirmDialog10318>footer .primary{grid-row:1}
 }
 
+/* Build 1.03.19 — only the settled top Account Directory card shows actions. */
+.accountDirectory0951 .accountSearch0951{isolation:isolate;z-index:3!important}
+.accountDirectory0951 .accountSearch0951 .accountSearchIcon0871{pointer-events:none!important}
+.accountDirectory0951 .accountSearch0951 input{
+  position:relative!important;
+  z-index:2!important;
+  width:100%!important;
+  min-width:0!important;
+  pointer-events:auto!important;
+  touch-action:manipulation!important;
+  -webkit-user-select:text!important;
+  user-select:text!important
+}
+.accountDirectory0951 .accountSearch0951>button{position:relative!important;z-index:3!important}
+.accountDirectory0951 .accountRow0951 .accountRowActions0951{display:none!important}
+.accountDirectory0951 .accountRow0951.isTopAccount10319 .accountRowActions0951{display:grid!important}
+.accountDirectory0951 .accountDirectoryList0871.isScrolling0878 .accountRow0951 .accountRowActions0951{display:none!important}
+.accountDirectory0951 .accountRow0951.isTopAccount10319{
+  border-color:color-mix(in srgb,var(--row-accent) 48%,#344154)!important;
+  box-shadow:0 9px 20px rgba(0,0,0,.28),inset 0 1px rgba(255,255,255,.04)!important
+}
+.accountDirectory0951 .accountDirectoryList0871.isScrolling0878 .accountRow0951.isTopAccount10319{
+  border-color:#242f3f!important;
+  box-shadow:none!important
+}
+:root{--navH:calc(76px + max(env(safe-area-inset-bottom),8px))}
+#appNav,.nearbyBottomNav069{
+  height:var(--navH)!important;
+  min-height:var(--navH)!important;
+  max-height:var(--navH)!important;
+  padding-top:6px!important;
+  padding-bottom:calc(6px + max(env(safe-area-inset-bottom),8px))!important
+}
+#appNav button,.nearbyBottomNav069 button{
+  height:58px!important;
+  min-height:58px!important;
+  max-height:58px!important;
+  padding:5px 3px 6px!important;
+  display:flex!important;
+  flex-direction:column!important;
+  align-items:center!important;
+  justify-content:center!important;
+  overflow:visible!important
+}
+#appNav .fvNavIcon073,.nearbyBottomNav069 .fvNavIcon073{
+  width:24px!important;
+  height:24px!important;
+  flex:0 0 24px!important
+}
+#appNav button span,.nearbyBottomNav069 button span{
+  display:block!important;
+  min-height:14px!important;
+  overflow:visible!important;
+  line-height:1.15!important;
+  white-space:nowrap!important
+}
+@media(max-width:350px){
+  #appNav button span,.nearbyBottomNav069 button span{font-size:.65rem!important;letter-spacing:0!important}
+}
+
 /* Build 1.03.7 — canonical Update Ready geometry. Keep this contract last. */
 body.fvUpdateModalOpen1033{overflow:hidden!important}
 #fvUpdateBanner072{

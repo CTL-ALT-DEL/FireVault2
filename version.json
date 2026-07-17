@@ -1,8 +1,8 @@
 {
-  "build": "1.03.18",
+  "build": "1.03.19",
   "released": "2026-07-16",
-  "note": "Rebuilds Add Account around address search, GPS assistance, and mandatory address confirmation.",
-  "label": "Confirmed Account Setup",
-  "version": "1.03.18",
-  "name": "Confirmed Account Setup"
+  "note": "Shows directory actions only on the settled top account, repairs search, and prevents navigation-label clipping.",
+  "label": "Focused Account Directory",
+  "version": "1.03.19",
+  "name": "Focused Account Directory"
 }
