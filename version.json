@@ -1,8 +1,8 @@
 {
-  "build": "1.03.19",
-  "released": "2026-07-16",
-  "note": "Shows directory actions only on the settled top account, repairs search, and prevents navigation-label clipping.",
-  "label": "Focused Account Directory",
-  "version": "1.03.19",
-  "name": "Focused Account Directory"
+  "build": "1.03.20",
+  "released": "2026-07-17",
+  "note": "Polishes Nearby Accounts controls, selection, distance readability, scrolling, and responsive map/list layout without adding features.",
+  "label": "Polished Nearby Workspace",
+  "version": "1.03.20",
+  "name": "Polished Nearby Workspace"
 }

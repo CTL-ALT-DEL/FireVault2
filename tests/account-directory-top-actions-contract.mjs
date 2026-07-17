@@ -13,7 +13,7 @@ function match(source,pattern,message){checks+=1;assert.match(source,pattern,mes
 function ok(value,message){checks+=1;assert.ok(value,message)}
 
 const build=JSON.parse(version).build;
-equal(build,"1.03.19","Top-account actions must ship in the current build.");
+equal(build,"1.03.20","Top-account actions must ship in the current build.");
 
 match(app,/aria-expanded="false" aria-label="Open/);
 match(app,/accountRowActions0951 workflowActions0957[^>]*aria-hidden="true"/);

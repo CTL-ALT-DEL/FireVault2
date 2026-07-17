@@ -1,4 +1,15 @@
-# FireVault Build 1.03.19 Validation
+# FireVault Build 1.03.20 Validation
+
+## Nearby Accounts workspace contract
+
+- Map/List and category-filter controls retain their existing behavior in clearer 48px targets.
+- The selected-account overlay shows distance, name, address, Account ID, and communicator category without covering the map controls.
+- Existing Route and Call actions remain immediately available for the selected map account; Call disables safely when no phone is saved.
+- Nearby cards expose readable bottom-right distance values and retain numbered, category-accented account identity.
+- Every card opens its exact account by tap, Enter, or Space and reports the same selected state visually and accessibly.
+- Touch and wheel movement use a temporary low-cost scrolling state, cancel safely, and settle without smooth-scroll feedback loops.
+- The phone workspace remains vertically compact, short screens reduce only map height, and iPad widths use a side-by-side map/list layout.
+- The dedicated Build 1.03.20 suite verifies active markup, accessibility, interaction state, scroll settling, and final responsive CSS.
 
 ## Account Directory top-actions, search, and navigation contract
 
@@ -12,7 +23,7 @@
 - A changed search resets to the top, recalculates the scroll tail, and exposes actions only on the first visible match.
 - The default directory sort label and selector option display the compact A-Z text.
 - The four bottom-navigation buttons reserve 58px for their icon and label plus safe-area-aware outer height.
-- A dedicated Build 1.03.19 suite verifies active markup, scroll-settle order, search events and matching, accessibility state, and final responsive CSS.
+- The dedicated Build 1.03.19 suite verifies active markup, scroll-settle order, search events and matching, accessibility state, and final responsive CSS.
 
 ## Add Account and address-confirmation contract
 
@@ -106,7 +117,7 @@
 ## Runtime and offline asset integrity
 
 - The HTML bootstrap contains 25 reviewed local stylesheet, module, manifest, icon, image, and application references.
-- Every local HTML reference carries the current Build 1.03.19 cache token.
+- Every local HTML reference carries the current Build 1.03.20 cache token.
 - All JavaScript imports are resolved from their source modules, exist inside the release, and carry the current build token.
 - CSS `url(...)`, branding profile assets, Photo Overlay sample media, and all three visual Help images resolve to packaged files.
 - All 30 runtime files are present in the 32-entry offline shell; the shell contains no duplicate or missing entry.
@@ -122,7 +133,7 @@
 - No nested FireVault build directory, `_config.yml`, or Ruby `Gemfile` can enter the deploy root.
 - The deployment guide identifies the current build, explains root-level extraction, and warns against uploading the containing ZIP folder.
 - The guide explains that only the newest workflow run matters and requires published `version.json` verification before updating the Home Screen app.
-- Runtime HTML and service-worker references agree on Build 1.03.19 and reject asset references from Builds 1.03.0 through 1.03.9.
+- Runtime HTML and service-worker references agree on Build 1.03.20 and reject asset references from Builds 1.03.0 through 1.03.9.
 
 ## Vault upgrade preservation
 
@@ -220,8 +231,8 @@
 - The new-user onboarding contract verifies the first-open guide, Demo Mode decision, GPS lookup, address confirmation, commercial-name suggestion, manual fallback, and form integration.
 - The Add Account address-lookup contract verifies the redesigned setup workspace, explicit search, result review, change invalidation, manual confirmation, metadata persistence, and responsive presentation.
 - The Account Directory top-actions contract verifies scroll-settled action visibility, immediate multi-word search, accessibility state, and unclipped bottom-navigation labels.
-- Active runtime and service-worker references resolve to Build 1.03.19.
-- `version.json`, the manifest, cache name, module imports, and release UI agree on Build 1.03.19.
+- Active runtime and service-worker references resolve to Build 1.03.20.
+- `version.json`, the manifest, cache name, module imports, and release UI agree on Build 1.03.20.
 
 ## Scope and compatibility
 

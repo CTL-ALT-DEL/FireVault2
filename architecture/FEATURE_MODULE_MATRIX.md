@@ -1,6 +1,6 @@
 # FireVault / Field Vault Feature and Module Matrix
 
-Build baseline: 1.03.19  
+Build baseline: 1.03.20  
 Architecture version: 8
 
 ## Decision rule
