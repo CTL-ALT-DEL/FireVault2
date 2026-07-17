@@ -1,8 +1,8 @@
 {
-  "build": "1.03.20",
+  "build": "1.03.21",
   "released": "2026-07-17",
-  "note": "Polishes Nearby Accounts controls, selection, distance readability, scrolling, and responsive map/list layout without adding features.",
-  "label": "Polished Nearby Workspace",
-  "version": "1.03.20",
-  "name": "Polished Nearby Workspace"
+  "note": "Removes Account Directory quick actions, keeps bottom navigation visible through search, removes redundant Account Detail location controls, and strengthens tab contrast.",
+  "label": "Simplified Account Workspace",
+  "version": "1.03.21",
+  "name": "Simplified Account Workspace"
 }

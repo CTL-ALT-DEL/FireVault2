@@ -1,19 +1,19 @@
 # FireVault
 
-## Build 1.03.20 — Polished Nearby Workspace
+## Build 1.03.21 — Simplified Account Workspace
 
-Build 1.03.20 gives Nearby Accounts a calmer, more readable map-and-list workspace without adding features or changing stored data.
+Build 1.03.21 simplifies Account Directory and Account Detail without adding features or changing stored data.
 
 ### Updated
 
-- Rebuilds the active Nearby header around clearer 48px Map/List and category-filter controls.
-- Presents the selected account, address, Account ID, category, and distance in one restrained map overlay.
-- Keeps Route and Call ready for the selected account instead of delaying those existing actions until map zoom completes.
-- Enlarges the bottom-right distance treatment and separates its value from the supporting “away” label.
-- Adds reliable keyboard opening and matching selected-state accessibility to every Nearby account card.
-- Removes the smooth-scroll feedback loop from list settling and suppresses card shadows while the list is moving.
-- Uses a compact single-column phone layout and a true map/list split workspace on iPad-sized screens.
-- Keeps Build 1.03.19 Account Directory search and top-account actions plus all prior update, vault, CSV, deployment, onboarding, form, list, and photo safeguards.
+- Removes Call, Route, Add Note, Photo, and Favorite controls from every Account Directory row, including the top result.
+- Keeps each directory row as one compact, reliable tap or keyboard target that opens Account Detail.
+- Keeps the bottom navigation visible while searching and explicitly restores it when directory search loses focus.
+- Preserves immediate multi-word search, A-Z sorting, filters, saved scroll position, and direct account opening.
+- Removes the redundant GPS & Navigation panel from the bottom of Account Detail’s Details tab.
+- Retains the account-header address, primary Route action, editable location fields, Plus Code, and exact-location tools.
+- Adds individual shaded tab surfaces and a stronger active treatment to improve Account Detail tab contrast.
+- Keeps Build 1.03.20 Nearby polish and all prior update, vault, CSV, deployment, onboarding, form, list, and photo safeguards.
 
 ### Run locally
 

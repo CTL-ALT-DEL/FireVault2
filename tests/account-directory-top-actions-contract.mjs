@@ -13,28 +13,17 @@ function match(source,pattern,message){checks+=1;assert.match(source,pattern,mes
 function ok(value,message){checks+=1;assert.ok(value,message)}
 
 const build=JSON.parse(version).build;
-equal(build,"1.03.20","Top-account actions must ship in the current build.");
+equal(build,"1.03.21","The compact Account Directory contract must ship in the current build.");
 
-match(app,/aria-expanded="false" aria-label="Open/);
-match(app,/accountRowActions0951 workflowActions0957[^>]*aria-hidden="true"/);
-for(const label of ["Call","Route","Add Note","Favorite"]) match(app,new RegExp(`<span>${label}<\\/span>`));
-
-match(app,/function setTopAccountCard10319\(list,card\)/);
-match(app,/const cards=visibleAccountCards0876\(list\)/);
-match(app,/item\.classList\.toggle\("isTopAccount10319",active\)/);
-match(app,/item\.setAttribute\("aria-expanded",String\(active\)\)/);
-match(app,/actions\.setAttribute\("aria-hidden",String\(!active\)\)/);
-match(app,/if\(active\)button\.removeAttribute\("tabindex"\)/);
-match(app,/else button\.tabIndex=-1/);
-match(app,/list\.dataset\.topAccountId10319=target\?\.dataset\.id\|\|""/);
-match(app,/function syncTopAccountCard10319\(list\)/);
-match(app,/setTopAccountCard10319\(list,closestVisibleAccountCard0796\(list\)\)/);
+const row=app.slice(app.indexOf("function accountDirectoryRow0759"),app.indexOf("function accountDirectorySort0760"));
+match(row,/role="button" tabindex="0" aria-label="Open/);
+ok(!row.includes("aria-expanded"),"A directory row must not advertise retired expandable actions.");
+ok(!row.includes("accountRowActions0951"),"A directory row must contain account identity only.");
+for(const label of ["Call","Route","Add Note","Favorite"])ok(!row.includes(`<span>${label}</span>`),`${label} must not appear on a directory row.`);
 
 const settle=app.slice(app.indexOf("function settleAccountsList0796"),app.indexOf("function sites()"));
 match(settle,/const card=closestVisibleAccountCard0796\(list\)/);
-match(settle,/setTopAccountCard10319\(list,card\)/);
-match(settle,/list\.classList\.remove\("isScrolling0878"\)/);
-ok(settle.indexOf("setTopAccountCard10319(list,card)")<settle.indexOf('list.classList.remove("isScrolling0878")'),"The destination must be selected before actions are revealed.");
+ok(!settle.includes("setTopAccountCard10319"),"Scroll settling must not restore top-account actions.");
 match(settle,/prepareAccountsScrollTail0796\(list\);[\s\S]*?persistAccountsViewState0761\(true\)/);
 
 const sites=app.slice(app.indexOf("function sites()"),app.indexOf("function nearbySites()"));
@@ -50,20 +39,18 @@ match(sites,/searchEl\?\.addEventListener\("input",applySearch\)/);
 match(sites,/searchEl\?\.addEventListener\("change",applySearch\)/);
 match(sites,/searchEl\?\.addEventListener\("compositionend",applySearch\)/);
 match(sites,/if\(queryChanged\)\{[\s\S]*?accountsScroll0759=0;[\s\S]*?list\.scrollTop=0;/);
-match(sites,/syncTopAccountCard10319\(list\);[\s\S]*?prepareAccountsScrollTail0796\(list\)/);
-match(sites,/list\.scrollTop=Math\.max\(0,accountsScroll0759\|\|0\);[\s\S]*?syncTopAccountCard10319\(list\)/);
+match(sites,/list\.scrollTop=Math\.max\(0,accountsScroll0759\|\|0\);[\s\S]*?prepareAccountsScrollTail0796\(list\)/);
 match(sites,/const card=event\.target\.closest\("\[data-account-card0759\]"\);[\s\S]*?openAccount\(card\.dataset\.id\)/);
 
-const marker="Build 1.03.19 — only the settled top Account Directory card shows actions";
+const historicalMarker="Build 1.03.19 — only the settled top Account Directory card shows actions";
+const currentMarker="Build 1.03.21 — simplified Account Directory and clearer Account Detail tabs";
 const updateMarker="Build 1.03.7 — canonical Update Ready geometry";
-ok(design.includes(marker),"The top-account action contract must be documented in the final design layer.");
-ok(design.indexOf(marker)<design.indexOf(updateMarker),"Directory rules must remain before the final Update Ready geometry contract.");
-match(design,/\.accountDirectory0951 \.accountRow0951 \.accountRowActions0951\{display:none!important\}/);
-match(design,/\.accountDirectory0951 \.accountRow0951\.isTopAccount10319 \.accountRowActions0951\{display:grid!important\}/);
-match(design,/\.accountDirectory0951 \.accountDirectoryList0871\.isScrolling0878 \.accountRow0951 \.accountRowActions0951\{display:none!important\}/);
-match(design,/\.accountDirectory0951 \.accountRow0951\.isTopAccount10319\{[\s\S]*?border-color:[\s\S]*?box-shadow:/);
-match(design,/\.accountDirectory0951 \.accountDirectoryList0871\.isScrolling0878 \.accountRow0951\.isTopAccount10319\{[\s\S]*?box-shadow:none!important/);
-match(design,/\.accountDirectory0951 \.accountSearch0951 input\{[\s\S]*?pointer-events:auto!important;[\s\S]*?user-select:text!important/);
+ok(design.includes(historicalMarker),"The former action contract must remain documented as release history.");
+ok(design.includes(currentMarker),"The current compact-directory contract must be documented.");
+ok(design.indexOf(historicalMarker)<design.indexOf(currentMarker),"The current cleanup must supersede the historical action contract.");
+ok(design.indexOf(currentMarker)<design.indexOf(updateMarker),"Directory rules must remain before the final Update Ready geometry contract.");
+match(design,/\.accountDirectory0951 \.accountRowActions0951\{[\s\S]*?display:none!important/);
+match(design,/body\.fv-route-sites #appNav,[\s\S]*?visibility:visible!important/);
 match(design,/:root\{--navH:calc\(76px \+ max\(env\(safe-area-inset-bottom\),8px\)\)\}/);
 match(design,/#appNav button,\.nearbyBottomNav069 button\{[\s\S]*?height:58px!important;[\s\S]*?overflow:visible!important/);
 match(design,/#appNav button span,\.nearbyBottomNav069 button span\{[\s\S]*?min-height:14px!important;[\s\S]*?line-height:1\.15!important/);

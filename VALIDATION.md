@@ -1,4 +1,16 @@
-# FireVault Build 1.03.20 Validation
+# FireVault Build 1.03.21 Validation
+
+## Account Directory and Account Detail cleanup contract
+
+- Account Directory rows contain account identity only; no row renders Call, Route, Add Note, Photo, or Favorite controls.
+- The retired top-account expanded state and action synchronization are absent from the active directory runtime.
+- Every row remains a single tap, Enter, or Space target that opens its exact Account Detail screen.
+- Immediate multi-word search, result counts, A-Z sorting, filtered scroll reset, and saved list position remain intact.
+- Bottom navigation is explicitly kept visible during directory search and restored after the search field loses focus.
+- Account Detail’s Details tab no longer renders the redundant large GPS & Navigation panel.
+- Address, primary Route, location editing, Plus Code, and exact-location workflows remain available on their established surfaces.
+- Account Detail tabs use individual shaded surfaces, alternating inactive depth, and a stronger active border and shadow.
+- The dedicated Build 1.03.21 suite verifies markup removal, retained workflows, navigation recovery, and final tab geometry.
 
 ## Nearby Accounts workspace contract
 
@@ -11,19 +23,16 @@
 - The phone workspace remains vertically compact, short screens reduce only map height, and iPad widths use a side-by-side map/list layout.
 - The dedicated Build 1.03.20 suite verifies active markup, accessibility, interaction state, scroll settling, and final responsive CSS.
 
-## Account Directory top-actions, search, and navigation contract
+## Account Directory search and navigation contract
 
-- Only the visible account card settled at the top of Account Directory exposes its quick-action strip.
-- Every other visible account remains compact, and all action strips remain collapsed while the list is moving.
-- The destination account is selected before scrolling ends, then its actions are revealed after it is aligned at the top.
-- Hidden action buttons are removed from keyboard navigation and carry matching collapsed accessibility state.
+- Every Account Directory row remains compact and contains no inline quick-action strip.
 - Card taps and keyboard activation continue to open the exact account represented by that card.
 - Search filters immediately for normal typing, paste, dictation, iOS composition input, native search events, and value changes.
 - Multi-word queries match each word anywhere in the complete indexed account record.
-- A changed search resets to the top, recalculates the scroll tail, and exposes actions only on the first visible match.
+- A changed search resets to the top and recalculates the scroll tail for the visible matches.
 - The default directory sort label and selector option display the compact A-Z text.
 - The four bottom-navigation buttons reserve 58px for their icon and label plus safe-area-aware outer height.
-- The dedicated Build 1.03.19 suite verifies active markup, scroll-settle order, search events and matching, accessibility state, and final responsive CSS.
+- The updated directory suite verifies compact markup, scroll settling, search events and matching, navigation persistence, and final responsive CSS.
 
 ## Add Account and address-confirmation contract
 
@@ -117,7 +126,7 @@
 ## Runtime and offline asset integrity
 
 - The HTML bootstrap contains 25 reviewed local stylesheet, module, manifest, icon, image, and application references.
-- Every local HTML reference carries the current Build 1.03.20 cache token.
+- Every local HTML reference carries the current Build 1.03.21 cache token.
 - All JavaScript imports are resolved from their source modules, exist inside the release, and carry the current build token.
 - CSS `url(...)`, branding profile assets, Photo Overlay sample media, and all three visual Help images resolve to packaged files.
 - All 30 runtime files are present in the 32-entry offline shell; the shell contains no duplicate or missing entry.
@@ -133,7 +142,7 @@
 - No nested FireVault build directory, `_config.yml`, or Ruby `Gemfile` can enter the deploy root.
 - The deployment guide identifies the current build, explains root-level extraction, and warns against uploading the containing ZIP folder.
 - The guide explains that only the newest workflow run matters and requires published `version.json` verification before updating the Home Screen app.
-- Runtime HTML and service-worker references agree on Build 1.03.20 and reject asset references from Builds 1.03.0 through 1.03.9.
+- Runtime HTML and service-worker references agree on Build 1.03.21 and reject asset references from Builds 1.03.0 through 1.03.9.
 
 ## Vault upgrade preservation
 
@@ -231,8 +240,8 @@
 - The new-user onboarding contract verifies the first-open guide, Demo Mode decision, GPS lookup, address confirmation, commercial-name suggestion, manual fallback, and form integration.
 - The Add Account address-lookup contract verifies the redesigned setup workspace, explicit search, result review, change invalidation, manual confirmation, metadata persistence, and responsive presentation.
 - The Account Directory top-actions contract verifies scroll-settled action visibility, immediate multi-word search, accessibility state, and unclipped bottom-navigation labels.
-- Active runtime and service-worker references resolve to Build 1.03.20.
-- `version.json`, the manifest, cache name, module imports, and release UI agree on Build 1.03.20.
+- Active runtime and service-worker references resolve to Build 1.03.21.
+- `version.json`, the manifest, cache name, module imports, and release UI agree on Build 1.03.21.
 
 ## Scope and compatibility
 

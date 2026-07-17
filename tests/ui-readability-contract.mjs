@@ -14,14 +14,10 @@ function match(source,pattern,message){checks+=1;assert.match(source,pattern,mes
 function ok(value,message){checks+=1;assert.ok(value,message)}
 
 const build=JSON.parse(version).build;
-equal(build,"1.03.20");
+equal(build,"1.03.21");
 
-match(app,/class="accountRowActions0951 workflowActions0957"/);
-match(app,/<span>Call<\/span>/);
-match(app,/<span>Route<\/span>/);
-match(app,/<span>Add Note<\/span>/);
-match(app,/<span>Photo<\/span>/);
-match(app,/<span>Favorite<\/span>/);
+const directoryRow=app.slice(app.indexOf("function accountDirectoryRow0759"),app.indexOf("function accountDirectorySort0760"));
+ok(!directoryRow.includes("accountRowActions0951"),"Account Directory quick actions are intentionally retired.");
 match(app,/class="accountTopBack1011"[^>]*><span aria-hidden="true">‹<\/span><strong>Back<\/strong>/);
 match(app,/class="accountActionGrid0871 accountActionGrid0952/);
 match(app,/<strong>Add \$\{esc\(appTerm\("note",1\)\)\}<\/strong>/);
@@ -37,14 +33,9 @@ match(design,/\.accountDirectory0951 \.accountRowTitle0951 h2\{font-size:15px!im
 match(design,/\.accountDirectory0951 \.accountRowAddress0951\{font-size:12px!important\}/);
 match(design,/\.accountDirectory0951 \.accountRowMeta0951>span\{font-size:10px!important\}/);
 match(design,/\.accountDirectory0951 \.accountRowIssues0951 span\{[\s\S]*?min-height:22px!important;[\s\S]*?font-size:9\.5px!important;/);
-match(design,/\.accountDirectory0951 \.accountRowActions0951 button,[\s\S]*?height:46px!important;[\s\S]*?min-height:46px!important;[\s\S]*?font-size:11\.5px!important;/);
-match(design,/\.accountDirectory0951 \.accountRowActions0951 button>span\{[\s\S]*?font-size:11\.5px!important;[\s\S]*?white-space:nowrap!important;/);
-match(design,/\.accountDirectory0951 \.accountRowActions0951 \.accountCardIcon0871\{width:18px!important;height:18px!important\}/);
-match(design,/\.accountDirectory0951 \.accountRowActions0951 \.accountFavorite0871>span\{font-size:10\.5px!important;white-space:nowrap!important\}/);
+match(design,/\.accountDirectory0951 \.accountRowActions0951\{[\s\S]*?display:none!important/);
 match(design,/\.accountDirectory0951 \.accountDirectoryNear0951,[\s\S]*?height:42px!important;[\s\S]*?min-height:42px!important;[\s\S]*?font-size:11\.5px!important;/);
 match(design,/@media\(max-width:390px\)\{[\s\S]*?\.accountDirectory0951 \.accountDirectoryReset0951\{height:40px!important;min-height:40px!important\}/);
-match(design,/@media\(max-width:390px\)\{[\s\S]*?\.accountDirectory0951 \.accountRowActions0951 button,[\s\S]*?height:48px!important;[\s\S]*?min-height:48px!important;/);
-match(design,/@media\(max-width:390px\)\{[\s\S]*?\.accountDirectory0951 \.accountRowActions0951 button>span\{font-size:10\.5px!important\}/);
 match(design,/@media\(max-width:430px\)\{[\s\S]*?\.accountDetail1011 \.accountTopBack1011\{min-width:64px!important\}/);
 match(design,/@media\(max-width:430px\)\{[\s\S]*?\.accountDetail1011 \.accountTopBack1011 strong\{font-size:12\.5px!important\}/);
 match(design,/@media\(max-width:430px\)\{[\s\S]*?\.accountDetail1011 \.accountActionGrid0952 strong\{font-size:13px!important\}/);

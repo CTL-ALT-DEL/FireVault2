@@ -13,7 +13,7 @@ function match(source,pattern,message){checks+=1;assert.match(source,pattern,mes
 function ok(value,message){checks+=1;assert.ok(value,message)}
 
 const build=JSON.parse(version).build;
-equal(build,"1.03.20");
+equal(build,"1.03.21");
 
 match(app,/screen fieldForm10315 contactFieldForm10315/);
 match(app,/screen fieldForm10315 equipmentFieldForm10315/);
