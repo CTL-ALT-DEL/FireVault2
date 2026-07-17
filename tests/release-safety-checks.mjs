@@ -1,18 +1,19 @@
 import assert from "node:assert/strict";
 import {readFile} from "node:fs/promises";
 
-const [index,worker,app,storage,styles,version]=await Promise.all([
+const [index,worker,app,storage,styles,design,version]=await Promise.all([
   readFile(new URL("../index.html",import.meta.url),"utf8"),
   readFile(new URL("../sw.js",import.meta.url),"utf8"),
   readFile(new URL("../src/app.js",import.meta.url),"utf8"),
   readFile(new URL("../src/storage.js",import.meta.url),"utf8"),
   readFile(new URL("../src/styles.css",import.meta.url),"utf8"),
+  readFile(new URL("../src/design-system.css",import.meta.url),"utf8"),
   readFile(new URL("../version.json",import.meta.url),"utf8")
 ]);
 const {encodePlusCode,isValidFullPlusCode}=await import("../src/open-location-code.js");
 
 const build=JSON.parse(version).build;
-assert.equal(build,"1.03.4");
+assert.equal(build,"1.03.5");
 assert.match(index,/setTimeout\(function\(\)\{[\s\S]*?showRecovery\([\s\S]*?\},8000\);/);
 assert.match(index,/updateButton\.disabled=false;laterButton\.disabled=false;/);
 assert.match(index,/updateButton\.textContent="Try Again";laterButton\.textContent="Reload App";/);
@@ -43,6 +44,11 @@ assert.match(app,/\{label:"Photos",items:\[/);
 assert.match(app,/photoOverlayDetailHeader1032/);
 assert.match(app,/function overlaySettingsPanel510\(/);
 assert.match(app,/function wireOverlaySettings510\(/);
+assert.match(app,/function wireOverlayDisclosures1035\(\)/);
+assert.match(app,/<details class="overlayActiveField0944 overlayMainField1012 overlayFieldDisclosure1035/);
+assert.match(app,/overlayDisclosureSummary1035\("1","Photo information"/);
+assert.match(app,/technicianOverlayIndependent1030 overlayDisclosure1035 technicianDisclosure1035/);
+assert.equal((app.match(/id="settingsBackBtn"/g)||[]).length,1);
 assert.match(app,/querySelectorAll\("\[data-overlay-preset\]"\)/);
 assert.match(app,/getElementById\("ovCustomLogo"\)/);
 assert.match(app,/wireTechnicianOverlayTemplate0946\(\)/);
@@ -54,6 +60,9 @@ assert.match(app,/useTechnicianOverlayOnSave:quickPhotoDraft0950\.useTechnicianO
 assert.match(app,/useTechnicianOverlayOnSave:imageData\?checked\("docUseTechnicianOverlay1034"\):false/);
 assert.match(app,/if\(id===\"overlay\"\)return moduleEnabled0955\(\"core\.photoOverlay\"\)\|\|moduleEnabled0955\(\"core\.photos\"\)/);
 assert.match(styles,/\.technicianPhotoToggle1034/);
+assert.match(design,/Build 1\.03\.5 — calm, progressive Photo Overlay workspace/);
+assert.match(design,/\.overlayFieldBuilder1012 \.overlayMainField1012\.overlayFieldDisclosure1035\{display:block!important/);
+assert.match(design,/@media\(max-width:759px\)[\s\S]*?\.overlayPreview1012\{position:relative!important;top:auto!important\}/);
 
 for(const source of [index,worker,app,storage]) assert.doesNotMatch(source,/\?v=1\.03\.0/,"Active runtime references must use the current build.");
-console.log(JSON.stringify({status:"passed",build,checks:40,csvPlusCode}));
+console.log(JSON.stringify({status:"passed",build,checks:48,csvPlusCode}));

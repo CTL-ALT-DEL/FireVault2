@@ -1159,6 +1159,7 @@ main,
   .overlayControlsColumn0943>.overlayContent0890{grid-column:1/-1!important}
   .overlayControlsColumn0943>.overlayBrand0890{grid-column:1/-1!important}
 }
+
 @media(max-width:520px){
   .settingsOverlayDetail0943 .settingsSimpleDetailBody0850{padding-left:6px!important;padding-right:6px!important}
   .overlayPreviewWide0943{padding:5px!important;border-radius:14px!important}
@@ -3214,4 +3215,63 @@ button,.btn,input,textarea,select{border-radius:var(--fv-control-radius,15px)}
     width:20px!important;
     height:20px!important;
   }
+}
+
+/* Build 1.03.5 — calm, progressive Photo Overlay workspace */
+.settingsOverlayDetail1012 .photoOverlayDetailHeader1032{
+  min-height:58px!important;padding:9px 14px!important;border-bottom-color:rgba(116,142,173,.18)!important;
+  background:rgba(7,16,26,.94)!important;box-shadow:0 8px 24px rgba(0,0,0,.28)!important;
+  backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px)
+}
+.settingsOverlayDetail1012 .photoOverlayDetailHeader1032 h1{font-size:19px!important}.settingsOverlayDetail1012 .photoOverlayDetailHeader1032 small{font-size:10.5px!important}
+.settingsOverlayDetail1012 .photoOverlayDetailHeader1032>#settingsBackBtn,.settingsOverlayDetail1012 .photoOverlayDetailHeader1032>#settingsDoneBtn{min-width:58px!important;min-height:42px!important;border-radius:12px!important}
+.photoOverlaySettings1030{width:min(100%,1120px)!important;margin-inline:auto!important;gap:12px!important}
+.overlayStudio1035{width:100%!important;display:grid!important;grid-template-columns:minmax(0,1fr)!important;gap:12px!important;margin:0!important}
+.overlayPreview1012{padding:8px!important;border-radius:18px!important;background:linear-gradient(155deg,#142439,#091521)!important}
+.overlayWorkspaceHead1012{grid-template-columns:minmax(0,1fr) auto!important;min-height:46px!important;padding:1px 4px 8px!important;gap:10px!important}
+.overlayWorkspaceHead1012>div>strong{font-size:16px!important}.overlayWorkspaceHead1012>div>small{font-size:10px!important}
+.overlayPreview1012 .overlayPreviewFrame0890{width:100%!important;max-width:680px!important}
+.overlayPreviewFoot1035{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:8px 4px 1px;color:#8fa1b5;font-size:9.5px}
+.overlayPreviewFoot1035 span{display:flex;align-items:center;gap:6px;color:#b9c8d8;font-weight:800}.overlayPreviewFoot1035 i{width:7px;height:7px;border-radius:999px;background:#38d78a;box-shadow:0 0 10px rgba(56,215,138,.55)}
+.overlayControlsColumn1035{width:100%!important;display:grid!important;grid-template-columns:minmax(0,1fr)!important;gap:9px!important;margin:0!important}
+.overlayQuickCard1035{padding:14px!important;border-radius:17px!important;box-shadow:0 9px 20px rgba(0,0,0,.2)!important}
+.overlayQuickCard1035 .overlayCardHead0890{margin-bottom:10px!important}.overlayQuickCard1035 .overlayCardHead0890 p{margin-top:3px!important;font-size:11px!important}
+.overlayQuickCard1035 .overlayPresetGrid0890{gap:7px!important}.overlayQuickCard1035 .overlayPresetGrid0890 button{min-height:64px!important;padding:8px!important;border-radius:13px!important}
+.overlayQuickCard1035 .overlayQuickToggles0890{margin-top:8px!important}.overlayQuickCard1035 .overlayQuickToggles0890 .checkRow{min-height:42px!important;padding:7px 10px!important}
+.overlayQuickCard1035 .overlayTaglineNote1034{margin-top:8px!important;padding:7px 9px!important;border-radius:9px!important;font-size:9.5px!important}
+.overlayDisclosure1035{min-width:0!important;overflow:hidden!important;padding:0!important;border:1px solid rgba(124,151,183,.22)!important;border-radius:16px!important;background:linear-gradient(150deg,#122235,#091522)!important;box-shadow:0 7px 18px rgba(0,0,0,.18),inset 0 1px rgba(255,255,255,.035)!important}
+.overlayDisclosure1035::details-content{overflow:hidden}.overlayDisclosure1035>summary::-webkit-details-marker,.overlayFieldDisclosure1035>summary::-webkit-details-marker{display:none}.overlayDisclosure1035>summary{list-style:none}
+.overlayDisclosureSummary1035{min-height:68px;display:grid;grid-template-columns:34px minmax(0,1fr) auto 18px;align-items:center;gap:10px;padding:11px 13px;cursor:pointer;user-select:none}
+.overlayDisclosureSummary1035>span{display:grid;place-items:center;width:34px;height:34px;border-radius:11px;background:rgba(67,148,218,.11);color:#8bc8ff;font-size:12px;font-weight:950}
+.overlayDisclosureSummary1035>div{min-width:0;display:grid;gap:3px}.overlayDisclosureSummary1035 strong{color:#f6f9fc;font-size:14px;line-height:1.1}.overlayDisclosureSummary1035 small{overflow:hidden;color:#91a1b3;font-size:10.5px;line-height:1.2;text-overflow:ellipsis;white-space:nowrap}
+.overlayDisclosureSummary1035>em{max-width:190px;overflow:hidden;padding:5px 8px;border:1px solid rgba(135,159,188,.17);border-radius:999px;background:rgba(255,255,255,.035);color:#9fb1c4;font-size:9.5px;font-style:normal;font-weight:800;text-overflow:ellipsis;white-space:nowrap}
+.overlayDisclosureSummary1035>b{color:#91a6bc;font-size:24px;line-height:1;transition:transform .18s ease}.overlayDisclosure1035[open]>.overlayDisclosureSummary1035{border-bottom:1px solid rgba(124,151,183,.15);background:rgba(67,148,218,.045)}.overlayDisclosure1035[open]>.overlayDisclosureSummary1035>b{transform:rotate(90deg)}
+.overlayDisclosureBody1035{padding:12px!important}.overlayLayoutBody1035{display:grid!important;gap:12px!important}
+.overlayDisclosure1035 .overlayBuilderGroup0944{padding:10px!important;border-radius:13px!important}.overlayDisclosure1035 .overlayBuilderGroup0944+.overlayBuilderGroup0944{margin-top:8px!important}
+.overlayDisclosure1035 .overlayBuilderTitle0944{margin-bottom:8px!important}.overlayDisclosure1035 .overlayBuilderTitle0944 strong{font-size:12.5px!important}.overlayDisclosure1035 .overlayBuilderTitle0944 small{font-size:10px!important}
+.overlayFieldBuilder1012 .overlayActiveFields0944{gap:6px!important}
+.overlayFieldBuilder1012 .overlayMainField1012.overlayFieldDisclosure1035{display:block!important;grid-template-columns:none!important;gap:0!important;padding:0!important;border-radius:12px!important;background:#101d2b!important}
+.overlayControlsColumn1035>.overlayQuickCard1012,.overlayControlsColumn1035>.overlayFieldBuilder1012,.overlayControlsColumn1035>.overlayLayout1012,.overlayControlsColumn1035>.overlayBrand1012{grid-column:1!important}
+.overlayFieldDisclosure1035>.overlayFieldTop1012{min-height:54px!important;grid-template-columns:25px minmax(0,1fr) auto 15px!important;gap:8px!important;padding:7px 9px!important;cursor:pointer;list-style:none}
+.overlayFieldDisclosure1035>.overlayFieldTop1012::-webkit-details-marker{display:none}
+.overlayFieldDisclosure1035 .overlayDragHandle0944{width:25px!important;height:36px!important}.overlayFieldDisclosure1035 .overlayActiveFieldText0944{gap:1px!important}.overlayFieldDisclosure1035 .overlayActiveFieldText0944 strong{font-size:12.5px!important}.overlayFieldDisclosure1035 .overlayActiveFieldText0944 small{font-size:9.5px!important}
+.overlayFieldState1035{padding:4px 7px;border-radius:999px;background:rgba(255,255,255,.04);color:#96a9bd;font-size:9px;font-weight:800;white-space:nowrap}.overlayFieldChevron1035{color:#8195aa;font-size:20px;transition:transform .18s ease}.overlayFieldDisclosure1035[open] .overlayFieldChevron1035{transform:rotate(90deg)}
+.overlayFieldDisclosure1035>.overlayFieldBottom1012{grid-template-columns:minmax(150px,.8fr) minmax(190px,1fr) auto!important;align-items:center!important;gap:7px!important;padding:8px 9px 9px 42px!important;border-top:1px solid rgba(124,151,183,.13)}
+.overlayFieldDisclosure1035 .overlayBreakButton0944{width:100%!important;min-width:0!important;min-height:40px!important;padding:6px 8px!important}.overlayFieldDisclosure1035 .overlayFieldAlign0945{width:100%!important;min-width:0!important;min-height:40px!important}.overlayFieldDisclosure1035 .overlayFieldAlign0945 button{min-height:40px!important;font-size:10px!important}
+.overlayFieldDisclosure1035 .overlayFieldActions0944{grid-template-columns:42px 42px 54px!important}.overlayFieldDisclosure1035 .overlayFieldActions0944 button{min-height:40px!important}.overlayFieldDisclosure1035 .overlayFieldActions0944 button>span{font-size:8.5px!important}
+.overlayDisclosure1035 .overlayFieldGrid510{display:flex!important;flex-wrap:wrap!important;gap:6px!important}.overlayDisclosure1035 .overlayFieldChip510{min-height:38px!important;width:auto!important;padding:7px 9px!important;border-radius:999px!important}.overlayDisclosure1035 .overlayFieldChip510 strong{font-size:10.5px!important}
+.overlayLayoutBody1035 .overlayChoice0890{min-height:50px!important}.overlayLayoutBody1035 .overlayChoiceIcon1012{width:18px!important;height:18px!important}.overlayLayoutBody1035 .overlayChoice0890 strong{font-size:10.5px!important}.overlayLayoutBody1035 .overlayRange0890{padding:10px!important}
+.overlayBrand1012 .overlayColorGrid0890{gap:7px!important;margin-bottom:9px!important}.overlayBrand1012 .overlayColorGrid0890 input[type="color"],.overlayBrand1012 .overlayColorGrid0890 select{min-height:44px!important}.overlayBrand1012 .overlayLogoCard511{grid-template-columns:72px minmax(0,1fr)!important;padding:9px!important}.overlayBrand1012 .overlayLogoPreview511{width:72px!important;height:72px!important;min-height:72px!important}.overlayBrand1012 .overlayUploadLabel511,.overlayBrand1012 .overlayLogoActions511 .ghost{min-height:38px!important}
+.technicianDisclosure1035{width:100%!important;margin:0!important}.technicianDisclosure1035>.overlayDisclosureSummary1035>span{background:rgba(139,92,246,.14);color:#c4b5fd}.technicianDisclosure1035>.overlayDisclosureSummary1035>em{text-transform:capitalize}
+.technicianCompactHead1035{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px}.technicianCompactHead1035 p{margin:0;color:#a6b3c2;font-size:10.5px;line-height:1.4}.technicianCompactHead1035 .overlayAutoSave0944{flex:0 0 auto}
+.technicianDisclosure1035 .technicianOverlayTemplateHead0946{margin-bottom:8px!important}.technicianDisclosure1035 .technicianOverlayAlignmentCard0948{margin:8px 0!important;padding:9px!important}.technicianDisclosure1035 .technicianOverlayPreview0946{min-height:74px!important;padding:10px!important}
+@media(min-width:760px){
+  .overlayStudio1035{grid-template-columns:minmax(310px,.86fr) minmax(420px,1.14fr)!important;align-items:start!important}.overlayStudio1035>.overlayPreview1012{position:sticky!important;top:8px!important;grid-column:1!important}.overlayStudio1035>.overlayControlsColumn1035{grid-column:2!important}.overlayLayoutBody1035{grid-template-columns:1fr 1fr!important}.overlayLayoutBody1035>.overlayRange0890{align-self:end}.overlayPreview1012 .overlayPreviewFrame0890{max-width:none!important}
+}
+@media(max-width:759px){
+  .overlayPreview1012{position:relative!important;top:auto!important}.overlayDisclosureSummary1035{grid-template-columns:32px minmax(0,1fr) 16px!important;min-height:64px;padding:10px!important}.overlayDisclosureSummary1035>span{width:32px;height:32px}.overlayDisclosureSummary1035>em{grid-column:2;grid-row:2;padding:0;border:0;background:none;font-size:9px}.overlayDisclosureSummary1035>b{grid-column:3;grid-row:1/3}.overlayFieldDisclosure1035>.overlayFieldBottom1012{grid-template-columns:1fr!important;padding-left:42px!important}.overlayFieldDisclosure1035 .overlayFieldActions0944{grid-template-columns:repeat(3,minmax(0,1fr))!important}.overlayFieldState1035{display:none}.overlayFieldDisclosure1035>.overlayFieldTop1012{grid-template-columns:25px minmax(0,1fr) 15px!important}.overlayFieldChevron1035{grid-column:3}.overlayQuickCard1035 .overlayCardHead0890 p{display:none}.technicianCompactHead1035{align-items:flex-start}
+}
+@media(max-width:430px){
+  .settingsOverlayDetail1012 .settingsSimpleDetailBody0850{padding:6px 6px calc(100px + env(safe-area-inset-bottom))!important}.settingsOverlayDetail1012 .photoOverlayDetailHeader1032{padding-inline:9px!important}.settingsOverlayDetail1012 .photoOverlayDetailHeader1032 .settingsDetailStatus0880{display:none!important}
+  .overlayPreview1012{padding:6px!important}.overlayWorkspaceHead1012{min-height:42px!important}.overlayPreviewFoot1035{padding-top:6px}.overlayQuickCard1035{padding:10px!important}.overlayQuickCard1035 .overlayPresetGrid0890 button{min-height:57px!important}.overlayQuickCard1035 .overlayQuickToggles0890 .checkRow{min-height:40px!important;font-size:11px!important}.overlayQuickCard1035 .overlayTaglineNote1034{display:none}.overlayDisclosureBody1035{padding:9px!important}.overlayDisclosure1035 .overlayBuilderTitle0944{display:grid!important}.overlayDisclosure1035 .overlayQuickAlign0945{width:100%!important;min-width:0!important;min-height:42px!important}.overlayFieldDisclosure1035 .overlayActiveFieldText0944 small{display:none!important}.overlayBrand1012 .overlayColorGrid0890{grid-template-columns:1fr 1fr!important}.overlayBrand1012 .overlayColorGrid0890>div:last-child{grid-column:1/-1}.technicianCompactHead1035{display:grid}.technicianCompactHead1035 .overlayAutoSave0944{justify-self:start}
 }

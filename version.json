@@ -1,8 +1,8 @@
 {
-  "build": "1.03.4",
+  "build": "1.03.5",
   "released": "2026-07-16",
-  "note": "Customer CSV coordinates now generate and persist offline Google Plus Codes, while Photo Overlay returns as a complete standalone Settings section.",
-  "label": "CSV Plus Codes & Photo Overlay",
-  "version": "1.03.4",
-  "name": "CSV Plus Codes & Photo Overlay"
+  "note": "Photo Overlay Settings now uses a compact progressive workspace with an always-visible preview, quick presets, and expandable editing controls.",
+  "label": "Photo Overlay Workspace Cleanup",
+  "version": "1.03.5",
+  "name": "Photo Overlay Workspace Cleanup"
 }
