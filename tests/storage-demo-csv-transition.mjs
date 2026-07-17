@@ -15,7 +15,7 @@ globalThis.sessionStorage=new StorageMock();
 
 const {BUILD,KEY,isDemoMode,setDemoMode,loadData,saveData,ensureSite}=await import("../src/storage.js");
 
-assert.equal(BUILD,"1.03.5");
+assert.equal(BUILD,"1.03.6");
 assert.equal(isDemoMode(),false);
 
 const defaultData=loadData();

@@ -13,7 +13,7 @@ const [index,worker,app,storage,styles,design,version]=await Promise.all([
 const {encodePlusCode,isValidFullPlusCode}=await import("../src/open-location-code.js");
 
 const build=JSON.parse(version).build;
-assert.equal(build,"1.03.5");
+assert.equal(build,"1.03.6");
 assert.match(index,/setTimeout\(function\(\)\{[\s\S]*?showRecovery\([\s\S]*?\},8000\);/);
 assert.match(index,/updateButton\.disabled=false;laterButton\.disabled=false;/);
 assert.match(index,/updateButton\.textContent="Try Again";laterButton\.textContent="Reload App";/);
@@ -23,6 +23,12 @@ assert.match(index,/fvUpdateNotes1033/);
 assert.match(index,/fireVaultOpenReleaseNotes/);
 assert.match(styles,/#fvUpdateBanner072[\s\S]*?backdrop-filter:blur\(14px\)/);
 assert.match(styles,/\.fvUpdateDialog1033[\s\S]*?width:min\(100%,540px\)/);
+assert.match(styles,/#fvUpdateBanner072\{[\s\S]*?position:fixed!important;inset:0!important/);
+assert.doesNotMatch(styles,/#fvUpdateBanner072\{[^}]*left:50%!important/);
+assert.doesNotMatch(styles,/#fvUpdateBanner072\{[^}]*bottom:calc\(88px/);
+assert.doesNotMatch(styles,/#fvUpdateBanner072 div\{display:grid/);
+assert.equal((styles.match(/#fvUpdateBanner072\{/g)||[]).length,2);
+assert.match(index,/event\.target===banner && !window\.FIREVAULT_UPDATE\.activating/);
 assert.equal((index.match(/postMessage\(\{type:"SKIP_WAITING"\}\)/g)||[]).length,1);
 assert.doesNotMatch(worker,/install"[\s\S]{0,180}skipWaiting\(/);
 assert.match(worker,/message"[\s\S]{0,180}SKIP_WAITING[\s\S]{0,80}skipWaiting\(/);
@@ -65,4 +71,4 @@ assert.match(design,/\.overlayFieldBuilder1012 \.overlayMainField1012\.overlayFi
 assert.match(design,/@media\(max-width:759px\)[\s\S]*?\.overlayPreview1012\{position:relative!important;top:auto!important\}/);
 
 for(const source of [index,worker,app,storage]) assert.doesNotMatch(source,/\?v=1\.03\.0/,"Active runtime references must use the current build.");
-console.log(JSON.stringify({status:"passed",build,checks:48,csvPlusCode}));
+console.log(JSON.stringify({status:"passed",build,checks:54,csvPlusCode}));

@@ -1,33 +1,17 @@
 # FireVault
 
-<<<<<<< HEAD
-## Build 1.03.5 — Photo Overlay Workspace Cleanup
+## Build 1.03.6 — Update Dialog Lockup Repair
 
-Build 1.03.5 redesigns Photo Overlay Settings as a calm, progressive workspace. The preview and presets stay immediately available; detailed tools remain one tap away without crowding the screen.
-
-### Updated
-
-- Keeps one clear Back control, an exact live preview, and the three visual presets at the top of the workspace.
-- Collapses Photo Information, Layout, Branding, and Technician Overlay into concise summary rows.
-- Lets each active field expand independently for line placement, alignment, ordering, and removal.
-- Uses a balanced preview-and-controls desktop layout and a clean single-column phone layout.
-- Preserves every overlay setting, auto-save behavior, category-aware tagline, and independent Technician Overlay option.
-- Adds regression checks for the progressive controls, responsive preview, and single Back control.
-=======
-## Build 1.03.4 — Category-Aware Photo Overlays
- 
-Build 1.03.4 makes the Photo Overlay tagline follow the selected photo category and adds an independent Technician Overlay option to camera and imported-photo workflows.
+Build 1.03.6 repairs the iPhone Update Ready screen shown as an oversized blank dark panel. Retired compact-banner styles were overriding the current centered dialog and clipping its controls off-screen.
 
 ### Updated
 
-- Uses `FIREVAULT FIELD NOTES - {CATEGORY}` whenever the Photo Overlay tagline is enabled. 
-- Uses `FIREVAULT FIELD NOTES` without a suffix when Other is selected.
-- Rebuilds live previews immediately when the selected photo category changes.
-- Adds an independent Technician Overlay toggle to Quick Photo capture and Take Photo / Upload Photo.
-- Saves the Technician Overlay choice with each photo without changing the normal Photo Overlay template.
-- Keeps Photo Overlay directly available from the main Settings page whenever Photos are enabled.
-- Retains Build 1.03.3 update-dialog recovery and all earlier CSV and Plus Code fixes.
->>>>>>> b4b0cafc2c6c607b145fd4a195aa5e026a507940
+- Removes the retired Build 0.72 and 1.01.5 banner geometry that conflicted with the centered Update Ready modal.
+- Keeps the update card centered inside a full-screen blurred backdrop on iPhone and iPad.
+- Keeps Install Update, Release Notes, Later, Try Again, and Reload App reachable.
+- Lets a tap on the empty backdrop dismiss the prompt safely before installation begins.
+- Adds regression checks that reject the exact legacy positioning rules responsible for the lockup.
+- Retains the Build 1.03.5 Photo Overlay workspace cleanup and every existing data workflow.
 
 ### Run locally
 

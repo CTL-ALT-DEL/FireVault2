@@ -1,8 +1,8 @@
 {
-  "build": "1.03.5",
+  "build": "1.03.6",
   "released": "2026-07-16",
-  "note": "Photo Overlay Settings now uses a compact progressive workspace with an always-visible preview, quick presets, and expandable editing controls.",
-  "label": "Photo Overlay Workspace Cleanup",
-  "version": "1.03.5",
-  "name": "Photo Overlay Workspace Cleanup"
+  "note": "Repairs the iPhone Update Ready lockup by removing retired banner geometry that covered and clipped the centered update dialog.",
+  "label": "Update Dialog Lockup Repair",
+  "version": "1.03.6",
+  "name": "Update Dialog Lockup Repair"
 }
