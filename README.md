@@ -1,17 +1,17 @@
 # FireVault
 
-## Build 1.03.6 — Update Dialog Lockup Repair
+## Build 1.03.7 — PWA Update & Overlay Stability
 
-Build 1.03.6 repairs the iPhone Update Ready screen shown as an oversized blank dark panel. Retired compact-banner styles were overriding the current centered dialog and clipping its controls off-screen.
+Build 1.03.7 is a no-new-features stability release. It makes the repaired Update Ready geometry the final stylesheet contract, validates the complete PWA upgrade path, and expands coverage for Photo Overlay capture and import workflows.
 
 ### Updated
 
-- Removes the retired Build 0.72 and 1.01.5 banner geometry that conflicted with the centered Update Ready modal.
-- Keeps the update card centered inside a full-screen blurred backdrop on iPhone and iPad.
-- Keeps Install Update, Release Notes, Later, Try Again, and Reload App reachable.
-- Lets a tap on the empty backdrop dismiss the prompt safely before installation begins.
-- Adds regression checks that reject the exact legacy positioning rules responsible for the lockup.
-- Retains the Build 1.03.5 Photo Overlay workspace cleanup and every existing data workflow.
+- Places a tightly scoped Update Ready geometry contract at the end of the stylesheet so older rules cannot override it.
+- Accounts for iPhone and iPad safe areas while keeping the dialog centered, scrollable, and fully inside the viewport.
+- Adds a dedicated PWA upgrade-contract test for build alignment, service-worker activation, cache cleanup, and all offline-shell files.
+- Expands Photo Overlay regression coverage across Quick Photo, imported photos, category rendering, normal overlay, and Technician Overlay composition.
+- Keeps deferred service-worker activation, the eight-second recovery watchdog, and backdrop dismissal intact.
+- Changes no records, storage schema, settings, or field features.
 
 ### Run locally
 

@@ -1,8 +1,8 @@
 {
-  "build": "1.03.6",
+  "build": "1.03.7",
   "released": "2026-07-16",
-  "note": "Repairs the iPhone Update Ready lockup by removing retired banner geometry that covered and clipped the centered update dialog.",
-  "label": "Update Dialog Lockup Repair",
-  "version": "1.03.6",
-  "name": "Update Dialog Lockup Repair"
+  "note": "Hardens the repaired Update Ready geometry, validates the PWA upgrade contract, and expands Photo Overlay workflow regression coverage.",
+  "label": "PWA Update & Overlay Stability",
+  "version": "1.03.7",
+  "name": "PWA Update & Overlay Stability"
 }
