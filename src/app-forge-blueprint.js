@@ -1,11 +1,11 @@
-import { APP_PROFILE, APP_PROFILE_SCHEMA_VERSION } from "./app-profile.js?v=1.03.26";
-import { MODULE_REGISTRY, MODULE_REGISTRY_VERSION, moduleRegistryExport } from "./module-registry.js?v=1.03.26";
-import { MODULE_BINDINGS_VERSION, moduleBindingsExport } from "./module-bindings.js?v=1.03.26";
-import { RECORD_SCHEMA, RECORD_SCHEMA_VERSION, recordSchemaExport } from "./record-schema.js?v=1.03.26";
-import { WORKFLOW_SCHEMA, WORKFLOW_SCHEMA_VERSION, workflowSchemaExport } from "./workflow-schema.js?v=1.03.26";
-import { THEME_PROFILE_SCHEMA_VERSION, resolveThemeProfile, themeProfileExport } from "./theme-profile.js?v=1.03.26";
-import { CONTENT_PACK_SCHEMA_VERSION, CONTENT_SOURCES, CONTENT_PACKS, contentPackRegistryExport } from "./content-pack-registry.js?v=1.03.26";
-import { SYNC_STORAGE_PROFILE_SCHEMA_VERSION, STORAGE_PROVIDERS, resolveSyncStorageProfile, syncStorageProfileExport } from "./sync-storage-profile.js?v=1.03.26";
+import { APP_PROFILE, APP_PROFILE_SCHEMA_VERSION } from "./app-profile.js?v=1.03.27";
+import { MODULE_REGISTRY, MODULE_REGISTRY_VERSION, moduleRegistryExport } from "./module-registry.js?v=1.03.27";
+import { MODULE_BINDINGS_VERSION, moduleBindingsExport } from "./module-bindings.js?v=1.03.27";
+import { RECORD_SCHEMA, RECORD_SCHEMA_VERSION, recordSchemaExport } from "./record-schema.js?v=1.03.27";
+import { WORKFLOW_SCHEMA, WORKFLOW_SCHEMA_VERSION, workflowSchemaExport } from "./workflow-schema.js?v=1.03.27";
+import { THEME_PROFILE_SCHEMA_VERSION, resolveThemeProfile, themeProfileExport } from "./theme-profile.js?v=1.03.27";
+import { CONTENT_PACK_SCHEMA_VERSION, CONTENT_SOURCES, CONTENT_PACKS, contentPackRegistryExport } from "./content-pack-registry.js?v=1.03.27";
+import { SYNC_STORAGE_PROFILE_SCHEMA_VERSION, STORAGE_PROVIDERS, resolveSyncStorageProfile, syncStorageProfileExport } from "./sync-storage-profile.js?v=1.03.27";
 
 export const APP_FORGE_BLUEPRINT_SCHEMA_VERSION = 1;
 export const APP_FORGE_BLUEPRINT_KIND = "field-vault.app-forge-blueprint";
@@ -99,14 +99,14 @@ export function appForgeReadinessSummary(appProfile=APP_PROFILE){
   });
 }
 
-export function appForgeBlueprintExport(appProfile=APP_PROFILE,build="1.03.26"){
+export function appForgeBlueprintExport(appProfile=APP_PROFILE,build="1.03.27"){
   const validation=validateAppForgeProfile(appProfile);
   const theme=resolveThemeProfile(appProfile);
   const storage=resolveSyncStorageProfile(appProfile);
   return clone({
     kind:APP_FORGE_BLUEPRINT_KIND,
     schemaVersion:APP_FORGE_BLUEPRINT_SCHEMA_VERSION,
-    build:String(build||"1.03.26"),
+    build:String(build||"1.03.27"),
     createdAt:new Date().toISOString(),
     product:{
       id:appProfile.id,

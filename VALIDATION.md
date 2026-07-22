@@ -1,4 +1,4 @@
-# FireVault Build 1.03.26 Validation
+# FireVault Build 1.03.27 Validation
 
 ## Native Apple Document Scanner contract
 
@@ -13,7 +13,7 @@
 - The compact review preserves capture order and collects a title, document type, date/revision, and optional notes.
 - Saving stages every page in IndexedDB before confirming success; a failed save removes the incomplete record and cleans orphaned media.
 - Saved scans retain account preview, PDF download, PDF share, deletion, backup, and timeline behavior.
-- The native project includes the camera permission message and uses app build/version 26 / 1.03.26 in both Debug and Release configurations.
+- The native project includes the camera permission message and uses app build/version 26 / 1.03.27 in both Debug and Release configurations.
 - The native asset catalog contains a real 1024×1024 FireVault app icon without an alpha channel.
 - The dedicated native scanner suite verifies the web bridge, native VisionKit delegate, multi-page transport, storage handoff, PDF tools, and final phone-safe review geometry.
 
@@ -27,7 +27,7 @@
 - Account Detail’s Details tab no longer renders the redundant large GPS & Navigation panel.
 - Address, primary Route, location editing, Plus Code, and exact-location workflows remain available on their established surfaces.
 - Account Detail tabs use individual shaded surfaces, alternating inactive depth, and a stronger active border and shadow.
-- The dedicated Build 1.03.26 suite verifies markup removal, retained workflows, navigation recovery, and final tab geometry.
+- The dedicated Build 1.03.27 suite verifies markup removal, retained workflows, navigation recovery, and final tab geometry.
 
 ## Nearby Accounts workspace contract
 
@@ -143,7 +143,7 @@
 ## Runtime and offline asset integrity
 
 - The HTML bootstrap contains 25 reviewed local stylesheet, module, manifest, icon, image, and application references.
-- Every local HTML reference carries the current Build 1.03.26 cache token.
+- Every local HTML reference carries the current Build 1.03.27 cache token.
 - All JavaScript imports are resolved from their source modules, exist inside the release, and carry the current build token.
 - CSS `url(...)`, branding profile assets, Photo Overlay sample media, and all three visual Help images resolve to packaged files.
 - All 30 runtime files are present in the 32-entry offline shell; the shell contains no duplicate or missing entry.
@@ -159,7 +159,7 @@
 - No nested FireVault build directory, `_config.yml`, or Ruby `Gemfile` can enter the deploy root.
 - The deployment guide identifies the current build, explains root-level extraction, and warns against uploading the containing ZIP folder.
 - The guide explains that only the newest workflow run matters and requires published `version.json` verification before updating the Home Screen app.
-- Runtime HTML and service-worker references agree on Build 1.03.26 and reject asset references from Builds 1.03.0 through 1.03.9.
+- Runtime HTML and service-worker references agree on Build 1.03.27 and reject asset references from Builds 1.03.0 through 1.03.9.
 
 ## Vault upgrade preservation
 
@@ -257,8 +257,8 @@
 - The new-user onboarding contract verifies the first-open guide, Demo Mode decision, GPS lookup, address confirmation, commercial-name suggestion, manual fallback, and form integration.
 - The Add Account address-lookup contract verifies the redesigned setup workspace, explicit search, result review, change invalidation, manual confirmation, metadata persistence, and responsive presentation.
 - The Account Directory top-actions contract verifies scroll-settled action visibility, immediate multi-word search, accessibility state, and unclipped bottom-navigation labels.
-- Active runtime and service-worker references resolve to Build 1.03.26.
-- `version.json`, the manifest, cache name, module imports, and release UI agree on Build 1.03.26.
+- Active runtime and service-worker references resolve to Build 1.03.27.
+- `version.json`, the manifest, cache name, module imports, and release UI agree on Build 1.03.27.
 
 ## Scope and compatibility
 

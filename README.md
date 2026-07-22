@@ -1,8 +1,8 @@
 # FireVault
 
-## Build 1.03.26 — One-Tap Document Scan
+## Build 1.03.27 — One-Tap Document Scan
 
-Build 1.03.26 makes Apple document scanning a primary Account Detail action in the native iPhone app.
+Build 1.03.27 makes Apple document scanning a primary Account Detail action in the native iPhone app.
 
 ### Updated
 

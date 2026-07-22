@@ -14,7 +14,7 @@ function match(source,pattern,message){checks+=1;assert.match(source,pattern,mes
 function ok(value,message){checks+=1;assert.ok(value,message)}
 
 const build=JSON.parse(version).build;
-equal(build,"1.03.26","Bottom navigation reliability must remain available in the current build.");
+equal(build,"1.03.27","Bottom navigation reliability must remain available in the current build.");
 
 const appNav=index.slice(index.indexOf('<nav id="appNav"'),index.indexOf("</nav>",index.indexOf('<nav id="appNav"')));
 for(const id of ["nav-home","nav-sites","nav-photo","nav-settings"]){

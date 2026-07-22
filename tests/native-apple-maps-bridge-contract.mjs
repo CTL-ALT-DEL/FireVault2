@@ -13,7 +13,7 @@ function ok(value,message){checks+=1;assert.ok(value,message)}
 function equal(actual,expected,message){checks+=1;assert.equal(actual,expected,message)}
 
 const build=JSON.parse(version).build;
-equal(build,"1.03.26","Apple Maps bridge must remain available in the current build.");
+equal(build,"1.03.27","Apple Maps bridge must remain available in the current build.");
 
 match(app,/window\.webkit\?\.messageHandlers\?\.fireVaultMaps\?\.postMessage/);
 match(app,/window\.fireVaultNativeMapsResolve=function/);

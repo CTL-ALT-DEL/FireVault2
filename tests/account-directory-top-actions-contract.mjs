@@ -13,7 +13,7 @@ function match(source,pattern,message){checks+=1;assert.match(source,pattern,mes
 function ok(value,message){checks+=1;assert.ok(value,message)}
 
 const build=JSON.parse(version).build;
-equal(build,"1.03.26","The compact Account Directory contract must ship in the current build.");
+equal(build,"1.03.27","The compact Account Directory contract must ship in the current build.");
 
 const row=app.slice(app.indexOf("function accountDirectoryRow0759"),app.indexOf("function accountDirectorySort0760"));
 match(row,/role="button" tabindex="0" aria-label="Open/);
