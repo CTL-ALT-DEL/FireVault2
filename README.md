@@ -1,8 +1,8 @@
 # FireVault
 
-## Build 1.03.21 — Simplified Account Workspace
+## Build 1.03.22 — Native Import Transition Fix
 
-Build 1.03.21 simplifies Account Directory and Account Detail without adding features or changing stored data.
+Build 1.03.22 simplifies Account Directory and Account Detail without adding features or changing stored data.
 
 ### Updated
 

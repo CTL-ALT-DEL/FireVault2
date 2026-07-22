@@ -15,7 +15,7 @@ globalThis.sessionStorage=new StorageMock();
 
 const {BUILD,KEY,isDemoMode,setDemoMode,loadData,saveData,ensureSite}=await import("../src/storage.js");
 
-assert.equal(BUILD,"1.03.21");
+assert.equal(BUILD,"1.03.22");
 assert.equal(isDemoMode(),false);
 
 const defaultData=loadData();
@@ -27,6 +27,11 @@ setDemoMode(false);
 const realImportBase=loadData({allowEmptyReal:true});
 assert.equal(isDemoMode(),false,"The CSV transition should leave Demo Mode before import analysis.");
 assert.equal(realImportBase.sites.length,0,"A fresh real vault should begin empty instead of reopening demo data.");
+saveData(realImportBase);
+
+const emptyAfterExitReload=loadData();
+assert.equal(isDemoMode(),false,"A deliberate Demo Mode exit must survive reload before the first CSV is imported.");
+assert.equal(emptyAfterExitReload.sites.length,0,"The established real vault should remain empty until the user imports accounts.");
 
 const imported=ensureSite({id:"csv-test-site",externalAccountId:"TEST-CSV-1031",name:"CSV Persistence Test",street:"100 Main St",city:"Cheyenne",state:"WY",zip:"82001"});
 realImportBase.sites.push(imported);

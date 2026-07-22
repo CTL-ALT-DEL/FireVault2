@@ -14,7 +14,7 @@ function match(source,pattern,message){checks+=1;assert.match(source,pattern,mes
 function ok(value,message){checks+=1;assert.ok(value,message)}
 
 const build=JSON.parse(version).build;
-equal(build,"1.03.21");
+equal(build,"1.03.22");
 
 match(app,/const FIRST_RUN_KEY_10317="firevault_first_run_complete_10317"/);
 match(app,/function firstRunComplete10317\(\).*localStorage\.getItem\(FIRST_RUN_KEY_10317\)/);
@@ -36,7 +36,7 @@ match(app,/id="demoChoiceTitle10317">Turn off Demo Mode\?<\/h2>/);
 match(app,/id="keepDemoAccount10317">No — Practice in Demo<\/button>/);
 match(app,/id="useRealAccount10317">Yes — Use Real Vault<\/button>/);
 match(app,/setDemoMode\(false\);/);
-match(app,/data=loadData\(\{allowEmptyReal:true\}\);applyTheme\(\)/);
+match(app,/data=loadData\(\{allowEmptyReal:true\}\);saveData\(data\);applyTheme\(\)/);
 match(app,/firstAccountGuide10317=true;demoAccountChoiceResolved10317=true;startAccountCreation10317\(\)/);
 
 match(app,/const guidedNewAccount10317=!editing&&/);

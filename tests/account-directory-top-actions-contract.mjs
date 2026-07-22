@@ -13,7 +13,7 @@ function match(source,pattern,message){checks+=1;assert.match(source,pattern,mes
 function ok(value,message){checks+=1;assert.ok(value,message)}
 
 const build=JSON.parse(version).build;
-equal(build,"1.03.21","The compact Account Directory contract must ship in the current build.");
+equal(build,"1.03.22","The compact Account Directory contract must ship in the current build.");
 
 const row=app.slice(app.indexOf("function accountDirectoryRow0759"),app.indexOf("function accountDirectorySort0760"));
 match(row,/role="button" tabindex="0" aria-label="Open/);
@@ -43,7 +43,7 @@ match(sites,/list\.scrollTop=Math\.max\(0,accountsScroll0759\|\|0\);[\s\S]*?prep
 match(sites,/const card=event\.target\.closest\("\[data-account-card0759\]"\);[\s\S]*?openAccount\(card\.dataset\.id\)/);
 
 const historicalMarker="Build 1.03.19 — only the settled top Account Directory card shows actions";
-const currentMarker="Build 1.03.21 — simplified Account Directory and clearer Account Detail tabs";
+const currentMarker="Build 1.03.22 — simplified Account Directory and clearer Account Detail tabs";
 const updateMarker="Build 1.03.7 — canonical Update Ready geometry";
 ok(design.includes(historicalMarker),"The former action contract must remain documented as release history.");
 ok(design.includes(currentMarker),"The current compact-directory contract must be documented.");

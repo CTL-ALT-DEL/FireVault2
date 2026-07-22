@@ -1,8 +1,8 @@
 {
-  "build": "1.03.21",
-  "released": "2026-07-17",
-  "note": "Removes Account Directory quick actions, keeps bottom navigation visible through search, removes redundant Account Detail location controls, and strengthens tab contrast.",
-  "label": "Simplified Account Workspace",
-  "version": "1.03.21",
-  "name": "Simplified Account Workspace"
+  "build": "1.03.22",
+  "released": "2026-07-21",
+  "note": "Repairs the first-use Demo Mode exit so an empty real vault is established before reload or Customer CSV analysis.",
+  "label": "Native Import Transition Fix",
+  "version": "1.03.22",
+  "name": "Native Import Transition Fix"
 }
