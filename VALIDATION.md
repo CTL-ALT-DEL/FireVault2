@@ -1,7 +1,11 @@
-# FireVault Build 1.03.25 Validation
+# FireVault Build 1.03.26 Validation
 
 ## Native Apple Document Scanner contract
 
+- Account Detail exposes one large native-only Scan Document action before the ordinary Call, Route, Note, and Photo controls.
+- A scan started from Account Detail returns to that same account after saving; the Documents / Photos entry remains as a secondary path.
+- Account Detail keeps Overview, Files, and Notes visible and collapses Details, Locations, and Equipment beneath an accessible More control.
+- Document search, filtering, and sorting stay inside a collapsed Find or organize saved items section.
 - Scan Document appears in an account’s Documents / Photos workspace only when the native iPhone bridge is available.
 - The native container uses Apple VisionKit for automatic page edges, perspective correction, crop review, retakes, and multi-page capture.
 - Pages are resized to a maximum 2200-pixel side, encoded as JPEG, and delivered sequentially to avoid holding every encoded page in native memory at once.
@@ -9,7 +13,8 @@
 - The compact review preserves capture order and collects a title, document type, date/revision, and optional notes.
 - Saving stages every page in IndexedDB before confirming success; a failed save removes the incomplete record and cleans orphaned media.
 - Saved scans retain account preview, PDF download, PDF share, deletion, backup, and timeline behavior.
-- The native project includes the camera permission message and uses app build/version 25 / 1.03.25 in both Debug and Release configurations.
+- The native project includes the camera permission message and uses app build/version 26 / 1.03.26 in both Debug and Release configurations.
+- The native asset catalog contains a real 1024×1024 FireVault app icon without an alpha channel.
 - The dedicated native scanner suite verifies the web bridge, native VisionKit delegate, multi-page transport, storage handoff, PDF tools, and final phone-safe review geometry.
 
 ## Account Directory and Account Detail cleanup contract
@@ -22,7 +27,7 @@
 - Account Detail’s Details tab no longer renders the redundant large GPS & Navigation panel.
 - Address, primary Route, location editing, Plus Code, and exact-location workflows remain available on their established surfaces.
 - Account Detail tabs use individual shaded surfaces, alternating inactive depth, and a stronger active border and shadow.
-- The dedicated Build 1.03.25 suite verifies markup removal, retained workflows, navigation recovery, and final tab geometry.
+- The dedicated Build 1.03.26 suite verifies markup removal, retained workflows, navigation recovery, and final tab geometry.
 
 ## Nearby Accounts workspace contract
 
@@ -138,7 +143,7 @@
 ## Runtime and offline asset integrity
 
 - The HTML bootstrap contains 25 reviewed local stylesheet, module, manifest, icon, image, and application references.
-- Every local HTML reference carries the current Build 1.03.25 cache token.
+- Every local HTML reference carries the current Build 1.03.26 cache token.
 - All JavaScript imports are resolved from their source modules, exist inside the release, and carry the current build token.
 - CSS `url(...)`, branding profile assets, Photo Overlay sample media, and all three visual Help images resolve to packaged files.
 - All 30 runtime files are present in the 32-entry offline shell; the shell contains no duplicate or missing entry.
@@ -154,7 +159,7 @@
 - No nested FireVault build directory, `_config.yml`, or Ruby `Gemfile` can enter the deploy root.
 - The deployment guide identifies the current build, explains root-level extraction, and warns against uploading the containing ZIP folder.
 - The guide explains that only the newest workflow run matters and requires published `version.json` verification before updating the Home Screen app.
-- Runtime HTML and service-worker references agree on Build 1.03.25 and reject asset references from Builds 1.03.0 through 1.03.9.
+- Runtime HTML and service-worker references agree on Build 1.03.26 and reject asset references from Builds 1.03.0 through 1.03.9.
 
 ## Vault upgrade preservation
 
@@ -252,8 +257,8 @@
 - The new-user onboarding contract verifies the first-open guide, Demo Mode decision, GPS lookup, address confirmation, commercial-name suggestion, manual fallback, and form integration.
 - The Add Account address-lookup contract verifies the redesigned setup workspace, explicit search, result review, change invalidation, manual confirmation, metadata persistence, and responsive presentation.
 - The Account Directory top-actions contract verifies scroll-settled action visibility, immediate multi-word search, accessibility state, and unclipped bottom-navigation labels.
-- Active runtime and service-worker references resolve to Build 1.03.25.
-- `version.json`, the manifest, cache name, module imports, and release UI agree on Build 1.03.25.
+- Active runtime and service-worker references resolve to Build 1.03.26.
+- `version.json`, the manifest, cache name, module imports, and release UI agree on Build 1.03.26.
 
 ## Scope and compatibility
 

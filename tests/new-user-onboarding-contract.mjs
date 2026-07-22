@@ -14,7 +14,7 @@ function match(source,pattern,message){checks+=1;assert.match(source,pattern,mes
 function ok(value,message){checks+=1;assert.ok(value,message)}
 
 const build=JSON.parse(version).build;
-equal(build,"1.03.25");
+equal(build,"1.03.26");
 
 match(app,/const FIRST_RUN_KEY_10317="firevault_first_run_complete_10317"/);
 match(app,/function firstRunComplete10317\(\).*localStorage\.getItem\(FIRST_RUN_KEY_10317\)/);

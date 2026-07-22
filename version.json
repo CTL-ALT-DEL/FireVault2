@@ -1,8 +1,8 @@
 {
-  "build": "1.03.25",
+  "build": "1.03.26",
   "released": "2026-07-21",
-  "note": "Restores account document scanning through Apple VisionKit with multi-page capture, automatic edge correction, compact save review, IndexedDB storage, and retained PDF tools.",
-  "label": "Apple Document Scanner",
-  "version": "1.03.25",
-  "name": "Apple Document Scanner"
+  "note": "Moves Apple document scanning to a prominent one-tap action on Account Detail and returns saved scans directly to the same account.",
+  "label": "One-Tap Document Scan",
+  "version": "1.03.26",
+  "name": "One-Tap Document Scan"
 }
