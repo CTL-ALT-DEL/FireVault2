@@ -18,7 +18,7 @@ const manifest=JSON.parse(manifestText);
 const build=version.build;
 const escapedBuild=build.replaceAll(".","\\.");
 
-assert.equal(build,"1.03.24");
+assert.equal(build,"1.03.25");
 assert.equal(manifest.version,build);
 assert.match(storage,new RegExp(`export const BUILD = "${escapedBuild}"`));
 assert.match(worker,new RegExp(`const BUILD="${escapedBuild}"`));

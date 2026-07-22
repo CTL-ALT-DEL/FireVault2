@@ -1,18 +1,19 @@
 # FireVault
 
-## Build 1.03.24 — Bottom Navigation Reliability
+## Build 1.03.25 — Apple Document Scanner
 
-Build 1.03.24 repairs and polishes FireVault’s persistent bottom navigation without changing stored data or adding features.
+Build 1.03.25 restores account document scanning through Apple VisionKit in the native iPhone app.
 
 ### Updated
 
-- Matches the dock’s column count to its visible buttons instead of forcing a retired three-button layout.
-- Keeps Nearby, Search, Photo, and Settings visible in equal-width columns.
-- Enlarges dock icons and keeps labels readable on narrow iPhones.
-- Preserves safe-area spacing around the Home indicator.
-- Restores the correct dock layout after Account Directory search input and keyboard dismissal.
-- Updates the in-app navigation manual and revision history.
-- Retains Build 1.03.23 native Apple Maps support and all prior update, vault, CSV, onboarding, form, list, and photo safeguards.
+- Adds Scan Document to each account’s Documents / Photos workspace in the native iPhone app.
+- Uses Apple VisionKit for automatic document edges, perspective correction, crop review, retakes, and multi-page capture.
+- Transfers finished pages sequentially into FireVault to reduce web-view memory pressure.
+- Adds a compact Save Scan review for title, type, date/revision, and optional notes.
+- Stores scan pages offline in IndexedDB outside the main account vault.
+- Retains existing scan preview, PDF download, PDF sharing, deletion, backup, and account timeline behavior.
+- Keeps the browser/PWA scanner hidden because Apple VisionKit requires the native Xcode app.
+- Retains Build 1.03.24 navigation reliability and Build 1.03.23 native Apple Maps support.
 
 ### Run locally
 

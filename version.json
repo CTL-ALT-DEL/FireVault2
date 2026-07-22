@@ -1,8 +1,8 @@
 {
-  "build": "1.03.24",
+  "build": "1.03.25",
   "released": "2026-07-21",
-  "note": "Repairs the four-button bottom dock with dynamic columns, larger readable controls, iPhone safe-area spacing, and reliable Account Directory search restoration.",
-  "label": "Bottom Navigation Reliability",
-  "version": "1.03.24",
-  "name": "Bottom Navigation Reliability"
+  "note": "Restores account document scanning through Apple VisionKit with multi-page capture, automatic edge correction, compact save review, IndexedDB storage, and retained PDF tools.",
+  "label": "Apple Document Scanner",
+  "version": "1.03.25",
+  "name": "Apple Document Scanner"
 }
