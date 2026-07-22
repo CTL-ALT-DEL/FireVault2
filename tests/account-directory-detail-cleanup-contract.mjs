@@ -13,7 +13,7 @@ function match(source,pattern,message){checks+=1;assert.match(source,pattern,mes
 function ok(value,message){checks+=1;assert.ok(value,message)}
 
 const build=JSON.parse(version).build;
-equal(build,"1.03.27","The simplified directory and detail layout must ship in the current build.");
+equal(build,"1.03.28","The simplified directory and detail layout must ship in the current build.");
 
 const row=app.slice(app.indexOf("function accountDirectoryRow0759"),app.indexOf("function accountDirectorySort0760"));
 match(row,/role="button" tabindex="0" aria-label="Open/);
@@ -48,8 +48,8 @@ match(details,/\$\{plusCodeSection071\(s\)\}/);
 const detailScreen=app.slice(app.indexOf("function siteDetail()"),app.indexOf("function wireDashboard068"));
 match(detailScreen,/<p>\$\{esc\(address\)\}<\/p>/);
 match(detailScreen,/id="detailRoute0871"/);
-match(detailScreen,/class="accountTabs0871 accountTabs0952 accountPrimaryTabs10326"/);
-match(detailScreen,/aria-current="\$\{accountDetailTab0735===key\?"page":"false"\}"/);
+match(detailScreen,/class="accountDetailContent0871 accountDetailContent0952 accountAccordion10328"/);
+match(detailScreen,/class="accountAccordionToggle10328"[\s\S]*?aria-expanded=/);
 
 const marker="Build 1.03.23 — simplified Account Directory and clearer Account Detail tabs";
 const updateMarker="Build 1.03.7 — canonical Update Ready geometry";

@@ -15,20 +15,18 @@ function match(source,pattern,message){checks+=1;assert.match(source,pattern,mes
 function ok(value,message){checks+=1;assert.ok(value,message)}
 
 const build=JSON.parse(version).build;
-equal(build,"1.03.27","Simplified scanning must remain available in Build 1.03.27.");
+equal(build,"1.03.28","Simplified scanning must remain available in Build 1.03.28.");
 
 const detail=app.slice(app.indexOf("function siteDetail()"),app.indexOf("function photoCategory524"));
-match(detail,/nativeDocumentScannerAvailable10325\(\)&&moduleEnabled0955\("core\.files"\)\?`<button class="accountScanPrimary10326" id="accountScanDocument10326"/);
-match(detail,/<strong>Scan Document<\/strong><small>Apple camera · automatic edges · multi-page<\/small>/);
-ok(detail.indexOf("accountScanDocument10326")<detail.indexOf("accountActionGrid0871"),"Scan Document must appear before ordinary account actions.");
+match(detail,/nativeScanReady10328\?`<button class="primary" id="accountScanDocument10326"/);
+match(detail,/<strong>Scan<\/strong>/);
+ok(detail.indexOf("accountScanDocument10326")<detail.indexOf("accountAccordion10328"),"Scan must appear before the tabless account sections.");
 match(detail,/accountScanDocument10326"\)\?\.addEventListener\("click",\(\)=>startNativeDocumentScan10325\(s,\{returnRoute:"siteDetail"\}\)\)/);
 match(app,/route\(options\.returnRoute==="siteDetail"\?"siteDetail":"siteDocs"\)/);
 
-match(detail,/\["overview","docs","notes"\]\.flatMap/);
-match(detail,/\["details","locations","equipment",\.\.\./);
-match(detail,/id="accountMoreTab10326" aria-expanded="false" aria-controls="accountMoreMenu10326"/);
-match(detail,/class="accountMoreMenu10326" id="accountMoreMenu10326" hidden/);
-match(detail,/button\.setAttribute\("aria-expanded",opening\?"true":"false"\)/);
+match(detail,/accordionOrder10328=\["overview","locations","equipment","docs","notes","details"\]/);
+match(detail,/accountAccordionToggle10328/);
+match(detail,/aria-expanded="\$\{active\?"true":"false"\}"/);
 
 const docs=app.slice(app.indexOf("function siteDocs()"),app.indexOf("function siteDocForm()"));
 match(docs,/<details class="docOrganize10326"><summary><span>Find or organize saved items<\/span><small>Search · filters · sort<\/small><\/summary>/);
@@ -38,9 +36,8 @@ const marker="Build 1.03.26 — one-tap Account Detail document scanning";
 const updateMarker="Build 1.03.7 — canonical Update Ready geometry";
 ok(design.includes(marker),"The final design layer must identify simplified scanning.");
 ok(design.indexOf(marker)<design.indexOf(updateMarker),"Simplified scanning rules must remain before the Update Ready geometry contract.");
-match(design,/\.accountDetail1011 \.accountScanPrimary10326\{[\s\S]*?min-height:58px!important;[\s\S]*?grid-template-columns:30px minmax\(0,1fr\) 18px!important/);
-match(design,/\.accountDetail1011 \.accountPrimaryTabs10326\{[\s\S]*?repeat\(var\(--account-primary-tab-count,4\),minmax\(0,1fr\)\)/);
-match(design,/\.accountDetail1011 \.accountMoreMenu10326\[hidden\]\{display:none!important\}/);
+match(design,/\.accountEssentialActions10328\{[\s\S]*?grid-template-columns:repeat\(var\(--account-essential-count,3\),minmax\(0,1fr\)\)/);
+match(design,/\.accountAccordionToggle10328\{[\s\S]*?min-height:52px!important/);
 match(design,/\.docOrganize10326>summary\{[\s\S]*?min-height:48px!important/);
 
 const catalog=JSON.parse(iconContents);

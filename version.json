@@ -1,8 +1,8 @@
 {
-  "build": "1.03.27",
+  "build": "1.03.28",
   "released": "2026-07-21",
-  "note": "Redesigns Account Detail with a compact identity card, scan action, utility controls, and section tabs so working content appears sooner.",
-  "label": "Compact Account Detail",
-  "version": "1.03.27",
-  "name": "Compact Account Detail"
+  "note": "Rebuilds Account Details as a tabless accordion focused on Overview, Maps, Equipment, Files, Scans, and Notes while disabling Tasks and Deficiencies without deleting their data.",
+  "label": "Tabless Account Details",
+  "version": "1.03.28",
+  "name": "Tabless Account Details"
 }

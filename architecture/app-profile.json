@@ -297,8 +297,6 @@
     "core.backupRestore",
     "core.security",
     "optional.equipment",
-    "optional.tasks",
-    "optional.deficiencies",
     "optional.reports",
     "optional.cloudStorage",
     "optional.importExport",

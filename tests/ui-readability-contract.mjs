@@ -14,13 +14,13 @@ function match(source,pattern,message){checks+=1;assert.match(source,pattern,mes
 function ok(value,message){checks+=1;assert.ok(value,message)}
 
 const build=JSON.parse(version).build;
-equal(build,"1.03.27");
+equal(build,"1.03.28");
 
 const directoryRow=app.slice(app.indexOf("function accountDirectoryRow0759"),app.indexOf("function accountDirectorySort0760"));
 ok(!directoryRow.includes("accountRowActions0951"),"Account Directory quick actions are intentionally retired.");
 match(app,/class="accountTopBack1011"[^>]*><span aria-hidden="true">‹<\/span><strong>Back<\/strong>/);
-match(app,/class="accountActionGrid0871 accountActionGrid0952/);
-match(app,/<strong>Add \$\{esc\(appTerm\("note",1\)\)\}<\/strong>/);
+match(app,/class="accountEssentialActions10328"/);
+match(app,/Files & Scans/);
 match(app,/class="nearbyDistance069"/);
 match(app,/photoOverlayDetailHeader1032/);
 match(app,/class="overlayActiveField0944 overlayMainField1012 overlayFieldDisclosure1035/);
@@ -38,8 +38,8 @@ match(design,/\.accountDirectory0951 \.accountDirectoryNear0951,[\s\S]*?height:4
 match(design,/@media\(max-width:390px\)\{[\s\S]*?\.accountDirectory0951 \.accountDirectoryReset0951\{height:40px!important;min-height:40px!important\}/);
 match(design,/@media\(max-width:430px\)\{[\s\S]*?\.accountDetail1011 \.accountTopBack1011\{min-width:64px!important\}/);
 match(design,/@media\(max-width:430px\)\{[\s\S]*?\.accountDetail1011 \.accountTopBack1011 strong\{font-size:12\.5px!important\}/);
-match(design,/@media\(max-width:430px\)\{[\s\S]*?\.accountDetail1011 \.accountActionGrid0952 strong\{font-size:13px!important\}/);
-match(design,/@media\(max-width:430px\)\{[\s\S]*?\.accountDetail1011 \.accountTabs0952 button\{min-width:96px!important;font-size:12\.5px!important\}/);
+match(design,/\.accountEssentialActions10328 button\{[\s\S]*?min-height:38px!important/);
+match(design,/\.accountAccordionToggle10328 strong\{font-size:13px!important/);
 match(design,/\.settingsPolish0880 \.settingsDetailHeader0880>#settingsBackBtn,[\s\S]*?height:44px!important;[\s\S]*?font-size:12\.5px!important;/);
 match(design,/\.settingsOverlayDetail1012 \.overlayFieldDisclosure1035 \.overlayFieldActions0944 button>span\{font-size:10px!important\}/);
 match(design,/\.settingsOverlayDetail1012 \.overlayFieldState1035\{font-size:10px!important\}/);

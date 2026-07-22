@@ -1,4 +1,4 @@
-import { GENERATED_APP_PROFILE } from "./generated-app-profile.js?v=1.03.27";
+import { GENERATED_APP_PROFILE } from "./generated-app-profile.js?v=1.03.28";
 
 export const APP_PROFILE_SCHEMA_VERSION = 12;
 
@@ -185,8 +185,6 @@ const FIREVAULT_APP_PROFILE = Object.freeze({
     "core.backupRestore",
     "core.security",
     "optional.equipment",
-    "optional.tasks",
-    "optional.deficiencies",
     "optional.reports",
     "optional.cloudStorage",
     "optional.importExport",

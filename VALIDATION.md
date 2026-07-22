@@ -1,10 +1,19 @@
-# FireVault Build 1.03.27 Validation
+# FireVault Build 1.03.28 Validation
+
+## Tabless Account Details contract
+
+- Account Details uses one accordion instead of tabs or a More menu.
+- Overview, Map & Locations, Equipment, Files & Scans, Notes, and Account Info remain available with only one section expanded at a time.
+- Scan, Call, and Route share one compact essentials row.
+- Tasks and Deficiencies are disabled in the active profile while stored records remain untouched.
+- The redundant global FireVault header is hidden only on Account Details to provide more working space.
+- Notes, files, scans, equipment, Apple Maps, GPS, Plus Codes, photos, and account information remain enabled.
 
 ## Native Apple Document Scanner contract
 
-- Account Detail exposes one large native-only Scan Document action before the ordinary Call, Route, Note, and Photo controls.
+- Account Details exposes a compact native-only Scan action beside Call and Route.
 - A scan started from Account Detail returns to that same account after saving; the Documents / Photos entry remains as a secondary path.
-- Account Detail keeps Overview, Files, and Notes visible and collapses Details, Locations, and Equipment beneath an accessible More control.
+- Files & Scans remains an accordion section and Apple scanning stays immediately available in the essentials row.
 - Document search, filtering, and sorting stay inside a collapsed Find or organize saved items section.
 - Scan Document appears in an account’s Documents / Photos workspace only when the native iPhone bridge is available.
 - The native container uses Apple VisionKit for automatic page edges, perspective correction, crop review, retakes, and multi-page capture.
@@ -13,7 +22,7 @@
 - The compact review preserves capture order and collects a title, document type, date/revision, and optional notes.
 - Saving stages every page in IndexedDB before confirming success; a failed save removes the incomplete record and cleans orphaned media.
 - Saved scans retain account preview, PDF download, PDF share, deletion, backup, and timeline behavior.
-- The native project includes the camera permission message and uses app build/version 26 / 1.03.27 in both Debug and Release configurations.
+- The native project includes the camera permission message and uses app build/version 28 / 1.03.28 in both Debug and Release configurations.
 - The native asset catalog contains a real 1024×1024 FireVault app icon without an alpha channel.
 - The dedicated native scanner suite verifies the web bridge, native VisionKit delegate, multi-page transport, storage handoff, PDF tools, and final phone-safe review geometry.
 
@@ -24,10 +33,10 @@
 - Every row remains a single tap, Enter, or Space target that opens its exact Account Detail screen.
 - Immediate multi-word search, result counts, A-Z sorting, filtered scroll reset, and saved list position remain intact.
 - Bottom navigation is explicitly kept visible during directory search and restored after the search field loses focus.
-- Account Detail’s Details tab no longer renders the redundant large GPS & Navigation panel.
+- Account Info no longer renders the redundant large GPS & Navigation panel.
 - Address, primary Route, location editing, Plus Code, and exact-location workflows remain available on their established surfaces.
-- Account Detail tabs use individual shaded surfaces, alternating inactive depth, and a stronger active border and shadow.
-- The dedicated Build 1.03.27 suite verifies markup removal, retained workflows, navigation recovery, and final tab geometry.
+- Account Details uses individually shaded accordion rows and one clear expanded state.
+- The dedicated Build 1.03.28 suite verifies markup removal, retained workflows, navigation recovery, and final accordion geometry.
 
 ## Nearby Accounts workspace contract
 
@@ -143,7 +152,7 @@
 ## Runtime and offline asset integrity
 
 - The HTML bootstrap contains 25 reviewed local stylesheet, module, manifest, icon, image, and application references.
-- Every local HTML reference carries the current Build 1.03.27 cache token.
+- Every local HTML reference carries the current Build 1.03.28 cache token.
 - All JavaScript imports are resolved from their source modules, exist inside the release, and carry the current build token.
 - CSS `url(...)`, branding profile assets, Photo Overlay sample media, and all three visual Help images resolve to packaged files.
 - All 30 runtime files are present in the 32-entry offline shell; the shell contains no duplicate or missing entry.
@@ -159,7 +168,7 @@
 - No nested FireVault build directory, `_config.yml`, or Ruby `Gemfile` can enter the deploy root.
 - The deployment guide identifies the current build, explains root-level extraction, and warns against uploading the containing ZIP folder.
 - The guide explains that only the newest workflow run matters and requires published `version.json` verification before updating the Home Screen app.
-- Runtime HTML and service-worker references agree on Build 1.03.27 and reject asset references from Builds 1.03.0 through 1.03.9.
+- Runtime HTML and service-worker references agree on Build 1.03.28 and reject asset references from Builds 1.03.0 through 1.03.9.
 
 ## Vault upgrade preservation
 
@@ -257,8 +266,8 @@
 - The new-user onboarding contract verifies the first-open guide, Demo Mode decision, GPS lookup, address confirmation, commercial-name suggestion, manual fallback, and form integration.
 - The Add Account address-lookup contract verifies the redesigned setup workspace, explicit search, result review, change invalidation, manual confirmation, metadata persistence, and responsive presentation.
 - The Account Directory top-actions contract verifies scroll-settled action visibility, immediate multi-word search, accessibility state, and unclipped bottom-navigation labels.
-- Active runtime and service-worker references resolve to Build 1.03.27.
-- `version.json`, the manifest, cache name, module imports, and release UI agree on Build 1.03.27.
+- Active runtime and service-worker references resolve to Build 1.03.28.
+- `version.json`, the manifest, cache name, module imports, and release UI agree on Build 1.03.28.
 
 ## Scope and compatibility
 
