@@ -1,8 +1,8 @@
 {
-  "build": "1.03.28",
+  "build": "1.03.29",
   "released": "2026-07-21",
-  "note": "Rebuilds Account Details as a tabless accordion focused on Overview, Maps, Equipment, Files, Scans, and Notes while disabling Tasks and Deficiencies without deleting their data.",
-  "label": "Tabless Account Details",
-  "version": "1.03.28",
-  "name": "Tabless Account Details"
+  "note": "Introduces the native Field Workspace for Account Detail with Apple Maps, Liquid Glass actions, Notes, Files and Scans, Equipment, and precise saved locations.",
+  "label": "Native Field Workspace",
+  "version": "1.03.29",
+  "name": "Native Field Workspace"
 }

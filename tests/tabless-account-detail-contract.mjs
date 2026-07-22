@@ -12,7 +12,7 @@ let checks=0;
 const ok=(value,message)=>{checks+=1;assert.ok(value,message)};
 const match=(source,pattern,message)=>{checks+=1;assert.match(source,pattern,message)};
 
-assert.equal(version.build,"1.03.28");checks+=1;
+assert.equal(version.build,"1.03.29");checks+=1;
 const detail=app.slice(app.indexOf("function siteDetail()"),app.indexOf("function photoCategory524"));
 for(const label of ["Overview","Map & Locations","Equipment","Files & Scans","Notes","Account Info"])match(detail,new RegExp(label.replace(/[&]/g,"&")),`${label} must be present in the tabless account flow.`);
 match(detail,/accountAccordion10328/);
@@ -31,4 +31,4 @@ ok(marker>=0&&marker<update,"Tabless Account Details styles must precede the pro
 match(design,/\.accountAccordion10328\{/);
 match(design,/grid-template-columns:repeat\(var\(--account-essential-count,3\),minmax\(0,1fr\)\)/);
 
-console.log(JSON.stringify({status:"passed",build:version.build,checks,layout:"tabless-accordion",disabledModules:["tasks","deficiencies"]}));
+console.log(JSON.stringify({status:"passed",build:version.build,checks,layout:"web-fallback-accordion",disabledModules:["tasks","deficiencies"]}));

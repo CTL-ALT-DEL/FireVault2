@@ -1,17 +1,20 @@
 # FireVault
 
-## Build 1.03.28 — Tabless Account Details
+## Build 1.03.29 — Native Field Workspace
 
-Build 1.03.28 implements Option 4: a simpler tabless Account Details workspace centered on Notes, Files, Scans, Equipment, and Maps.
+Build 1.03.29 replaces Account Detail inside the native iPhone app with a focused SwiftUI Field Workspace centered on Notes, Files, Scans, Equipment, and Maps.
 
 ### Updated
 
-- Replaces the Account Detail tab and More menus with one accordion: Overview, Map & Locations, Equipment, Files & Scans, Notes, and Account Info.
-- Keeps only one account section expanded at a time.
-- Places Scan, Call, and Route in one compact essentials row.
-- Hides the redundant global FireVault header while viewing Account Details.
+- Uses native SwiftUI for the Account identity, Apple Map, field destinations, recent activity, and quick actions.
+- Presents Notes, Files & Scans, Equipment, and Locations as four clear work destinations.
+- Places Scan, Note, Camera, and Route in one compact Liquid Glass action dock.
+- Uses Apple MapKit for the account and precise saved entrances, parking areas, panels, risers, FDCs, and other locations.
+- Keeps Favorite, Edit Account, Call, Nearby, Search, Photo, and Settings connected through a controlled native-to-web bridge.
 - Disables Tasks and Deficiencies in the active profile without deleting any existing stored records.
 - Retains Notes, files, photos, Apple document scanning, equipment, maps, GPS, Plus Codes, and account information.
+- Keeps the established web vault as the data authority; the bridge sends lightweight metadata and returns actions to existing save workflows.
+- Retains the Build 1.03.28 accordion only as the browser/PWA fallback where SwiftUI is unavailable.
 - Returns a saved scan to the same Account Detail screen instead of sending the technician into the document-management workspace.
 - Keeps Scan Document in Documents / Photos as a secondary access point.
 - Uses Apple VisionKit for automatic document edges, perspective correction, crop review, retakes, and multi-page capture.
@@ -20,7 +23,7 @@ Build 1.03.28 implements Option 4: a simpler tabless Account Details workspace c
 - Stores scan pages offline in IndexedDB outside the main account vault.
 - Retains existing scan preview, PDF download, PDF sharing, deletion, backup, and account timeline behavior.
 - Keeps the browser/PWA scanner hidden because Apple VisionKit requires the native Xcode app.
-- Retains Build 1.03.27 account cleanup, Build 1.03.25 Apple VisionKit capture, Build 1.03.24 navigation reliability, and Build 1.03.23 native Apple Maps support.
+- Retains Build 1.03.28 module cleanup, Build 1.03.25 Apple VisionKit capture, Build 1.03.24 navigation reliability, and Build 1.03.23 native Apple Maps support.
 
 ### Run locally
 
