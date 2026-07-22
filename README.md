@@ -1,12 +1,18 @@
 # FireVault
 
-## Build 1.03.29 — Native Field Workspace
+## Build 1.03.30 — Native App Shell
 
-Build 1.03.29 replaces Account Detail inside the native iPhone app with a focused SwiftUI Field Workspace centered on Notes, Files, Scans, Equipment, and Maps.
+Build 1.03.30 redesigns FireVault’s everyday iPhone navigation in native SwiftUI while retaining the focused Account Field Workspace and the established, data-safe web editors.
 
 ### Updated
 
-- Uses native SwiftUI for the Account identity, Apple Map, field destinations, recent activity, and quick actions.
+- Adds a native SwiftUI shell for Nearby, Accounts, Photo access, and Settings.
+- Rebuilds Nearby with Apple MapKit, numbered account pins, readable distance cards, refresh, Route, and Open actions.
+- Rebuilds Accounts with fast native search, A–Z, Favorites, and Recent sorting, compact identity rows, and a clear Add Account control.
+- Consolidates Settings into five collapsible areas: Profile, Field Tools, Reports, Data & Security, and Help & About.
+- Keeps Settings search native and hides secondary controls until their group is opened.
+- Uses one compact Liquid Glass bottom dock with reliable iPhone safe-area spacing.
+- Retains native SwiftUI for Account identity, Apple Map, field destinations, recent activity, and quick actions.
 - Presents Notes, Files & Scans, Equipment, and Locations as four clear work destinations.
 - Places Scan, Note, Camera, and Route in one compact Liquid Glass action dock.
 - Uses Apple MapKit for the account and precise saved entrances, parking areas, panels, risers, FDCs, and other locations.

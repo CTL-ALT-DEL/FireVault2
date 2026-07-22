@@ -15,7 +15,7 @@ function match(source,pattern,message){checks+=1;assert.match(source,pattern,mes
 function ok(value,message){checks+=1;assert.ok(value,message)}
 
 const build=JSON.parse(version).build;
-equal(build,"1.03.29","Simplified scanning must remain available in Build 1.03.29.");
+equal(build,"1.03.30","Simplified scanning must remain available in Build 1.03.30.");
 
 const detail=app.slice(app.indexOf("function siteDetail()"),app.indexOf("function photoCategory524"));
 match(detail,/nativeScanReady10328\?`<button class="primary" id="accountScanDocument10326"/);

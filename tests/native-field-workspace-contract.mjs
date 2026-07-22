@@ -14,7 +14,7 @@ const equal=(actual,expected,message)=>{checks+=1;assert.equal(actual,expected,m
 const match=(source,pattern,message)=>{checks+=1;assert.match(source,pattern,message)};
 const ok=(value,message)=>{checks+=1;assert.ok(value,message)};
 
-equal(JSON.parse(version).build,"1.03.29","The native Field Workspace must ship in Build 1.03.29.");
+equal(JSON.parse(version).build,"1.03.30","The native Field Workspace must ship in Build 1.03.30.");
 
 // The existing web vault stays authoritative and sends only lightweight account metadata.
 match(app,/function nativeFieldWorkspaceAvailable10329\(\)/);
@@ -36,10 +36,11 @@ match(container,/configuration\.userContentController\.add\(context\.coordinator
 match(container,/if message\.name == "fireVaultWorkspace"/);
 match(container,/workspaceBridge\.present\(account\)/);
 match(container,/FieldWorkspaceView\(account: account, bridge: workspaceBridge\)/);
-match(container,/FireVault-iOS\/1\.03\.29/);
+match(container,/FireVault-iOS\/1\.03\.30/);
 
 // The new Account experience is native SwiftUI, Apple Maps based, and field focused.
 match(workspace,/final class FireVaultWorkspaceBridge: ObservableObject/);
+match(workspace,/import Combine/);
 match(workspace,/struct FieldWorkspaceView: View/);
 match(workspace,/MapArrivalView/);
 match(workspace,/FilesScansView/);
@@ -55,8 +56,10 @@ for(const label of ["Notes","Files & Scans","Equipment","Locations","Scan","Came
 }
 ok(!workspace.includes('"Tasks"'),"Tasks must not appear in the native Field Workspace.");
 ok(!workspace.includes('"Deficiencies"'),"Deficiencies must not appear in the native Field Workspace.");
+const mapPreview=workspace.slice(workspace.indexOf("private var mapPreview"),workspace.indexOf("private var destinations"));
+equal((mapPreview.match(/MapArrivalView\(account: account, bridge: bridge\)/g)||[]).length,1,"The Account map destination must be inserted exactly once.");
 
-equal((project.match(/CURRENT_PROJECT_VERSION = 29;/g)||[]).length,2,"Both app configurations must use native build 29.");
-equal((project.match(/MARKETING_VERSION = 1\.03\.29;/g)||[]).length,2,"Both app configurations must use marketing version 1.03.29.");
+equal((project.match(/CURRENT_PROJECT_VERSION = 31;/g)||[]).length,2,"Both app configurations must use native build 31.");
+equal((project.match(/MARKETING_VERSION = 1\.03\.30;/g)||[]).length,2,"Both app configurations must use marketing version 1.03.30.");
 
-console.log(JSON.stringify({status:"passed",build:"1.03.29",checks,workspace:"native-swiftui",map:"MapKit",material:"Liquid Glass"}));
+console.log(JSON.stringify({status:"passed",build:"1.03.30",checks,workspace:"native-swiftui",map:"MapKit",material:"Liquid Glass"}));

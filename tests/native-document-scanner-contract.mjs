@@ -15,7 +15,7 @@ function match(source,pattern,message){checks+=1;assert.match(source,pattern,mes
 function ok(value,message){checks+=1;assert.ok(value,message)}
 
 const build=JSON.parse(version).build;
-equal(build,"1.03.29","The native Apple scanner must ship in Build 1.03.29.");
+equal(build,"1.03.30","The native Apple scanner must ship in Build 1.03.30.");
 
 // The browser app exposes the scanner only when the native WKWebView bridge exists.
 match(app,/window\.webkit\?\.messageHandlers\?\.fireVaultScanner\?\.postMessage/);
@@ -49,10 +49,10 @@ match(native,/jpegData\(compressionQuality: 0\.82\)/);
 match(native,/prepareAndDeliverScannerPage/);
 match(native,/fireVaultNativeScannerPage/);
 match(native,/fireVaultNativeScannerResolve/);
-match(native,/FireVault-iOS\/1\.03\.29/);
+match(native,/FireVault-iOS\/1\.03\.30/);
 
-equal((project.match(/CURRENT_PROJECT_VERSION = 29;/g)||[]).length,2,"Both app configurations must use native build 29.");
-equal((project.match(/MARKETING_VERSION = 1\.03\.29;/g)||[]).length,2,"Both app configurations must use version 1.03.29.");
+equal((project.match(/CURRENT_PROJECT_VERSION = 31;/g)||[]).length,2,"Both app configurations must use native build 31.");
+equal((project.match(/MARKETING_VERSION = 1\.03\.30;/g)||[]).length,2,"Both app configurations must use version 1.03.30.");
 match(project,/INFOPLIST_KEY_NSCameraUsageDescription = "FireVault uses the camera to photograph and scan fire alarm equipment and site documents\.";/);
 
 const marker="Build 1.03.25 — compact Apple Document Scanner handoff and save review";

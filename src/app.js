@@ -1,19 +1,19 @@
-import { BUILD, KEY, loadData, saveData, ensureSite, fullAddress, esc, uid, downloadBlob, syncSummary, syncQueue, syncConflicts, syncActivity, createSyncPackage, importSyncPackage, resolveSyncConflict, notePackageExport, deviceIdentity, recordSyncActivity, autoBackupInfo, latestAutoBackup, restoreAutoBackup, isDemoMode, setDemoMode, resetDemoData, securityFoundationSummary, securityAudit, recycleBinInfo, restoreRecycleRecord, purgeRecycleBin, recordSecurityEvent, validateVaultIntegrity } from "./storage.js?v=1.03.29";
-import { backendAdapterSummary, runBackendAdapterDiagnostics, backendAdapterManifest, PROVIDER_CONTRACT_VERSION, FILE_STORAGE_CATALOG, fileStoragePlanSummary, cloudFileStorageManifest, MICROSOFT_STORAGE_TYPES, microsoftStorageAccounts, saveMicrosoftStorageAccounts, createMicrosoftStorageAccount, microsoftStorageAccountById, microsoftAppRegistration, saveMicrosoftAppRegistration, microsoftStorageSummary, microsoftStorageManifest } from "./providers.js?v=1.03.29";
-import { encodePlusCode, isValidFullPlusCode, normalizePlusCode, plusCodePrecisionLabel } from "./open-location-code.js?v=1.03.29";
-import { hydrateVaultMedia, stageVaultMedia, prepareVaultWithMedia, mediaStorageSummary, requestPersistentMediaStorage, pruneOrphanedMedia, flushMediaWrites } from "./media-store.js?v=1.03.29";
-import { APP_PROFILE, APP_PROFILE_SCHEMA_VERSION, appTerm, appLabel, appNavigationLabel, appProfileExport } from "./app-profile.js?v=1.03.29";
-import { MODULE_REGISTRY, MODULE_REGISTRY_VERSION, MODULE_CLASSIFICATIONS, FUTURE_APP_COLUMNS, moduleRegistrySummary, moduleMatrixRows, moduleRegistryExport } from "./module-registry.js?v=1.03.29";
-import { MODULE_BINDINGS_VERSION, NAV_MODULE_REQUIREMENTS as NAV_MODULE_REQUIREMENTS_0955, ROUTE_MODULE_REQUIREMENTS as ROUTE_MODULE_REQUIREMENTS_0955, SETTINGS_MODULE_REQUIREMENTS as SETTINGS_MODULE_REQUIREMENTS_0955, ACCOUNT_TAB_BINDINGS, requirementsMet as moduleRequirementsMetFromBindings0955, moduleBindingsExport } from "./module-bindings.js?v=1.03.29";
-import { RECORD_SCHEMA, RECORD_SCHEMA_VERSION, recordFieldById, activeRecordFields, recordFieldEnabled, recordFieldRequired, activeDetailSections, recordDetailSectionEnabled, recordPhotoCategories, recordSchemaSummary, recordSchemaExport } from "./record-schema.js?v=1.03.29";
-import { WORKFLOW_SCHEMA, WORKFLOW_SCHEMA_VERSION, activeWorkflowActions, workflowActionEnabled, quickPhotoWorkflow, workflowSchemaSummary, workflowSchemaExport } from "./workflow-schema.js?v=1.03.29";
-import { THEME_PROFILE_SCHEMA_VERSION, resolveThemeProfile, applyThemeProfile, themeBrandAsset, themeWordmarkMarkup, themeProfileSummary, themeProfileExport } from "./theme-profile.js?v=1.03.29";
-import { CONTENT_PACK_SCHEMA_VERSION, CONTENT_SOURCE_TYPES, CONTENT_SOURCES, CONTENT_PACKS, resolveContentPackProfile, activeContentSources, activeContentPacks, contentPackLibraryFolders, contentPackSummary, contentPackRegistryExport } from "./content-pack-registry.js?v=1.03.29";
-import { SYNC_STORAGE_PROFILE_SCHEMA_VERSION, STORAGE_PROVIDER_TYPES, STORAGE_PROVIDERS, STORAGE_ROLES, resolveSyncStorageProfile, activeStorageProviders, storageProviderEnabled, storageRoleProviders, syncStorageSettingsTabEnabled, syncStorageSummary, syncStorageProfileExport } from "./sync-storage-profile.js?v=1.03.29";
-import { APP_FORGE_BLUEPRINT_SCHEMA_VERSION, appForgeReadinessSummary, validateAppForgeProfile, appForgeBlueprintExport } from "./app-forge-blueprint.js?v=1.03.29";
-import { APP_FORGE_RECIPE_SCHEMA_VERSION, appForgeRecipes, appForgeRecipeSummary, appForgeRecipeBlueprintExport, appForgeRecipeCatalogExport } from "./app-forge-recipes.js?v=1.03.29";
-import { APP_FORGE_FACTORY_SCHEMA_VERSION, createAppForgeGenerationRequest, appForgeFactoryManifest, appForgeFactorySummary, appForgeFactorySchemaExport } from "./app-forge-factory.js?v=1.03.29";
-import { APP_FORGE_GENERATOR_SCHEMA_VERSION, appForgeGeneratorPlan, appForgeGeneratorSummary, generateAppForgePwaPackage, appForgeGeneratorSchemaExport } from "./app-forge-generator.js?v=1.03.29";
+import { BUILD, KEY, loadData, saveData, ensureSite, fullAddress, esc, uid, downloadBlob, syncSummary, syncQueue, syncConflicts, syncActivity, createSyncPackage, importSyncPackage, resolveSyncConflict, notePackageExport, deviceIdentity, recordSyncActivity, autoBackupInfo, latestAutoBackup, restoreAutoBackup, isDemoMode, setDemoMode, resetDemoData, securityFoundationSummary, securityAudit, recycleBinInfo, restoreRecycleRecord, purgeRecycleBin, recordSecurityEvent, validateVaultIntegrity } from "./storage.js?v=1.03.30";
+import { backendAdapterSummary, runBackendAdapterDiagnostics, backendAdapterManifest, PROVIDER_CONTRACT_VERSION, FILE_STORAGE_CATALOG, fileStoragePlanSummary, cloudFileStorageManifest, MICROSOFT_STORAGE_TYPES, microsoftStorageAccounts, saveMicrosoftStorageAccounts, createMicrosoftStorageAccount, microsoftStorageAccountById, microsoftAppRegistration, saveMicrosoftAppRegistration, microsoftStorageSummary, microsoftStorageManifest } from "./providers.js?v=1.03.30";
+import { encodePlusCode, isValidFullPlusCode, normalizePlusCode, plusCodePrecisionLabel } from "./open-location-code.js?v=1.03.30";
+import { hydrateVaultMedia, stageVaultMedia, prepareVaultWithMedia, mediaStorageSummary, requestPersistentMediaStorage, pruneOrphanedMedia, flushMediaWrites } from "./media-store.js?v=1.03.30";
+import { APP_PROFILE, APP_PROFILE_SCHEMA_VERSION, appTerm, appLabel, appNavigationLabel, appProfileExport } from "./app-profile.js?v=1.03.30";
+import { MODULE_REGISTRY, MODULE_REGISTRY_VERSION, MODULE_CLASSIFICATIONS, FUTURE_APP_COLUMNS, moduleRegistrySummary, moduleMatrixRows, moduleRegistryExport } from "./module-registry.js?v=1.03.30";
+import { MODULE_BINDINGS_VERSION, NAV_MODULE_REQUIREMENTS as NAV_MODULE_REQUIREMENTS_0955, ROUTE_MODULE_REQUIREMENTS as ROUTE_MODULE_REQUIREMENTS_0955, SETTINGS_MODULE_REQUIREMENTS as SETTINGS_MODULE_REQUIREMENTS_0955, ACCOUNT_TAB_BINDINGS, requirementsMet as moduleRequirementsMetFromBindings0955, moduleBindingsExport } from "./module-bindings.js?v=1.03.30";
+import { RECORD_SCHEMA, RECORD_SCHEMA_VERSION, recordFieldById, activeRecordFields, recordFieldEnabled, recordFieldRequired, activeDetailSections, recordDetailSectionEnabled, recordPhotoCategories, recordSchemaSummary, recordSchemaExport } from "./record-schema.js?v=1.03.30";
+import { WORKFLOW_SCHEMA, WORKFLOW_SCHEMA_VERSION, activeWorkflowActions, workflowActionEnabled, quickPhotoWorkflow, workflowSchemaSummary, workflowSchemaExport } from "./workflow-schema.js?v=1.03.30";
+import { THEME_PROFILE_SCHEMA_VERSION, resolveThemeProfile, applyThemeProfile, themeBrandAsset, themeWordmarkMarkup, themeProfileSummary, themeProfileExport } from "./theme-profile.js?v=1.03.30";
+import { CONTENT_PACK_SCHEMA_VERSION, CONTENT_SOURCE_TYPES, CONTENT_SOURCES, CONTENT_PACKS, resolveContentPackProfile, activeContentSources, activeContentPacks, contentPackLibraryFolders, contentPackSummary, contentPackRegistryExport } from "./content-pack-registry.js?v=1.03.30";
+import { SYNC_STORAGE_PROFILE_SCHEMA_VERSION, STORAGE_PROVIDER_TYPES, STORAGE_PROVIDERS, STORAGE_ROLES, resolveSyncStorageProfile, activeStorageProviders, storageProviderEnabled, storageRoleProviders, syncStorageSettingsTabEnabled, syncStorageSummary, syncStorageProfileExport } from "./sync-storage-profile.js?v=1.03.30";
+import { APP_FORGE_BLUEPRINT_SCHEMA_VERSION, appForgeReadinessSummary, validateAppForgeProfile, appForgeBlueprintExport } from "./app-forge-blueprint.js?v=1.03.30";
+import { APP_FORGE_RECIPE_SCHEMA_VERSION, appForgeRecipes, appForgeRecipeSummary, appForgeRecipeBlueprintExport, appForgeRecipeCatalogExport } from "./app-forge-recipes.js?v=1.03.30";
+import { APP_FORGE_FACTORY_SCHEMA_VERSION, createAppForgeGenerationRequest, appForgeFactoryManifest, appForgeFactorySummary, appForgeFactorySchemaExport } from "./app-forge-factory.js?v=1.03.30";
+import { APP_FORGE_GENERATOR_SCHEMA_VERSION, appForgeGeneratorPlan, appForgeGeneratorSummary, generateAppForgePwaPackage, appForgeGeneratorSchemaExport } from "./app-forge-generator.js?v=1.03.30";
 window.__FIREVAULT_MODULE_READY = true;
 window.__FIREVAULT_BUILD = BUILD;
 const ACTIVE_THEME_0958=resolveThemeProfile(APP_PROFILE);
@@ -264,13 +264,13 @@ function showDemoAccountChoice10317(){
   overlay.className="firstRunOverlay10317 demoAccountChoice10317";
   overlay.innerHTML=`<section class="firstRunDialog10317 demoChoiceDialog10317" role="dialog" aria-modal="true" aria-labelledby="demoChoiceTitle10317"><header class="demoChoiceHead10317"><span>＋</span><div><em>FIRST ACCOUNT</em><h2 id="demoChoiceTitle10317">Turn off Demo Mode?</h2></div><button class="ghost" id="closeDemoChoice10317" aria-label="Cancel">×</button></header><p>Demo accounts are fictional. Choose <strong>Yes</strong> before entering real customer information, or choose <strong>No</strong> to practice with a temporary demo account.</p><div class="demoChoiceSafety10317"><i>✓</i><span>Your demo changes and real customer vault stay separate.</span></div><footer class="demoChoiceActions10317"><button class="ghost" id="keepDemoAccount10317">No — Practice in Demo</button><button class="primary" id="useRealAccount10317">Yes — Use Real Vault</button></footer></section>`;
   document.body.appendChild(overlay);document.body.classList.add("fvFirstRunOpen10317");
-  const close=()=>closeFirstRunSurface10317(overlay);
-  overlay.querySelector("#closeDemoChoice10317").onclick=close;
-  overlay.querySelector("#keepDemoAccount10317").onclick=()=>{close();firstAccountGuide10317=true;demoAccountChoiceResolved10317=true;startAccountCreation10317();demoAccountChoiceResolved10317=false;};
+  const close=(restoreShell=false)=>{closeFirstRunSurface10317(overlay);if(restoreShell)resumeNativeAppShell10330();};
+  overlay.querySelector("#closeDemoChoice10317").onclick=()=>close(true);
+  overlay.querySelector("#keepDemoAccount10317").onclick=()=>{close(false);firstAccountGuide10317=true;demoAccountChoiceResolved10317=true;startAccountCreation10317();demoAccountChoiceResolved10317=false;};
   overlay.querySelector("#useRealAccount10317").onclick=()=>{
     setDemoMode(false);
     if(isDemoMode()){const text=overlay.querySelector(".demoChoiceSafety10317 span");if(text)text.textContent="Demo Mode could not be turned off because browser storage is unavailable.";return;}
-    data=loadData({allowEmptyReal:true});saveData(data);applyTheme();close();firstAccountGuide10317=true;startAccountCreation10317();
+    data=loadData({allowEmptyReal:true});saveData(data);applyTheme();close(false);firstAccountGuide10317=true;startAccountCreation10317();
   };
 }
 
@@ -2452,6 +2452,7 @@ function render(){
     animateRouteEntry0781();
     installLayoutGuard0785();
     privacyInitialize0791();
+    syncNativeAppShell10330();
   }catch(err){ showError(err); }
 }
 
@@ -4744,6 +4745,107 @@ function revealActiveAccountTab1014(){
   rail.scrollLeft+=activeCenter-railCenter;
 }
 
+/* Build 1.03.30 — native everyday app shell. The web vault remains the data authority. */
+function nativeAppShellAvailable10330(){
+  return !!window.webkit?.messageHandlers?.fireVaultAppShell?.postMessage;
+}
+function nativeAppAccountPayload10330(s){
+  const primary=primaryContact477(s);
+  const recent=recentSiteTime476(s);
+  return {
+    id:String(s.id||""),
+    name:String(s.name||appLabel("unnamedRecord")),
+    address:String(fullAddress(s)||"No address saved"),
+    accountId:String(accountId069(s)||""),
+    category:String(accountCategoryLabel0735(s)||""),
+    phone:String(formatPhone0758(primary?.phone||s.sitePhone)||""),
+    favorite:!!isPinnedSite566(s),
+    latitude:hasGps(s)?Number(s.gps.lat):null,
+    longitude:hasGps(s)?Number(s.gps.lng):null,
+    recentText:recent?new Date(recent).toISOString():""
+  };
+}
+const NATIVE_SETTINGS_GROUPS_10330=[
+  {id:"profile",title:"Profile",subtitle:"Your field identity",symbol:"person.crop.circle",tint:"blue",tabs:["tech"]},
+  {id:"field",title:"Field Tools",subtitle:"Photos, maps, GPS, and Plus Codes",symbol:"wrench.and.screwdriver",tint:"green",tabs:["overlay","gps","plusCodes"]},
+  {id:"reports",title:"Reports",subtitle:"Reports and customer email",symbol:"doc.text",tint:"purple",tabs:["reports","email"]},
+  {id:"data",title:"Data & Security",subtitle:"Storage, import, backup, and protection",symbol:"externaldrive",tint:"amber",tabs:["cloudFiles","microsoftStorage","sync","customerImport","categories","backup","webdav","privacy","security"]},
+  {id:"help",title:"Help & About",subtitle:"Manual, updates, Demo Mode, and app information",symbol:"questionmark.circle",tint:"red",tabs:["manual","updates","demo","about"]}
+];
+const NATIVE_SETTING_SYMBOLS_10330={
+  tech:"person.text.rectangle",overlay:"camera.filters",gps:"location",plusCodes:"plus.square.dashed",
+  reports:"doc.text",email:"envelope",cloudFiles:"folder",microsoftStorage:"cloud",sync:"arrow.triangle.2.circlepath",
+  customerImport:"square.and.arrow.down",categories:"tag",backup:"externaldrive.badge.timemachine",webdav:"server.rack",
+  privacy:"lock",security:"shield.checkered",manual:"book.closed",updates:"arrow.down.circle",demo:"theatermasks",about:"info.circle"
+};
+function nativeSettingsPayload10330(){
+  const tabs=settingsTabs();
+  return NATIVE_SETTINGS_GROUPS_10330.map(group=>{
+    const items=group.tabs.map(id=>{
+      const tab=tabs.find(row=>row[0]===id);if(!tab)return null;
+      const status=settingsTabStatus0880(id);
+      return {id,title:String(tab[1]||id),subtitle:String(tab[2]||status[1]||""),symbol:NATIVE_SETTING_SYMBOLS_10330[id]||"gearshape",status:String(status[0]||"")};
+    }).filter(Boolean);
+    const status=group.id==="profile"?settingsTabStatus0880("tech")[0]:group.id==="help"?`v${BUILD}`:`${items.length} options`;
+    return {...group,status:String(status),items};
+  }).filter(group=>group.items.length);
+}
+function nativeAppShellPayload10330(){
+  const accounts=[...(data.sites||[])].map(nativeAppAccountPayload10330);
+  const nearby=(nearbyState?nearbyAllRows069():[]).slice(0,30).map(row=>({
+    id:String(row.s.id||""),account:nativeAppAccountPayload10330(row.s),distanceMeters:Number(row.meters)||0,distanceLabel:String(distanceLabel(row.meters))
+  }));
+  const locationStatus=nearbyScanStatus0652.state==="scanning"?String(nearbyScanStatus0652.message||"Locating this iPhone…"):
+    nearbyScanStatus0652.state==="error"?"Location needs attention":nearbyState?`Updated ${new Date(nearbyState.at).toLocaleTimeString([], {hour:"numeric",minute:"2-digit"})}`:"Location not checked";
+  return {
+    build:BUILD,
+    initialTab:view==="sites"?"accounts":view==="settings"?"settings":"nearby",
+    demoMode:isDemoMode(),
+    today:new Date().toLocaleDateString([], {weekday:"short",month:"short",day:"numeric"}),
+    technicianName:String(data.settings?.technician?.name||""),
+    locationStatus,
+    accounts,nearby,settingsGroups:nativeSettingsPayload10330()
+  };
+}
+function shouldPresentNativeAppShell10330(){
+  return view==="home"||view==="sites"||(view==="settings"&&mode!=="settingsDetail");
+}
+function postNativeAppShell10330(action,payload=null){
+  if(!nativeAppShellAvailable10330())return false;
+  try{window.webkit.messageHandlers.fireVaultAppShell.postMessage(payload?{action,payload}:{action});return true;}
+  catch(error){console.warn("Native app shell unavailable",error);return false;}
+}
+function syncNativeAppShell10330(){
+  if(!nativeAppShellAvailable10330())return;
+  requestAnimationFrame(()=>shouldPresentNativeAppShell10330()?postNativeAppShell10330("present",nativeAppShellPayload10330()):postNativeAppShell10330("dismiss"));
+}
+function resumeNativeAppShell10330(){
+  if(shouldPresentNativeAppShell10330())syncNativeAppShell10330();
+}
+window.fireVaultNativeAppAction=function(message={}){
+  const action=String(message.action||"");
+  const target=(data.sites||[]).find(item=>item.id===String(message.id||""));
+  switch(action){
+    case "refreshNearby":
+      view="home";mode=null;runNearbyScan0652("home");[50,900,2500,6000].forEach(delay=>setTimeout(syncNativeAppShell10330,delay));break;
+    case "openAccount":
+      if(!target)return;selectedSiteId=target.id;accountDetailReturn0952=message.source==="nearby"?"home":"sites";mode=null;route("siteDetail");break;
+    case "addAccount":
+      selectedSiteId=null;mode=null;startAccountCreation10317();break;
+    case "photo":
+      quickPhotoStart0950(String(message.id||""));break;
+    case "routeAccount":
+      if(target)routeSite10323(target);break;
+    case "callAccount":{
+      if(!target)return;const primary=primaryContact477(target),phone=formatPhone0758(primary?.phone||target.sitePhone)||"";
+      if(phone)location.href=`tel:${phone.replace(/[^+\d]/g,"")}`;else toast("No phone number is saved for this account.");break;
+    }
+    case "openSetting":
+      settingsGroup067=String(message.group||settingsGroupForTab067(String(message.id||"")));settingsTab=String(message.id||"tech");mode="settingsDetail";view="settings";render();break;
+    default:break;
+  }
+};
+
 /* Build 1.03.29 — native Field Workspace. The web vault remains the data authority. */
 function nativeFieldWorkspaceAvailable10329(){
   return !!window.webkit?.messageHandlers?.fireVaultWorkspace?.postMessage;
@@ -5644,7 +5746,7 @@ function quickPhotoEnsureInput0950(){
   const input=document.createElement("input");
   input.type="file";input.accept="image/*";if(QUICK_PHOTO_WORKFLOW_0957.cameraFacing!=="none")input.setAttribute("capture",QUICK_PHOTO_WORKFLOW_0957.cameraFacing);input.hidden=true;input.id="quickPhotoInput0950";
   input.addEventListener("change",quickPhotoFileSelected0950);
-  input.addEventListener("cancel",()=>resumeNativeFieldWorkspace10329());
+  input.addEventListener("cancel",()=>{resumeNativeFieldWorkspace10329();resumeNativeAppShell10330();});
   document.body.appendChild(input);quickPhotoInput0950=input;return input;
 }
 function quickPhotoStart0950(accountId=""){
@@ -5687,7 +5789,7 @@ async function quickPhotoFileSelected0950(event){
     quickPhotoShowReview0950();
   }catch(err){console.error(err);toast("The photo could not be prepared. Try again.","error");}
 }
-function quickPhotoCloseReview0950(){quickPhotoOverlay0950?.remove();quickPhotoOverlay0950=null;}
+function quickPhotoCloseReview0950(restoreShell=true){quickPhotoOverlay0950?.remove();quickPhotoOverlay0950=null;if(restoreShell){resumeNativeFieldWorkspace10329();resumeNativeAppShell10330();}}
 function quickPhotoReviewAccountMarkup0950(account){
   const content=`<span>${esc(account?.name||appLabel("chooseRecord"))}</span><small>${esc(quickPhotoAccountMeta0950(account))}</small>`;
   return QUICK_PHOTO_WORKFLOW_0957.allowAccountChange
@@ -5719,11 +5821,11 @@ function quickPhotoReviewMarkup0950(){
   </section>`;
 }
 function quickPhotoShowReview0950(){
-  quickPhotoCloseReview0950();
+  quickPhotoCloseReview0950(false);
   const overlay=document.createElement("div");overlay.className="quickPhotoOverlay0950";overlay.innerHTML=quickPhotoReviewMarkup0950();document.body.appendChild(overlay);quickPhotoOverlay0950=overlay;
   overlay.addEventListener("click",event=>{if(event.target===overlay)quickPhotoCloseReview0950();});
   document.getElementById("quickPhotoClose0950")?.addEventListener("click",quickPhotoCloseReview0950);
-  document.getElementById("quickPhotoRetake0950")?.addEventListener("click",()=>{quickPhotoCloseReview0950();const input=quickPhotoEnsureInput0950();input.value="";input.click();});
+  document.getElementById("quickPhotoRetake0950")?.addEventListener("click",()=>{quickPhotoCloseReview0950(false);const input=quickPhotoEnsureInput0950();input.value="";input.click();});
   document.getElementById("quickPhotoChangeAccount0950")?.addEventListener("click",()=>quickPhotoOpenAccountPicker0950(account=>{quickPhotoDraft0950.accountId=account.id;if(QUICK_PHOTO_WORKFLOW_0957.rememberAccount)quickPhotoWriteSafe0950(QUICK_PHOTO_LAST_ACCOUNT_KEY0950,account.id);quickPhotoShowReview0950();}));
   document.getElementById("quickPhotoCategory0950")?.addEventListener("change",event=>{quickPhotoDraft0950.category=event.target.value||workflowPhotoDefaultCategory0957();if(QUICK_PHOTO_WORKFLOW_0957.rememberCategory)quickPhotoWriteSafe0950(QUICK_PHOTO_LAST_CATEGORY_KEY0950,quickPhotoDraft0950.category);quickPhotoRenderPreview0950();});
   document.getElementById("quickPhotoOverlayToggle0950")?.addEventListener("change",event=>{quickPhotoDraft0950.useOverlay=event.target.checked;quickPhotoRenderPreview0950();});
@@ -5752,10 +5854,10 @@ function quickPhotoOpenAccountPicker0950(onSelect=null,openCameraAfter=false){
   const accounts=[...(data.sites||[])].sort((a,b)=>String(a.name||"").localeCompare(String(b.name||""),undefined,{sensitivity:"base",numeric:true}));
   overlay.innerHTML=`<section class="quickPhotoPicker0950" role="dialog" aria-modal="true" aria-labelledby="quickPhotoPickerTitle0950"><header><div><span>PHOTO ${esc(recordSingular.toUpperCase())}</span><h2 id="quickPhotoPickerTitle0950">${esc(appLabel("chooseRecord"))}</h2></div><button type="button" class="ghost" id="quickPhotoPickerClose0950">×</button></header><div class="quickPhotoPickerSearch0950">${fvIcon073("search")}<input id="quickPhotoAccountSearch0950" type="search" placeholder="Search name, address, or ${esc(recordIdLabel)}" autocomplete="off"></div><div class="quickPhotoAccountList0950" id="quickPhotoAccountList0950">${accounts.map(account=>`<button type="button" data-quick-photo-account="${esc(account.id)}" data-search="${esc([account.name,account.externalAccountId,account.accountId,fullAddress(account)].filter(Boolean).join(" ").toLowerCase())}"><strong>${esc(account.name||appLabel("unnamedRecord"))}</strong><small>${esc(quickPhotoAccountMeta0950(account))}</small></button>`).join("")||`<div class="empty">No ${esc(recordsLower)} are available.</div>`}</div></section>`;
   document.body.appendChild(overlay);quickPhotoPicker0950=overlay;
-  const close=()=>{overlay.remove();if(quickPhotoPicker0950===overlay)quickPhotoPicker0950=null;};
-  overlay.addEventListener("click",event=>{if(event.target===overlay)close();});document.getElementById("quickPhotoPickerClose0950").onclick=close;
+  const close=(restoreShell=true)=>{overlay.remove();if(quickPhotoPicker0950===overlay)quickPhotoPicker0950=null;if(restoreShell){resumeNativeFieldWorkspace10329();resumeNativeAppShell10330();}};
+  overlay.addEventListener("click",event=>{if(event.target===overlay)close(true);});document.getElementById("quickPhotoPickerClose0950").onclick=()=>close(true);
   document.getElementById("quickPhotoAccountSearch0950").oninput=event=>{const q=event.target.value.trim().toLowerCase();document.querySelectorAll("[data-quick-photo-account]").forEach(button=>button.hidden=Boolean(q)&&!button.dataset.search.includes(q));};
-  document.querySelectorAll("[data-quick-photo-account]").forEach(button=>button.onclick=()=>{const account=quickPhotoAccountById0950(button.dataset.quickPhotoAccount);if(!account)return;close();quickPhotoDraft0950.accountId=account.id;if(QUICK_PHOTO_WORKFLOW_0957.rememberAccount)quickPhotoWriteSafe0950(QUICK_PHOTO_LAST_ACCOUNT_KEY0950,account.id);if(onSelect)onSelect(account);else if(openCameraAfter)quickPhotoStart0950(account.id);});
+  document.querySelectorAll("[data-quick-photo-account]").forEach(button=>button.onclick=()=>{const account=quickPhotoAccountById0950(button.dataset.quickPhotoAccount);if(!account)return;close(false);quickPhotoDraft0950.accountId=account.id;if(QUICK_PHOTO_WORKFLOW_0957.rememberAccount)quickPhotoWriteSafe0950(QUICK_PHOTO_LAST_ACCOUNT_KEY0950,account.id);if(onSelect)onSelect(account);else if(openCameraAfter)quickPhotoStart0950(account.id);});
   setTimeout(()=>document.getElementById("quickPhotoAccountSearch0950")?.focus(),80);
 }
 async function quickPhotoSave0950(){
@@ -8804,7 +8906,7 @@ function manualHome058(){
     ${bookmarked.length?`<section class="academySaved067"><div><span>Saved pages</span><strong>Bookmarks</strong></div>${bookmarked.map(ch=>`<button data-manual-chapter="${ch.id}"><span>${ch.icon}</span><strong>${esc(ch.title)}</strong><b>›</b></button>`).join('')}</section>`:''}
     <details class="academyMore067"><summary><span>More learning tools</span><b>⌄</b></summary><div><button data-manual-view="tutorials">Interactive Tutorials</button><button data-manual-view="tips">Field Tips</button><button data-manual-view="tour">Show Me Around</button><button data-manual-view="revisions">Revision History</button><button data-manual-view="tracker">Documentation Tracker</button></div></details>
     ${pinnedLearning059()}
-    <p class="academyReviewNote067">Manual revision 1.03.29 · Reviewed July 2026. Documentation must be checked with every release.</p>
+    <p class="academyReviewNote067">Manual revision 1.03.30 · Reviewed July 2026. Documentation must be checked with every release.</p>
   </div>`;
 }
 function manualList058(){
@@ -8826,21 +8928,21 @@ function manualChapterView058(){
 }
 function manualSimplePage058(type){
  const pages={
-  quick:["🚀","Quick Start Guide","Get FireVault ready for a normal field day.",[["1. Verify the build","Confirm the green build badge shows 1.03.29 before entering production information."],["2. Complete Technician Profile","Enter your name, company, phone, email, and license or employee identification."],["3. Review permissions","Allow location and photo access only when FireVault requests them and the feature is needed."],["4. Create or open a site","Add the customer name, full address, panel details, contacts, access notes, and GPS location."],["5. Document the site","Use Notes, Files & Scans, Equipment, and Map & Locations inside Account Details."],["6. Finish and protect the data","Review the account, then export a current backup after significant field documentation."]]],
+  quick:["🚀","Quick Start Guide","Get FireVault ready for a normal field day.",[["1. Verify the build","Confirm the green build badge shows 1.03.30 before entering production information."],["2. Complete Technician Profile","Enter your name, company, phone, email, and license or employee identification."],["3. Review permissions","Allow location and photo access only when FireVault requests them and the feature is needed."],["4. Create or open a site","Add the customer name, full address, panel details, contacts, access notes, and GPS location."],["5. Document the site","Use Notes, Files & Scans, Equipment, and Map & Locations inside Account Details."],["6. Finish and protect the data","Review the account, then export a current backup after significant field documentation."]]],
   new:["🆕","What’s New in 1.03.24","Bottom navigation is more reliable and readable without adding features.",[["Four-button dock","Nearby, Search, Photo, and Settings now share four equal-width columns."],["Readable controls","Larger icons and single-line labels remain clear on narrow iPhones."],["Search stability","Account Directory restores the dock after typing, dictation, paste, clearing, and keyboard dismissal."],["Dynamic modules","If a navigation module is disabled, the dock automatically uses the remaining visible-button count."],["Maps retained","Build 1.03.23 native Apple Maps workflows and browser fallbacks remain unchanged."]]],
   tips:["🧰","Field Tips","Short practices that improve the usefulness of FireVault records.",[["Write for the next technician","Include the exact panel, circuit, device, location, symptom, test result, and next action instead of relying on memory."],["Photograph context first","Take one wide photo showing the equipment location before close-up terminal, label, or damage photos."],["Keep notes factual","Use Notes for observations and follow-up details, then attach related photos, scans, equipment, or exact map locations."],["Confirm the account","Before using Quick Capture, verify the selected customer site to prevent records from being stored under the wrong account."],["Back up before updates","Download an external backup before a major update or device change and after completing significant field documentation."]]],
   revisions:["📋","Revision History","Application and documentation checkpoints.",[[["1.03.24","Repairs the four-button bottom dock with dynamic columns, larger readable controls, iPhone safe-area spacing, and reliable Search-screen restoration."],["1.03.23","Adds native Apple Maps search, Core Location GPS, Apple reverse geocoding, Apple map previews, and Apple Maps routes with browser-safe fallback."],["1.03.22","Repairs first-use Demo Mode exit by establishing the empty real vault before reload or Customer CSV analysis."],["1.03.21","Removes Account Directory quick actions, keeps bottom navigation visible through search, removes the redundant Account Detail location panel, and strengthens tab contrast."],["1.03.20","Polishes Nearby Accounts controls, selected-account context, distance readability, scrolling, and responsive map-list layout without adding features."],["1.03.19","Shows Account Directory actions only on the settled top account, repairs immediate multi-word search, and prevents bottom-navigation label clipping."],["1.03.18","Rebuilds Add Account with three-step navigation, live readiness, business and street-address search, GPS assistance, structured review, change invalidation, and required manual confirmation."],["1.03.17","Adds a minimal first-run guide, a protected Demo Mode decision, and confirmed GPS address and commercial-name assistance for the first account."],["1.03.16","Polishes Contact, Equipment, Task, and Deficiency lists with compact headers, readable cards, 44 pixel filters, and phone action grids without changing workflows."],["1.03.15","Standardizes Contact, Equipment, Task, and Deficiency editors with consistent headers, readable fields, Unsaved states, and sticky actions without changing workflows."],["1.03.14","Polishes Add and Edit Account with a working Unsaved header state, clearer labels and Required badges, tighter sections, and safer phone actions without changing fields or validation."],["1.03.13","Cleans up Quick Photo review and Take Photo / Upload Photo with compact phone categories, readable toggles, and a two-by-two action grid without changing photo behavior."],["1.03.12","Improves active-screen text and touch targets across Account Directory, Account Detail, Settings, and compact Photo Overlay controls without changing workflows or stored data."],["1.03.11","Adds complete runtime and offline asset-graph validation for HTML, imports, CSS, manifest, branding, Help media, icons, and current build tokens without changing app features."],["1.03.10","Adds verified GitHub Pages direct publishing, current root-extraction instructions, and automated nested-package and stale-build rejection without changing app features."],["1.03.9","Locks realistic account data, Plus Codes, photo metadata, overlay settings, technician settings, recovery, backup, and service-worker isolation into the release suite."],["1.03.8","Adds a bounded fresh-first navigation bootstrap with fast cached fallback, background refresh, and executable fast, slow, offline, and first-install simulations."],["1.03.7","Hardens the final Update Ready geometry, adds a complete PWA upgrade contract, and expands Photo Overlay capture and import regression coverage without new features."],["1.03.6","Repairs the iPhone Update Ready lockup by removing retired banner geometry, preserving the centered dialog, and adding a safe backdrop-dismiss path."],["1.03.5","Redesigns Photo Overlay Settings as a compact progressive workspace with an always-visible preview, quick presets, expandable fields, and collapsed advanced sections."],["1.03.4","Adds category-aware FIREVAULT FIELD NOTES taglines, restores Photo Overlay in Settings, and provides a separate per-photo Technician Overlay option."],["1.03.3","Redesigns Update Ready as a large centered dialog with a blurred backdrop, clear data-safety messaging, release notes, and resilient recovery controls."],["1.03.2","Generates and persists Google Plus Codes during Customer CSV processing and restores Photo Overlay as a standalone Settings section with complete controls."],["1.03.1","Moves Customer CSV import out of Demo Mode before analysis, verifies real-vault persistence, and retains Update Ready lockup recovery."],["1.03.0","Cleans up Nearby, Account Detail, Settings, Photo Overlay, Email Preview, storage identities, visual Help, and update recovery."],["1.02.0","Adds the foreground arrival prompt and On-Site Guide with shared-account confirmation, property mapping, ordered exact locations, and manual Account Detail access."],["1.01.5","Redesigns Update Ready as a clear field-safe sheet with full-size actions, installation progress, duplicate handling, and retry guidance."],["1.01.4","Keeps the selected Account Detail tab fully visible after every tab change on narrow phones without changing tab content or workflows."],["1.01.3","Replaces the wrapping Account Detail Favorite label with a compact star-only 44px control while preserving its action and accessible state."],["1.01.2","Polishes Photo Overlay with a clearer step-by-step editor, larger field controls, compact branding, and responsive phone/iPad layouts."],["1.01.1","Polishes Account Detail with larger field-ready actions, clearer account hierarchy, simplified icon tabs, and responsive phone/iPad layouts."],["1.01.0","Simplifies FireVault Settings into six technician-focused areas and hides AppForge factory tools from normal app use."],["1.00.0","Adds the AppForge Generator Engine with deterministic, isolated, installable PWA ZIP packages for all four Product Recipes."],["0.99.0","Adds deterministic AppForge Factory Manifests with generation requests, composed profiles, validation gates, output inventories, requirements, and safety guardrails."],["0.98.0","Adds validated AppForge Product Recipes for FireVault, Wyoming Explorer, Wyoming Fishing Guide, and Ghost Towns Guide with explicit publication requirements."],["0.97.0","Adds a validated AppForge Product Blueprint that packages identity, modules, data, workflows, branding, content, and storage as one portable build definition."],["0.96.0","Adds a profile-driven Sync & Storage Profile for local backends, approved providers, backups, collaboration policy, conflict handling, and credential safeguards."],["0.95.9","Adds profile-driven data sources and content packs, derives Library folders from active packs, and prepares verified versioned catalogs without downloading remote data."],["0.95.8","Adds a profile-driven Theme Profile for brand assets, semantic colors, typography, shape, and mobile browser chrome while preserving FireVault’s dark technician interface."],["0.95.7","Adds profile-defined action surfaces and Quick Photo workflow presets while preserving FireVault's complete technician workflow."],["0.95.6","Adds a profile-defined record schema for account fields, detail sections, and photo categories while keeping FireVault's complete fire-alarm data model active."],["0.95.5","Makes navigation, Account Detail tabs and actions, routes, and Settings respond to the App Profile enabled-module list while preserving all FireVault modules."],["0.95.4","Connects the App Profile terminology layer to live Search, Nearby, Account Detail, account forms, Quick Photo, navigation, and photo-category workflows while preserving FireVault labels and storage."],["0.95.3","Adds a central App Profile, terminology layer, module registry, in-app architecture view, and reusable feature matrix while preserving FireVault workflows and storage."],["0.95.2","Redesigns Account Detail with a compact identity header, four fast actions, reordered tabs, responsive iPad content, and origin-aware Back navigation."],["0.95.1","Rebuilds Account Directory as a compact dark two-line list with a smaller search header, slim filters, dense account rows, and preserved quick actions."],["0.95.0","Adds a bottom-navigation Photo button with current-account capture, overlay preview, account confirmation, automatic image resizing, category memory, and IndexedDB-safe saving."],["0.94.10","Fixes the Account Detail crash caused by an undefined account-context value when opening an account from Nearby Accounts or Search."],["0.94.9","Shows Tech Info as a single Photo Overlay field with its own adjustment options and hides individual technician profile fields from the overlay editor."],["0.94.8","Repairs Technician Overlay Template wrapping and adds group-level left, center, or right alignment with exact preview/export matching."],["0.94.7","Adds a resized technician profile photo and completion-aware collapsible Technician sections that remain open until required information is filled."],["0.94.6","Enlarges Photo Overlay editing controls, adds a reusable Technician Overlay Template under Profile, and replaces the old Technician + Phone shortcut with Technician Info."],["0.94.5","Makes Photo Overlay field rows thinner, adds per-field flush-left/flush-right alignment, and adds a one-tap Technician + Phone flush-right layout."],["0.94.4","Replaces raw Photo Overlay text editing with an auto-saving field builder that supports one-tap add, reordering, line control, and removal without a keyboard confirmation step."],["0.94.3","Maximizes the Photo Overlay Field Photo preview, removes the full detail header, and repairs field insertion and long overlay text rendering."],["0.94.2","Keeps the Photo Overlay Field Photo preview visible while controls scroll, reduces the preview size, and removes the visible sample-photo attribution line."],["0.94.1","Aligned the Nearby bottom navigation with Search and Settings and removed the red active-button underline across all three sections."],["0.94.0","Polished Settings section hierarchy, rebuilt the Account Directory header and search controls, improved active navigation, and standardized active-screen spacing and touch targets."],["0.93.1","Removed the three Settings shortcut buttons and repaired horizontal page overflow so Settings remains locked to vertical scrolling on iPhone and iPad."],["0.93.0","Improved field reliability with a visible splash presentation, unsaved-change protection, duplicate-action prevention, corrected navigation states, keyboard-safe forms, and consistent interaction feedback."],["0.92.0","Introduced a canonical release-facing design system for global chrome, Account Directory, Account Detail, Settings, Nearby, forms, cards, buttons, and responsive iPhone/iPad layouts."],["0.91.1","Rebuilt the three Settings status shortcuts as equal-width responsive controls with clear icons, readable status text, and reliable iPhone/iPad alignment."],["0.91.0","Moved photos and scanned-page payloads from the main localStorage vault into IndexedDB, added storage health and protection controls, preserved complete-media exports, and retained safe legacy migration."],["0.90.0","Core cleanup removed retired scanner capture and service timers, shortened startup, removed the global portrait lock, standardized Account terminology, and added release-safe error recovery."],["0.89.0","Rebuilt Photo Overlay as a compact visual studio with an exact canvas preview, quick presets, reorganized content/layout/branding controls, expanded account fields, and a real fire-alarm deficiency sample photo with attribution."],["0.88.0","Overhauled Settings with sticky search, live status summaries, richer grouped cards, consistent detail screens, and improved iPad layout while preserving every release-critical setting."],["0.87.11","Restored WebDAV Backup to Data & Backup and Settings search while preserving saved connection settings and transfer tools."],["0.87.10","Aligned the four Account Directory card actions across the full card width in Call, Route, Add Note, Favorite order."],["0.87.9","Cleaned up the Account Directory with layered depth, raised controls, dimensional account cards, and category-accented shading while preserving fluid scrolling."],["0.87.8","Improved Account Directory scrolling performance and added iPad portrait, landscape, and split-view layout refinements."],["0.87.4","Added spacing and search to Settings, removed the Field category, moved Google Plus Codes under Maps & GPS, enlarged Account ID/category tags, moved Favorite beside Call, removed empty panel/contact text, and restored Nearby-style card scroll locking."],["0.87.3","Moved account addresses below site names, placed Account ID and category tags beneath the address, and changed Settings to a dark grouped-list design without a duplicate logo."],["0.87.2","Polished Account Directory cards and removed the default Ready, No Open Work, and GPS status tags so only actionable issues are shown."],["0.87.1","Rebuilt Account Directory, Search, account cards, and Account Detail from the stable 0.86.1 baseline and removed the layout gap above the bottom navigation."],["0.86.1","Repaired the Settings startup error and standardized the three-button Nearby, Search, and Settings dock across the app."],["0.86.0","Redesigned Settings as a simplified dark tile dashboard and renamed the bottom Accounts navigation button to Search."],["0.85.0","Removed Tools navigation and the Account Detail Visit action, and rebuilt Settings as a simple grouped menu with clean detail screens."],["0.84.0","Refined Nearby map selection with a fixed details overlay, no marker popup, delayed street-level zoom, and direct account-card navigation."],["0.81.0","Prepared FireVault for App Store review by removing the document scanner, Daily Route and time-tracking controls, theme selection, advanced settings, diagnostics access, and excess instructional copy while preserving account data."]],["0.80.3","Defaulted new Tools scanner documents to the closest GPS-ready account with visible distance, accuracy, retry, and manual override."],["0.80.2","Simplified Document Scanner, added on-device AI Auto Scan with live corner framing and hands-free capture, and repaired mobile keyboard field visibility."],["0.80.1","Moved Document Scanner to Tools, added post-capture account search and matching, and added scanner access inside the full Site Notes workspace."],["0.80.0","Added an account-specific multi-page camera document scanner with automatic edge detection, manual corner correction, rotation, cleanup modes, page ordering, PDF preview/download/share, and account-note activity."],["0.79.14","Restored numbered Nearby Accounts map pins matched to distance-sorted list rows and removed Smart Account Intelligence."],["0.79.13","Repaired startup parsing inherited from 0.79.11 and corrected Building Navigator location-copy syntax."],["0.79.12","Added Building Navigator with exact site locations, GPS/Plus Codes, verification, linked photos, route targets, and timeline events."],["0.79.7","Shortened every Settings summary and removed the colored bar from each Section Overview."],["0.79.6","Added Nearby-style account-list scroll locking so cards settle cleanly at the top while the Accounts controls remain fixed."],["0.79.5","Added separate Personal OneDrive, Work OneDrive, and SharePoint connection profiles with exact photo/document assignments and no-personal-fallback protection."],["0.79.4","Added independent photo and document storage destinations, cloud-provider integration targets, and offline Google Plus Codes for accounts and exact field locations."],["0.79.3","Added backend-neutral provider interfaces for authentication, database, file storage, synchronization, and audit while keeping FireVault fully local."],["0.79.2","Added a unified Security Center with vault integrity validation, backup health, audit filters, device naming, session clearing, and PIN confirmation for sensitive exports, restores, and deletion."],["0.79.1","Added an optional local six-digit privacy lock with PBKDF2 hashing, inactivity/background locking, app-switcher privacy screen, recovery code, cooldown protection, and local lock events."],["0.79.0","Added security-ready schema 4 metadata, stable workspace/user/device identities, local audit history, pending change queue, recoverable deletion, credential-safe exports, and protected restore/reset actions."],["0.67.0","Redesigned Account View around service actions and grouped information, consolidated Settings into five folders, and simplified FireVault Academy and contextual Help for continuous reading."],["0.65.2","Repaired Nearby Accounts with GPS inventory counts, imported-coordinate recovery, persistent permission and timeout messages, a standard-accuracy retry, and nearest-site fallback results."],["0.65.1","Added online latitude/longitude calculation, coordinate validation, geocoding progress, unmatched-address review, optional CSV coordinates, and coordinate-safe repeat importing."],["0.65.0","Added preview-first customer CSV importing, Account Id update matching, validation warnings, imported monitoring details, and sync activity tracking."],["0.64.1","Simplified Academy article headers, removed floating metadata badges, and improved continuous scrolling and readability."],["0.64.0","Added Sync Activity, a conflict review center, export/import audit entries, and an automatic OneDrive connection-readiness checklist."],["0.63.1","Overhauled contextual Help and Academy reader formatting, removed overlapping sticky article headers, and restored full scrolling on phones and tablets."],["0.63.0","Added permanent record IDs, audit metadata, local version tracking, pending-sync states, conflict readiness, device identity, and a Team Sync settings workspace."],["0.60.0","Connected major screens and Settings areas directly to matching Academy chapters with return-to-screen navigation."],["0.59.0","Added interactive tutorials, guided orientation, pinned learning, field tips, and documentation tracking."],["0.58.0","Expanded Help & Manual into FireVault Academy with bookmarks, smart search, Quick Start, and reader navigation."],["0.57.0","Added the first complete searchable in-app FireVault User Manual."],["Ongoing review rule","Any change to navigation, labels, storage, workflows, permissions, or supported layouts requires the related manual chapter to be checked."]]],
   trouble:["❓","Troubleshooting","Common problems and safe first checks.",FIREVAULT_MANUAL_058.find(x=>x.id==="trouble")?.topics||[]]
  };
- pages.quick[3][0][1]="Confirm the green build badge shows 1.03.29 before entering production information.";
- pages.new=["🆕","What’s New in 1.03.29","The native iPhone app now opens Account Detail as a focused Field Workspace built with SwiftUI, Apple Maps, and Liquid Glass controls.",[
-  ["Native Account workspace","Account identity, Apple Map, field destinations, recent activity, and primary tools now use a real SwiftUI screen in the Xcode app."],
-  ["Four clear destinations","Notes, Files & Scans, Equipment, and Locations replace the cramped accordion as the main account hierarchy."],
-  ["Field action dock","Scan, Note, Camera, and Route stay reachable in one compact Liquid Glass action dock."],
-  ["Map and arrival","Apple MapKit displays the account and saved entrance, parking, panel, riser, FDC, and other exact locations."],
-  ["Safe data bridge","The existing FireVault vault remains the source of truth, so stored accounts and established save workflows are unchanged."]
+ pages.quick[3][0][1]="Confirm the green build badge shows 1.03.30 before entering production information.";
+ pages.new=["🆕","What’s New in 1.03.30","FireVault’s everyday iPhone navigation now uses a native SwiftUI shell with Apple MapKit and Liquid Glass controls.",[
+  ["Native Nearby","A live Apple map, numbered account pins, readable distance cards, refresh control, and direct Route and Open actions replace the web dashboard."],
+  ["Native Accounts","Fast on-device search, A–Z, Favorites, and Recent sorting, compact identity rows, and a clear Add Account button simplify the directory."],
+  ["Five-area Settings","Profile, Field Tools, Reports, Data & Security, and Help & About stay collapsed until needed and include native settings search."],
+  ["One native navigation dock","Nearby, Accounts, Photo, and Settings remain readable above the iPhone safe area and match the Account Field Workspace."],
+  ["Safe workflow handoff","Existing editors and the FireVault vault remain the source of truth, so stored accounts and proven save workflows are unchanged."]
  ]];
- if(Array.isArray(pages.revisions?.[3]?.[0]))pages.revisions[3][0].unshift(["1.03.29","Adds the native SwiftUI Field Workspace with Apple Maps, Liquid Glass actions, and focused Notes, Files & Scans, Equipment, and Locations destinations."],["1.03.28","Rebuilds the browser Account Details fallback as a tabless accordion and disables Tasks and Deficiencies without deleting stored records."],["1.03.27","Compacts the Account Detail command header so working information appears sooner."],["1.03.26","Moves Scan Document directly onto Account Detail, returns saved scans to the same account, collapses secondary account tabs and document-management controls, and adds the native FireVault app icon."],["1.03.25","Restores account document scanning through Apple VisionKit with automatic edge correction, multi-page capture, compact save review, IndexedDB storage, and retained PDF tools."]);
+ if(Array.isArray(pages.revisions?.[3]?.[0]))pages.revisions[3][0].unshift(["1.03.30","Adds the native SwiftUI app shell for Nearby, Accounts, Photo access, and five-area Settings while retaining safe web-backed editors."],["1.03.29","Adds the native SwiftUI Field Workspace with Apple Maps, Liquid Glass actions, and focused Notes, Files & Scans, Equipment, and Locations destinations."],["1.03.28","Rebuilds the browser Account Details fallback as a tabless accordion and disables Tasks and Deficiencies without deleting stored records."],["1.03.27","Compacts the Account Detail command header so working information appears sooner."],["1.03.26","Moves Scan Document directly onto Account Detail, returns saved scans to the same account, collapses secondary account tabs and document-management controls, and adds the native FireVault app icon."],["1.03.25","Restores account document scanning through Apple VisionKit with automatic edge correction, multi-page capture, compact save review, IndexedDB storage, and retained PDF tools."]);
  const [icon,title,note,items]=pages[type]||["ⓘ","Unavailable","This Help section is not available in the installed version.",[["Current status","Return to Help and choose an available chapter or tutorial."]]];
  return `<div class="academySimple058"><div class="academyReaderTop058"><button class="ghost" data-manual-view="home">‹ Academy</button><div><span>${icon} FireVault Academy</span><h2>${esc(title)}</h2><p>${esc(note)}</p></div></div><div class="academySimpleCards058">${items.map(([a,b],i)=>`<article><span>${String(i+1).padStart(2,'0')}</span><div><h3>${esc(a)}</h3><p>${esc(b)}</p></div></article>`).join("")}</div></div>`;
 }
@@ -10702,11 +10804,12 @@ function wireBackupSafety552(){
 
 function showChangelog(){
   const notes = [
-    "Build 1.03.29 introduces a native SwiftUI Field Workspace whenever Account Detail opens in the iPhone app.",
-    "Account identity, Apple Map, four work destinations, recent field activity, and primary actions use a calm field-first hierarchy.",
-    "Notes, Files & Scans, Equipment, and Locations open as focused native destinations instead of a tall accordion.",
-    "Scan, Note, Camera, and Route share a compact Liquid Glass action dock.",
-    "Apple MapKit displays the main account and saved arrival points without using an embedded web map.",
+    "Build 1.03.30 adds a native SwiftUI shell for Nearby, Accounts, Photo access, and Settings in the iPhone app.",
+    "Nearby uses Apple MapKit with numbered account pins, readable distance cards, refresh, Route, and Open actions.",
+    "Accounts adds fast native search with A–Z, Favorites, and Recent sorting and a clear Add Account control.",
+    "Settings is consolidated into five collapsed areas with native search: Profile, Field Tools, Reports, Data & Security, and Help & About.",
+    "The bottom navigation uses one compact Liquid Glass dock with reliable safe-area spacing.",
+    "Build 1.03.29’s native Account Field Workspace remains available for Notes, Files & Scans, Equipment, and precise Locations.",
     "Tasks and Deficiencies remain disabled in the active app profile; any existing stored records remain preserved.",
     "The web vault remains the data authority, and the browser/PWA retains the Build 1.03.28 fallback layout.",
     "Build 1.03.25 restores Apple-powered document scanning inside each account in the native iPhone app.",
@@ -10912,7 +11015,7 @@ function showChangelog(){
   overlay.className="releaseOverlay";
   overlay.innerHTML=`<div class="releaseSheet" role="dialog" aria-modal="true" aria-label="FireVault release notes">
     <div class="releaseHead"><div><strong>${fireVaultBrand575()}</strong><span>Build ${BUILD}</span></div><button class="ghost iconBtn" id="closeRelease" aria-label="Close release notes">×</button></div>
-    <div class="releaseBody"><h2>Release Notes</h2><p class="releaseIntro">FireVault 1.03.29 turns Account Detail into a native Field Workspace while keeping the existing vault and saved data unchanged.</p><ul>${notes.map(n=>`<li>${esc(n)}</li>`).join("")}</ul></div>
+    <div class="releaseBody"><h2>Release Notes</h2><p class="releaseIntro">FireVault 1.03.30 brings the everyday iPhone app into native SwiftUI while keeping the existing vault and saved data unchanged.</p><ul>${notes.map(n=>`<li>${esc(n)}</li>`).join("")}</ul></div>
   </div>`;
   document.body.appendChild(overlay);
   const close=()=>overlay.remove();

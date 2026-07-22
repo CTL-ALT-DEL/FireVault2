@@ -13,7 +13,7 @@ function equal(actual,expected,message){checks+=1;assert.equal(actual,expected,m
 function match(source,pattern,message){checks+=1;assert.match(source,pattern,message)}
 function ok(value,message){checks+=1;assert.ok(value,message)}
 
-equal(JSON.parse(version).build,"1.03.29");
+equal(JSON.parse(version).build,"1.03.30");
 
 // The new-account surface is structurally different without changing Edit Account.
 match(app,/accountFormScreen0760\$\{editing\?"":" accountFormCreate10318"\}/);

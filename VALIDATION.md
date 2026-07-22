@@ -1,4 +1,15 @@
-# FireVault Build 1.03.29 Validation
+# FireVault Build 1.03.30 Validation
+
+## Native App Shell contract
+
+- Nearby, Accounts, Photo access, and Settings use the native SwiftUI shell inside the iPhone app.
+- Nearby uses Apple MapKit, numbered pins, selected-account context, readable distances, refresh, Route, and Open actions.
+- Accounts uses native search plus A–Z, Favorites, and Recent sorting without restoring row-level quick-action clutter.
+- Settings is consolidated into five collapsible areas: Profile, Field Tools, Reports, Data & Security, and Help & About.
+- Native Settings search filters individual settings while all groups remain collapsed during normal browsing.
+- The Liquid Glass navigation dock keeps Nearby, Accounts, Photo, and Settings above the iPhone safe area.
+- Specialized editors hand off to established vault workflows so existing persistence, imports, backups, photo overlays, and security behavior remain compatible.
+- The app shell bridge sends lightweight metadata only and never transfers photo or scan image payloads.
 
 ## Native Field Workspace contract
 
@@ -25,7 +36,7 @@
 - The compact review preserves capture order and collects a title, document type, date/revision, and optional notes.
 - Saving stages every page in IndexedDB before confirming success; a failed save removes the incomplete record and cleans orphaned media.
 - Saved scans retain account preview, PDF download, PDF share, deletion, backup, and timeline behavior.
-- The native project includes the camera permission message and uses app build/version 29 / 1.03.29 in both Debug and Release configurations.
+- The native project includes the camera permission message and uses app build/version 31 / 1.03.30 in both Debug and Release configurations.
 - The native asset catalog contains a real 1024×1024 FireVault app icon without an alpha channel.
 - The dedicated native scanner suite verifies the web bridge, native VisionKit delegate, multi-page transport, storage handoff, PDF tools, and final phone-safe review geometry.
 
@@ -155,7 +166,7 @@
 ## Runtime and offline asset integrity
 
 - The HTML bootstrap contains 25 reviewed local stylesheet, module, manifest, icon, image, and application references.
-- Every local HTML reference carries the current Build 1.03.29 cache token.
+- Every local HTML reference carries the current Build 1.03.30 cache token.
 - All JavaScript imports are resolved from their source modules, exist inside the release, and carry the current build token.
 - CSS `url(...)`, branding profile assets, Photo Overlay sample media, and all three visual Help images resolve to packaged files.
 - All 30 runtime files are present in the 32-entry offline shell; the shell contains no duplicate or missing entry.
@@ -171,7 +182,7 @@
 - No nested FireVault build directory, `_config.yml`, or Ruby `Gemfile` can enter the deploy root.
 - The deployment guide identifies the current build, explains root-level extraction, and warns against uploading the containing ZIP folder.
 - The guide explains that only the newest workflow run matters and requires published `version.json` verification before updating the Home Screen app.
-- Runtime HTML and service-worker references agree on Build 1.03.29 and reject asset references from Builds 1.03.0 through 1.03.9.
+- Runtime HTML and service-worker references agree on Build 1.03.30 and reject asset references from Builds 1.03.0 through 1.03.9.
 
 ## Vault upgrade preservation
 
@@ -269,8 +280,8 @@
 - The new-user onboarding contract verifies the first-open guide, Demo Mode decision, GPS lookup, address confirmation, commercial-name suggestion, manual fallback, and form integration.
 - The Add Account address-lookup contract verifies the redesigned setup workspace, explicit search, result review, change invalidation, manual confirmation, metadata persistence, and responsive presentation.
 - The Account Directory top-actions contract verifies scroll-settled action visibility, immediate multi-word search, accessibility state, and unclipped bottom-navigation labels.
-- Active runtime and service-worker references resolve to Build 1.03.29.
-- `version.json`, the manifest, cache name, module imports, and release UI agree on Build 1.03.29.
+- Active runtime and service-worker references resolve to Build 1.03.30.
+- `version.json`, the manifest, cache name, module imports, and release UI agree on Build 1.03.30.
 
 ## Scope and compatibility
 

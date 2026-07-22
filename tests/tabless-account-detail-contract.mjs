@@ -12,7 +12,7 @@ let checks=0;
 const ok=(value,message)=>{checks+=1;assert.ok(value,message)};
 const match=(source,pattern,message)=>{checks+=1;assert.match(source,pattern,message)};
 
-assert.equal(version.build,"1.03.29");checks+=1;
+assert.equal(version.build,"1.03.30");checks+=1;
 const detail=app.slice(app.indexOf("function siteDetail()"),app.indexOf("function photoCategory524"));
 for(const label of ["Overview","Map & Locations","Equipment","Files & Scans","Notes","Account Info"])match(detail,new RegExp(label.replace(/[&]/g,"&")),`${label} must be present in the tabless account flow.`);
 match(detail,/accountAccordion10328/);

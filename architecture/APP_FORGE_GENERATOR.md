@@ -1,6 +1,6 @@
 # AppForge Generator Engine
 
-Build baseline: 1.03.29  
+Build baseline: 1.03.30  
 Generator schema: 1
 
 The Generator Engine is the first executable AppForge stage. It turns a validated Product Recipe and Factory Manifest into a separate, installable PWA source package without changing the running FireVault installation.

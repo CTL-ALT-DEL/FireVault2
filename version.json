@@ -1,8 +1,8 @@
 {
-  "build": "1.03.29",
+  "build": "1.03.30",
   "released": "2026-07-21",
-  "note": "Introduces the native Field Workspace for Account Detail with Apple Maps, Liquid Glass actions, Notes, Files and Scans, Equipment, and precise saved locations.",
-  "label": "Native Field Workspace",
-  "version": "1.03.29",
-  "name": "Native Field Workspace"
+  "note": "Adds a native SwiftUI app shell for Nearby, Accounts, Photo access, and a five-area Settings hub while preserving the Field Workspace and established vault editors.",
+  "label": "Native App Shell",
+  "version": "1.03.30",
+  "name": "Native App Shell"
 }
