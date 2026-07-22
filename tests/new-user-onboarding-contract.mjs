@@ -14,7 +14,7 @@ function match(source,pattern,message){checks+=1;assert.match(source,pattern,mes
 function ok(value,message){checks+=1;assert.ok(value,message)}
 
 const build=JSON.parse(version).build;
-equal(build,"1.03.22");
+equal(build,"1.03.23");
 
 match(app,/const FIRST_RUN_KEY_10317="firevault_first_run_complete_10317"/);
 match(app,/function firstRunComplete10317\(\).*localStorage\.getItem\(FIRST_RUN_KEY_10317\)/);
@@ -46,13 +46,15 @@ match(app,/id="firstAccountManual10317">✎ Enter Manually<\/button>/);
 match(app,/Find and confirm the location/);
 match(app,/Address lookup starts only after you tap Search or Use Current Location/);
 match(app,/firstAccountGps10317"\)\?\.addEventListener\("click",captureFirstAccountAddress10317\)/);
-match(app,/navigator\.geolocation\.getCurrentPosition\(async position=>/);
+match(app,/nativeAppleMapsAvailable10323\(\)\?await nativeMapRequest10323\("currentLocation"\)/);
+match(app,/navigator\.geolocation\.getCurrentPosition\(resolve,reject,gpsOptions\(\)\)/);
 ok(!/scheduleFirstRunOnboarding10317[\s\S]{0,500}navigator\.geolocation\.getCurrentPosition/.test(app),"First-run slides must not request location automatically.");
 
 match(storage,/addressAssist:true/);
 match(storage,/reverseGeocodeEndpoint:"https:\/\/nominatim\.openstreetmap\.org\/reverse"/);
 match(app,/gpsAddressAssist","Enable address lookup when adding accounts"/);
-match(app,/Search and current-location assistance run only after a tap and always require address confirmation/);
+match(app,/Search and GPS assistance run only after a tap and always require address confirmation/);
+match(app,/native iPhone app uses Apple Maps and Core Location/);
 match(app,/s\.gps=\{\.\.\.\(s\.gps\|\|\{\}\)[\s\S]*?addressAssist:checked\("gpsAddressAssist"\)\}/);
 
 match(app,/function reverseCurrentAddress10317\(coords\)/);

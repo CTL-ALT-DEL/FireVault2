@@ -13,7 +13,7 @@ function match(source,pattern,message){checks+=1;assert.match(source,pattern,mes
 function ok(value,message){checks+=1;assert.ok(value,message)}
 
 const build=JSON.parse(version).build;
-equal(build,"1.03.22","The polished Nearby workspace must ship in the current build.");
+equal(build,"1.03.23","The polished Nearby workspace must ship in the current build.");
 
 const card=app.slice(app.indexOf("function nearbyAccountCard069"),app.indexOf("function homeNearbyMapShell069"));
 match(card,/role="button" tabindex="0"/);

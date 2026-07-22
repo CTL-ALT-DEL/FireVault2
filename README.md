@@ -1,15 +1,17 @@
 # FireVault
 
-## Build 1.03.22 — Native Import Transition Fix
+## Build 1.03.23 — Native Apple Maps Bridge
 
-Build 1.03.22 simplifies Account Directory and Account Detail without adding features or changing stored data.
+Build 1.03.23 connects the native iPhone container to Apple Maps while preserving the browser PWA fallback and stored FireVault data.
 
 ### Updated
 
-- Removes Call, Route, Add Note, Photo, and Favorite controls from every Account Directory row, including the top result.
-- Keeps each directory row as one compact, reliable tap or keyboard target that opens Account Detail.
-- Keeps the bottom navigation visible while searching and explicitly restores it when directory search loses focus.
-- Preserves immediate multi-word search, A-Z sorting, filters, saved scroll position, and direct account opening.
+- Uses Apple Maps for native address and business searches.
+- Uses Apple Core Location for GPS capture in the native iPhone app.
+- Uses Apple reverse geocoding for the confirmed current-address workflow.
+- Uses Apple map snapshots behind Nearby Accounts and On-Site Guide pins.
+- Opens native driving routes in Apple Maps.
+- Keeps OpenStreetMap and browser geolocation only as PWA fallbacks.
 - Removes the redundant GPS & Navigation panel from the bottom of Account Detail’s Details tab.
 - Retains the account-header address, primary Route action, editable location fields, Plus Code, and exact-location tools.
 - Adds individual shaded tab surfaces and a stronger active treatment to improve Account Detail tab contrast.

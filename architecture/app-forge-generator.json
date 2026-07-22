@@ -1,7 +1,7 @@
 {
   "kind": "field-vault.app-forge-generated-pwa",
   "schemaVersion": 1,
-  "build": "1.03.22",
+  "build": "1.03.23",
   "registeredRecipes": 4,
   "packageReady": 4,
   "releaseCandidates": 1,

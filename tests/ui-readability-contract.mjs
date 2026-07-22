@@ -14,7 +14,7 @@ function match(source,pattern,message){checks+=1;assert.match(source,pattern,mes
 function ok(value,message){checks+=1;assert.ok(value,message)}
 
 const build=JSON.parse(version).build;
-equal(build,"1.03.22");
+equal(build,"1.03.23");
 
 const directoryRow=app.slice(app.indexOf("function accountDirectoryRow0759"),app.indexOf("function accountDirectorySort0760"));
 ok(!directoryRow.includes("accountRowActions0951"),"Account Directory quick actions are intentionally retired.");
