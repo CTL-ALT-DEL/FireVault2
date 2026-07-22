@@ -1,9 +1,9 @@
-import { APP_PROFILE } from "./app-profile.js?v=1.03.23";
-import { MODULE_REGISTRY } from "./module-registry.js?v=1.03.23";
-import { CONTENT_PACKS } from "./content-pack-registry.js?v=1.03.23";
-import { STORAGE_PROVIDERS } from "./sync-storage-profile.js?v=1.03.23";
-import { validateAppForgeProfile, appForgeBlueprintExport } from "./app-forge-blueprint.js?v=1.03.23";
-import { APP_FORGE_RECIPE_SCHEMA_VERSION, appForgeRecipes, appForgeRecipeById } from "./app-forge-recipes.js?v=1.03.23";
+import { APP_PROFILE } from "./app-profile.js?v=1.03.24";
+import { MODULE_REGISTRY } from "./module-registry.js?v=1.03.24";
+import { CONTENT_PACKS } from "./content-pack-registry.js?v=1.03.24";
+import { STORAGE_PROVIDERS } from "./sync-storage-profile.js?v=1.03.24";
+import { validateAppForgeProfile, appForgeBlueprintExport } from "./app-forge-blueprint.js?v=1.03.24";
+import { APP_FORGE_RECIPE_SCHEMA_VERSION, appForgeRecipes, appForgeRecipeById } from "./app-forge-recipes.js?v=1.03.24";
 
 export const APP_FORGE_FACTORY_SCHEMA_VERSION = 1;
 export const APP_FORGE_FACTORY_KIND = "field-vault.app-forge-factory-manifest";
@@ -95,7 +95,7 @@ function factoryOutputs(request,recipe,blueprintReady){
   return rows;
 }
 
-export function appForgeFactoryManifest(recipeId="firevault",build="1.03.23",overrides={}){
+export function appForgeFactoryManifest(recipeId="firevault",build="1.03.24",overrides={}){
   const recipe=appForgeRecipeById(recipeId);if(!recipe)return null;
   const request=createAppForgeGenerationRequest(recipeId,overrides);
   const requestValidation=validateAppForgeGenerationRequest(request);
@@ -109,7 +109,7 @@ export function appForgeFactoryManifest(recipeId="firevault",build="1.03.23",ove
     kind:APP_FORGE_FACTORY_KIND,
     schemaVersion:APP_FORGE_FACTORY_SCHEMA_VERSION,
     recipeSchemaVersion:APP_FORGE_RECIPE_SCHEMA_VERSION,
-    build:String(build||"1.03.23"),
+    build:String(build||"1.03.24"),
     request,
     recipe:{id:recipe.id,name:recipe.name,status:recipe.status,assetStatus:recipe.assetStatus,databaseStatus:recipe.databaseStatus},
     validation:{request:requestValidation,profile:profileValidation},
@@ -121,7 +121,7 @@ export function appForgeFactoryManifest(recipeId="firevault",build="1.03.23",ove
   });
 }
 
-export function appForgeFactorySummary(build="1.03.23"){
+export function appForgeFactorySummary(build="1.03.24"){
   const manifests=appForgeRecipes().map(recipe=>appForgeFactoryManifest(recipe.id,build)).filter(Boolean);
   return clone({schemaVersion:APP_FORGE_FACTORY_SCHEMA_VERSION,total:manifests.length,factoryReady:manifests.filter(manifest=>manifest.readiness.factoryReady).length,publicationReady:manifests.filter(manifest=>manifest.readiness.publicationReady).length,requirementsPending:manifests.filter(manifest=>manifest.readiness.state==="requirements-pending").length,outputItems:manifests.reduce((sum,manifest)=>sum+manifest.outputs.length,0)});
 }

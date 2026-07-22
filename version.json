@@ -1,8 +1,8 @@
 {
-  "build": "1.03.23",
+  "build": "1.03.24",
   "released": "2026-07-21",
-  "note": "Adds native Apple Maps search, business and address matching, Core Location GPS, Apple map previews, and Apple Maps routing with browser-safe fallback.",
-  "label": "Native Apple Maps Bridge",
-  "version": "1.03.23",
-  "name": "Native Apple Maps Bridge"
+  "note": "Repairs the four-button bottom dock with dynamic columns, larger readable controls, iPhone safe-area spacing, and reliable Account Directory search restoration.",
+  "label": "Bottom Navigation Reliability",
+  "version": "1.03.24",
+  "name": "Bottom Navigation Reliability"
 }

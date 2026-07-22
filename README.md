@@ -1,21 +1,18 @@
 # FireVault
 
-## Build 1.03.23 — Native Apple Maps Bridge
+## Build 1.03.24 — Bottom Navigation Reliability
 
-Build 1.03.23 connects the native iPhone container to Apple Maps while preserving the browser PWA fallback and stored FireVault data.
+Build 1.03.24 repairs and polishes FireVault’s persistent bottom navigation without changing stored data or adding features.
 
 ### Updated
 
-- Uses Apple Maps for native address and business searches.
-- Uses Apple Core Location for GPS capture in the native iPhone app.
-- Uses Apple reverse geocoding for the confirmed current-address workflow.
-- Uses Apple map snapshots behind Nearby Accounts and On-Site Guide pins.
-- Opens native driving routes in Apple Maps.
-- Keeps OpenStreetMap and browser geolocation only as PWA fallbacks.
-- Removes the redundant GPS & Navigation panel from the bottom of Account Detail’s Details tab.
-- Retains the account-header address, primary Route action, editable location fields, Plus Code, and exact-location tools.
-- Adds individual shaded tab surfaces and a stronger active treatment to improve Account Detail tab contrast.
-- Keeps Build 1.03.20 Nearby polish and all prior update, vault, CSV, deployment, onboarding, form, list, and photo safeguards.
+- Matches the dock’s column count to its visible buttons instead of forcing a retired three-button layout.
+- Keeps Nearby, Search, Photo, and Settings visible in equal-width columns.
+- Enlarges dock icons and keeps labels readable on narrow iPhones.
+- Preserves safe-area spacing around the Home indicator.
+- Restores the correct dock layout after Account Directory search input and keyboard dismissal.
+- Updates the in-app navigation manual and revision history.
+- Retains Build 1.03.23 native Apple Maps support and all prior update, vault, CSV, onboarding, form, list, and photo safeguards.
 
 ### Run locally
 

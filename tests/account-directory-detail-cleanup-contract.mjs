@@ -13,7 +13,7 @@ function match(source,pattern,message){checks+=1;assert.match(source,pattern,mes
 function ok(value,message){checks+=1;assert.ok(value,message)}
 
 const build=JSON.parse(version).build;
-equal(build,"1.03.23","The simplified directory and detail layout must ship in the current build.");
+equal(build,"1.03.24","The simplified directory and detail layout must ship in the current build.");
 
 const row=app.slice(app.indexOf("function accountDirectoryRow0759"),app.indexOf("function accountDirectorySort0760"));
 match(row,/role="button" tabindex="0" aria-label="Open/);
@@ -31,7 +31,7 @@ match(settle,/list\.classList\.remove\("isScrolling0878"\)/);
 
 const sites=app.slice(app.indexOf("function sites()"),app.indexOf("function nearbySites()"));
 match(sites,/searchEl\?\.addEventListener\("input",applySearch\)/);
-match(sites,/if\(nav\)\{nav\.style\.display="grid";nav\.style\.visibility="visible";nav\.style\.opacity="1";nav\.style\.pointerEvents="auto";nav\.style\.transform="none";\}/);
+match(sites,/restoreDirectoryNavigation10324\(\)/);
 match(sites,/searchEl\?\.addEventListener\("blur",\(\)=>setTimeout\(\(\)=>\{[\s\S]*?classList\.remove\("fvKeyboardOpen0802"\)/);
 match(sites,/list\?\.addEventListener\("pointerdown",\(\)=>\{if\(document\.activeElement===searchEl\)searchEl\.blur\(\);\}/);
 match(sites,/const card=event\.target\.closest\("\[data-account-card0759\]"\);[\s\S]*?openAccount\(card\.dataset\.id\)/);
